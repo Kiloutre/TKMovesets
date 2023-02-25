@@ -1,13 +1,21 @@
 ﻿// CMakeProject1.cpp : définit le point d'entrée de l'application.
 
-#include "UseImGui.h"
+#include "MainProgram.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "constants.h"
+#include <stdio.h>
 
 using namespace std;
 
+static void glfw_error_callback(int error, const char* description)
+{
+	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
 int main()
 {
+	glfwSetErrorCallback(glfw_error_callback);
 	// Setup window
 	if (!glfwInit())
 		return 1;
@@ -20,7 +28,7 @@ int main()
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
 	// Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui - Conan", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, PROGRAM_TITLE, NULL, NULL);
 	if (window == NULL)
 		return 1;
 	glfwMakeContextCurrent(window);
@@ -33,10 +41,10 @@ int main()
 	glfwGetFramebufferSize(window, &screen_width, &screen_height);
 	glViewport(0, 0, screen_width, screen_height);
 
-	UseImGui myimgui;
-	myimgui.Init(window, glsl_version);
+	MainProgram myimgui(window, glsl_version);
 
 	while (!glfwWindowShouldClose(window)) {
+		// Poll and handle events such as MKB inputs, window resize
 		glfwPollEvents();
 		//glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
 

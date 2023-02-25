@@ -1,11 +1,11 @@
 {
 
-  "name": "imguiexample",
+  "name": "tekkentools",
   "version": "0.1",
   "dependencies": [
     {
       "name": "imgui",
-      "features":  ["glfw-binding", "opengl3-binding"]
+      "features": [ "glfw-binding", "opengl3-binding" ]
     },
     "glfw3",
     "glad"
