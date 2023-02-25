@@ -6,3 +6,4 @@
 # define PROGRAM_WIN_MIN_HEIGHT  720
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
+# define DEFAULT_LANG            "en-US"

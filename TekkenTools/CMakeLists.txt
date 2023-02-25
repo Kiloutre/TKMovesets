@@ -1,5 +1,10 @@
 ﻿
-add_executable (TekkenTools "main.cpp" "MainProgram.cpp" "MainProgram.h" "constants.h" "NavigationMenu.cpp" "NavigationMenu.h")
+set(INCLUDE_FOLDERS "Main" "Submenus")
+set(MAIN_SOURCES "Main/main.cpp" "Main/MainProgram.cpp" "Main/NavigationMenu.cpp")
+set(ALL_SOURCES ${MAIN_SOURCES} "Submenus/Submenu_Extract.cpp")
+
+add_executable (TekkenTools ${ALL_SOURCES})
+target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TekkenTools PROPERTY CXX_STANDARD 20)
