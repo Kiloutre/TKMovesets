@@ -1,8 +1,10 @@
 #pragma once
-#include "NavigationMenu.h"
-#include <ImGui.h>
 #include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+
+#include "NavigationMenu.h"
+#include "Submenu_Extract.h"
+#include "Submenu_Import.h"
+#include "Submenu_OnlinePlay.h"
 
 class MainWindow {
 public:
@@ -12,5 +14,8 @@ public:
 	void Render();
 	void Shutdown();
 
-	NavigationMenu* navMenu;
+	NavigationMenu     navMenu;
+	Submenu_Extract    extractMenu;
+	Submenu_Import	   importMenu;
+	Submenu_OnlinePlay onlineMenu;
 };

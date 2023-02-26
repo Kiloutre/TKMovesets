@@ -1,8 +1,8 @@
+#include <ImGui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include "MainWindow.h"
-#include "NavigationMenu.h"
-#include "Submenu_Extract.h"
-#include "Submenu_Import.h"
-#include "Submenu_OnlinePlay.h"
 
 MainWindow::MainWindow(GLFWwindow* window, const char* glsl_version)
 {
@@ -16,8 +16,6 @@ MainWindow::MainWindow(GLFWwindow* window, const char* glsl_version)
 	ImGui::StyleColorsDark();
 
 	io.IniFilename = NULL; //I don't want to save settings (for now). Perhaps save in appdata later.
-
-	navMenu = new NavigationMenu();
 }
 
 void MainWindow::NewFrame()
@@ -38,20 +36,20 @@ void MainWindow::Update()
 		ImGui::Columns(2);
 		ImGui::SetColumnOffset(1, 230);
 		// Render navigation menu
-		navMenu->Render();
+		navMenu.Render();
 
 		// Render submenus
 		ImGui::NextColumn();
-		switch (navMenu->menuId)
+		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:
-			Submenu_Extract::getInstance()->Render();
+			extractMenu.Render();
 			break;
 		case NAV__MENU_IMPORT:
-			Submenu_Import::getInstance()->Render();
+			importMenu.Render();
 			break;
 		case NAV__MENU_ONLINE_PLAY:
-			Submenu_OnlinePlay::getInstance()->Render();
+			onlineMenu.Render();
 			break;
 		case NAV__MENU_CAMERA:
 			break;
@@ -75,10 +73,6 @@ void MainWindow::Render()
 
 void MainWindow::Shutdown()
 {
-	// Free allocated memory
-	delete navMenu;
-
-
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

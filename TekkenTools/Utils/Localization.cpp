@@ -1,3 +1,9 @@
+#include <fstream>
+#include <map>
+#include <format>
+#include <sstream>
+#include <string>
+
 #include "Localization.h"
 
 std::map<std::string, std::string> g_translations;

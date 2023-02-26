@@ -1,7 +1,5 @@
 #include "Process.h"
 
-//Singleton
-
 void Process::Attach()
 {
 	if (attached)

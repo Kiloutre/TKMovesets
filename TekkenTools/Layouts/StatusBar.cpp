@@ -1,6 +1,7 @@
-#include "StatusBar.h"
+#include <ImGui.h>
 
-StatusBar* StatusBar::s_instance = nullptr;
+#include "StatusBar.h"
+#include "Localization.h"
 
 StatusBar::StatusBar()
 {

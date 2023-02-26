@@ -1,3 +1,5 @@
+#include <ImGui.h>
+
 #include "NavigationMenu.h"
 #include "Localization.h"
 #include "imgui_extras.h"

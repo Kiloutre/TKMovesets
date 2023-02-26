@@ -1,7 +1,8 @@
-#include "Submenu_Extract.h"
-#include "imgui_extras.h"
+#include <ImGui.h>
 
-Submenu_Extract* Submenu_Extract::s_instance = nullptr;
+#include "Submenu_Extract.h"
+#include "Localization.h"
+#include "imgui_extras.h"
 
 Submenu_Extract::Submenu_Extract()
 {

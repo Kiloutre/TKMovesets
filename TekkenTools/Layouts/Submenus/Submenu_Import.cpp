@@ -1,7 +1,8 @@
-#include "Submenu_Import.h"
-#include "imgui_extras.h"
+#include <ImGui.h>
 
-Submenu_Import* Submenu_Import::s_instance = nullptr;
+#include "Submenu_Import.h"
+#include "Localization.h"
+#include "imgui_extras.h"
 
 Submenu_Import::Submenu_Import()
 {

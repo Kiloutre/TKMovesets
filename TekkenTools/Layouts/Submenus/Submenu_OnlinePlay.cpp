@@ -1,7 +1,8 @@
-#include "Submenu_OnlinePlay.h"
-#include "imgui_extras.h"
+#include <ImGui.h>
 
-Submenu_OnlinePlay* Submenu_OnlinePlay::s_instance = nullptr;
+#include "Submenu_OnlinePlay.h"
+#include "Localization.h"
+#include "imgui_extras.h"
 
 Submenu_OnlinePlay::Submenu_OnlinePlay()
 {
