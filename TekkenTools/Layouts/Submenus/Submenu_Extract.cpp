@@ -11,7 +11,7 @@ void Submenu_Extract::Render()
 {
 	ImGuiExtra_RenderTextbox(_("extraction.explanation"));
 
-	ImGuiExtra_RenderTextbox(_("extraction.explanation"), TEXTBOX_BORDER_WARNING);
+	ImGuiExtra_RenderTextbox(_("extraction.game_not_running"), TEXTBOX_BORDER_WARNING);
 
 	ImGui::Button(_("extraction.extract_1p"));
 	ImGui::SameLine();

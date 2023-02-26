@@ -4,9 +4,10 @@ std::map<std::string, std::string> g_translations;
 
 void LoadTranslations(const char* c_langId)
 {
-	std::ifstream infile(std::format("Translations/{}.txt", c_langId));
+	std::ifstream infile;
 	std::string line;
 
+	infile.open(std::format("Translations/{}.txt", c_langId));
 	while (std::getline(infile, line))
 	{
 		size_t commentStart = line.find_first_of('#');
@@ -39,7 +40,6 @@ void LoadTranslations(const char* c_langId)
 
 const char* GetLocalizedText(const char *c_stringId...)
 {
-	if (g_translations.count(c_stringId) == 0)
-		throw(std::format("Unknown translation string '{}'", c_stringId));
+	if (g_translations.count(c_stringId) == 0) return c_stringId;
 	return g_translations[c_stringId].c_str();
 }

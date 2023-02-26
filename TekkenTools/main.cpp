@@ -36,6 +36,7 @@ int main(int argc, wchar_t** argv)
 	if (!glfwInit())
 		return 1;
 
+	// Load translation
 	LoadTranslations(PROGRAM_DEFAULT_LANG);
 
 	// GL 3.0 + GLSL 130

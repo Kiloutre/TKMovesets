@@ -22,7 +22,8 @@ navmenu.about = About
 ## Submenus ##
 
 # Extraction #
-extraction.explanation = Movesets have to first be extracted from the game into files on your computer to be then used. Extracts only movesets : not models or projectiles.\nExtraction is done with the game running (from memory), with the target character(s) loaded and visible on the screen (it doesn't matter what gamemode).
+extraction.explanation = Movesets have to first be extracted from the game to be then used. Extracts only movesets : not models or visual effects.\nExtraction is done with the game running (from memory), with the target character(s) loaded and visible on the screen (it doesn't matter what gamemode).
+extraction.game_not_running = Tekken is not running.
 extraction.extract_1p = Extract (1P)
 extraction.extract_2p = Extract (2P)
 extraction.extract_both = Extract (1P & 2P)
