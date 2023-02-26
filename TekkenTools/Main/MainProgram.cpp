@@ -1,5 +1,6 @@
 #include "MainProgram.h"
 #include "NavigationMenu.h"
+#include "Submenu_Extract.h"
 
 MainProgram::MainProgram(GLFWwindow* window, const char* glsl_version)
 {
@@ -13,6 +14,8 @@ MainProgram::MainProgram(GLFWwindow* window, const char* glsl_version)
 	ImGui::StyleColorsDark();
 
 	io.IniFilename = NULL; //I don't want to save settings (for now). Perhaps save in appdata later.
+
+	navMenu = new NavigationMenu();
 }
 
 void MainProgram::NewFrame()
@@ -31,12 +34,13 @@ void MainProgram::Update()
 
 	ImGui::Columns(2);
 	ImGui::SetColumnOffset(1, 230); 
-	navMenu.Render();
+	navMenu->Render();
 
 	ImGui::NextColumn();
-	switch (navMenu.getMenuId())
+	switch (navMenu->getMenuId())
 	{
 	case NAV__MENU_EXTRACT:
+		Submenu_Extract::getInstance()->Render();
 		break;
 	case NAV__MENU_IMPORT:
 		break;
@@ -57,6 +61,10 @@ void MainProgram::Render()
 
 void MainProgram::Shutdown()
 {
+	// Free allocated memory
+	delete navMenu;
+
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

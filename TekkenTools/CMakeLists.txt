@@ -1,7 +1,9 @@
 ﻿
 set(INCLUDE_FOLDERS "Main" "Submenus")
 set(MAIN_SOURCES "Main/main.cpp" "Main/MainProgram.cpp" "Main/NavigationMenu.cpp")
-set(ALL_SOURCES ${MAIN_SOURCES} "Submenus/Submenu_Extract.cpp")
+#set(OTHER_SOURCES "")
+set(SUBMENU_SOURCES "Submenus/Submenu_Extract.cpp")
+set(ALL_SOURCES ${MAIN_SOURCES} ${SUBMENU_SOURCES})
 
 add_executable (TekkenTools ${ALL_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
