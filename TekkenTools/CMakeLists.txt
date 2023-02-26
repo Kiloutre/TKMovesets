@@ -1,12 +1,35 @@
 ﻿
 
-set(MAIN_SOURCES "main.cpp" "Layouts/MainWindow.cpp" "Layouts/NavigationMenu.cpp" )
-set(LAYOUT_SOURCES "Layouts/MainWindow.cpp" "Layouts/NavigationMenu.cpp" )
-set(SUBMENU_SOURCES "Layouts/Submenus/Submenu_Extract.cpp")
-set(OTHER_SOURCES "Utils/imgui_extras.cpp" "Utils/Localization.cpp")
+set(INCLUDE_FOLDERS
+                    "Layouts"
+                    "Layouts/Submenus"
+                    "Utils"
+)
+
+set(MAIN_SOURCES
+                    "main.cpp"
+                    "Layouts/MainWindow.cpp"
+                    "Layouts/NavigationMenu.cpp"
+)
+
+set(LAYOUT_SOURCES
+                    "Layouts/MainWindow.cpp"
+                    "Layouts/NavigationMenu.cpp"
+)
+
+set(SUBMENU_SOURCES
+                    "Layouts/Submenus/Submenu_Extract.cpp"
+                    "Layouts/Submenus/Submenu_Import.cpp"
+                    "Layouts/Submenus/Submenu_OnlinePlay.cpp"
+)
+
+set(OTHER_SOURCES
+                    "Utils/imgui_extras.cpp"
+                    "Utils/Localization.cpp"
+)
+
 set(ALL_SOURCES ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES})
 
-set(INCLUDE_FOLDERS "Layouts" "Layouts/Submenus" "Utils")
 
 add_executable (TekkenTools ${ALL_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})

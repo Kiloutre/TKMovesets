@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 #include "NavigationMenu.h"
 #include "Submenu_Extract.h"
+#include "Submenu_Import.h"
+#include "Submenu_OnlinePlay.h"
 
 MainWindow::MainWindow(GLFWwindow* window, const char* glsl_version)
 {
@@ -32,22 +34,34 @@ void MainWindow::Update()
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::Begin("MainWindow", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 
-	ImGui::Columns(2);
-	ImGui::SetColumnOffset(1, 230); 
-	navMenu->Render();
-
-	ImGui::NextColumn();
-	switch (navMenu->menuId)
 	{
-	case NAV__MENU_EXTRACT:
-		Submenu_Extract::getInstance()->Render();
-		break;
-	case NAV__MENU_IMPORT:
-		break;
-	case NAV__MENU_EDITION:
-		break;
-	case NAV__MENU_CAMERA:
-		break;
+		ImGui::Columns(2);
+		ImGui::SetColumnOffset(1, 230);
+		// Render navigation menu
+		navMenu->Render();
+
+		// Render submenus
+		ImGui::NextColumn();
+		switch (navMenu->menuId)
+		{
+		case NAV__MENU_EXTRACT:
+			Submenu_Extract::getInstance()->Render();
+			break;
+		case NAV__MENU_IMPORT:
+			Submenu_Import::getInstance()->Render();
+			break;
+		case NAV__MENU_ONLINE_PLAY:
+			Submenu_OnlinePlay::getInstance()->Render();
+			break;
+		case NAV__MENU_CAMERA:
+			break;
+		case NAV__MENU_EDITION:
+			break;
+		case NAV__MENU_DOCUMENTATION:
+			break;
+		case NAV__MENU_ABOUT:
+			break;
+		}
 	}
 
 	ImGui::End(); 

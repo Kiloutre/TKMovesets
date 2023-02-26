@@ -10,12 +10,6 @@ Submenu_Extract::Submenu_Extract()
 void Submenu_Extract::Render() 
 {
 	ImGuiExtra_RenderTextbox(_("extraction.explanation"));
-
+	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	ImGuiExtra_RenderTextbox(_("extraction.game_not_running"), TEXTBOX_BORDER_WARNING);
-
-	ImGui::Button(_("extraction.extract_1p"));
-	ImGui::SameLine();
-	ImGui::Button(_("extraction.extract_2p"));
-	ImGui::SameLine();
-	ImGui::Button(_("extraction.extract_both"));
 }
