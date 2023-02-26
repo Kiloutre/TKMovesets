@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include "constants.h"
 #include <stdio.h>
+#include <format>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ int main()
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
 	// Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, PROGRAM_TITLE, NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION).c_str(), NULL, NULL);
 	if (window == NULL)
 		return 1;
 	glfwMakeContextCurrent(window);
