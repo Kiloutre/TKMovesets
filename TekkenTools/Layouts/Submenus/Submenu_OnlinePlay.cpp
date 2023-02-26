@@ -12,5 +12,5 @@ void Submenu_OnlinePlay::Render()
 {
 	ImGuiExtra_RenderTextbox(_("online.explanation"));
 	ImGui::SeparatorText(_("importation.select_moveset"));
-	ImGuiExtra_RenderTextbox(_("importation.game_not_running"), TEXTBOX_BORDER_WARNING);
+	ImGuiExtra_TextboxWarning(_("importation.game_not_running"));
 }

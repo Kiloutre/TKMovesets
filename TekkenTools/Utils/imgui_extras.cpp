@@ -6,7 +6,10 @@ void ImGuiExtra_RenderTextbox(const char* text)
 	ImGuiExtra_RenderTextbox(text, TEXTBOX_BORDER_COLOR);
 }
 
+#include <stdio.h>
+
 // This is a mess, does not work properly  and needs to be re-done entirely, to be honest.
+// Todo: min / max size, allow centering of text
 void ImGuiExtra_RenderTextbox(const char* text, ImU32 borderColor, ImU32 fillColor)
 {
 	// Get starting drawing pos (useful for border)
@@ -15,9 +18,8 @@ void ImGuiExtra_RenderTextbox(const char* text, ImU32 borderColor, ImU32 fillCol
 	// Draw border
 	float rectEndX;
 	{
-		float textSizeX = ImGui::CalcTextSize(text, NULL, false, ImGui::GetContentRegionAvail().x).x;
-		float textSizeY = ImGui::CalcTextSize(text).y;
-		ImVec2 rectEnd = ImVec2(drawStart.x + textSizeX, drawStart.y + textSizeY + (TEXTBOX_VERT_PADDING * 3.0f));
+		ImVec2 textSize = ImGui::CalcTextSize(text, NULL, false, ImGui::GetContentRegionAvail().x - (TEXTBOX_HORIZ_PADDING * 2.0f));
+		ImVec2 rectEnd = ImVec2(drawStart.x + textSize.x + (TEXTBOX_HORIZ_PADDING * 2.0f), drawStart.y + textSize.y + (TEXTBOX_VERT_PADDING * 2.0f));
 		rectEndX = rectEnd.x;
 
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();

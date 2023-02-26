@@ -12,7 +12,6 @@ Submenu_Import::Submenu_Import()
 void Submenu_Import::Render()
 {
 	ImGuiExtra_RenderTextbox(_("importation.explanation"));
-	ImGui::TextWrapped(_("importation.select_moveset"));
-	ImGui::SeparatorText(_("importation.game_not_running"));
-	ImGuiExtra_RenderTextbox(_("importation.game_not_running"), TEXTBOX_BORDER_WARNING);
+	ImGui::SeparatorText(_("importation.select_moveset"));
+	ImGuiExtra_TextboxWarning(_("importation.game_not_running"));
 }
