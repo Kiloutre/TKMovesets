@@ -1,8 +1,8 @@
-#include "MainProgram.h"
+#include "MainWindow.h"
 #include "NavigationMenu.h"
 #include "Submenu_Extract.h"
 
-MainProgram::MainProgram(GLFWwindow* window, const char* glsl_version)
+MainWindow::MainWindow(GLFWwindow* window, const char* glsl_version)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -18,14 +18,14 @@ MainProgram::MainProgram(GLFWwindow* window, const char* glsl_version)
 	navMenu = new NavigationMenu();
 }
 
-void MainProgram::NewFrame()
+void MainWindow::NewFrame()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
 
-void MainProgram::Update()
+void MainWindow::Update()
 {
 	// Interface should be done here
 	ImGui::SetNextWindowSize(ImVec2(1280, 720));
@@ -53,13 +53,13 @@ void MainProgram::Update()
 	ImGui::End(); 
 }
 
-void MainProgram::Render()
+void MainWindow::Render()
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void MainProgram::Shutdown()
+void MainWindow::Shutdown()
 {
 	// Free allocated memory
 	delete navMenu;

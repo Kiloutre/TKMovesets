@@ -28,6 +28,8 @@ NAV__MENU NavigationMenu::getMenuId()
 	return menuId;
 }
 
+// Layour //
+
 void NavigationMenu::RenderBtnList(NavMenuBtn* btns, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i)

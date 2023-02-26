@@ -4,9 +4,9 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-class MainProgram {
+class MainWindow {
 public:
-	MainProgram(GLFWwindow* window, const char* glsl_version);
+	MainWindow(GLFWwindow* window, const char* glsl_version);
 	virtual void NewFrame();
 	virtual void Update();
 	void Render();

@@ -1,6 +1,6 @@
 ﻿// CMakeProject1.cpp : définit le point d'entrée de l'application.
 
-#include "MainProgram.h"
+#include "MainWindow.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "constants.h"
@@ -42,7 +42,7 @@ int main()
 	glfwGetFramebufferSize(window, &screen_width, &screen_height);
 	glViewport(0, 0, screen_width, screen_height);
 
-	MainProgram myimgui(window, glsl_version);
+	MainWindow program(window, glsl_version);
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize
@@ -50,13 +50,13 @@ int main()
 		//glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
 
 		glClear(GL_COLOR_BUFFER_BIT);
-		myimgui.NewFrame();
-		myimgui.Update();
-		myimgui.Render();
+		program.NewFrame();
+		program.Update();
+		program.Render();
 		glfwSwapBuffers(window);
 	}
 
-	myimgui.Shutdown();
+	program.Shutdown();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
