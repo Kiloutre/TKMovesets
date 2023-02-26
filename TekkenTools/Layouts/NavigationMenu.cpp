@@ -52,9 +52,9 @@ void NavigationMenu::Render()
 	ImGui::SeparatorText(_("navmenu.category_moveset"));
 	RenderBtnList(moveset_btns, sizeof(moveset_btns) / sizeof(moveset_btns[0]));
 
-	ImGui::SeparatorText(_("navmenu.tools"));
+	ImGui::SeparatorText(_("navmenu.category_tools"));
 	RenderBtnList(tools_btns, sizeof(tools_btns) / sizeof(tools_btns[0]));
 
-	ImGui::SeparatorText(_("navmenu.other"));
+	ImGui::SeparatorText(_("navmenu.category_other"));
 	RenderBtnList(other_btns, sizeof(other_btns) / sizeof(other_btns[0]));
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <ImGui.h>
+#include "Localization.h"
 
 class Submenu_Extract {
 public:

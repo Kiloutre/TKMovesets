@@ -9,14 +9,15 @@ Submenu_Extract::Submenu_Extract()
 {
 	// Init
 }
-
 void Submenu_Extract::Render() 
 {
-	ImGuiExtra_RenderTextbox("extraction.explanation");
+	ImGuiExtra_RenderTextbox(_("extraction.explanation"));
 
-	ImGui::Button("extraction.extract_1p");
+	ImGuiExtra_RenderTextbox(_("extraction.explanation"), TEXTBOX_BORDER_WARNING);
+
+	ImGui::Button(_("extraction.extract_1p"));
 	ImGui::SameLine();
-	ImGui::Button("extraction.extract_2p");
+	ImGui::Button(_("extraction.extract_2p"));
 	ImGui::SameLine();
-	ImGui::Button("extraction.extract_both");
+	ImGui::Button(_("extraction.extract_both"));
 }

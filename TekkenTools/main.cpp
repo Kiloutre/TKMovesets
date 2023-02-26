@@ -1,11 +1,14 @@
 ﻿// CMakeProject1.cpp : définit le point d'entrée de l'application.
 
-#include "MainWindow.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "constants.h"
+
 #include <stdio.h>
 #include <format>
+
+#include "constants.h"
+#include "MainWindow.h"
+#include "Localization.h"
 
 using namespace std;
 
@@ -20,6 +23,8 @@ int main()
 	// Setup window
 	if (!glfwInit())
 		return 1;
+
+	LoadTranslations(PROGRAM_DEFAULT_LANG);
 
 	// GL 3.0 + GLSL 130
 	const char* glsl_version = "#version 130";
