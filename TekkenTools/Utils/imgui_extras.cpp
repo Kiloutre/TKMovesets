@@ -35,3 +35,13 @@ void ImGuiExtra_RenderTextbox(const char* text, ImU32 borderColor, ImU32 fillCol
 	// Fix cursor position that is incorrect after drawing the text
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + TEXTBOX_VERT_PADDING);
 }
+
+bool ImGUIExtra_RenderButton(const char* text, bool enabled, ImVec2 size)
+{
+	if (!enabled) return ImGui::Button(text, size);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+	ImGui::Button(text, size);
+	ImGui::PopStyleVar();
+	return false;
+}

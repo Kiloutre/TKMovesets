@@ -1,5 +1,6 @@
 #include "NavigationMenu.h"
 #include "Localization.h"
+#include "imgui_extras.h"
 
 NavMenuBtn moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},
@@ -23,26 +24,15 @@ NavigationMenu::NavigationMenu()
 	menuId = NAV__MENU_DEFAULT;
 }
 
-NAV__MENU NavigationMenu::getMenuId()
-{
-	return menuId;
-}
-
-// Layour //
+// Layout //
 
 void NavigationMenu::RenderBtnList(NavMenuBtn* btns, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i)
 	{
-		NavMenuBtn navBtn = btns[i];
 		ImGui::Spacing();
-		if (menuId == navBtn.id)
-		{
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-			ImGui::Button(_(navBtn.name), ImVec2(215, 39));
-			ImGui::PopStyleVar();
-		}
-		else if (ImGui::Button(GetLocalizedText(navBtn.name), ImVec2(215, 39)))
+		NavMenuBtn navBtn = btns[i];
+		if (ImGUIExtra_RenderButton(_(navBtn.name), menuId == navBtn.id, ImVec2(215, 39)))
 			menuId = navBtn.id;
 	}
 }

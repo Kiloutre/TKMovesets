@@ -37,7 +37,7 @@ void MainWindow::Update()
 	navMenu->Render();
 
 	ImGui::NextColumn();
-	switch (navMenu->getMenuId())
+	switch (navMenu->menuId)
 	{
 	case NAV__MENU_EXTRACT:
 		Submenu_Extract::getInstance()->Render();

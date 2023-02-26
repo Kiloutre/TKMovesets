@@ -25,9 +25,8 @@ class NavigationMenu {
 public:
 	NavigationMenu();
 	void Render();
-	NAV__MENU getMenuId();
-private:
-	NAV__MENU menuId = NAV__MENU_DEFAULT;
 
+	NAV__MENU menuId = NAV__MENU_DEFAULT;
+private:
 	void RenderBtnList(NavMenuBtn* btns, unsigned int size);
 };

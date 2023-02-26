@@ -1,8 +1,6 @@
 #include "Submenu_Extract.h"
 #include "imgui_extras.h"
 
-#include <stdio.h>
-
 Submenu_Extract* Submenu_Extract::s_instance = nullptr;
 
 Submenu_Extract::Submenu_Extract()

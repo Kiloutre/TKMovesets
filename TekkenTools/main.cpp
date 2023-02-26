@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 #include <format>
+#include <windows.h>
+#include <filesystem>
 
 #include "constants.h"
 #include "MainWindow.h"
@@ -17,8 +19,18 @@ static void glfw_error_callback(int error, const char* description)
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-int main()
+int main(int argc, wchar_t** argv)
 {
+	{
+		// Make sure working dir is same as .exe
+		wchar_t currPath[MAX_PATH] = { 0 };
+		GetModuleFileNameW(NULL, currPath, MAX_PATH);
+		wstring ws(currPath);
+		string newPath(ws.begin(), ws.end());
+		newPath.erase(newPath.find_last_of("\\"));
+		std::filesystem::current_path(newPath);
+	}
+
 	glfwSetErrorCallback(glfw_error_callback);
 	// Setup window
 	if (!glfwInit())
