@@ -4,18 +4,18 @@
 #include "Localization.h"
 #include "imgui_extras.h"
 
-NavMenuBtn moveset_btns[] = {
+const NavMenuBtn const moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},
 	{NAV__MENU_IMPORT, "navmenu.import"},
 	{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
 };
 
-NavMenuBtn tools_btns[] = {
+const NavMenuBtn const tools_btns[] = {
 	{NAV__MENU_EDITION, "navmenu.moveset_edit"},
 	{NAV__MENU_CAMERA, "navmenu.camera"},
 };
 
-NavMenuBtn other_btns[] = {
+const NavMenuBtn const other_btns[] = {
 	{NAV__MENU_DOCUMENTATION, "navmenu.documentation"},
 	{NAV__MENU_ABOUT, "navmenu.about"},
 };
@@ -28,14 +28,15 @@ NavigationMenu::NavigationMenu()
 
 // Layout //
 
-void NavigationMenu::RenderBtnList(NavMenuBtn* btns, unsigned int size)
+void NavigationMenu::RenderBtnList(const NavMenuBtn* BTNS, unsigned int SIZE)
 {
-	for (unsigned int i = 0; i < size; ++i)
+	for (unsigned int i = 0; i < SIZE; ++i)
 	{
 		ImGui::Spacing();
-		NavMenuBtn navBtn = btns[i];
-		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.name), menuId == navBtn.id, ImVec2(215, 39)))
-			menuId = navBtn.id;
+		NavMenuBtn navBtn = BTNS[i];
+		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.NAME), menuId == navBtn.ID, ImVec2(215, 39))) {
+			menuId = navBtn.ID;
+		}
 	}
 }
 

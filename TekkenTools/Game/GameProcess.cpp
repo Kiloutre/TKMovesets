@@ -90,7 +90,7 @@ GameProcessError GameProcess::AttachToNamedProcess()
 	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
 	else {
 		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-		if (hProcess != NULL && LoadGameMainModule(pid)) {
+		if (hProcess != nullptr && LoadGameMainModule(pid)) {
 			printf("Module addr: %p\n", modBaseAddr);
 			processId = pid;
 			return PROC_ATTACHED;
@@ -103,9 +103,9 @@ GameProcessError GameProcess::AttachToNamedProcess()
 
 void GameProcess::DetachFromGame()
 {
-	if (hProcess != NULL) {
+	if (hProcess != nullptr) {
 		CloseHandle(hProcess);
-		hProcess = NULL;
+		hProcess = nullptr;
 	}
 	errcode = PROC_NOT_ATTACHED;
 }
@@ -119,7 +119,7 @@ void GameProcess::Update()
 		{
 			// Todo: try reading from a random value, see if an exception is thrown
 			if (GetGamePID() == (DWORD)-1) {
-				hProcess = NULL;
+				hProcess = nullptr;
 				errcode = PROC_EXITED;
 			}
 		} else if (errcode != PROC_ATTACHED)
@@ -132,10 +132,14 @@ void GameProcess::Update()
 
 bool GameProcess::AttemptRead()
 {
-	//try {
+	/*
+	try {
 		//readInt(modBaseAddr);
-		//return true;
-	//}
+	} catch() {
+		return false;
+	}
+	*/
+	return true;
 }
 
 char GameProcess::readByte(const long addr)

@@ -15,8 +15,8 @@ enum NAV__MENU
 
 struct NavMenuBtn
 {
-	const NAV__MENU id;
-	const char* name;
+	const NAV__MENU ID;
+	const char* NAME;
 	//const char* icon;
 };
 
@@ -27,5 +27,5 @@ public:
 
 	NAV__MENU menuId = NAV__MENU_DEFAULT;
 private:
-	void RenderBtnList(NavMenuBtn* btns, unsigned int size);
+	void RenderBtnList(const NavMenuBtn* BTNS, const unsigned int SIZE);
 };

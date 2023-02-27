@@ -51,7 +51,8 @@ void Submenu_Extract::Render()
 
 	ImGui::Checkbox(_("extraction.overwrite_duplicate"), &overwrite_same_filename);
 
-	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
+	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
+									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
 	{
 		ImGui::TableSetupColumn("##", 0, 3.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
@@ -78,15 +79,18 @@ void Submenu_Extract::Render()
 	}
 
 
-	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_1p"), p.errcode == PROC_ATTACHED))
-		;
+	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_1p"), p.errcode == PROC_ATTACHED)) {
+
+	}
 	//GameExtract::getInstance()
 
 	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_2p"), p.errcode == PROC_ATTACHED))
-		;
+	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_2p"), p.errcode == PROC_ATTACHED)) {
+
+	}
 
 	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), p.errcode == PROC_ATTACHED))
-		;
+	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), p.errcode == PROC_ATTACHED)) {
+
+	}
 }

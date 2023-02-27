@@ -30,7 +30,7 @@ private:
 	GameProcess& operator = (const GameProcess&) = delete;
 	GameProcess(const GameProcess&) = delete;
 
-	HANDLE hProcess = NULL;
+	HANDLE hProcess = nullptr;
 	DWORD GetGamePID();
 	bool LoadGameMainModule(DWORD pid);
 	GameProcessError AttachToNamedProcess();

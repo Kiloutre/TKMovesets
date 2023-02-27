@@ -1,4 +1,5 @@
 #include <ImGui.h>
+#include <stdio.h>
 
 #include "StatusBar.h"
 #include "GameProcess.h"
@@ -30,6 +31,7 @@ void StatusBar::Render()
 	switch (p.errcode)
 	{
 		// Todo: apply color-coding
+	default:
 	case PROC_NOT_ATTACHED:
 		ImGui::TextUnformatted(_("process.game_not_attached"));
 		break;
@@ -52,4 +54,10 @@ void StatusBar::Render()
 		ImGui::TextUnformatted(_("process.game_unexpected_exit"));
 		break;
 	}
+
+	ImGui::SameLine();
+
+	char buf[16];
+	sprintf(buf, "%.1f FPS", 1000.0f / ImGui::GetIO().Framerate);
+	ImGui::TextUnformatted(buf);
 }

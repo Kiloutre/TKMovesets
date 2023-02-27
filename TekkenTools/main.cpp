@@ -26,7 +26,7 @@ int main(int argc, wchar_t** argv)
 	{
 		// Make sure working dir is same as .exe
 		wchar_t currPath[MAX_PATH] = { 0 };
-		GetModuleFileNameW(NULL, currPath, MAX_PATH);
+		GetModuleFileNameW(nullptr, currPath, MAX_PATH);
 		wstring ws(currPath);
 		string newPath(ws.begin(), ws.end());
 		newPath.erase(newPath.find_last_of("\\"));
@@ -35,23 +35,25 @@ int main(int argc, wchar_t** argv)
 
 	glfwSetErrorCallback(glfw_error_callback);
 	// Setup window
-	if (!glfwInit())
+	if (!glfwInit()) {
 		return 1;
+	}
 
 	// Load translation
-	LoadTranslations(PROGRAM_DEFAULT_LANG);
+	Localization::LoadFile(PROGRAM_DEFAULT_LANG);
 
 	// GL 3.0 + GLSL 130
-	const char* glsl_version = "#version 130";
+	const char* GLSL_VERSION = "#version 130";
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
 	// Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION).c_str(), NULL, NULL);
-	if (window == NULL)
-		return 1;
+	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION).c_str(), nullptr, nullptr);
+	if (window == nullptr) {
+		return 2;
+	}
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // Enable vsync
 
@@ -64,7 +66,7 @@ int main(int argc, wchar_t** argv)
 		glViewport(0, 0, screen_width, screen_height);
 	}
 
-	MainWindow program(window, glsl_version);
+	MainWindow program(window, GLSL_VERSION);
 	GameProcess::getInstance().Attach();
 	GameAddressesFile::getInstance().LoadFile();
 

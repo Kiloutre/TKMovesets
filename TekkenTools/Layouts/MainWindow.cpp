@@ -4,18 +4,18 @@
 
 #include "MainWindow.h"
 
-MainWindow::MainWindow(GLFWwindow* window, const char* glsl_version)
+MainWindow::MainWindow(GLFWwindow* window, const char* GLSL_VERSION)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
+	ImGui_ImplOpenGL3_Init(GLSL_VERSION);
 
 	ImGui::StyleColorsDark();
 
-	io.IniFilename = NULL; //I don't want to save settings (for now). Perhaps save in appdata later.
+	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
@@ -26,7 +26,7 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
-void MainWindow::Update(const int width, const int height)
+void MainWindow::Update(const int WIDTH, const int HEIGHT)
 {
 	const float c_statusBarHeight = 30;
 
@@ -35,8 +35,8 @@ void MainWindow::Update(const int width, const int height)
 	// Navbar
 	{
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, height - c_statusBarHeight), ImVec2(-1, height - c_statusBarHeight));
-		ImGui::Begin("Navbar", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, HEIGHT - c_statusBarHeight), ImVec2(-1, WIDTH - c_statusBarHeight));
+		ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		navMenu.Render();
 		navMenuWidth = ImGui::GetWindowWidth();
 		ImGui::End();
@@ -45,8 +45,8 @@ void MainWindow::Update(const int width, const int height)
 	// Menus
 	{
 		ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(width - navMenuWidth, height - c_statusBarHeight), ImVec2(width - navMenuWidth, height - c_statusBarHeight));
-		ImGui::Begin("Tools", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+		ImGui::SetNextWindowSizeConstraints(ImVec2(WIDTH - navMenuWidth, HEIGHT - c_statusBarHeight), ImVec2(WIDTH - navMenuWidth, HEIGHT - c_statusBarHeight));
+		ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:
@@ -72,9 +72,9 @@ void MainWindow::Update(const int width, const int height)
 
 	// Status bar
 	{
-		ImGui::SetNextWindowPos(ImVec2(0, height - c_statusBarHeight));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(width, c_statusBarHeight), ImVec2(width, c_statusBarHeight));
-		ImGui::Begin("StatusBar", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+		ImGui::SetNextWindowPos(ImVec2(0, HEIGHT - c_statusBarHeight));
+		ImGui::SetNextWindowSizeConstraints(ImVec2(WIDTH, c_statusBarHeight), ImVec2(WIDTH, c_statusBarHeight));
+		ImGui::Begin("StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		statusBar.Render();
 		ImGui::End();
 	}

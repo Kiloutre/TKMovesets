@@ -48,7 +48,9 @@ void GameAddressesFile::LoadFile()
 		size_t idStart = line.find_first_not_of(' ', 0);
 		size_t separator = line.find_first_of('=');
 
-		if (separator == std::string::npos) continue;
+		if (separator == std::string::npos) {
+			continue;
+		}
 		if (commentStart != std::string::npos)
 		{
 			if (commentStart < separator) continue;
@@ -65,14 +67,19 @@ void GameAddressesFile::LoadFile()
 		if (value.rfind("+", 0) == 0) {
 			g_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));
 		}
-		else
+		else {
 			g_absolute_pointer_paths[key] = ParsePtrPath(value);
+		}
 	}
 }
 
 std::vector<void*> GameAddressesFile::GetAddress(const char *c_addressId)
 {
-	if (g_relative_pointer_paths.count(c_addressId) != 0) return g_relative_pointer_paths[c_addressId];
-	if (g_absolute_pointer_paths.count(c_addressId) != 0) return g_absolute_pointer_paths[c_addressId];
+	if (g_relative_pointer_paths.count(c_addressId) != 0) {
+		return g_relative_pointer_paths[c_addressId];
+	}
+	if (g_absolute_pointer_paths.count(c_addressId) != 0) {
+		return g_absolute_pointer_paths[c_addressId];
+	}
 	return std::vector<void*>();
 }

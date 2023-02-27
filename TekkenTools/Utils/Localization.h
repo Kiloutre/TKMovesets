@@ -1,6 +1,9 @@
 #pragma once
 
-#define _(...) GetLocalizedText(__VA_ARGS__)
+#define _(...) Localization::GetText(__VA_ARGS__)
 
-void LoadTranslations(const char* c_langId);
-const char* GetLocalizedText(const char* c_stringId...);
+namespace Localization
+{
+	void LoadFile(const char* c_langId);
+	const char* GetText(const char* c_stringId...);
+}
