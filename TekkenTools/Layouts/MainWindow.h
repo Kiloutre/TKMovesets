@@ -2,6 +2,7 @@
 #include <imgui_impl_glfw.h>
 
 #include "NavigationMenu.h"
+#include "StatusBar.h"
 #include "Submenu_Extract.h"
 #include "Submenu_Import.h"
 #include "Submenu_OnlinePlay.h"
@@ -15,6 +16,7 @@ public:
 	void Shutdown();
 
 	NavigationMenu     navMenu;
+	StatusBar          statusBar;
 	Submenu_Extract    extractMenu;
 	Submenu_Import	   importMenu;
 	Submenu_OnlinePlay onlineMenu;

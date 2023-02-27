@@ -37,8 +37,6 @@ void Submenu_Extract::Render()
 				ImGuiExtra_TextboxTip(_("process.attaching"));
 				break;
 			}
-
-			if (ImGui::Button(_("process.attach"))) p.Attach();
 		}
 
 	}

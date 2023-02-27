@@ -2,6 +2,8 @@
 #include <ImGui.h>
 #include "constants.h"
 
+ImVec2 operator+(const ImVec2& self, const ImVec2& other);
+
 namespace ImGuiExtra
 {
 	// Render button that can be disabled

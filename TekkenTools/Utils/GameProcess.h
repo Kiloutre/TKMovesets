@@ -6,12 +6,19 @@
 
 enum GameProcessError
 {
+	// This will happen if the process-attaching thread is not started
 	PROC_NOT_ATTACHED = 0,
-	PROC_ATTACHED = 1,
-	PROC_NOT_FOUND = 2,
+	// Process not found in the process list
+	PROC_NOT_FOUND = 1,
+	// Currently searching for the game process or attempting to attach to it
+	PROC_ATTACHING = 2,
+	// Found but not attached 
 	PROC_ATTACH_ERR = 3,
+	// Found, attached, version mismatch
 	PROC_VERSION_MISMATCH = 4,
-	PROC_ATTACHING = 5,
+	// Attached with no error
+	PROC_ATTACHED = 5,
+	// Unexpected exit
 	PROC_EXITED = 6,
 };
 

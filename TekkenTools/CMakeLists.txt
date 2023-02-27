@@ -8,13 +8,12 @@ set(INCLUDE_FOLDERS
 
 set(MAIN_SOURCES
                     "main.cpp"
-                    "Layouts/MainWindow.cpp"
-                    "Layouts/NavigationMenu.cpp"
 )
 
 set(LAYOUT_SOURCES
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
+                    "Layouts/StatusBar.cpp"
 )
 
 set(SUBMENU_SOURCES

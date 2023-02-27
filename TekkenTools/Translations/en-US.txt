@@ -12,13 +12,15 @@ yes = Yes
 no = No
 1p = Player 1
 2p = Player 2
+process.status = Status:
 process.attach = Attach to Tekken 7
 process.attaching = Attaching...
-process.game_not_loaded = Tekken 7 is not loaded.
+process.game_attached = Tekken 7 is running and attached.
+process.game_not_attached = Tekken 7 is not attached.
 process.game_not_running = Tekken 7 is not running or could not be found.
 process.game_version_mismatch = The current Tekken version is not supported by game_address.txt.
-process.game_attach_err = Could not attach to the game's process. This may be caused by underprivileged rights.
-process.game_unexpected_exit = Process exited unexpectedly.
+process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
+process.game_unexpected_exit = Game exited unexpectedly.
 
 ## Main ##
 

@@ -12,7 +12,6 @@ void GameProcess::Attach()
 		throw("Process is already attached : not re-attaching.");
 
 	processName = "TekkenGame-Win64-Shipping.exe";
-	errcode = PROC_ATTACHING;
 	if (!threadStarted)
 	{
 		threadStarted = true;
@@ -74,18 +73,20 @@ void GameProcess::DetachFromGame()
 
 void GameProcess::Update()
 {
+	errcode = PROC_ATTACHING;
 	while (threadStarted)
 	{
 		if (errcode == PROC_ATTACHING) AttachToNamedProcess();
 		else if (errcode == PROC_ATTACHED)
 		{
+			// Todo: try reading from a random value, see if an exception is thrown
 			if (GetGamePID() == (DWORD)-1) {
 				hProcess = NULL;
 				errcode = PROC_EXITED;
 			}
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 	DetachFromGame();
 }
