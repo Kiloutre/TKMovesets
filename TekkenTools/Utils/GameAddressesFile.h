@@ -13,9 +13,6 @@ public:
 		return s_instance;
 	}
 
-	std::map<std::string, std::vector<void*>> g_absolute_pointer_paths;
-	std::map<std::string, std::vector<void*>> g_relative_pointer_paths;
-
 	void LoadFile();
 	std::vector<void*> GetAddress(const char* c_addressId);
 private:
@@ -23,6 +20,9 @@ private:
 	~GameAddressesFile() = default;
 	GameAddressesFile& operator = (const GameAddressesFile&) = delete;
 	GameAddressesFile(const GameAddressesFile&) = delete;
+
+	std::map<std::string, std::vector<void*>> m_absolute_pointer_paths;
+	std::map<std::string, std::vector<void*>> m_relative_pointer_paths;
 
 	std::vector<void*> ParsePtrPath(std::string path);
 };

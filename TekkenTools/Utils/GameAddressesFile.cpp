@@ -35,8 +35,9 @@ std::vector<void*> GameAddressesFile::ParsePtrPath(std::string path)
 
 void GameAddressesFile::LoadFile()
 {
-	g_absolute_pointer_paths.clear();
-	g_relative_pointer_paths.clear();
+	m_absolute_pointer_paths.clear();
+	m_relative_pointer_paths.clear();
+
 	std::ifstream infile;
 	std::string line;
 
@@ -65,21 +66,21 @@ void GameAddressesFile::LoadFile()
 		}
 
 		if (value.rfind("+", 0) == 0) {
-			g_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));
+			m_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));
 		}
 		else {
-			g_absolute_pointer_paths[key] = ParsePtrPath(value);
+			m_absolute_pointer_paths[key] = ParsePtrPath(value);
 		}
 	}
 }
 
 std::vector<void*> GameAddressesFile::GetAddress(const char *c_addressId)
 {
-	if (g_relative_pointer_paths.count(c_addressId) != 0) {
-		return g_relative_pointer_paths[c_addressId];
+	if (m_relative_pointer_paths.count(c_addressId) != 0) {
+		return m_relative_pointer_paths[c_addressId];
 	}
-	if (g_absolute_pointer_paths.count(c_addressId) != 0) {
-		return g_absolute_pointer_paths[c_addressId];
+	if (m_absolute_pointer_paths.count(c_addressId) != 0) {
+		return m_absolute_pointer_paths[c_addressId];
 	}
 	return std::vector<void*>();
 }

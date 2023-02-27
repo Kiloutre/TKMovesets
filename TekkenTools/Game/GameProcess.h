@@ -44,11 +44,11 @@ public:
 	}
 
 	//Variables
-	GameProcessError errcode = PROC_NOT_ATTACHED;
-	bool threadStarted = false;
+	GameProcessError errcode{ PROC_NOT_ATTACHED };
+	bool threadStarted{ false };
+	DWORD processId{ (DWORD)-1 };
+	BYTE* modBaseAddr{ (BYTE*)0 };
 	std::string processName;
-	DWORD processId = (DWORD)-1;
-	BYTE* modBaseAddr = (BYTE*)0;
 
 	// Process stuff
 	void Attach();
@@ -57,12 +57,12 @@ public:
 	// High level functions
 
 	// Low level functions
-	char  readByte(const long addr);
-	short readShort(const long addr);
-	int   readInt(const long addr);
-	float readFloat(const long addr);
-	void  readBytes(const long addr, char* buf, const unsigned int BUF_SIZE);
+	char  readByte(const long ADDR);
+	short readShort(const long ADDR);
+	int   readInt(const long ADDR);
+	float readFloat(const long ADDR);
+	void  readBytes(const long ADDR, char* buf, const unsigned int BUF_SIZE);
 
-	long allocateMem(const unsigned int size);
-	void freeMem(const long addr);
+	long allocateMem(const unsigned int ADDR);
+	void freeMem(const long ADDR);
 };

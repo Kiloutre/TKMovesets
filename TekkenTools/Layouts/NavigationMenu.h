@@ -25,7 +25,7 @@ public:
 	NavigationMenu();
 	void Render();
 
-	NAV__MENU menuId = NAV__MENU_DEFAULT;
+	NAV__MENU menuId{ NAV__MENU_DEFAULT };
 private:
 	void RenderBtnList(const NavMenuBtn* BTNS, const unsigned int SIZE);
 };
