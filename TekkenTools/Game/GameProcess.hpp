@@ -57,12 +57,12 @@ public:
 	// High level functions
 
 	// Low level functions
-	char  readByte(const long ADDR);
-	short readShort(const long ADDR);
-	int   readInt(const long ADDR);
-	float readFloat(const long ADDR);
-	void  readBytes(const long ADDR, char* buf, const unsigned int BUF_SIZE);
+	char  readByte(long addr);
+	short readShort(long addr);
+	int   readInt(long addr);
+	float readFloat(long addr);
+	void  readBytes(long addr, char* buf, size_t bufSize);
 
-	long allocateMem(const unsigned int ADDR);
-	void freeMem(const long ADDR);
+	long allocateMem(size_t amount);
+	void freeMem(long addr);
 };

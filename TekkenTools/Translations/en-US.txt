@@ -47,6 +47,7 @@ navmenu.documentation = Documentation
 navmenu.about = About
 
 # Status bar #
+status.fps = %.1f FPS # 32 characters max, will crash otherwise
 
 ## Submenus ##
 
@@ -55,10 +56,12 @@ extraction.explanation = Movesets have to first be extracted from the game to be
 extraction.cannot_extract = Movesets cannot be extracted.
 extraction.extracted_movesets = Extracted movesets
 extraction.extract_1p = Extract (1P)
+extraction.extract_2p = Extract (2P)
 extraction.extract_1p_name = Extract (1P, {})
 extraction.extract_2p_name = Extract (2P, {})
 extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
+extraction.progress = Extracting... (%.0f%%)
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
@@ -72,7 +75,7 @@ importation.deallocate_unused = Deallocate unused movesets
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background download the opponent's moveset on your computer and apply it to them and will do the same on their end.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.
 online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
-online.moveset_x_selected = Moveset {} selected
+online.moveset_x_selected = Moveset '%s' selected
 
 # Moveset Edition #
 edition.explanation = You can here edit extracted movesets. Refer to documentation for tutorials and helpful ressources.\nTurn on 'Live edition' for quickly modifying the custom moveset: Simple values changes will be instantly applied in memory with zero loading time.

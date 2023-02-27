@@ -20,22 +20,16 @@ const NavMenuBtn const other_btns[] = {
 	{NAV__MENU_ABOUT, "navmenu.about"},
 };
 
-NavigationMenu::NavigationMenu()
-{
-	// Init
-	menuId = NAV__MENU_DEFAULT;
-}
-
 // Layout //
 
-void NavigationMenu::RenderBtnList(const NavMenuBtn* BTNS, unsigned int SIZE)
+void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count)
 {
-	for (unsigned int i = 0; i < SIZE; ++i)
+	for (size_t i = 0; i < count; ++i)
 	{
 		ImGui::Spacing();
-		NavMenuBtn navBtn = BTNS[i];
-		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.NAME), menuId == navBtn.ID, ImVec2(215, 39))) {
-			menuId = navBtn.ID;
+		NavMenuBtn navBtn = c_btns[i];
+		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId == navBtn.id, ImVec2(215, 39))) {
+			menuId = navBtn.id;
 		}
 	}
 }
@@ -43,11 +37,11 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* BTNS, unsigned int SIZE)
 void NavigationMenu::Render()
 {
 	ImGui::SeparatorText(_("navmenu.category_moveset"));
-	RenderBtnList(moveset_btns, sizeof(moveset_btns) / sizeof(moveset_btns[0]));
+	RenderBtnList(moveset_btns, sizeof(moveset_btns) / sizeof(*moveset_btns));
 
 	ImGui::SeparatorText(_("navmenu.category_tools"));
-	RenderBtnList(tools_btns, sizeof(tools_btns) / sizeof(tools_btns[0]));
+	RenderBtnList(tools_btns, sizeof(tools_btns) / sizeof(*tools_btns));
 
 	ImGui::SeparatorText(_("navmenu.category_other"));
-	RenderBtnList(other_btns, sizeof(other_btns) / sizeof(other_btns[0]));
+	RenderBtnList(other_btns, sizeof(other_btns) / sizeof(*other_btns));
 }

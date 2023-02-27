@@ -1,28 +1,15 @@
 #pragma once
 
-#include <map>
-#include <string>
 #include <vector>
 
-class GameAddressesFile
+namespace GameAddressesFile
 {
-public:
-	static GameAddressesFile& getInstance() {
-		// Todo: mutex here or something?
-		static GameAddressesFile s_instance;
-		return s_instance;
-	}
-
+	// Load the game_addresses.txt file for use GetAddress()
 	void LoadFile();
-	std::vector<void*> GetAddress(const char* c_addressId);
-private:
-	GameAddressesFile() = default;
-	~GameAddressesFile() = default;
-	GameAddressesFile& operator = (const GameAddressesFile&) = delete;
-	GameAddressesFile(const GameAddressesFile&) = delete;
 
-	std::map<std::string, std::vector<void*>> m_absolute_pointer_paths;
-	std::map<std::string, std::vector<void*>> m_relative_pointer_paths;
+	// Returns whether or not the given address is a relative pointer path (have to add main module address to first item) or not
+	bool IsAddressRelative(const char* c_addressId);
 
-	std::vector<void*> ParsePtrPath(std::string path);
-};
+	// Returns a pointer path, that may rely on the base address or not. To use with IsAddressRelative().
+	const std::vector<void*> GetAddress(const char* c_addressId);
+}

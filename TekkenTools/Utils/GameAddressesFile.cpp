@@ -6,7 +6,10 @@
 
 #include "GameAddressesFile.hpp"
 
-std::vector<void*> GameAddressesFile::ParsePtrPath(std::string path)
+std::map<std::string, std::vector<void*>> g_absolute_pointer_paths;
+std::map<std::string, std::vector<void*>> g_relative_pointer_paths;
+
+std::vector<void*> ParsePtrPath(std::string path)
 {
 	std::vector<void*> ptrPath = std::vector<void*>();
 
@@ -33,54 +36,66 @@ std::vector<void*> GameAddressesFile::ParsePtrPath(std::string path)
 	return ptrPath;
 }
 
-void GameAddressesFile::LoadFile()
+namespace GameAddressesFile
 {
-	m_absolute_pointer_paths.clear();
-	m_relative_pointer_paths.clear();
-
-	std::ifstream infile;
-	std::string line;
-
-	infile.open("game_addresses.txt");
-	while (std::getline(infile, line))
+	void LoadFile()
 	{
-		size_t commentStart = line.find_first_of('#');
+		g_absolute_pointer_paths.clear();
+		g_relative_pointer_paths.clear();
 
-		size_t idStart = line.find_first_not_of(' ', 0);
-		size_t separator = line.find_first_of('=');
+		std::ifstream infile;
+		std::string line;
 
-		if (separator == std::string::npos) {
-			continue;
-		}
-		if (commentStart != std::string::npos)
+		infile.open("game_addresses.txt");
+		while (std::getline(infile, line))
 		{
-			if (commentStart < separator) continue;
-			line = line.substr(0, commentStart);
-		}
+			size_t commentStart = line.find_first_of('#');
 
-		std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
-		std::string value;
-		{
-			size_t value_start = line.find_first_not_of(" =", separator);
-			value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
-		}
+			size_t idStart = line.find_first_not_of(' ', 0);
+			size_t separator = line.find_first_of('=');
 
-		if (value.rfind("+", 0) == 0) {
-			m_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));
+			if (separator == std::string::npos) {
+				continue;
+			}
+			if (commentStart != std::string::npos)
+			{
+				if (commentStart < separator) continue;
+				line = line.substr(0, commentStart);
+			}
+
+			std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
+			std::string value;
+			{
+				size_t value_start = line.find_first_not_of(" =", separator);
+				value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
+			}
+
+			if (value.rfind("+", 0) == 0) {
+				g_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));
+			}
+			else {
+				g_absolute_pointer_paths[key] = ParsePtrPath(value);
+			}
 		}
-		else {
-			m_absolute_pointer_paths[key] = ParsePtrPath(value);
+	}
+
+	bool IsAddressRelative(const char* c_addressId)
+	{
+		if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
+			return true;
 		}
+		return false;
+	}
+
+	const std::vector<void*> GetAddress(const char* c_addressId)
+	{
+		if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
+			return g_relative_pointer_paths[c_addressId];
+		}
+		if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
+			return g_absolute_pointer_paths[c_addressId];
+		}
+		return std::vector<void*>();
 	}
 }
 
-std::vector<void*> GameAddressesFile::GetAddress(const char *c_addressId)
-{
-	if (m_relative_pointer_paths.count(c_addressId) != 0) {
-		return m_relative_pointer_paths[c_addressId];
-	}
-	if (m_absolute_pointer_paths.count(c_addressId) != 0) {
-		return m_absolute_pointer_paths[c_addressId];
-	}
-	return std::vector<void*>();
-}

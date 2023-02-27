@@ -4,6 +4,9 @@
 
 namespace Localization
 {
-	void LoadFile(const char* c_langId);
-	const char* GetText(const char* c_stringId...);
+	// Load a translation file for use with Localization::GetText
+	void LoadFile(const char* c_langId, bool unloadPrevious = true);
+
+	// Returns a translated string from its corresponding string identifier
+	const char* GetText(const char* c_stringId);
 }

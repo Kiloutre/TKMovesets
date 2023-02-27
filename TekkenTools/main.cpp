@@ -68,7 +68,7 @@ int main(int argc, wchar_t** argv)
 
 	MainWindow program(window, GLSL_VERSION);
 	GameProcess::getInstance().Attach();
-	GameAddressesFile::getInstance().LoadFile();
+	GameAddressesFile::LoadFile();
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize

@@ -10,8 +10,12 @@ std::map<std::string, std::string> g_translations;
 
 namespace Localization
 {
-	void LoadFile(const char* c_langId)
+	void LoadFile(const char* c_langId, bool unloadPrevious)
 	{
+		if (unloadPrevious) {
+			g_translations.clear();
+		}
+
 		std::ifstream infile;
 		std::string line;
 
@@ -54,11 +58,11 @@ namespace Localization
 		}
 	}
 
-	const char* GetText(const char *c_stringId...)
+	const char* GetText(const char *c_stringId)
 	{
-		if (g_translations.count(c_stringId) == 0) {
-			return c_stringId;
+		if (g_translations.find(c_stringId) != g_translations.end()) {
+			return g_translations[c_stringId].c_str();
 		}
-		return g_translations[c_stringId].c_str();
+		return c_stringId;
 	}
 }

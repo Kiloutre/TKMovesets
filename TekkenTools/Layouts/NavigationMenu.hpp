@@ -15,17 +15,16 @@ enum NAV__MENU
 
 struct NavMenuBtn
 {
-	const NAV__MENU ID;
-	const char* NAME;
+	NAV__MENU id;
+	const char* c_name;
 	//const char* icon;
 };
 
 class NavigationMenu {
 public:
-	NavigationMenu();
 	void Render();
 
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
 private:
-	void RenderBtnList(const NavMenuBtn* BTNS, const unsigned int SIZE);
+	void RenderBtnList(const NavMenuBtn* c_btns, size_t count);
 };

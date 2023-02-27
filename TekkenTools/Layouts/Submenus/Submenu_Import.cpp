@@ -4,11 +4,6 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 
-Submenu_Import::Submenu_Import()
-{
-	// Init
-}
-
 void Submenu_Import::Render()
 {
 

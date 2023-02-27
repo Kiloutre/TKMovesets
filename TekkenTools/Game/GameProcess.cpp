@@ -142,37 +142,37 @@ bool GameProcess::AttemptRead()
 	return true;
 }
 
-char GameProcess::readByte(const long ADDR)
+char GameProcess::readByte(long addr)
 {
 	return 0;
 }
 
-short GameProcess::readShort(const long ADDR)
+short GameProcess::readShort(long addr)
 {
 	return 0;
 }
 
-int GameProcess::readInt(const long ADDR)
+int GameProcess::readInt(long addr)
 {
 	return 0;
 }
 
-float GameProcess::readFloat(const long ADDR)
+float GameProcess::readFloat(long addr)
 {
 	return 0;
 }
 
-void GameProcess::readBytes(const long ADDR, char* buf, const unsigned int BUF_SIZE)
+void GameProcess::readBytes(long addr, char* buf, size_t bufSize)
 {
 
 }
 
-long GameProcess::allocateMem(const unsigned int ADDR)
+long GameProcess::allocateMem(size_t amount)
 {
 	return 0;
 }
 
-void GameProcess::freeMem(const long ADDR)
+void GameProcess::freeMem(long addr)
 {
 
 }

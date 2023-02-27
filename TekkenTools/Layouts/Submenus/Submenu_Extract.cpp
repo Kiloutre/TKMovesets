@@ -6,13 +6,6 @@
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
 
-Submenu_Extract::Submenu_Extract()
-{
-	// Init
-	// Read from settings
-	overwrite_same_filename = false;
-}
-
 const char* items[] = {
 	"testtesttesttesttesttesttesttesttest",
 	"mdr",
@@ -49,7 +42,33 @@ void Submenu_Extract::Render()
 		}
 	}
 
-	ImGui::Checkbox(_("extraction.overwrite_duplicate"), &overwrite_same_filename);
+
+	{
+		// Todo: also take into account if an extraction is already ongoing
+		GameExtract& extractor = GameExtract::getInstance();
+		bool canExtract = p.errcode == PROC_ATTACHED && !extractor.busy;
+
+		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &overwrite_same_filename);
+		ImGui::SameLine();
+		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_1p"), canExtract)) {
+			extractor.ExtractP1();
+		}
+
+		ImGui::SameLine();
+		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_2p"), canExtract)) {
+			extractor.ExtractP2();
+		}
+
+		ImGui::SameLine();
+		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
+			extractor.ExtractAll();
+		}
+
+		if (extractor.busy) {
+			ImGui::SameLine();
+			ImGui::Text(_("extraction.extracting"), extractor.extractionProgress);
+		}
+	}
 
 	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
@@ -60,7 +79,7 @@ void Submenu_Extract::Render()
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableHeadersRow();
 
-		for (int i = 0; i < sizeof(items) / sizeof(*items); ++i)
+		for (size_t i = 0; i < sizeof(items) / sizeof(*items); ++i)
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
@@ -76,21 +95,5 @@ void Submenu_Extract::Render()
 			ImGui::TextUnformatted("27/02/2023 16:22");
 		}
 		ImGui::EndTable();
-	}
-
-
-	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_1p"), p.errcode == PROC_ATTACHED)) {
-
-	}
-	//GameExtract::getInstance()
-
-	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_2p"), p.errcode == PROC_ATTACHED)) {
-
-	}
-
-	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), p.errcode == PROC_ATTACHED)) {
-
 	}
 }

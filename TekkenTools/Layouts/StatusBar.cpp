@@ -12,18 +12,19 @@ StatusBar::StatusBar()
 }
 void StatusBar::Render()
 {
-	// Todo: set layout mode as horizontal, look into menubars maybe
-
-	GameProcess& p = GameProcess::getInstance();
-
 	/*
-	if (p.errcode != PROC_ATTACHED && p.errcode != PROC_ATTACHING) {
-		if (ImGui::Button(_("process.attach"))) {
-			p.Attach();
-		}
+	* Draw FPS
+	{
+		char buf[40];
+		sprintf(buf, "%.1f FPS |", 1000.0f / ImGui::GetIO().Framerate);
+		ImGui::TextUnformatted(buf);
 		ImGui::SameLine();
 	}
 	*/
+
+	// Todo: set layout mode as horizontal, look into menubars maybe
+
+	GameProcess& p = GameProcess::getInstance();
 
 	ImGui::TextUnformatted(_("process.status"));
 	ImGui::SameLine();
@@ -56,8 +57,4 @@ void StatusBar::Render()
 	}
 
 	ImGui::SameLine();
-
-	char buf[16];
-	sprintf(buf, "%.1f FPS", 1000.0f / ImGui::GetIO().Framerate);
-	ImGui::TextUnformatted(buf);
 }
