@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <windows.h>
 #include <thread>
 
 enum GameProcessError
@@ -21,7 +23,10 @@ private:
 	GameProcess& operator = (const GameProcess&) = delete;
 	GameProcess(const GameProcess&) = delete;
 
-	void __AttachToNamedProcess__(const char* processName);
+	HANDLE hProcess = NULL;
+	DWORD GetGamePID();
+	void AttachToNamedProcess();
+	void DetachFromGame();
 public:
 	static GameProcess& getInstance() {
 		static GameProcess s_instance;
@@ -31,6 +36,7 @@ public:
 	//Variables
 	GameProcessError errcode = PROC_NOT_ATTACHED;
 	bool threadStarted = false;
+	std::string processName;
 
 	// Process stuff
 	void Attach();

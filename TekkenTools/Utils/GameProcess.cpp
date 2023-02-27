@@ -1,6 +1,5 @@
 #include <chrono>
 #include <thread>
-#include <cstdio>
 #include <windows.h>
 #include <tlhelp32.h>
 
@@ -11,6 +10,8 @@ void GameProcess::Attach()
 {
 	if (errcode == PROC_ATTACHED)
 		throw("Process is already attached : not re-attaching.");
+
+	processName = "TekkenGame-Win64-Shipping.exe";
 	errcode = PROC_ATTACHING;
 	if (!threadStarted)
 	{
@@ -20,22 +21,71 @@ void GameProcess::Attach()
 	}
 }
 
-
-void GameProcess::__AttachToNamedProcess__(const char* processName)
+// The idea here is to use functions that require less privilege than OpenProcess, but i believe right now there is no difference
+DWORD GameProcess::GetGamePID()
 {
+	HANDLE hProcessSnap;
+	PROCESSENTRY32 pe32;
+	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
+	if (GetLastError() == ERROR_ACCESS_DENIED) return (DWORD)-1;
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+	if (Process32First(hProcessSnap, &pe32)) {
+		if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
+			DWORD pid = pe32.th32ProcessID;
+			CloseHandle(hProcessSnap);
+			return pid;
+		}
+
+		while (Process32Next(hProcessSnap, &pe32)) {
+			if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
+				DWORD pid = pe32.th32ProcessID;
+				CloseHandle(hProcessSnap);
+				return pid;
+			}
+		}
+		CloseHandle(hProcessSnap);
+	}
+
+	return (DWORD)-1;
+}
+
+void GameProcess::AttachToNamedProcess()
+{
+	DWORD pid = GetGamePID();
+
+	if (pid == (DWORD)-1) errcode = PROC_NOT_FOUND;
+	else
+	{
+		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+		if (hProcess != NULL) errcode = (hProcess != NULL) ? PROC_ATTACHED : PROC_ATTACH_ERR;
+	}
+}
+
+void GameProcess::DetachFromGame()
+{
+	if (hProcess != NULL) {
+		CloseHandle(hProcess);
+		hProcess = NULL;
+	}
+	errcode = PROC_NOT_ATTACHED;
 }
 
 void GameProcess::Update()
 {
-	while (true)
+	while (threadStarted)
 	{
-		if (errcode == PROC_ATTACHING)
+		if (errcode == PROC_ATTACHING) AttachToNamedProcess();
+		else if (errcode == PROC_ATTACHED)
 		{
-			__AttachToNamedProcess__("TekkenGame-Win64-Shipping.exe");
-			continue;
+			if (GetGamePID() == (DWORD)-1) {
+				hProcess = NULL;
+				errcode = PROC_EXITED;
+			}
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
+	DetachFromGame();
 }

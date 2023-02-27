@@ -10,7 +10,7 @@ class MainWindow {
 public:
 	MainWindow(GLFWwindow* window, const char* glsl_version);
 	virtual void NewFrame();
-	virtual void Update();
+	virtual void Update(int width, int height);
 	void Render();
 	void Shutdown();
 

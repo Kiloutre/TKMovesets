@@ -56,20 +56,25 @@ int main(int argc, wchar_t** argv)
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		throw("Unable to context to OpenGL");
 
-	int screen_width, screen_height;
-	glfwGetFramebufferSize(window, &screen_width, &screen_height);
-	glViewport(0, 0, screen_width, screen_height);
+	{
+		int screen_width, screen_height;
+		glfwGetFramebufferSize(window, &screen_width, &screen_height);
+		glViewport(0, 0, screen_width, screen_height);
+	}
 
 	MainWindow program(window, glsl_version);
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize
 		glfwPollEvents();
-		//glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+		glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		program.NewFrame();
-		program.Update();
+		program.Update(width, height);
 		program.Render();
 		glfwSwapBuffers(window);
 	}

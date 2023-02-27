@@ -21,6 +21,7 @@ void Submenu_Extract::Render()
 			switch (p.errcode)
 			{
 			case PROC_NOT_ATTACHED:
+			case PROC_EXITED:
 				ImGuiExtra_TextboxWarning(_("process.game_not_loaded"));
 				break;
 			case PROC_NOT_FOUND:

@@ -21,6 +21,11 @@ namespace ImGuiExtra
 		return false;
 	}
 
+	void RenderTextbox(const char* text)
+	{
+		ImGuiExtra::RenderTextbox(text, TEXTBOX_BORDER_COLOR);
+	}
+
 	// This is a mess, does not work properly  and needs to be re-done entirely, to be honest.
 	// Todo: min / max size, allow centering of text
 	void RenderTextbox(const char* text, ImU32 borderColor, ImU32 fillColor)

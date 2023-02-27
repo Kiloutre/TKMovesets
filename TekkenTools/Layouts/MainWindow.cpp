@@ -16,6 +16,7 @@ MainWindow::MainWindow(GLFWwindow* window, const char* glsl_version)
 	ImGui::StyleColorsDark();
 
 	io.IniFilename = NULL; //I don't want to save settings (for now). Perhaps save in appdata later.
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
 void MainWindow::NewFrame()
@@ -25,41 +26,38 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
-void MainWindow::Update()
+void MainWindow::Update(int width, int height)
 {
-	// Interface should be done here
-	ImGui::SetNextWindowSize(ImVec2(1280, 720));
+	float navMenuWidth;
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
-	ImGui::Begin("MainWindow", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(-1, height), ImVec2(-1, height));
+	ImGui::Begin("Navbar", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+	navMenu.Render();
+	navMenuWidth = ImGui::GetWindowWidth();
+	ImGui::End();
 
+	ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(width - navMenuWidth, height), ImVec2(width - navMenuWidth, height));
+	ImGui::Begin("Tools", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+	switch (navMenu.menuId)
 	{
-		ImGui::Columns(2);
-		ImGui::SetColumnOffset(1, 230);
-		// Render navigation menu
-		navMenu.Render();
-
-		// Render submenus
-		ImGui::NextColumn();
-		switch (navMenu.menuId)
-		{
-		case NAV__MENU_EXTRACT:
-			extractMenu.Render();
-			break;
-		case NAV__MENU_IMPORT:
-			importMenu.Render();
-			break;
-		case NAV__MENU_ONLINE_PLAY:
-			onlineMenu.Render();
-			break;
-		case NAV__MENU_CAMERA:
-			break;
-		case NAV__MENU_EDITION:
-			break;
-		case NAV__MENU_DOCUMENTATION:
-			break;
-		case NAV__MENU_ABOUT:
-			break;
-		}
+	case NAV__MENU_EXTRACT:
+		extractMenu.Render();
+		break;
+	case NAV__MENU_IMPORT:
+		importMenu.Render();
+		break;
+	case NAV__MENU_ONLINE_PLAY:
+		onlineMenu.Render();
+		break;
+	case NAV__MENU_CAMERA:
+		break;
+	case NAV__MENU_EDITION:
+		break;
+	case NAV__MENU_DOCUMENTATION:
+		break;
+	case NAV__MENU_ABOUT:
+		break;
 	}
 
 	ImGui::End(); 
