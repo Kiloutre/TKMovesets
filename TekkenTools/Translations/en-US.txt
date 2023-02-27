@@ -12,6 +12,9 @@ yes = Yes
 no = No
 1p = Player 1
 2p = Player 2
+
+# Process #
+
 process.status = Status:
 process.attach = Attach to Tekken 7
 process.attaching = Attaching...
@@ -21,6 +24,11 @@ process.game_not_running = Tekken 7 is not running or could not be found.
 process.game_version_mismatch = The current Tekken version is not supported by game_address.txt.
 process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
 process.game_unexpected_exit = Game exited unexpectedly.
+
+# Moveset #
+moveset.origin = Origin
+moveset.target_character = Character
+moveset.date = Date
 
 ## Main ##
 
@@ -47,7 +55,8 @@ extraction.explanation = Movesets have to first be extracted from the game to be
 extraction.cannot_extract = Movesets cannot be extracted.
 extraction.extracted_movesets = Extracted movesets
 extraction.extract_1p = Extract (1P)
-extraction.extract_2p = Extract (2P)
+extraction.extract_1p_name = Extract (1P, {})
+extraction.extract_2p_name = Extract (2P, {})
 extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 

@@ -27,27 +27,60 @@ DWORD GameProcess::GetGamePID()
 	PROCESSENTRY32 pe32;
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-	if (GetLastError() == ERROR_ACCESS_DENIED) return (DWORD)-1;
-
-	pe32.dwSize = sizeof(PROCESSENTRY32);
-	if (Process32First(hProcessSnap, &pe32)) {
-		if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
-			DWORD pid = pe32.th32ProcessID;
-			CloseHandle(hProcessSnap);
-			return pid;
-		}
-
-		while (Process32Next(hProcessSnap, &pe32)) {
+	if (GetLastError() != ERROR_ACCESS_DENIED)
+	{
+		pe32.dwSize = sizeof(PROCESSENTRY32);
+		if (Process32First(hProcessSnap, &pe32)) {
 			if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
 				DWORD pid = pe32.th32ProcessID;
 				CloseHandle(hProcessSnap);
 				return pid;
+			}
+
+			while (Process32Next(hProcessSnap, &pe32)) {
+				if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
+					DWORD pid = pe32.th32ProcessID;
+					CloseHandle(hProcessSnap);
+					return pid;
+				}
 			}
 		}
 		CloseHandle(hProcessSnap);
 	}
 
 	return (DWORD)-1;
+}
+
+bool GameProcess::LoadGameMainModule(DWORD pid)
+{
+	HANDLE moduleSnap;
+	MODULEENTRY32 me32 = { };
+
+	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+
+	if (GetLastError() != ERROR_ACCESS_DENIED)
+	{
+		me32.dwSize = sizeof(MODULEENTRY32);
+		if (Module32First(moduleSnap, &me32)) {
+			if (strcmp(me32.szModule, processName.c_str()) == 0) {
+				modBaseAddr = me32.modBaseAddr;
+				CloseHandle(moduleSnap);
+				return true;
+			}
+
+			while (Module32Next(moduleSnap, &me32)) {
+				if (strcmp(me32.szModule, processName.c_str()) == 0) {
+
+					modBaseAddr = me32.modBaseAddr;
+					CloseHandle(moduleSnap);
+					return true;
+				}
+			}
+		}
+		CloseHandle(moduleSnap);
+	}
+
+	return false;
 }
 
 void GameProcess::AttachToNamedProcess()
@@ -58,7 +91,14 @@ void GameProcess::AttachToNamedProcess()
 	else
 	{
 		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-		if (hProcess != NULL) errcode = (hProcess != NULL) ? PROC_ATTACHED : PROC_ATTACH_ERR;
+		if (hProcess != NULL && LoadGameMainModule(pid)) {
+			printf("Module addr: %p\n", modBaseAddr);
+			errcode = PROC_ATTACHED;
+			processId = pid;
+		}
+		else {
+			errcode = PROC_ATTACH_ERR;
+		}
 	}
 }
 

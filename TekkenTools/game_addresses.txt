@@ -1,0 +1,113 @@
+# For updating purposes
+version     = 9 # Must be different for it to register it as an update
+repo_link   = https://raw.githubusercontent.com/Kiloutre/TekkenMovesetExtractor/master/
+
+# Tekken 7 addresses and offsets. Changes with updates
+t7_process_name       = TekkenGame-Win64-Shipping.exe
+t7_base               = 0x0                # base is useless here
+t7_p1_addr            = +0x34DF630, 0
+t7_playerstruct_size  = 0x3670             # Distance between 2 players addresses
+t7_motbin_offset      = 0x1520
+t7_chara_id_offset    = 0xD8
+t7_camera_mota_offset = 0x14A0
+
+# Tag2 addresses.
+tag2_process_name       = Cemu.exe
+tag2_base               = 0x0              # Changes with every restart
+tag2_p1_addr_1010f800   = 0x10885C90       # Game ID: 00050000-1010f800 [EU v32]
+tag2_p1_addr_10110000   = 0x10884C70       # Game ID: 00050000-10110000 [US v16]
+tag2_window_title_regex = TitleId: [0-9a-fA-F]{8}\-([0-9a-fA-F]{8})  # Defines what part of the title to keep. This makes it choose the right addr.
+tag2_playerstruct_size  = 0x2960           # Distance between 2 players addresses
+tag2_motbin_offset      = -0x98
+tag2_chara_id_offset    = -0xCC
+tag2_player_count       = 4
+
+# Tag2 RPCS3 addresses. (BLES01702)
+rpcs3_tag2_process_name       = rpcs3.exe
+rpcs3_tag2_base               = 0x300000000
+rpcs3_tag2_p1_addr            = 0x160C2B0  
+rpcs3_tag2_playerstruct_size  = 0x28B0
+rpcs3_tag2_motbin_offset      = -0x98
+rpcs3_tag2_chara_id_offset    = -0xCC
+rpcs3_tag2_player_count       = 4
+
+# Tekken Revolution addresses (NPEB01406 01.05)
+rev_process_name       = rpcs3.exe
+rev_base               = 0x300000000
+rev_p1_addr            = 0x12DA030
+rev_playerstruct_size  = 0x24A0  
+rev_motbin_offset      = -0xA8
+rev_chara_id_offset    = -0xDC
+
+# Tekken 6 addresses (BLES00635 01.03)
+t6_process_name       = rpcs3.exe
+t6_base               = 0x300000000
+t6_p1_addr            = 0xB2C1EC
+t6_playerstruct_size  = 0xC40
+t6_motbin_offset      = -0x8C
+t6_chara_id_offset    = -0xDC              # tofind
+
+# Tekken 3D addresses
+3d_process_name       = citra-qt.exe
+3d_base               = 0x271B2273040      # Does not look consistent; changes with every restart?
+3d_p1_addr            = 0x938C000
+3d_playerstruct_size  = 0xC40              # tofind
+3d_motbin_offset      = 0x1340
+3d_chara_id_offset    = 0x0                # tofind
+
+# Tekken 5 DR Online addresses (NPEA00019 01.00)
+t5dr_process_name       = rpcs3.exe
+t5dr_base               = 0x300000000 
+t5dr_p1_addr            = 0x10090850
+t5dr_playerstruct_size  = 0x8D0
+t5dr_motbin_offset      = 0x50
+#t5dr_chara_id_addr     = 0x102C8D0A
+
+# Tekken 5 addresses (SLUS-21059, NTSC-USA)
+t5_process_name       = pcsx2.exe
+t5_base               = 0x20000000 
+t5_p1_addr            = 0x3a8ad0
+t5_playerstruct_size  = 0x8D0
+t5_motbin_offset      = 0x50
+t5_chara_id_offset    = 0x42
+
+# Tekken 4 addresses (SLUS-20328, NTSC-USA)
+t4_process_name       = pcsx2.exe
+t4_base               = 0x20000000         
+t4_p1_addr            = 0x2AA4E4
+t4_playerstruct_size  = 0xF24              
+t4_motbin_offset      = -0xEE0
+t4_chara_id_offset    = -0xEEC
+
+
+# miscellaneous
+player_curr_move_addr_offset = 0x220                          # Used by Animator to overwrite current address
+player_curr_move_offset      = 0x350                          # Used by editor to force a move to play
+next_move_offset             = 0xDA0                          # Used by editor to force sa move to play
+curr_frame_timer_offset      = 0x1D4                          # Used by editor to force a move to play
+code_injection_addr          = +0x74ABEF                      # Address that writes on player+motbin_offset; used for online play. 
+playerid_ptr                 = +0x34CE508, 0x0                # Used to find whether local player is 1P or 2P; used for online play
+#Finding playerid_starting_ptr: Go in training mode as 2p; scan for value on 1. Change to 1P; scan for value on 0. Repeat many times to lower matches to a few hundreds. Do combo; grabs and change outfit & character to keep lowering matches.
+#Scan repeatedly value between 0 and 1 during loading to filter out the remaining garbage. Then pause the process (slow to 0.00); set all remaining variables to a fringe unique value (e.g. 216246545) and search for the following pointer path that leads to the fringe value
+
+# blender tools
+player_distance_limit_addr   = +0x6E6ABF
+player_collision_code_addr   = +0x6D89E5
+wall_collision_code_addr     = +0x796DA4                 #writes negative values on [player + 1308] to induce reverse movement
+
+# -- Camera animator --
+game_speed_address         = +0x34DF51C                  # where we write our game speed. Easy to find by doing move that slow down time like heaven's gate, jin ZEN 2
+game_speed_injection       = +0x701F40                   # prevent game speed from being overwritten; find game speed and look at what writes on it
+game_frame_counter         = +0x34CD4E0                  # related to game timer: pausing the game pauses it
+global_frame_counter       = +0x344A034                  # detached from game timer
+using_global_frame_counter = 1                           # 0 = more reliable; 1 = animation is not paused by game and camera can move even if the in-game time is frozen
+freeze_code_addr           = +0x262404                   # jne +262F8A; used to freeze players #?"
+freeze_code                = "E9 BE 14 00 00"            # jmp +262B9A
+freeze_code_orig           = "0F 85 BD 14 00 00"         # fOUND IN A FUNCTION WITH A "CMP BYTE ptr [rsi+4b8], 00" right above it. Couple of mov[rsp+???],??? a bit under it. mov ???; [???+???] directly under it.
+freeze_environment         = +0x1575E41                  # used to freeze particles in the environment when the game speed reaches 0. gotta find this one using unreal unlocker and not game pause. searching of hex 00 75 08 32 also work
+input_buffer               = +0x34CE510, 0x1f4           # used to read player input during camera control. (read only address, read by 41 8B ?? 10 94 00 00 00)
+input_code_injection       = +0x2E2CC7                   # prevent player movement during manual camera control (not related to above pointer)
+camera_ptr                 = +0x3785470, 0x30, 0x418, 0  # used to find camera; best pointer path is 0x30 0x418, 0x0
+camera_code_injection      = +0x16A7E40                  # prevent writing of certain camera offsets (x in nepafu's table)
+camera_code_injection2     = +0x16BF430                  # prevent writing of fov
+nop_inputs                 = 1                           # 1 = disable player control during live control; 0 = don't disable

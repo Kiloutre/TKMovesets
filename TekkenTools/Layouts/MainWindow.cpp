@@ -26,7 +26,7 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
-void MainWindow::Update(int width, int height)
+void MainWindow::Update(const int width, const int height)
 {
 	const float c_statusBarHeight = 30;
 

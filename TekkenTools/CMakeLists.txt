@@ -3,11 +3,14 @@
 set(INCLUDE_FOLDERS
                     "Layouts"
                     "Layouts/Submenus"
+                    "Game"
                     "Utils"
 )
 
 set(MAIN_SOURCES
                     "main.cpp"
+                    "Game/GameProcess.cpp"
+                    "Game/GameExtract.cpp"
 )
 
 set(LAYOUT_SOURCES
@@ -23,7 +26,6 @@ set(SUBMENU_SOURCES
 )
 
 set(OTHER_SOURCES
-                    "Utils/GameProcess.cpp"
                     "Utils/imgui_extras.cpp"
                     "Utils/Localization.cpp"
 )
@@ -37,8 +39,14 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TekkenTools PROPERTY CXX_STANDARD 20)
 endif()
 
+# Addresses file #
+add_custom_target(copy-addresses ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/game_addresses.txt ${CMAKE_CURRENT_BINARY_DIR}/game_addresses.txt
+    DEPENDS TekkenTools)
+
 # Translations #
-add_custom_target(copy-runtime-files ALL
+## todo: loop on dir
+add_custom_target(copy-translations ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/Translations ${CMAKE_CURRENT_BINARY_DIR}/Translations
     DEPENDS TekkenTools)
 

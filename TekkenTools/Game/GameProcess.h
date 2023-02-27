@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <windows.h>
 #include <thread>
+#include <windows.h>
 
 enum GameProcessError
 {
@@ -32,6 +32,7 @@ private:
 
 	HANDLE hProcess = NULL;
 	DWORD GetGamePID();
+	bool LoadGameMainModule(DWORD pid);
 	void AttachToNamedProcess();
 	void DetachFromGame();
 public:
@@ -44,6 +45,8 @@ public:
 	GameProcessError errcode = PROC_NOT_ATTACHED;
 	bool threadStarted = false;
 	std::string processName;
+	DWORD processId;
+	BYTE* modBaseAddr;
 
 	// Process stuff
 	void Attach();
@@ -52,12 +55,12 @@ public:
 	// High level functions
 
 	// Low level functions
-	char  readByte(long addr);
-	short readShort(long addr);
-	int   readInt(long addr);
-	float readFloat(long addr);
-	int   readBytes(long addr, char* buf, unsigned int BUF_SIZE);
+	char  readByte(const long addr);
+	short readShort(const long addr);
+	int   readInt(const long addr);
+	float readFloat(const long addr);
+	int   readBytes(const long addr, char* buf, const unsigned int BUF_SIZE);
 
-	long allocateMem(unsigned int size);
-	void freeMem(long addr);
+	long allocateMem(const unsigned int size);
+	void freeMem(const long addr);
 };

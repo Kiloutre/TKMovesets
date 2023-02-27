@@ -22,32 +22,32 @@ void StatusBar::Render()
 		ImGui::SameLine();
 	}
 
-	ImGui::Text(_("process.status"));
+	ImGui::TextUnformatted(_("process.status"));
 	ImGui::SameLine();
 
 	switch (p.errcode)
 	{
 		// Todo: apply color-coding
 	case PROC_NOT_ATTACHED:
-		ImGui::Text(_("process.game_not_attached"));
+		ImGui::TextUnformatted(_("process.game_not_attached"));
 		break;
 	case PROC_NOT_FOUND:
-		ImGui::Text(_("process.game_not_running"));
+		ImGui::TextUnformatted(_("process.game_not_running"));
 		break;
 	case PROC_ATTACHING:
-		ImGui::Text(_("process.attaching"));
-		break;
-	case PROC_ATTACH_ERR:
-		ImGui::Text(_("process.game_version_mismatch"));
+		ImGui::TextUnformatted(_("process.attaching"));
 		break;
 	case PROC_VERSION_MISMATCH:
-		ImGui::Text(_("process.game_attach_err"));
+		ImGui::TextUnformatted(_("process.game_version_mismatch"));
+		break;
+	case PROC_ATTACH_ERR:
+		ImGui::TextUnformatted(_("process.game_attach_err"));
 		break;
 	case PROC_ATTACHED:
-		ImGui::Text(_("process.game_attached"));
+		ImGui::TextUnformatted(_("process.game_attached"));
 		break;
 	case PROC_EXITED:
-		ImGui::Text(_("process.game_unexpected_exit"));
+		ImGui::TextUnformatted(_("process.game_unexpected_exit"));
 		break;
 	}
 }
