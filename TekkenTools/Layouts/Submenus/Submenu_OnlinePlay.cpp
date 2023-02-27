@@ -10,7 +10,7 @@ Submenu_OnlinePlay::Submenu_OnlinePlay()
 }
 void Submenu_OnlinePlay::Render()
 {
-	ImGuiExtra_RenderTextbox(_("online.explanation"));
+	ImGuiExtra::RenderTextbox(_("online.explanation"));
 	ImGui::SeparatorText(_("importation.select_moveset"));
 	ImGuiExtra_TextboxWarning(_("importation.game_not_running"));
 }

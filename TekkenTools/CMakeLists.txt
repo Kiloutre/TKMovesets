@@ -24,12 +24,12 @@ set(SUBMENU_SOURCES
 )
 
 set(OTHER_SOURCES
+                    "Utils/GameProcess.cpp"
                     "Utils/imgui_extras.cpp"
                     "Utils/Localization.cpp"
 )
 
 set(ALL_SOURCES ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES})
-
 
 add_executable (TekkenTools ${ALL_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
