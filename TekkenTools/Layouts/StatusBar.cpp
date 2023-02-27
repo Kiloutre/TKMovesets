@@ -1,10 +1,10 @@
 #include <ImGui.h>
 #include <stdio.h>
 
-#include "StatusBar.h"
-#include "GameProcess.h"
-#include "Localization.h"
-#include "imgui_extras.h"
+#include "StatusBar.hpp"
+#include "GameProcess.hpp"
+#include "Localization.hpp"
+#include "imgui_extras.hpp"
 
 StatusBar::StatusBar()
 {

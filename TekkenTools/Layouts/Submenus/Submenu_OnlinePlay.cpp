@@ -1,8 +1,8 @@
 #include <ImGui.h>
 
-#include "Submenu_OnlinePlay.h"
-#include "Localization.h"
-#include "imgui_extras.h"
+#include "Submenu_OnlinePlay.hpp"
+#include "Localization.hpp"
+#include "imgui_extras.hpp"
 
 Submenu_OnlinePlay::Submenu_OnlinePlay()
 {

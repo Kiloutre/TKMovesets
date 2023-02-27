@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "Localization.h"
+#include "Localization.hpp"
 
 std::map<std::string, std::string> g_translations;
 

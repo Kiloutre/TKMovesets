@@ -1,4 +1,4 @@
-#include "GameExtract.h"
+#include "GameExtract.hpp"
 
 void ExtractP1()
 {

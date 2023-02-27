@@ -1,8 +1,8 @@
 #include <ImGui.h>
 
-#include "NavigationMenu.h"
-#include "Localization.h"
-#include "imgui_extras.h"
+#include "NavigationMenu.hpp"
+#include "Localization.hpp"
+#include "imgui_extras.hpp"
 
 const NavMenuBtn const moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},

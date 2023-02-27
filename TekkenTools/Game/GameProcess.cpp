@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
-#include "GameProcess.h"
+#include "GameProcess.hpp"
 
 // Starts the attaching process in an existing other thread
 void GameProcess::Attach()

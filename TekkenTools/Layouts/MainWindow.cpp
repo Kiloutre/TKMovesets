@@ -2,7 +2,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "MainWindow.h"
+#include "MainWindow.hpp"
 
 MainWindow::MainWindow(GLFWwindow* window, const char* GLSL_VERSION)
 {

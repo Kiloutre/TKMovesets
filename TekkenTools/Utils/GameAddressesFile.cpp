@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "GameAddressesFile.h"
+#include "GameAddressesFile.hpp"
 
 std::vector<void*> GameAddressesFile::ParsePtrPath(std::string path)
 {

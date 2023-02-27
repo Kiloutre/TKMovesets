@@ -9,10 +9,10 @@
 #include <filesystem>
 
 #include "constants.h"
-#include "MainWindow.h"
-#include "Localization.h"
-#include "GameProcess.h"
-#include "GameAddressesFile.h"
+#include "MainWindow.hpp"
+#include "Localization.hpp"
+#include "GameProcess.hpp"
+#include "GameAddressesFile.hpp"
 
 using namespace std;
 

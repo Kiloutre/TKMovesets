@@ -1,11 +1,11 @@
 #pragma once
 #include <imgui_impl_glfw.h>
 
-#include "NavigationMenu.h"
-#include "StatusBar.h"
-#include "Submenu_Extract.h"
-#include "Submenu_Import.h"
-#include "Submenu_OnlinePlay.h"
+#include "NavigationMenu.hpp"
+#include "StatusBar.hpp"
+#include "Submenu_Extract.hpp"
+#include "Submenu_Import.hpp"
+#include "Submenu_OnlinePlay.hpp"
 
 class MainWindow {
 public:

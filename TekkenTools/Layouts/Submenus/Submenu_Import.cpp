@@ -1,8 +1,8 @@
 #include <ImGui.h>
 
-#include "Submenu_Import.h"
-#include "Localization.h"
-#include "imgui_extras.h"
+#include "Submenu_Import.hpp"
+#include "Localization.hpp"
+#include "imgui_extras.hpp"
 
 Submenu_Import::Submenu_Import()
 {

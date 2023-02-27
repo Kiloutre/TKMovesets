@@ -1,10 +1,10 @@
 #include <ImGui.h>
 
-#include "Submenu_Extract.h"
-#include "Localization.h"
-#include "imgui_extras.h"
-#include "GameProcess.h"
-#include "GameExtract.h"
+#include "Submenu_Extract.hpp"
+#include "Localization.hpp"
+#include "imgui_extras.hpp"
+#include "GameProcess.hpp"
+#include "GameExtract.hpp"
 
 Submenu_Extract::Submenu_Extract()
 {
