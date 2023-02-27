@@ -25,7 +25,11 @@ void LoadTranslations(const char* c_langId)
 		if (commentStart != std::string::npos && commentStart < separator) continue;
 
 		std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
-		std::string value = line.substr(line.find_first_not_of(" =", separator), line.find_last_not_of(" =") + 1);
+		std::string value;
+		{
+			size_t value_start = line.find_first_not_of(" =", separator);
+			value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
+		}
 
 		if (key.length() == 0) continue;
 		

@@ -10,6 +10,7 @@ set(INCLUDE_FOLDERS
 set(MAIN_SOURCES
                     "main.cpp"
                     "Game/GameProcess.cpp"
+                    "Game/GameData.cpp"
                     "Game/GameExtract.cpp"
 )
 
@@ -28,6 +29,7 @@ set(SUBMENU_SOURCES
 set(OTHER_SOURCES
                     "Utils/imgui_extras.cpp"
                     "Utils/Localization.cpp"
+                    "Utils/GameAddressesFile.cpp"
 )
 
 set(ALL_SOURCES ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES})

@@ -12,6 +12,7 @@
 #include "MainWindow.h"
 #include "Localization.h"
 #include "GameProcess.h"
+#include "GameAddressesFile.h"
 
 using namespace std;
 
@@ -64,7 +65,8 @@ int main(int argc, wchar_t** argv)
 	}
 
 	MainWindow program(window, glsl_version);
-	//GameProcess::getInstance().Attach();
+	GameProcess::getInstance().Attach();
+	GameAddressesFile::getInstance().LoadFile();
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize

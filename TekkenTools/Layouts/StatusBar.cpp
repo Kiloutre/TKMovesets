@@ -15,12 +15,14 @@ void StatusBar::Render()
 
 	GameProcess& p = GameProcess::getInstance();
 
+	/*
 	if (p.errcode != PROC_ATTACHED && p.errcode != PROC_ATTACHING) {
 		if (ImGui::Button(_("process.attach"))) {
 			p.Attach();
 		}
 		ImGui::SameLine();
 	}
+	*/
 
 	ImGui::TextUnformatted(_("process.status"));
 	ImGui::SameLine();

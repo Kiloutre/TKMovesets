@@ -33,10 +33,12 @@ private:
 	HANDLE hProcess = NULL;
 	DWORD GetGamePID();
 	bool LoadGameMainModule(DWORD pid);
-	void AttachToNamedProcess();
+	GameProcessError AttachToNamedProcess();
 	void DetachFromGame();
+	bool AttemptRead();
 public:
 	static GameProcess& getInstance() {
+		// Todo: mutex here or something?
 		static GameProcess s_instance;
 		return s_instance;
 	}
@@ -45,8 +47,8 @@ public:
 	GameProcessError errcode = PROC_NOT_ATTACHED;
 	bool threadStarted = false;
 	std::string processName;
-	DWORD processId;
-	BYTE* modBaseAddr;
+	DWORD processId = (DWORD)-1;
+	BYTE* modBaseAddr = (BYTE*)0;
 
 	// Process stuff
 	void Attach();
@@ -59,7 +61,7 @@ public:
 	short readShort(const long addr);
 	int   readInt(const long addr);
 	float readFloat(const long addr);
-	int   readBytes(const long addr, char* buf, const unsigned int BUF_SIZE);
+	void  readBytes(const long addr, char* buf, const unsigned int BUF_SIZE);
 
 	long allocateMem(const unsigned int size);
 	void freeMem(const long addr);

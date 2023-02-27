@@ -83,21 +83,20 @@ bool GameProcess::LoadGameMainModule(DWORD pid)
 	return false;
 }
 
-void GameProcess::AttachToNamedProcess()
+GameProcessError GameProcess::AttachToNamedProcess()
 {
 	DWORD pid = GetGamePID();
 
-	if (pid == (DWORD)-1) errcode = PROC_NOT_FOUND;
-	else
-	{
+	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
+	else {
 		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 		if (hProcess != NULL && LoadGameMainModule(pid)) {
 			printf("Module addr: %p\n", modBaseAddr);
-			errcode = PROC_ATTACHED;
 			processId = pid;
+			return PROC_ATTACHED;
 		}
 		else {
-			errcode = PROC_ATTACH_ERR;
+			return PROC_ATTACH_ERR;
 		}
 	}
 }
@@ -116,17 +115,60 @@ void GameProcess::Update()
 	errcode = PROC_ATTACHING;
 	while (threadStarted)
 	{
-		if (errcode == PROC_ATTACHING) AttachToNamedProcess();
-		else if (errcode == PROC_ATTACHED)
+		if (errcode == PROC_ATTACHED)
 		{
 			// Todo: try reading from a random value, see if an exception is thrown
 			if (GetGamePID() == (DWORD)-1) {
 				hProcess = NULL;
 				errcode = PROC_EXITED;
 			}
-		}
+		} else if (errcode != PROC_ATTACHED)
+			errcode = AttachToNamedProcess();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 	DetachFromGame();
+}
+
+bool GameProcess::AttemptRead()
+{
+	//try {
+		//readInt(modBaseAddr);
+		//return true;
+	//}
+}
+
+char GameProcess::readByte(const long addr)
+{
+	return 0;
+}
+
+short GameProcess::readShort(const long addr)
+{
+	return 0;
+}
+
+int GameProcess::readInt(const long addr)
+{
+	return 0;
+}
+
+float GameProcess::readFloat(const long addr)
+{
+	return 0;
+}
+
+void GameProcess::readBytes(const long addr, char* buf, const unsigned int BUF_SIZE)
+{
+
+}
+
+long GameProcess::allocateMem(const unsigned int size)
+{
+	return 0;
+}
+
+void GameProcess::freeMem(const long addr)
+{
+
 }
