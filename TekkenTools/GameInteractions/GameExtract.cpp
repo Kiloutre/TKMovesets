@@ -31,10 +31,11 @@ void GameExtract::Update()
 	while (m_threadStarted)
 	{
 		if (process->IsAttached() && process->CheckRunning()) {
-			for (gameAddr playerAddress : m_playerAddress) {
-				ExtractCharacter(playerAddress);
+			while (m_playerAddress.size() > 0)
+			{
+				ExtractCharacter(m_playerAddress[0]);
+				m_playerAddress.erase(m_playerAddress.begin());
 			}
-			m_playerAddress.clear();
 		}
 		else if (currentGameId != -1) {
 			c_characterNames[0] = nullptr;
