@@ -49,7 +49,7 @@ bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 		me32.dwSize = sizeof(MODULEENTRY32);
 		if (Module32First(moduleSnap, &me32)) {
 			if (strcmp(me32.szModule, processName) == 0) {
-				modBaseAddr = (int64_t)me32.modBaseAddr;
+				modBaseAddr = (gameAddr)me32.modBaseAddr;
 				CloseHandle(moduleSnap);
 				return true;
 			}
@@ -57,7 +57,7 @@ bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 			while (Module32Next(moduleSnap, &me32)) {
 				if (strcmp(me32.szModule, processName) == 0) {
 
-					modBaseAddr = (int64_t)me32.modBaseAddr;
+					modBaseAddr = (gameAddr)me32.modBaseAddr;
 					CloseHandle(moduleSnap);
 					return true;
 				}
@@ -90,31 +90,41 @@ GameProcessError GameProcess::AttachToNamedProcess(const char* processName)
 
 bool GameProcess::Attach(const char* processName)
 {
-	// Another thread might access errcode before AttachToNameProcess() may return, that is why we set it first
-	errcode = PROC_ATTACHING;
+	if (errcode == PROC_ATTACHED) {
+		return false;
+	}
+
 	errcode = AttachToNamedProcess(processName);
 	return errcode == PROC_ATTACHED;
 }
 
-void GameProcess::DetachFromGame()
+bool GameProcess::IsAttached()
+{
+	return errcode == PROC_ATTACHED;
+}
+
+void GameProcess::DetachFromGame(bool updateErrcode)
 {
 	if (hProcess != nullptr) {
 		CloseHandle(hProcess);
 		hProcess = nullptr;
 	}
-	errcode = PROC_NOT_ATTACHED;
+	if (updateErrcode) {
+		errcode = PROC_NOT_ATTACHED;
+	}
 }
 
-bool GameProcess::AttemptRead()
+bool GameProcess::CheckRunning()
 {
-	// Todo
-	/*
-	try {
-		//readInt32(modBaseAddr);
-	} catch() {
-		return false;
+	if (hProcess != nullptr) {
+		int32_t value = 0;
+		if (ReadProcessMemory(hProcess, (LPCVOID)modBaseAddr, (LPVOID)&value, 4, nullptr) == 0)
+		{
+			DetachFromGame(false);
+			errcode = PROC_EXITED;
+			return false;
+		}
 	}
-	*/
 	return true;
 }
 

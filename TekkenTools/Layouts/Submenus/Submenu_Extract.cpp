@@ -16,13 +16,13 @@ struct movesetInfo
 	const char* date;
 };
 
-const size_t movesetCount = 4;
-const movesetInfo movesetInfos[movesetCount] = {
+const movesetInfo movesetInfos[] = {
 	{ "test.tkmvst", "Devilish Kazuya", "Tekken 7", "Kazuya", "15:05 28/02/2023" },
 	{ "test.tkmvst", "EX Jin", "Tekken 7", "Jin", "15:05 28/02/2023" },
 	{ "test.tkmvst", "Ascended Paul", "Tekken 8", "Paul", "15:05 28/02/2023" },
 	{ "test.tkmvst", "Legacy T7 Kazuya", "Tekken 8", "Kazuya", "15:05 28/02/2023" },
 };
+const size_t movesetCount = sizeof(movesetInfos) / sizeof(*movesetInfos);
 
 struct gameProcessName
 {
@@ -30,12 +30,11 @@ struct gameProcessName
 	const char* processName;
 };
 
-const size_t gameListCount = 3;
 const gameProcessName gameList[] = {
-	{ "", "" },
 	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
 	{ "Tekken 8", "Tekken8.exe" },
 };
+const size_t gameListCount = sizeof(gameList) / sizeof(*gameList);
 
 void Submenu_Extract::Render() 
 {
@@ -47,12 +46,11 @@ void Submenu_Extract::Render()
 		ImGui::SeparatorText(_("extraction.extraction"));
 		size_t currentItem = extractor.currentGameId;
 		ImGui::PushItemWidth(150.0f);
-		if (ImGui::BeginCombo("##", currentItem == 0 ? _("extraction.select_game") : gameList[currentItem].name))
+		if (ImGui::BeginCombo("##", currentItem == -1 ? _("extraction.select_game") : gameList[currentItem].name))
 		{
-			for (size_t i = 1; i < gameListCount; ++i)
+			for (size_t i = 0; i < gameListCount; ++i)
 			{
-				const char* name = i == 0 ? _("extraction.game_none") : gameList[i].name;
-				if (ImGui::Selectable(name, currentItem == i, 0, ImVec2(100.0f, 0)) && i != 0)
+				if (ImGui::Selectable(gameList[i].name, currentItem == i, 0, ImVec2(100.0f, 0)))
 				{
 					extractor.SetTargetProcess(gameList[i].processName, i);
 				}
@@ -68,18 +66,17 @@ void Submenu_Extract::Render()
 		{
 		case PROC_NOT_ATTACHED:
 		case PROC_EXITED:
+		case PROC_ATTACHING:
 			ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
 			break;
 		case PROC_NOT_FOUND:
 			ImGuiExtra_TextboxWarning(_("process.game_not_running"));
 			break;
+		case PROC_VERSION_MISMATCH:
 			ImGuiExtra_TextboxWarning(_("process.game_version_mismatch"));
 			break;
-		case PROC_VERSION_MISMATCH:
+		case PROC_ATTACH_ERR:
 			ImGuiExtra_TextboxWarning(_("process.game_attach_err"));
-			break;
-		case PROC_ATTACHING:
-			ImGuiExtra_TextboxTip(_("process.attaching"));
 			break;
 		}
 	}

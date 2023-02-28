@@ -36,10 +36,8 @@ private:
 	DWORD GetGamePID(const char* processName);
 	// Load the address of the main module in .modBaseAddr
 	bool LoadGameMainModule(const char* processName, DWORD pid);
-	// Attempts a read and detaches from the game if it fails
-	bool AttemptRead();
-	// Detach from the game
-	void DetachFromGame();
+	// Detach from the game, sets .errcode to PROC_NOT_ATTACHED if desired
+	void DetachFromGame(bool updateErrcode=true);
 public:
 	// Status of the process attachment
 	GameProcessError errcode{ PROC_NOT_ATTACHED };
@@ -48,12 +46,16 @@ public:
 	// pid of process we latch on
 	DWORD processId{ (DWORD)-1 };
 	// Address of main module in game
-	int64_t modBaseAddr{ 0 };
+	gameAddr modBaseAddr{ (gameAddr)0 };
 
 	// -- Interaction stuff -- //
 	// 
 	// Attach to a process, return false is failed. See .errcode for more details.
 	bool Attach(const char* processName);
+	// Returns true if .errcode = PROC_NOT_ATTACHED
+	bool IsAttached();
+	// Checks if pid still used by process & attempts a read. Updates .errcode & returns false if it fails.
+	bool CheckRunning();
 	
 	// Reads a char (1b) from the game in little endian
 	int8_t  readInt8(gameAddr addr);
@@ -61,7 +63,7 @@ public:
 	int16_t readInt16(gameAddr addr);
 	// Reads an int (4b) from the game in little endian
 	int32_t readInt32(gameAddr addr);
-	// Reads an int (4b) from the game in little endian
+	// Reads an int (8b) from the game in little endian
 	int64_t readInt64(gameAddr addr);
 	// Reads a floating point number (4b) from the game in little endian
 	float   readFloat(gameAddr addr);
@@ -82,7 +84,7 @@ public:
 	void writeBytes(gameAddr addr, void* buf, size_t bufSize);
 
 	// Allocates a certain amount of memory in the game
-	byte* allocateMem(size_t amount);
+	gameAddr allocateMem(size_t amount);
 	// Frees memory that we previously allocated. Address must be the exact same as when it was returned by allocateMem().
 	void freeMem(gameAddr addr);
 };

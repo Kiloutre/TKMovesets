@@ -9,7 +9,6 @@
 void GameData::CacheAddresses()
 {
 	std::map<std::string, gameAddr> cachedAddresses;
-	m_moduleAddress = m_process->modBaseAddr;
 
 	for (std::string addressId : GameAddressesFile::GetAllEntries())
 	{
@@ -29,12 +28,12 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId)
 	std::vector<gameAddr> ptrPath = GameAddressesFile::GetAddress(c_addressId, isRelative);
 
 	if (ptrPath.size() == 0) {
-		return nullptr;
+		return GAME_ADDR_NULL;
 	}
 
 	gameAddr addr = ptrPath[0];
 	if (isRelative) {
-		addr += m_moduleAddress;
+		addr += (int64_t)m_process->modBaseAddr;
 	}
 
 	{
@@ -43,13 +42,16 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId)
 		{
 			for (size_t i = 1; i < pathLen; ++i)
 			{
+				if (addr == (gameAddr)0) {
+					return GAME_ADDR_NULL;
+				}
 				addr = (gameAddr)m_process->readInt64(addr) + (int64_t)ptrPath[i];
 			}
 			// double, triplecheck. Thre's no way this works right now
 		}
 	}
 
-	return (byte*)addr;
+	return addr;
 }
 
 int8_t GameData::ReadInt8(const char* c_addressId)
@@ -78,6 +80,11 @@ int64_t GameData::ReadInt64(const char* c_addressId)
 	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
 				? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
 	return m_process->readInt64(addr);
+}
+
+gameAddr GameData::ReadPtr(const char* c_addressId)
+{
+	return (gameAddr)ReadInt64(c_addressId);
 }
 
 float GameData::ReadFloat(const char* c_addressId)

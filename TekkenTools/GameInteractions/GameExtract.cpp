@@ -4,6 +4,7 @@
 #include "GameData.hpp"
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
+#include "GameAddresses.h"
 
 // -- Thread stuff -- //
 
@@ -17,7 +18,7 @@ void GameExtract::StartThread()
 	}
 }
 
-void GameExtract::OrderExtraction(void *playerAddress)
+void GameExtract::OrderExtraction(gameAddr playerAddress)
 {
 	m_playerAddress.push_back(playerAddress);
 }
@@ -26,10 +27,15 @@ void GameExtract::Update()
 {
 	while (m_threadStarted)
 	{
-		while (m_playerAddress.size() > 0)
-		{
-			ExtractCharacter(m_playerAddress.back());
-			m_playerAddress.pop_back();
+		if (process->IsAttached() && process->CheckRunning()) {
+			while (m_playerAddress.size() > 0)
+			{
+				ExtractCharacter(m_playerAddress.back());
+				m_playerAddress.pop_back();
+			}
+		}
+		else if (currentGameId != -1) {
+			process->Attach(currentGameProcess.c_str());
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -38,7 +44,7 @@ void GameExtract::Update()
 
 // -- Actual extraction -- //
 
-void GameExtract::ExtractCharacter(void* playerAddress)
+void GameExtract::ExtractCharacter(gameAddr playerAddress)
 {
 	extractionProgress = 0.0f;
 
@@ -68,13 +74,13 @@ bool GameExtract::IsBusy()
 
 void GameExtract::ExtractP1()
 {
-	void* playerAddress = nullptr;
+	gameAddr playerAddress = game->ReadPtr("p1_addr");
 	OrderExtraction(playerAddress);
 }
 
 void GameExtract::ExtractP2()
 {
-	void* playerAddress = nullptr;
+	gameAddr playerAddress = (gameAddr)0;
 	OrderExtraction(playerAddress);
 }
 

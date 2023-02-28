@@ -33,8 +33,10 @@ public:
 	int16_t ReadInt16(const char* c_addressId);
 	// Reads an int (4b) from the game in little endian
 	int32_t ReadInt32(const char* c_addressId);
-	// Reads an int (4b) from the game in little endian
+	// Reads an int (8b) from the game in little endian
 	int64_t ReadInt64(const char* c_addressId);
+	// Reads a 8b value from the game to be interpreted as a pointer
+	gameAddr ReadPtr(const char* c_addressId);
 	// Reads a floating point number (4b) from the game in little endian
 	float ReadFloat(const char* c_addressId);
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer

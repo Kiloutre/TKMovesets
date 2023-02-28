@@ -4,6 +4,7 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "GameAddresses.h"
 
 class GameExtract
 {
@@ -16,14 +17,14 @@ private:
 	// Is a thread running
 	bool m_threadStarted = false;
 	// Player address to extract
-	std::vector<void*> m_playerAddress;
+	std::vector<gameAddr> m_playerAddress;
 
 	// Order an extraction to be pushed to the queue
-	void OrderExtraction(void* playerAddress);
+	void OrderExtraction(gameAddr playerAddress);
 	// Regularly called in an isolated thread to execute queued extractions
 	void Update();
 	// Extract a character from its address
-	void ExtractCharacter(void* playerAddress);
+	void ExtractCharacter(gameAddr playerAddress);
 public:
 	static GameExtract& getInstance() {
 		// Todo: mutex here or something?
@@ -32,7 +33,7 @@ public:
 	}
 
 	// Stores the ID of the currently opened game
-	size_t currentGameId = 0;
+	size_t currentGameId = -1;
 	// Used to know which process is currently being searched/opened
 	std::string currentGameProcess;
 	// Currently opened process for extraction
