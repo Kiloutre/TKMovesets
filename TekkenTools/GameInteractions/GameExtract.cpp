@@ -1,3 +1,4 @@
+#include "GameData.hpp"
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
 
@@ -5,8 +6,8 @@ void GameExtract::ExtractCharacter(void* playerAddress)
 {
 	busy = true;
 	extractionProgress = 0.0f;
-	process = &GameProcess::getInstance();
 
+	process = &GameProcess::getInstance();
 	// ...
 
 

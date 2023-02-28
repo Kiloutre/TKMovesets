@@ -1,5 +1,7 @@
-t7_p1_addr            = +0x34DF630, 0
-t7_playerstruct_size  = 0x3670
-t7_motbin_offset      = 0x1520
-t7_chara_id_offset    = 0xD8
-t7_camera_mota_offset = 0x14A0
+# This is a comment
+
+p1_addr                = +0x34DF630, 0
+val_playerstruct_size  = 0x3670
+val_motbin_offset      = 0x1520
+val_chara_id_offset    = 0xD8
+val_camera_mota_offset = 0x14A0

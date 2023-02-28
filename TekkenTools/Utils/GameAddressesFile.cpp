@@ -8,8 +8,9 @@
 
 std::map<std::string, std::vector<void*>> g_absolute_pointer_paths;
 std::map<std::string, std::vector<void*>> g_relative_pointer_paths;
+std::vector<std::string> g_entries;
 
-std::vector<void*> ParsePtrPath(std::string path)
+std::vector<void*> ParsePtrPathString(std::string path)
 {
 	std::vector<void*> ptrPath = std::vector<void*>();
 
@@ -40,8 +41,9 @@ namespace GameAddressesFile
 {
 	void LoadFile()
 	{
-		g_absolute_pointer_paths.clear();
-		g_relative_pointer_paths.clear();
+		std::map<std::string, std::vector<void*>> absolute_pointer_paths;
+		std::map<std::string, std::vector<void*>> relative_pointer_paths;
+		std::vector<std::string> entries;
 
 		std::ifstream infile;
 		std::string line;
@@ -74,12 +76,24 @@ namespace GameAddressesFile
 			}
 
 			if (value.rfind("+", 0) == 0) {
-				g_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));
+				relative_pointer_paths[key] = ParsePtrPathString(value.substr(1));
 			}
 			else {
-				g_absolute_pointer_paths[key] = ParsePtrPath(value);
+				absolute_pointer_paths[key] = ParsePtrPathString(value);
 			}
+
+			entries.push_back(key);
 		}
+		
+		// Replace these only when we have a proper replacement built
+		g_absolute_pointer_paths = absolute_pointer_paths;
+		g_relative_pointer_paths = g_relative_pointer_paths;
+		g_entries = entries;
+	}
+
+	const std::vector<std::string> GetAllEntries()
+	{
+		return g_entries;
 	}
 
 	bool IsAddressRelative(const char* c_addressId)

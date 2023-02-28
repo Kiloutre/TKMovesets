@@ -5,6 +5,7 @@
 #include "imgui_extras.hpp"
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
+#include "GameInteractions.hpp"
 
 const char* items[] = {
 	"testtesttesttesttesttesttesttesttest",
@@ -46,7 +47,8 @@ void Submenu_Extract::Render()
 	{
 		// Todo: also take into account if an extraction is already ongoing
 		GameExtract& extractor = GameExtract::getInstance();
-		bool canExtract = p.errcode == PROC_ATTACHED && !extractor.busy;
+		bool busy = GameInteractions::getInstance().busy;
+		bool canExtract = p.errcode == PROC_ATTACHED && !busy;
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &overwrite_same_filename);
 		ImGui::SameLine();
@@ -64,7 +66,8 @@ void Submenu_Extract::Render()
 			extractor.ExtractAll();
 		}
 
-		if (extractor.busy) {
+		if (busy) {
+			// Todo: identify what it is busy with
 			ImGui::SameLine();
 			ImGui::Text(_("extraction.extracting"), extractor.extractionProgress);
 		}

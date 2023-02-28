@@ -62,6 +62,8 @@ extraction.extract_2p_name = Extract (2P, {})
 extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.progress = Extracting... (%.0f%%)
+extraction.busy = Cannot extract: software is busy
+extraction.rename = Rename moveset
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.

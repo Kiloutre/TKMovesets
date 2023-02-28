@@ -42,6 +42,9 @@ private:
 	void DetachFromGame();
 	// Attempts a read and detaches from the game if it fails
 	bool AttemptRead();
+
+	// Is true when the process was opened.
+	bool recentlyReloaded = true;
 public:
 	static GameProcess& getInstance() {
 		// Todo: mutex here or something?
@@ -58,9 +61,12 @@ public:
 	// pid of process we latch on
 	DWORD processId{ (DWORD)-1 };
 	// Address of main module in game
-	BYTE* modBaseAddr{ (BYTE*)0 };
+	int64_t modBaseAddr{ 0 };
 	// Name of process to latch on to
 	std::string processName;
+
+	// Returns true once after the process was latched onto. Afterward, will return only false until the process is re-opened.
+	bool MustReloadAddresses();
 
 	// -- Process stuff -- //
 
@@ -81,7 +87,7 @@ public:
 	int64_t readInt64(void* addr);
 	// Reads a floating point number (4b) from the game in little endian
 	float   readFloat(void* addr);
-	// Reads readSize amounts of bytes from the game and write them to the provided buffer
+	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
 	void    readBytes(void* addr, void* buf, size_t readSize);
 
 	// Writes a char (1b) to the game
@@ -94,7 +100,7 @@ public:
 	void writeInt64(void* addr, int64_t value);
 	// Writes a floating point number (4b) to the game
 	void writeFloat(void* addr, float value);
-	// Writes bufSize amounts of bytes to the game
+	// Writes [bufSize] amounts of bytes to the game
 	void writeBytes(void* addr, void* buf, size_t bufSize);
 
 	// Allocates a certain amount of memory in the game

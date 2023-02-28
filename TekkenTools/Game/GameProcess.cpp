@@ -5,7 +5,7 @@
 
 #include "GameProcess.hpp"
 
-// -- Private helpers -- //
+// -- Private : Helpers -- //
 
 DWORD GameProcess::GetGamePID()
 {
@@ -40,7 +40,7 @@ DWORD GameProcess::GetGamePID()
 bool GameProcess::LoadGameMainModule(DWORD pid)
 {
 	HANDLE moduleSnap;
-	MODULEENTRY32 me32 = { };
+	MODULEENTRY32 me32 = {};
 
 	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
 
@@ -49,7 +49,7 @@ bool GameProcess::LoadGameMainModule(DWORD pid)
 		me32.dwSize = sizeof(MODULEENTRY32);
 		if (Module32First(moduleSnap, &me32)) {
 			if (strcmp(me32.szModule, processName.c_str()) == 0) {
-				modBaseAddr = me32.modBaseAddr;
+				modBaseAddr = (int64_t)me32.modBaseAddr;
 				CloseHandle(moduleSnap);
 				return true;
 			}
@@ -57,7 +57,7 @@ bool GameProcess::LoadGameMainModule(DWORD pid)
 			while (Module32Next(moduleSnap, &me32)) {
 				if (strcmp(me32.szModule, processName.c_str()) == 0) {
 
-					modBaseAddr = me32.modBaseAddr;
+					modBaseAddr = (int64_t)me32.modBaseAddr;
 					CloseHandle(moduleSnap);
 					return true;
 				}
@@ -77,8 +77,8 @@ GameProcessError GameProcess::AttachToNamedProcess()
 	else {
 		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 		if (hProcess != nullptr && LoadGameMainModule(pid)) {
-			printf("Module addr: %p\n", modBaseAddr);
 			processId = pid;
+			recentlyReloaded = true;
 			return PROC_ATTACHED;
 		}
 		else {
@@ -87,7 +87,7 @@ GameProcessError GameProcess::AttachToNamedProcess()
 	}
 }
 
-// -- Public lifespan -- //
+// -- Public : Lifespan -- //
 
 // Starts the attaching process in an existing other thread
 void GameProcess::StartAttachingThread()
@@ -124,8 +124,10 @@ void GameProcess::Update()
 				hProcess = nullptr;
 				errcode = PROC_EXITED;
 			}
-		} else if (errcode != PROC_ATTACHED)
+		}
+		else if (errcode != PROC_ATTACHED) {
 			errcode = AttachToNamedProcess();
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
@@ -145,39 +147,48 @@ bool GameProcess::AttemptRead()
 	return true;
 }
 
-// -- Reading -- //
+// -- Public: Other -- //
+
+bool GameProcess::MustReloadAddresses()
+{
+	bool mustReload = recentlyReloaded;
+	if (mustReload) recentlyReloaded = false;
+	return mustReload;
+}
+
+// -- Public : Reading -- //
 
 int8_t GameProcess::readInt8(void* addr)
 {
-	int8_t value;
+	int8_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
 	return value;
 }
 
 int16_t GameProcess::readInt16(void* addr)
 {
-	int16_t value;
+	int16_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
 	return value;
 }
 
 int32_t GameProcess::readInt32(void* addr)
 {
-	int16_t value;
+	int16_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
 int64_t GameProcess::readInt64(void* addr)
 {
-	int16_t value;
+	int16_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
 	return value;
 }
 
 float GameProcess::readFloat(void* addr)
 {
-	float value;
+	float value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
@@ -187,7 +198,7 @@ void GameProcess::readBytes(void* addr, void* buf, size_t readSize)
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&buf, readSize, nullptr);
 }
 
-// -- Writing -- // 
+// -- Public : Writing -- // 
 
 void GameProcess::writeInt8(void* addr, int8_t value)
 {
@@ -219,7 +230,7 @@ void  GameProcess::writeBytes(void* addr, void* buf, size_t bufSize)
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)buf, bufSize, nullptr);
 }
 
-// -- Allocation & Freeing -- // 
+// -- Public : Allocation & Freeing -- // 
 
 void* GameProcess::allocateMem(size_t amount)
 {
