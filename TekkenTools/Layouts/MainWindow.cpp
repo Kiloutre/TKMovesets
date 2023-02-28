@@ -3,6 +3,9 @@
 #include <imgui_impl_opengl3.h>
 
 #include "MainWindow.hpp"
+#include "GameData.hpp"
+#include "GameExtract.hpp"
+#include "GameProcess.hpp"
 
 MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 {
@@ -17,6 +20,15 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	// Init subclasses of singletons
+	{
+		GameExtract& extractor = GameExtract::getInstance();
+		GameProcess* process = new GameProcess();
+		extractor.process = process;
+		extractor.game = new GameData(process);
+		extractor.StartThread();
+	}
 }
 
 void MainWindow::NewFrame()

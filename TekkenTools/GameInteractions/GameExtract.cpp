@@ -7,15 +7,19 @@
 
 // -- Thread stuff -- //
 
-void GameExtract::OrderExtraction(void *playerAddress)
+void GameExtract::StartThread()
 {
-	m_playerAddress.push_back(playerAddress);
 	if (!m_threadStarted)
 	{
 		m_threadStarted = true;
 		std::thread t(&GameExtract::Update, this);
 		t.detach();
 	}
+}
+
+void GameExtract::OrderExtraction(void *playerAddress)
+{
+	m_playerAddress.push_back(playerAddress);
 }
 
 void GameExtract::Update()
@@ -38,8 +42,6 @@ void GameExtract::ExtractCharacter(void* playerAddress)
 {
 	extractionProgress = 0.0f;
 
-	process = &GameProcess::getInstance();
-	//gamedata= &GameData::getInstance();
 	// ...
 
 
@@ -50,9 +52,13 @@ void GameExtract::ExtractCharacter(void* playerAddress)
 
 void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 {
-	if (IsBusy()) return;
+	if (IsBusy()) {
+		return;
+	}
+
+	currentGameProcess = std::string(processName);
 	currentGameId = gameId;
-	//process.
+	process->Attach(processName);
 }
 
 bool GameExtract::IsBusy()

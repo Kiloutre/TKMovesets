@@ -60,7 +60,7 @@ namespace Localization
 		}
 	}
 
-	const char* GetText(const char *c_stringId)
+	const char* GetText(const char* c_stringId)
 	{
 		if (g_translations.find(c_stringId) != g_translations.end()) {
 			return g_translations[c_stringId].c_str();

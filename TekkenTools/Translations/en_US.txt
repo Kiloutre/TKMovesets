@@ -18,7 +18,7 @@ no = No
 process.status = Status:
 process.attach = Attach to game
 process.attaching = Attaching...
-process.game_not_attached = Currently not trying to attach.
+process.game_not_attached = Currently not trying to attach. Please select a game to extract from.
 process.game_attached = Game is running and attached.
 process.game_not_running = Game is not running or could not be found.
 process.game_version_mismatch = The current game version is not supported by game_address.txt.
@@ -62,9 +62,10 @@ extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.progress = Extracting... (%.0f%%)
 extraction.busy = Cannot extract: software is busy
-extraction.select_game = Select game to extract from
+extraction.select_game = Select a game
 extraction.extracted_movesets = Extracted movesets
 extraction.rename = Rename moveset
+extraction.game_none = None
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.

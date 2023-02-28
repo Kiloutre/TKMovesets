@@ -1,5 +1,3 @@
-#include <chrono>
-#include <thread>
 #include <windows.h>
 #include <tlhelp32.h>
 
@@ -7,7 +5,7 @@
 
 // -- Private : Helpers -- //
 
-DWORD GameProcess::GetGamePID()
+DWORD GameProcess::GetGamePID(const char* processName)
 {
 	HANDLE hProcessSnap;
 	PROCESSENTRY32 pe32;
@@ -17,14 +15,14 @@ DWORD GameProcess::GetGamePID()
 	{
 		pe32.dwSize = sizeof(PROCESSENTRY32);
 		if (Process32First(hProcessSnap, &pe32)) {
-			if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
+			if (strcmp(pe32.szExeFile, processName) == 0) {
 				DWORD pid = pe32.th32ProcessID;
 				CloseHandle(hProcessSnap);
 				return pid;
 			}
 
 			while (Process32Next(hProcessSnap, &pe32)) {
-				if (strcmp(pe32.szExeFile, processName.c_str()) == 0) {
+				if (strcmp(pe32.szExeFile, processName) == 0) {
 					DWORD pid = pe32.th32ProcessID;
 					CloseHandle(hProcessSnap);
 					return pid;
@@ -37,7 +35,7 @@ DWORD GameProcess::GetGamePID()
 	return (DWORD)-1;
 }
 
-bool GameProcess::LoadGameMainModule(DWORD pid)
+bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 {
 	HANDLE moduleSnap;
 	MODULEENTRY32 me32 = {};
@@ -48,14 +46,14 @@ bool GameProcess::LoadGameMainModule(DWORD pid)
 	{
 		me32.dwSize = sizeof(MODULEENTRY32);
 		if (Module32First(moduleSnap, &me32)) {
-			if (strcmp(me32.szModule, processName.c_str()) == 0) {
+			if (strcmp(me32.szModule, processName) == 0) {
 				modBaseAddr = (int64_t)me32.modBaseAddr;
 				CloseHandle(moduleSnap);
 				return true;
 			}
 
 			while (Module32Next(moduleSnap, &me32)) {
-				if (strcmp(me32.szModule, processName.c_str()) == 0) {
+				if (strcmp(me32.szModule, processName) == 0) {
 
 					modBaseAddr = (int64_t)me32.modBaseAddr;
 					CloseHandle(moduleSnap);
@@ -69,16 +67,15 @@ bool GameProcess::LoadGameMainModule(DWORD pid)
 	return false;
 }
 
-GameProcessError GameProcess::AttachToNamedProcess()
+GameProcessError GameProcess::AttachToNamedProcess(const char* processName)
 {
-	DWORD pid = GetGamePID();
+	DWORD pid = GetGamePID(processName);
 
 	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
 	else {
 		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-		if (hProcess != nullptr && LoadGameMainModule(pid)) {
+		if (hProcess != nullptr && LoadGameMainModule(processName, pid)) {
 			processId = pid;
-			recentlyReloaded = true;
 			return PROC_ATTACHED;
 		}
 		else {
@@ -87,21 +84,14 @@ GameProcessError GameProcess::AttachToNamedProcess()
 	}
 }
 
-// -- Public : Lifespan -- //
+// -- Public -- //
 
-// Starts the attaching process in an existing other thread
-void GameProcess::StartAttachingThread()
+bool GameProcess::Attach(const char* processName)
 {
-	if (errcode == PROC_ATTACHED)
-		throw("Process is already attached : not re-attaching.");
-
-	processName = "TekkenGame-Win64-Shipping.exe";
-	if (!threadStarted)
-	{
-		threadStarted = true;
-		std::thread t(&GameProcess::Update, this);
-		t.detach();
-	}
+	// Another thread might access errcode before AttachToNameProcess() may return, that is why we set it first
+	errcode = PROC_ATTACHING;
+	errcode = AttachToNamedProcess(processName);
+	return errcode == PROC_ATTACHED;
 }
 
 void GameProcess::DetachFromGame()
@@ -111,27 +101,6 @@ void GameProcess::DetachFromGame()
 		hProcess = nullptr;
 	}
 	errcode = PROC_NOT_ATTACHED;
-}
-
-void GameProcess::Update()
-{
-	errcode = PROC_ATTACHING;
-	while (threadStarted)
-	{
-		if (errcode == PROC_ATTACHED)
-		{
-			if (GetGamePID() == (DWORD)-1 || !GameProcess::AttemptRead()) {
-				hProcess = nullptr;
-				errcode = PROC_EXITED;
-			}
-		}
-		else if (errcode != PROC_ATTACHED) {
-			errcode = AttachToNamedProcess();
-		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	}
-	DetachFromGame();
 }
 
 bool GameProcess::AttemptRead()
@@ -148,13 +117,6 @@ bool GameProcess::AttemptRead()
 }
 
 // -- Public: Other -- //
-
-bool GameProcess::MustReloadAddresses()
-{
-	bool mustReload = recentlyReloaded;
-	if (mustReload) recentlyReloaded = false;
-	return mustReload;
-}
 
 // -- Public : Reading -- //
 

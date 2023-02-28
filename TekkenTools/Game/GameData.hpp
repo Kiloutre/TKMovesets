@@ -11,29 +11,20 @@
 class GameData
 {
 private:
-	GameData() = default;
-	~GameData() = default;
-	GameData& operator = (const GameData&) = delete;
-	GameData(const GameData&) = delete;
-
 	// Cached module address to avoid having to fetch it all the time
-	int64_t moduleAddress{};
+	int64_t m_moduleAddress{};
 	// Cached addresses and pointer path so that we don't have to re-compute everything mid-extraction/importation
 	std::map<std::string, void*> m_cachedAddresses;
-	// The singleton that allows us to read/write on process memory
-	GameProcess* process;
+	// The subclass that allows us to read/write on process memory
+	GameProcess* m_process;
 	
 	// Reads a ptr path from an address identifier and return its last pointer
 	void* ReadPtrPath(const char* c_addressId);
 public:
-	static GameData& getInstance() {
-		// Todo: mutex here or something?
-		static GameData s_instance;
-		return s_instance;
-	}
-
 	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
 	void CacheAddresses();
+
+	GameData(GameProcess* process) : m_process(process) {}
 
 	// Reads a char (1b) from the game in little endian
 	int8_t ReadInt8(const char* c_addressId);

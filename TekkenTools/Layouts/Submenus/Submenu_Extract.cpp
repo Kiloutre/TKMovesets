@@ -1,3 +1,4 @@
+#include <format>
 #include <ImGui.h>
 
 #include "Submenu_Extract.hpp"
@@ -20,6 +21,7 @@ struct gameProcessName
 };
 
 const gameProcessName gameList[] = {
+	{ "", "" },
 	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
 	{ "Tekken 8", "Tekken8.exe" },
 };
@@ -33,11 +35,13 @@ void Submenu_Extract::Render()
 	{
 		ImGui::SeparatorText(_("extraction.extraction"));
 		size_t currentItem = extractor.currentGameId;
-		if (ImGui::BeginCombo("##", gameList[currentItem].name))
+		ImGui::PushItemWidth(150.0f);
+		if (ImGui::BeginCombo("##", currentItem == 0 ? _("extraction.select_game") : gameList[currentItem].name))
 		{
-			for (size_t i = 0; i < sizeof(gameList) / sizeof(*gameList); ++i)
+			for (size_t i = 1; i < sizeof(gameList) / sizeof(*gameList); ++i)
 			{
-				if (ImGui::Selectable(gameList[i].name, currentItem == i, 0, ImVec2(100, 0)))
+				const char* name = i == 0 ? _("extraction.game_none") : gameList[i].name;
+				if (ImGui::Selectable(name, currentItem == i, 0, ImVec2(100.0f, 0)) && i != 0)
 				{
 					extractor.SetTargetProcess(gameList[i].processName, i);
 				}
@@ -46,10 +50,10 @@ void Submenu_Extract::Render()
 		}
 	}
 
-	GameProcess& p = GameProcess::getInstance();
-	if (p.errcode != PROC_ATTACHED)
+	GameProcess* p = extractor.process;
+	if (p->errcode != PROC_ATTACHED)
 	{
-		switch (p.errcode)
+		switch (p->errcode)
 		{
 		case PROC_NOT_ATTACHED:
 		case PROC_EXITED:
@@ -73,7 +77,7 @@ void Submenu_Extract::Render()
 	{
 		// Todo: also take into account if an extraction is already ongoing
 		bool busy = extractor.IsBusy();
-		bool canExtract = p.errcode == PROC_ATTACHED && !busy;
+		bool canExtract = p->errcode == PROC_ATTACHED && !busy;
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 		ImGui::SameLine();

@@ -25,35 +25,20 @@ enum GameProcessError
 class GameProcess
 {
 private:
-	GameProcess() = default;
-	~GameProcess() = default;
-	GameProcess& operator = (const GameProcess&) = delete;
-	GameProcess(const GameProcess&) = delete;
-
 	// Stores the handle of the opened process
 	HANDLE hProcess = nullptr;
-	// Returns the game PID
-	DWORD GetGamePID();
-	// Load the address of the main module in .modBaseAddr
-	bool LoadGameMainModule(DWORD pid);
+
 	// Attach to .processName
-	GameProcessError AttachToNamedProcess();
-	// Detach from the game
-	void DetachFromGame();
+	GameProcessError AttachToNamedProcess(const char* processName);
+	// Returns the game PID
+	DWORD GetGamePID(const char* processName);
+	// Load the address of the main module in .modBaseAddr
+	bool LoadGameMainModule(const char* processName, DWORD pid);
 	// Attempts a read and detaches from the game if it fails
 	bool AttemptRead();
-
-	// Is true when the process was opened.
-	bool recentlyReloaded = true;
+	// Detach from the game
+	void DetachFromGame();
 public:
-	static GameProcess& getInstance() {
-		// Todo: mutex here or something?
-		static GameProcess s_instance;
-		return s_instance;
-	}
-
-	// -- Variables -- //
-	// 
 	// Status of the process attachment
 	GameProcessError errcode{ PROC_NOT_ATTACHED };
 	// Determines if a thread with Update() is currently running
@@ -62,20 +47,11 @@ public:
 	DWORD processId{ (DWORD)-1 };
 	// Address of main module in game
 	int64_t modBaseAddr{ 0 };
-	// Name of process to latch on to
-	std::string processName;
-
-	// Returns true once after the process was latched onto. Afterward, will return only false until the process is re-opened.
-	bool MustReloadAddresses();
-
-	// -- Process stuff -- //
-
-	// Starts a thread that will seek to attach this class to the game
-	void StartAttachingThread();
-	// Called regularly in order to find the game's process and detect when it is not running anymore
-	void Update();
 
 	// -- Interaction stuff -- //
+	// 
+	// Attach to a process, return false is failed. See .errcode for more details.
+	bool Attach(const char* processName);
 	
 	// Reads a char (1b) from the game in little endian
 	int8_t  readInt8(void* addr);

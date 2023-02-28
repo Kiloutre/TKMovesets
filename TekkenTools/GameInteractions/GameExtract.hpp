@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "GameData.hpp"
 #include "GameProcess.hpp"
 
 class GameExtract
@@ -32,11 +33,17 @@ public:
 
 	// Stores the ID of the currently opened game
 	size_t currentGameId = 0;
+	// Used to know which process is currently being searched/opened
+	std::string currentGameProcess;
 	// Currently opened process for extraction
-	GameProcess* process;
+	GameProcess* process = nullptr;
+	// Helper to read on address from their game_addresses.txt identifier
+	GameData* game = nullptr;
 	// Progress of the current extraction, between 0.0f and 100.0f
 	float extractionProgress{ 0.0f };
 
+	// Starts the thread that will later be used for extracton
+	void StartThread();
 	// Is curently busy with an extraction
 	bool IsBusy();
 	// Set the process to open
