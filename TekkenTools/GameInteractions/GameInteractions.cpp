@@ -4,17 +4,16 @@
 #include "GameData.hpp"
 #include "GameInteractions.hpp"
 
-void GameInteractions::StartAction(void (*callback)(va_list), float& t_progress)
+void GameInteractions::StartAction()
 {
 	busy = true;
-	progress = t_progress;
-	*progress = 0;
 	GameData::getInstance().CacheAddresses();
 
 	if (!threadStarted)
 	{
+		actionToCall = t_callback;
 		threadStarted = true;
-		std::thread t(&GameInteractions::Update, this);
+		std::thread t(&GameInteractions::Update(), this);
 		t.detach();
 	}
 }
@@ -22,11 +21,17 @@ void GameInteractions::StartAction(void (*callback)(va_list), float& t_progress)
 
 void GameInteractions::Update()
 {
-	if (false) // if (actionOrdered)
+	while (true)
 	{
-		//executeAction();
-		//actionOrdered = nullptr;
-		*progress = 100.0f;
-		busy = false;
+
+		if (actionToCall != nullptr)
+		{
+			actionToCall();
+			actionToCall = nullptr;
+			*progress = 100.0f;
+			busy = false;
+
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 }

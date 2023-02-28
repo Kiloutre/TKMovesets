@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 
+#include "GameProcess.hpp"
+
 // Class that allows you to read from the game using only the address identifier from game_address.txt
 // Also provides caching of pointer paths. But overall this is still a high-level class aimed at cleaning up code elsewhere and keeping things segmented.
 // Todo: store current player datas here for fancy displaying later on

@@ -19,8 +19,6 @@ public:
 		return s_instance;
 	}
 
-	// true = Currently busy with an extraction.
-	bool busy{ false };
 	// Progress of the current extraction, between 0.0f and 100.0f
 	float extractionProgress{ 0.0f };
 	GameProcess* process;

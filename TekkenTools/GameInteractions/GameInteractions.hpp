@@ -10,8 +10,10 @@ private:
 	GameInteractions& operator = (const GameInteractions&) = delete;
 	GameInteractions(const GameInteractions&) = delete;
 
-	// Holds a reference to the progress variable to pass on to the action
-	float& progress;
+	//
+	void* playerAddress;
+	// Callback that will be called during the next Update()
+	void (GameExtract::* actionToCall)(void*) = nullptr;
 public:
 	static GameInteractions& getInstance() {
 		// Todo: mutex here or something?
@@ -25,7 +27,7 @@ public:
 	bool threadStarted{ false };
 
 	// Orders an action that will be executed in its own thread
-	//void GameInteractions::StartAction(void* callback, float& progress);
+	void StartAction();
 
 	// Regularly called in its own thread, executes queued actions
 	void Update();

@@ -1,13 +1,14 @@
 #include "GameData.hpp"
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
+#include "GameInteractions.hpp"
 
 void GameExtract::ExtractCharacter(void* playerAddress)
 {
-	busy = true;
 	extractionProgress = 0.0f;
 
 	process = &GameProcess::getInstance();
+	//gamedata= &GameData::getInstance();
 	// ...
 
 
@@ -16,7 +17,7 @@ void GameExtract::ExtractCharacter(void* playerAddress)
 
 void GameExtract::ExtractP1()
 {
-	//ExtractCharacter();
+	void* playerAddress = nullptr;
 }
 
 void GameExtract::ExtractP2()
@@ -26,6 +27,5 @@ void GameExtract::ExtractP2()
 
 void GameExtract::ExtractAll()
 {
-	ExtractP1();
-	ExtractP2();
+	//GameInteractions::getInstance().StartAction();
 }
