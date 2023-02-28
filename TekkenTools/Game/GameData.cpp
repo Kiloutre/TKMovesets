@@ -33,21 +33,21 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId)
 
 	gameAddr addr = ptrPath[0];
 	if (isRelative) {
-		addr += (int64_t)m_process->modBaseAddr;
+		addr += m_process->modBaseAddr;
 	}
 
 	{
-		const size_t pathLen = ptrPath.size();
-		if (pathLen > 1)
+		size_t pathLen = ptrPath.size() - 1;
+		if (pathLen > 0)
 		{
 			for (size_t i = 1; i < pathLen; ++i)
 			{
 				if (addr == (gameAddr)0) {
 					return GAME_ADDR_NULL;
 				}
-				addr = (gameAddr)m_process->readInt64(addr) + (int64_t)ptrPath[i];
+				addr = (gameAddr)m_process->readInt64(addr) + ptrPath[i];
 			}
-			// double, triplecheck. Thre's no way this works right now
+			addr += ptrPath[pathLen];
 		}
 	}
 

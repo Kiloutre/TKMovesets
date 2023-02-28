@@ -14,7 +14,7 @@ namespace ImGuiExtra
 {
 	bool RenderButtonEnabled(const char* c_text, bool enabled, ImVec2 size)
 	{
-		if (!enabled) {
+		if (enabled) {
 			return ImGui::Button(c_text, size);
 		}
 

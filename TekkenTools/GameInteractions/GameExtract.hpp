@@ -6,6 +6,13 @@
 #include "GameProcess.hpp"
 #include "GameAddresses.h"
 
+enum GameId
+{
+	GameId_t7 = 0,
+	GameId_t8 = 1,
+	GameId_ttt2 = 2,
+};
+
 class GameExtract
 {
 private:
@@ -25,6 +32,8 @@ private:
 	void Update();
 	// Extract a character from its address
 	void ExtractCharacter(gameAddr playerAddress);
+	// Reads the movesets for the players characters' names. Accessible under .characterNames & .c_characterNames
+	void LoadCharacterName(int playerId);
 public:
 	static GameExtract& getInstance() {
 		// Todo: mutex here or something?
@@ -42,18 +51,20 @@ public:
 	GameData* game = nullptr;
 	// Progress of the current extraction, between 0.0f and 100.0f
 	float extractionProgress{ 0.0f };
+	// Contains the character names
+	std::string characterNames[4];
+	char* c_characterNames[4]{};
+	// Max character count of the game
+	int characterCount = 2;
 
-	// Starts the thread that will later be used for extracton
-	void StartThread();
-	// Is curently busy with an extraction
+	// Returns the name of the given player's character
+	const char* GetCharacterName(int playerId);
+	// Is crurently busy with an extraction
 	bool IsBusy();
 	// Set the process to open
 	void SetTargetProcess(const char* processName, size_t gameId);
-
-	// Extracts only the first player's selected character
-	void ExtractP1();
-	// Extracts only the second player's selected character
-	void ExtractP2();
-	// Extracts every player character 
-	void ExtractAll();
+	// Starts the thread that will later be used for extracton
+	void StartThread();
+	// Queue a character extraction. -1 of all characters
+	void QueueCharacterExtraction(int playerId);
 };

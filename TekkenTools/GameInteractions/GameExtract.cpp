@@ -5,6 +5,9 @@
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
 #include "GameAddresses.h"
+#include "GameAddressesFile.hpp"
+#include "Extractor.hpp"
+#include "Extractor_t7.hpp"
 
 // -- Thread stuff -- //
 
@@ -35,6 +38,7 @@ void GameExtract::Update()
 			}
 		}
 		else if (currentGameId != -1) {
+			c_characterNames[0] = nullptr;
 			process->Attach(currentGameProcess.c_str());
 		}
 
@@ -44,17 +48,38 @@ void GameExtract::Update()
 
 // -- Actual extraction -- //
 
+// Todo: move in t7 file
 void GameExtract::ExtractCharacter(gameAddr playerAddress)
 {
 	extractionProgress = 0.0f;
 
-	// ...
+	Extractor* extractor = nullptr;
 
+	switch (currentGameId)
+	{
+	case GameId_t7:
+		extractor = new ExtractorT7(process, game);
+		break;
+	case GameId_t8:
+		extractor = nullptr;
+		break;
+	case GameId_ttt2:
+		extractor = nullptr;
+		break;
+	}
 
-	extractionProgress = 100.0f;
+	if (extractor != nullptr) {
+		extractor->Extract(playerAddress, &extractionProgress);
+		delete extractor;
+	}
 }
 
 // -- Interaction -- //
+
+const char* GameExtract::GetCharacterName(int playerId)
+{
+	return nullptr;
+}
 
 void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 {
@@ -72,20 +97,18 @@ bool GameExtract::IsBusy()
 	return m_playerAddress.size() > 0;
 }
 
-void GameExtract::ExtractP1()
+
+void GameExtract::QueueCharacterExtraction(int playerId)
 {
 	gameAddr playerAddress = game->ReadPtr("p1_addr");
-	OrderExtraction(playerAddress);
-}
+	gameAddr playerStructSize = GameAddressesFile::GetSingleValue("val_playerstruct_size");
 
-void GameExtract::ExtractP2()
-{
-	gameAddr playerAddress = (gameAddr)0;
-	OrderExtraction(playerAddress);
-}
-
-void GameExtract::ExtractAll()
-{
-	ExtractP1();
-	ExtractP2();
+	if (playerId == -1) {
+		for (playerId = 0; playerId < characterCount; ++playerId) {
+			OrderExtraction(playerAddress + playerId * playerStructSize);
+		}
+	}
+	else {
+		OrderExtraction(playerAddress);
+	}
 }

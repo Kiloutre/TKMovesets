@@ -87,7 +87,7 @@ namespace GameAddressesFile
 		
 		// Replace these only when we have a proper replacement built
 		g_absolute_pointer_paths = absolute_pointer_paths;
-		g_relative_pointer_paths = g_relative_pointer_paths;
+		g_relative_pointer_paths = relative_pointer_paths;
 		g_entries = entries;
 	}
 
@@ -102,6 +102,14 @@ namespace GameAddressesFile
 			return true;
 		}
 		return false;
+	}
+
+	const int64_t GetSingleValue(const char* c_addressId)
+	{
+		if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
+			return (int64_t)g_absolute_pointer_paths[c_addressId][0];
+		}
+		return (int64_t)-1;
 	}
 
 	const std::vector<gameAddr> GetAddress(const char* c_addressId)

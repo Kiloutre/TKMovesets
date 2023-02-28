@@ -30,6 +30,7 @@ struct gameProcessName
 	const char* processName;
 };
 
+// Respect the ids of GameId enum here.
 const gameProcessName gameList[] = {
 	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
 	{ "Tekken 8", "Tekken8.exe" },
@@ -88,19 +89,30 @@ void Submenu_Extract::Render()
 		bool canExtract = p->errcode == PROC_ATTACHED && !busy;
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
-		ImGui::SameLine();
-		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_1p"), canExtract)) {
-			extractor.ExtractP1();
-		}
 
-		ImGui::SameLine();
-		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_2p"), canExtract)) {
-			extractor.ExtractP2();
+		for (unsigned int playerId = 0; playerId < extractor.characterCount; ++playerId)
+		{
+			ImGui::SameLine();
+
+			const char* characterName = extractor.GetCharacterName(playerId);
+			std::string buttonText;
+
+			const char playerIdTranslationId[3] = { '1' + (char)playerId , 'p', '\0' };
+			if (characterName == nullptr) {
+				buttonText = std::format("{} ({})", _("extraction.extract"), _(playerIdTranslationId));
+			}
+			else {
+				buttonText = std::format("{} ({}, {})", _("extraction.extract"), _(playerIdTranslationId), characterName);
+			}
+
+			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtract)) {
+				extractor.QueueCharacterExtraction(playerId);
+			}
 		}
 
 		ImGui::SameLine();
 		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
-			extractor.ExtractAll();
+			extractor.QueueCharacterExtraction(-1);
 		}
 
 		if (busy) {
@@ -111,7 +123,6 @@ void Submenu_Extract::Render()
 	}
 
 	//ImGui::EndTable()
-
 
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg

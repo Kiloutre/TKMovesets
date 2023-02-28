@@ -54,10 +54,7 @@ status.fps = %.1f FPS # 32 characters max, will crash otherwise
 # Extraction #
 extraction.explanation = Movesets have to first be extracted from the game to be then used. Extracts only movesets : not models or visual effects.\nExtraction is done with the game running (from memory), with the target character(s) loaded and visible on the screen (it doesn't matter what gamemode).
 extraction.extraction = Extraction
-extraction.extract_1p = Extract (1P)
-extraction.extract_2p = Extract (2P)
-extraction.extract_1p_name = Extract (1P, {})
-extraction.extract_2p_name = Extract (2P, {})
+extraction.extract = Extract
 extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.progress = Extracting... (%.0f%%)

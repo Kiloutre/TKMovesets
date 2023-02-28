@@ -15,6 +15,10 @@ set(MAIN_SOURCES
                     "GameInteractions/GameExtract.cpp"
 )
 
+set(GAME_SPECIFIC_SOURCES
+                    "GameInteractions/Extractor_t7.cpp"
+)
+
 set(LAYOUT_SOURCES
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
@@ -33,9 +37,7 @@ set(OTHER_SOURCES
                     "Utils/GameAddressesFile.cpp"
 )
 
-set(ALL_SOURCES ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES})
-
-add_executable (TekkenTools ${ALL_SOURCES})
+add_executable (TekkenTools ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES} ${GAME_SPECIFIC_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

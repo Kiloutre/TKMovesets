@@ -148,14 +148,14 @@ int16_t GameProcess::readInt16(gameAddr addr)
 
 int32_t GameProcess::readInt32(gameAddr addr)
 {
-	int16_t value{};
+	int32_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
 int64_t GameProcess::readInt64(gameAddr addr)
 {
-	int16_t value{};
+	int64_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
 	return value;
 }
