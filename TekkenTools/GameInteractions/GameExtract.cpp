@@ -4,7 +4,6 @@
 #include "GameData.hpp"
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
-#include "GameInteractions.hpp"
 
 // -- Thread stuff -- //
 
@@ -51,6 +50,7 @@ void GameExtract::ExtractCharacter(void* playerAddress)
 
 void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 {
+	if (IsBusy()) return;
 	currentGameId = gameId;
 	//process.
 }
@@ -74,6 +74,6 @@ void GameExtract::ExtractP2()
 
 void GameExtract::ExtractAll()
 {
-	void* playerAddress = nullptr;
-	OrderExtraction(playerAddress);
+	ExtractP1();
+	ExtractP2();
 }

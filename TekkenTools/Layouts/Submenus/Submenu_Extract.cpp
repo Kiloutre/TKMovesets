@@ -5,7 +5,6 @@
 #include "imgui_extras.hpp"
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
-#include "GameInteractions.hpp"
 
 const char* items[] = {
 	"testtesttesttesttesttesttesttesttest",
@@ -21,7 +20,7 @@ struct gameProcessName
 };
 
 const gameProcessName gameList[] = {
-	{ "Tekken 7", "TekkenGame - Win64 - Shipping.exe" },
+	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
 	{ "Tekken 8", "Tekken8.exe" },
 };
 
@@ -30,6 +29,7 @@ void Submenu_Extract::Render()
 	GameExtract& extractor = GameExtract::getInstance();
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
+	//ImGui::BeginTable()
 	{
 		ImGui::SeparatorText(_("extraction.extraction"));
 		size_t currentItem = extractor.currentGameId;
@@ -72,7 +72,7 @@ void Submenu_Extract::Render()
 
 	{
 		// Todo: also take into account if an extraction is already ongoing
-		bool busy = GameInteractions::getInstance().busy;
+		bool busy = extractor.IsBusy();
 		bool canExtract = p.errcode == PROC_ATTACHED && !busy;
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
@@ -97,6 +97,8 @@ void Submenu_Extract::Render()
 			ImGui::Text(_("extraction.extracting"), extractor.extractionProgress);
 		}
 	}
+
+	//ImGui::EndTable()
 
 
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
