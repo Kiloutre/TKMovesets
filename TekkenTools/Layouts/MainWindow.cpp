@@ -84,8 +84,8 @@ void MainWindow::Update(int width, int height)
 
 	// Status bar
 	{
-		ImGui::SetNextWindowPos(ImVec2(0, height - c_statusBarHeight));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(width, c_statusBarHeight), ImVec2(width, c_statusBarHeight));
+		ImGui::SetNextWindowPos(ImVec2(0.0f, height - c_statusBarHeight));
+		ImGui::SetNextWindowSizeConstraints(ImVec2((float)width, c_statusBarHeight), ImVec2((float)width, c_statusBarHeight));
 		ImGui::Begin("StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		statusBar.Render();
 		ImGui::End();

@@ -5,6 +5,7 @@ set(INCLUDE_FOLDERS
                     "Layouts/Submenus"
                     "Game"
                     "GameInteractions"
+                    "GameInteractions/Extractors"
                     "Utils"
 )
 
@@ -13,10 +14,11 @@ set(MAIN_SOURCES
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
                     "GameInteractions/GameExtract.cpp"
+                    "GameInteractions/Extractors/Extractor.cpp"
 )
 
 set(GAME_SPECIFIC_SOURCES
-                    "GameInteractions/Extractor_t7.cpp"
+                    "GameInteractions/Extractors/Extractor_t7.cpp"
 )
 
 set(LAYOUT_SOURCES

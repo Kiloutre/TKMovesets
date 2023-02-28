@@ -21,6 +21,8 @@ std::vector<gameAddr> ParsePtrPathString(std::string path)
 			ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos, pos), NULL, 16));
 		}
 		catch (const std::out_of_range& oor) {
+			// Todo: warn of bad formatting
+			oor;
 			ptrPath.push_back((gameAddr)0);
 		}
 		pos += 1;
@@ -31,6 +33,8 @@ std::vector<gameAddr> ParsePtrPathString(std::string path)
 		ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos), NULL, 16));
 	}
 	catch (const std::out_of_range& oor) {
+		// Todo: warn of bad formatting
+		oor;
 		ptrPath.push_back((gameAddr)0);
 	}
 

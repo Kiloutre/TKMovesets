@@ -90,7 +90,7 @@ void Submenu_Extract::Render()
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 
-		for (unsigned int playerId = 0; playerId < extractor.characterCount; ++playerId)
+		for (int playerId = 0; playerId < extractor.characterCount; ++playerId)
 		{
 			ImGui::SameLine();
 

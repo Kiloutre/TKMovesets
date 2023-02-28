@@ -4,18 +4,18 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 
-const NavMenuBtn const moveset_btns[] = {
+const NavMenuBtn moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},
 	{NAV__MENU_IMPORT, "navmenu.import"},
 	{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
 };
 
-const NavMenuBtn const tools_btns[] = {
+const NavMenuBtn tools_btns[] = {
 	{NAV__MENU_EDITION, "navmenu.moveset_edit"},
 	{NAV__MENU_CAMERA, "navmenu.camera"},
 };
 
-const NavMenuBtn const other_btns[] = {
+const NavMenuBtn other_btns[] = {
 	{NAV__MENU_DOCUMENTATION, "navmenu.documentation"},
 	{NAV__MENU_ABOUT, "navmenu.about"},
 };

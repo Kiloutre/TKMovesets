@@ -32,7 +32,7 @@ private:
 	void Update();
 	// Extract a character from its address
 	void ExtractCharacter(gameAddr playerAddress);
-	// Reads the movesets for the players characters' names. Accessible under .characterNames & .c_characterNames
+	// Reads the movesets for the players characters' names. Accessible under .characterNames & .c_characterNames (TODO)
 	void LoadCharacterName(int playerId);
 public:
 	static GameExtract& getInstance() {

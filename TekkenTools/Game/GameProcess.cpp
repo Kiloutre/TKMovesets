@@ -169,7 +169,7 @@ float GameProcess::readFloat(gameAddr addr)
 
 void GameProcess::readBytes(gameAddr addr, void* buf, size_t readSize)
 {
-	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&buf, readSize, nullptr);
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)buf, readSize, nullptr);
 }
 
 // -- Public : Writing -- // 
