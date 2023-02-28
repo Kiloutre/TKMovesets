@@ -7,11 +7,21 @@
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
 
-const char* items[] = {
-	"testtesttesttesttesttesttesttesttest",
-	"mdr",
-	"lol",
-	"salut"
+struct movesetInfo
+{
+	const char* filename;
+	const char* name;
+	const char* origin;
+	const char* target_character;
+	const char* date;
+};
+
+const size_t movesetCount = 4;
+const movesetInfo movesetInfos[movesetCount] = {
+	{ "test.tkmvst", "Devilish Kazuya", "Tekken 7", "Kazuya", "15:05 28/02/2023" },
+	{ "test.tkmvst", "EX Jin", "Tekken 7", "Jin", "15:05 28/02/2023" },
+	{ "test.tkmvst", "Ascended Paul", "Tekken 8", "Paul", "15:05 28/02/2023" },
+	{ "test.tkmvst", "Legacy T7 Kazuya", "Tekken 8", "Kazuya", "15:05 28/02/2023" },
 };
 
 struct gameProcessName
@@ -20,6 +30,7 @@ struct gameProcessName
 	const char* processName;
 };
 
+const size_t gameListCount = 3;
 const gameProcessName gameList[] = {
 	{ "", "" },
 	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
@@ -38,7 +49,7 @@ void Submenu_Extract::Render()
 		ImGui::PushItemWidth(150.0f);
 		if (ImGui::BeginCombo("##", currentItem == 0 ? _("extraction.select_game") : gameList[currentItem].name))
 		{
-			for (size_t i = 1; i < sizeof(gameList) / sizeof(*gameList); ++i)
+			for (size_t i = 1; i < gameListCount; ++i)
 			{
 				const char* name = i == 0 ? _("extraction.game_none") : gameList[i].name;
 				if (ImGui::Selectable(name, currentItem == i, 0, ImVec2(100.0f, 0)) && i != 0)
@@ -115,20 +126,20 @@ void Submenu_Extract::Render()
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableHeadersRow();
 
-		for (size_t i = 0; i < sizeof(items) / sizeof(*items); ++i)
+		for (size_t i = 0; i <  movesetCount; ++i)
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(items[i]);
+			ImGui::TextUnformatted(movesetInfos[i].name);
 
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted("Tekken 7");
+			ImGui::TextUnformatted(movesetInfos[i].origin);
 
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted("Kazuya");
+			ImGui::TextUnformatted(movesetInfos[i].target_character);
 
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted("27/02/2023 16:22");
+			ImGui::TextUnformatted(movesetInfos[i].date);
 		}
 		ImGui::EndTable();
 	}
