@@ -4,14 +4,14 @@
 
 #include "MainWindow.hpp"
 
-MainWindow::MainWindow(GLFWwindow* window, const char* GLSL_VERSION)
+MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(GLSL_VERSION);
+	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
 	ImGui::StyleColorsDark();
 
@@ -26,7 +26,7 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
-void MainWindow::Update(const int WIDTH, const int HEIGHT)
+void MainWindow::Update(int width, int height)
 {
 	const float c_statusBarHeight = 30;
 
@@ -35,7 +35,7 @@ void MainWindow::Update(const int WIDTH, const int HEIGHT)
 	// Navbar
 	{
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, HEIGHT - c_statusBarHeight), ImVec2(-1, WIDTH - c_statusBarHeight));
+		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, height - c_statusBarHeight), ImVec2(-1, height - c_statusBarHeight));
 		ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		navMenu.Render();
 		navMenuWidth = ImGui::GetWindowWidth();
@@ -45,7 +45,7 @@ void MainWindow::Update(const int WIDTH, const int HEIGHT)
 	// Menus
 	{
 		ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(WIDTH - navMenuWidth, HEIGHT - c_statusBarHeight), ImVec2(WIDTH - navMenuWidth, HEIGHT - c_statusBarHeight));
+		ImGui::SetNextWindowSizeConstraints(ImVec2(width - navMenuWidth, height - c_statusBarHeight), ImVec2(width - navMenuWidth, height - c_statusBarHeight));
 		ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		switch (navMenu.menuId)
 		{
@@ -72,8 +72,8 @@ void MainWindow::Update(const int WIDTH, const int HEIGHT)
 
 	// Status bar
 	{
-		ImGui::SetNextWindowPos(ImVec2(0, HEIGHT - c_statusBarHeight));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(WIDTH, c_statusBarHeight), ImVec2(WIDTH, c_statusBarHeight));
+		ImGui::SetNextWindowPos(ImVec2(0, height - c_statusBarHeight));
+		ImGui::SetNextWindowSizeConstraints(ImVec2(width, c_statusBarHeight), ImVec2(width, c_statusBarHeight));
 		ImGui::Begin("StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 		statusBar.Render();
 		ImGui::End();

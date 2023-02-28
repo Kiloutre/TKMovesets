@@ -9,10 +9,14 @@
 
 class MainWindow {
 public:
-	MainWindow(GLFWwindow* window, const char* GLSL_VERSION);
+	MainWindow(GLFWwindow* window, const char* c_glsl_version);
+	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
 	virtual void NewFrame();
-	virtual void Update(const int WIDTH, const int HEIGHT);
+	// Main layout rendering function
+	virtual void Update(int width, int height);
+	// Makes the final ImGui and GLSL calls to display the window's content
 	void Render();
+	// Cleanup function
 	void Shutdown();
 
 	NavigationMenu     navMenu;

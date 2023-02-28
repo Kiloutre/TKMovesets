@@ -42,18 +42,12 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
 endif()
 
 # Addresses file #
-add_custom_target(copy-addresses ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/game_addresses.txt ${CMAKE_CURRENT_BINARY_DIR}/game_addresses.txt
-    DEPENDS TekkenTools)
+configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
 
 # Translations #
-## todo: loop on dir
-add_custom_target(copy-translations ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/Translations ${CMAKE_CURRENT_BINARY_DIR}/Translations
-    DEPENDS TekkenTools)
+add_custom_command(TARGET TekkenTools PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
 
 # Libraries #
-
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(TekkenTools PRIVATE glad::glad)
 

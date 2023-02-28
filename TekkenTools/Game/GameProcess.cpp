@@ -6,7 +6,7 @@
 #include "GameProcess.hpp"
 
 // Starts the attaching process in an existing other thread
-void GameProcess::Attach()
+void GameProcess::StartAttachingThread()
 {
 	if (errcode == PROC_ATTACHED)
 		throw("Process is already attached : not re-attaching.");
@@ -162,7 +162,7 @@ float GameProcess::readFloat(long addr)
 	return 0;
 }
 
-void GameProcess::readBytes(long addr, char* buf, size_t bufSize)
+void GameProcess::readBytes(long addr, char* buf, size_t readSize)
 {
 
 }

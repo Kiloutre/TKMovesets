@@ -8,7 +8,8 @@ private:
 	GameExtract& operator = (const GameExtract&) = delete;
 	GameExtract(const GameExtract&) = delete;
 
-	void ExtractP1ayer(void *playerAddress);
+	// Extract a character from its address
+	void ExtractCharacter(void *playerAddress);
 public:
 	static GameExtract& getInstance() {
 		// Todo: mutex here or something?
@@ -16,10 +17,15 @@ public:
 		return s_instance;
 	}
 
+	// true = Currently busy with an extraction.
 	bool busy{ false };
+	// Progress of the current extraction, between 0.0f and 100.0f
 	float extractionProgress{ 0.0f };
 
+	// Extracts only the first player's selected character
 	void ExtractP1();
+	// Extracts only the second player's selected character
 	void ExtractP2();
+	// Extracts every player character 
 	void ExtractAll();
 };

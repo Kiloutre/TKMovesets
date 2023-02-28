@@ -6,10 +6,6 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 
-StatusBar::StatusBar()
-{
-	// Init
-}
 void StatusBar::Render()
 {
 	/*

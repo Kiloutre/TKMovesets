@@ -1,6 +1,6 @@
 #include "GameExtract.hpp"
 
-void GameExtract::ExtractP1ayer(void* playerAddress)
+void GameExtract::ExtractCharacter(void* playerAddress)
 {
 	busy = true;
 	extractionProgress = 0.0f;
@@ -13,12 +13,12 @@ void GameExtract::ExtractP1ayer(void* playerAddress)
 
 void GameExtract::ExtractP1()
 {
-	//ExtractP1ayer(0);
+	//ExtractCharacter();
 }
 
 void GameExtract::ExtractP2()
 {
-	//ExtractP1ayer(0);
+	//ExtractCharacter();
 }
 
 void GameExtract::ExtractAll()

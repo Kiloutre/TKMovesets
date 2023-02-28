@@ -39,26 +39,28 @@ int main(int argc, wchar_t** argv)
 		return 1;
 	}
 
-	// Load translation
-	Localization::LoadFile(PROGRAM_DEFAULT_LANG);
-
 	// GL 3.0 + GLSL 130
-	const char* GLSL_VERSION = "#version 130";
+	const char* c_glsl_version = "#version 130";
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
-	// Create window with graphics context
-	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION).c_str(), nullptr, nullptr);
+	// Create window
+	std::string windowTitle = std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION);
+	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle.c_str(), nullptr, nullptr);
+
 	if (window == nullptr) {
 		return 2;
 	}
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1); // Enable vsync
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	glfwMakeContextCurrent(window);
+	// Enable vsync
+	glfwSwapInterval(1);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw("Unable to context to OpenGL");
+	}
 
 	{
 		int screen_width, screen_height;
@@ -66,21 +68,31 @@ int main(int argc, wchar_t** argv)
 		glViewport(0, 0, screen_width, screen_height);
 	}
 
-	MainWindow program(window, GLSL_VERSION);
-	GameProcess::getInstance().Attach();
+	// Load translation
+	Localization::LoadFile(PROGRAM_DEFAULT_LANG);
+	// Load game addresses
 	GameAddressesFile::LoadFile();
+	// Start the thread that will seek the game progress and attach to it
+	GameProcess::getInstance().StartAttachingThread();
+
+	MainWindow program(window, c_glsl_version);
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize
 		glfwPollEvents();
+		
+		// Set window BG
 		glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 
-		glClear(GL_COLOR_BUFFER_BIT);
 		program.NewFrame();
+		
+		// Main layout function : every we display is in there
 		program.Update(width, height);
+
 		program.Render();
 		glfwSwapBuffers(window);
 	}
