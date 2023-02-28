@@ -1,6 +1,8 @@
 #pragma once
 
+#include "GameAddresses.h"
 // Contains the structs used for Extraction/Importation
+//template<size_t S> class Sizer { }; Sizer<sizeof(t7structs::Move)> foo;
 
 namespace t7structs
 {
@@ -46,11 +48,6 @@ namespace t7structs
 		char content[0xC];
 	};
 
-	struct Move
-	{
-		char content[0xB0];
-	};
-
 	struct Voiceclip
 	{
 		char content[0x4];
@@ -86,66 +83,102 @@ namespace t7structs
 		char content[0x4];
 	};
 
+	struct Move
+	{
+		char* name;
+		char* anim_name;
+		void* anim_addr;
+		int32_t vuln;
+		int32_t hitlevel;
+		t7structs::Cancel* cancel_addr;
+		int64_t _u1_llong; // = 0 always when writin, is a ptr but no idea what it points to
+		int64_t _u2_llong;
+		int64_t _u3_llong;
+		int64_t _u4_llong;
+		int64_t _u5_llong; // = 0 always when writin, is a ptr but no idea what it points to
+		int32_t _u6_int;
+		int16_t transition;
+		int16_t _u7_short;
+		int16_t _u8_short;
+		int16_t _u9_short;
+		int32_t _u10_int;
+		t7structs::HitCondition* hit_condition_addr;
+		int32_t anim_max_len;
+		int32_t _u11_int;
+		int32_t _u12_int;
+		int32_t _u13_int;
+		t7structs::Voiceclip* voicelip_addr;
+		t7structs::ExtraMoveProperty* extra_move_property_addr;
+		int64_t _u14_llong; // = 0 always when writing, is a ptr but no idea what it points to
+		int64_t _u15_llong; // = 0 always when writin, is a ptr but no idea what it points to
+		int32_t hitbox_location;
+		int32_t first_active_frame;
+		int32_t last_active_frame;
+		int16_t _u17_short;
+		int16_t _u18_short;
+		int16_t _u19_short;
+	};
+
 
 	// -- Other -- //
 
 	struct movesetLists
 	{
 		t7structs::Reactions* reactions;
-		int64_t reactionsCount;
+		uint64_t reactionsCount;
 
 		t7structs::Requirement* requirement;
-		int64_t requirementCount;
+		uint64_t requirementCount;
 
 		t7structs::HitCondition* hitCondition;
-		int64_t hitConditionCount;
+		uint64_t hitConditionCount;
 
 		t7structs::Projectile* projectile;
-		int64_t projectileCount;
+		uint64_t projectileCount;
 
 		t7structs::Pushback* pushback;
-		int64_t pushbackCount;
+		uint64_t pushbackCount;
 
 		t7structs::PushbackExtradata* pushbackExtradata;
-		int64_t pushbackExtradataCount;
+		uint64_t pushbackExtradataCount;
 
 		t7structs::Cancel* cancel;
-		int64_t cancelCount;
+		uint64_t cancelCount;
 
 		t7structs::Cancel* groupCancel;
-		int64_t groupCancelCount;
+		uint64_t groupCancelCount;
 
 		t7structs::CancelExtradata* cancelExtradata;
-		int64_t cancelExtradataCount;
+		uint64_t cancelExtradataCount;
 
 		t7structs::ExtraMoveProperty* extraMoveProperty;
-		int64_t extraMovePropertyCount;
+		uint64_t extraMovePropertyCount;
 
 		void* unknown_0x1f0;
-		int64_t unknown_0x1f8;
+		uint64_t unknown_0x1f8;
 
 		void* unknown_0x200;
-		int64_t unknown_0x208;
+		uint64_t unknown_0x208;
 
 		t7structs::Move* move;
-		int64_t moveCount;
+		uint64_t moveCount;
 
 		t7structs::Voiceclip* Voiceclip;
-		int64_t VoiceclipCount;
+		uint64_t VoiceclipCount;
 
 		t7structs::InputSequence* inputSequence;
-		int64_t inputSequenceCount;
+		uint64_t inputSequenceCount;
 
 		t7structs::InputExtradata* inputExtradata;
-		int64_t inputExtradataCount;
+		uint64_t inputExtradataCount;
 
 		t7structs::UnknownParryRelated* unknownParryRelated;
-		int64_t unknownParryRelatedCount;
+		uint64_t unknownParryRelatedCount;
 
 		t7structs::ThrowExtra* throwExtra;
-		int64_t throwExtraCount;
+		uint64_t throwExtraCount;
 
 		t7structs::Throw* throws;
-		int64_t throwsCount;
+		uint64_t throwsCount;
 	};
 }

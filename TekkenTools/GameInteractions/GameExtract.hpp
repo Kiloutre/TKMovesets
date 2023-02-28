@@ -50,7 +50,7 @@ public:
 	// Helper to read on address from their game_addresses.txt identifier
 	GameData* game = nullptr;
 	// Progress of the current extraction, between 0.0f and 100.0f
-	float extractionProgress{ 0.0f };
+	float progress{ 0.0f };
 	// Contains the character names
 	std::string characterNames[4];
 	char* c_characterNames[4]{};

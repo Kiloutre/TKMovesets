@@ -31,11 +31,10 @@ void GameExtract::Update()
 	while (m_threadStarted)
 	{
 		if (process->IsAttached() && process->CheckRunning()) {
-			while (m_playerAddress.size() > 0)
-			{
-				ExtractCharacter(m_playerAddress.back());
-				m_playerAddress.pop_back();
+			for (gameAddr playerAddress : m_playerAddress) {
+				ExtractCharacter(playerAddress);
 			}
+			m_playerAddress.clear();
 		}
 		else if (currentGameId != -1) {
 			c_characterNames[0] = nullptr;
@@ -51,7 +50,7 @@ void GameExtract::Update()
 // Todo: move in t7 file
 void GameExtract::ExtractCharacter(gameAddr playerAddress)
 {
-	extractionProgress = 0.0f;
+	progress = 0.0f;
 
 	Extractor* extractor = nullptr;
 
@@ -69,7 +68,7 @@ void GameExtract::ExtractCharacter(gameAddr playerAddress)
 	}
 
 	if (extractor != nullptr) {
-		extractor->Extract(playerAddress, &extractionProgress);
+		extractor->Extract(playerAddress, &progress);
 		delete extractor;
 	}
 }

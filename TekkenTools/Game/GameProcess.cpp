@@ -90,28 +90,26 @@ GameProcessError GameProcess::AttachToNamedProcess(const char* processName)
 
 bool GameProcess::Attach(const char* processName)
 {
-	if (errcode == PROC_ATTACHED) {
+	if (status == PROC_ATTACHED) {
 		return false;
 	}
 
-	errcode = AttachToNamedProcess(processName);
-	return errcode == PROC_ATTACHED;
+	status = AttachToNamedProcess(processName);
+	return status == PROC_ATTACHED;
 }
 
 bool GameProcess::IsAttached()
 {
-	return errcode == PROC_ATTACHED;
+	return status == PROC_ATTACHED;
 }
 
-void GameProcess::DetachFromGame(bool updateErrcode)
+void GameProcess::DetachFromGame()
 {
 	if (hProcess != nullptr) {
 		CloseHandle(hProcess);
 		hProcess = nullptr;
 	}
-	if (updateErrcode) {
-		errcode = PROC_NOT_ATTACHED;
-	}
+	status = PROC_NOT_ATTACHED;
 }
 
 bool GameProcess::CheckRunning()
@@ -120,8 +118,8 @@ bool GameProcess::CheckRunning()
 		int32_t value = 0;
 		if (ReadProcessMemory(hProcess, (LPCVOID)modBaseAddr, (LPVOID)&value, 4, nullptr) == 0)
 		{
-			DetachFromGame(false);
-			errcode = PROC_EXITED;
+			DetachFromGame();
+			status = PROC_EXITED;
 			return false;
 		}
 	}

@@ -36,11 +36,11 @@ private:
 	DWORD GetGamePID(const char* processName);
 	// Load the address of the main module in .modBaseAddr
 	bool LoadGameMainModule(const char* processName, DWORD pid);
-	// Detach from the game, sets .errcode to PROC_NOT_ATTACHED if desired
-	void DetachFromGame(bool updateErrcode=true);
+	// Detach from the game,
+	void DetachFromGame();
 public:
 	// Status of the process attachment
-	GameProcessError errcode{ PROC_NOT_ATTACHED };
+	GameProcessError status{ PROC_NOT_ATTACHED };
 	// Determines if a thread with Update() is currently running
 	bool threadStarted{ false };
 	// pid of process we latch on
@@ -50,11 +50,11 @@ public:
 
 	// -- Interaction stuff -- //
 	// 
-	// Attach to a process, return false is failed. See .errcode for more details.
+	// Attach to a process, return false is failed. See .status for more details.
 	bool Attach(const char* processName);
-	// Returns true if .errcode = PROC_NOT_ATTACHED
+	// Returns true if .status = PROC_NOT_ATTACHED
 	bool IsAttached();
-	// Checks if pid still used by process & attempts a read. Updates .errcode & returns false if it fails.
+	// Checks if pid still used by process & attempts a read. Updates .status & returns false if it fails.
 	bool CheckRunning();
 	
 	// Reads a char (1b) from the game in little endian

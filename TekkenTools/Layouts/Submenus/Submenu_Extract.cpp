@@ -60,10 +60,10 @@ void Submenu_Extract::Render()
 		}
 	}
 
-	GameProcess* p = extractor.process;
-	if (p->errcode != PROC_ATTACHED)
+	GameProcess* process = extractor.process;
+	if (process->status != PROC_ATTACHED)
 	{
-		switch (p->errcode)
+		switch (process->status)
 		{
 		case PROC_NOT_ATTACHED:
 		case PROC_EXITED:
@@ -86,7 +86,7 @@ void Submenu_Extract::Render()
 	{
 		// Todo: also take into account if an extraction is already ongoing
 		bool busy = extractor.IsBusy();
-		bool canExtract = p->errcode == PROC_ATTACHED && !busy;
+		bool canExtract = process->status == PROC_ATTACHED && !busy;
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 
@@ -116,9 +116,9 @@ void Submenu_Extract::Render()
 		}
 
 		if (busy) {
-			// Todo: identify what it is busy with
+			// Todo: identify what it is busy with, calculate progress according to total
 			ImGui::SameLine();
-			ImGui::Text(_("extraction.extracting"), extractor.extractionProgress);
+			ImGui::Text(_("extraction.extracting"), extractor.progress);
 		}
 	}
 
