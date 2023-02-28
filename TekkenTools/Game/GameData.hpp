@@ -4,6 +4,7 @@
 #include <string>
 
 #include "GameProcess.hpp"
+#include "GameAddresses.h"
 
 // Class that allows you to read from the game using only the address identifier from game_address.txt
 // Also provides caching of pointer paths. But overall this is still a high-level class aimed at cleaning up code elsewhere and keeping things segmented.
@@ -14,12 +15,12 @@ private:
 	// Cached module address to avoid having to fetch it all the time
 	int64_t m_moduleAddress{};
 	// Cached addresses and pointer path so that we don't have to re-compute everything mid-extraction/importation
-	std::map<std::string, void*> m_cachedAddresses;
+	std::map<std::string, gameAddr> m_cachedAddresses;
 	// The subclass that allows us to read/write on process memory
 	GameProcess* m_process;
 	
 	// Reads a ptr path from an address identifier and return its last pointer
-	void* ReadPtrPath(const char* c_addressId);
+	gameAddr ReadPtrPath(const char* c_addressId);
 public:
 	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
 	void CacheAddresses();

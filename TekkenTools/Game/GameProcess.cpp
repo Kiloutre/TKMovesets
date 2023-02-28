@@ -2,6 +2,8 @@
 #include <tlhelp32.h>
 
 #include "GameProcess.hpp"
+#include "GameAddresses.h"
+#include "GameAddressesFile.hpp"
 
 // -- Private : Helpers -- //
 
@@ -120,86 +122,86 @@ bool GameProcess::AttemptRead()
 
 // -- Public : Reading -- //
 
-int8_t GameProcess::readInt8(void* addr)
+int8_t GameProcess::readInt8(gameAddr addr)
 {
 	int8_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
 	return value;
 }
 
-int16_t GameProcess::readInt16(void* addr)
+int16_t GameProcess::readInt16(gameAddr addr)
 {
 	int16_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
 	return value;
 }
 
-int32_t GameProcess::readInt32(void* addr)
+int32_t GameProcess::readInt32(gameAddr addr)
 {
 	int16_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
-int64_t GameProcess::readInt64(void* addr)
+int64_t GameProcess::readInt64(gameAddr addr)
 {
 	int16_t value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
 	return value;
 }
 
-float GameProcess::readFloat(void* addr)
+float GameProcess::readFloat(gameAddr addr)
 {
 	float value{};
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
-void GameProcess::readBytes(void* addr, void* buf, size_t readSize)
+void GameProcess::readBytes(gameAddr addr, void* buf, size_t readSize)
 {
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&buf, readSize, nullptr);
 }
 
 // -- Public : Writing -- // 
 
-void GameProcess::writeInt8(void* addr, int8_t value)
+void GameProcess::writeInt8(gameAddr addr, int8_t value)
 {
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 1, nullptr);
 }
 
-void  GameProcess::writeInt16(void* addr, int16_t value)
+void  GameProcess::writeInt16(gameAddr addr, int16_t value)
 {
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 2, nullptr);
 }
 
-void  GameProcess::writeInt32(void* addr, int32_t value)
+void  GameProcess::writeInt32(gameAddr addr, int32_t value)
 {
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
 }
 
-void  GameProcess::writeInt64(void* addr, int64_t value)
+void  GameProcess::writeInt64(gameAddr addr, int64_t value)
 {
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 8, nullptr);
 }
 
-void  GameProcess::writeFloat(void* addr, float value)
+void  GameProcess::writeFloat(gameAddr addr, float value)
 {
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
 }
 
-void  GameProcess::writeBytes(void* addr, void* buf, size_t bufSize)
+void  GameProcess::writeBytes(gameAddr addr, void* buf, size_t bufSize)
 {
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)buf, bufSize, nullptr);
 }
 
 // -- Public : Allocation & Freeing -- // 
 
-void* GameProcess::allocateMem(size_t amount)
+gameAddr GameProcess::allocateMem(size_t amount)
 {
-	return VirtualAllocEx(hProcess, 0, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	return (gameAddr)VirtualAllocEx(hProcess, 0, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 }
 
-void GameProcess::freeMem(void* addr)
+void GameProcess::freeMem(gameAddr addr)
 {
 	VirtualFreeEx(hProcess, (LPVOID)addr, 0, MEM_RELEASE);
 }

@@ -6,32 +6,32 @@
 
 #include "GameAddressesFile.hpp"
 
-std::map<std::string, std::vector<void*>> g_absolute_pointer_paths;
-std::map<std::string, std::vector<void*>> g_relative_pointer_paths;
+std::map<std::string, std::vector<gameAddr> > g_absolute_pointer_paths;
+std::map<std::string, std::vector<gameAddr> > g_relative_pointer_paths;
 std::vector<std::string> g_entries;
 
-std::vector<void*> ParsePtrPathString(std::string path)
+std::vector<gameAddr> ParsePtrPathString(std::string path)
 {
-	std::vector<void*> ptrPath = std::vector<void*>();
+	std::vector<gameAddr> ptrPath = std::vector<gameAddr>();
 
 	size_t prevPos = 0;
 	size_t pos = 0;
 	while ((pos = path.find(",", pos)) != std::string::npos) {
 		try {
-			ptrPath.push_back((void*)std::stoll(path.substr(prevPos, pos), NULL, 16));
+			ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos, pos), NULL, 16));
 		}
 		catch (const std::out_of_range& oor) {
-			ptrPath.push_back((void*)0);
+			ptrPath.push_back((gameAddr)0);
 		}
 		pos += 1;
 		prevPos = pos;
 	}
 
 	try {
-		ptrPath.push_back((void*)std::stoll(path.substr(prevPos), NULL, 16));
+		ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos), NULL, 16));
 	}
 	catch (const std::out_of_range& oor) {
-		ptrPath.push_back((void*)0);
+		ptrPath.push_back((gameAddr)0);
 	}
 
 	return ptrPath;
@@ -41,8 +41,8 @@ namespace GameAddressesFile
 {
 	void LoadFile()
 	{
-		std::map<std::string, std::vector<void*>> absolute_pointer_paths;
-		std::map<std::string, std::vector<void*>> relative_pointer_paths;
+		std::map<std::string, std::vector<gameAddr>> absolute_pointer_paths;
+		std::map<std::string, std::vector<gameAddr>> relative_pointer_paths;
 		std::vector<std::string> entries;
 
 		std::ifstream infile;
@@ -104,7 +104,7 @@ namespace GameAddressesFile
 		return false;
 	}
 
-	const std::vector<void*> GetAddress(const char* c_addressId)
+	const std::vector<gameAddr> GetAddress(const char* c_addressId)
 	{
 		if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
 			return g_relative_pointer_paths[c_addressId];
@@ -112,10 +112,10 @@ namespace GameAddressesFile
 		if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
 			return g_absolute_pointer_paths[c_addressId];
 		}
-		return std::vector<void*>();
+		return std::vector<gameAddr>();
 	}
 
-	const std::vector<void*> GetAddress(const char* c_addressId, bool& isRelative)
+	const std::vector<gameAddr> GetAddress(const char* c_addressId, bool& isRelative)
 	{
 		if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
 			isRelative = true;
@@ -125,7 +125,7 @@ namespace GameAddressesFile
 		if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
 			return g_absolute_pointer_paths[c_addressId];
 		}
-		return std::vector<void*>();
+		return std::vector<gameAddr>();
 	}
 }
 

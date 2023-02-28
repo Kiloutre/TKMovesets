@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "GameAddresses.h"
+
 namespace GameAddressesFile
 {
 	// Load the game_addresses.txt file for use GetAddress()
@@ -14,6 +16,6 @@ namespace GameAddressesFile
 	bool IsAddressRelative(const char* c_addressId);
 
 	// Returns a pointer path, that may rely on the base address or not. To use with IsAddressRelative().
-	const std::vector<void*> GetAddress(const char* c_addressId);
-	const std::vector<void*> GetAddress(const char* c_addressId, bool& isRelative);
+	const std::vector<gameAddr> GetAddress(const char* c_addressId);
+	const std::vector<gameAddr> GetAddress(const char* c_addressId, bool& isRelative);
 }
