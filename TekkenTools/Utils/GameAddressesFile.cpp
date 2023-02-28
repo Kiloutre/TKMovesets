@@ -69,6 +69,9 @@ namespace GameAddressesFile
 				size_t value_start = line.find_first_not_of(" =", separator);
 				value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
 			}
+			if (key.length() == 0) {
+				continue;
+			}
 
 			if (value.rfind("+", 0) == 0) {
 				g_relative_pointer_paths[key] = ParsePtrPath(value.substr(1));

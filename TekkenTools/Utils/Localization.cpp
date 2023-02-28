@@ -43,7 +43,9 @@ namespace Localization
 				value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
 			}
 
-			if (key.length() == 0) continue;
+			if (key.length() == 0) {
+				continue;
+			}
 		
 			{
 				size_t newlinePos = 0;
