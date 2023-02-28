@@ -72,8 +72,6 @@ int main(int argc, wchar_t** argv)
 	Localization::LoadFile(PROGRAM_DEFAULT_LANG);
 	// Load game addresses
 	GameAddressesFile::LoadFile();
-	// Start the thread that will seek the game progress and attach to it
-	GameProcess::getInstance().StartAttachingThread();
 
 	MainWindow program(window, c_glsl_version);
 

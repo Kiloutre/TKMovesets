@@ -16,12 +16,12 @@ no = No
 # Process #
 
 process.status = Status:
-process.attach = Attach to Tekken 7
+process.attach = Attach to game
 process.attaching = Attaching...
-process.game_attached = Tekken 7 is running and attached.
-process.game_not_attached = Tekken 7 is not attached.
-process.game_not_running = Tekken 7 is not running or could not be found.
-process.game_version_mismatch = The current Tekken version is not supported by game_address.txt.
+process.game_not_attached = Currently not trying to attach.
+process.game_attached = Game is running and attached.
+process.game_not_running = Game is not running or could not be found.
+process.game_version_mismatch = The current game version is not supported by game_address.txt.
 process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
 process.game_unexpected_exit = Game exited unexpectedly.
 
@@ -53,8 +53,7 @@ status.fps = %.1f FPS # 32 characters max, will crash otherwise
 
 # Extraction #
 extraction.explanation = Movesets have to first be extracted from the game to be then used. Extracts only movesets : not models or visual effects.\nExtraction is done with the game running (from memory), with the target character(s) loaded and visible on the screen (it doesn't matter what gamemode).
-extraction.cannot_extract = Movesets cannot be extracted.
-extraction.extracted_movesets = Extracted movesets
+extraction.extraction = Extraction
 extraction.extract_1p = Extract (1P)
 extraction.extract_2p = Extract (2P)
 extraction.extract_1p_name = Extract (1P, {})
@@ -63,6 +62,8 @@ extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.progress = Extracting... (%.0f%%)
 extraction.busy = Cannot extract: software is busy
+extraction.select_game = Select game to extract from
+extraction.extracted_movesets = Extracted movesets
 extraction.rename = Rename moveset
 
 # Importation #

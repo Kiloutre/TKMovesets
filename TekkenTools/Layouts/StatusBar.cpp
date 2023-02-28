@@ -16,7 +16,6 @@ void StatusBar::Render()
 		ImGui::TextUnformatted(buf);
 		ImGui::SameLine();
 	}
-	*/
 
 	// Todo: set layout mode as horizontal, look into menubars maybe
 
@@ -53,4 +52,5 @@ void StatusBar::Render()
 	}
 
 	ImGui::SameLine();
+	*/
 }

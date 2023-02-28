@@ -14,11 +14,37 @@ const char* items[] = {
 	"salut"
 };
 
+struct gameProcessName
+{
+	const char* name;
+	const char* processName;
+};
+
+const gameProcessName gameList[] = {
+	{ "Tekken 7", "TekkenGame - Win64 - Shipping.exe" },
+	{ "Tekken 8", "Tekken8.exe" },
+};
+
 void Submenu_Extract::Render() 
 {
+	GameExtract& extractor = GameExtract::getInstance();
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
-	ImGui::SeparatorText(_("extraction.extracted_movesets"));
+	{
+		ImGui::SeparatorText(_("extraction.extraction"));
+		size_t currentItem = extractor.currentGameId;
+		if (ImGui::BeginCombo("##", gameList[currentItem].name))
+		{
+			for (size_t i = 0; i < sizeof(gameList) / sizeof(*gameList); ++i)
+			{
+				if (ImGui::Selectable(gameList[i].name, currentItem == i, 0, ImVec2(100, 0)))
+				{
+					extractor.SetTargetProcess(gameList[i].processName, i);
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
 
 	GameProcess& p = GameProcess::getInstance();
 	if (p.errcode != PROC_ATTACHED)
@@ -46,11 +72,10 @@ void Submenu_Extract::Render()
 
 	{
 		// Todo: also take into account if an extraction is already ongoing
-		GameExtract& extractor = GameExtract::getInstance();
 		bool busy = GameInteractions::getInstance().busy;
 		bool canExtract = p.errcode == PROC_ATTACHED && !busy;
 
-		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &overwrite_same_filename);
+		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 		ImGui::SameLine();
 		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_1p"), canExtract)) {
 			extractor.ExtractP1();
@@ -73,6 +98,8 @@ void Submenu_Extract::Render()
 		}
 	}
 
+
+	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
 	{
