@@ -5,22 +5,8 @@
 
 #include "GameProcess.hpp"
 
-// Starts the attaching process in an existing other thread
-void GameProcess::StartAttachingThread()
-{
-	if (errcode == PROC_ATTACHED)
-		throw("Process is already attached : not re-attaching.");
+// -- Private helpers -- //
 
-	processName = "TekkenGame-Win64-Shipping.exe";
-	if (!threadStarted)
-	{
-		threadStarted = true;
-		std::thread t(&GameProcess::Update, this);
-		t.detach();
-	}
-}
-
-// The idea here is to use functions that require less privilege than OpenProcess, but i believe right now there is no difference
 DWORD GameProcess::GetGamePID()
 {
 	HANDLE hProcessSnap;
@@ -101,6 +87,23 @@ GameProcessError GameProcess::AttachToNamedProcess()
 	}
 }
 
+// -- Public lifespan -- //
+
+// Starts the attaching process in an existing other thread
+void GameProcess::StartAttachingThread()
+{
+	if (errcode == PROC_ATTACHED)
+		throw("Process is already attached : not re-attaching.");
+
+	processName = "TekkenGame-Win64-Shipping.exe";
+	if (!threadStarted)
+	{
+		threadStarted = true;
+		std::thread t(&GameProcess::Update, this);
+		t.detach();
+	}
+}
+
 void GameProcess::DetachFromGame()
 {
 	if (hProcess != nullptr) {
@@ -117,8 +120,7 @@ void GameProcess::Update()
 	{
 		if (errcode == PROC_ATTACHED)
 		{
-			// Todo: try reading from a random value, see if an exception is thrown
-			if (GetGamePID() == (DWORD)-1) {
+			if (GetGamePID() == (DWORD)-1 || !GameProcess::AttemptRead()) {
 				hProcess = nullptr;
 				errcode = PROC_EXITED;
 			}
@@ -132,9 +134,10 @@ void GameProcess::Update()
 
 bool GameProcess::AttemptRead()
 {
+	// Todo
 	/*
 	try {
-		//readInt(modBaseAddr);
+		//readInt32(modBaseAddr);
 	} catch() {
 		return false;
 	}
@@ -142,37 +145,88 @@ bool GameProcess::AttemptRead()
 	return true;
 }
 
-char GameProcess::readByte(long addr)
+// -- Reading -- //
+
+int8_t GameProcess::readInt8(void* addr)
 {
-	return 0;
+	int8_t value;
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
+	return value;
 }
 
-short GameProcess::readShort(long addr)
+int16_t GameProcess::readInt16(void* addr)
 {
-	return 0;
+	int16_t value;
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
+	return value;
 }
 
-int GameProcess::readInt(long addr)
+int32_t GameProcess::readInt32(void* addr)
 {
-	return 0;
+	int16_t value;
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+	return value;
 }
 
-float GameProcess::readFloat(long addr)
+int64_t GameProcess::readInt64(void* addr)
 {
-	return 0;
+	int16_t value;
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
+	return value;
 }
 
-void GameProcess::readBytes(long addr, char* buf, size_t readSize)
+float GameProcess::readFloat(void* addr)
 {
-
+	float value;
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+	return value;
 }
 
-long GameProcess::allocateMem(size_t amount)
+void GameProcess::readBytes(void* addr, void* buf, size_t readSize)
 {
-	return 0;
+	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&buf, readSize, nullptr);
 }
 
-void GameProcess::freeMem(long addr)
-{
+// -- Writing -- // 
 
+void GameProcess::writeInt8(void* addr, int8_t value)
+{
+	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 1, nullptr);
+}
+
+void  GameProcess::writeInt16(void* addr, int16_t value)
+{
+	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 2, nullptr);
+}
+
+void  GameProcess::writeInt32(void* addr, int32_t value)
+{
+	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
+}
+
+void  GameProcess::writeInt64(void* addr, int64_t value)
+{
+	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 8, nullptr);
+}
+
+void  GameProcess::writeFloat(void* addr, float value)
+{
+	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
+}
+
+void  GameProcess::writeBytes(void* addr, void* buf, size_t bufSize)
+{
+	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)buf, bufSize, nullptr);
+}
+
+// -- Allocation & Freeing -- // 
+
+void* GameProcess::allocateMem(size_t amount)
+{
+	return VirtualAllocEx(hProcess, 0, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+}
+
+void GameProcess::freeMem(void* addr)
+{
+	VirtualFreeEx(hProcess, (LPVOID)addr, 0, MEM_RELEASE);
 }

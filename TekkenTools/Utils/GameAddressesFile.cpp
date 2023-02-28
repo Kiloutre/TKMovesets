@@ -100,5 +100,18 @@ namespace GameAddressesFile
 		}
 		return std::vector<void*>();
 	}
+
+	const std::vector<void*> GetAddress(const char* c_addressId, bool& isRelative)
+	{
+		if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
+			isRelative = true;
+			return g_relative_pointer_paths[c_addressId];
+		}
+		isRelative = false;
+		if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
+			return g_absolute_pointer_paths[c_addressId];
+		}
+		return std::vector<void*>();
+	}
 }
 

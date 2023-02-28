@@ -72,29 +72,33 @@ public:
 	// -- Interaction stuff -- //
 	
 	// Reads a char (1b) from the game in little endian
-	char  readByte(long addr);
+	int8_t  readInt8(void* addr);
 	// Reads a short (2b) from the game in little endian
-	short readShort(long addr);
+	int16_t readInt16(void* addr);
 	// Reads an int (4b) from the game in little endian
-	int   readInt(long addr);
+	int32_t readInt32(void* addr);
+	// Reads an int (4b) from the game in little endian
+	int64_t readInt64(void* addr);
 	// Reads a floating point number (4b) from the game in little endian
-	float readFloat(long addr);
+	float   readFloat(void* addr);
 	// Reads readSize amounts of bytes from the game and write them to the provided buffer
-	void  readBytes(long addr, char* buf, size_t readSize);
+	void    readBytes(void* addr, void* buf, size_t readSize);
 
 	// Writes a char (1b) to the game
-	void  writeByte(long addr, char value);
+	void writeInt8(void* addr, int8_t value);
 	// Writes a short (2b) to the game
-	void readShort(long addr, short value);
-	// Writes an int (4b) from the game
-	void   readInt(long addr, int value);
+	void writeInt16(void* addr, int16_t value);
+	// Writes an int (4b) to the game
+	void writeInt32(void* addr, int32_t value);
+	// Writes a 8b to the game
+	void writeInt64(void* addr, int64_t value);
 	// Writes a floating point number (4b) to the game
-	void readFloat(long addr, float value);
+	void writeFloat(void* addr, float value);
 	// Writes bufSize amounts of bytes to the game
-	void  writeBytes(long addr, void* buf, size_t bufSize);
+	void writeBytes(void* addr, void* buf, size_t bufSize);
 
 	// Allocates a certain amount of memory in the game
-	long allocateMem(size_t amount);
+	void* allocateMem(size_t amount);
 	// Frees memory that we previously allocated. Address must be the exact same as when it was returned by allocateMem().
-	void freeMem(long addr);
+	void freeMem(void* addr);
 };

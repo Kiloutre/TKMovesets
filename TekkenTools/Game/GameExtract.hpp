@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameProcess.hpp"
+
 class GameExtract
 {
 private:
@@ -21,6 +23,7 @@ public:
 	bool busy{ false };
 	// Progress of the current extraction, between 0.0f and 100.0f
 	float extractionProgress{ 0.0f };
+	GameProcess* process;
 
 	// Extracts only the first player's selected character
 	void ExtractP1();
