@@ -180,7 +180,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	t7structs::movesetLists lists{};
 	t7structs::motaList motaList{};
 	m_process->readBytes(movesetAddr + 0x150, &lists, sizeof(t7structs::movesetLists));
-	m_process->readBytes(movesetAddr + 0x280, &lists, sizeof(t7structs::motaList));
+	m_process->readBytes(movesetAddr + 0x280, &motaList, sizeof(t7structs::motaList));
 
 	// Keep these two separated cause the list will lose them (on purpose) but need them for covnerting ptr into offsets
 	gameAddr firstListAddr = (gameAddr)lists.reactions;
