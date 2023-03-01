@@ -24,6 +24,7 @@ process.game_not_running = Game is not running or could not be found.
 process.game_version_mismatch = The current game version is not supported by game_address.txt.
 process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
 process.game_unexpected_exit = Game exited unexpectedly.
+process.cant_extract = Cannot extract because characters aren't loaded.
 
 # Moveset #
 moveset.origin = Origin
@@ -59,7 +60,6 @@ extraction.extract = Extract
 extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.progress = Extracting... (%.0f%%)
-extraction.cant_extract = Cannot extract because characters can't be detected.
 extraction.select_game = Select a game
 extraction.extracted_movesets = Extracted movesets
 extraction.rename = Rename moveset

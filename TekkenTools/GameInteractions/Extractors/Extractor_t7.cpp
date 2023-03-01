@@ -1,4 +1,7 @@
+#include <string>
+#include <cctype>
 #include <stddef.h>
+#include <algorithm>
 
 #include "helpers.hpp"
 #include "Extractor.hpp"
@@ -279,6 +282,10 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 		characterName = std::string(buf);
 	}
 
+	if (characterName.size() == 0) {
+		return std::string();
+	}
+
 	if (characterName.front() == '[') {
 		characterName.erase(0, 1);
 	}
@@ -287,11 +294,43 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 		characterName.erase(characterName.size() - 1);
 	}
 
+	std::replace(characterName.begin(), characterName.end(), '_', ' ');
+
+	{
+		bool isWordStart = true;
+		for (size_t i = 0; i < characterName.size(); ++i)
+		{
+			// Have to pass an unsigned char or this will throw when an invalid character is found
+			if (!isprint((unsigned char)characterName[i])) {
+				characterName[i] = ' ';
+			} else if (isalpha((unsigned char)characterName[i])) {
+				characterName[i] = isWordStart ? toupper(characterName[i]) : tolower(characterName[i]);
+			}
+			isWordStart = strchr(" -.", characterName[i]) != nullptr;
+		}
+	}
+
 	return characterName;
 }
 
 bool ExtractorT7::CanExtract()
 {
-	// todo
-	return true;
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+
+	if (playerAddress == 0 || playerAddress == -1) {
+		return false;
+	}
+
+	gameAddr currentMove = m_process->readInt64(playerAddress + 0x220);
+	if (currentMove == 0 || currentMove == -1) {
+		return false;
+	}
+
+	gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
+	if (animAddr == 0 || animAddr == -1) {
+		return false;
+	}
+
+	uint8_t animType = m_process->readInt8(animAddr);
+	return animType == 0x64 || animType == 0xC8;
 }

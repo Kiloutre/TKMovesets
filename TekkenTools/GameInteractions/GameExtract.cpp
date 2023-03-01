@@ -117,11 +117,13 @@ void GameExtract::ReloadMovesetList()
 
 void GameExtract::LoadCharacterNames()
 {
-	gameAddr playerAddress = game->ReadPtr("p1_addr");
-	gameAddr playerStructSize = GameAddressesFile::GetSingleValue("val_playerstruct_size");
+	if (m_extractor != nullptr && m_extractor->CanExtract()) {
+		gameAddr playerAddress = game->ReadPtr("p1_addr");
+		gameAddr playerStructSize = GameAddressesFile::GetSingleValue("val_playerstruct_size");
 
-	for (int playerId = 0; playerId < characterCount; ++playerId) {
-		characterNames[playerId] = m_extractor->GetPlayerCharacterName(playerAddress + playerId * playerStructSize);
+		for (int playerId = 0; playerId < characterCount; ++playerId) {
+			characterNames[playerId] = m_extractor->GetPlayerCharacterName(playerAddress + playerId * playerStructSize);
+		}
 	}
 }
 
@@ -208,6 +210,9 @@ void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 
 bool GameExtract::CanExtract()
 {
+	if (m_extractor == nullptr) {
+		return false;
+	}
 	// Per-game definition
 	return m_extractor->CanExtract();
 }

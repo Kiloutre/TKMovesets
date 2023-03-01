@@ -66,7 +66,9 @@ namespace Helpers
 
 	std::string getMovesetNameFromFilename(std::string filename)
 	{
-		return filename.substr(strlen(MOVESET_DIRECTORY) + 1, filename.size() - strlen(MOVESET_DIRECTORY) - strlen(MOVESET_FILENAME_EXTENSION) - 1);
+		std::string name = filename.substr(strlen(MOVESET_DIRECTORY) + 1, filename.size() - strlen(MOVESET_DIRECTORY) - strlen(MOVESET_FILENAME_EXTENSION) - 1);
+
+		return name;
 	}
 
 	bool isHeaderStringMalformated(const char* str, size_t size)
