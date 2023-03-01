@@ -46,7 +46,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 			return comp;
 		}
 	}
-
+	printf("No boundary found for %llx\n", animAddr);
 	// Arbitrary 1KB size for anims where we can't find a close enough boundary
 	return animAddr + 1000 + 1;
 }
@@ -54,7 +54,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 // Attempts to try to get an animation's size
 uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
 {
-	unsigned char animType = m_process->readInt16(anim);
+	unsigned char animType = m_process->readInt8(anim);
 
 	if (animType == 0xC8) {
 		return ExtractorUtils::getC8AnimSize(m_process, anim);
@@ -104,6 +104,9 @@ void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, ui
 		gameAddr maxAnimEnd = getClosestBoundary(animAddr, boundaries);
 
 		uint64_t animSize = TryFindAnimSize(animAddr, maxAnimEnd - animAddr);
+
+
+		//printf("%lld,%llx\n", animSize, animAddr);
 
 		offsets[animAddr] = totalSize;
 		animSizes[animAddr] = animSize;
@@ -163,7 +166,7 @@ void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount,
 	end = lastItemEnd + 1; // Add 1 for extracting the nullbyte too
 }
 
-void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
+void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwriteSameFilename)
 {
 	using std::chrono::high_resolution_clock;
 	auto t1 = high_resolution_clock::now();
@@ -174,8 +177,10 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + GameAddressesFile::GetSingleValue("val_motbin_offset"));
 
 	// Get the size of the various lists in the moveset, will need that later. We matched the same structure they did so a single read cab fill it.
-	t7structs::movesetLists lists;
+	t7structs::movesetLists lists{};
+	t7structs::motaList motaList{};
 	m_process->readBytes(movesetAddr + 0x150, &lists, sizeof(t7structs::movesetLists));
+	m_process->readBytes(movesetAddr + 0x280, &lists, sizeof(t7structs::motaList));
 
 	// Keep these two separated cause the list will lose them (on purpose) but need them for covnerting ptr into offsets
 	gameAddr firstListAddr = (gameAddr)lists.reactions;
@@ -221,7 +226,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 
 	header.flags = 0;
 	strcpy(header.version_string, MOVESET_VERSION_STRING);
-	strcpy(header.origin, cm_gameOriginString);
+	strcpy(header.origin, GetGameOriginString());
 	strcpy(header.target_character, characterName.c_str());
 	strcpy(header.date, Helpers::currentDateTime().c_str());
 
@@ -233,7 +238,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	header.motaBlockOffset = header.animationBlockOffset + animationBlockSize;
 
 	// Create the file
-	if (CreateMovesetFile(characterName.c_str(), cm_gameIdentifierString))
+	if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
 	{
 		// Start writing what we extracted into the file
 		m_file.write((char*)&header, sizeof(header));

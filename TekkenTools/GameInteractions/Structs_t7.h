@@ -15,21 +15,23 @@ namespace t7structs
 
 	struct PushbackExtradata
 	{
-		char content[0x2];
+		int16_t value;
 	};
 
 	struct Requirement
 	{
-		char content[0x8];
+		int32_t req;
+		int32_t param;
 	};
 
 	struct CancelExtradata
 	{
-		char content[0x4];
+		int32_t value;
 	};
 
 	struct Cancel
 	{
+
 		char content[0x28];
 	};
 
@@ -45,17 +47,20 @@ namespace t7structs
 
 	struct ExtraMoveProperty
 	{
-		char content[0xC];
+		int32_t starting_frame;
+		int32_t id;
+		int32_t param;
 	};
 
 	struct Voiceclip
 	{
-		char content[0x4];
+		int32_t value;
 	};
 
 	struct InputExtradata
 	{
-		char content[0x8];
+		int32_t _u1_int;
+		int32_t _u2_int;
 	};
 
 	struct InputSequence
@@ -80,7 +85,7 @@ namespace t7structs
 
 	struct UnknownParryRelated
 	{
-		char content[0x4];
+		int32_t value;
 	};
 
 	struct Move
@@ -122,6 +127,22 @@ namespace t7structs
 
 
 	// -- Other -- //
+
+	struct motaList
+	{
+		void* mota_0; // Anims
+		void* mota_1; // Anims
+		void* mota_2; // Hand
+		void* mota_3; // Hand
+		void* mota_4; // Face
+		void* mota_5; // Face
+		void* mota_6; // Wings (probably more to it)
+		void* mota_7; // Wings (probablty more to it)
+		void* mota_8; // Camera
+		void* mota_9; // Camera
+		void* mota_10; // Unknown
+		void* mota_11; // Unnown
+	};
 
 	struct movesetLists
 	{

@@ -12,6 +12,19 @@ ImVec2 operator*(const ImVec2& c_self, float value)
 
 namespace ImGuiExtra
 {
+	void HelpMarker(const char* desc)
+	{
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(desc);
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+	}
+
 	bool RenderButtonEnabled(const char* c_text, bool enabled, ImVec2 size)
 	{
 		if (enabled) {

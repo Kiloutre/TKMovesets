@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <windows.h>
 
+#include "Helpers.hpp"
 #include "Extractor.hpp"
 
 #include "GameAddresses.h"
@@ -30,11 +31,31 @@ void* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	return block;
 }
 
-bool Extractor::CreateMovesetFile(const char* characterName, const char* gameIdentifierstring)
+std::string Extractor::GetFilename(const char* characterName, const char* gameIdentifierString, unsigned int suffixId)
+{
+	if (suffixId <= 1) {
+		return std::format("{}/{}{}" MOVESET_FILENAME_EXTENSION, cm_extractionDir, gameIdentifierString, characterName);
+	}
+	else {
+		return std::format("{}/{}{} ({})" MOVESET_FILENAME_EXTENSION, cm_extractionDir, gameIdentifierString, characterName, suffixId);
+	}
+}
+
+bool Extractor::CreateMovesetFile(const char* characterName, const char* gameIdentifierstring, bool overwriteSameFilename)
 {
 	CreateDirectory(cm_extractionDir, NULL);
 
-	std::string filePath = std::format("{}/{}{}" MOVESET_FILENAME_EXTENSION, cm_extractionDir, gameIdentifierstring, characterName);
+	std::string filePath = GetFilename(characterName, gameIdentifierstring);
+
+	if (Helpers::fileExists(filePath.c_str())) {
+		filePath = GetFilename(characterName, gameIdentifierstring, 1);
+		unsigned int counter = 1;
+		while (Helpers::fileExists(filePath.c_str())) {
+			counter++;
+			filePath = GetFilename(characterName, gameIdentifierstring, counter);
+		}
+	}
+
 	m_file.open(filePath.c_str(), std::ios::binary | std::ios::out);
 	return !m_file.fail();
 }

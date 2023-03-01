@@ -15,13 +15,13 @@ class ExtractorT7 : public Extractor
 {
 public:
 	using Extractor::Extractor; // Inherit constructor too
-	void Extract(gameAddr playerAddress, float* progress) override;
+	void Extract(gameAddr playerAddress, float* progress, bool overwriteSameFilename) override;
 	std::string GetPlayerCharacterName(gameAddr playerAddress) override;
 	bool CanExtract() override;
 
+	const char* GetGameIdentifierString() override { return "T7_"; }
+	const char* GetGameOriginString() override { return "Tekken7"; }
 private:
-	const char* cm_gameIdentifierString = "T7_";
-	const char* cm_gameOriginString = "Tekken 7";
 
 	// Writes bounds of the block containing anim and move names
 	void getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);

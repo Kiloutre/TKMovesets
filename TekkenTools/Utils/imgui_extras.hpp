@@ -8,6 +8,9 @@ ImVec2 operator*(const ImVec2& c_self, float value);
 
 namespace ImGuiExtra
 {
+	// Displays a hoverable text that displays a tootip
+	void HelpMarker(const char* desc);
+
 	// Render button that can be disabled (low alpha, always returns false)
 	bool RenderButtonEnabled(const char* c_text, bool c_enabled, ImVec2 c_size=ImVec2(0, 0));
 

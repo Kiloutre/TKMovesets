@@ -1,6 +1,7 @@
 #include <set>
 #include <chrono>
 #include <thread>
+#include <format>
 #include <iostream>
 #include <filesystem>
 
@@ -27,6 +28,10 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 	file.read((char*)&header, sizeof(MovesetHeader));
 
 	size_t readBytes = file.gcount();
+	file.seekg(0, std::ios::end);
+	size_t totalSize = file.tellg();
+	file.close();
+
 	if (readBytes != sizeof(MovesetHeader)) {
 		// Malformed file header
 		return nullptr;
@@ -44,7 +49,8 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 		Helpers::getMovesetNameFromFilename(filename),
 		std::string(header.origin),
 		std::string(header.target_character),
-		std::string(header.date)
+		std::string(header.date),
+		totalSize
 	};
 }
 
@@ -142,7 +148,7 @@ void GameExtract::Update()
 			while (m_playerAddress.size() > 0)
 			{
 				// Start extraction
-				m_extractor->Extract(m_playerAddress[0], &progress);
+				m_extractor->Extract(m_playerAddress[0], &progress, overwriteSameFilename);
 				m_playerAddress.erase(m_playerAddress.begin());
 				ReloadMovesetList();
 			}

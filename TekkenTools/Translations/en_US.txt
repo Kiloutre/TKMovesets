@@ -31,6 +31,8 @@ moveset.origin = Origin
 moveset.target_character = Character
 moveset.date = Date
 moveset.invalid = INVALID
+moveset.size = Size
+moveset.size_mb = MB
 
 ## Main ##
 
@@ -59,6 +61,7 @@ extraction.extraction = Extraction
 extraction.extract = Extract
 extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
+extraction.overwrite_explanation = Enable to overwrite moveset with same names.\nDisable to have name conflicts resolved with number suffixes.\nEx: T7_JIN (2)
 extraction.progress = Extracting... (%.0f%%)
 extraction.select_game = Select a game
 extraction.extracted_movesets = Extracted movesets

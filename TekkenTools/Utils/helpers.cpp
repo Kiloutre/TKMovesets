@@ -67,7 +67,6 @@ namespace Helpers
 	std::string getMovesetNameFromFilename(std::string filename)
 	{
 		std::string name = filename.substr(strlen(MOVESET_DIRECTORY) + 1, filename.size() - strlen(MOVESET_DIRECTORY) - strlen(MOVESET_FILENAME_EXTENSION) - 1);
-
 		return name;
 	}
 
@@ -83,5 +82,10 @@ namespace Helpers
 		}
 
 		return str[i] != '\0'; // Ensure last char is a nullbyte
+	}
+
+	bool fileExists(const char* name) {
+		struct stat buffer;
+		return (stat(name, &buffer) == 0);
 	}
 }

@@ -6,6 +6,7 @@
 #include "imgui_extras.hpp"
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
+#include "Helpers.hpp"
 
 struct gameProcessName
 {
@@ -71,13 +72,14 @@ void Submenu_Extract::Render()
 		ImGuiExtra_TextboxWarning(_("process.cant_extract"));
 	}
 
-
 	{
 		bool busy = extractor.IsBusy();
 		bool canExtract = p->status == PROC_ATTACHED && !busy && extractor.CanExtract();
 
 		// Extraction settings
-		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
+		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &extractor.overwriteSameFilename);
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
 
 		// Extraction buttons, will be disabled if we can't extract
 		for (int playerId = 0; playerId < extractor.characterCount; ++playerId)
@@ -96,14 +98,12 @@ void Submenu_Extract::Render()
 			}
 
 			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtract)) {
-				// Todo: check for overwriting
 				extractor.QueueCharacterExtraction(playerId);
 			}
 		}
 
 		ImGui::SameLine();
 		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
-			// Todo: check for overwriting
 			extractor.QueueCharacterExtraction(-1);
 		}
 
@@ -119,13 +119,14 @@ void Submenu_Extract::Render()
 
 	// List of extracted movesets
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
-	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
+	if (ImGui::BeginTable("nice", 5, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
 	{
 		ImGui::TableSetupColumn("##", 0, 3.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
+		ImGui::TableSetupColumn(_("moveset.size"));
 		ImGui::TableHeadersRow();
 
 		for (movesetInfo* moveset : extractor.extractedMovesets)
@@ -147,6 +148,10 @@ void Submenu_Extract::Render()
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->date.c_str());
+
+				ImGui::TableNextColumn();
+				std::string sizeString = std::format("{:.2f} {}", ((float)moveset->size) / 1000000, _("moveset.size_mb"));
+				ImGui::TextUnformatted(sizeString.c_str());
 			}
 		}
 		ImGui::EndTable();

@@ -24,4 +24,10 @@ namespace Helpers
 
     // Returns true if one of the header strings is not properly formatted indicating a bad moveset file
     bool isHeaderStringMalformated(const char* string, size_t size);
+
+    // Returns true if file exists
+    bool fileExists(const char* name);
+
+    // printf-like formatting for building stf::string instances
+    template<typename ... Args> std::string string_format(const std::string& format, Args ... args);
 }

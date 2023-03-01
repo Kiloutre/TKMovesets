@@ -24,6 +24,7 @@ struct movesetInfo
 	std::string origin;
 	std::string target_character;
 	std::string date;
+	uint64_t size;
 };
 
 class GameExtract
@@ -76,6 +77,8 @@ public:
 	int characterCount = 2;
 	// Contains the list of movesets found in the extraction directory
 	std::vector<movesetInfo*> extractedMovesets;
+	// Determine whether to ovewrite existing movesets when extracting or to append a number to the name
+	bool overwriteSameFilename = false;
 
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
 	bool CanExtract();
