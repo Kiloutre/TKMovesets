@@ -11,7 +11,7 @@
 DWORD GameProcess::GetGamePID(const char* processName)
 {
 	HANDLE hProcessSnap;
-	PROCESSENTRY32 pe32{};
+	PROCESSENTRY32 pe32{ 0 };
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 	if (GetLastError() != ERROR_ACCESS_DENIED)
@@ -41,7 +41,7 @@ DWORD GameProcess::GetGamePID(const char* processName)
 bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 {
 	HANDLE moduleSnap;
-	MODULEENTRY32 me32{};
+	MODULEENTRY32 me32{ 0 };
 
 	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
 
@@ -133,35 +133,35 @@ bool GameProcess::CheckRunning()
 
 int8_t GameProcess::readInt8(gameAddr addr)
 {
-	int8_t value{};
+	int8_t value{ -1 };
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
 	return value;
 }
 
 int16_t GameProcess::readInt16(gameAddr addr)
 {
-	int16_t value{};
+	int16_t value{ -1 };
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
 	return value;
 }
 
 int32_t GameProcess::readInt32(gameAddr addr)
 {
-	int32_t value{};
+	int32_t value{ -1 };
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
 int64_t GameProcess::readInt64(gameAddr addr)
 {
-	int64_t value{};
+	int64_t value{ -1 };
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
 	return value;
 }
 
 float GameProcess::readFloat(gameAddr addr)
 {
-	float value{};
+	float value{ -1 };
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }

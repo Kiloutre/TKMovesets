@@ -74,18 +74,21 @@ void Submenu_Extract::Render()
 			ImGuiExtra_TextboxWarning(_("process.game_not_running"));
 			break;
 		case PROC_VERSION_MISMATCH:
-			ImGuiExtra_TextboxWarning(_("process.game_version_mismatch"));
+			ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
 			break;
 		case PROC_ATTACH_ERR:
-			ImGuiExtra_TextboxWarning(_("process.game_attach_err"));
+			ImGuiExtra_TextboxError(_("process.game_attach_err"));
 			break;
 		}
+	}
+	else if (!extractor.CanExtract()) {
+		ImGuiExtra_TextboxWarning(_("process.cant_extract"));
 	}
 
 
 	{
 		bool busy = extractor.IsBusy();
-		bool canExtract = p->status == PROC_ATTACHED && !busy;
+		bool canExtract = p->status == PROC_ATTACHED && !busy && extractor.CanExtract();
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 

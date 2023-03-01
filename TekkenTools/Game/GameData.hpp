@@ -14,7 +14,7 @@ class GameData
 {
 private:
 	// Cached module address to avoid having to fetch it all the time
-	int64_t m_moduleAddress{};
+	int64_t m_moduleAddress{ 0 };
 	// Cached addresses and pointer path so that we don't have to re-compute everything mid-extraction/importation
 	std::map<std::string, gameAddr> m_cachedAddresses;
 	// The subclass that allows us to read/write on process memory

@@ -1,6 +1,7 @@
 #include <format>
 #include <fstream>
 #include <cstdlib>
+#include <windows.h>
 
 #include "Extractor.hpp"
 
@@ -17,9 +18,11 @@ void* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	return block;
 }
 
-void Extractor::CreateMovesetFile(const char* characterName)
+void Extractor::CreateMovesetFile(const char* characterName, const char* gameIdentifierstring)
 {
-	std::string filePath = std::format("{}/{}.txt", extractionDir, characterName);
+	CreateDirectory(cm_extractionDir, NULL);
+
+	std::string filePath = std::format("{}/{}{}.tkbin", cm_extractionDir, gameIdentifierstring, characterName);
 	m_file.open(filePath.c_str(), std::ios::binary | std::ios::out);
 }
 

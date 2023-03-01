@@ -62,7 +62,9 @@ public:
 	// Max character count of the game
 	int characterCount = 2;
 
-	// Is crurently busy with an extraction
+	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
+	bool CanExtract();
+	// Is currently busy with an extraction
 	bool IsBusy();
 	// Set the process to open
 	void SetTargetProcess(const char* processName, size_t gameId);

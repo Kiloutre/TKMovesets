@@ -104,6 +104,11 @@ void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 	}
 }
 
+bool GameExtract::CanExtract()
+{
+	return m_extractor->CanExtract();
+}
+
 bool GameExtract::IsBusy()
 {
 	return m_playerAddress.size() > 0;

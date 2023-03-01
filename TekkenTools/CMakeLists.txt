@@ -35,6 +35,7 @@ set(SUBMENU_SOURCES
 
 set(OTHER_SOURCES
                     "Utils/imgui_extras.cpp"
+                    "Utils/helpers.cpp"
                     "Utils/Localization.cpp"
                     "Utils/GameAddressesFile.cpp"
 )

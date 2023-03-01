@@ -85,6 +85,7 @@ namespace t7structs
 
 	struct Move
 	{
+		// Todo: rename what needs to be renamed
 		char* name;
 		char* anim_name;
 		void* anim_addr;
@@ -163,8 +164,8 @@ namespace t7structs
 		t7structs::Move* move;
 		uint64_t moveCount;
 
-		t7structs::Voiceclip* Voiceclip;
-		uint64_t VoiceclipCount;
+		t7structs::Voiceclip* voiceclip;
+		uint64_t voiceclipCount;
 
 		t7structs::InputSequence* inputSequence;
 		uint64_t inputSequenceCount;
