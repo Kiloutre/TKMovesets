@@ -4,7 +4,6 @@
 #include <windows.h>
 
 #include "Extractor.hpp"
-#include "GameProcess.hpp"
 
 #include "GameAddresses.h"
 

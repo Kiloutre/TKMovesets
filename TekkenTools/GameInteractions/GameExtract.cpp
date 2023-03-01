@@ -4,9 +4,7 @@
 #include <iostream>
 #include <filesystem>
 
-#include "GameData.hpp"
 #include "GameExtract.hpp"
-#include "GameProcess.hpp"
 #include "GameAddressesFile.hpp"
 #include "Extractor.hpp"
 #include "Extractor_t7.hpp"

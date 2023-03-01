@@ -18,6 +18,7 @@ const gameProcessName gameList[] = {
 	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
 	{ "Tekken 8", "Tekken8.exe" },
 };
+
 const size_t gameListCount = sizeof(gameList) / sizeof(*gameList);
 
 void Submenu_Extract::Render() 
