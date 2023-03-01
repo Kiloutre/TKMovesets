@@ -12,6 +12,33 @@
 #include <stdio.h>
 #include <iostream>
 
+std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
+{
+	gameAddr movesetAddr = m_process->readInt64(playerAddress + GameAddressesFile::GetSingleValue("val_motbin_offset"));
+
+	if (movesetAddr == 0) {
+		return std::string();
+	}
+
+	std::string characterName;
+
+	{
+		char buf[32 + 1]{};
+		m_process->readBytes(movesetAddr + 0x2E8, buf, 32);
+		characterName = std::string(buf);
+	}
+
+	if (characterName.front() == '[') {
+		characterName.erase(0, 1);
+	}
+
+	if (characterName.back() == ']') {
+		characterName.erase(characterName.size() - 1);
+	}
+
+	return characterName;
+}
+
 void getAnimationBlockBounds(t7structs::Move *move, uint64_t moveCount, gameAddr &start, gameAddr &end)
 {
 	// Todo: fix. This does not extract everything
@@ -89,4 +116,8 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	free(movesetInfoBlock);
 	free(movesetBlock);
 	free(animationBlock);
+
+	std::string characterName = GetPlayerCharacterName(playerAddress);
+	CreateMovesetFile(characterName.c_str());
+	CloseMovesetFile();
 }

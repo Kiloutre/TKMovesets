@@ -4,6 +4,7 @@
 #include <string>
 
 #include "GameProcess.hpp"
+
 #include "GameAddresses.h"
 
 // Class that allows you to read from the game using only the address identifier from game_address.txt

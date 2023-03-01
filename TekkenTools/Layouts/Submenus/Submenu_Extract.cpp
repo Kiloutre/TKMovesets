@@ -60,10 +60,10 @@ void Submenu_Extract::Render()
 		}
 	}
 
-	GameProcess* process = extractor.process;
-	if (process->status != PROC_ATTACHED)
+	GameProcess* p = extractor.process;
+	if (p->status != PROC_ATTACHED)
 	{
-		switch (process->status)
+		switch (p->status)
 		{
 		case PROC_NOT_ATTACHED:
 		case PROC_EXITED:
@@ -84,9 +84,8 @@ void Submenu_Extract::Render()
 
 
 	{
-		// Todo: also take into account if an extraction is already ongoing
 		bool busy = extractor.IsBusy();
-		bool canExtract = process->status == PROC_ATTACHED && !busy;
+		bool canExtract = p->status == PROC_ATTACHED && !busy;
 
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 
@@ -94,11 +93,11 @@ void Submenu_Extract::Render()
 		{
 			ImGui::SameLine();
 
-			const char* characterName = extractor.GetCharacterName(playerId);
+			const char* characterName = extractor.characterNames[playerId].c_str();
 			std::string buttonText;
 
 			const char playerIdTranslationId[3] = { '1' + (char)playerId , 'p', '\0' };
-			if (characterName == nullptr) {
+			if (characterName[0] == '\0') {
 				buttonText = std::format("{} ({})", _("extraction.extract"), _(playerIdTranslationId));
 			}
 			else {
@@ -118,7 +117,7 @@ void Submenu_Extract::Render()
 		if (busy) {
 			// Todo: identify what it is busy with, calculate progress according to total
 			ImGui::SameLine();
-			ImGui::Text(_("extraction.extracting"), extractor.progress);
+			ImGui::Text(_("extraction.progress"), extractor.progress);
 		}
 	}
 

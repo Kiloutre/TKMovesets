@@ -4,10 +4,11 @@
 #include "GameData.hpp"
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
-#include "GameAddresses.h"
 #include "GameAddressesFile.hpp"
 #include "Extractor.hpp"
 #include "Extractor_t7.hpp"
+
+#include "GameAddresses.h"
 
 // -- Thread stuff -- //
 
@@ -26,60 +27,67 @@ void GameExtract::OrderExtraction(gameAddr playerAddress)
 	m_playerAddress.push_back(playerAddress);
 }
 
+void GameExtract::LoadCharacterNames()
+{
+	gameAddr playerAddress = game->ReadPtr("p1_addr");
+	gameAddr playerStructSize = GameAddressesFile::GetSingleValue("val_playerstruct_size");
+
+	for (int playerId = 0; playerId < characterCount; ++playerId) {
+		characterNames[playerId] = m_extractor->GetPlayerCharacterName(playerAddress + playerId * playerStructSize);
+	}
+}
+
 void GameExtract::Update()
 {
 	while (m_threadStarted)
 	{
 		if (process->IsAttached() && process->CheckRunning()) {
+			LoadCharacterNames();
 			while (m_playerAddress.size() > 0)
 			{
-				ExtractCharacter(m_playerAddress[0]);
+				// Start extraction
+				m_extractor->Extract(m_playerAddress[0], &progress);
 				m_playerAddress.erase(m_playerAddress.begin());
 			}
 		}
 		else if (currentGameId != -1) {
-			c_characterNames[0] = nullptr;
-			process->Attach(currentGameProcess.c_str());
+			// Process closed, try to attach again in case it is restarted
+			if (process->Attach(currentGameProcess.c_str())) {
+				OnProcessAttach();
+			}
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 }
 
-// -- Actual extraction -- //
-
-// Todo: move in t7 file
-void GameExtract::ExtractCharacter(gameAddr playerAddress)
+void GameExtract::OnProcessAttach()
 {
-	progress = 0.0f;
+	InstantiateExtractor();
+	LoadCharacterNames();
+}
 
-	Extractor* extractor = nullptr;
+void GameExtract::InstantiateExtractor()
+{
+	if (m_extractor != nullptr) {
+		delete m_extractor;
+	}
 
 	switch (currentGameId)
 	{
 	case GameId_t7:
-		extractor = new ExtractorT7(process, game);
+		m_extractor = new ExtractorT7(process, game);
 		break;
 	case GameId_t8:
-		extractor = nullptr;
+		m_extractor = nullptr;
 		break;
 	case GameId_ttt2:
-		extractor = nullptr;
+		m_extractor = nullptr;
 		break;
-	}
-
-	if (extractor != nullptr) {
-		extractor->Extract(playerAddress, &progress);
-		delete extractor;
 	}
 }
 
 // -- Interaction -- //
-
-const char* GameExtract::GetCharacterName(int playerId)
-{
-	return nullptr;
-}
 
 void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 {
@@ -87,9 +95,13 @@ void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 		return;
 	}
 
+	if (process->IsAttached()) process->Detach();
+
 	currentGameProcess = std::string(processName);
 	currentGameId = gameId;
-	process->Attach(processName);
+	if (process->Attach(processName)) {
+		OnProcessAttach();
+	}
 }
 
 bool GameExtract::IsBusy()

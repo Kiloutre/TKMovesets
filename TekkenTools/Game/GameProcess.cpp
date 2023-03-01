@@ -2,15 +2,16 @@
 #include <tlhelp32.h>
 
 #include "GameProcess.hpp"
-#include "GameAddresses.h"
 #include "GameAddressesFile.hpp"
+
+#include "GameAddresses.h"
 
 // -- Private : Helpers -- //
 
 DWORD GameProcess::GetGamePID(const char* processName)
 {
 	HANDLE hProcessSnap;
-	PROCESSENTRY32 pe32;
+	PROCESSENTRY32 pe32{};
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 	if (GetLastError() != ERROR_ACCESS_DENIED)
@@ -40,7 +41,7 @@ DWORD GameProcess::GetGamePID(const char* processName)
 bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 {
 	HANDLE moduleSnap;
-	MODULEENTRY32 me32 = {};
+	MODULEENTRY32 me32{};
 
 	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
 
@@ -103,7 +104,7 @@ bool GameProcess::IsAttached()
 	return status == PROC_ATTACHED;
 }
 
-void GameProcess::DetachFromGame()
+void GameProcess::Detach()
 {
 	if (hProcess != nullptr) {
 		CloseHandle(hProcess);
@@ -118,7 +119,7 @@ bool GameProcess::CheckRunning()
 		int32_t value = 0;
 		if (ReadProcessMemory(hProcess, (LPCVOID)modBaseAddr, (LPVOID)&value, 4, nullptr) == 0)
 		{
-			DetachFromGame();
+			Detach();
 			status = PROC_EXITED;
 			return false;
 		}

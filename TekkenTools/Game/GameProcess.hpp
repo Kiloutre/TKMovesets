@@ -36,8 +36,6 @@ private:
 	DWORD GetGamePID(const char* processName);
 	// Load the address of the main module in .modBaseAddr
 	bool LoadGameMainModule(const char* processName, DWORD pid);
-	// Detach from the game,
-	void DetachFromGame();
 public:
 	// Status of the process attachment
 	GameProcessError status{ PROC_NOT_ATTACHED };
@@ -52,6 +50,8 @@ public:
 	// 
 	// Attach to a process, return false is failed. See .status for more details.
 	bool Attach(const char* processName);
+	// Detach from the game,
+	void Detach();
 	// Returns true if .status = PROC_NOT_ATTACHED
 	bool IsAttached();
 	// Checks if pid still used by process & attempts a read. Updates .status & returns false if it fails.

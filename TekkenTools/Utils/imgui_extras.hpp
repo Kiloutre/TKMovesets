@@ -1,5 +1,6 @@
 #pragma once
 #include <ImGui.h>
+
 #include "constants.h"
 
 ImVec2 operator+(const ImVec2& c_self, const ImVec2& c_other);

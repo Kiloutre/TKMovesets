@@ -3,8 +3,9 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
-#include "GameAddresses.h"
 #include "GameAddressesFile.hpp"
+
+#include "GameAddresses.h"
 
 void GameData::CacheAddresses()
 {

@@ -8,11 +8,12 @@
 #include <windows.h>
 #include <filesystem>
 
-#include "constants.h"
 #include "MainWindow.hpp"
 #include "Localization.hpp"
 #include "GameProcess.hpp"
 #include "GameAddressesFile.hpp"
+
+#include "constants.h"
 
 using namespace std;
 

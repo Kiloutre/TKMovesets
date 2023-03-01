@@ -4,6 +4,8 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "Extractor.hpp"
+
 #include "GameAddresses.h"
 
 enum GameId
@@ -21,19 +23,23 @@ private:
 	GameExtract& operator = (const GameExtract&) = delete;
 	GameExtract(const GameExtract&) = delete;
 
+	// Extractor glass, never stores an Extractor*, used for polymorphism
+	Extractor* m_extractor = nullptr;
 	// Is a thread running
 	bool m_threadStarted = false;
 	// Player address to extract
 	std::vector<gameAddr> m_playerAddress;
 
+	// Callback called whenever the process is re-atached
+	void OnProcessAttach();
+	// Instantiate an extractor with polymorphism, also destroy the old one
+	void InstantiateExtractor();
 	// Order an extraction to be pushed to the queue
 	void OrderExtraction(gameAddr playerAddress);
-	// Regularly called in an isolated thread to execute queued extractions
+	// Latch on to process 
 	void Update();
-	// Extract a character from its address
-	void ExtractCharacter(gameAddr playerAddress);
-	// Reads the movesets for the players characters' names. Accessible under .characterNames & .c_characterNames (TODO)
-	void LoadCharacterName(int playerId);
+	// Reads the movesets for the players characters' names. Accessible under .characterNames
+	void LoadCharacterNames();
 public:
 	static GameExtract& getInstance() {
 		// Todo: mutex here or something?
@@ -53,12 +59,9 @@ public:
 	float progress{ 0.0f };
 	// Contains the character names
 	std::string characterNames[4];
-	char* c_characterNames[4]{};
 	// Max character count of the game
 	int characterCount = 2;
 
-	// Returns the name of the given player's character
-	const char* GetCharacterName(int playerId);
 	// Is crurently busy with an extraction
 	bool IsBusy();
 	// Set the process to open

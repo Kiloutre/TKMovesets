@@ -3,8 +3,9 @@
 #include "Extractor.hpp"
 #include "GameData.hpp"
 #include "GameProcess.hpp"
-#include "GameAddresses.h"
 #include "GameAddressesFile.hpp"
+
+#include "GameAddresses.h"
 #include "Structs_t7.h"
 
 class T7Moveset
@@ -34,4 +35,5 @@ class ExtractorT7 : public Extractor
 public:
 	using Extractor::Extractor; // Inherit constructor too
 	void Extract(gameAddr playerAddress, float* progress) override;
+	std::string GetPlayerCharacterName(gameAddr playerAddress) override;
 };
