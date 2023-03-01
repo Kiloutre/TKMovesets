@@ -209,6 +209,6 @@ void GameExtract::QueueCharacterExtraction(int playerId)
 		}
 	}
 	else {
-		OrderExtraction(playerAddress);
+		OrderExtraction(playerAddress + playerId * playerStructSize);
 	}
 }
