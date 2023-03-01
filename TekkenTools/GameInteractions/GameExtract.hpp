@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <set>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -8,11 +8,22 @@
 
 #include "GameAddresses.h"
 
+// Contains a unique ID for every supported game. Every list should respect the index order here
 enum GameId
 {
 	GameId_t7 = 0,
 	GameId_t8 = 1,
 	GameId_ttt2 = 2,
+};
+
+// Moveset info, most of which is read straight from the file. Use for display.
+struct movesetInfo
+{
+	std::string filename;
+	std::string name;
+	std::string origin;
+	std::string target_character;
+	std::string date;
 };
 
 class GameExtract
@@ -29,6 +40,8 @@ private:
 	bool m_threadStarted = false;
 	// Player address to extract
 	std::vector<gameAddr> m_playerAddress;
+	// A set containing the list of moveset files in the configured extraction dir. Used to determine when to fetch new movesets info
+	std::set<std::string> m_extractedMovesetFilenames;
 
 	// Callback called whenever the process is re-atached
 	void OnProcessAttach();
@@ -61,6 +74,8 @@ public:
 	std::string characterNames[4];
 	// Max character count of the game
 	int characterCount = 2;
+	// Contains the list of movesets found in the extraction directory
+	std::vector<movesetInfo*> extractedMovesets;
 
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
 	bool CanExtract();
@@ -72,4 +87,6 @@ public:
 	void StartThread();
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterExtraction(int playerId);
+	// Reads movesets from their configured extraction dir. Accessible under .extractedMovesets
+	void ReloadMovesetList();
 };

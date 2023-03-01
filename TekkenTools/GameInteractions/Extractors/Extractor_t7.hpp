@@ -21,4 +21,6 @@ public:
 private:
 	const char* cm_gameIdentifierString = "T7_";
 	const char* cm_gameOriginString = "Tekken 7";
+
+	void getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
 };

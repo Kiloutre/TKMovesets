@@ -6,12 +6,18 @@
 #include "GameProcess.hpp"
 #include "GameAddressesFile.hpp"
 
+#include "constants.h"
 #include "GameAddresses.h"
 
 // Data contained at the head of every extracted movesets
+// Todo: perhaps make strings have a variable length? Better than having wasted characters
 struct MovesetHeader
 {
-	// Origin (Game name + author)
+	// Version string of the extracted moveset
+	char versionString[32];
+	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
+	int64_t flags;
+	// Origin (Game name + author if you want)
 	char origin[32];
 	// Target character to play on
 	char target_character[32];
@@ -31,7 +37,7 @@ public:
 	virtual bool CanExtract() = 0;
 protected:
 	// Stores the extraction directory
-	const char* cm_extractionDir = "./extracted_chars";
+	const char* cm_extractionDir = MOVESET_DIRECTORY;
 	// Stores the process to read on
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt

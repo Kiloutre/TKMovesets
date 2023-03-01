@@ -22,7 +22,8 @@ void Extractor::CreateMovesetFile(const char* characterName, const char* gameIde
 {
 	CreateDirectory(cm_extractionDir, NULL);
 
-	std::string filePath = std::format("{}/{}{}.tkbin", cm_extractionDir, gameIdentifierstring, characterName);
+	std::string filePath = std::format("{}/{}{}" MOVESET_FILENAME_EXTENSION, cm_extractionDir, gameIdentifierstring, characterName);
+	// todo: check open return value
 	m_file.open(filePath.c_str(), std::ios::binary | std::ios::out);
 }
 

@@ -29,6 +29,7 @@ process.game_unexpected_exit = Game exited unexpectedly.
 moveset.origin = Origin
 moveset.target_character = Character
 moveset.date = Date
+moveset.invalid = INVALID
 
 ## Main ##
 

@@ -27,6 +27,7 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 		GameProcess* process = new GameProcess();
 		extractor.process = process;
 		extractor.game = new GameData(process);
+		extractor.ReloadMovesetList();
 		extractor.StartThread();
 	}
 }

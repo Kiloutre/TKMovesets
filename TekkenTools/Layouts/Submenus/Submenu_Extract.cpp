@@ -7,23 +7,6 @@
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
 
-struct movesetInfo
-{
-	const char* filename;
-	const char* name;
-	const char* origin;
-	const char* target_character;
-	const char* date;
-};
-
-const movesetInfo movesetInfos[] = {
-	{ "test.tkmvst", "Devilish Kazuya", "Tekken 7", "Kazuya", "15:05 28/02/2023" },
-	{ "test.tkmvst", "EX Jin", "Tekken 7", "Jin", "15:05 28/02/2023" },
-	{ "test.tkmvst", "Ascended Paul", "Tekken 8", "Paul", "15:05 28/02/2023" },
-	{ "test.tkmvst", "Legacy T7 Kazuya", "Tekken 8", "Kazuya", "15:05 28/02/2023" },
-};
-const size_t movesetCount = sizeof(movesetInfos) / sizeof(*movesetInfos);
-
 struct gameProcessName
 {
 	const char* name;
@@ -136,20 +119,25 @@ void Submenu_Extract::Render()
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableHeadersRow();
 
-		for (size_t i = 0; i <  movesetCount; ++i)
+		for (movesetInfo* moveset : extractor.extractedMovesets)
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(movesetInfos[i].name);
+			ImGui::TextUnformatted(moveset->name.c_str());
 
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(movesetInfos[i].origin);
+			if (moveset->origin == "INVALID") {
+				ImGui::TextUnformatted(_("moveset.invalid"));
+			}
+			else {
+				ImGui::TextUnformatted(moveset->origin.c_str());
 
-			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(movesetInfos[i].target_character);
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(moveset->target_character.c_str());
 
-			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(movesetInfos[i].date);
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(moveset->date.c_str());
+			}
 		}
 		ImGui::EndTable();
 	}
