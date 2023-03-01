@@ -45,6 +45,7 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 
 void GameExtract::StartThread()
 {
+	// Start the extraction thread that will run regularly, attach itself to the game whenever found and consume the queue
 	if (!m_threadStarted)
 	{
 		m_threadStarted = true;
@@ -90,9 +91,8 @@ void GameExtract::ReloadMovesetList()
 		}
 	}
 
-	// Delete entries that don't exist anymore
+	// Delete moveset entries that don't exist anymore (deleted files)
 	for (size_t i = 0; i < extractedMovesets.size();) {
-
 		movesetInfo* moveset = extractedMovesets[i];
 		struct stat buffer;
 
@@ -120,11 +120,18 @@ void GameExtract::LoadCharacterNames()
 
 void GameExtract::Update()
 {
+	// Executed in its own thread, is the one in charge of extraction, that way it won't interrupt the GUI rendering
 	while (m_threadStarted)
 	{
+		// Update the list of moveset files. This is better than doing it in the display thread
 		ReloadMovesetList();
+
+		// Ensure the process is still open and valid before possibly extracting
 		if (process->IsAttached() && process->CheckRunning()) {
+			// Load character name for fancy live displaying : You know who you're extracting
 			LoadCharacterNames();
+
+			// Extraction queue is a FIFO (first in first out) queue
 			while (m_playerAddress.size() > 0)
 			{
 				// Start extraction
@@ -146,6 +153,7 @@ void GameExtract::Update()
 
 void GameExtract::OnProcessAttach()
 {
+	// Load the appropriate extractor for the selected game and attempt to load the character names
 	InstantiateExtractor();
 	LoadCharacterNames();
 }
@@ -155,6 +163,8 @@ void GameExtract::InstantiateExtractor()
 	if (m_extractor != nullptr) {
 		delete m_extractor;
 	}
+
+	// Every game has its own extraction subtleties so we use polymorphism to manage that
 
 	switch (currentGameId)
 	{
@@ -203,15 +213,18 @@ bool GameExtract::IsBusy()
 
 void GameExtract::QueueCharacterExtraction(int playerId)
 {
+	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = game->ReadPtr("p1_addr");
 	gameAddr playerStructSize = GameAddressesFile::GetSingleValue("val_playerstruct_size");
 
 	if (playerId == -1) {
+		// Queue the extraction of every character one by one
 		for (playerId = 0; playerId < characterCount; ++playerId) {
 			OrderExtraction(playerAddress + playerId * playerStructSize);
 		}
 	}
 	else {
+		// Queue the extraction of one character
 		OrderExtraction(playerAddress + playerId * playerStructSize);
 	}
 }

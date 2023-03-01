@@ -27,6 +27,7 @@ void Submenu_Extract::Render()
 
 	//ImGui::BeginTable()
 	{
+		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		ImGui::SeparatorText(_("extraction.extraction"));
 		size_t currentItem = extractor.currentGameId;
 		ImGui::PushItemWidth(150.0f);
@@ -43,6 +44,7 @@ void Submenu_Extract::Render()
 		}
 	}
 
+	// If we can't extract, display a warning detailling why
 	GameProcess* p = extractor.process;
 	if (p->status != PROC_ATTACHED)
 	{
@@ -73,8 +75,10 @@ void Submenu_Extract::Render()
 		bool busy = extractor.IsBusy();
 		bool canExtract = p->status == PROC_ATTACHED && !busy && extractor.CanExtract();
 
+		// Extraction settings
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwrite_same_filename);
 
+		// Extraction buttons, will be disabled if we can't extract
 		for (int playerId = 0; playerId < extractor.characterCount; ++playerId)
 		{
 			ImGui::SameLine();
@@ -91,16 +95,19 @@ void Submenu_Extract::Render()
 			}
 
 			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtract)) {
+				// Todo: check for overwriting
 				extractor.QueueCharacterExtraction(playerId);
 			}
 		}
 
 		ImGui::SameLine();
 		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
+			// Todo: check for overwriting
 			extractor.QueueCharacterExtraction(-1);
 		}
 
 		if (busy) {
+			// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
 			// Todo: identify what it is busy with, calculate progress according to total
 			ImGui::SameLine();
 			ImGui::Text(_("extraction.progress"), extractor.progress);
@@ -109,6 +116,7 @@ void Submenu_Extract::Render()
 
 	//ImGui::EndTable()
 
+	// List of extracted movesets
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	if (ImGui::BeginTable("nice", 4, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
@@ -127,6 +135,7 @@ void Submenu_Extract::Render()
 
 			ImGui::TableNextColumn();
 			if (moveset->origin == "INVALID") {
+				// Badly formatted file. Display it, but mention it is invalid
 				ImGui::TextUnformatted(_("moveset.invalid"));
 			}
 			else {

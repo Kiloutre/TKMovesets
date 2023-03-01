@@ -150,25 +150,33 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	strcpy(header.date, Helpers::currentDateTime().c_str());
 
 	// Create the file
-	CreateMovesetFile(characterName.c_str(), cm_gameIdentifierString);
+	if (CreateMovesetFile(characterName.c_str(), cm_gameIdentifierString))
+	{
+		// Start writing what we extracted into the file
+		m_file.write((char*)&header, sizeof(header));
+		m_file.write((char*)movesetInfoBlock, movesetInfoBlockSize);
+		m_file.write((char*)&lists, sizeof(lists));
+		m_file.write((char*)nameBlock, nameBlockSize);
+		m_file.write((char*)movesetBlock, movesetBlockSize);
+		//m_file.write((char*)mainAnimationBlock, animationBlockSize);
+		//m_file.write((char*)otherAnimationsBlock, otherAnimationBlockSize);
 
-	// Start writing what we extracted into the file
-	m_file.write((char*)&header, sizeof(header));
-	m_file.write((char*)movesetInfoBlock, movesetInfoBlockSize);
-	m_file.write((char*)&lists, sizeof(lists));
-	m_file.write((char*)nameBlock, nameBlockSize);
-	m_file.write((char*)movesetBlock, movesetBlockSize);
-	//m_file.write((char*)mainAnimationBlock, animationBlockSize);
-	//m_file.write((char*)otherAnimationsBlock, otherAnimationBlockSize);
+	// Extraction is over
+		CloseMovesetFile();
+	}
+	else {
+		// todo: signal error that will be looked at by GameExtract
+	}
 
+
+
+	// Cleanup our temp allocated memory blocks
 	free(movesetInfoBlock);
 	free(nameBlock);
 	free(movesetBlock);
 	//free(mainAnimationBlock);
 	//free(otherAnimationsBlock);
 
-	// Extraction is over!
-	CloseMovesetFile();
 
 	auto t2 = high_resolution_clock::now();
 	auto ms_int = duration_cast<milliseconds>(t2 - t1);

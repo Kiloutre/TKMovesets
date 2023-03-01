@@ -61,11 +61,13 @@ namespace GameAddressesFile
 			size_t separator = line.find_first_of('=');
 
 			if (separator == std::string::npos) {
+				// Not a 'key = value' entry
 				continue;
 			}
 			if (commentStart != std::string::npos)
 			{
 				if (commentStart < separator) continue;
+				// We remove everything in the line before the comment
 				line = line.substr(0, commentStart);
 			}
 
@@ -80,6 +82,7 @@ namespace GameAddressesFile
 			}
 
 			if (value.rfind("+", 0) == 0) {
+				// Entries starting with '+' are relative to the module address
 				relative_pointer_paths[key] = ParsePtrPathString(value.substr(1));
 			}
 			else {
@@ -89,7 +92,8 @@ namespace GameAddressesFile
 			entries.push_back(key);
 		}
 		
-		// Replace these only when we have a proper replacement built
+		// Replace these only when we have a proper replacement built, because functions running on other threads require these to be completley built at all times
+		// So can't clear them at the start and build them little by little.
 		g_absolute_pointer_paths = absolute_pointer_paths;
 		g_relative_pointer_paths = relative_pointer_paths;
 		g_entries = entries;

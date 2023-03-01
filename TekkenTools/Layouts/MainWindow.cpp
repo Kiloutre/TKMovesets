@@ -18,10 +18,11 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 
 	ImGui::StyleColorsDark();
 
+	// Setup ImGui config
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-	// Init subclasses of singletons
+	// Init subclasses of singletons, start threads too
 	{
 		GameExtract& extractor = GameExtract::getInstance();
 		GameProcess* process = new GameProcess();
@@ -34,6 +35,7 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 
 void MainWindow::NewFrame()
 {
+	// I believe this inits the current frame buffer
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -41,6 +43,7 @@ void MainWindow::NewFrame()
 
 void MainWindow::Update(int width, int height)
 {
+	// Actual rendering stuff
 	const float c_statusBarHeight = 30;
 
 	float navMenuWidth;
@@ -95,12 +98,15 @@ void MainWindow::Update(int width, int height)
 
 void MainWindow::Render()
 {
+	// Render the frame buffer
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void MainWindow::Shutdown()
 {
+	// Cleanup of everything we do should be done here
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

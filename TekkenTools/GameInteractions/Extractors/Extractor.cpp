@@ -18,13 +18,13 @@ void* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	return block;
 }
 
-void Extractor::CreateMovesetFile(const char* characterName, const char* gameIdentifierstring)
+bool Extractor::CreateMovesetFile(const char* characterName, const char* gameIdentifierstring)
 {
 	CreateDirectory(cm_extractionDir, NULL);
 
 	std::string filePath = std::format("{}/{}{}" MOVESET_FILENAME_EXTENSION, cm_extractionDir, gameIdentifierstring, characterName);
-	// todo: check open return value
 	m_file.open(filePath.c_str(), std::ios::binary | std::ios::out);
+	return !m_file.fail();
 }
 
 void Extractor::CloseMovesetFile()

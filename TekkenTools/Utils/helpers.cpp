@@ -51,6 +51,11 @@ namespace Helpers
 		return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
 	}
 
+	bool endsWith(std::u32string_view str, std::u32string_view suffix)
+	{
+		return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+	}
+
 	std::string getMovesetNameFromFilename(std::string filename)
 	{
 		return filename.substr(strlen(MOVESET_DIRECTORY) + 1, filename.size() - strlen(MOVESET_DIRECTORY) - strlen(MOVESET_FILENAME_EXTENSION) - 1);

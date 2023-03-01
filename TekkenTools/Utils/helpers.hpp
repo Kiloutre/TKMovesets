@@ -17,7 +17,8 @@ namespace Helpers
 
     // Returns true if a string ends with [suffix]
     bool endsWith(std::string_view str, std::string_view suffix);
+    bool endsWith(std::u32string_view str, std::u32string_view suffix);
 
-    // Converts filename into displayable name
+    // Converts filename into displayable name. U32 for UTF8
     std::string getMovesetNameFromFilename(std::string filename);
 }

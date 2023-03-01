@@ -12,6 +12,8 @@ namespace Localization
 {
 	void LoadFile(const char* c_langId, bool unloadPrevious)
 	{
+		// If you want fallback lines (like en_US by default when the current file is lacking an entry), set unloadPrevious to false.
+		// I generally don't like this idea though because i want lacking translations to be made clear visually.
 		if (unloadPrevious) {
 			g_translations.clear();
 		}
@@ -28,11 +30,13 @@ namespace Localization
 			size_t separator = line.find_first_of('=');
 
 			if (separator == std::string::npos) {
+				// Not a 'key = value' entry
 				continue;
 			}
 			if (commentStart != std::string::npos)
 			{
 				if (commentStart < separator) continue;
+				// We remove everything in the line before the comment
 				line = line.substr(0, commentStart);
 			}
 
@@ -48,6 +52,7 @@ namespace Localization
 			}
 		
 			{
+				// Translations may contain \n, so we replace them with the actual '\n' character
 				size_t newlinePos = 0;
 				while ((newlinePos = value.find("\\n", newlinePos)) != std::string::npos)
 				{
