@@ -178,7 +178,9 @@ void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 		return;
 	}
 
-	if (process->IsAttached()) process->Detach();
+	if (process->IsAttached()) {
+		process->Detach();
+	}
 
 	currentGameProcess = std::string(processName);
 	currentGameId = gameId;
@@ -189,14 +191,15 @@ void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 
 bool GameExtract::CanExtract()
 {
+	// Per-game definition
 	return m_extractor->CanExtract();
 }
 
 bool GameExtract::IsBusy()
 {
+	// There are still playerAddresss to extract from
 	return m_playerAddress.size() > 0;
 }
-
 
 void GameExtract::QueueCharacterExtraction(int playerId)
 {
