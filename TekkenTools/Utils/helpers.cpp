@@ -1,5 +1,6 @@
 #include <map>
 #include <time.h>
+#include <cctype>
 
 #include "helpers.hpp"
 
@@ -46,18 +47,39 @@ namespace Helpers
 		}
 	}
 
-	bool endsWith(std::string_view str, std::string_view suffix)
+	bool endsWith(std::string str, std::string suffix)
 	{
-		return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
-	}
+		if (str.length() < suffix.length())
+			return false;
+		size_t i = str.length() - suffix.length();
 
-	bool endsWith(std::u32string_view str, std::u32string_view suffix)
-	{
-		return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+		for (char c : suffix)
+		{
+			if (c != str[i]) {
+				return false;
+			}
+			++i;
+		}
+
+		return true;
 	}
 
 	std::string getMovesetNameFromFilename(std::string filename)
 	{
 		return filename.substr(strlen(MOVESET_DIRECTORY) + 1, filename.size() - strlen(MOVESET_DIRECTORY) - strlen(MOVESET_FILENAME_EXTENSION) - 1);
+	}
+
+	bool isHeaderStringMalformated(const char* str, size_t size)
+	{
+		size_t i = 0;
+
+		while (i < size && str[i] != '\0') {
+			if (isalnum(str[i]) == 0 && strchr(MOVESET_HEADER_STRING_CHARSET, str[i]) == nullptr) {
+				return true;
+			}
+			++i;
+		}
+
+		return str[i] != '\0'; // Ensure last char is a nullbyte
 	}
 }

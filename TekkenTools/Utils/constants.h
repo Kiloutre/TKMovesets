@@ -8,9 +8,10 @@
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LANG    "en_US"
 
-# define MOVESET_DIRECTORY "./extracted_chars"
-# define MOVESET_FILENAME_EXTENSION ".tkbin"
-# define MOVESET_VERSION_STRING "0.1"
+# define MOVESET_DIRECTORY             "./extracted_chars"
+# define MOVESET_FILENAME_EXTENSION    ".tkbin"
+# define MOVESET_VERSION_STRING        "0.1"
+# define MOVESET_HEADER_STRING_CHARSET "_-+!()[]{} "
 
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 

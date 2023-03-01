@@ -34,6 +34,13 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 		return nullptr;
 	}
 
+	if ( Helpers::isHeaderStringMalformated(header.origin, sizeof(header.origin)) ||
+		Helpers::isHeaderStringMalformated(header.origin, sizeof(header.target_character)) ||
+		Helpers::isHeaderStringMalformated(header.origin, sizeof(header.version_string)) ||
+		Helpers::isHeaderStringMalformated(header.origin, sizeof(header.date)) ) {
+		return nullptr;
+	}
+
 	return new movesetInfo{
 		filename,
 		Helpers::getMovesetNameFromFilename(filename),

@@ -4,8 +4,21 @@
 #include <windows.h>
 
 #include "Extractor.hpp"
+#include "GameProcess.hpp"
 
 #include "GameAddresses.h"
+
+namespace ExtractorUtils
+{
+	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim)
+	{
+		uint8_t bone_count = process->readInt8(anim + 2);
+		uint32_t header_size = bone_count * 0x4 + 0x8;
+		uint32_t frame_size = bone_count * 0x4 * 3;
+		uint32_t length = process->readInt32(anim + 4);
+		return header_size + frame_size * length;
+	}
+};
 
 void* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {

@@ -27,4 +27,6 @@ private:
 	void getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
 	// Returns an allocated block containing animations that weren't in the main animation block
 	void* GetAnimations(t7structs::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets);
+	// Attempts to find the animation size in memory
+	uint64_t TryFindAnimSize(gameAddr anim, size_t maxSize);
 };
