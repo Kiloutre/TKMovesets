@@ -106,7 +106,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	printf("movesetBlockSize size: %lld\n", movesetBlockSize);
 	printf("Anim block size: %lld - %llx %llx\n", animationEnd - animationStart, animationStart, animationEnd);
 
-	T7MovesetHeader header{0};
+	MovesetHeader header{0};
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 
 	strcpy(header.origin, cm_gameOriginString);

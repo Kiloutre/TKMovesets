@@ -10,16 +10,6 @@
 #include "Structs_t7.h"
 #include "GameAddresses.h"
 
-struct T7MovesetHeader
-{
-	// Origin (Game name + author)
-	char origin[32];
-	// Target character to play on
-	char target_character[32];
-	// Date of last modification
-	char date[24];
-};
-
 class ExtractorT7 : public Extractor
 {
 public:

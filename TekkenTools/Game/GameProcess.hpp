@@ -47,7 +47,7 @@ public:
 	gameAddr modBaseAddr{ (gameAddr)0 };
 
 	// -- Interaction stuff -- //
-	// 
+
 	// Attach to a process, return false is failed. See .status for more details.
 	bool Attach(const char* processName);
 	// Detach from the game,

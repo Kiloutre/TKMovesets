@@ -8,6 +8,17 @@
 
 #include "GameAddresses.h"
 
+// Data contained at the head of every extracted movesets
+struct MovesetHeader
+{
+	// Origin (Game name + author)
+	char origin[32];
+	// Target character to play on
+	char target_character[32];
+	// Date of last modification
+	char date[24];
+};
+
 // Base class for extracting from a game
 class Extractor
 {
