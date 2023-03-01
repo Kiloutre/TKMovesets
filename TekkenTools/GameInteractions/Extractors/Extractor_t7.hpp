@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 #include "Extractor.hpp"
@@ -22,5 +23,8 @@ private:
 	const char* cm_gameIdentifierString = "T7_";
 	const char* cm_gameOriginString = "Tekken 7";
 
+	// Writes bounds of the block containing anim and move names
 	void getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
+	// Returns an allocated block containing animations that weren't in the main animation block
+	void* GetOtherAnimations(std::vector<gameAddr> outOfBounds, uint64_t &size_out, std::map<gameAddr, uint64_t> &offsets);
 };

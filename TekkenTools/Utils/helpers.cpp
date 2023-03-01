@@ -1,8 +1,10 @@
+#include <map>
 #include <time.h>
 
 #include "helpers.hpp"
 
 #include "constants.h"
+#include "GameAddresses.h"
 
 namespace Helpers
 {
@@ -23,6 +25,22 @@ namespace Helpers
 		{
 			uint64_t* structMember = (uint64_t*)listCursor;
 			*structMember -= to_substract;
+			listCursor += struct_size;
+		}
+	}
+
+	void ConvertPtrsToOffsetWithMap(void* listAddr, uint64_t to_substract, std::map<gameAddr, uint64_t> m, uint64_t struct_size, uint64_t amount)
+	{
+		uint64_t listCursor = (uint64_t)listAddr;
+		while (amount-- > 0)
+		{
+			gameAddr* structMember = (gameAddr*)listCursor;
+			if (m.find(*structMember) != m.end()) {
+				*structMember = m[*structMember];
+			}
+			else {
+				*structMember -= to_substract;
+			}
 			listCursor += struct_size;
 		}
 	}

@@ -30,11 +30,10 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 
 	size_t readBytes = file.gcount();
 	if (readBytes != sizeof(MovesetHeader)) {
-		// Malformed file
+		// Malformed file header
 		return nullptr;
 	}
 
-	// todo: open file, read, etc
 	return new movesetInfo{
 		filename,
 		Helpers::getMovesetNameFromFilename(filename),

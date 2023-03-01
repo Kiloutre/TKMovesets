@@ -8,11 +8,13 @@
 #include "helpers.hpp"
 
 using Helpers::ConvertPtrsToOffset;
+using Helpers::ConvertPtrsToOffsetWithMap;
 
 // Todo: remove
 #include <chrono>
 #include <stdio.h>
 #include <iostream>
+//
 
 static int64_t getAnimSize(gameAddr anim)
 {
@@ -20,7 +22,48 @@ static int64_t getAnimSize(gameAddr anim)
 	return 0;
 }
 
-void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount,  gameAddr& start, gameAddr& end)
+// Stores the lowest and max animation addresses for quick extraction. Returns fringe (out of bounds) addresses in a vector.
+static std::vector<gameAddr> getMainAnimationBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr movesetAddr, gameAddr& start, gameAddr& end)
+{
+	// Todo: fix. This does not extract everything
+	uint64_t smallest = (int64_t)move[0].anim_addr;
+	uint64_t highest = smallest;
+
+	std::vector<gameAddr> outOfBounds;
+
+	for (size_t moveId = 1; moveId < moveCount; ++moveId)
+	{
+		uint64_t anim_addr = (uint64_t)move[moveId].anim_addr;
+
+		if (anim_addr < smallest) {
+			smallest = anim_addr;
+		}
+		else if (anim_addr > highest) {
+			if (anim_addr < movesetAddr) {
+				highest = anim_addr;
+			}
+			else {
+				// Anim is not in the block, we will save it for later
+				outOfBounds.push_back(anim_addr);
+			}
+		}
+	}
+
+	start = smallest;
+	end = highest + getAnimSize(highest);
+
+	sort(outOfBounds.begin(), outOfBounds.end());
+
+	return outOfBounds;
+}
+
+void* ExtractorT7::GetOtherAnimations(std::vector<gameAddr> outOfBounds, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets)
+{
+	//remplir la map
+	return nullptr;
+}
+
+void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
 	uint64_t smallest = (int64_t)move[0].name;
 	uint64_t highest = smallest;
@@ -55,34 +98,7 @@ void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount,
 	end = lastItemEnd + 1; // Add 1 for extracting the nullbyte too
 }
 
-static void getAnimationBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr movesetAddr, gameAddr& start, gameAddr& end)
-{
-	// Todo: fix. This does not extract everything
-	uint64_t smallest = (int64_t)move[0].anim_addr;
-	uint64_t highest = smallest;
-
-	for (size_t moveId = 1; moveId < moveCount; ++moveId)
-	{
-		uint64_t anim_addr = (uint64_t)move[moveId].anim_addr;
-
-		if (anim_addr < smallest) {
-			smallest = anim_addr;
-		}
-		else if (anim_addr > highest) {
-			if (anim_addr < movesetAddr) {
-				highest = anim_addr;
-			}
-			else {
-				// Anim is in MOTAs for some reason??
-			}
-		}
-	}
-
-	start = smallest;
-	end = highest + getAnimSize(highest);
-}
-
-void FixMovesetOffsets(char* movesetBlock, const t7structs::movesetLists* lists)
+static void fixMovesetOffsets(char* movesetBlock, const t7structs::movesetLists* lists, gameAddr nameStart, gameAddr animStart, std::map<gameAddr, uint64_t> otherAnimOffsets)
 {
 	char* addr;
 	// Fix move ptrs
@@ -90,6 +106,10 @@ void FixMovesetOffsets(char* movesetBlock, const t7structs::movesetLists* lists)
 	// Add movelist offset
 	addr = movesetBlock + (uint64_t)lists->move;
 	// Convert every ptr into offsets by substracting the list's head address to the address the member contains
+	ConvertPtrsToOffset(addr + offsetof(t7structs::Move, name), nameStart, sizeof(t7structs::Move), lists->moveCount);
+	ConvertPtrsToOffset(addr + offsetof(t7structs::Move, anim_name), nameStart, sizeof(t7structs::Move), lists->moveCount);
+	// This one tries to replace if found in the map but otherwise will substract like the others
+	ConvertPtrsToOffsetWithMap(addr + offsetof(t7structs::Move, anim_addr), animStart, otherAnimOffsets, sizeof(t7structs::Move), lists->moveCount);
 	ConvertPtrsToOffset(addr + offsetof(t7structs::Move, cancel_addr), (gameAddr)lists->cancel, sizeof(t7structs::Move), lists->moveCount);
 	ConvertPtrsToOffset(addr + offsetof(t7structs::Move, hit_condition_addr), (gameAddr)lists->hitCondition, sizeof(t7structs::Move), lists->moveCount);
 	ConvertPtrsToOffset(addr + offsetof(t7structs::Move, voicelip_addr), (gameAddr)lists->voiceclip, sizeof(t7structs::Move), lists->moveCount);
@@ -126,14 +146,19 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	// Reads block containing the actual moveset data
 	uint64_t movesetBlockSize = 0;
 	void* movesetBlock = allocateAndReadBlock(firstListAddr, lastListAddr + (sizeof(t7structs::Throw) * lists.throwsCount), movesetBlockSize);
-	FixMovesetOffsets((char*)movesetBlock, &lists);;
 
 	// Reads block containing most of the animations (not all of them are in it so this is a first step only)
 	uint64_t animationBlockSize = 0;
 	gameAddr animationStart = 0;
 	gameAddr animationEnd = 0;
-	getAnimationBlockBounds((t7structs::Move*)((int64_t)movesetBlock + (int64_t)lists.move), lists.moveCount, movesetAddr, animationStart, animationEnd);
-	//void* animationBlock = allocateAndReadBlock(animationStart, animationEnd, animationBlockSize);
+	std::vector<gameAddr> outOfBounds;
+	outOfBounds = getMainAnimationBlockBounds((t7structs::Move*)((int64_t)movesetBlock + (int64_t)lists.move), lists.moveCount, movesetAddr, animationStart, animationEnd);
+	//void* mainAnimationBlock = allocateAndReadBlock(animationStart, animationEnd, animationBlockSize);
+
+	// Extract other animations and build a map
+	std::map<gameAddr, uint64_t> otherAnimOffsets;
+	uint64_t otherAnimationBlockSize = 0;
+	void* otherAnimationsBlock = GetOtherAnimations(outOfBounds, otherAnimationBlockSize, otherAnimOffsets);
 
 	// Reads block containing names of moves and animations
 	uint64_t nameBlockSize = 0;
@@ -143,6 +168,9 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	void *nameBlock = allocateAndReadBlock(nameStart, nameEnd, nameBlockSize);
 
 	
+	// Now that we extracted everything, we can properly convert pts to offsets
+	fixMovesetOffsets((char*)movesetBlock, &lists, nameStart, animationStart, otherAnimOffsets);
+
 
 	printf("movesetInfo size: %lld\n", movesetInfoBlockSize);
 	printf("movesetBlockSize size: %lld\n", movesetBlockSize);
@@ -169,12 +197,14 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress)
 	m_file.write((char*)&lists, sizeof(lists));
 	m_file.write((char*)nameBlock, nameBlockSize);
 	m_file.write((char*)movesetBlock, movesetBlockSize);
-	//m_file.write((char*)animationBlock, animationBlockSize);
+	//m_file.write((char*)mainAnimationBlock, animationBlockSize);
+	//m_file.write((char*)otherAnimationsBlock, otherAnimationBlockSize);
 
 	free(movesetInfoBlock);
 	free(nameBlock);
 	free(movesetBlock);
-	//free(animationBlock);
+	//free(mainAnimationBlock);
+	//free(otherAnimationsBlock);
 
 	// Extraction is over!
 	CloseMovesetFile();
