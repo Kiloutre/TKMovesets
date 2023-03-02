@@ -81,7 +81,7 @@ importation.import_to = Import to:
 importation.play_sound = Play a sound  when importing succeeds
 
 # Online #
-online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background download the opponent's moveset on your computer and apply it to them and will do the same on their end.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.
+online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.
 online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
 online.moveset_x_selected = Moveset '%s' selected

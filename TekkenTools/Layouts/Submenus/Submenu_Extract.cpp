@@ -4,23 +4,10 @@
 #include "Submenu_Extract.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
+#include "Games.hpp"
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
-
-struct gameProcessName
-{
-	const char* name;
-	const char* processName;
-};
-
-// Respect the ids of GameId enum here.
-const gameProcessName exportGameList[] = {
-	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
-	{ "Tekken 8", "Tekken8.exe" },
-};
-
-const size_t gameListCount = sizeof(exportGameList) / sizeof(*exportGameList);
 
 void Submenu_Extract::Render(GameExtract* extractorHelper)
 {
@@ -32,13 +19,17 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 		ImGui::SeparatorText(_("extraction.extraction"));
 		size_t currentGameId = extractorHelper->currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5f);
-		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : exportGameList[currentGameId].name))
+
+		size_t gameListCount = Games::GetGamesCount();
+		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
 			for (size_t i = 0; i < gameListCount; ++i)
 			{
-				if (ImGui::Selectable(exportGameList[i].name, currentGameId == i, 0, ImVec2(100.0f, 0)))
-				{
-					extractorHelper->SetTargetProcess(exportGameList[i].processName, i);
+				GameInfo* game = Games::GetGameInfo(i);
+				if (game->flags & GameExtractable) {
+					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
+						extractorHelper->SetTargetProcess(game->processName, i);
+					}
 				}
 			}
 			ImGui::EndCombo();

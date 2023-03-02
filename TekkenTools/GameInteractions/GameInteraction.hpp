@@ -7,15 +7,9 @@
 #include "LocalStorage.hpp"
 #include "ThreadedClass.hpp"
 
-#include "GameAddresses.h"
+#include "Games.hpp"
 
-// Contains a unique ID for every supported game. Every list should respect the index order here
-enum GameId
-{
-	GameId_t7 = 0,
-	GameId_t8 = 1,
-	GameId_ttt2 = 2,
-};
+#include "GameAddresses.h"
 
 class GameInteraction : public ThreadedClass
 {
@@ -33,7 +27,7 @@ public:
 	// Everything that is related to files is done through .storage. Listing, deleting, etc.
 	LocalStorage* storage = nullptr;
 	// Stores the ID of the currently opened game
-	size_t currentGameId = -1;
+	int8_t currentGameId = -1;
 	// Used to know which process is currently being searched/opened
 	std::string currentGameProcess;
 	// Currently opened process for extraction

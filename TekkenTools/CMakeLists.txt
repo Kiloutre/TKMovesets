@@ -17,13 +17,15 @@ set(BINARY_SOURCES
                     "main.cpp"
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
+                    "GameInteractions/Games.cpp"
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
                     "GameInteractions/GameImport.cpp"
-                    "GameInteractions/Extractors/Extractor.cpp"
-                    "GameInteractions/Importers/Importer.cpp"
                     "LocalStorage/LocalStorage.cpp"
 
+                    # ExportImport
+                    "GameInteractions/Extractors/Extractor.cpp"
+                    "GameInteractions/Importers/Importer.cpp"
                     # Game-specific
                     "GameInteractions/Extractors/Extractor_t7.cpp"
                     "GameInteractions/Importers/Importer_t7.cpp"

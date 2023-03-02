@@ -4,20 +4,6 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 
-struct gameProcessName
-{
-	const char* name;
-	const char* processName;
-};
-
-// Respect the ids of GameId enum here.
-const gameProcessName importGameList[] = {
-	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
-	{ "Tekken 8", "Tekken8.exe" },
-};
-
-const size_t gameListCount = sizeof(importGameList) / sizeof(*importGameList);
-
 void Submenu_Import::Render(GameImport *importerHelper)
 {
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
@@ -30,13 +16,16 @@ void Submenu_Import::Render(GameImport *importerHelper)
 		size_t currentGameId = importerHelper->currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : importGameList[currentGameId].name))
+		size_t gameListCount = Games::GetGamesCount();
+		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
 			for (size_t i = 0; i < gameListCount; ++i)
 			{
-				if (ImGui::Selectable(importGameList[i].name, currentGameId == i, 0, ImVec2(100.0f, 0)))
-				{
-					importerHelper->SetTargetProcess(importGameList[i].processName, i);
+				GameInfo* game = Games::GetGameInfo(i);
+				if (game->flags & GameImportable) {
+					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
+						importerHelper->SetTargetProcess(game->processName, i);
+					}
 				}
 			}
 			ImGui::EndCombo();
