@@ -1,12 +1,16 @@
 #pragma once
 #include <imgui_impl_glfw.h>
 
+// Toplevel menus
 #include "NavigationMenu.hpp"
 #include "StatusBar.hpp"
+// Submenus
 #include "Submenu_Extract.hpp"
 #include "Submenu_Import.hpp"
 #include "Submenu_OnlinePlay.hpp"
+// 
 #include "GameExtract.hpp"
+#include "GameImport.hpp"
 #include "LocalStorage.hpp"
 
 class MainWindow {
@@ -18,6 +22,7 @@ private:
 	Submenu_OnlinePlay onlineMenu;
 public:
 	GameExtract extractor;
+	GameImport importer;
 	LocalStorage storage;
 
 	MainWindow(GLFWwindow* window, const char* c_glsl_version);

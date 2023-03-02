@@ -16,10 +16,9 @@
 
 // -- Private methods -- //
 
-void GameExtract::OnProcessAttach()
+void GameImport::OnProcessAttach()
 {
 	InstantiateFactory();
-	LoadCharacterNames();
 	m_plannedImportations.clear();
 }
 
@@ -55,7 +54,7 @@ void GameImport::RunningUpdate()
 	{
 		auto [filename, playerAddress] = m_plannedImportations[0];
 		// Start Importation
-		m_importer->Import(m_playerAddress[0], playerAddress, &progress);
+		m_importer->Import(filename.c_str(), playerAddress, &progress);
 		m_plannedImportations.erase(m_plannedImportations.begin());
 	}
 }
@@ -85,14 +84,14 @@ bool GameImport::CanStart()
 bool GameImport::IsBusy()
 {
 	// There are still playerAddresss to extract from
-	return m_playerAddress.size() > 0;
+	return m_plannedImportations.size() > 0;
 }
 
-void GameImport::QueueCharacterImportation(std::string filename, int playerId)
+void GameImport::QueueCharacterImportation(std::string filename)
 {
 	// It is safe to call this function even while an extraction is ongoing
-	gameAddr playerAddress = game->ReadPtr("p1_addr");
 	gameAddr playerStructSize = GameAddressesFile::GetSingleValue("val_playerstruct_size");
+	gameAddr playerAddress = game->ReadPtr("p1_addr") + currentCharacterId * playerStructSize;
 
 	m_plannedImportations.push_back(std::pair<std::string, gameAddr>(filename, playerAddress));
 }

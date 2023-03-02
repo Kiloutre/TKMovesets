@@ -15,12 +15,12 @@ struct gameProcessName
 };
 
 // Respect the ids of GameId enum here.
-const gameProcessName gameList[] = {
+const gameProcessName exportGameList[] = {
 	{ "Tekken 7", "TekkenGame-Win64-Shipping.exe" },
 	{ "Tekken 8", "Tekken8.exe" },
 };
 
-const size_t gameListCount = sizeof(gameList) / sizeof(*gameList);
+const size_t gameListCount = sizeof(exportGameList) / sizeof(*exportGameList);
 
 void Submenu_Extract::Render(GameExtract* extractorHelper)
 {
@@ -30,15 +30,15 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 	{
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		ImGui::SeparatorText(_("extraction.extraction"));
-		size_t currentItem = extractorHelper->currentGameId;
-		ImGui::PushItemWidth(150.0f);
-		if (ImGui::BeginCombo("##", currentItem == -1 ? _("extraction.select_game") : gameList[currentItem].name))
+		size_t currentGameId = extractorHelper->currentGameId;
+		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5);
+		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : exportGameList[currentGameId].name))
 		{
 			for (size_t i = 0; i < gameListCount; ++i)
 			{
-				if (ImGui::Selectable(gameList[i].name, currentItem == i, 0, ImVec2(100.0f, 0)))
+				if (ImGui::Selectable(exportGameList[i].name, currentGameId == i, 0, ImVec2(100.0f, 0)))
 				{
-					extractorHelper->SetTargetProcess(gameList[i].processName, i);
+					extractorHelper->SetTargetProcess(exportGameList[i].processName, i);
 				}
 			}
 			ImGui::EndCombo();
@@ -68,7 +68,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 		}
 	}
 	else if (!extractorHelper->CanStart()) {
-		ImGuiExtra_TextboxWarning(_("process.cant_extract"));
+		ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
 	}
 
 	{
@@ -118,15 +118,15 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 
 	// List of extracted movesets
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
-	if (ImGui::BeginTable("nice", 6, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
-									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
+	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
+									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
-		ImGui::TableSetupColumn("Delete", 0, 0.0f);
+		ImGui::TableSetupColumn(_("moveset.delete"), 0, 0.0f);
 		ImGui::TableHeadersRow();
 
 		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration

@@ -19,8 +19,6 @@ protected:
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt
 	GameData* m_game;
-	//
-	gameAddr m_playerAddress;
 
 public:
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}

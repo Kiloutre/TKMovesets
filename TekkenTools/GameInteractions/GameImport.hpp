@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pair>
+#include <utility>
 #include <sys/stat.h>
 
 #include "Importer.hpp"
@@ -24,6 +24,8 @@ private:
 	// Function ran in the parallel thread, used to latch on to process
 	void RunningUpdate() override;
 public:
+	uint8_t currentPlayerId = 0;
+
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
@@ -31,5 +33,5 @@ public:
 	// Is currently busy with an extraction
 	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters
-	void QueueCharacterImportation(const char* filename, int playerId);
+	void QueueCharacterImportation(std::string filename, int playerId);
 };

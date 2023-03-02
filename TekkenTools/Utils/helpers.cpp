@@ -19,7 +19,7 @@ namespace Helpers
 		return std::string(buf);
 	}
 
-	void ConvertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount)
+	void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount)
 	{
 		uint64_t listCursor = (uint64_t)listAddr;
 		while (amount-- > 0)
@@ -30,7 +30,7 @@ namespace Helpers
 		}
 	}
 
-	void ConvertPtrsToOffsets(void* listAddr, std::map<gameAddr, uint64_t> m, uint64_t struct_size, uint64_t amount)
+	void convertPtrsToOffsets(void* listAddr, std::map<gameAddr, uint64_t> m, uint64_t struct_size, uint64_t amount)
 	{
 		uint64_t listCursor = (uint64_t)listAddr;
 		while (amount-- > 0)

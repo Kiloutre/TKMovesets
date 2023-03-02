@@ -1,7 +1,7 @@
 #include <string>
 #include <cctype>
 #include <stddef.h>
-#include <algorithm>
+#include <iterator>
 
 #include "helpers.hpp"
 #include "Extractor.hpp"
@@ -11,7 +11,7 @@
 #include "Structs_t7.h"
 #include "GameAddresses.h"
 
-using Helpers::ConvertPtrsToOffsets;
+using Helpers::convertPtrsToOffsets;
 using namespace t7structs;
 
 // Todo: remove
@@ -19,6 +19,8 @@ using namespace t7structs;
 #include <chrono>
 #include <stdio.h>
 #include <iostream>
+#include <algorithm>
+#include <functional>
 
 // -- Static helpers -- //
 
@@ -41,53 +43,58 @@ static std::vector<gameAddr> getMotaListAnims(t7structs::motaList* mota)
 	return animAddrs;
 }
 
+
 static void fixMovesetOffsets(char* movesetBlock, const movesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> animOffsetMap)
 {
 	char* addr;
 
 	// Convert move ptrs
 	addr = movesetBlock + (uint64_t)lists->move;
+	// 
+	// todo: do this through iterators instead of 50 000 function calls
+	// wil llock cleaner as well
+	// 
 	// Convert every ptr into offsets by substracting the list's head address to the address the member contains
-	ConvertPtrsToOffsets(addr + offsetof(Move, name), nameStart, sizeof(Move), lists->moveCount);
-	ConvertPtrsToOffsets(addr + offsetof(Move, anim_name), nameStart, sizeof(Move), lists->moveCount);
-	ConvertPtrsToOffsets(addr + offsetof(Move, anim_addr), animOffsetMap, sizeof(Move), lists->moveCount); // This one uses a map
-	ConvertPtrsToOffsets(addr + offsetof(Move, cancel_addr), (gameAddr)lists->cancel, sizeof(Move), lists->moveCount);
-	ConvertPtrsToOffsets(addr + offsetof(Move, hit_condition_addr), (gameAddr)lists->hitCondition, sizeof(Move), lists->moveCount);
-	ConvertPtrsToOffsets(addr + offsetof(Move, voicelip_addr), (gameAddr)lists->voiceclip, sizeof(Move), lists->moveCount);
-	ConvertPtrsToOffsets(addr + offsetof(Move, extra_move_property_addr), (gameAddr)lists->hitCondition, sizeof(Move), lists->moveCount);
+	convertPtrsToOffsets(addr + offsetof(Move, name), nameStart, sizeof(Move), lists->moveCount);
+	convertPtrsToOffsets(addr + offsetof(Move, anim_name), nameStart, sizeof(Move), lists->moveCount);
+	convertPtrsToOffsets(addr + offsetof(Move, anim_addr), animOffsetMap, sizeof(Move), lists->moveCount); // This one uses a map
+	convertPtrsToOffsets(addr + offsetof(Move, cancel_addr), (gameAddr)lists->cancel, sizeof(Move), lists->moveCount);
+	convertPtrsToOffsets(addr + offsetof(Move, hit_condition_addr), (gameAddr)lists->hitCondition, sizeof(Move), lists->moveCount);
+	convertPtrsToOffsets(addr + offsetof(Move, voicelip_addr), (gameAddr)lists->voiceclip, sizeof(Move), lists->moveCount);
+	convertPtrsToOffsets(addr + offsetof(Move, extra_move_property_addr), (gameAddr)lists->hitCondition, sizeof(Move), lists->moveCount);
 
 	// Convert projectile ptrs
 	addr = movesetBlock + (uint64_t)lists->projectile;
-	ConvertPtrsToOffsets(addr + offsetof(Projectile, cancel_addr), (gameAddr)lists->cancel, sizeof(Projectile), lists->projectileCount);
-	ConvertPtrsToOffsets(addr + offsetof(Projectile, hit_condition_addr), (gameAddr)lists->extraMoveProperty, sizeof(Projectile), lists->projectileCount);
+	convertPtrsToOffsets(addr + offsetof(Projectile, cancel_addr), (gameAddr)lists->cancel, sizeof(Projectile), lists->projectileCount);
+	convertPtrsToOffsets(addr + offsetof(Projectile, hit_condition_addr), (gameAddr)lists->extraMoveProperty, sizeof(Projectile), lists->projectileCount);
 
 	// Convert cancel ptrs
 	addr = movesetBlock + (uint64_t)lists->cancel;
-	ConvertPtrsToOffsets(addr + offsetof(Cancel, requirement_addr), (gameAddr)lists->requirement, sizeof(Cancel), lists->cancelCount);
-	ConvertPtrsToOffsets(addr + offsetof(Cancel, extradata_addr), (gameAddr)lists->cancelExtradata, sizeof(Cancel), lists->cancelCount);
+	convertPtrsToOffsets(addr + offsetof(Cancel, requirement_addr), (gameAddr)lists->requirement, sizeof(Cancel), lists->cancelCount);
+	convertPtrsToOffsets(addr + offsetof(Cancel, extradata_addr), (gameAddr)lists->cancelExtradata, sizeof(Cancel), lists->cancelCount);
 
 	// Convert reaction ptrs
 	addr = movesetBlock + (uint64_t)lists->reactions;
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, front_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, backturned_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, left_side_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, right_side_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, front_counterhit_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, downed_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
-	ConvertPtrsToOffsets(addr + offsetof(Reactions, block_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, front_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, backturned_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, left_side_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, right_side_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, front_counterhit_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, downed_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
+	convertPtrsToOffsets(addr + offsetof(Reactions, block_pushback), (gameAddr)lists->pushback, sizeof(Reactions), lists->reactionsCount);
 
 	// Convert input sequence ptrs
 	addr = movesetBlock + (uint64_t)lists->inputSequence;
-	ConvertPtrsToOffsets(addr + offsetof(InputSequence, input_addr), (gameAddr)lists->input, sizeof(InputSequence), lists->inputSequenceCount);
+	convertPtrsToOffsets(addr + offsetof(InputSequence, input_addr), (gameAddr)lists->input, sizeof(InputSequence), lists->inputSequenceCount);
 
 	// Convert throws ptrs
 	addr = movesetBlock + (uint64_t)lists->throws;
-	ConvertPtrsToOffsets(addr + offsetof(ThrowData, cameradata_addr), (gameAddr)lists->cameraData, sizeof(ThrowData), lists->throwsCount);
+	convertPtrsToOffsets(addr + offsetof(ThrowData, cameradata_addr), (gameAddr)lists->cameraData, sizeof(ThrowData), lists->throwsCount);
 
 	// Convert hit conditions ptrs
 	addr = movesetBlock + (uint64_t)lists->hitCondition;
-	ConvertPtrsToOffsets(addr + offsetof(HitCondition, requirement_addr), (gameAddr)lists->requirement, sizeof(HitCondition), lists->hitConditionCount);
-	ConvertPtrsToOffsets(addr + offsetof(HitCondition, reactions_addr), (gameAddr)lists->reactions, sizeof(HitCondition), lists->hitConditionCount);
+	convertPtrsToOffsets(addr + offsetof(HitCondition, requirement_addr), (gameAddr)lists->requirement, sizeof(HitCondition), lists->hitConditionCount);
+	convertPtrsToOffsets(addr + offsetof(HitCondition, reactions_addr), (gameAddr)lists->reactions, sizeof(HitCondition), lists->hitConditionCount);
 }
 
 static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> boundaries)
@@ -247,7 +254,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	gameAddr lastListAddr = (gameAddr)lists.throws;
 
 	// Convert the list of ptr into a list of global offsets by substracting the head of the first list. Lists starts after the previous one ends so this works.
-	ConvertPtrsToOffsets(&lists, firstListAddr, (sizeof(void*) * 2), sizeof(lists) / sizeof(void*) / 2);
+	convertPtrsToOffsets(&lists, firstListAddr, (sizeof(void*) * 2), sizeof(lists) / sizeof(void*) / 2);
 
 	// Reads block containing basic moveset infos and aliases
 	uint64_t movesetInfoBlockSize = 0;

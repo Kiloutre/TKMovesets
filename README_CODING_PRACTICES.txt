@@ -28,7 +28,7 @@ Syntax norms and whatnot to make things consistent and clear throughout the proj
 
 // -- Naming -- //
 - Functions should start with an upper case
-- Helpers functions, static or not should start with a lower cases
+- Helper s functions, static or not should start with a lower cases
 - camelCase
 - Constant should be prefixed c_
 - Globals should be suffixed g_

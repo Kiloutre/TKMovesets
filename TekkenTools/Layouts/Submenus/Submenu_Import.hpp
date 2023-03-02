@@ -1,6 +1,8 @@
 #pragma once
 
+#include "GameImport.hpp"
+
 class Submenu_Import {
 public:
-	void Render();
+	void Render(GameImport* importerHelper);
 };

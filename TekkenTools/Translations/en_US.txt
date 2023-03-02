@@ -12,19 +12,20 @@ yes = Yes
 no = No
 1p = Player 1
 2p = Player 2
+3p = Player 3
+4p = Player 4
 
 # Process #
 
 process.status = Status:
 process.attach = Attach to game
 process.attaching = Attaching...
-process.game_not_attached = Currently not trying to attach. Please select a game to extract from.
+process.game_not_attached = Currently not trying to attach. Please select a game.
 process.game_attached = Game is running and attached.
 process.game_not_running = Game is not running or could not be found.
 process.game_version_mismatch = The current game version is not supported by game_address.txt.
 process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
 process.game_unexpected_exit = Game exited unexpectedly.
-process.cant_extract = Cannot extract because characters aren't loaded.
 
 # Moveset #
 moveset.origin = Origin
@@ -33,6 +34,8 @@ moveset.date = Date
 moveset.invalid = INVALID
 moveset.size = Size
 moveset.size_mb = MB
+moveset.import = Import
+moveset.delete = Delete
 
 ## Main ##
 
@@ -63,18 +66,18 @@ extraction.extract_both = Extract (1P & 2P)
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.overwrite_explanation = Enable to overwrite moveset with same names.\nDisable to have name conflicts resolved with number suffixes.\nEx: T7_JIN (2)
 extraction.progress = Extracting... (%.0f%%)
-extraction.select_game = Select a game
 extraction.extracted_movesets = Extracted movesets
+extraction.select_game = Select a game
 extraction.rename = Rename moveset
-extraction.game_none = None
+extraction.cant_extract = Cannot extract because characters aren't loaded.
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
-importation.cannot_import = Movesets cannot be imported.
-importation.select_moveset = Select moveset
-importation.import_1p = Import to 1P
-importation.import_2p = Import to 2P
+importation.importation = Importation
+importation.select_moveset = Select moveset to import
 importation.deallocate_unused = Deallocate unused movesets
+importation.cant_import = Cannot import because you are not loaded into an active game (training mode, etc).
+importation.play_sound = Play a sound  when importing succeeds
 
 # Online #
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background download the opponent's moveset on your computer and apply it to them and will do the same on their end.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.

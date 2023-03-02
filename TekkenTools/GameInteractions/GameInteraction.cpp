@@ -21,6 +21,14 @@ void GameInteraction::SetTargetProcess(const char* processName, size_t gameId)
 	currentGameProcess = std::string(processName);
 	currentGameId = gameId;
 	if (process->Attach(processName)) {
+
+		if (gameId == GameId_ttt2) {
+			characterCount = 4;
+		}
+		else {
+			characterCount = 2;
+		}
+
 		OnProcessAttach();
 	}
 }

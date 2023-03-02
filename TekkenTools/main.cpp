@@ -24,18 +24,35 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 // Initialize the important members of mainwindow. I prefer doing it here because it is mostly a layout and GUI-related class
-static void InitMainWindow(MainWindow& program)
+static void InitMainClasses(MainWindow& program)
 {
 	program.storage.ReloadMovesetList();
-
 
 	program.extractor.process = new GameProcess;
 	program.extractor.game = new GameData(program.extractor.process);
 	program.extractor.storage = &program.storage;
 
+	program.importer.process = new GameProcess;
+	program.importer.game = new GameData(program.extractor.process);
+	program.importer.storage = &program.storage;
 
 	program.storage.StartThread();
 	program.extractor.StartThread();
+	program.importer.StartThread();
+}
+
+// Free up memory and stop threads cleanly before exiting the program
+static void DestroyMainClasses(MainWindow& program)
+{
+	program.extractor.StopThreadAndCleanup();
+	delete program.extractor.process;
+	delete program.extractor.game;
+
+	program.importer.StopThreadAndCleanup();
+	delete program.importer.process;
+	delete program.importer.game;
+
+	program.storage.StopThreadAndCleanup();
 }
 
 // -- main -- //
@@ -97,7 +114,7 @@ int main(int argc, wchar_t** argv)
 
 	// Init main program. This will get most things going and create the important threads
 	MainWindow program(window, c_glsl_version);
-	InitMainWindow(program);
+	InitMainClasses(program);
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize. Required
@@ -121,6 +138,7 @@ int main(int argc, wchar_t** argv)
 		glfwSwapBuffers(window);
 	}
 
+	DestroyMainClasses(program);
 	// Cleanup what needs to be cleaned up
 	program.Shutdown();
 

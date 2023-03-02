@@ -61,7 +61,7 @@ void MainWindow::Update(int width, int height)
 			extractMenu.Render(&extractor);
 			break;
 		case NAV__MENU_IMPORT:
-			importMenu.Render();
+			importMenu.Render(&importer);
 			break;
 		case NAV__MENU_ONLINE_PLAY:
 			onlineMenu.Render();
@@ -97,16 +97,6 @@ void MainWindow::Render()
 
 void MainWindow::Shutdown()
 {
-	// Cleanup of everything we do should be done here
-
-	extractor.StopThreadAndCleanup();
-	delete extractor.process;
-	delete extractor.game;
-
-	storage.StopThreadAndCleanup();
-
-
-
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

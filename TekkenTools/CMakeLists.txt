@@ -17,8 +17,9 @@ set(MAIN_SOURCES
                     "Game/GameData.cpp"
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
+                    "GameInteractions/GameImport.cpp"
                     "GameInteractions/Extractors/Extractor.cpp"
-                    #"GameInteractions/Importers/Importer.cpp"
+                    "GameInteractions/Importers/Importer.cpp"
                     "LocalStorage/LocalStorage.cpp"
 )
 
