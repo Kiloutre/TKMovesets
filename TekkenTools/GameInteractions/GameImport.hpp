@@ -3,7 +3,7 @@
 #include <pair>
 #include <sys/stat.h>
 
-//#include "Importer.hpp"
+#include "Importer.hpp"
 #include "LocalStorage.hpp"
 #include "GameInteraction.hpp"
 
@@ -13,7 +13,7 @@ class GameImport : public virtual GameInteraction
 {
 private:
 	// Importer class, never stores an Importer*, used for polymorphism
-	void* m_importer = nullptr;
+	Importer* m_importer = nullptr;
 	// Movesets to import and corresponding player id 
 	std::vector<std::pair<std::string, gameAddr>> m_plannedImportations;
 
@@ -29,7 +29,7 @@ public:
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
 	bool CanStart() override;
 	// Is currently busy with an extraction
-	bool IsBusy();
+	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterImportation(const char* filename, int playerId);
 };

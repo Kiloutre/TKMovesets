@@ -18,11 +18,13 @@ set(MAIN_SOURCES
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
                     "GameInteractions/Extractors/Extractor.cpp"
+                    #"GameInteractions/Importers/Importer.cpp"
                     "LocalStorage/LocalStorage.cpp"
 )
 
 set(GAME_SPECIFIC_SOURCES
                     "GameInteractions/Extractors/Extractor_t7.cpp"
+                    "GameInteractions/Importers/Importer_t7.cpp"
 )
 
 set(LAYOUT_SOURCES

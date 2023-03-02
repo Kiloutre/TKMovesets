@@ -32,7 +32,7 @@ public:
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
 	bool CanStart() override;
 	// Is currently busy with an extraction
-	bool IsBusy();
+	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterExtraction(int playerId);
 };

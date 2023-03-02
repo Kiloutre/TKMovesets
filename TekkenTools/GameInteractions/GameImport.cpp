@@ -7,8 +7,8 @@
 
 #include "GameImport.hpp"
 #include "GameAddressesFile.hpp"
-//#include "Importer.hpp"
-//#include "Importer_t7.hpp"
+#include "Importer.hpp"
+#include "Importer_t7.hpp"
 #include "helpers.hpp"
 
 #include "constants.h"
@@ -23,11 +23,11 @@ void GameExtract::OnProcessAttach()
 	m_plannedImportations.clear();
 }
 
-/*
+
 void GameImport::InstantiateFactory()
 {
-	if (m_extractor != nullptr) {
-		delete m_extractor;
+	if (m_importer != nullptr) {
+		delete m_importer;
 	}
 
 	// Every game has its own extraction subtleties so we use polymorphism to manage that
@@ -35,17 +35,17 @@ void GameImport::InstantiateFactory()
 	switch (currentGameId)
 	{
 	case GameId_t7:
-		m_importer = new ExtractorT7(process, game);
+		m_importer = new ImporterT7(process, game);
 		break;
 	case GameId_t8:
-		m_extractor = nullptr;
+		m_importer = nullptr;
 		break;
 	case GameId_ttt2:
-		m_extractor = nullptr;
+		m_importer = nullptr;
 		break;
 	}
 }
-*/
+
 
 void GameImport::RunningUpdate()
 {
@@ -54,8 +54,8 @@ void GameImport::RunningUpdate()
 	while (m_plannedImportations.size() > 0)
 	{
 		auto [filename, playerAddress] = m_plannedImportations[0];
-		// Start extraction
-		//m_importer->Import(m_playerAddress[0], playerAddress, &progress);
+		// Start Importation
+		m_importer->Import(m_playerAddress[0], playerAddress, &progress);
 		m_plannedImportations.erase(m_plannedImportations.begin());
 	}
 }
