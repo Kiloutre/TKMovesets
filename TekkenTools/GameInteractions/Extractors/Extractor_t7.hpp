@@ -21,7 +21,7 @@ public:
 	uint32_t GetCharacterID(gameAddr playerAddress) override;
 
 	const char* GetGameIdentifierString() override { return "T7_"; }
-	const char* GetGameOriginString() override { return "Tekken7"; }
+	const char* GetGameOriginString() override { return "Tekken 7"; }
 private:
 
 	// Writes bounds of the block containing anim and move names

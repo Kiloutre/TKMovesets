@@ -114,9 +114,9 @@ void GameExtract::ReloadMovesetList()
 
 		if ((stat(moveset->filename.c_str(), &buffer) != 0) || buffer.st_mtime != moveset->modificationDate) {
 			// File does not exist anymore, de-allocate the info we stored about it
+			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
 			delete moveset;
-			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
 		}
 		else {
 			++i;

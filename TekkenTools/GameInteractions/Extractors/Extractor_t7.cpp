@@ -299,12 +299,10 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + GameAddressesFile::GetSingleValue("val_motbin_offset"));
-
-	if (movesetAddr == 0) {
-		return std::string();
-	}
-
 	std::string characterName;
+	if (movesetAddr == 0) {
+		return characterName;
+	}
 
 	{
 		char buf[32]{ 0 };
@@ -316,16 +314,15 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 		return std::string();
 	}
 
+	// Turn name into something more readable. '[CHARACTER_NAME.s]' becomes 'Character Name.S'
 	if (characterName.front() == '[') {
 		characterName.erase(0, 1);
 	}
-
 	if (characterName.back() == ']') {
 		characterName.erase(characterName.size() - 1);
 	}
 
 	std::replace(characterName.begin(), characterName.end(), '_', ' ');
-
 	{
 		bool isWordStart = true;
 		for (size_t i = 0; i < characterName.size(); ++i)
@@ -339,7 +336,6 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 			isWordStart = strchr(" -.", characterName[i]) != nullptr;
 		}
 	}
-
 	return characterName;
 }
 
