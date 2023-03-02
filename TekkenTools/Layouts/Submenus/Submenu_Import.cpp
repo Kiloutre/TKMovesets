@@ -23,7 +23,10 @@ void Submenu_Import::Render(GameImport *importerHelper)
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
 	ImGui::SeparatorText(_("importation.importation"));
 
+	ImGui::TextUnformatted(_("importation.import_to"));
+
 	{
+		ImGui::SameLine();
 		size_t currentGameId = importerHelper->currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
@@ -39,10 +42,11 @@ void Submenu_Import::Render(GameImport *importerHelper)
 			ImGui::EndCombo();
 		}
 		ImGui::PopID();
-		ImGui::SameLine();
 	}
 
+
 	{
+		ImGui::SameLine();
 		char buf[3] = { '1' + importerHelper->currentPlayerId, 'p', '\0' };
 		ImGui::PushItemWidth(150.0f);
 		if (ImGui::BeginCombo("##", _(buf)))
@@ -61,8 +65,12 @@ void Submenu_Import::Render(GameImport *importerHelper)
 	}
 
 
-	// If we can't extract, display a warning detailling why
+	// If we can't import, display a warning detailling why
 	GameProcess* p = importerHelper->process;
+
+	bool busy = importerHelper->IsBusy();
+	bool canImport = p->status == PROC_ATTACHED && !busy && importerHelper->CanStart();
+
 	if (p->status != PROC_ATTACHED)
 	{
 		switch (p->status)
@@ -125,7 +133,7 @@ void Submenu_Import::Render(GameImport *importerHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
-				if (ImGui::Button(_("moveset.import")))
+				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport))
 				{
 					importerHelper->QueueCharacterImportation(moveset->filename);
 				}

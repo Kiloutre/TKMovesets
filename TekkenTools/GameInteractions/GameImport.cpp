@@ -52,7 +52,7 @@ void GameImport::RunningUpdate()
 	// Extraction queue is a FIFO (first in first out) queue
 	while (m_plannedImportations.size() > 0)
 	{
-		auto [filename, playerAddress] = m_plannedImportations[0];
+		auto &[filename, playerAddress] = m_plannedImportations[0];
 		// Start Importation
 		m_importer->Import(filename.c_str(), playerAddress, &progress);
 		m_plannedImportations.erase(m_plannedImportations.begin());

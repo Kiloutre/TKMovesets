@@ -77,6 +77,7 @@ importation.importation = Importation
 importation.select_moveset = Select moveset to import
 importation.deallocate_unused = Deallocate unused movesets
 importation.cant_import = Cannot import because you are not loaded into an active game (training mode, etc).
+importation.import_to = Import to:
 importation.play_sound = Play a sound  when importing succeeds
 
 # Online #

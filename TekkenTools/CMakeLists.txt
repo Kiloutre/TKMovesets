@@ -51,6 +51,8 @@ set(OTHER_SOURCES
 add_executable (TekkenTools ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES} ${GAME_SPECIFIC_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
 
+#add_library(yourlibtest SHARED ${GAME_SPECIFIC_SOURCES})
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TekkenTools PROPERTY CXX_STANDARD 20)
 endif()
