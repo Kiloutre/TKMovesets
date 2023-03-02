@@ -43,7 +43,7 @@ static std::vector<gameAddr> getMotaListAnims(t7structs::motaList* mota)
 }
 
 // Converts abslute ptr into relative offsets before saving to file
-static void fixMovesetOffsets(char* movesetBlock, const movesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> animOffsetMap)
+static void fixMovesetOffsets(char* movesetBlock, const movesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
 	// Todo: maybe turn this into callback for ease of reading?
 
@@ -55,7 +55,7 @@ static void fixMovesetOffsets(char* movesetBlock, const movesetLists* lists, gam
 	{
 		move->name -= nameStart;
 		move->anim_name -= nameStart;
-		*(char*)move->anim_addr = animOffsetMap[(gameAddr)move->anim_addr];
+		*(char*)(&move->anim_addr) = animOffsetMap[(gameAddr)move->anim_addr];
 		move->cancel_addr -= (gameAddr)lists->cancel;
 		move->hit_condition_addr -= (gameAddr)lists->hitCondition;
 		move->voicelip_addr -= (gameAddr)lists->voiceclip;

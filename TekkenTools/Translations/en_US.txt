@@ -36,7 +36,6 @@ moveset.size = Size
 moveset.size_mb = MB
 moveset.import = Import
 moveset.delete = Delete
-moveset.exractor_version = Extractor version
 
 ## Main ##
 
