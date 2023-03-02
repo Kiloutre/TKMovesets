@@ -21,14 +21,14 @@ struct NavMenuBtn
 };
 
 class NavigationMenu {
+private:
+	// Render a list of buttons with predetermined size for use in the navbar
+	void RenderBtnList(const NavMenuBtn* c_btns, size_t count);
 public:
+	// Stores the ID of the current menu to ender
+	NAV__MENU menuId{ NAV__MENU_DEFAULT };
+
 	// Main render function
 	void Render();
 
-	// Stores the ID of the current menu to ender
-	NAV__MENU menuId{ NAV__MENU_DEFAULT };
-private:
-	
-	// Render a list of buttons with predetermined size for use in the navbar
-	void RenderBtnList(const NavMenuBtn* c_btns, size_t count);
 };

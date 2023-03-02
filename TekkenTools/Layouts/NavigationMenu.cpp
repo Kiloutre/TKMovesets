@@ -4,6 +4,8 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 
+// - Const layout definition - //
+
 const NavMenuBtn moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},
 	{NAV__MENU_IMPORT, "navmenu.import"},
@@ -20,7 +22,7 @@ const NavMenuBtn other_btns[] = {
 	{NAV__MENU_ABOUT, "navmenu.about"},
 };
 
-// Layout //
+// -- Private methods -- //
 
 void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count)
 {
@@ -33,6 +35,8 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count)
 		}
 	}
 }
+
+// -- Public methods -- //
 
 void NavigationMenu::Render()
 {

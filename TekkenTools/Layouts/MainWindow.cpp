@@ -7,6 +7,8 @@
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
 
+// -- Public methods -- //
+
 MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 {
 	IMGUI_CHECKVERSION();
@@ -24,7 +26,6 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 
 	// Init subclasses of singletons, start threads too
 	{
-        // todo: delete
 		extractor = &GameExtract::getInstance();
 		GameProcess* process = new GameProcess();
 		extractor->process = process;

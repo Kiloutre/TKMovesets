@@ -9,6 +9,14 @@
 #include "GameExtract.hpp"
 
 class MainWindow {
+private:
+	NavigationMenu     navMenu;
+	StatusBar          statusBar;
+	Submenu_Extract    extractMenu;
+	Submenu_Import	   importMenu;
+	Submenu_OnlinePlay onlineMenu;
+
+	GameExtract* extractor;
 public:
 	MainWindow(GLFWwindow* window, const char* c_glsl_version);
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
@@ -19,12 +27,4 @@ public:
 	void Render();
 	// Cleanup function
 	void Shutdown();
-
-	NavigationMenu     navMenu;
-	StatusBar          statusBar;
-	Submenu_Extract    extractMenu;
-	Submenu_Import	   importMenu;
-	Submenu_OnlinePlay onlineMenu;
-
-	GameExtract* extractor;
 };

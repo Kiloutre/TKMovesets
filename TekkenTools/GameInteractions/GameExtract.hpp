@@ -54,8 +54,6 @@ private:
 	void OnProcessAttach();
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	void InstantiateExtractor();
-	// Order an extraction to be pushed to the queue
-	void OrderExtraction(gameAddr playerAddress);
 	// Latch on to process 
 	void Update();
 	// Reads the movesets for the players characters' names. Accessible under .characterNames
@@ -102,4 +100,6 @@ public:
 	void ReloadMovesetList();
 	// Frees the content of .garbage. Must be called by the display thread after being finished with .extractedMovesets
 	void CleanupUnusedMovesetInfos();
+	// Delete a moveset's file entirely
+	void DeleteMoveset(const char* filename);
 };

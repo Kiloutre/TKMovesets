@@ -14,6 +14,8 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
+// -- Static helpers --
+
 // Reads a movest in order to fetch its header informations such as character name, version, etc. Can return null if errors are encountered.
 static movesetInfo* fetchMovesetInformations(std::string filename)
 {
@@ -58,100 +60,7 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 	return nullptr;
 }
 
-void GameExtract::StartThread()
-{
-	// Start the extraction thread that will run regularly, attach itself to the game whenever found and consume the queue
-	if (!m_threadStarted)
-	{
-		m_threadStarted = true;
-		m_t = std::thread(&GameExtract::Update, this);
-	}
-}
-
-void GameExtract::StopThreadAndCleanup()
-{
-	// Order thread to stop
-	m_threadStarted = false;
-	m_t.join();
-
-	// Free allocated ressources
-	CleanupUnusedMovesetInfos();
-	for (movesetInfo *movesetInfo : extractedMovesets) {
-		delete movesetInfo;
-	}
-
-	if (m_extractor != nullptr) {
-		delete m_extractor;
-	}
-}
-
-void GameExtract::OrderExtraction(gameAddr playerAddress)
-{
-	m_playerAddress.push_back(playerAddress);
-}
-
-void GameExtract::ReloadMovesetList()
-{
-	// Loop through every file
-	for (const auto& entry : std::filesystem::directory_iterator(MOVESET_DIRECTORY))
-	{
-		// todo: see how this works with utf8 chars
-		std::string filename = entry.path().string();
-
-		if (!Helpers::endsWith(filename, MOVESET_FILENAME_EXTENSION)) {
-			// Skip files that we do not recognize
-			continue;
-		}
-
-		// If new file is detected, fetch its infos
-		if (!m_extractedMovesetFilenames.contains(filename))
-		{
-			m_extractedMovesetFilenames.insert(filename);
-			movesetInfo* moveset = fetchMovesetInformations(filename);
-
-			if (moveset == nullptr) {
-				moveset = new movesetInfo{
-				   .filename = filename,
-				   .name = Helpers::getMovesetNameFromFilename(filename),
-				   .origin = std::string("INVALID"),
-				   .target_character = std::string(""),
-				   .date = std::string(""),
-				   .size = 0,
-				   .modificationDate = 0
-				};
-			}
-
-			extractedMovesets.push_back(moveset);
-		}
-	}
-
-	// Delete moveset entries that don't exist anymore (deleted files)
-	for (size_t i = 0; i < extractedMovesets.size();) {
-		movesetInfo* moveset = extractedMovesets[i];
-		struct stat buffer;
-
-		if ((stat(moveset->filename.c_str(), &buffer) != 0) || buffer.st_mtime != moveset->modificationDate) {
-			// File does not exist anymore, de-allocate the info we stored about it
-			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
-			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
-			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
-			m_garbage.push_back(moveset);
-		}
-		else {
-			++i;
-		}
-	}
-}
-
-void GameExtract::CleanupUnusedMovesetInfos()
-{
-	while (m_garbage.size() > 0)
-	{
-		movesetInfo* moveset = m_garbage[0];
-		m_garbage.erase(m_garbage.begin());
-		delete moveset;
-	}
-}
+// -- Private methods -- //
 
 void GameExtract::LoadCharacterNames()
 {
@@ -227,7 +136,22 @@ void GameExtract::InstantiateExtractor()
 	}
 }
 
-// -- Interaction -- //
+// -- Public methods -- //
+
+bool GameExtract::CanExtract()
+{
+	if (m_extractor == nullptr) {
+		return false;
+	}
+	// Per-game definition
+	return m_extractor->CanExtract();
+}
+
+bool GameExtract::IsBusy()
+{
+	// There are still playerAddresss to extract from
+	return m_playerAddress.size() > 0;
+}
 
 void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 {
@@ -246,19 +170,31 @@ void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
 	}
 }
 
-bool GameExtract::CanExtract()
+void GameExtract::StartThread()
 {
-	if (m_extractor == nullptr) {
-		return false;
+	// Start the extraction thread that will run regularly, attach itself to the game whenever found and consume the queue
+	if (!m_threadStarted)
+	{
+		m_threadStarted = true;
+		m_t = std::thread(&GameExtract::Update, this);
 	}
-	// Per-game definition
-	return m_extractor->CanExtract();
 }
 
-bool GameExtract::IsBusy()
+void GameExtract::StopThreadAndCleanup()
 {
-	// There are still playerAddresss to extract from
-	return m_playerAddress.size() > 0;
+	// Order thread to stop
+	m_threadStarted = false;
+	m_t.join();
+
+	// Free allocated ressources
+	CleanupUnusedMovesetInfos();
+	for (movesetInfo* movesetInfo : extractedMovesets) {
+		delete movesetInfo;
+	}
+
+	if (m_extractor != nullptr) {
+		delete m_extractor;
+	}
 }
 
 void GameExtract::QueueCharacterExtraction(int playerId)
@@ -270,11 +206,79 @@ void GameExtract::QueueCharacterExtraction(int playerId)
 	if (playerId == -1) {
 		// Queue the extraction of every character one by one
 		for (playerId = 0; playerId < characterCount; ++playerId) {
-			OrderExtraction(playerAddress + playerId * playerStructSize);
+			m_playerAddress.push_back(playerAddress + playerId * playerStructSize);
 		}
 	}
 	else {
 		// Queue the extraction of one character
-		OrderExtraction(playerAddress + playerId * playerStructSize);
+		m_playerAddress.push_back(playerAddress + playerId * playerStructSize);
 	}
+}
+
+void GameExtract::ReloadMovesetList()
+{
+	// Loop through every file
+	for (const auto& entry : std::filesystem::directory_iterator(MOVESET_DIRECTORY))
+	{
+		// todo: see how this works with utf8 chars
+		std::string filename = entry.path().string();
+
+		if (!Helpers::endsWith(filename, MOVESET_FILENAME_EXTENSION)) {
+			// Skip files that we do not recognize
+			continue;
+		}
+
+		// If new file is detected, fetch its infos
+		if (!m_extractedMovesetFilenames.contains(filename))
+		{
+			m_extractedMovesetFilenames.insert(filename);
+			movesetInfo* moveset = fetchMovesetInformations(filename);
+
+			if (moveset == nullptr) {
+				moveset = new movesetInfo{
+				   .filename = filename,
+				   .name = Helpers::getMovesetNameFromFilename(filename),
+				   .origin = std::string("INVALID"),
+				   .target_character = std::string(""),
+				   .date = std::string(""),
+				   .size = 0,
+				   .modificationDate = 0
+				};
+			}
+
+			extractedMovesets.push_back(moveset);
+		}
+	}
+
+	// Delete moveset entries that don't exist anymore (deleted files)
+	for (size_t i = 0; i < extractedMovesets.size();) {
+		movesetInfo* moveset = extractedMovesets[i];
+		struct stat buffer;
+
+		if ((stat(moveset->filename.c_str(), &buffer) != 0) || buffer.st_mtime != moveset->modificationDate) {
+			// File does not exist anymore, de-allocate the info we stored about it
+			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
+			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
+			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
+			m_garbage.push_back(moveset);
+		}
+		else {
+			++i;
+		}
+	}
+}
+
+void GameExtract::CleanupUnusedMovesetInfos()
+{
+	while (m_garbage.size() > 0)
+	{
+		movesetInfo* moveset = m_garbage[0];
+		m_garbage.erase(m_garbage.begin());
+		delete moveset;
+	}
+}
+
+void GameExtract::DeleteMoveset(const char* filename)
+{
+	remove(filename);
 }

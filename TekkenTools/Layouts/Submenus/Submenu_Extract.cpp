@@ -119,14 +119,15 @@ void Submenu_Extract::Render()
 
 	// List of extracted movesets
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
-	if (ImGui::BeginTable("nice", 5, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
+	if (ImGui::BeginTable("nice", 6, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable))
 	{
-		ImGui::TableSetupColumn("##", 0, 3.0f);
+		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn("Delete", 0, 0.0f);
 		ImGui::TableHeadersRow();
 
 		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
@@ -156,6 +157,14 @@ void Submenu_Extract::Render()
 				ImGui::TableNextColumn();
 				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
 				ImGui::TextUnformatted(sizeString.c_str());
+
+				ImGui::TableNextColumn();
+				ImGui::PushID(moveset->filename.c_str());
+				if (ImGui::Button("X"))
+				{
+					extractor.DeleteMoveset(moveset->filename.c_str());
+				}
+				ImGui::PopID();
 			}
 		}
 		// Don't de-allocate moveset infos until we're done iterating on it

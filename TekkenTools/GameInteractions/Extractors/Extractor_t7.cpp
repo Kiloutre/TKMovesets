@@ -20,6 +20,8 @@ using namespace t7structs;
 #include <stdio.h>
 #include <iostream>
 
+// -- Static helpers -- //
+
 static void getMotaAnims(gameAddr motaAddr, std::vector<gameAddr> &animAddr)
 {
 	// read header
@@ -101,89 +103,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 	return animAddr + 1000 + 1;
 }
 
-// Attempts to try to get an animation's size
-uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
-{
-	unsigned char animType = m_process->readInt8(anim);
-
-	if (animType == 0xC8) {
-		return ExtractorUtils::getC8AnimSize(m_process, anim);
-	}
-	else {
-		// We do not know how to figure out the size of a 0x64 anim yet
-
-		if (maxSize >= 1000000) {
-			// Arbitrary 1MB max size of an animation. Not a good idea tbh
-			// todo : change this
-			return 1000000;
-		}
-
-		return maxSize;
-	}
-}
-
-void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
-{
-	uint64_t totalSize = 0;
-	std::map<gameAddr, uint64_t> animSizes;
-	void* animationBlock = nullptr;
-
-	std::vector<gameAddr> addrList;
-	// Get animation list and sort it
-	for (size_t i = 0; i < moveCount; ++i)
-	{
-		t7structs::Move* move = &movelist[i];
-		gameAddr anim_addr = (gameAddr)move->anim_addr;
-
-		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
-			// Avoid adding duplicates
-			addrList.push_back(anim_addr);
-		}
-
-		// List built by mota
-		if (std::find(boundaries.begin(), boundaries.end(), anim_addr) == boundaries.end()) {
-			// Avoid adding duplicates
-			boundaries.push_back(anim_addr);
-		}
-	}
-	// Sort boundaries list
-	std::sort(boundaries.begin(), boundaries.end());
-	
-	// Find anim sizes and establish offsets
-	size_t animCount = addrList.size();
-	for (size_t i = 0; i < animCount; ++i)
-	{
-		// Todo: use MOTAs to try to find animation boundaries since some of these animations will be from MOTA files
-		gameAddr animAddr = addrList[i];
-		gameAddr maxAnimEnd = getClosestBoundary(animAddr, boundaries);
-
-		uint64_t animSize = TryFindAnimSize(animAddr, maxAnimEnd - animAddr);
-
-
-		//printf("%lld,%llx\n", animSize, animAddr);
-
-		offsets[animAddr] = totalSize;
-		animSizes[animAddr] = animSize;
-		totalSize += animSize;
-	}
-
-	printf("Anim total size: %lld (%f MB)\n", totalSize, (float)totalSize / 1000000);
-
-	// Allocate block
-	animationBlock = malloc(totalSize);
-
-	// Read animations and write to our block
-	unsigned char *animationBlockCursor = (unsigned char*)animationBlock;
-	for (gameAddr animAddr : addrList)
-	{
-		int64_t animSize = animSizes[animAddr];
-		m_process->readBytes(animAddr, animationBlockCursor, animSize);
-		animationBlockCursor += animSize;
-	}
-
-	size_out = totalSize;
-	return animationBlock;
-}
+// -- Private methods -- //
 
 void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
@@ -219,6 +139,92 @@ void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount,
 	start = smallest;
 	end = lastItemEnd + 1; // Add 1 for extracting the nullbyte too
 }
+
+
+void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
+{
+	uint64_t totalSize = 0;
+	std::map<gameAddr, uint64_t> animSizes;
+	void* animationBlock = nullptr;
+
+	std::vector<gameAddr> addrList;
+	// Get animation list and sort it
+	for (size_t i = 0; i < moveCount; ++i)
+	{
+		t7structs::Move* move = &movelist[i];
+		gameAddr anim_addr = (gameAddr)move->anim_addr;
+
+		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
+			// Avoid adding duplicates
+			addrList.push_back(anim_addr);
+		}
+
+		// List built by mota
+		if (std::find(boundaries.begin(), boundaries.end(), anim_addr) == boundaries.end()) {
+			// Avoid adding duplicates
+			boundaries.push_back(anim_addr);
+		}
+	}
+	// Sort boundaries list
+	std::sort(boundaries.begin(), boundaries.end());
+	
+	// Find anim sizes and establish offsets
+	size_t animCount = addrList.size();
+	for (size_t i = 0; i < animCount; ++i)
+	{
+		gameAddr animAddr = addrList[i];
+		gameAddr maxAnimEnd = getClosestBoundary(animAddr, boundaries);
+
+		uint64_t animSize = TryFindAnimSize(animAddr, maxAnimEnd - animAddr);
+
+
+		//printf("%lld,%llx\n", animSize, animAddr);
+
+		offsets[animAddr] = totalSize;
+		animSizes[animAddr] = animSize;
+		totalSize += animSize;
+	}
+
+	printf("Anim total size: %lld (%f MB)\n", totalSize, (float)totalSize / 1000000);
+
+	// Allocate block
+	animationBlock = malloc(totalSize);
+
+	// Read animations and write to our block
+	unsigned char *animationBlockCursor = (unsigned char*)animationBlock;
+	for (gameAddr animAddr : addrList)
+	{
+		int64_t animSize = animSizes[animAddr];
+		m_process->readBytes(animAddr, animationBlockCursor, animSize);
+		animationBlockCursor += animSize;
+	}
+
+	size_out = totalSize;
+	return animationBlock;
+}
+
+uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
+{
+	// Attempts to try to get an animation's size
+	unsigned char animType = m_process->readInt8(anim);
+
+	if (animType == 0xC8) {
+		return ExtractorUtils::getC8AnimSize(m_process, anim);
+	}
+	else {
+		// We do not know how to figure out the size of a 0x64 anim yet
+
+		if (maxSize >= 1000000) {
+			// Arbitrary 1MB max size of an animation. Not a good idea tbh
+			// todo : change this
+			return 1000000;
+		}
+
+		return maxSize;
+	}
+}
+
+// -- Public methods -- //
 
 void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwriteSameFilename)
 {
@@ -328,6 +334,29 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	std::cout << ms_int.count() << "ms - " << ms_double.count() << "ms\n";
 }
 
+bool ExtractorT7::CanExtract()
+{
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+
+	if (playerAddress == 0 || playerAddress == -1) {
+		return false;
+	}
+
+	gameAddr currentMove = m_process->readInt64(playerAddress + 0x220);
+	if (currentMove == 0 || currentMove == -1) {
+		return false;
+	}
+
+	gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
+	if (animAddr == 0 || animAddr == -1) {
+		return false;
+	}
+
+	uint8_t animType = m_process->readInt8(animAddr);
+	return animType == 0x64 || animType == 0xC8;
+}
+
+
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + GameAddressesFile::GetSingleValue("val_motbin_offset"));
@@ -374,26 +403,4 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)
 {
 	return m_process->readInt16(playerAddress + 0xD8);
-}
-
-bool ExtractorT7::CanExtract()
-{
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
-
-	if (playerAddress == 0 || playerAddress == -1) {
-		return false;
-	}
-
-	gameAddr currentMove = m_process->readInt64(playerAddress + 0x220);
-	if (currentMove == 0 || currentMove == -1) {
-		return false;
-	}
-
-	gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
-	if (animAddr == 0 || animAddr == -1) {
-		return false;
-	}
-
-	uint8_t animType = m_process->readInt8(animAddr);
-	return animType == 0x64 || animType == 0xC8;
 }

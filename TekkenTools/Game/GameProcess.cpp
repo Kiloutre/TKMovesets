@@ -5,7 +5,24 @@
 
 #include "GameAddresses.h"
 
-// -- Private : Helpers -- //
+// -- Private methods  -- //
+
+GameProcessError GameProcess::AttachToNamedProcess(const char* processName)
+{
+	DWORD pid = GetGamePID(processName);
+
+	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
+	else {
+		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+		if (hProcess != nullptr && LoadGameMainModule(processName, pid)) {
+			processId = pid;
+			return PROC_ATTACHED;
+		}
+		else {
+			return PROC_ATTACH_ERR;
+		}
+	}
+}
 
 DWORD GameProcess::GetGamePID(const char* processName)
 {
@@ -69,24 +86,7 @@ bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 	return false;
 }
 
-GameProcessError GameProcess::AttachToNamedProcess(const char* processName)
-{
-	DWORD pid = GetGamePID(processName);
-
-	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
-	else {
-		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-		if (hProcess != nullptr && LoadGameMainModule(processName, pid)) {
-			processId = pid;
-			return PROC_ATTACHED;
-		}
-		else {
-			return PROC_ATTACH_ERR;
-		}
-	}
-}
-
-// -- Public -- //
+// -- Public methods -- //
 
 bool GameProcess::Attach(const char* processName)
 {
@@ -98,11 +98,6 @@ bool GameProcess::Attach(const char* processName)
 	return status == PROC_ATTACHED;
 }
 
-bool GameProcess::IsAttached()
-{
-	return status == PROC_ATTACHED;
-}
-
 void GameProcess::Detach()
 {
 	if (hProcess != nullptr) {
@@ -110,6 +105,11 @@ void GameProcess::Detach()
 		hProcess = nullptr;
 	}
 	status = PROC_NOT_ATTACHED;
+}
+
+bool GameProcess::IsAttached()
+{
+	return status == PROC_ATTACHED;
 }
 
 bool GameProcess::CheckRunning()
@@ -126,9 +126,6 @@ bool GameProcess::CheckRunning()
 	return true;
 }
 
-// -- Public: Other -- //
-
-// -- Public : Reading -- //
 
 int8_t GameProcess::readInt8(gameAddr addr)
 {
@@ -170,7 +167,6 @@ void GameProcess::readBytes(gameAddr addr, void* buf, size_t readSize)
 	ReadProcessMemory(hProcess, (LPCVOID)addr, (LPVOID)buf, readSize, nullptr);
 }
 
-// -- Public : Writing -- // 
 
 void GameProcess::writeInt8(gameAddr addr, int8_t value)
 {
@@ -202,7 +198,6 @@ void  GameProcess::writeBytes(gameAddr addr, void* buf, size_t bufSize)
 	WriteProcessMemory(hProcess, (LPVOID)addr, (LPCVOID)buf, bufSize, nullptr);
 }
 
-// -- Public : Allocation & Freeing -- // 
 
 gameAddr GameProcess::allocateMem(size_t amount)
 {
