@@ -28,7 +28,7 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count)
 	{
 		ImGui::Spacing();
 		NavMenuBtn navBtn = c_btns[i];
-		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId != navBtn.id, ImVec2(215, 39))) {
+		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId != navBtn.id, ImVec2(160, 30))) {
 			menuId = navBtn.id;
 		}
 	}
