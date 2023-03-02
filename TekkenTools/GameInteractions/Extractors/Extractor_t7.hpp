@@ -7,10 +7,11 @@
 #include "GameProcess.hpp"
 #include "GameAddressesFile.hpp"
 
+#include "constants.h"
 #include "Structs_t7.h"
 #include "GameAddresses.h"
 
-class ExtractorT7 : public Extractor
+class DLLCONTENT ExtractorT7 : public Extractor
 {
 public:
 	using Extractor::Extractor; // Inherit constructor too
@@ -21,8 +22,8 @@ public:
 	uint32_t GetCharacterID(gameAddr playerAddress) override;
 
 
-	const char* GetGameIdentifierString() override { return "T7_"; }
-	const char* GetGameOriginString() override { return "Tekken 7"; }
+	const char* GetGameIdentifierString() override;
+	const char* GetGameOriginString() override;
 private:
 
 	// Writes bounds of the block containing anim and move names

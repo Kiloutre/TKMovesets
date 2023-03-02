@@ -411,3 +411,13 @@ uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)
 {
 	return m_process->readInt16(playerAddress + 0xD8);
 }
+
+const char* ExtractorT7::GetGameIdentifierString()
+{
+	return "T7_";
+}
+
+const char* ExtractorT7::GetGameOriginString()
+{
+	return "Tekken 7";
+}

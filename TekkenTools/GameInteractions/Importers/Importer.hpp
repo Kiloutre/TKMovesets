@@ -7,7 +7,6 @@
 #include "GameAddressesFile.hpp"
 #include "LocalStorage.hpp"
 
-#include "constants.h"
 #include "GameAddresses.h"
 
 // Base class for extracting from a game
