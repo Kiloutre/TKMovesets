@@ -25,13 +25,6 @@ set(BINARY_SOURCES
                     "GameInteractions/GameImport.cpp"
                     "LocalStorage/LocalStorage.cpp"
 
-                    # ExportImport
-                    "GameInteractions/Extractors/Extractor.cpp"
-                    "GameInteractions/Importers/Importer.cpp"
-                    # Game-specific
-                    "GameInteractions/Extractors/Extractor_t7.cpp"
-                    "GameInteractions/Importers/Importer_t7.cpp"
-
                     # Layout
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
@@ -50,19 +43,20 @@ set(BINARY_SOURCES
 )
 
 set(IMPORTEXPORT_SOURCES
-                    # Main sources
+                    # Keep a copy of these since Extractor & Importers are reliant on them
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
+                    # Same
+                    "Utils/helpers.cpp"
+                    "Utils/GameAddressesFile.cpp"
+
+                    # Base classes for our extractor & importers
                     "GameInteractions/Extractors/Extractor.cpp"
                     "GameInteractions/Importers/Importer.cpp"
 
                     # Game-specific
                     "GameInteractions/Extractors/Extractor_t7.cpp"
                     "GameInteractions/Importers/Importer_t7.cpp"
-
-                    # Helpers and such
-                    "Utils/helpers.cpp"
-                    "Utils/GameAddressesFile.cpp"
 )
 
 # Build .dll containing per-game Import/Export functions, that way no need to update the whole software #
