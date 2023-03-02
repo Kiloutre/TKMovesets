@@ -33,5 +33,5 @@ public:
 	// Is currently busy with an extraction
 	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters
-	void QueueCharacterImportation(std::string filename, int playerId);
+	void QueueCharacterImportation(std::string filename);
 };
