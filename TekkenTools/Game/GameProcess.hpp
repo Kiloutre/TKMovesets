@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <thread>
+#include <utility>
 #include <windows.h>
 
 #include "GameAddresses.h"
@@ -28,13 +30,15 @@ class GameProcess
 {
 private:
 	// Stores the handle of the opened process
-	HANDLE hProcess = nullptr;
+	HANDLE m_processHandle = nullptr;
+	// Module addresses and sized of the current process
+	std::vector<std::pair<gameAddr, uint64_t>> m_moduleInfos;
 
 	// Attach to .processName
 	GameProcessError AttachToNamedProcess(const char* processName);
 	// Returns the game PID
 	DWORD GetGamePID(const char* processName);
-	// Load the address of the main module in .modBaseAddr
+	// Load the address of the main module in .moduleAddr
 	bool LoadGameMainModule(const char* processName, DWORD pid);
 public:
 	// Status of the process attachment
@@ -44,7 +48,11 @@ public:
 	// pid of process we latch on
 	DWORD processId{ (DWORD)-1 };
 	// Address of main module in game
-	gameAddr modBaseAddr{ (gameAddr)0 };
+	gameAddr moduleAddr{ (gameAddr)0x0 };
+	// Contains the size of the module in bytes
+	uint64_t moduleSize{ 0 };
+	// Base address. Every read & write will be done on base + addr.
+	//gameAddr baseAddress{ (gameAddr)0x0 };
 
 	// -- Interaction stuff -- //
 

@@ -34,7 +34,7 @@ Syntax norms and whatnot to make things consistent and clear throughout the proj
 - Globals should be suffixed g_
 Classes:
 - Class names should start with an upper case
-- Private class members should be prefixed m_
+- Private/Protected members should be prefixed m_
 - Methods should start with an upper case
 Game structs:
 - snake_case for members

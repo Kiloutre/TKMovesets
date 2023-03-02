@@ -33,7 +33,7 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId)
 
 	gameAddr addr = ptrPath[0];
 	if (isRelative) {
-		addr += m_process->modBaseAddr;
+		addr += m_process->moduleAddr;
 	}
 
 	{
