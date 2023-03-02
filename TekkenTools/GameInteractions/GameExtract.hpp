@@ -47,6 +47,8 @@ private:
 	std::set<std::string> m_extractedMovesetFilenames;
 	// .extractedMovesets garbage, because it can be accessed in another thread while we remove items for it.
 	std::vector<movesetInfo*> m_garbage;
+	//
+	std::thread m_t;
 
 	// Callback called whenever the process is re-atached
 	void OnProcessAttach();
@@ -92,6 +94,8 @@ public:
 	void SetTargetProcess(const char* processName, size_t gameId);
 	// Starts the thread that will later be used for extracton
 	void StartThread();
+	// Stops the thread started above
+	void StopThread();
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterExtraction(int playerId);
 	// Reads movesets from their configured extraction dir. Accessible under .extractedMovesets

@@ -64,8 +64,20 @@ void GameExtract::StartThread()
 	if (!m_threadStarted)
 	{
 		m_threadStarted = true;
-		std::thread t(&GameExtract::Update, this);
-		t.detach();
+		m_t = std::thread(&GameExtract::Update, this);
+	}
+}
+
+void GameExtract::StopThread()
+{
+	// Order thread to stop
+	m_threadStarted = false;
+	m_t.join();
+
+	// Free allocated ressources
+	CleanupUnusedMovesetInfos();
+	for (movesetInfo *movesetInfo : extractedMovesets) {
+		delete movesetInfo;
 	}
 }
 

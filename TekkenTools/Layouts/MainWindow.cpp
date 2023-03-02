@@ -24,12 +24,13 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 
 	// Init subclasses of singletons, start threads too
 	{
-		GameExtract& extractor = GameExtract::getInstance();
+        // todo: delete
+		extractor = &GameExtract::getInstance();
 		GameProcess* process = new GameProcess();
-		extractor.process = process;
-		extractor.game = new GameData(process);
-		extractor.ReloadMovesetList();
-		extractor.StartThread();
+		extractor->process = process;
+		extractor->game = new GameData(process);
+		extractor->ReloadMovesetList();
+		extractor->StartThread();
 	}
 }
 
@@ -106,6 +107,10 @@ void MainWindow::Render()
 void MainWindow::Shutdown()
 {
 	// Cleanup of everything we do should be done here
+
+	extractor->StopThread();
+	delete extractor->process;
+	delete extractor->game;
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

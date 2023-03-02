@@ -6,6 +6,7 @@
 #include "Submenu_Extract.hpp"
 #include "Submenu_Import.hpp"
 #include "Submenu_OnlinePlay.hpp"
+#include "GameExtract.hpp"
 
 class MainWindow {
 public:
@@ -24,4 +25,6 @@ public:
 	Submenu_Extract    extractMenu;
 	Submenu_Import	   importMenu;
 	Submenu_OnlinePlay onlineMenu;
+
+	GameExtract* extractor;
 };
