@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GameAddresses.h"
-// Contains the structs used for Extraction/Importation
+#include <stdint.h>
 
+// Contains the structs used for Extraction/Importation
 namespace t7structs
 {
 	// -- Main data type -- //
