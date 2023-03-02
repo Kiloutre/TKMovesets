@@ -11,7 +11,7 @@
 #include "Structs_t7.h"
 #include "GameAddresses.h"
 
-class DLLCONTENT ImporterT7 : public Importer
+class ImporterT7 : public Importer
 {
 public:
 	using Importer::Importer; // Inherit constructor too

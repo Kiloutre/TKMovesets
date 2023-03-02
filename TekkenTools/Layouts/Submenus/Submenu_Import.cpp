@@ -28,7 +28,7 @@ void Submenu_Import::Render(GameImport *importerHelper)
 	{
 		ImGui::SameLine();
 		size_t currentGameId = importerHelper->currentGameId;
-		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5);
+		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : importGameList[currentGameId].name))
 		{
@@ -52,7 +52,7 @@ void Submenu_Import::Render(GameImport *importerHelper)
 		if (ImGui::BeginCombo("##", _(buf)))
 		{
 			size_t currentPlayerId = importerHelper->currentPlayerId;
-			for (size_t i = 0; i < importerHelper->characterCount; ++i)
+			for (int8_t i = 0; i < importerHelper->characterCount; ++i)
 			{
 				buf[0] = '1' + i;
 				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0)))

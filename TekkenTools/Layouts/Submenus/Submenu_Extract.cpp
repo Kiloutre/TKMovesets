@@ -31,7 +31,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		ImGui::SeparatorText(_("extraction.extraction"));
 		size_t currentGameId = extractorHelper->currentGameId;
-		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5);
+		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5f);
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : exportGameList[currentGameId].name))
 		{
 			for (size_t i = 0; i < gameListCount; ++i)

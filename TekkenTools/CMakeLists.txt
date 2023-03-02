@@ -69,8 +69,8 @@ target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 # Build program .exe
 add_executable (TekkenTools ${BINARY_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
-#add_dependencies(TekkenTools ExportImport)
-#target_link_libraries(TekkenTools PRIVATE ExportImport)
+add_dependencies(TekkenTools ExportImport)
+target_link_libraries(TekkenTools PRIVATE ExportImport)
 
 # Addresses file #
 configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
@@ -78,7 +78,7 @@ configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
 # Translations #
 add_custom_command(TARGET TekkenTools PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
 
-# Link the libraries that we use#
+# Link the other libraries that we use #
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(TekkenTools PRIVATE glad::glad)
 

@@ -11,7 +11,7 @@
 #include "Structs_t7.h"
 #include "GameAddresses.h"
 
-class DLLCONTENT ExtractorT7 : public Extractor
+class ExtractorT7 : public Extractor
 {
 public:
 	using Extractor::Extractor; // Inherit constructor too
