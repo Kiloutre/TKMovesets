@@ -1,4 +1,7 @@
+Syntax norms and whatnot to make things consistent and clear throughout the project
+
 // -- Coding practice -- //
+
 
 // -- File structure -- //
 - include groups: first (#include <>) for librairies that aren't ours, then our (#include ".hpp"), then our (#include ".h")
@@ -33,3 +36,5 @@ Classes:
 - Class names should start with an upper case
 - Private class members should be prefixed m_
 - Methods should start with an upper case
+Game structs:
+- snake_case for members

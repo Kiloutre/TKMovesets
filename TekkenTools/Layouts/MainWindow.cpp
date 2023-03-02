@@ -23,16 +23,6 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	// Setup ImGui config
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-	// Init subclasses of singletons, start threads too
-	{
-		extractor = &GameExtract::getInstance();
-		GameProcess* process = new GameProcess();
-		extractor->process = process;
-		extractor->game = new GameData(process);
-		extractor->ReloadMovesetList();
-		extractor->StartThread();
-	}
 }
 
 void MainWindow::NewFrame()
@@ -68,7 +58,7 @@ void MainWindow::Update(int width, int height)
 		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:
-			extractMenu.Render();
+			extractMenu.Render(&extractor);
 			break;
 		case NAV__MENU_IMPORT:
 			importMenu.Render();
@@ -109,9 +99,13 @@ void MainWindow::Shutdown()
 {
 	// Cleanup of everything we do should be done here
 
-	extractor->StopThreadAndCleanup();
-	delete extractor->process;
-	delete extractor->game;
+	extractor.StopThreadAndCleanup();
+	delete extractor.process;
+	delete extractor.game;
+
+	storage.StopThreadAndCleanup();
+
+
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

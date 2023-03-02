@@ -7,6 +7,7 @@
 #include "Submenu_Import.hpp"
 #include "Submenu_OnlinePlay.hpp"
 #include "GameExtract.hpp"
+#include "LocalStorage.hpp"
 
 class MainWindow {
 private:
@@ -15,9 +16,10 @@ private:
 	Submenu_Extract    extractMenu;
 	Submenu_Import	   importMenu;
 	Submenu_OnlinePlay onlineMenu;
-
-	GameExtract* extractor;
 public:
+	GameExtract extractor;
+	LocalStorage storage;
+
 	MainWindow(GLFWwindow* window, const char* c_glsl_version);
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
 	virtual void NewFrame();

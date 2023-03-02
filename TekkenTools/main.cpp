@@ -10,17 +10,35 @@
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
-#include "GameProcess.hpp"
 #include "GameAddressesFile.hpp"
 
 #include "constants.h"
 
 using namespace std;
 
+// -- Static helpers -- //
+
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
+
+// Initialize the important members of mainwindow. I prefer doing it here because it is mostly a layout and GUI-related class
+static void InitMainWindow(MainWindow& program)
+{
+	program.storage.ReloadMovesetList();
+
+
+	program.extractor.process = new GameProcess;
+	program.extractor.game = new GameData(program.extractor.process);
+	program.extractor.storage = &program.storage;
+
+
+	program.storage.StartThread();
+	program.extractor.StartThread();
+}
+
+// -- main -- //
 
 int main(int argc, wchar_t** argv)
 {
@@ -79,6 +97,7 @@ int main(int argc, wchar_t** argv)
 
 	// Init main program. This will get most things going and create the important threads
 	MainWindow program(window, c_glsl_version);
+	InitMainWindow(program);
 
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events such as MKB inputs, window resize. Required

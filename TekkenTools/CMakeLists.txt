@@ -6,6 +6,8 @@ set(INCLUDE_FOLDERS
                     "Game"
                     "GameInteractions"
                     "GameInteractions/Extractors"
+                    "GameInteractions/Importers"
+                    "LocalStorage"
                     "Utils"
 )
 
@@ -15,6 +17,7 @@ set(MAIN_SOURCES
                     "Game/GameData.cpp"
                     "GameInteractions/GameExtract.cpp"
                     "GameInteractions/Extractors/Extractor.cpp"
+                    "LocalStorage/LocalStorage.cpp"
 )
 
 set(GAME_SPECIFIC_SOURCES
