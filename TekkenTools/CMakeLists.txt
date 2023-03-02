@@ -1,5 +1,7 @@
 ﻿# Set C++20, mostly for std::format
 set(CMAKE_CXX_STANDARD 20)
+# This is needed or CMake will expect a .lib file instead of .dll for our own libs
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 set(INCLUDE_FOLDERS
                     "Layouts"
@@ -64,15 +66,15 @@ set(IMPORTEXPORT_SOURCES
 )
 
 # Build .dll containing per-game Import/Export functions, that way no need to update the whole software #
-#add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} )
-#target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
-#target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
+add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} )
+target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
+target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe
 add_executable (TekkenTools ${BINARY_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
-#add_dependencies(TekkenTools ExportImport)
-#target_link_libraries(TekkenTools PRIVATE ExportImport)
+add_dependencies(TekkenTools ExportImport)
+target_link_libraries(TekkenTools PRIVATE ExportImport)
 
 # Addresses file #
 configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
