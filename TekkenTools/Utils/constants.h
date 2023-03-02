@@ -1,5 +1,11 @@
 #pragma once
 
+#ifndef DLL_EXPORTING
+#define DLLCONTENT __declspec(dllexport)
+#else
+#define DLLCONTENT __declspec(dllimport)
+#endif
+
 # define PROGRAM_TITLE           "TekkenTools"
 # define PROGRAM_VERSION         "0.1"
 # define PROGRAM_WIN_MIN_WIDTH   1280

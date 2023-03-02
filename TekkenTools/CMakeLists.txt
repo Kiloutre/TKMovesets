@@ -51,11 +51,13 @@ set(OTHER_SOURCES
 # Build .dll containing per-game Import/Export functions, that way no need to update the whole software #
 #add_library(ExportImport SHARED ${GAME_SPECIFIC_SOURCES} )
 #target_include_directories(ExportImport PUBLIC ${INCLUDE_FOLDERS})
+#target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
-
+# Build program .exe
 add_executable (TekkenTools ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES} ${GAME_SPECIFIC_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
-
+#add_dependencies(TekkenTools ExportImport)
+#target_link_libraries(TekkenTools PRIVATE ExportImport)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TekkenTools PROPERTY CXX_STANDARD 20)
