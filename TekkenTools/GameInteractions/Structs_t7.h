@@ -2,127 +2,208 @@
 
 #include "GameAddresses.h"
 // Contains the structs used for Extraction/Importation
-//template<size_t S> class Sizer { }; Sizer<sizeof(t7structs::Move)> foo;
 
 namespace t7structs
 {
 	// -- Main data type -- //
 
-	struct Pushback
-	{
-		char content[0x10];
-	};
-
 	struct PushbackExtradata
 	{
-		int16_t value;
+		uint16_t horizontal_offset;
+	};
+
+	struct Pushback
+	{
+		int16_t duration;
+		int16_t displacement;
+		int32_t num_of_loops;
+		PushbackExtradata* extradata_addr;
 	};
 
 	struct Requirement
 	{
-		int32_t req;
-		int32_t param;
+		uint32_t req;
+		uint32_t param;
 	};
 
 	struct CancelExtradata
 	{
-		int32_t value;
+		uint32_t value;
 	};
 
 	struct Cancel
 	{
-
-		char content[0x28];
+		uint64_t command;
+		Requirement* requirement_addr;
+		CancelExtradata* extradata_addr;
+		uint32_t detection_start;
+		uint32_t detection_end;
+		uint32_t starting_frame;
+		uint16_t move_id;
+		uint16_t cancel_option;
 	};
 
 	struct Reactions
 	{
-		char content[0x70];
+		// 0 = 0 when writing (might be a ptr)
+		Pushback* front_pushback;
+		Pushback* backturned_pushback;
+		Pushback* left_side_pushback;
+		Pushback* right_side_pushback;
+		Pushback* front_counterhit_pushback; // If you ever wondered why your CH launcher didn't launch after a sidestep, that's why
+		Pushback* downed_pushback;
+		Pushback* block_pushback;
+
+		uint16_t front_direction;
+		uint16_t back_direction;
+		uint16_t left_side_direction;
+		uint16_t right_side_direction;
+		uint16_t front_counterhit_direction;
+		uint16_t downed_direction;
+
+		uint64_t _0x44_long; // 0,  Not actually sure it is a long
+
+		uint16_t vertical_pushback;
+		uint16_t standing;
+		uint16_t default_moveid;
+		uint16_t crouch_moveid;
+		uint16_t counterhit_moveid;
+		uint16_t crouch_counterhit_moveid;
+		uint16_t left_side_moveid;
+		uint16_t crouch_left_side_moveid;
+		uint16_t right_side_moveid;
+		uint16_t crouch_right_side_moveid;
+		uint16_t backturned_moveid;
+		uint16_t crouch_backturned_moveid;
+		uint16_t block_moveid;
+		uint16_t crouch_block_moveid;
+		uint16_t wallslump_moveid;
+		uint16_t downed_moveid;
 	};
 
 	struct HitCondition
 	{
-		char content[0x18];
-	};
-
-	struct ExtraMoveProperty
-	{
-		int32_t starting_frame;
-		int32_t id;
-		int32_t param;
+		Requirement* requirement_addr;
+		uint64_t damage;
+		Reactions* reactions_addr;
 	};
 
 	struct Voiceclip
 	{
-		int32_t value;
+		uint32_t id;
 	};
 
-	struct InputExtradata
+	struct ExtraMoveProperty
 	{
-		int32_t _u1_int;
-		int32_t _u2_int;
+		uint32_t starting_frame;
+		uint32_t id;
+		uint32_t param;
+	};
+
+	struct Input
+	{
+		// todo: name properly 
+		int32_t _0x00_int;
+		int32_t _0x04_int;
 	};
 
 	struct InputSequence
 	{
-		char content[0x10];
+		uint16_t input_window_frames; // I assume the max amount of frames between the first &last input
+		uint16_t input_amount;
+		int32_t _0x4_int; // Apparently unused
+		Input* input_addr;
 	};
 
 	struct Projectile
 	{
-		char content[0xA8];
+		uint32_t vfx_id;
+		int32_t _0x4_int;
+		uint32_t vfx_variation_id;
+		int32_t _0xC_int;
+		int32_t _0x10_int;
+		int32_t _0x14_int;
+		uint32_t delay; // Frames before both velocity components can be applied
+		uint32_t vertical_velocity;
+		uint32_t horizonal_velocity;
+		int32_t _0x24_int; // 0: disable projectile
+		uint32_t duration;
+		uint32_t no_collision; // default: 0. Non-zero: no collision
+		uint32_t size; // 0: no collision
+		int32_t _0x34_int;
+		uint32_t hit_level;
+		int32_t _0x3C_int[6];
+		uint32_t voiceclip_on_hit;
+		int32_t _0x58_int;
+		int32_t _0x5C_int;
+		HitCondition* hit_condition_addr;
+		Cancel* cancel_addr;
+		int32_t _0x70_int;
+		int32_t _0x74_int;
+		uint32_t can_hitbox_connect;
+		int32_t _0x7C_int;
+		int32_t _0x80_int;
+		uint32_t gravity;
+		int32_t _0x88_int[8];
 	};
 
-	struct ThrowExtra
+	struct CameraData
 	{
-		char content[0xC];
+		int32_t _0x0_int;
+		int16_t _0x4_short;
+		int16_t left_side_camera_data;
+		int16_t right_side_camera_data;
+		int16_t _0xA_short;
 	};
 
-	struct Throw
+	struct ThrowData
 	{
-		char content[0x10];
+		int32_t _0x0_int;
+		CameraData* cameradata_addr;
 	};
 
 	struct UnknownParryRelated
 	{
-		int32_t value;
+		uint32_t value;
 	};
 
 	struct Move
 	{
-		// Todo: rename what needs to be renamed
+		// 0 = 0 when writing (might be a ptr)
 		char* name;
 		char* anim_name;
 		void* anim_addr;
 		uint32_t vuln;
 		uint32_t hitlevel;
 		t7structs::Cancel* cancel_addr;
-		int64_t _u1_llong; // = 0 always when writin, is a ptr but no idea what it points to
-		int64_t _u2_llong;
-		int64_t _u3_llong;
-		int64_t _u4_llong;
-		int64_t _u5_llong; // = 0 always when writin, is a ptr but no idea what it points to
-		int32_t _u6_int;
+		int64_t _0x28_llong; // 0
+		int64_t _0x30_llong;
+		int64_t _0x38_llong;
+		int64_t _0x40_llong;
+		int64_t _0x48_llong; // 0
+		int32_t _0x50_int;
 		uint16_t transition;
-		int16_t _u7_short;
-		int16_t moveId_val1; // currmoveId + 1 - your_character_id
-		int16_t moveId_val2;
-		int32_t _u10_int;
+		int16_t _0x56_short;
+		uint16_t moveId_val1; // Clearly related to move ID
+		uint16_t moveId_val2; // Clearly related to current character ID
+		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
+		int16_t _0x5E_short; // 0
 		t7structs::HitCondition* hit_condition_addr;
 		uint32_t anim_len;
-		int32_t _u11_int;
-		int32_t _u12_int;
-		int32_t _u13_int;
+		uint32_t airborne_start;
+		uint32_t airborne_end;
+		uint32_t ground_fall;
 		t7structs::Voiceclip* voicelip_addr;
 		t7structs::ExtraMoveProperty* extra_move_property_addr;
-		int64_t _u14_llong; // = 0 always when writing, is a ptr but no idea what it points to
-		int64_t _u15_llong; // = 0 always when writin, is a ptr but no idea what it points to
+		int64_t _0x88_llong; // 0
+		int64_t _0x90_llong; // 0
+		int32_t _0x98_int;
 		int32_t hitbox_location;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _u17_short;
-		int16_t _u18_short;
-		int16_t _u19_short;
+		int16_t _0xA8_short; // facing/extras
+		uint16_t distance;
+		int16_t _0xAC_short;
 	};
 
 
@@ -191,16 +272,16 @@ namespace t7structs
 		t7structs::InputSequence* inputSequence;
 		uint64_t inputSequenceCount;
 
-		t7structs::InputExtradata* inputExtradata;
-		uint64_t inputExtradataCount;
+		t7structs::Input* input;
+		uint64_t inputCount;
 
 		t7structs::UnknownParryRelated* unknownParryRelated;
 		uint64_t unknownParryRelatedCount;
 
-		t7structs::ThrowExtra* throwExtra;
-		uint64_t throwExtraCount;
+		t7structs::CameraData* cameraData;
+		uint64_t cameraDataCount;
 
-		t7structs::Throw* throws;
+		t7structs::ThrowData* throws;
 		uint64_t throwsCount;
 	};
 }
