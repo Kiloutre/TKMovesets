@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <sys/stat.h>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -25,6 +26,7 @@ struct movesetInfo
 	std::string target_character;
 	std::string date;
 	uint64_t size;
+	time_t modificationDate;
 };
 
 class GameExtract

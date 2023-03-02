@@ -19,12 +19,30 @@ using Helpers::ConvertPtrsToOffsets;
 #include <stdio.h>
 #include <iostream>
 
+static void getMotaAnims(gameAddr motaAddr, std::vector<gameAddr> &animAddr)
+{
+	// read header
+	// push motaAddr + offsets
+}
+
+static std::vector<gameAddr> getMotaListAnims(t7structs::motaList* mota)
+{
+	std::vector<gameAddr> animAddrs;
+
+	for (size_t i = 0; i < 12; ++i)
+	{
+		gameAddr motaAddr = (gameAddr)mota + i * sizeof(void*);
+		getMotaAnims(motaAddr, animAddrs);
+	}
+
+	return animAddrs;
+}
+
 static void fixMovesetOffsets(char* movesetBlock, const t7structs::movesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> animOffsetMap)
 {
 	char* addr;
 	// Fix move ptrs
 
-	// Add movelist offset
 	addr = movesetBlock + (uint64_t)lists->move;
 	// Convert every ptr into offsets by substracting the list's head address to the address the member contains
 	ConvertPtrsToOffsets(addr + offsetof(t7structs::Move, name), nameStart, sizeof(t7structs::Move), lists->moveCount);
@@ -72,14 +90,13 @@ uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
 	}
 }
 
-void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets)
+void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
 	void* animationBlock = nullptr;
 
 	std::vector<gameAddr> addrList;
-
 	// Get animation list and sort it
 	for (size_t i = 0; i < moveCount; ++i)
 	{
@@ -90,10 +107,15 @@ void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, ui
 			// Avoid adding duplicates
 			addrList.push_back(anim_addr);
 		}
+
+		// List built by mota
+		if (std::find(boundaries.begin(), boundaries.end(), anim_addr) == boundaries.end()) {
+			// Avoid adding duplicates
+			boundaries.push_back(anim_addr);
+		}
 	}
-	// Sort address list
-	std::sort(addrList.begin(), addrList.end());
-	std::vector<gameAddr> boundaries = addrList;
+	// Sort boundaries list
+	std::sort(boundaries.begin(), boundaries.end());
 	
 	// Find anim sizes and establish offsets
 	size_t animCount = addrList.size();
@@ -198,10 +220,12 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	void* movesetBlock = allocateAndReadBlock(firstListAddr, lastListAddr + (sizeof(t7structs::Throw) * lists.throwsCount), movesetBlockSize);
 	t7structs::Move* movelist = (t7structs::Move*)((int64_t)movesetBlock + (int64_t)lists.move);
 
+	// Prepare anim list to properly guess size of anims
+	std::vector<gameAddr> animList = getMotaListAnims(&motaList);
 	// Extract animations and build a map for their old address -> their new offset
 	std::map<gameAddr, uint64_t> animOffsetMap;
 	uint64_t animationBlockSize = 0;
-	void* animationBlock = GetAnimations(movelist, lists.moveCount, animationBlockSize, animOffsetMap);
+	void* animationBlock = GetAnimations(movelist, lists.moveCount, animationBlockSize, animOffsetMap, animList);
 
 	// Reads block containing names of moves and animations
 	gameAddr nameStart = 0;
@@ -225,6 +249,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 
 	header.flags = 0;
+	header.characterId = GetCharacterID(playerAddress);
 	strcpy(header.version_string, MOVESET_VERSION_STRING);
 	strcpy(header.origin, GetGameOriginString());
 	strcpy(header.target_character, characterName.c_str());
@@ -316,6 +341,11 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 	}
 
 	return characterName;
+}
+
+uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)
+{
+	return m_process->readInt16(playerAddress + 0xD8);
 }
 
 bool ExtractorT7::CanExtract()

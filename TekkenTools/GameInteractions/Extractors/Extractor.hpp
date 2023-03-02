@@ -18,8 +18,10 @@ namespace ExtractorUtils
 // Todo: perhaps make strings have a variable length? Better than having wasted characters
 struct MovesetHeader
 {
+	// ID of the extracted character, used internally to make some moves that require it work
+	int32_t characterId;
 	// Version string of the extracted moveset
-	char version_string[32];
+	char version_string[28];
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
 	int64_t flags;
 	// Origin (Game name + author if you want)
@@ -33,8 +35,8 @@ struct MovesetHeader
 	int64_t listsBlockOffset;
 	int64_t nameBlockOffset;
 	int64_t movesetBlockOffset;
-	int64_t animationBlockOffset;
-	int64_t motaBlockOffset;
+	int64_t animationBlockOffset; // Custom block
+	int64_t motaBlockOffset; // Custom block
 };
 
 // Base class for extracting from a game
@@ -44,15 +46,17 @@ public:
 	Extractor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
 	virtual void Extract(gameAddr playerAddress, float* progress, bool overwriteSameFilename) = 0;
-	// Returns a string containing the character name of the provided playerId.
-	virtual std::string GetPlayerCharacterName(gameAddr playerAddress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanExtract() = 0;
+	// Returns a string containing the character name of the provided playerId.
+	virtual std::string GetPlayerCharacterName(gameAddr playerAddress) = 0;
+	// Returns the ID of the character, actually important toward making movesets work properly
+	virtual uint32_t GetCharacterID(gameAddr playerAddress) = 0;
+
 	// Returns the game identifier string, used for moveset file pefix
 	virtual const char* GetGameIdentifierString() = 0;
 	// Returns the game name, used in moveset headers
 	virtual const char* GetGameOriginString() = 0;
-
 protected:
 	// Stores the extraction directory
 	const char* cm_extractionDir = MOVESET_DIRECTORY;

@@ -47,7 +47,7 @@ bool Extractor::CreateMovesetFile(const char* characterName, const char* gameIde
 
 	std::string filePath = GetFilename(characterName, gameIdentifierstring);
 
-	if (Helpers::fileExists(filePath.c_str())) {
+	if (!overwriteSameFilename && Helpers::fileExists(filePath.c_str())) {
 		filePath = GetFilename(characterName, gameIdentifierstring, 1);
 		unsigned int counter = 1;
 		while (Helpers::fileExists(filePath.c_str())) {

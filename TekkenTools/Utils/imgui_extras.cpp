@@ -57,7 +57,9 @@ namespace ImGuiExtra
 	void RenderTextbox(const char* c_text, ImU32 borderColor, ImU32 fillColor)
 	{
 		// Get starting drawing pos (useful for border)
-		const ImVec2 c_drawStart = ImGui::GetCursorPos();
+		ImVec2 c_drawStart = ImGui::GetCursorPos();
+		// Todo: correct start pos when scrolling. This actually does not work for some reason. Must test more.
+		c_drawStart.y -= ImGui::GetScrollY();
 
 		// Draw border & fill
 		ImVec2 rectEnd;

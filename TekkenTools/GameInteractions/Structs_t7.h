@@ -94,8 +94,8 @@ namespace t7structs
 		char* name;
 		char* anim_name;
 		void* anim_addr;
-		int32_t vuln;
-		int32_t hitlevel;
+		uint32_t vuln;
+		uint32_t hitlevel;
 		t7structs::Cancel* cancel_addr;
 		int64_t _u1_llong; // = 0 always when writin, is a ptr but no idea what it points to
 		int64_t _u2_llong;
@@ -103,13 +103,13 @@ namespace t7structs
 		int64_t _u4_llong;
 		int64_t _u5_llong; // = 0 always when writin, is a ptr but no idea what it points to
 		int32_t _u6_int;
-		int16_t transition;
+		uint16_t transition;
 		int16_t _u7_short;
-		int16_t _u8_short;
-		int16_t _u9_short;
+		int16_t moveId_val1; // currmoveId + 1 - your_character_id
+		int16_t moveId_val2;
 		int32_t _u10_int;
 		t7structs::HitCondition* hit_condition_addr;
-		int32_t anim_max_len;
+		uint32_t anim_len;
 		int32_t _u11_int;
 		int32_t _u12_int;
 		int32_t _u13_int;
@@ -118,8 +118,8 @@ namespace t7structs
 		int64_t _u14_llong; // = 0 always when writing, is a ptr but no idea what it points to
 		int64_t _u15_llong; // = 0 always when writin, is a ptr but no idea what it points to
 		int32_t hitbox_location;
-		int32_t first_active_frame;
-		int32_t last_active_frame;
+		uint32_t first_active_frame;
+		uint32_t last_active_frame;
 		int16_t _u17_short;
 		int16_t _u18_short;
 		int16_t _u19_short;

@@ -44,13 +44,18 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 		return nullptr;
 	}
 
+	struct stat buffer;
+	// stat() the file to read modification time
+	stat(filename.c_str(), &buffer);
+
 	return new movesetInfo{
 		filename,
 		Helpers::getMovesetNameFromFilename(filename),
 		std::string(header.origin),
 		std::string(header.target_character),
 		std::string(header.date),
-		totalSize
+		totalSize,
+		buffer.st_mtime
 	};
 }
 
@@ -107,7 +112,7 @@ void GameExtract::ReloadMovesetList()
 		movesetInfo* moveset = extractedMovesets[i];
 		struct stat buffer;
 
-		if ((stat(moveset->filename.c_str(), &buffer) != 0)) {
+		if ((stat(moveset->filename.c_str(), &buffer) != 0) || buffer.st_mtime != moveset->modificationDate) {
 			// File does not exist anymore, de-allocate the info we stored about it
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
 			delete moveset;
