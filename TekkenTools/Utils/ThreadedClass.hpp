@@ -11,7 +11,7 @@ protected:
 	std::thread m_t;
 
 public:
-	virtual void StartThread() = 0;
+	virtual void StartThread();
 	virtual void Update() = 0;
-	virtual void StopThreadAndCleanup() = 0;
+	virtual void StopThreadAndCleanup();
 };

@@ -69,15 +69,7 @@ void LocalStorage::Update()
 	}
 }
 
-void LocalStorage::StartThread()
-{
-	// Start the extraction thread that will run regularly, attach itself to the game whenever found and consume the queue
-	if (!m_threadStarted)
-	{
-		m_threadStarted = true;
-		m_t = std::thread(&LocalStorage::Update, this);
-	}
-}
+// -- Public methods -- //
 
 void LocalStorage::StopThreadAndCleanup()
 {

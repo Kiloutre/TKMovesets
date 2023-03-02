@@ -30,12 +30,11 @@ void GameExtract::LoadCharacterNames()
 
 void GameExtract::OnProcessAttach()
 {
-	// Load the appropriate extractor for the selected game and attempt to load the character names
-	InstantiateExtractor();
+	InstantiateFactory();
 	LoadCharacterNames();
 }
 
-void GameExtract::InstantiateExtractor()
+void GameExtract::InstantiateFactory()
 {
 	if (m_extractor != nullptr) {
 		delete m_extractor;
@@ -88,7 +87,18 @@ void GameExtract::Update()
 
 // -- Public methods -- //
 
-bool GameExtract::CanExtract()
+void GameExtract::StopThreadAndCleanup()
+{
+	// Order thread to stop
+	m_threadStarted = false;
+	m_t.join();
+
+	if (m_extractor != nullptr) {
+		delete m_extractor;
+	}
+}
+
+bool GameExtract::CanStart()
 {
 	if (m_extractor == nullptr) {
 		return false;
@@ -101,44 +111,6 @@ bool GameExtract::IsBusy()
 {
 	// There are still playerAddresss to extract from
 	return m_playerAddress.size() > 0;
-}
-
-void GameExtract::SetTargetProcess(const char* processName, size_t gameId)
-{
-	if (IsBusy()) {
-		return;
-	}
-
-	if (process->IsAttached()) {
-		process->Detach();
-	}
-
-	currentGameProcess = std::string(processName);
-	currentGameId = gameId;
-	if (process->Attach(processName)) {
-		OnProcessAttach();
-	}
-}
-
-void GameExtract::StartThread()
-{
-	// Start the extraction thread that will run regularly, attach itself to the game whenever found and consume the queue
-	if (!m_threadStarted)
-	{
-		m_threadStarted = true;
-		m_t = std::thread(&GameExtract::Update, this);
-	}
-}
-
-void GameExtract::StopThreadAndCleanup()
-{
-	// Order thread to stop
-	m_threadStarted = false;
-	m_t.join();
-
-	if (m_extractor != nullptr) {
-		delete m_extractor;
-	}
 }
 
 void GameExtract::QueueCharacterExtraction(int playerId)

@@ -67,13 +67,13 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 			break;
 		}
 	}
-	else if (!extractorHelper->CanExtract()) {
+	else if (!extractorHelper->CanStart()) {
 		ImGuiExtra_TextboxWarning(_("process.cant_extract"));
 	}
 
 	{
 		bool busy = extractorHelper->IsBusy();
-		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper->CanExtract();
+		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper->CanStart();
 
 		// Extraction settings
 		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &extractorHelper->overwriteSameFilename);

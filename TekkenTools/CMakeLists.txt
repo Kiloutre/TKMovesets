@@ -15,6 +15,7 @@ set(MAIN_SOURCES
                     "main.cpp"
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
+                    "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
                     "GameInteractions/Extractors/Extractor.cpp"
                     "LocalStorage/LocalStorage.cpp"
@@ -41,6 +42,7 @@ set(OTHER_SOURCES
                     "Utils/helpers.cpp"
                     "Utils/Localization.cpp"
                     "Utils/GameAddressesFile.cpp"
+                    "Utils/ThreadedClass.cpp"
 )
 
 add_executable (TekkenTools ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES} ${GAME_SPECIFIC_SOURCES})

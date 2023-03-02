@@ -33,7 +33,6 @@ void* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	return block;
 }
 
-
 std::string Extractor::GetFilename(const char* characterName, const char* gameIdentifierString, unsigned int suffixId)
 {
 	if (suffixId <= 1) {
