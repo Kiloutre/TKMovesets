@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "constants.h"
+
 enum GameFlag
 {
 	// Game can be opened for character extraction
@@ -31,8 +33,8 @@ struct GameInfo
 namespace Games
 {
 	// Returns a pointer to a struct containing a game's name, process name, character count
-	GameInfo* GetGameInfo(uint8_t idx);
+	DLLCONTENT GameInfo* GetGameInfo(uint8_t idx);
 
 	// Returns the amount of supported games
-	size_t GetGamesCount();
+	DLLCONTENT size_t GetGamesCount();
 }

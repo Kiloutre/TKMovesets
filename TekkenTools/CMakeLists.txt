@@ -19,7 +19,6 @@ set(BINARY_SOURCES
                     "main.cpp"
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
-                    "GameInteractions/Games.cpp"
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
                     "GameInteractions/GameImport.cpp"
@@ -49,7 +48,9 @@ set(IMPORTEXPORT_SOURCES
                     # Same
                     "Utils/helpers.cpp"
                     "Utils/GameAddressesFile.cpp"
-
+                    
+                    # List of games
+                    "GameInteractions/Games.cpp"
                     # Base classes for our extractor & importers
                     "GameInteractions/Extractors/Extractor.cpp"
                     "GameInteractions/Importers/Importer.cpp"
