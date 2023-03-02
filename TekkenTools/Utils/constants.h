@@ -16,8 +16,8 @@
 
 # define MOVESET_DIRECTORY             "./extracted_chars"
 # define MOVESET_FILENAME_EXTENSION    ".tkbin"
-# define MOVESET_VERSION_STRING        "0.1"
-# define MOVESET_HEADER_STRING_CHARSET "_-+!()[]{} "
+# define MOVESET_VERSION_STRING        "0.1"  // We might update extractors/importers without touching the main tool, so this is separated
+# define MOVESET_HEADER_STRING_CHARSET "_-+!()[]{}.,;: " // Accepted chars in header strings are alphanum + those specified here
 
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 

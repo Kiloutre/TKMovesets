@@ -44,5 +44,5 @@ public:
 	// Is currently busy
 	virtual bool IsBusy() = 0;
 	// Set the process to open
-	void SetTargetProcess(const char* processName, size_t gameId);
+	void SetTargetProcess(const char* processName, uint8_t gameId);
 };

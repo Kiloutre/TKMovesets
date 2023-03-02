@@ -45,10 +45,9 @@ static std::vector<gameAddr> getMotaListAnims(t7structs::motaList* mota)
 // Converts abslute ptr into relative offsets before saving to file
 static void fixMovesetOffsets(char* movesetBlock, const movesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> animOffsetMap)
 {
-	char* addr;
-	size_t i;
-
 	// Todo: maybe turn this into callback for ease of reading?
+
+	size_t i;
 
 	// Convert move ptrs
 	i = 0;
@@ -362,6 +361,8 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 bool ExtractorT7::CanExtract()
 {
 	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
+	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
 	if (playerAddress == 0 || playerAddress == -1) {
 		return false;

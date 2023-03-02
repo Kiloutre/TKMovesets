@@ -45,6 +45,7 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 				.name = Helpers::getMovesetNameFromFilename(filename),
 				.origin = std::string(header.origin),
 				.target_character = std::string(header.target_character),
+				.version_string = std::string(header.version_string),
 				.date = std::string(header.date),
 				.size = (float)totalSize / 1000 / 1000,
 				.modificationDate = buffer.st_mtime

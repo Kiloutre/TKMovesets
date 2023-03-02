@@ -109,7 +109,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 
 	// List of extracted movesets
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
-	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
+	if (ImGui::BeginTable("##", 7, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
@@ -117,6 +117,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.exractor_version"));
 		ImGui::TableSetupColumn(_("moveset.delete"), 0, 0.0f);
 		ImGui::TableHeadersRow();
 
@@ -143,6 +144,9 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->date.c_str());
+
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(moveset->version_string.c_str());
 
 				ImGui::TableNextColumn();
 				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));

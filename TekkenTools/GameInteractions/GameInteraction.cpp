@@ -8,7 +8,7 @@
 
 // -- Public methods -- //
 
-void GameInteraction::SetTargetProcess(const char* processName, size_t gameId)
+void GameInteraction::SetTargetProcess(const char* processName, uint8_t gameId)
 {
 	if (IsBusy()) {
 		return;
