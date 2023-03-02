@@ -25,7 +25,7 @@ struct movesetInfo
 	std::string origin;
 	std::string target_character;
 	std::string date;
-	uint64_t size;
+	float size;
 	time_t modificationDate;
 };
 
@@ -45,6 +45,8 @@ private:
 	std::vector<gameAddr> m_playerAddress;
 	// A set containing the list of moveset files in the configured extraction dir. Used to determine when to fetch new movesets info
 	std::set<std::string> m_extractedMovesetFilenames;
+	// .extractedMovesets garbage, because it can be accessed in another thread while we remove items for it.
+	std::vector<movesetInfo*> m_garbage;
 
 	// Callback called whenever the process is re-atached
 	void OnProcessAttach();
@@ -94,4 +96,6 @@ public:
 	void QueueCharacterExtraction(int playerId);
 	// Reads movesets from their configured extraction dir. Accessible under .extractedMovesets
 	void ReloadMovesetList();
+	// Frees the content of .garbage. Must be called by the display thread after being finished with .extractedMovesets
+	void CleanupUnusedMovesetInfos();
 };

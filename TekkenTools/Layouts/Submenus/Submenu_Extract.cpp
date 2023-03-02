@@ -129,8 +129,12 @@ void Submenu_Extract::Render()
 		ImGui::TableSetupColumn(_("moveset.size"));
 		ImGui::TableHeadersRow();
 
-		for (movesetInfo* moveset : extractor.extractedMovesets)
+		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
+		for (size_t i = 0; i < extractor.extractedMovesets.size(); ++i)
 		{
+			// moveset is guaranteed not to be freed until after this loop
+			movesetInfo* moveset = extractor.extractedMovesets[i];
+
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(moveset->name.c_str());
@@ -150,10 +154,13 @@ void Submenu_Extract::Render()
 				ImGui::TextUnformatted(moveset->date.c_str());
 
 				ImGui::TableNextColumn();
-				std::string sizeString = std::format("{:.2f} {}", ((float)moveset->size) / 1000000, _("moveset.size_mb"));
+				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
 				ImGui::TextUnformatted(sizeString.c_str());
 			}
 		}
+		// Don't de-allocate moveset infos until we're done iterating on it
+		extractor.CleanupUnusedMovesetInfos();
+
 		ImGui::EndTable();
 	}
 }

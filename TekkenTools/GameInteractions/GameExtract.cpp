@@ -20,43 +20,42 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 	std::ifstream file;
 	file.open(filename, std::ios::binary);
 
-	if (file.fail()) {
-		return nullptr;
+	if (!file.fail()) {
+
+		MovesetHeader header{ 0 };
+		file.read((char*)&header, sizeof(MovesetHeader));
+
+		size_t readBytes = file.gcount();
+		file.seekg(0, std::ios::end);
+		size_t totalSize = file.tellg();
+		file.close();
+
+		if (readBytes != sizeof(MovesetHeader) ||
+			Helpers::isHeaderStringMalformated(header.origin, sizeof(header.origin)) ||
+			Helpers::isHeaderStringMalformated(header.origin, sizeof(header.target_character)) ||
+			Helpers::isHeaderStringMalformated(header.origin, sizeof(header.version_string)) ||
+			Helpers::isHeaderStringMalformated(header.origin, sizeof(header.date))) {
+			// File malformated
+		}
+		else {
+			struct stat buffer;
+			// stat() the file to read modification time
+			stat(filename.c_str(), &buffer);
+
+			return new movesetInfo{
+				.filename = filename,
+				.name = Helpers::getMovesetNameFromFilename(filename),
+				.origin = std::string(header.origin),
+				.target_character = std::string(header.target_character),
+				.date = std::string(header.date),
+				.size = (float)totalSize / 1000 / 1000,
+				.modificationDate = buffer.st_mtime
+			};
+		}
+
 	}
 
-	MovesetHeader header{ 0 };
-	file.read((char*)&header, sizeof(MovesetHeader));
-
-	size_t readBytes = file.gcount();
-	file.seekg(0, std::ios::end);
-	size_t totalSize = file.tellg();
-	file.close();
-
-	if (readBytes != sizeof(MovesetHeader)) {
-		// Malformed file header
-		return nullptr;
-	}
-
-	if ( Helpers::isHeaderStringMalformated(header.origin, sizeof(header.origin)) ||
-		Helpers::isHeaderStringMalformated(header.origin, sizeof(header.target_character)) ||
-		Helpers::isHeaderStringMalformated(header.origin, sizeof(header.version_string)) ||
-		Helpers::isHeaderStringMalformated(header.origin, sizeof(header.date)) ) {
-		return nullptr;
-	}
-
-	struct stat buffer;
-	// stat() the file to read modification time
-	stat(filename.c_str(), &buffer);
-
-	return new movesetInfo{
-		filename,
-		Helpers::getMovesetNameFromFilename(filename),
-		std::string(header.origin),
-		std::string(header.target_character),
-		std::string(header.date),
-		totalSize,
-		buffer.st_mtime
-	};
+	return nullptr;
 }
 
 void GameExtract::StartThread()
@@ -92,17 +91,20 @@ void GameExtract::ReloadMovesetList()
 		if (!m_extractedMovesetFilenames.contains(filename))
 		{
 			m_extractedMovesetFilenames.insert(filename);
-
 			movesetInfo* moveset = fetchMovesetInformations(filename);
+
 			if (moveset == nullptr) {
 				moveset = new movesetInfo{
-					filename,
-					Helpers::getMovesetNameFromFilename(filename),
-					"INVALID",
-					"",
-					""
+				   .filename = filename,
+				   .name = Helpers::getMovesetNameFromFilename(filename),
+				   .origin = std::string("INVALID"),
+				   .target_character = std::string(""),
+				   .date = std::string(""),
+				   .size = 0,
+				   .modificationDate = 0
 				};
 			}
+
 			extractedMovesets.push_back(moveset);
 		}
 	}
@@ -114,13 +116,24 @@ void GameExtract::ReloadMovesetList()
 
 		if ((stat(moveset->filename.c_str(), &buffer) != 0) || buffer.st_mtime != moveset->modificationDate) {
 			// File does not exist anymore, de-allocate the info we stored about it
-			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
+			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
-			delete moveset;
+			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
+			m_garbage.push_back(moveset);
 		}
 		else {
 			++i;
 		}
+	}
+}
+
+void GameExtract::CleanupUnusedMovesetInfos()
+{
+	while (m_garbage.size() > 0)
+	{
+		movesetInfo* moveset = m_garbage[0];
+		m_garbage.erase(m_garbage.begin());
+		delete moveset;
 	}
 }
 
