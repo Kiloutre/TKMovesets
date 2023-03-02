@@ -68,7 +68,7 @@ void GameExtract::StartThread()
 	}
 }
 
-void GameExtract::StopThread()
+void GameExtract::StopThreadAndCleanup()
 {
 	// Order thread to stop
 	m_threadStarted = false;
@@ -78,6 +78,10 @@ void GameExtract::StopThread()
 	CleanupUnusedMovesetInfos();
 	for (movesetInfo *movesetInfo : extractedMovesets) {
 		delete movesetInfo;
+	}
+
+	if (m_extractor != nullptr) {
+		delete m_extractor;
 	}
 }
 

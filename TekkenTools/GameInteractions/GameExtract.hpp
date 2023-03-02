@@ -95,7 +95,7 @@ public:
 	// Starts the thread that will later be used for extracton
 	void StartThread();
 	// Stops the thread started above
-	void StopThread();
+	void StopThreadAndCleanup();
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterExtraction(int playerId);
 	// Reads movesets from their configured extraction dir. Accessible under .extractedMovesets

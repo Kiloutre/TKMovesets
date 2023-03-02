@@ -108,7 +108,7 @@ void MainWindow::Shutdown()
 {
 	// Cleanup of everything we do should be done here
 
-	extractor->StopThread();
+	extractor->StopThreadAndCleanup();
 	delete extractor->process;
 	delete extractor->game;
 
