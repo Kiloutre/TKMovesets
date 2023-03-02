@@ -1,4 +1,5 @@
-﻿
+﻿# Set C++20, mostly for std::format
+set(CMAKE_CXX_STANDARD 20)
 
 set(INCLUDE_FOLDERS
                     "Layouts"
@@ -11,7 +12,8 @@ set(INCLUDE_FOLDERS
                     "Utils"
 )
 
-set(MAIN_SOURCES
+set(BINARY_SOURCES
+                    # Main sources
                     "main.cpp"
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
@@ -21,26 +23,21 @@ set(MAIN_SOURCES
                     "GameInteractions/Extractors/Extractor.cpp"
                     "GameInteractions/Importers/Importer.cpp"
                     "LocalStorage/LocalStorage.cpp"
-)
 
-set(GAME_SPECIFIC_SOURCES
+                    # Game-specific
                     "GameInteractions/Extractors/Extractor_t7.cpp"
                     "GameInteractions/Importers/Importer_t7.cpp"
-)
 
-set(LAYOUT_SOURCES
+                    # Layout
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
                     "Layouts/StatusBar.cpp"
-)
-
-set(SUBMENU_SOURCES
+                    # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
                     "Layouts/Submenus/Submenu_OnlinePlay.cpp"
-)
 
-set(OTHER_SOURCES
+                    # Helpers and such
                     "Utils/imgui_extras.cpp"
                     "Utils/helpers.cpp"
                     "Utils/Localization.cpp"
@@ -48,20 +45,32 @@ set(OTHER_SOURCES
                     "Utils/ThreadedClass.cpp"
 )
 
+set(IMPORTEXPORT_SOURCES
+                    # Main sources
+                    "Game/GameProcess.cpp"
+                    "Game/GameData.cpp"
+                    "GameInteractions/Extractors/Extractor.cpp"
+                    "GameInteractions/Importers/Importer.cpp"
+
+                    # Game-specific
+                    "GameInteractions/Extractors/Extractor_t7.cpp"
+                    "GameInteractions/Importers/Importer_t7.cpp"
+
+                    # Helpers and such
+                    "Utils/helpers.cpp"
+                    "Utils/GameAddressesFile.cpp"
+)
+
 # Build .dll containing per-game Import/Export functions, that way no need to update the whole software #
-#add_library(ExportImport SHARED ${GAME_SPECIFIC_SOURCES} )
-#target_include_directories(ExportImport PUBLIC ${INCLUDE_FOLDERS})
+add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} )
+target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 #target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe
-add_executable (TekkenTools ${MAIN_SOURCES} ${LAYOUT_SOURCES} ${SUBMENU_SOURCES} ${OTHER_SOURCES} ${GAME_SPECIFIC_SOURCES})
+add_executable (TekkenTools ${BINARY_SOURCES})
 target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
 #add_dependencies(TekkenTools ExportImport)
-#target_link_libraries(TekkenTools PRIVATE ExportImport)
-
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET TekkenTools PROPERTY CXX_STANDARD 20)
-endif()
+#target_link_libraries(TekkenTools PRIVATE ExportImport)²
 
 # Addresses file #
 configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
