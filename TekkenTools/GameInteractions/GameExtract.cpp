@@ -32,6 +32,7 @@ void GameExtract::OnProcessAttach()
 {
 	InstantiateFactory();
 	LoadCharacterNames();
+	m_playerAddress.clear();
 }
 
 void GameExtract::InstantiateFactory()
@@ -56,32 +57,17 @@ void GameExtract::InstantiateFactory()
 	}
 }
 
-void GameExtract::Update()
+void GameExtract::RunningUpdate()
 {
-	// Executed in its own thread, is the one in charge of extraction, that way it won't interrupt the GUI rendering
-	while (m_threadStarted)
+	// Load character name for fancy live displaying : You know who you're extracting
+	LoadCharacterNames();
+
+	// Extraction queue is a FIFO (first in first out) queue
+	while (m_playerAddress.size() > 0)
 	{
-		// Ensure the process is still open and valid before possibly extracting
-		if (process->IsAttached() && process->CheckRunning()) {
-			// Load character name for fancy live displaying : You know who you're extracting
-			LoadCharacterNames();
-
-			// Extraction queue is a FIFO (first in first out) queue
-			while (m_playerAddress.size() > 0)
-			{
-				// Start extraction
-				m_extractor->Extract(m_playerAddress[0], &progress, overwriteSameFilename);
-				m_playerAddress.erase(m_playerAddress.begin());
-			}
-		}
-		else if (currentGameId != -1) {
-			// Process closed, try to attach again in case it is restarted
-			if (process->Attach(currentGameProcess.c_str())) {
-				OnProcessAttach();
-			}
-		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
+		// Start extraction
+		m_extractor->Extract(m_playerAddress[0], &progress, overwriteSameFilename);
+		m_playerAddress.erase(m_playerAddress.begin());
 	}
 }
 

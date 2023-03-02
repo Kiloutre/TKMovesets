@@ -2,6 +2,7 @@
 
 #include "ThreadedClass.hpp"
 
+// -- Public functions -- //
 
 void ThreadedClass::StartThread()
 {

@@ -5,10 +5,6 @@
 
 // -- Private methods -- //
 
-void GameInteraction::OnProcessAttach()
-{
-	InstantiateFactory();
-}
 
 // -- Public methods -- //
 
@@ -29,3 +25,24 @@ void GameInteraction::SetTargetProcess(const char* processName, size_t gameId)
 	}
 }
 
+void GameInteraction::Update()
+{
+	// Executed in its own thread, is the one in charge of extraction, that way it won't interrupt the GUI rendering
+	while (m_threadStarted)
+	{
+		// Ensure the process is still open and valid before possibly extracting
+		if (process->IsAttached() && process->CheckRunning()) {
+			if (CanStart()) {
+				RunningUpdate();
+			}
+		}
+		else if (currentGameId != -1) {
+			// Process closed, try to attach again in case it is restarted
+			if (process->Attach(currentGameProcess.c_str())) {
+				OnProcessAttach();
+			}
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
+	}
+}

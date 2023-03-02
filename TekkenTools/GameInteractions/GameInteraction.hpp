@@ -4,6 +4,7 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "LocalStorage.hpp"
 #include "ThreadedClass.hpp"
 
 #include "GameAddresses.h"
@@ -18,13 +19,19 @@ enum GameId
 
 class GameInteraction : public ThreadedClass
 {
-private:
-	// Callback called whenever the process is re-atached
-	virtual void OnProcessAttach();
+protected:
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	virtual void InstantiateFactory() = 0;
+	// Function ran in the parallel thread, executed by Update() only if latched on and if CanStart() returned true
+	virtual void RunningUpdate() = 0;
+	// Callback called when the process has latched on a process for the first time
+	virtual void OnProcessAttach() = 0;
 
+	// Function ran in the parallel thread, executed regularly
+	void Update();
 public:
+	// Everything that is related to files is done through .storage. Listing, deleting, etc.
+	LocalStorage* storage = nullptr;
 	// Stores the ID of the currently opened game
 	size_t currentGameId = -1;
 	// Used to know which process is currently being searched/opened

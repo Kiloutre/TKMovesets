@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sys/stat.h>
+#include <windows.h>
 
 #include "LocalStorage.hpp"
 #include "Helpers.hpp"
@@ -89,7 +90,8 @@ void LocalStorage::StopThreadAndCleanup()
 
 void LocalStorage::ReloadMovesetList()
 {
-	// Loop through every file
+	CreateDirectory(MOVESET_DIRECTORY, NULL);
+
 	for (const auto& entry : std::filesystem::directory_iterator(MOVESET_DIRECTORY))
 	{
 		// todo: see how this works with utf8 chars

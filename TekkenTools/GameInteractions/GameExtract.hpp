@@ -1,12 +1,6 @@
 #pragma once
 
-#include <set>
-#include <sys/stat.h>
-
-#include "GameData.hpp"
-#include "GameProcess.hpp"
 #include "Extractor.hpp"
-#include "LocalStorage.hpp"
 #include "GameInteraction.hpp"
 
 #include "GameAddresses.h"
@@ -25,11 +19,9 @@ private:
 	void OnProcessAttach() override;
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	void InstantiateFactory() override;
-	// Function ran in the parallel thread, used to latch on to process
-	void Update() override;
+	// Function ran in the parallel thread, executed only if latched on and if CanStart() returned true
+	void RunningUpdate() override;
 public:
-	// Everything that is related to files is done through .storage. Listing, deleting, etc.
-	LocalStorage* storage = nullptr;
 	// Contains the character names
 	std::string characterNames[4];
 	// Determine whether to ovewrite existing movesets when extracting or to append a number to the name
