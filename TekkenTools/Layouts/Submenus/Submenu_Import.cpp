@@ -64,7 +64,6 @@ void Submenu_Import::Render(GameImport *importerHelper)
 		}
 	}
 
-
 	// If we can't import, display a warning detailling why
 	GameProcess* p = importerHelper->process;
 

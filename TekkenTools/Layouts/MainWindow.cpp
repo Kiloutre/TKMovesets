@@ -23,6 +23,10 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	// Setup ImGui config
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	io.Fonts->AddFontDefault();
+	// Font import example
+	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", 13, NULL, io.Fonts->GetGlyphRangesDefault());
 }
 
 void MainWindow::NewFrame()

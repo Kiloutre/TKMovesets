@@ -90,11 +90,12 @@ void LocalStorage::StopThreadAndCleanup()
 
 void LocalStorage::ReloadMovesetList()
 {
+	// Create extraction directory if it doesn't exist
 	CreateDirectory(MOVESET_DIRECTORY, NULL);
 
 	for (const auto& entry : std::filesystem::directory_iterator(MOVESET_DIRECTORY))
 	{
-		// todo: see how this works with utf8 chars
+		// Todo: Unicode .name support
 		std::string filename = entry.path().string();
 
 		if (!Helpers::endsWith(filename, MOVESET_FILENAME_EXTENSION)) {
