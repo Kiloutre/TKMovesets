@@ -10,7 +10,6 @@
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
-#include "GameAddressesFile.hpp"
 
 #include "constants.h"
 
@@ -109,8 +108,6 @@ int main(int argc, wchar_t** argv)
 
 	// Load translation
 	Localization::LoadFile(PROGRAM_DEFAULT_LANG);
-	// Load game addresses
-	GameAddressesFile::LoadFile();
 
 	// Init main program. This will get most things going and create the important threads
 	MainWindow program(window, c_glsl_version);

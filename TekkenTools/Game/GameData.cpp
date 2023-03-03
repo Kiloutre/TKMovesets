@@ -10,7 +10,7 @@ void GameData::CacheAddresses()
 {
 	std::map<std::string, gameAddr> cachedAddresses;
 
-	for (std::string addressId : GameAddressesFile::GetAllEntries())
+	for (std::string addressId : addrFile.GetAllEntries())
 	{
 		if (addressId.rfind("val_", 0) == 0) {
 			// Ignore if not address / ptr path
@@ -25,7 +25,7 @@ void GameData::CacheAddresses()
 gameAddr GameData::ReadPtrPath(const char* c_addressId)
 {
 	bool isRelative;
-	std::vector<gameAddr> ptrPath = GameAddressesFile::GetAddress(c_addressId, isRelative);
+	std::vector<gameAddr> ptrPath = addrFile.GetAddress(c_addressId, isRelative);
 
 	if (ptrPath.size() == 0) {
 		return GAME_ADDR_NULL;

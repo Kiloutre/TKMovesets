@@ -4,6 +4,7 @@
 #include <string>
 
 #include "GameProcess.hpp"
+#include "GameAddressesFile.hpp"
 
 #include "GameAddresses.h"
 
@@ -23,10 +24,8 @@ private:
 	// Reads a ptr path from an address identifier and return its last pointer
 	gameAddr ReadPtrPath(const char* c_addressId);
 public:
-	GameData(GameProcess* process) : m_process(process) {}
-	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
-	void CacheAddresses();
-
+	// Stores addresses
+	GameAddressesFile addrFile;
 	// Reads a char (1b) from the game in little endian
 	int8_t ReadInt8(const char* c_addressId);
 	// Reads a short (2b) from the game in little endian
@@ -42,4 +41,8 @@ public:
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
 	void ReadBytes(const char* c_addressId, void* buf, size_t readSize);
 	// Todo: writing functions
+
+	GameData(GameProcess* process) : m_process(process) {}
+	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
+	void CacheAddresses();
 };
