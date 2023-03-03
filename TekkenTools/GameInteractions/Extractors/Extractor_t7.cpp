@@ -4,9 +4,8 @@
 #include <iterator>
 
 #include "helpers.hpp"
-#include "Extractor.hpp"
 #include "Extractor_t7.hpp"
-#include "GameAddressesFile.hpp"
+#include "LocalStorage.hpp"
 
 #include "Structs_t7.h"
 #include "GameAddresses.h"

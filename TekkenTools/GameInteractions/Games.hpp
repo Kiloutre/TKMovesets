@@ -4,8 +4,8 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
-#include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
+#include "Extractor_t7.hpp"
 
 #include "constants.h"
 

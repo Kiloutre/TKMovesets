@@ -1,9 +1,7 @@
 #include <string>
 
 #include "helpers.hpp"
-#include "Importer.hpp"
 #include "Importer_t7.hpp"
-#include "GameAddressesFile.hpp"
 
 #include "Structs_t7.h"
 #include "GameAddresses.h"

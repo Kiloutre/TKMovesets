@@ -38,3 +38,12 @@ Classes:
 - Methods should start with an upper case
 Game structs:
 - snake_case for members
+
+
+
+// DOC //
+https://github.com/ocornut/imgui/blob/v1.89.1/imgui.h#L330
+https://github.com/ocornut/imgui/blob/docking/imgui.h
+https://traineq.org/ImGuiBundle/emscripten/bin/demo_imgui_bundle.html
+https://pthom.github.io/imgui_manual_online/manual/imgui_manual.html
+https://github.com/ocornut/imgui/wiki/Glossary

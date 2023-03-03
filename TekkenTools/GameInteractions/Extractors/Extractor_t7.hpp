@@ -3,9 +3,6 @@
 #include <string>
 
 #include "Extractor.hpp"
-#include "GameData.hpp"
-#include "GameProcess.hpp"
-#include "GameAddressesFile.hpp"
 
 #include "constants.h"
 #include "Structs_t7.h"
