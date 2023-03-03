@@ -257,7 +257,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	using std::chrono::duration;
 	using std::chrono::milliseconds;
 
-	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile.GetSingleValue("val_motbin_offset"));
+	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 
 	// Get the size of the various lists in the moveset, will need that later. We matched the same structure they did so a single read cab fill it.
 	t7structs::movesetLists lists{};
@@ -384,7 +384,7 @@ bool ExtractorT7::CanExtract()
 
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
-	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile.GetSingleValue("val_motbin_offset"));
+	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 	std::string characterName;
 	if (movesetAddr == 0) {
 		return characterName;

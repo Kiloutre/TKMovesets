@@ -24,8 +24,8 @@ private:
 	// Reads a ptr path from an address identifier and return its last pointer
 	gameAddr ReadPtrPath(const char* c_addressId);
 public:
-	// Stores addresses. Todo: move this the hell away from here. This has nothing to do here!!
-	GameAddressesFile addrFile;
+	// Stores ptr paths, absolute addresses, values and such 
+	GameAddressesFile* addrFile;
 	// Reads a char (1b) from the game in little endian
 	int8_t ReadInt8(const char* c_addressId);
 	// Reads a short (2b) from the game in little endian
@@ -42,7 +42,7 @@ public:
 	void ReadBytes(const char* c_addressId, void* buf, size_t readSize);
 	// Todo: writing functions
 
-	GameData(GameProcess* process) : m_process(process) {}
+	GameData(GameProcess* process, GameAddressesFile* t_addrFile) : m_process(process), addrFile(t_addrFile) {}
 	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
 	void CacheAddresses();
 };

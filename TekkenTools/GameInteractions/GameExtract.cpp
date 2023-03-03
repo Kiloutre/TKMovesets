@@ -19,7 +19,7 @@ void GameExtract::LoadCharacterNames()
 {
 	if (m_extractor != nullptr && m_extractor->CanExtract()) {
 		gameAddr playerAddress = game->ReadPtr("p1_addr");
-		gameAddr playerStructSize = game->addrFile.GetSingleValue("val_playerstruct_size");
+		gameAddr playerStructSize = game->addrFile->GetSingleValue("val_playerstruct_size");
 
 		for (int playerId = 0; playerId < characterCount; ++playerId) {
 			characterNames[playerId] = m_extractor->GetPlayerCharacterName(playerAddress + playerId * playerStructSize);
@@ -89,7 +89,7 @@ void GameExtract::QueueCharacterExtraction(int playerId)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = game->ReadPtr("p1_addr");
-	gameAddr playerStructSize = game->addrFile.GetSingleValue("val_playerstruct_size");
+	gameAddr playerStructSize = game->addrFile->GetSingleValue("val_playerstruct_size");
 
 	if (playerId == -1) {
 		// Queue the extraction of every character one by one

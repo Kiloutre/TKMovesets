@@ -10,6 +10,7 @@
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
+#include "GameAddressesFile.hpp"
 
 #include "constants.h"
 
@@ -27,12 +28,15 @@ static void InitMainClasses(MainWindow& program)
 {
 	program.storage.ReloadMovesetList();
 
+	GameAddressesFile* addrFile = new GameAddressesFile();
+
+	// Todo: maybe do this in the damn constructor...
 	program.extractor.process = new GameProcess;
-	program.extractor.game = new GameData(program.extractor.process);
+	program.extractor.game = new GameData(program.extractor.process, addrFile);
 	program.extractor.storage = &program.storage;
 
 	program.importer.process = new GameProcess;
-	program.importer.game = new GameData(program.extractor.process);
+	program.importer.game = new GameData(program.extractor.process, addrFile);
 	program.importer.storage = &program.storage;
 
 	program.storage.StartThread();
@@ -49,6 +53,7 @@ static void DestroyMainClasses(MainWindow& program)
 
 	program.importer.StopThreadAndCleanup();
 	delete program.importer.process;
+	delete program.importer.game->addrFile;
 	delete program.importer.game;
 
 	program.storage.StopThreadAndCleanup();

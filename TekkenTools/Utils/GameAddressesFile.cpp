@@ -6,10 +6,6 @@
 
 #include "GameAddressesFile.hpp"
 
-std::map<std::string, std::vector<gameAddr> > g_absolute_pointer_paths;
-std::map<std::string, std::vector<gameAddr> > g_relative_pointer_paths;
-std::vector<std::string> g_entries;
-
 static std::vector<gameAddr> ParsePtrPathString(std::string path)
 {
 	std::vector<gameAddr> ptrPath = std::vector<gameAddr>();
@@ -97,52 +93,33 @@ void GameAddressesFile::Reload()
 
 	// Replace these only when we have a proper replacement built, because functions running on other threads require these to be completley built at all times
 	// So can't clear them at the start and build them little by little.
-	g_absolute_pointer_paths = absolute_pointer_paths;
-	g_relative_pointer_paths = relative_pointer_paths;
-	g_entries = entries;
+	m_absolute_pointer_paths = absolute_pointer_paths;
+	m_relative_pointer_paths = relative_pointer_paths;
+	m_entries = entries;
 }
 
 const std::vector<std::string> GameAddressesFile::GetAllEntries()
 {
-	return g_entries;
-}
-
-bool GameAddressesFile::IsAddressRelative(const char* c_addressId)
-{
-	if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
-		return true;
-	}
-	return false;
+	return m_entries;
 }
 
 const int64_t GameAddressesFile::GetSingleValue(const char* c_addressId)
 {
-	if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
-		return (int64_t)g_absolute_pointer_paths[c_addressId][0];
+	if (m_absolute_pointer_paths.find(c_addressId) != m_absolute_pointer_paths.end()) {
+		return (int64_t)m_absolute_pointer_paths[c_addressId][0];
 	}
 	return (int64_t)-1;
 }
 
-const std::vector<gameAddr> GameAddressesFile::GetAddress(const char* c_addressId)
-{
-	if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
-		return g_relative_pointer_paths[c_addressId];
-	}
-	if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
-		return g_absolute_pointer_paths[c_addressId];
-	}
-	return std::vector<gameAddr>();
-}
-
 const std::vector<gameAddr> GameAddressesFile::GetAddress(const char* c_addressId, bool& isRelative)
 {
-	if (g_relative_pointer_paths.find(c_addressId) != g_relative_pointer_paths.end()) {
+	if (m_relative_pointer_paths.find(c_addressId) != m_relative_pointer_paths.end()) {
 		isRelative = true;
-		return g_relative_pointer_paths[c_addressId];
+		return m_relative_pointer_paths[c_addressId];
 	}
 	isRelative = false;
-	if (g_absolute_pointer_paths.find(c_addressId) != g_absolute_pointer_paths.end()) {
-		return g_absolute_pointer_paths[c_addressId];
+	if (m_absolute_pointer_paths.find(c_addressId) != m_absolute_pointer_paths.end()) {
+		return m_absolute_pointer_paths[c_addressId];
 	}
 	return std::vector<gameAddr>();
 }
