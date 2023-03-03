@@ -24,7 +24,7 @@ private:
 	// Reads a ptr path from an address identifier and return its last pointer
 	gameAddr ReadPtrPath(const char* c_addressId);
 public:
-	// Stores addresses
+	// Stores addresses. Todo: move this the hell away from here. This has nothing to do here!!
 	GameAddressesFile addrFile;
 	// Reads a char (1b) from the game in little endian
 	int8_t ReadInt8(const char* c_addressId);

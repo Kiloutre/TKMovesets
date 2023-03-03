@@ -43,6 +43,11 @@ static std::vector<gameAddr> ParsePtrPathString(std::string path)
 
 GameAddressesFile::GameAddressesFile()
 {
+	Reload();
+}
+
+void GameAddressesFile::Reload()
+{
 	std::map<std::string, std::vector<gameAddr>> absolute_pointer_paths;
 	std::map<std::string, std::vector<gameAddr>> relative_pointer_paths;
 	std::vector<std::string> entries;
