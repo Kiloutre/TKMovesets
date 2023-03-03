@@ -276,7 +276,7 @@ uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
 
 // -- Public methods -- //
 
-void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename)
+ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename)
 {
 	using std::chrono::high_resolution_clock;
 	auto t1 = high_resolution_clock::now();
@@ -354,24 +354,33 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 	header.offsets.animationBlockOffset = header.offsets.movesetBlockOffset + movesetBlockSize;
 	header.offsets.motaBlockOffset = header.offsets.animationBlockOffset + animationBlockSize;
 
-	// Create the file
-	if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
-	{
-		// Start writing what we extracted into the file
-		m_file.write((char*)&header, sizeof(header));
-		m_file.write((char*)movesetInfoBlock, movesetInfoBlockSize);
-		m_file.write((char*)&lists, sizeof(lists));
-		m_file.write((char*)nameBlock, nameBlockSize);
-		m_file.write((char*)movesetBlock, movesetBlockSize);
-		m_file.write((char*)animationBlock, animationBlockSize);
-		m_file.write((char*)motaCustomBlock, motaCustomBlockSize);
+	ExtractionErrcode errcode = ExtractionSuccesful;
 
-		// Extraction is over
-		CloseMovesetFile();
+	if (movesetInfoBlock == nullptr)
+	{
+		errcode = ExtractionAllocationErr;
 	}
 	else {
-		// todo: signal error that will be looked at by GameExtract
+		// Create the file
+		if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
+		{
+			// Start writing what we extracted into the file
+			m_file.write((char*)&header, sizeof(header));
+			m_file.write((char*)movesetInfoBlock, movesetInfoBlockSize);
+			m_file.write((char*)&lists, sizeof(lists));
+			m_file.write((char*)nameBlock, nameBlockSize);
+			m_file.write((char*)movesetBlock, movesetBlockSize);
+			m_file.write((char*)animationBlock, animationBlockSize);
+			m_file.write((char*)motaCustomBlock, motaCustomBlockSize);
+
+			// Extraction is over
+			CloseMovesetFile();
+		}
+		else {
+			errcode = ExtractionFileCreationErr;
+		}
 	}
+
 
 
 
@@ -380,12 +389,14 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 	free(nameBlock);
 	free(movesetBlock);
 	free(animationBlock);
+	free(motaCustomBlockSize);
 
 
 	auto t2 = high_resolution_clock::now();
 	auto ms_int = duration_cast<milliseconds>(t2 - t1);
 	duration<double, std::milli> ms_double = t2 - t1;
 	std::cout << ms_int.count() << "ms - " << ms_double.count() << "ms\n";
+	return errcode;
 }
 
 bool ExtractorT7::CanExtract()

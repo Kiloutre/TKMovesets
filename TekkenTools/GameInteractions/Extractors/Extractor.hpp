@@ -8,6 +8,13 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
+enum ExtractionErrcode
+{
+	ExtractionSuccesful = 0,
+	ExtractionAllocationErr = 1,
+	ExtractionFileCreationErr = 1,
+};
+
 namespace ExtractorUtils
 {
 	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim);
@@ -39,7 +46,7 @@ protected:
 public:
 	Extractor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual void Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename) = 0;
+	virtual ExtractionErrcode Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanExtract() = 0;
 	// Returns a string containing the character name of the provided playerId.
