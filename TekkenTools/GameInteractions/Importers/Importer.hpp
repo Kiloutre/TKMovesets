@@ -8,6 +8,14 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
+enum ImportationErrcode
+{
+	ImportationSuccessful = 0,
+	ImportationAllocationErr = 1,
+	ImportationGameAllocationErr = 2,
+	ImportationFileReadErr = 3,
+};
+
 // Base class for extracting from a game
 class DLLCONTENT Importer
 {
@@ -21,7 +29,7 @@ protected:
 public:
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual void Import(const char* filename, gameAddr playerAddress, float* progress) = 0;
+	virtual ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float* progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanImport() = 0;
 };

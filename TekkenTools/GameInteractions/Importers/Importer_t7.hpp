@@ -12,7 +12,7 @@ class DLLCONTENT ImporterT7 : public Importer
 {
 public:
 	using Importer::Importer; // Inherit constructor too
-	void Import(const char* filename, gameAddr playerAddress, float* progress) override;
+	ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float* progress) override;
 	bool CanImport() override;
 
 };

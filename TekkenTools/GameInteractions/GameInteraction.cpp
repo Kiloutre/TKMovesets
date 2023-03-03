@@ -14,14 +14,11 @@ void GameInteraction::SetTargetProcess(const char* processName, uint8_t gameId)
 		return;
 	}
 
-	if (process->IsAttached()) {
-		process->Detach();
-	}
-
 	currentGameProcess = std::string(processName);
 	currentGameId = gameId;
-	if (process->Attach(processName)) {
-		OnProcessAttach();
+
+	if (process->IsAttached()) {
+		process->Detach();
 	}
 }
 
@@ -38,7 +35,7 @@ void GameInteraction::Update()
 		}
 		else if (currentGameId != -1) {
 			// Process closed, try to attach again in case it is restarted
-			if (process->Attach(currentGameProcess.c_str())) {
+			if (process->Attach(currentGameProcess.c_str(), m_processExtraFlags)) {
 				OnProcessAttach();
 			}
 		}

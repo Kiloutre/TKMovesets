@@ -7,13 +7,14 @@
 
 // -- Private methods  -- //
 
-GameProcessError GameProcess::AttachToNamedProcess(const char* processName)
+GameProcessError GameProcess::AttachToNamedProcess(const char* processName, DWORD processExtraFlags)
 {
 	DWORD pid = GetGamePID(processName);
 
 	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
 	else {
-		m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+		printf("process flags are %lld\n", processExtraFlags);
+		m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | processExtraFlags, FALSE, pid);
 		if (m_processHandle != nullptr && LoadGameMainModule(processName, pid)) {
 			processId = pid;
 			return PROC_ATTACHED;
@@ -101,13 +102,13 @@ bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 
 // -- Public methods -- //
 
-bool GameProcess::Attach(const char* processName)
+bool GameProcess::Attach(const char* processName, DWORD processExtraFlags)
 {
 	if (status == PROC_ATTACHED) {
 		return false;
 	}
 
-	status = AttachToNamedProcess(processName);
+	status = AttachToNamedProcess(processName, processExtraFlags);
 	return status == PROC_ATTACHED;
 }
 
@@ -214,7 +215,7 @@ void  GameProcess::writeBytes(gameAddr addr, void* buf, size_t bufSize)
 
 gameAddr GameProcess::allocateMem(size_t amount)
 {
-	return (gameAddr)VirtualAllocEx(m_processHandle, 0, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	return (gameAddr)VirtualAllocEx(m_processHandle, nullptr, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 }
 
 void GameProcess::freeMem(gameAddr addr)

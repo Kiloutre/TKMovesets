@@ -36,7 +36,7 @@ static void InitMainClasses(MainWindow& program)
 	program.extractor.storage = &program.storage;
 
 	program.importer.process = new GameProcess;
-	program.importer.game = new GameData(program.extractor.process, addrFile);
+	program.importer.game = new GameData(program.importer.process, addrFile);
 	program.importer.storage = &program.storage;
 
 	program.storage.StartThread();

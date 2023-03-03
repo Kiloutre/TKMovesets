@@ -127,6 +127,8 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 	return animAddr + 1000 + 1;
 }
 
+// -- Private methods - //
+
 char* ExtractorT7::allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
 {
 	size_out = sizeof(MotaList);
@@ -149,8 +151,6 @@ char* ExtractorT7::allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
 
 	return customBlock;
 }
-
-// -- Private methods -- //
 
 void ExtractorT7::getNamesBlockBounds(t7structs::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
@@ -347,14 +347,14 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	strcpy(header.infos.target_character, characterName.c_str());
 	strcpy(header.infos.date, Helpers::currentDateTime().c_str());
 
-	header.offsets.movesetInfoBlockOffset = sizeof(header);
-	header.offsets.listsBlockOffset = header.offsets.movesetInfoBlockOffset + movesetInfoBlockSize;
-	header.offsets.nameBlockOffset = header.offsets.listsBlockOffset + sizeof(lists);
-	header.offsets.movesetBlockOffset = header.offsets.nameBlockOffset + nameBlockSize;
-	header.offsets.animationBlockOffset = header.offsets.movesetBlockOffset + movesetBlockSize;
-	header.offsets.motaBlockOffset = header.offsets.animationBlockOffset + animationBlockSize;
+	header.offsets.movesetInfoBlock = sizeof(header);
+	header.offsets.listsBlock = header.offsets.movesetInfoBlock + movesetInfoBlockSize;
+	header.offsets.nameBlock = header.offsets.listsBlock + sizeof(lists);
+	header.offsets.movesetBlock = header.offsets.nameBlock + nameBlockSize;
+	header.offsets.animationBlock = header.offsets.movesetBlock + movesetBlockSize;
+	header.offsets.motaBlock = header.offsets.animationBlock + animationBlockSize;
 
-	ExtractionErrcode errcode = ExtractionSuccesful;
+	ExtractionErrcode errcode = ExtractionSuccessful;
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
 		|| movesetBlock == nullptr || animationBlock == nullptr || motaCustomBlock == nullptr) {

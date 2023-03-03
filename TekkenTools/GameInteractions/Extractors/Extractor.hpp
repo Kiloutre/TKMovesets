@@ -10,9 +10,9 @@
 
 enum ExtractionErrcode
 {
-	ExtractionSuccesful = 0,
+	ExtractionSuccessful = 0,
 	ExtractionAllocationErr = 1,
-	ExtractionFileCreationErr = 1,
+	ExtractionFileCreationErr = 2,
 };
 
 namespace ExtractorUtils

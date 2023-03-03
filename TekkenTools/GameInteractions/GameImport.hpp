@@ -23,8 +23,14 @@ private:
 	// Function ran in the parallel thread, used to latch on to process
 	void RunningUpdate() override;
 public:
+	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
+	// true = force the 32769 move from the new moveset to apply 
+	bool apply_instantly = true;
+	// todo: garbage collector or something
 
+	// Default flags are raed-only, so the importer needs this
+	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)

@@ -35,7 +35,7 @@ private:
 	std::vector<std::pair<gameAddr, uint64_t>> m_moduleInfos;
 
 	// Attach to .processName
-	GameProcessError AttachToNamedProcess(const char* processName);
+	GameProcessError AttachToNamedProcess(const char* processName, DWORD processExtraFlags);
 	// Returns the game PID
 	DWORD GetGamePID(const char* processName);
 	// Load the address of the main module in .moduleAddr
@@ -57,7 +57,7 @@ public:
 	// -- Interaction stuff -- //
 
 	// Attach to a process, return false is failed. See .status for more details.
-	bool Attach(const char* processName);
+	bool Attach(const char* processName, DWORD processExtraFlags);
 	// Detach from the game,
 	void Detach();
 	// Returns true if .status = PROC_NOT_ATTACHED

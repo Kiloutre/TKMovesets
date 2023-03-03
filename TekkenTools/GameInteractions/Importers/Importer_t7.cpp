@@ -5,17 +5,57 @@
 
 #include "Structs_t7.h"
 #include "GameAddresses.h"
+#include "MovesetStructs.h"
 
 
 // -- Static helpers -- //
 
-// -- Private methods -- //
+
+static void* GetMovesetInfos(std::ifstream& file, MovesetHeader* out, uint64_t& movesetSize)
+{
+	file.read((char*)out, sizeof(MovesetHeader));
+	file.seekg(0, std::ios::end);
+	movesetSize = file.tellg();
+	char* movesetData = (char*)malloc(movesetSize);
+	if (movesetData) {
+		file.seekg(out->offsets.movesetInfoBlock, std::ios::beg);
+		file.read(movesetData, movesetSize);
+	}
+	file.close();
+	return movesetData;
+}
 
 // -- Public methods -- //
 
-void ImporterT7::Import(const char* filename, gameAddr playerAddress, float* progress)
+ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float* progress)
 {
-	// todo
+	std::ifstream file;
+	file.open(filename, std::ios::binary);
+
+	if (file.fail()) {
+		return ImportationFileReadErr;
+	}
+
+	MovesetHeader header{ 0 };
+
+	uint64_t movesetSize;
+	void *movesetData = GetMovesetInfos(file, &header, movesetSize);
+	if (movesetData == nullptr) {
+		return ImportationAllocationErr;
+	}
+	;
+
+	gameAddr allocatedMovesetArea = m_process->allocateMem(movesetSize);
+	if (allocatedMovesetArea == 0) {
+		free(movesetData);
+		return ImportationGameAllocationErr;
+	}
+
+	printf("Moveset allocated at %llx\n", allocatedMovesetArea);
+	m_process->writeBytes(allocatedMovesetArea, movesetData, movesetSize);
+
+	free(movesetData);
+	return ImportationSuccessful;
 }
 
 bool ImporterT7::CanImport()

@@ -1,4 +1,5 @@
 #include <ImGui.h>
+#include <format>
 
 #include "Submenu_Import.hpp"
 #include "Localization.hpp"
@@ -14,10 +15,10 @@ void Submenu_Import::Render(GameImport *importerHelper)
 	{
 		ImGui::SameLine();
 		size_t currentGameId = importerHelper->currentGameId;
-		ImGui::PushItemWidth(ImGui::CalcTextSize(_("extraction.select_game")).x * 1.5f);
+		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 		size_t gameListCount = Games::GetGamesCount();
-		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("extraction.select_game") : Games::GetGameInfo(currentGameId)->name))
+		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
 			for (size_t i = 0; i < gameListCount; ++i)
 			{
@@ -53,6 +54,12 @@ void Submenu_Import::Render(GameImport *importerHelper)
 		}
 	}
 
+	// Extraction settings
+	ImGui::SameLine();
+	ImGui::Checkbox(_("importation.apply_instantly"), &importerHelper->apply_instantly);
+	ImGui::SameLine();
+	ImGuiExtra::HelpMarker(_("importation.apply_instantly_explanation"));
+
 	// If we can't import, display a warning detailling why
 	GameProcess* p = importerHelper->process;
 
@@ -84,14 +91,15 @@ void Submenu_Import::Render(GameImport *importerHelper)
 	}
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
-	if (ImGui::BeginTable("##", 5, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
+	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 		| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
 	{
-		ImGui::TableSetupColumn("##", 0, 5.0f);
+		ImGui::TableSetupColumn("##", 0, 0.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
-		ImGui::TableSetupColumn("##");
+		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.import"));
 		ImGui::TableHeadersRow();
 
 		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
@@ -120,6 +128,10 @@ void Submenu_Import::Render(GameImport *importerHelper)
 				ImGui::TextUnformatted(moveset->date.c_str());
 
 				ImGui::TableNextColumn();
+				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
+				ImGui::TextUnformatted(sizeString.c_str());
+
+				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport))
 				{
@@ -127,12 +139,12 @@ void Submenu_Import::Render(GameImport *importerHelper)
 				}
 				ImGui::PopID();
 			}
+			ImGui::PopID();
 		}
-		ImGui::PopID();
+
 		// Don't de-allocate moveset infos until we're done iterating on it
 		importerHelper->storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
 	}
-	//ImGui::ListBox("##", &selectedMoveset, items, sizeof(items) / sizeof(*items));
 }

@@ -23,12 +23,12 @@ struct MovesetHeader_infos
 struct MovesetHeader_offsets
 {
 	// Offsets of the various blocks contained within the moveset, in the same order they will appear in
-	int64_t movesetInfoBlockOffset;
-	int64_t listsBlockOffset;
-	int64_t nameBlockOffset;
-	int64_t movesetBlockOffset;
-	int64_t animationBlockOffset; // Custom block
-	int64_t motaBlockOffset; // Custom block
+	int64_t movesetInfoBlock;
+	int64_t listsBlock;
+	int64_t nameBlock;
+	int64_t movesetBlock;
+	int64_t animationBlock; // Custom block
+	int64_t motaBlock; // Custom block
 };
 
 

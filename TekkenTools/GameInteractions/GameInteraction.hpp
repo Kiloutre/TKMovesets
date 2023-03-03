@@ -14,6 +14,9 @@
 class GameInteraction : public ThreadedClass
 {
 protected:
+	// Flags that will be used to open the process with
+	DWORD m_processExtraFlags = 0;
+
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	virtual void InstantiateFactory() = 0;
 	// Function ran in the parallel thread, executed by Update() only if latched on and if CanStart() returned true
