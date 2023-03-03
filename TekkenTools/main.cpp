@@ -42,6 +42,9 @@ static void InitMainClasses(MainWindow& program)
 	program.storage.StartThread();
 	program.extractor.StartThread();
 	program.importer.StartThread();
+
+	program.extractor.SetTargetProcess("TekkenGame-Win64-Shipping.exe", 0);
+	program.importer.SetTargetProcess("TekkenGame-Win64-Shipping.exe", 0);
 }
 
 // Free up memory and stop threads cleanly before exiting the program

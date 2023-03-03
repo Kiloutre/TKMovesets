@@ -35,7 +35,7 @@ protected:
 
 
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
-	void* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
+	char* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
 
 	// Creates the file to later write on. Return true if it succeeded.
 	bool CreateMovesetFile(const char* characterName, const char* gameIdentifierstring, bool overwriteSameFilename);

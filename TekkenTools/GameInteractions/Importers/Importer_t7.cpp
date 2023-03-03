@@ -35,6 +35,7 @@ void ImporterT7::CorrectMotaList(MovesetHeader& header, char* movesetData, gameA
 	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
 	uint64_t* fileMotaCursor = (uint64_t*)motaList;
 
+	// This is just a list of uint64_t anyway so might as well do this
 	for (size_t i = 0; i <= 12; ++i)
 	{
 		if (fileMotaCursor[i] == 0 || true) {
@@ -56,6 +57,7 @@ void ImporterT7::CorrectPtrList(MovesetHeader& header, char* movesetData, gameAd
 	gameAddr offset = gameMoveset + header.offsets.movesetBlock;
 
 	// LOL
+	// there has to be some better way to do this
 	*(uint64_t*)(&lists->reactions) += offset;
 	*(uint64_t*)&lists->requirement += offset;
 	*(uint64_t*)&lists->hitCondition += offset;
