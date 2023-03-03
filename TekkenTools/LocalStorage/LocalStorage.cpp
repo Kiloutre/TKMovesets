@@ -32,9 +32,9 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 		MovesetHeader_infos* movesetInfos = (MovesetHeader_infos*)&header;
 
 		if (readBytes != sizeof(MovesetHeader) ||
+			Helpers::isHeaderStringMalformated(movesetInfos->version_string, sizeof(movesetInfos->version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->origin, sizeof(movesetInfos->origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->target_character, sizeof(movesetInfos->target_character)) ||
-			Helpers::isHeaderStringMalformated(movesetInfos->version_string, sizeof(movesetInfos->version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->date, sizeof(movesetInfos->date))) {
 			// File malformated
 		}

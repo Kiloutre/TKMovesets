@@ -356,8 +356,10 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 
 	ExtractionErrcode errcode = ExtractionSuccesful;
 
-	if (movesetInfoBlock == nullptr)
-	{
+	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
+		|| movesetBlock == nullptr || animationBlock == nullptr || motaCustomBlock == nullptr) {
+		// Todo: maybe use new() and delete
+		// Todo: this still isn't safe right now because read/write on those pointers after allocating them
 		errcode = ExtractionAllocationErr;
 	}
 	else {

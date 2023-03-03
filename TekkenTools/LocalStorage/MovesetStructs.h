@@ -4,10 +4,10 @@
 
 struct MovesetHeader_infos
 {
+	// Version string of the extracted moveset
+	char version_string[32];
 	// ID of the game that the moveset was extracted from
 	int32_t gameId;
-	// Version string of the extracted moveset
-	char version_string[28];
 	// ID of the extracted character, used internally to make some moves that require it work
 	int32_t characterId;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
