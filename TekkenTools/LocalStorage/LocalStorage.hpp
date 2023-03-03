@@ -14,7 +14,7 @@ struct movesetInfo
 	std::string origin;
 	std::string target_character;
 	std::string version_string;
-	std::string date;
+	uint64_t date;
 	float size;
 	time_t modificationDate;
 };

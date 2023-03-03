@@ -13,7 +13,6 @@ GameProcessError GameProcess::AttachToNamedProcess(const char* processName, DWOR
 
 	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
 	else {
-		printf("process flags are %lld\n", processExtraFlags);
 		m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | processExtraFlags, FALSE, pid);
 		if (m_processHandle != nullptr && LoadGameMainModule(processName, pid)) {
 			processId = pid;

@@ -4,6 +4,7 @@
 #include "Submenu_Import.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
+#include "Helpers.hpp"
 
 void Submenu_Import::Render(GameImport *importerHelper)
 {
@@ -125,7 +126,7 @@ void Submenu_Import::Render(GameImport *importerHelper)
 				ImGui::TextUnformatted(moveset->target_character.c_str());
 
 				ImGui::TableNextColumn();
-				ImGui::TextUnformatted(moveset->date.c_str());
+				ImGui::TextUnformatted(Helpers::currentDateTime(moveset->date).c_str());
 
 				ImGui::TableNextColumn();
 				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
@@ -139,8 +140,8 @@ void Submenu_Import::Render(GameImport *importerHelper)
 				}
 				ImGui::PopID();
 			}
-			ImGui::PopID();
 		}
+		ImGui::PopID();
 
 		// Don't de-allocate moveset infos until we're done iterating on it
 		importerHelper->storage->CleanupUnusedMovesetInfos();

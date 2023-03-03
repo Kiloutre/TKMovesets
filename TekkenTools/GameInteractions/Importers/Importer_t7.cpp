@@ -4,31 +4,84 @@
 #include "Importer_t7.hpp"
 
 #include "Structs_t7.h"
-#include "GameAddresses.h"
-#include "MovesetStructs.h"
+
+using namespace t7structs;
 
 
 // -- Static helpers -- //
 
-
-static void* GetMovesetInfos(std::ifstream& file, MovesetHeader* out, uint64_t& movesetSize)
+static char* GetMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& movesetSize)
 {
-	file.read((char*)out, sizeof(MovesetHeader));
+	file.read((char*)header, sizeof(MovesetHeader));
 	file.seekg(0, std::ios::end);
 	movesetSize = file.tellg();
 	char* movesetData = (char*)malloc(movesetSize);
 	if (movesetData) {
-		file.seekg(out->offsets.movesetInfoBlock, std::ios::beg);
+		file.seekg(header->offsets.movesetInfoBlock + header->infos.header_size, std::ios::beg);
 		file.read(movesetData, movesetSize);
 	}
 	file.close();
 	return movesetData;
 }
 
+void ImporterT7::CorrectMotaList(MovesetHeader& header, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
+{
+	MotaList currentMotasList{};
+	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
+	m_process->readBytes(currentMovesetAddr + 0x280, &currentMotasList, sizeof(MotaList));
+
+	MotaList* motaList = (MotaList*)(movesetData + header.offsets.motalistsBlock);
+
+	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
+	uint64_t* fileMotaCursor = (uint64_t*)motaList;
+
+	for (size_t i = 0; i <= 12; ++i)
+	{
+		if (fileMotaCursor[i] == 0 || true) {
+			// Moveset block was not included in the file: copy the currently used one
+			fileMotaCursor[i] = gameMotaCursor[i];
+		}
+		else
+		{
+			// Todo: check if this works. I believe we are off.
+			fileMotaCursor[i] += gameMoveset;
+		}
+	}
+}
+
+void ImporterT7::CorrectPtrList(MovesetHeader& header, char* movesetData, gameAddr gameMoveset)
+{
+	MovesetLists* lists = (MovesetLists*)(movesetData + header.offsets.listsBlock);
+
+	gameAddr offset = gameMoveset + header.offsets.movesetBlock;
+
+	// LOL
+	*(uint64_t*)(&lists->reactions) += offset;
+	*(uint64_t*)&lists->requirement += offset;
+	*(uint64_t*)&lists->hitCondition += offset;
+	*(uint64_t*)&lists->projectile += offset;
+	*(uint64_t*)&lists->pushback += offset;
+	*(uint64_t*)&lists->pushbackExtradata += offset;
+	*(uint64_t*)&lists->cancel += offset;
+	*(uint64_t*)&lists->groupCancel += offset;
+	*(uint64_t*)&lists->cancelExtradata += offset;
+	*(uint64_t*)&lists->extraMoveProperty += offset;
+	*(uint64_t*)&lists->unknown_0x1f0 += offset;
+	*(uint64_t*)&lists->unknown_0x200 += offset;
+	*(uint64_t*)&lists->move += offset;
+	*(uint64_t*)&lists->voiceclip += offset;
+	*(uint64_t*)&lists->inputSequence += offset;
+	*(uint64_t*)&lists->input += offset;
+	*(uint64_t*)&lists->unknownParryRelated += offset;
+	*(uint64_t*)&lists->cameraData += offset;
+	*(uint64_t*)&lists->throws += offset;
+}
+
 // -- Public methods -- //
 
 ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float* progress)
 {
+	// Read file data
 	std::ifstream file;
 	file.open(filename, std::ios::binary);
 
@@ -38,21 +91,35 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 	MovesetHeader header{ 0 };
 
+	// Allocate a copy of the moveset locally. This is NOT in the game's memory
 	uint64_t movesetSize;
-	void *movesetData = GetMovesetInfos(file, &header, movesetSize);
+	char *movesetData = GetMovesetInfos(file, &header, movesetSize);
 	if (movesetData == nullptr) {
 		return ImportationAllocationErr;
 	}
-	;
-
-	gameAddr allocatedMovesetArea = m_process->allocateMem(movesetSize);
-	if (allocatedMovesetArea == 0) {
+	
+	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
+	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
+	gameAddr gameMoveset = m_process->allocateMem(movesetSize);
+	if (gameMoveset == 0) {
 		free(movesetData);
 		return ImportationGameAllocationErr;
 	}
 
-	printf("Moveset allocated at %llx\n", allocatedMovesetArea);
-	m_process->writeBytes(allocatedMovesetArea, movesetData, movesetSize);
+	// Correct/Convert everything that needs to be corrected/converted first
+
+	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
+	CorrectMotaList(header, movesetData, gameMoveset, playerAddress);
+	// Turn our moveset structures lists offsets into ptrs
+	CorrectPtrList(header, movesetData, gameMoveset);
+
+
+	// Finally lrite our moveset to the game's memory
+	printf("Moveset allocated at %llx\n", gameMoveset);
+	m_process->writeBytes(gameMoveset, movesetData, movesetSize);
+
+	// Todo: write moveset to player
+	// Todo: Write move 32769 to player
 
 	free(movesetData);
 	return ImportationSuccessful;

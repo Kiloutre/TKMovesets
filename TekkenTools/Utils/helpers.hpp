@@ -9,7 +9,7 @@
 namespace Helpers
 {
     // Gets the current date format in 'hour:minutes day/month/year'
-    std::string currentDateTime();
+    std::string currentDateTime(uint64_t date);
 
     // In a (moveset) list, can convert ptr members of every structure in the list into offsets
     void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount);

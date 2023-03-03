@@ -222,7 +222,8 @@ namespace t7structs
 		void* mota_8; // Camera
 		void* mota_9; // Camera
 		void* mota_10; // Unknown
-		void* mota_11; // Unnown
+		void* mota_11; // Unknown
+		void* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
 	};
 
 	struct MovesetLists

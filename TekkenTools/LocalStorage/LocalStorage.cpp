@@ -34,8 +34,7 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 		if (readBytes != sizeof(MovesetHeader) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->version_string, sizeof(movesetInfos->version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->origin, sizeof(movesetInfos->origin)) ||
-			Helpers::isHeaderStringMalformated(movesetInfos->target_character, sizeof(movesetInfos->target_character)) ||
-			Helpers::isHeaderStringMalformated(movesetInfos->date, sizeof(movesetInfos->date))) {
+			Helpers::isHeaderStringMalformated(movesetInfos->target_character, sizeof(movesetInfos->target_character))) {
 			// File malformated
 		}
 		else {
@@ -49,7 +48,7 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 				.origin = std::string(movesetInfos->origin),
 				.target_character = std::string(movesetInfos->target_character),
 				.version_string = std::string(movesetInfos->version_string),
-				.date = std::string(movesetInfos->date),
+				.date = movesetInfos->date,
 				.size = (float)totalSize / 1000 / 1000,
 				.modificationDate = buffer.st_mtime
 			};
@@ -119,7 +118,7 @@ void LocalStorage::ReloadMovesetList()
 				   .name = Helpers::getMovesetNameFromFilename(filename),
 				   .origin = std::string("INVALID"),
 				   .target_character = std::string(""),
-				   .date = std::string(""),
+				   .date = 0,
 				   .size = 0,
 				   .modificationDate = 0
 				};

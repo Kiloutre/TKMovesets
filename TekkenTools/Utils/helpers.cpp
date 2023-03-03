@@ -9,13 +9,13 @@
 
 namespace Helpers
 {
-	std::string currentDateTime() {
-		time_t     now = time(0);
+	std::string currentDateTime(uint64_t date) {
+		time_t     now = date;
 		struct tm  tstruct;
 		char       buf[20];
 
 		localtime_s(&tstruct, &now);
-		strftime(buf, sizeof(buf), "%H:%M %d/%m/%Y", &tstruct);
+		strftime(buf, sizeof(buf), "%d/%m/%Y %H:%M", &tstruct);
 		return std::string(buf);
 	}
 

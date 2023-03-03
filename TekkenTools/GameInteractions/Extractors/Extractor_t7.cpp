@@ -33,7 +33,7 @@ static std::vector<gameAddr> getMotaListAnims(MotaList* mota)
 {
 	std::vector<gameAddr> animAddrs;
 
-	for (size_t i = 0; i < 12; ++i)
+	for (size_t i = 0; i <= 12; ++i)
 	{
 		gameAddr motaAddr = (gameAddr)mota + i * sizeof(void*);
 		getMotaAnims(motaAddr, animAddrs);
@@ -114,6 +114,7 @@ static void fixMovesetOffsets(char* movesetBlock, const MovesetLists* lists, gam
 	}
 }
 
+// Find the closest anim address in order to establish the current anim's end. A bit hacky, but does the job until we can understand how to get 0x64 anims sizes
 static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> boundaries)
 {
 	for (gameAddr comp : boundaries)
@@ -131,22 +132,28 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 
 char* ExtractorT7::allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
 {
-	size_out = sizeof(MotaList);
+	// Custom block contains the mota files we want and does not contain the rest
+
+	std::map<gameAddr, uint64_t> offsetMap;
+
+	size_out = 4; // todo: change, obviously. Get the sizeof the blocks we want and allocate that.
 	char* customBlock = (char*)malloc(size_out);
 	if (customBlock == nullptr) {
 		size_out = 0;
 		return nullptr;
 	}
-
-	// Custom block: list of 12 uint64_t (mota offsets), followed by the mota themselves
-	// Set offset to 0 to indicate that we didn't export the corresponding mota file
-
-	memcpy(customBlock, motas, sizeof(MotaList));
-	// Convert mota offsets into ptrs by getting the size of each block
-
+	
+	//11 motas + 1 unknown (still clearly a ptr)
+	uint64_t* motaAddr = (uint64_t*)motas;
 	for (size_t i = 0; i < 12; ++i)
 	{
-		((int64_t*)customBlock)[i] = 0;
+		if (offsetMap.find(motaAddr[i]) != offsetMap.end()) {
+			motaAddr[i] = offsetMap[motaAddr[i]];
+		}
+		else {
+			// Set to 0 for mota block we aren't exporting
+			motaAddr[i] = 0;
+		}
 	}
 
 	return customBlock;
@@ -296,12 +303,12 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	gameAddr firstListAddr = (gameAddr)lists.reactions;
 	gameAddr lastListAddr = (gameAddr)lists.throws;
 
-	// Convert the list of ptr into a list of global offsets by substracting the head of the first list. Lists starts after the previous one ends so this works.
+	// Convert the list of ptr into a list of offsets relative to ???
 	Helpers::convertPtrsToOffsets(&lists, firstListAddr, (sizeof(void*) * 2), sizeof(lists) / sizeof(void*) / 2);
 
 	// Reads block containing basic moveset infos and aliases
 	uint64_t movesetInfoBlockSize = 0;
-	void* movesetInfoBlock = allocateAndReadBlock(movesetAddr + 0x8, movesetAddr + 0x150, movesetInfoBlockSize);
+	void* movesetInfoBlock = allocateAndReadBlock(movesetAddr, movesetAddr + 0x150, movesetInfoBlockSize);
 
 	// Reads block containing the actual moveset data
 	uint64_t movesetBlockSize = 0;
@@ -330,11 +337,6 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	fixMovesetOffsets((char*)movesetBlock, &lists, nameStart, animOffsetMap);
 
 
-	printf("movesetInfo size: %lld\n", movesetInfoBlockSize);
-	printf("movesetBlockSize size: %lld\n", movesetBlockSize);
-	printf("Name block size: %lld - %llx %llx\n", nameEnd - nameStart, nameStart, nameEnd);
-
-
 	// Setup our own header to write in the output file containg useful information
 	MovesetHeader header{0};
 	std::string characterName = GetPlayerCharacterName(playerAddress);
@@ -345,11 +347,16 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	strcpy(header.infos.version_string, MOVESET_VERSION_STRING);
 	strcpy(header.infos.origin, GetGameOriginString());
 	strcpy(header.infos.target_character, characterName.c_str());
-	strcpy(header.infos.date, Helpers::currentDateTime().c_str());
+	header.infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();;
+	header.infos.header_size = sizeof(MovesetHeader);
 
-	header.offsets.movesetInfoBlock = sizeof(header);
+	// Calculate each offsets according to the previous block offset + its size
+	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
+	// This is bceause you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
+	header.offsets.movesetInfoBlock = 0x0;
 	header.offsets.listsBlock = header.offsets.movesetInfoBlock + movesetInfoBlockSize;
-	header.offsets.nameBlock = header.offsets.listsBlock + sizeof(lists);
+	header.offsets.motalistsBlock = header.offsets.listsBlock + sizeof(lists);
+	header.offsets.nameBlock = header.offsets.motalistsBlock + sizeof(motasList);
 	header.offsets.movesetBlock = header.offsets.nameBlock + nameBlockSize;
 	header.offsets.animationBlock = header.offsets.movesetBlock + movesetBlockSize;
 	header.offsets.motaBlock = header.offsets.animationBlock + animationBlockSize;
@@ -370,6 +377,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 			m_file.write((char*)&header, sizeof(header));
 			m_file.write((char*)movesetInfoBlock, movesetInfoBlockSize);
 			m_file.write((char*)&lists, sizeof(lists));
+			m_file.write((char*)&motasList, sizeof(motasList));
 			m_file.write((char*)nameBlock, nameBlockSize);
 			m_file.write((char*)movesetBlock, movesetBlockSize);
 			m_file.write((char*)animationBlock, animationBlockSize);
