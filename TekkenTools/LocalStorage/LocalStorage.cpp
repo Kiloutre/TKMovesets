@@ -131,8 +131,8 @@ void LocalStorage::ReloadMovesetList()
 		movesetInfo* moveset = extractedMovesets[i];
 		struct stat buffer;
 
-		if ((stat(moveset->filename.c_str(), &buffer) != 0) || buffer.st_mtime != moveset->modificationDate) {
-			// File does not exist anymore, de-allocate the info we stored about it
+		if ((stat(moveset->filename.c_str(), &buffer) != 0) || (moveset->modificationDate != 0 && buffer.st_mtime != moveset->modificationDate)) {
+			// File does not exist anymore or was recently modified, de-allocate the info we stored about it
 			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
 			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);

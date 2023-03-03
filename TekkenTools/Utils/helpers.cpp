@@ -75,10 +75,15 @@ namespace Helpers
 		size_t i = 0;
 
 		while (i < size && str[i] != '\0') {
-			if (isalnum(str[i]) == 0 && strchr(MOVESET_HEADER_STRING_CHARSET, str[i]) == nullptr) {
+			if (isalnum((unsigned char)str[i]) == 0 && strchr(MOVESET_HEADER_STRING_CHARSET, str[i]) == nullptr) {
 				return true;
 			}
 			++i;
+		}
+
+		if (i == 0) {
+			// Empty string
+			return true;
 		}
 
 		return str[i] != '\0'; // Ensure last char is a nullbyte

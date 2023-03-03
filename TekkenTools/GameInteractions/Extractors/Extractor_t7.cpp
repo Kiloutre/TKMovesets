@@ -249,7 +249,7 @@ uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
 
 // -- Public methods -- //
 
-void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwriteSameFilename)
+void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename)
 {
 	using std::chrono::high_resolution_clock;
 	auto t1 = high_resolution_clock::now();
@@ -310,6 +310,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, bool overwrit
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 
 	header.flags = 0;
+	header.gameId = gameId;
 	header.characterId = GetCharacterID(playerAddress);
 	strcpy(header.version_string, MOVESET_VERSION_STRING);
 	strcpy(header.origin, GetGameOriginString());

@@ -112,7 +112,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 	if (ImGui::BeginTable("##", 7, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
 	{
-		ImGui::TableSetupColumn("##", 0, 6.0f);
+		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));

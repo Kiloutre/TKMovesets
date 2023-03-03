@@ -52,7 +52,7 @@ void GameExtract::RunningUpdate()
 	while (m_playerAddress.size() > 0)
 	{
 		// Start extraction
-		m_extractor->Extract(m_playerAddress[0], &progress, overwriteSameFilename);
+		m_extractor->Extract(m_playerAddress[0], &progress, currentGameId, overwriteSameFilename);
 		m_playerAddress.erase(m_playerAddress.begin());
 	}
 }
