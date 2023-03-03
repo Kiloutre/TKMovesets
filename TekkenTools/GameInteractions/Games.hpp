@@ -2,6 +2,11 @@
 
 #include <stdint.h>
 
+#include "GameData.hpp"
+#include "GameProcess.hpp"
+#include "Extractor_t7.hpp"
+#include "Importer_t7.hpp"
+
 #include "constants.h"
 
 enum GameFlag
@@ -37,4 +42,8 @@ namespace Games
 
 	// Returns the amount of supported games
 	DLLCONTENT size_t GetGamesCount();
+
+	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game);
+
+	DLLCONTENT Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game);
 }

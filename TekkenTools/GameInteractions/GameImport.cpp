@@ -6,9 +6,8 @@
 #include <filesystem>
 
 #include "GameImport.hpp"
-#include "GameAddressesFile.hpp"
+#include "Games.hpp"
 #include "Importer.hpp"
-#include "Importer_t7.hpp"
 #include "helpers.hpp"
 
 #include "constants.h"
@@ -30,19 +29,7 @@ void GameImport::InstantiateFactory()
 	}
 
 	// Every game has its own extraction subtleties so we use polymorphism to manage that
-
-	switch (currentGameId)
-	{
-	case GameId_t7:
-		m_importer = new ImporterT7(process, game);
-		break;
-	case GameId_t8:
-		m_importer = nullptr;
-		break;
-	case GameId_ttt2:
-		m_importer = nullptr;
-		break;
-	}
+	m_importer = Games::FactoryGetImporter(currentGameId, process, game);
 }
 
 

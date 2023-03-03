@@ -11,7 +11,7 @@
 #include "GameAddresses.h"
 
 // Base class for extracting from a game
-class Importer
+class DLLCONTENT Importer
 {
 protected:
 	// Stores the extraction directory

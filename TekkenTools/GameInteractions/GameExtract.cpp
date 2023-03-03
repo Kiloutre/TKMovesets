@@ -6,9 +6,8 @@
 #include <filesystem>
 
 #include "GameExtract.hpp"
-#include "GameAddressesFile.hpp"
+#include "Games.hpp"
 #include "Extractor.hpp"
-#include "Extractor_t7.hpp"
 #include "helpers.hpp"
 
 #include "constants.h"
@@ -41,20 +40,7 @@ void GameExtract::InstantiateFactory()
 		delete m_extractor;
 	}
 
-	// Every game has its own extraction subtleties so we use polymorphism to manage that
-
-	switch (currentGameId)
-	{
-	case GameId_t7:
-		m_extractor = new ExtractorT7(process, game);
-		break;
-	case GameId_t8:
-		m_extractor = nullptr;
-		break;
-	case GameId_ttt2:
-		m_extractor = nullptr;
-		break;
-	}
+	m_extractor = Games::FactoryGetExtractor(currentGameId, process, game);
 }
 
 void GameExtract::RunningUpdate()

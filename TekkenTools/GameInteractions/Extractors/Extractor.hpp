@@ -16,7 +16,7 @@ namespace ExtractorUtils
 };
 
 // Base class for extracting from a game
-class Extractor
+class DLLCONTENT Extractor
 {
 protected:
 	// Stores the extraction directory

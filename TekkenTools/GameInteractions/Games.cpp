@@ -1,4 +1,6 @@
 #include "Games.hpp"
+#include "Extractor_t7.hpp"
+#include "Importer_t7.hpp"
 
 const GameInfo cg_gamesInfo[] = {
 	{
@@ -34,5 +36,28 @@ namespace Games
 	size_t GetGamesCount()
 	{
 		return sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo);
+	}
+
+
+	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
+	{
+		switch (gameId)
+		{
+		case GameId_t7:
+			return new ExtractorT7(process, game);
+			break;
+		}
+		return nullptr;
+	}
+
+	DLLCONTENT Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game)
+	{
+		switch (gameId)
+		{
+		case GameId_t7:
+			return new ImporterT7(process, game);
+			break;
+		}
+		return nullptr;
 	}
 };
