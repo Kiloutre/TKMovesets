@@ -39,7 +39,7 @@ namespace Games
 	}
 
 
-	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
+	Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
 	{
 		switch (gameId)
 		{
@@ -50,7 +50,7 @@ namespace Games
 		return nullptr;
 	}
 
-	DLLCONTENT Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game)
+	Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game)
 	{
 		switch (gameId)
 		{
