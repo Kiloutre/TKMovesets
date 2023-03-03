@@ -55,7 +55,7 @@ static void fixMovesetOffsets(char* movesetBlock, const MovesetLists* lists, gam
 	{
 		move->name -= nameStart;
 		move->anim_name -= nameStart;
-		*(char*)(&move->anim_addr) = animOffsetMap[(gameAddr)move->anim_addr];
+		*(uint64_t*)(&move->anim_addr) = animOffsetMap[(gameAddr)move->anim_addr];
 		move->cancel_addr -= (gameAddr)lists->cancel;
 		move->hit_condition_addr -= (gameAddr)lists->hitCondition;
 		move->voicelip_addr -= (gameAddr)lists->voiceclip;
@@ -389,7 +389,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	free(nameBlock);
 	free(movesetBlock);
 	free(animationBlock);
-	free(motaCustomBlockSize);
+	free(motaCustomBlock);
 
 
 	auto t2 = high_resolution_clock::now();
