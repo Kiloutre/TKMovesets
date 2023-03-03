@@ -16,7 +16,7 @@ namespace ExtractorUtils
 		uint32_t header_size = bone_count * 0x4 + 0x8;
 		uint32_t frame_size = bone_count * 0x4 * 3;
 		uint32_t length = process->readInt32(anim + 4);
-		return header_size + frame_size * length;
+		return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
 	}
 };
 
@@ -27,6 +27,10 @@ void* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	size_t blockSize = blockEnd - blockStart;
 
 	void* block = malloc(sizeof(char) * blockSize);
+	if (block == nullptr) {
+		size_out = 0;
+		return nullptr;
+	}
 	m_process->readBytes(blockStart, block, blockSize);
 	size_out = blockSize;
 

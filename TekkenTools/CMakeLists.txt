@@ -86,4 +86,3 @@ target_link_libraries(TekkenTools PRIVATE glfw)
 
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries(TekkenTools PRIVATE imgui::imgui)
-

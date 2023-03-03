@@ -131,6 +131,10 @@ char* ExtractorT7::allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
 {
 	size_out = sizeof(MotaList);
 	char* customBlock = (char*)malloc(size_out);
+	if (customBlock == nullptr) {
+		size_out = 0;
+		return nullptr;
+	}
 
 	// Custom block: list of 12 uint64_t (mota offsets), followed by the mota themselves
 	// Set offset to 0 to indicate that we didn't export the corresponding mota file
@@ -231,7 +235,10 @@ void* ExtractorT7::GetAnimations(t7structs::Move* movelist, size_t moveCount, ui
 	printf("Anim total size: %lld (%f MB)\n", totalSize, (float)totalSize / 1000000);
 
 	// Allocate block
-	animationBlock = malloc(totalSize);
+	if (!(animationBlock = malloc(totalSize))) {
+		size_out = 0;
+		return nullptr;
+	}
 
 	// Read animations and write to our block
 	unsigned char *animationBlockCursor = (unsigned char*)animationBlock;

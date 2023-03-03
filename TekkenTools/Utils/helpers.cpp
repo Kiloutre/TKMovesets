@@ -85,7 +85,6 @@ namespace Helpers
 			// Empty string
 			return true;
 		}
-
 		return str[i] != '\0'; // Ensure last char is a nullbyte
 	}
 
