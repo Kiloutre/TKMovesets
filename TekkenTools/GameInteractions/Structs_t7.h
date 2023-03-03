@@ -209,7 +209,7 @@ namespace t7structs
 
 	// -- Other -- //
 
-	struct motaList
+	struct MotaList
 	{
 		void* mota_0; // Anims
 		void* mota_1; // Anims
@@ -225,7 +225,7 @@ namespace t7structs
 		void* mota_11; // Unnown
 	};
 
-	struct movesetLists
+	struct MovesetLists
 	{
 		t7structs::Reactions* reactions;
 		uint64_t reactionsCount;

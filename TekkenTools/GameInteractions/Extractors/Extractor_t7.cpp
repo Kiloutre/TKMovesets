@@ -5,10 +5,9 @@
 
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
-#include "LocalStorage.hpp"
 
+#include "MovesetStructs.h"
 #include "Structs_t7.h"
-#include "GameAddresses.h"
 
 using namespace t7structs;
 
@@ -22,13 +21,15 @@ using namespace t7structs;
 
 // -- Static helpers -- //
 
+// Returns a list of anim absolute addresses contained within a mota
 static void getMotaAnims(gameAddr motaAddr, std::vector<gameAddr> &animAddr)
 {
 	// read header
 	// push motaAddr + offsets
 }
 
-static std::vector<gameAddr> getMotaListAnims(t7structs::motaList* mota)
+// Returns a list of anim absolute addresses contained within every mota
+static std::vector<gameAddr> getMotaListAnims(MotaList* mota)
 {
 	std::vector<gameAddr> animAddrs;
 
@@ -42,7 +43,7 @@ static std::vector<gameAddr> getMotaListAnims(t7structs::motaList* mota)
 }
 
 // Converts abslute ptr into relative offsets before saving to file
-static void fixMovesetOffsets(char* movesetBlock, const movesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
+static void fixMovesetOffsets(char* movesetBlock, const MovesetLists* lists, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
 	// Todo: maybe turn this into callback for ease of reading?
 
@@ -124,6 +125,25 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 	printf("No boundary found for %llx\n", animAddr);
 	// Arbitrary 1KB size for anims where we can't find a close enough boundary
 	return animAddr + 1000 + 1;
+}
+
+char* ExtractorT7::allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
+{
+	size_out = sizeof(MotaList);
+	char* customBlock = (char*)malloc(size_out);
+
+	// Custom block: list of 12 uint64_t (mota offsets), followed by the mota themselves
+	// Set offset to 0 to indicate that we didn't export the corresponding mota file
+
+	memcpy(customBlock, motas, sizeof(MotaList));
+	// Convert mota offsets into ptrs by getting the size of each block
+
+	for (size_t i = 0; i < 12; ++i)
+	{
+		((int64_t*)customBlock)[i] = 0;
+	}
+
+	return customBlock;
 }
 
 // -- Private methods -- //
@@ -260,10 +280,10 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 
 	// Get the size of the various lists in the moveset, will need that later. We matched the same structure they did so a single read cab fill it.
-	t7structs::movesetLists lists{};
-	t7structs::motaList motaList{};
-	m_process->readBytes(movesetAddr + 0x150, &lists, sizeof(t7structs::movesetLists));
-	m_process->readBytes(movesetAddr + 0x280, &motaList, sizeof(t7structs::motaList));
+	MovesetLists lists{};
+	MotaList motasList{};
+	m_process->readBytes(movesetAddr + 0x150, &lists, sizeof(MovesetLists));
+	m_process->readBytes(movesetAddr + 0x280, &motasList, sizeof(MotaList));
 
 	// Keep these two separated cause the list will lose them (on purpose) but need them for covnerting ptr into offsets
 	gameAddr firstListAddr = (gameAddr)lists.reactions;
@@ -282,7 +302,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 	t7structs::Move* movelist = (t7structs::Move*)((int64_t)movesetBlock + (int64_t)lists.move);
 
 	// Prepare anim list to properly guess size of anims
-	std::vector<gameAddr> animList = getMotaListAnims(&motaList);
+	std::vector<gameAddr> animList = getMotaListAnims(&motasList);
 	// Extract animations and build a map for their old address -> their new offset
 	std::map<gameAddr, uint64_t> animOffsetMap;
 	uint64_t animationBlockSize = 0;
@@ -293,7 +313,10 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 	gameAddr nameEnd = 0;
 	getNamesBlockBounds(movelist, lists.moveCount, nameStart, nameEnd);
 	uint64_t nameBlockSize = 0;
-	void *nameBlock = allocateAndReadBlock(nameStart, nameEnd, nameBlockSize);
+	void* nameBlock = allocateAndReadBlock(nameStart, nameEnd, nameBlockSize);
+
+	uint64_t motaCustomBlockSize = 0;
+	void* motaCustomBlock = allocateMotaCustomBlock(&motasList, motaCustomBlockSize);
 
 
 	// Now that we extracted everything, we can properly convert pts to offsets
@@ -309,20 +332,20 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 	MovesetHeader header{0};
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 
-	header.flags = 0;
-	header.gameId = gameId;
-	header.characterId = GetCharacterID(playerAddress);
-	strcpy(header.version_string, MOVESET_VERSION_STRING);
-	strcpy(header.origin, GetGameOriginString());
-	strcpy(header.target_character, characterName.c_str());
-	strcpy(header.date, Helpers::currentDateTime().c_str());
+	header.infos.flags = 0;
+	header.infos.gameId = gameId;
+	header.infos.characterId = GetCharacterID(playerAddress);
+	strcpy(header.infos.version_string, MOVESET_VERSION_STRING);
+	strcpy(header.infos.origin, GetGameOriginString());
+	strcpy(header.infos.target_character, characterName.c_str());
+	strcpy(header.infos.date, Helpers::currentDateTime().c_str());
 
-	header.movesetInfoBlockOffset = sizeof(header);
-	header.listsBlockOffset = header.movesetInfoBlockOffset + movesetInfoBlockSize;
-	header.nameBlockOffset = header.listsBlockOffset + sizeof(lists);
-	header.movesetBlockOffset = header.nameBlockOffset + nameBlockSize;
-	header.animationBlockOffset = header.movesetBlockOffset + movesetBlockSize;
-	header.motaBlockOffset = header.animationBlockOffset + animationBlockSize;
+	header.offsets.movesetInfoBlockOffset = sizeof(header);
+	header.offsets.listsBlockOffset = header.offsets.movesetInfoBlockOffset + movesetInfoBlockSize;
+	header.offsets.nameBlockOffset = header.offsets.listsBlockOffset + sizeof(lists);
+	header.offsets.movesetBlockOffset = header.offsets.nameBlockOffset + nameBlockSize;
+	header.offsets.animationBlockOffset = header.offsets.movesetBlockOffset + movesetBlockSize;
+	header.offsets.motaBlockOffset = header.offsets.animationBlockOffset + animationBlockSize;
 
 	// Create the file
 	if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
@@ -334,7 +357,7 @@ void ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameI
 		m_file.write((char*)nameBlock, nameBlockSize);
 		m_file.write((char*)movesetBlock, movesetBlockSize);
 		m_file.write((char*)animationBlock, animationBlockSize);
-		//m_file.write((char*)customMotaBlock, customMotaBlockSize);
+		m_file.write((char*)motaCustomBlock, motaCustomBlockSize);
 
 		// Extraction is over
 		CloseMovesetFile();

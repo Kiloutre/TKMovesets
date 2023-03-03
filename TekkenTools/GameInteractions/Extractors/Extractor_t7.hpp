@@ -30,4 +30,7 @@ private:
 	void* GetAnimations(t7structs::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr>& animList);
 	// Attempts to find the animation size in memory
 	uint64_t TryFindAnimSize(gameAddr anim, size_t maxSize);
+
+	// Returns an allocated block containing mota block offsets followed by mota blocks
+	char* allocateMotaCustomBlock(t7structs::MotaList* motas, uint64_t& size_out);
 };
