@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <vector>
 
 #include "GameAddresses.h"
@@ -13,14 +14,18 @@ private:
 	std::map<std::string, std::vector<gameAddr> > m_relative_pointer_paths;
 	// List of entry in the address list file
 	std::vector<std::string> m_entries;
-
+	// Mutex used to avoid m_entries iterator crashing because of concurrent m_entries modification
+	std::mutex m_entries_mutex;
 public:
+
 	GameAddressesFile();
 
-	// Reload the game addresses file. Do not call: the re-assignation of m_entries would cause any thread iterating on it to throw. TODO : fix this to implement live reload (really not important). Mutex?
+	// Reload the game addresses file.
 	void Reload();
-	// Returns a list of every game_address.txt entry (key only)
+	// Returns a list of every game_address.txt entry (key only). Locks a mutex that has to be unlocked by UnlockEntriesMutex() after finishing with the variable.
 	const std::vector<std::string> GetAllEntries();
+	// Unlocks the mutex locked by GetAllEntries()
+	void UnlockEntriesMutex();
 	// Returns a single numerical value from the file
 	const int64_t GetSingleValue(const char* c_addressId);
 	// Returns a pointer path, that may rely on the base address or not.

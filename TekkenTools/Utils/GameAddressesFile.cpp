@@ -95,12 +95,21 @@ void GameAddressesFile::Reload()
 	// So can't clear them at the start and build them little by little.
 	m_absolute_pointer_paths = absolute_pointer_paths;
 	m_relative_pointer_paths = relative_pointer_paths;
+	
+	m_entries_mutex.lock();
 	m_entries = entries;
+	m_entries_mutex.unlock();
 }
 
 const std::vector<std::string> GameAddressesFile::GetAllEntries()
 {
+	m_entries_mutex.lock();
 	return m_entries;
+}
+
+void GameAddressesFile::UnlockEntriesMutex()
+{
+	m_entries_mutex.unlock();
 }
 
 const int64_t GameAddressesFile::GetSingleValue(const char* c_addressId)
