@@ -14,9 +14,9 @@ namespace StructsT7
 
 	struct Pushback
 	{
-		int16_t duration;
+		uint16_t duration;
 		int16_t displacement;
-		int32_t num_of_loops;
+		uint32_t num_of_loops;
 		PushbackExtradata* extradata_addr;
 	};
 
@@ -84,7 +84,8 @@ namespace StructsT7
 	struct HitCondition
 	{
 		Requirement* requirement_addr;
-		uint64_t damage;
+		uint32_t damage;
+		uint32_t _0xC_int; // What the hell is this? since when has this been here?
 		Reactions* reactions_addr;
 	};
 
@@ -110,7 +111,7 @@ namespace StructsT7
 	struct InputSequence
 	{
 		uint16_t input_window_frames; // I assume the max amount of frames between the first &last input
-		uint16_t input_amount;
+		uint16_t input_amount; // The amount of input to read from input_addr
 		int32_t _0x4_int; // Apparently unused
 		Input* input_addr;
 	};
@@ -206,6 +207,20 @@ namespace StructsT7
 		int16_t _0xAC_short;
 	};
 
+	// THE SIZE FOR THIS ONE IS NOT KNOWN
+	// Todo: extract __every__ character. See who has this filled to establish struct size.
+	struct unknown_0x1f0__unknown_size
+	{
+		char content[1];
+	};
+
+	struct unknown_0x200
+	{
+		Cancel* cancel_addr;
+		uint32_t requirement_req; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
+		uint32_t _0xC_int; // Often small values
+	};
+
 
 	// -- Other -- //
 
@@ -293,9 +308,9 @@ namespace StructsT7_gameAddr
 {
 	struct Pushback
 	{
-		int16_t duration;
+		uint16_t duration;
 		int16_t displacement;
-		int32_t num_of_loops;
+		uint32_t num_of_loops;
 		gameAddr extradata_addr;
 	};
 
@@ -352,14 +367,15 @@ namespace StructsT7_gameAddr
 	struct HitCondition
 	{
 		gameAddr requirement_addr;
-		uint64_t damage;
+		uint32_t damage;
+		uint32_t _0xC_int; // What the hell is this? since when has this been here?
 		gameAddr reactions_addr;
 	};
 
 	struct InputSequence
 	{
 		uint16_t input_window_frames; // I assume the max amount of frames between the first &last input
-		uint16_t input_amount;
+		uint16_t input_amount; // The amount of inputs to read from inputAddr
 		int32_t _0x4_int; // Apparently unused
 		gameAddr input_addr;
 	};
@@ -401,6 +417,13 @@ namespace StructsT7_gameAddr
 	{
 		int32_t _0x0_int;
 		gameAddr cameradata_addr;
+	};
+
+	struct unknown_0x200
+	{
+		gameAddr cancel_addr;
+		uint32_t requirement_req; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
+		uint32_t _0xC_int; // Often small values
 	};
 
 	struct Move
@@ -477,10 +500,10 @@ namespace StructsT7_gameAddr
 		uint64_t extraMovePropertyCount;
 
 		gameAddr unknown_0x1f0;
-		uint64_t unknown_0x1f8;
+		uint64_t unknown_0x1f0_size;
 
 		gameAddr unknown_0x200;
-		uint64_t unknown_0x208;
+		uint64_t unknown_0x200_size;
 
 		gameAddr move;
 		uint64_t moveCount;

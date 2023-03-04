@@ -34,11 +34,8 @@ static std::vector<gameAddr> getMotaListAnims(MotaList* mota, std::vector<gameAd
 	return animAddrs;
 }
 
-// Converts absolute ptr into relative offsets before saving to file
-// I know Tekken does the same but convertes to indexes instead of ptrs.
-// I just don't think it's a good idea.
-
-static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
+// Converts absolute ptr into indexes before saving to file
+static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
 	size_t i;
 
@@ -105,6 +102,13 @@ static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetTable
 	{
 		TO_INDEX(hitCondition->requirement_addr, table.requirement, Requirement);
 		TO_INDEX(hitCondition->reactions_addr, table.reactions, Reactions);
+	}
+
+	// Convert ??? ptrs
+	i = 0;
+	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(movesetBlock + offsets.unknown_0x200); i < table.unknown_0x200_size; ++i, ++unknown)
+	{
+		TO_INDEX(unknown->cancel_addr, table.cancel, Cancel);
 	}
 }
 
@@ -382,8 +386,8 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	movesetInfoBlock = allocateAndReadBlock(movesetAddr, movesetAddr + 0x150, s_movesetInfoBlock);
 
 
-	// Now that we extracted everything, we can properly convert pts to offsets
-	convertMovesetPointers(movesetBlock, table, offsets, nameBlockStart, animOffsets);
+	// Now that we extracted everything, we can properly convert pts to indexes
+	convertMovesetPointersToIndexes(movesetBlock, table, offsets, nameBlockStart, animOffsets);
 
 	// -- Extraction & data conversion finished --
 
