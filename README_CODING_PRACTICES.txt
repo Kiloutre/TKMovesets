@@ -6,10 +6,11 @@ Syntax norms and whatnot to make things consistent and clear throughout the proj
 // -- File structure -- //
 - include groups: first (#include <>) for librairies that aren't ours, then our (#include ".hpp"), then our (#include ".h")
 - Class .cpp files should be structured as such: 
-  -- Static helpers --
+  -- Helpers (static or in namespace if used elsewhere) --
   -- Private methods --
   -- Public methods --
 - Class .hpp files should be structured as such:
+  - Helpers (in namespace)
   - Private members, then private methods
   - Protected members, then protected methods
   - Public members, then public methods
@@ -22,20 +23,16 @@ Syntax norms and whatnot to make things consistent and clear throughout the proj
   
 // -- Commenting -- //
 - Static helpers should contain a explanation of their purpose right above their definitions
-- Functions, structs, classes, methods and members contain a explanation of their purpose right above their declaration
-- Generally should add comment explaining a function's code step by step unless it's a really small and obvious one
-- Enums should have a comment for each of their entry
+- Functions, structs, classes, methods and members contain a explanation of their purpose right above their declaration.h
+- Generally should add comments explaining a function's code step by step unless it's a really small and obvious one
+- Enums should have a comment for each of their entry if there's any useful detail to add
 
 // -- Naming -- //
-- Functions should start with an upper case
-- Helper s functions, static or not should start with a lower cases
-- camelCase
-- Constant should be prefixed c_
-- Globals should be suffixed g_
+- Functions/methods should start with an upper case, unless it's a static/function in namespace 
+- camelCase for everything
+- Constant should be prefixed c_, globals prefixed by g_
 Classes:
-- Class names should start with an upper case
 - Private/Protected members should be prefixed m_
-- Methods should start with an upper case
 Game structs:
 - snake_case for members
 
