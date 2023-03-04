@@ -6,7 +6,7 @@
 
 #include "GameAddressesFile.hpp"
 
-static std::vector<gameAddr> ParsePtrPathString(std::string path)
+static std::vector<gameAddr> parsePtrPathString(std::string path)
 {
 	std::vector<gameAddr> ptrPath = std::vector<gameAddr>();
 
@@ -82,10 +82,10 @@ void GameAddressesFile::Reload()
 
 		if (value.rfind("+", 0) == 0) {
 			// Entries starting with '+' are relative to the module address
-			relative_pointer_paths[key] = ParsePtrPathString(value.substr(1));
+			relative_pointer_paths[key] = parsePtrPathString(value.substr(1));
 		}
 		else {
-			absolute_pointer_paths[key] = ParsePtrPathString(value);
+			absolute_pointer_paths[key] = parsePtrPathString(value);
 		}
 
 		entries.push_back(key);

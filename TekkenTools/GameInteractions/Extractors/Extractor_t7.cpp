@@ -2,20 +2,13 @@
 #include <cctype>
 #include <stddef.h>
 #include <iterator>
+#include <algorithm>
 
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
 
 #include "MovesetStructs.h"
 #include "Structs_t7.h"
-
-// Todo: remove
-#include <format>
-#include <chrono>
-#include <stdio.h>
-#include <iostream>
-#include <algorithm>
-#include <functional>
 
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
@@ -127,7 +120,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 			return comp;
 		}
 	}
-	printf("No boundary found for %llx\n", animAddr);
+	printf("No boundary found for anim %llx, extracting only 1KB\n", animAddr);
 	// Arbitrary 1KB size for anims where we can't find a close enough boundary
 	return animAddr + 1000 + 1;
 }
@@ -223,7 +216,7 @@ char* ExtractorT7::GetAnimations(Move* movelist, size_t moveCount, uint64_t &siz
 			boundaries.push_back(anim_addr);
 		}
 	}
-	// Sort boundaries list
+	// Sort boundaries list because we will iterate on it, trying to find the first item higher than what we're comparing with
 	std::sort(boundaries.begin(), boundaries.end());
 	
 	// Find anim sizes and establish offsets
@@ -233,10 +226,7 @@ char* ExtractorT7::GetAnimations(Move* movelist, size_t moveCount, uint64_t &siz
 		gameAddr animAddr = addrList[i];
 		gameAddr maxAnimEnd = getClosestBoundary(animAddr, boundaries);
 
-		uint64_t animSize = TryFindAnimSize(animAddr, maxAnimEnd - animAddr);
-
-
-		//printf("%lld,%llx\n", animSize, animAddr);
+		uint64_t animSize = GetAnimationSize(animAddr, maxAnimEnd - animAddr);
 
 		offsets[animAddr] = totalSize;
 		animSizes[animAddr] = animSize;
@@ -264,7 +254,7 @@ char* ExtractorT7::GetAnimations(Move* movelist, size_t moveCount, uint64_t &siz
 	return animationBlock;
 }
 
-uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
+uint64_t ExtractorT7::GetAnimationSize(gameAddr anim, size_t maxSize)
 {
 	// Attempts to try to get an animation's size
 	unsigned char animType = m_process->readInt8(anim);
@@ -289,12 +279,6 @@ uint64_t ExtractorT7::TryFindAnimSize(gameAddr anim, size_t maxSize)
 
 ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename)
 {
-	using std::chrono::high_resolution_clock;
-	auto t1 = high_resolution_clock::now();
-	using std::chrono::duration_cast;
-	using std::chrono::duration;
-	using std::chrono::milliseconds;
-
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 
 	// Get the size of the various lists in the moveset, will need that later. We matched the same structure they did so a single read cab fill it.
@@ -407,11 +391,6 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	free(animationBlock);
 	free(motaCustomBlock);
 
-
-	auto t2 = high_resolution_clock::now();
-	auto ms_int = duration_cast<milliseconds>(t2 - t1);
-	duration<double, std::milli> ms_double = t2 - t1;
-	std::cout << ms_int.count() << "ms - " << ms_double.count() << "ms\n";
 	return errcode;
 }
 
@@ -486,14 +465,4 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)
 {
 	return m_process->readInt16(playerAddress + 0xD8);
-}
-
-const char* ExtractorT7::GetGameIdentifierString()
-{
-	return "T7_";
-}
-
-const char* ExtractorT7::GetGameOriginString()
-{
-	return "Tekken 7";
 }

@@ -11,7 +11,7 @@
 
 // -- Static helpers -- //
 
-static char* GetMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& movesetSize)
+static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& movesetSize)
 {
 	file.read((char*)header, sizeof(MovesetHeader));
 	file.seekg(0, std::ios::end);
@@ -58,7 +58,6 @@ void ImporterT7::CorrectPtrList(MovesetHeader& header, char* movesetData, gameAd
 	gameAddr offset = gameMoveset + header.offsets.movesetBlock;
 
 	// LOL
-	// there has to be some better way to do this
 	*(uint64_t*)(&lists->reactions) += offset;
 	*(uint64_t*)&lists->requirement += offset;
 	*(uint64_t*)&lists->hitCondition += offset;
@@ -96,7 +95,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
 	uint64_t movesetSize;
-	char *movesetData = GetMovesetInfos(file, &header, movesetSize);
+	char *movesetData = getMovesetInfos(file, &header, movesetSize);
 	if (movesetData == nullptr) {
 		return ImportationAllocationErr;
 	}
