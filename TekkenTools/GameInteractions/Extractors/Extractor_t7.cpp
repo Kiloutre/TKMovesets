@@ -123,7 +123,7 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(movesetBlock + offsets.unknown_0x200); i < table.unknown_0x200_size; ++i, ++unknown)
 	{
-		TO_INDEX(unknown->cancel_addr, table.cancel, Cancel);
+		TO_INDEX(unknown->requirements_addr, table.requirement, Cancel);
 	}
 }
 
