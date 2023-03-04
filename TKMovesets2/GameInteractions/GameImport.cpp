@@ -51,6 +51,13 @@ void GameImport::RunningUpdate()
 	}
 }
 
+void GameImport::PreProcessDetach()
+{
+	if (free_unused_movesets) {
+		m_importer->CleanupUnusedMovesets();
+	}
+}
+
 // -- Public methods -- //
 
 void GameImport::StopThreadAndCleanup()
@@ -60,6 +67,9 @@ void GameImport::StopThreadAndCleanup()
 	m_t.join();
 
 	if (m_importer != nullptr) {
+		if (free_unused_movesets && process->IsAttached()) {
+			m_importer->CleanupUnusedMovesets();
+		}
 		delete m_importer;
 	}
 }

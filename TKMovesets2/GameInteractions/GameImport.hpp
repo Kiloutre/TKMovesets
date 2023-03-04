@@ -22,6 +22,8 @@ private:
 	void InstantiateFactory() override;
 	// Function ran in the parallel thread, used to latch on to process
 	void RunningUpdate() override;
+	// Called before detaching form the current process
+	void PreProcessDetach() override;
 
 public:
 	// PlayerID to apply the moveset to

@@ -23,6 +23,8 @@ protected:
 	virtual void RunningUpdate() = 0;
 	// Callback called when the process has latched on a process for the first time
 	virtual void OnProcessAttach() = 0;
+	// Called before detaching from the process when executing SetTargetProces()
+	virtual void PreProcessDetach() {};
 
 	// Function ran in the parallel thread, executed regularly
 	void Update();
