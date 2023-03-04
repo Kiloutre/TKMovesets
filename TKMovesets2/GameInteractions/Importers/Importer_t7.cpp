@@ -195,7 +195,7 @@ void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, cons
 	i = 0;
 	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(moveset + blockOffsets.movesetBlock + offsets->unknown_0x200); i < offsets->unknown_0x200_size; ++i, ++unknown)
 	{
-		FROM_INDEX(unknown->requirements_addr, blockOffset + offsets->cancel, Requirement);
+		FROM_INDEX(unknown->requirements_addr, blockOffset + offsets->requirement, Requirement);
 	}
 }
 
