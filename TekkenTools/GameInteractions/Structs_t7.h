@@ -193,8 +193,8 @@ namespace StructsT7
 		uint32_t airborne_start;
 		uint32_t airborne_end;
 		uint32_t ground_fall;
-		Voiceclip* voicelip_addr;
-		ExtraMoveProperty* extra_move_property_addr;
+		Voiceclip* voicelip_addr; // Can be NULL
+		ExtraMoveProperty* extra_move_property_addr; // Can be NULL
 		int64_t _0x88_llong; // 0
 		int64_t _0x90_llong; // 0
 		int32_t _0x98_int;
@@ -429,8 +429,8 @@ namespace StructsT7_gameAddr
 		uint32_t airborne_start;
 		uint32_t airborne_end;
 		uint32_t ground_fall;
-		gameAddr voicelip_addr;
-		gameAddr extra_move_property_addr;
+		gameAddr voicelip_addr; // Can be NULL
+		gameAddr extra_move_property_addr; // Can be NULL
 		int64_t _0x88_llong; // 0
 		int64_t _0x90_llong; // 0
 		int32_t _0x98_int;

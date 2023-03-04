@@ -86,17 +86,21 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, gAddr:
 	// todo:: this isnt correct
 	gAddr::Move* move = (gAddr::Move*)(moveset + blockOffsets.movesetBlock + offsets->move);
 	uint64_t moveCount = offsets->moveCount;
+	gameAddr movesetBlockOffset = gameMoveset + blockOffsets.movesetBlock;
+
+	printf("%llx - %llx - %llx\n", +blockOffsets.movesetBlock + offsets->move, blockOffsets.movesetBlock, offsets->move);
 
 	for (size_t i = 0; i < moveCount; ++i)
 	{
-		break;
 		move->name_addr += gameMoveset + blockOffsets.nameBlock;
-		move->anim_addr += gameMoveset + blockOffsets.nameBlock;
+		move->anim_name_addr += gameMoveset + blockOffsets.nameBlock;
 		move->anim_addr += gameMoveset + blockOffsets.animationBlock;
-		move->cancel_addr += gameMoveset + offsets->cancel;
-		move->hit_condition_addr += gameMoveset + offsets->hitCondition;
-		move->voicelip_addr += gameMoveset + offsets->voiceclip;
-		move->extra_move_property_addr += gameMoveset + offsets->extraMoveProperty;
+		move->cancel_addr += movesetBlockOffset + offsets->cancel; // this doesnt work
+
+		printf("%lld - %d\n", move->hit_condition_addr, move->hit_condition_addr == MOVESET_ADDR_NULL);
+		ADD_IF_NOT_NULL_ADDR(move->hit_condition_addr, movesetBlockOffset + offsets->hitCondition);
+		ADD_IF_NOT_NULL_ADDR(move->voicelip_addr, movesetBlockOffset + offsets->voiceclip);
+		ADD_IF_NOT_NULL_ADDR(move->extra_move_property_addr, movesetBlockOffset + offsets->extraMoveProperty);
 
 		++move;
 	}
@@ -152,7 +156,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 
 	//Convert move offets into ptrs
-	//ConvertMovesOffsets(moveset, gameMoveset, offsets, header.offsets);
+	ConvertMovesOffsets(moveset, gameMoveset, offsets, header.offsets);
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);

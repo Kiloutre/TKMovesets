@@ -37,6 +37,7 @@ static std::vector<gameAddr> getMotaListAnims(MotaList* mota, std::vector<gameAd
 // Converts absolute ptr into relative offsets before saving to file
 // I know Tekken does the same but convertes to indexes instead of ptrs.
 // I just don't think it's a good idea.
+
 static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
 	size_t i;
@@ -49,17 +50,18 @@ static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetTable
 		move->anim_name_addr -= nameStart;
 		move->anim_addr = animOffsetMap[move->anim_addr];
 		move->cancel_addr -= table.cancel;
-		move->hit_condition_addr -= table.hitCondition;
-		move->voicelip_addr -= table.voiceclip;
-		move->extra_move_property_addr -= table.extraMoveProperty;
+		SUBSTRACT_BY_IF_NOT_NULL_ADDR(move->hit_condition_addr, table.hitCondition);
+		SUBSTRACT_BY_IF_NOT_NULL_ADDR(move->voicelip_addr, table.voiceclip);
+		SUBSTRACT_BY_IF_NOT_NULL_ADDR(move->extra_move_property_addr, table.extraMoveProperty);
 	}
 
 	// Convert projectile ptrs
 	i = 0;
 	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(movesetBlock + offsets.projectile); i < table.projectileCount; ++i, ++projectile)
 	{
-		projectile->cancel_addr -= table.cancel;
-		projectile->hit_condition_addr -= table.hitCondition;
+		// One projectile actually has both at 0 for some reason ?
+		SUBSTRACT_BY_IF_NOT_NULL_ADDR(projectile->cancel_addr, table.cancel);
+		SUBSTRACT_BY_IF_NOT_NULL_ADDR(projectile->hit_condition_addr, table.hitCondition);
 	}
 
 	// Convert cancel ptrs
@@ -398,7 +400,6 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	header.offsets.tableBlock = Helpers::align8Bytes(header.offsets.movesetInfoBlock + s_movesetInfoBlock);
 	header.offsets.motalistsBlock = Helpers::align8Bytes(header.offsets.tableBlock + s_tableBlock);
 	header.offsets.nameBlock = Helpers::align8Bytes(header.offsets.motalistsBlock + s_motasListBlock);
-	printf("calc moveset block: %llx\n", Helpers::align8Bytes(header.offsets.nameBlock + s_nameBlock));
 	header.offsets.movesetBlock = Helpers::align8Bytes(header.offsets.nameBlock + s_nameBlock);
 	header.offsets.animationBlock = Helpers::align8Bytes(header.offsets.movesetBlock + s_movesetBlock);
 	header.offsets.motaBlock = Helpers::align8Bytes(header.offsets.animationBlock + s_animationBlock);
