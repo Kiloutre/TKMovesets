@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <iterator>
 #include <algorithm>
+#include <vector>
 
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
@@ -14,25 +15,6 @@
 // Contains the same structures as StructsT7 but with no pointers: gameAddr instead
 
 // -- Static helpers -- //
-
-// Returns a list of anim absolute addresses contained within a mota
-static void getMotaAnims(gameAddr motaAddr, std::vector<gameAddr> &animAddr)
-{
-	// read header
-	// push motaAddr + offsets
-}
-
-// Returns a list of anim absolute addresses contained within every mota
-static std::vector<gameAddr> getMotaListAnims(MotaList* mota, std::vector<gameAddr>& animAddrs)
-{
-	for (size_t i = 0; i <= 12; ++i)
-	{
-		gameAddr motaAddr = (gameAddr)mota + i * 8;
-		getMotaAnims(motaAddr, animAddrs);
-	}
-
-	return animAddrs;
-}
 
 // Converts absolute ptr into indexes before saving to file
 static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
@@ -143,13 +125,71 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 
 // -- Private methods - //
 
-char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
+uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap)
 {
-	// Custom block contains the mota files we want and does not contain the rest
+	uint64_t motaCustomBlockSize = 0;
 
-	std::map<gameAddr, uint64_t> offsetMap;
+	// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
+	uint16_t motasToExport = StructsT7Helpers::MOTA_HANDS | StructsT7Helpers::MOTA_CAMERAS;
 
-	size_out = 4; // todo: change, obviously. Get the sizeof the blocks we want and allocate that.
+	// Normally you would go up to (i < 12), but i don't care about the last two and i do care about working with a reliable motaSize, so this is what i am doing
+	for (size_t i = 0; i < 10; ++i)
+	{
+		gameAddr motaAddr = ((uint64_t*)motas)[i];
+		gameAddr motaSize = ((uint64_t*)motas)[i + 2] - motaAddr;
+		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
+
+		if (offsetMap.find(motaAddr) != offsetMap.end()) {
+			continue;
+		}
+
+		char buf[0x10];
+		m_process->readBytes(motaAddr, buf, 0x10);
+		if (memcmp(buf, "MOTA", 4) != 0) {
+			// Malformed MOTA, don't save it
+			continue;
+		}
+
+		bool isBigEndian = (buf[4] == 0);
+		uint32_t animCount = *(uint32_t*)(buf + 0xC);
+
+		if (isBigEndian) {
+			// Big endian ones are clearly different, haven't looked into understanding them
+			continue;
+		}
+
+		if (animCount == 0) {
+			// Some motas can be empty, don't save it. Or maybe we should? It might be purposeful.
+			continue;
+		}
+
+		// Read of the mota file offset list, which is a list of 4 bytes offsets relative to the mota file start itself
+		for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
+		{
+			uint64_t animAddr = motaAddr + m_process->readInt32(motaAddr + 0x14 + (motaAnimIdx - 1) * 4);
+			if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
+				boundaries.push_back(animAddr);
+			}
+		}
+
+		// Use bitfligs to sore which one we want to store
+		if ((1 << i) & motasToExport) {
+			offsetMap[motaAddr] = motaCustomBlockSize;
+			motaCustomBlockSize += motaSize;
+		}
+	}
+	return motaCustomBlockSize;
+}
+
+char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries)
+{
+	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
+
+	std::map<gameAddr, gameAddr> offsetMap;
+	uint64_t sizeToAllocate = 0;
+
+	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap);
+
 	char* customBlock = (char*)malloc(size_out);
 	if (customBlock == nullptr) {
 		size_out = 0;
@@ -157,10 +197,12 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out)
 	}
 	
 	//11 motas + 1 unknown (still clearly a ptr)
-	uint64_t* motaAddr = (uint64_t*)motas;
-	for (size_t i = 0; i < 12; ++i)
+	gameAddr* motaAddr = (gameAddr*)motas;
+	for (size_t i = 0; i < 10; ++i)
 	{
 		if (offsetMap.find(motaAddr[i]) != offsetMap.end()) {
+			gameAddr motaSize = motaAddr[i + 2] - motaAddr[i];
+			m_process->readBytes(motaAddr[i], customBlock + offsetMap[motaAddr[i]], motaSize);
 			motaAddr[i] = offsetMap[motaAddr[i]];
 		}
 		else {
@@ -226,7 +268,7 @@ char* ExtractorT7::CopyAnimations(Move* movelist, size_t moveCount, uint64_t &si
 			addrList.push_back(anim_addr);
 		}
 
-		// List built by mota
+		// List built by mota first, we append to it too
 		if (std::find(boundaries.begin(), boundaries.end(), anim_addr) == boundaries.end()) {
 			// Avoid adding duplicates
 			boundaries.push_back(anim_addr);
@@ -317,11 +359,10 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, Move*
 	return allocateAndReadBlock(nameBlockStart, nameBlockEnd, size_out);
 }
 
-char* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& animList)
+char* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
 {
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
-	getMotaListAnims(motasList, animList);
-	return AllocateMotaCustomBlock(motasList, size_out);
+	return AllocateMotaCustomBlock(motasList, size_out, boundaries);
 }
 
 void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress)
@@ -333,7 +374,7 @@ void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, ga
 	strcpy(infos.origin, GetGameOriginString());
 	strcpy(infos.target_character, GetPlayerCharacterName(playerAddress).c_str());
 	infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();;
-	infos.header_size = Helpers::align8Bytes(sizeof(MovesetHeader));
+	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(MovesetHeader));
 }
 
 // -- Public methods -- //

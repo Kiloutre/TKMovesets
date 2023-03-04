@@ -28,9 +28,9 @@ private:
 	// Allocate and copy the contents of the name block
 	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart);
 	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
-	char* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& animBoundaries);
+	char* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries);
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
-	char* CopyAnimations(Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr>& animList);
+	char* CopyAnimations(Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr>& boundaries);
 
 	/// Helpers
 
@@ -39,7 +39,9 @@ private:
 	// Returns the amount of bytes an animation contains
 	uint64_t GetAnimationSize(gameAddr anim, size_t maxSize);
 	// Returns an allocated block containing mota block offsets followed by mota blocks
-	char* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out);
+	char* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries);
+	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
+	uint64_t CalculateMotaCustomBlockSize(MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap);
 
 public:
 	using Extractor::Extractor; // Inherit constructor too
