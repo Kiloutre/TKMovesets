@@ -6,7 +6,6 @@
 #include "GameProcess.hpp"
 
 #include "constants.h"
-#include "GameAddresses.h"
 
 enum ExtractionErrcode
 {
