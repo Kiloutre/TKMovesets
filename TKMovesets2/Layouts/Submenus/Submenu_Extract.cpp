@@ -16,6 +16,8 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 	//ImGui::BeginTable()
 	// todo: show console or something? need status
 	{
+		ImGui::TextUnformatted(_("extraction.extract_from"));
+
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		size_t currentGameId = extractorHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
@@ -100,7 +102,6 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 
 		if (busy) {
 			// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
-			// Todo: identify what it is busy with, calculate progress according to total
 			ImGui::SameLine();
 			ImGui::Text(_("extraction.progress"), extractorHelper.progress);
 		}

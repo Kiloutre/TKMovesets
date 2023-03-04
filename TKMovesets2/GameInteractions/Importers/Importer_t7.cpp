@@ -203,6 +203,7 @@ void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, cons
 
 ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress)
 {
+	progress = 0;
 	// Read file data
 	std::ifstream file(filename, std::ios::binary);
 
@@ -231,6 +232,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	if (moveset == nullptr) {
 		return ImportationAllocationErr;
 	}
+	progress = 20;
 
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
@@ -240,6 +242,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 		free(moveset);
 		return ImportationGameAllocationErr;
 	}
+	progress = 40;
 
 	// -- Conversions -- //
 
@@ -250,22 +253,27 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 	//Convert move offets into ptrs
 	ConvertMovesetIndexes(moveset, gameMoveset, offsets, header.offsets);
+	progress = 70;
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);
+	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
 	ConvertMotaListOffsets(header.offsets.motalistsBlock, moveset, gameMoveset, playerAddress);
+	progress = 90;
 
 
 	// -- Allocation &Conversion finished -- //
 
 	// Finally write our moveset to the game's memory
 	m_process->writeBytes(gameMoveset, moveset, s_moveset);
+	progress = 99;
 
 	// Then write our moveset address to the current player
 
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"), gameMoveset);
+	progress = 100;
 
 	if (applyInstantly) {
 		SetCurrentMove(playerAddress, gameMoveset, 32769);

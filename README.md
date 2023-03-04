@@ -14,3 +14,4 @@ If you have any contribution to bring, feel free, there is room for improvement 
 - Code injection to force current moveset to stay among loading screens
 - **Moveset editor**
 - Auto-updater
+- Garbage collector: currently, allocated movesets are never freed from the game's memory. Store all allocated games, detect the ones that aren't in use anymore, free them.

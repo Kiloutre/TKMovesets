@@ -11,10 +11,10 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
 	ImGui::SeparatorText(_("importation.importation"));
 
-	ImGui::TextUnformatted(_("importation.import_to"));
-	ImGui::SameLine();
-
 	{
+		ImGui::TextUnformatted(_("importation.import_to"));
+		ImGui::SameLine();
+
 		// todo: show console or something? need status
 		size_t currentGameId = importerHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
@@ -67,6 +67,12 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 
 	bool busy = importerHelper.IsBusy();
 	bool canImport = p->status == PROC_ATTACHED && !busy && importerHelper.CanStart();
+
+	if (busy) {
+		// Progress text. Importation should generally be fast enough that this will be displayed briefly, but it's still nice to have
+		ImGui::SameLine();
+		ImGui::Text(_("importation.progress"), importerHelper.progress);
+	}
 
 	if (p->status != PROC_ATTACHED)
 	{
