@@ -24,16 +24,23 @@ struct MovesetHeader_infos
 	uint32_t header_size;
 };
 
+// Offsets of the various blocks contained within the moveset, in the same order they will appear in
 // You can append new members to this structure without breaking compatibility
 struct MovesetHeader_offsets
 {
-	// Offsets of the various blocks contained within the moveset, in the same order they will appear in
+	// Store moveid aliases and some more i don't understand
 	int64_t movesetInfoBlock;
-	int64_t listsBlock;
+	// Store a list of offsets toward various structure lists paired with thei rsize
+	int64_t tableBlock;
+	// Store a list of offets pointing to mota files
 	int64_t motalistsBlock;
+	// Stores an offset to the block containing move names & anim names (they are the same)
 	int64_t nameBlock;
+	// Stores an offset to the block containing stucture lists
 	int64_t movesetBlock;
+	// Store an offset to the block containing every regular animation used in the moveset
 	int64_t animationBlock; // Custom block
+	// Store an offset to the block containing the multiple mota files for those that are extracted
 	int64_t motaBlock; // Custom block
 };
 

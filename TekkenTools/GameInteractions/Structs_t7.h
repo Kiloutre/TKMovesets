@@ -226,7 +226,7 @@ namespace StructsT7
 		void* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
 	};
 
-	struct MovesetLists
+	struct MovesetTable
 	{
 		Reactions* reactions;
 		uint64_t reactionsCount;
@@ -289,7 +289,7 @@ namespace StructsT7
 
 // Contains most of the same structs as above, but with no ptr (gameAddr instead)
 // Helps reduce the need of casting throughout the code and that is important for code clarity
-namespace StructsT7Helpers
+namespace StructsT7_gameAddr
 {
 	struct Pushback
 	{
@@ -444,7 +444,7 @@ namespace StructsT7Helpers
 
 	// -- Other -- //
 
-	struct MovesetLists
+	struct MovesetTable
 	{
 		gameAddr reactions;
 		uint64_t reactionsCount;

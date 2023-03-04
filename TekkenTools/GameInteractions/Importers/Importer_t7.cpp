@@ -7,7 +7,7 @@
 
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
-#define gAddr StructsT7Helpers
+#define gAddr StructsT7_gameAddr
 
 // -- Static helpers -- //
 
@@ -25,7 +25,9 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 	return movesetData;
 }
 
-void ImporterT7::CorrectMotaList(MovesetHeader& header, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
+// -- Private methods -- //
+
+void ImporterT7::ConvertMotaListOffsets(MovesetHeader& header, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
@@ -51,32 +53,35 @@ void ImporterT7::CorrectMotaList(MovesetHeader& header, char* movesetData, gameA
 	}
 }
 
-void ImporterT7::CorrectPtrList(MovesetHeader& header, char* movesetData, gameAddr gameMoveset)
+void ImporterT7::ConvertMovesetTableOffsets(MovesetHeader& header, char* movesetData, gameAddr gameMoveset)
 {
-	gAddr::MovesetLists* lists = (gAddr::MovesetLists*)(movesetData + header.offsets.listsBlock);
-
+	gAddr::MovesetTable* table = (gAddr::MovesetTable*)(movesetData + header.offsets.tableBlock);
 	gameAddr offset = gameMoveset + header.offsets.movesetBlock;
 
-	// LOL
-	*(uint64_t*)(&lists->reactions) += offset;
-	*(uint64_t*)&lists->requirement += offset;
-	*(uint64_t*)&lists->hitCondition += offset;
-	*(uint64_t*)&lists->projectile += offset;
-	*(uint64_t*)&lists->pushback += offset;
-	*(uint64_t*)&lists->pushbackExtradata += offset;
-	*(uint64_t*)&lists->cancel += offset;
-	*(uint64_t*)&lists->groupCancel += offset;
-	*(uint64_t*)&lists->cancelExtradata += offset;
-	*(uint64_t*)&lists->extraMoveProperty += offset;
-	*(uint64_t*)&lists->unknown_0x1f0 += offset;
-	*(uint64_t*)&lists->unknown_0x200 += offset;
-	*(uint64_t*)&lists->move += offset;
-	*(uint64_t*)&lists->voiceclip += offset;
-	*(uint64_t*)&lists->inputSequence += offset;
-	*(uint64_t*)&lists->input += offset;
-	*(uint64_t*)&lists->unknownParryRelated += offset;
-	*(uint64_t*)&lists->cameraData += offset;
-	*(uint64_t*)&lists->throws += offset;
+	table->reactions += offset;
+	table->requirement += offset;
+	table->hitCondition += offset;
+	table->projectile += offset;
+	table->pushback += offset;
+	table->pushbackExtradata += offset;
+	table->cancel += offset;
+	table->groupCancel += offset;
+	table->cancelExtradata += offset;
+	table->extraMoveProperty += offset;
+	table->unknown_0x1f0 += offset;
+	table->unknown_0x200 += offset;
+	table->move += offset;
+	table->voiceclip += offset;
+	table->inputSequence += offset;
+	table->input += offset;
+	table->unknownParryRelated += offset;
+	table->cameraData += offset;
+	table->throws += offset;
+}
+
+void ImporterT7::ConvertMovesOffsets(MovesetHeader& header, char* movesetData, gAddr::MovesetTable& offsets)
+{
+
 }
 
 // -- Public methods -- //
@@ -110,13 +115,16 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 	// Correct/Convert everything that needs to be corrected/converted first
 
+	//Move
+	//ConvertMovesOffsets(header, movesetData, );
+
+	// Turn our table offsets into ptrs
+	// Do this at the ned because we actually need the offsets above
+	ConvertMovesetTableOffsets(header, movesetData, gameMoveset);
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	CorrectMotaList(header, movesetData, gameMoveset, playerAddress);
-	// Turn our moveset structures lists offsets into ptrs
-	CorrectPtrList(header, movesetData, gameMoveset);
+	ConvertMotaListOffsets(header, movesetData, gameMoveset, playerAddress);
 
-
-	// Finally lrite our moveset to the game's memory
+	// Finally write our moveset to the game's memory
 	printf("Moveset allocated at %llx\n", gameMoveset);
 	m_process->writeBytes(gameMoveset, movesetData, movesetSize);
 
