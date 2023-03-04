@@ -6,7 +6,7 @@
 #define DLLCONTENT __declspec(dllimport)
 #endif
 
-# define PROGRAM_TITLE           "TekkenTools"
+# define PROGRAM_TITLE           "TKMovesets - kilo"
 # define PROGRAM_VERSION         "0.1"
 # define PROGRAM_WIN_MIN_WIDTH   1280
 # define PROGRAM_WIN_MIN_HEIGHT  720

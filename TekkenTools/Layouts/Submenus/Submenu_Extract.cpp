@@ -9,24 +9,24 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 
-void Submenu_Extract::Render(GameExtract& extractorHelper)
+void RenderSubmenu_Extract(GameExtract& extractorHelper)
 {
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
 	//ImGui::BeginTable()
+	// todo: show console or something? need status
 	{
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
-		ImGui::SeparatorText(_("extraction.extraction"));
-		uint8_t currentGameId = extractorHelper.currentGameId;
+		size_t currentGameId = extractorHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
-
-		uint8_t gameListCount = Games::GetGamesCount();
+		ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
+		size_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
-			for (uint8_t i = 0; i < gameListCount; ++i)
+			for (size_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
-				if (game->flags & GameExtractable) {
+				if (game->flags & GameImportable) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 						extractorHelper.SetTargetProcess(game->processName, i);
 					}
@@ -34,6 +34,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			}
 			ImGui::EndCombo();
 		}
+		ImGui::PopID();
 	}
 
 	// If we can't extract, display a warning detailling why
@@ -107,7 +108,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 	//ImGui::EndTable()
 
-	// List of extracted movesets
+	// List of extracted moveset
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	if (ImGui::BeginTable("##", 7, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
 		| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))

@@ -6,15 +6,16 @@
 #include "imgui_extras.hpp"
 #include "Helpers.hpp"
 
-void Submenu_Import::Render(GameImport& importerHelper)
+void RenderSubmenu_Import(GameImport& importerHelper)
 {
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
 	ImGui::SeparatorText(_("importation.importation"));
 
 	ImGui::TextUnformatted(_("importation.import_to"));
+	ImGui::SameLine();
 
 	{
-		ImGui::SameLine();
+		// todo: show console or something? need status
 		size_t currentGameId = importerHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict

@@ -6,6 +6,10 @@
 #include "GameData.hpp"
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
+// Submenus
+#include "Submenu_Extract.hpp"
+#include "Submenu_Import.hpp"
+#include "Submenu_About.hpp"
 
 // -- Public methods -- //
 
@@ -40,7 +44,7 @@ void MainWindow::NewFrame()
 void MainWindow::Update(int width, int height)
 {
 	// Actual rendering stuff
-	const float c_statusBarHeight = 30;
+	const float c_statusBarHeight = 0;// 30;
 
 	float navMenuWidth;
 
@@ -62,10 +66,10 @@ void MainWindow::Update(int width, int height)
 		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:
-			extractMenu.Render(extractor);
+			RenderSubmenu_Extract(extractor);
 			break;
 		case NAV__MENU_IMPORT:
-			importMenu.Render(importer);
+			RenderSubmenu_Import(importer);
 			break;
 		case NAV__MENU_ONLINE_PLAY:
 			onlineMenu.Render();
@@ -77,12 +81,14 @@ void MainWindow::Update(int width, int height)
 		case NAV__MENU_DOCUMENTATION:
 			break;
 		case NAV__MENU_ABOUT:
+			RenderSubmenu_About();
 			break;
 		}
 		ImGui::End();
 	}
 
-	// Status bar
+	// Status bar, currently not useful
+	/*
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, height - c_statusBarHeight));
 		ImGui::SetNextWindowSizeConstraints(ImVec2((float)width, c_statusBarHeight), ImVec2((float)width, c_statusBarHeight));
@@ -90,6 +96,7 @@ void MainWindow::Update(int width, int height)
 		statusBar.Render();
 		ImGui::End();
 	}
+	*/
 }
 
 void MainWindow::Render()

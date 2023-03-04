@@ -21,9 +21,11 @@ private:
 	void ConvertMotaListOffsets(uint64_t motalistsBlock, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress);
 	// In our locally allocated movest, correct the lists pointing to the various moveset structure lists
 	void ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset);
-	//  Convert offsets of moves into ptrs
-	void ConvertMovesOffsets(char* movesetData, gameAddr gameMoveset, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets);
+	//  Convert indexes of moves, cancels, hit conditions, etc... into ptrs
+	void ConvertMovesetIndexes(char* movesetData, gameAddr gameMoveset, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets);
 
+	// Sets the move of the player
+	void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId);
 public:
 	using Importer::Importer; // Inherit constructor too
 	ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress) override;

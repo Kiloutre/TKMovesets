@@ -79,7 +79,6 @@ importation.apply_instantly_explanation = Turning this to off will let the game 
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.
 online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
-online.moveset_x_selected = Moveset '%s' selected
 
 # Moveset Edition #
 edition.explanation = You can here edit extracted movesets. Refer to documentation for tutorials and helpful ressources.\nTurn on 'Live edition' for quickly modifying the custom moveset: Simple values changes will be instantly applied in memory with zero loading time.
@@ -97,4 +96,11 @@ edition.save = Save
 
 # About #
 
-
+about.explanation = TKMovesets is a software made by independant modders who are not legally affiliated in any way with the games this software interacts with.\nThis software is licensed under the GPLv3: It is free software (as in freedom) that you are free to obtain, modify and redistribute as long as you do not change the license.\nIf you paid for this software, you have been scammed.
+about.credits = Credits:
+about.kilo_explanation = Main developer behind the moveset extractor, responsible of reverse engineering the vast majority of the data structures, establishing the export/import methodology, and writing this moveset export/import/edition softwares.
+about.ali_explanation = Among other things helped reverse engineer moveset structures, helped significantly figuring out IDs for moveset editing, created moveset editing tutorials and brought about many features like camera and hand animations
+about.fletch_explanation = Brought moveset edition to great lengths by creating documentation of a significant number of moveset editing properties and creating many tutorials for it
+about.koenji_explanation = Got on moveset edition early and helped understand its workflow a ton, also contributed to deciphering many moveset properties
+about.sadamitsu_explanation = Helped understand a lot more about animations of various kind, how they were structured and where they were stored
+about.dennis_stanistan_explanation = Unknowingly helped through a random discord post that then allowed the first moveset extractor to get started

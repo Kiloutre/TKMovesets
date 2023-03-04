@@ -14,6 +14,7 @@ set(INCLUDE_FOLDERS
                     "Utils"
 )
 
+# This will be included in the .exe
 set(BINARY_SOURCES
                     # Main sources
                     "main.cpp"
@@ -32,6 +33,7 @@ set(BINARY_SOURCES
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
                     "Layouts/Submenus/Submenu_OnlinePlay.cpp"
+                    "Layouts/Submenus/Submenu_About.cpp"
 
                     # Helpers and such
                     "Utils/imgui_extras.cpp"
@@ -41,6 +43,7 @@ set(BINARY_SOURCES
                     "Utils/ThreadedClass.cpp"
 )
 
+# This will be included in the .dll and should only be related to extraction/importation
 set(IMPORTEXPORT_SOURCES
                     # Keep a copy of these since Extractor & Importers are reliant on them
                     "Game/GameProcess.cpp"
@@ -49,6 +52,7 @@ set(IMPORTEXPORT_SOURCES
                     "Utils/helpers.cpp"
                     "Utils/GameAddressesFile.cpp"
                     
+
                     # List of games
                     "GameInteractions/Games.cpp"
                     # Base classes for our extractor & importers
@@ -66,23 +70,23 @@ target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe
-add_executable (TekkenTools ${BINARY_SOURCES})
-target_include_directories(TekkenTools PRIVATE ${INCLUDE_FOLDERS})
-add_dependencies(TekkenTools ExportImport)
-target_link_libraries(TekkenTools PRIVATE ExportImport)
+add_executable (TKMovesets2 ${BINARY_SOURCES})
+target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
+add_dependencies(TKMovesets2 ExportImport)
+target_link_libraries(TKMovesets2 PRIVATE ExportImport)
 
 # Addresses file #
 configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
 
 # Translations #
-add_custom_command(TARGET TekkenTools PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
+add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
 
 # Link the other libraries that we use #
 find_package(glad CONFIG REQUIRED)
-target_link_libraries(TekkenTools PRIVATE glad::glad)
+target_link_libraries(TKMovesets2 PRIVATE glad::glad)
 
 find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(TekkenTools PRIVATE glfw)
+target_link_libraries(TKMovesets2 PRIVATE glfw)
 
 find_package(imgui CONFIG REQUIRED)
-target_link_libraries(TekkenTools PRIVATE imgui::imgui)
+target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)

@@ -5,10 +5,9 @@
 #include "NavigationMenu.hpp"
 #include "StatusBar.hpp"
 // Submenus
-#include "Submenu_Extract.hpp"
-#include "Submenu_Import.hpp"
 #include "Submenu_OnlinePlay.hpp"
-// 
+
+// Other
 #include "GameExtract.hpp"
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
@@ -16,9 +15,7 @@
 class MainWindow {
 private:
 	NavigationMenu     navMenu;
-	StatusBar          statusBar;
-	Submenu_Extract    extractMenu;
-	Submenu_Import	   importMenu;
+	//StatusBar          statusBar;
 	Submenu_OnlinePlay onlineMenu;
 public:
 	GameExtract extractor;

@@ -27,6 +27,34 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 
 // -- Private methods -- //
 
+void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
+
+{
+	{
+		// Each player actually holds 5 copies of its moveset ptr.
+		// One of them is the one to default to when going back to aliases move (>= 32768)
+		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
+		for (size_t i = 0; i < 5; ++i) {
+			m_process->writeInt64(movesetOffset + i * 8, playerMoveset);
+		}
+	}
+
+	if (moveId >= 0x8000) {
+		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
+		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
+	}
+	
+	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
+
+	// Write a big number to the frame timer to force the current move end
+	m_process->writeInt32(playerAddress + 0x1D4, 99999);
+	// Tell the game which move to play NEXT
+	m_process->writeInt64(playerAddress + 0xDA0, moveAddr);
+	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
+	m_process->writeInt64(playerAddress + 0x350, moveId);
+}
+
 void ImporterT7::ConvertMotaListOffsets(uint64_t motalistsBlock, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
@@ -79,7 +107,7 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 	table->throws += offset;
 }
 
-void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
+void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
 {
 	size_t i;
 	gameAddr blockOffset = gameMoveset + blockOffsets.movesetBlock;
@@ -221,7 +249,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 
 	//Convert move offets into ptrs
-	ConvertMovesOffsets(moveset, gameMoveset, offsets, header.offsets);
+	ConvertMovesetIndexes(moveset, gameMoveset, offsets, header.offsets);
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);
@@ -233,11 +261,15 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	// -- Allocation &Conversion finished -- //
 
 	// Finally write our moveset to the game's memory
-	printf("Moveset allocated at %llx\n", gameMoveset);
 	m_process->writeBytes(gameMoveset, moveset, s_moveset);
 
-	// Todo: write moveset to player
-	// Todo: Write move 32769 to player
+	// Then write our moveset address to the current player
+
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"), gameMoveset);
+
+	if (applyInstantly) {
+		SetCurrentMove(playerAddress, gameMoveset, 32769);
+	}
 
 	// -- Cleanup -- //
 

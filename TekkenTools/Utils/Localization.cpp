@@ -44,6 +44,9 @@ namespace Localization
 			std::string value;
 			{
 				size_t value_start = line.find_first_not_of(" =", separator);
+				if (value_start == std::string::npos) {
+					continue;
+				}
 				value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
 			}
 

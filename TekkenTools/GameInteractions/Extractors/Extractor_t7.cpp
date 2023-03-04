@@ -311,6 +311,9 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, Move*
 {
 	gameAddr nameBlockEnd;
 	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
+	// There is some stuff before the move names i want to get (character name, date string and stuff)
+	// So i hardcode the address because i know it
+	nameBlockStart = movesetAddr + 0x2E8;
 	return allocateAndReadBlock(nameBlockStart, nameBlockEnd, size_out);
 }
 
@@ -445,13 +448,13 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 			// The actual full moveset data, all of this will be allocated from the file in one go
 			m_file.write(movesetInfoBlock, s_movesetInfoBlock);
-			Helpers::align8Bytes(m_file);
+			//Helpers::align8Bytes(m_file); // The size of movesetInfoBlock is fixed and is divisible by 8 : no misalignement possible.
 
 			m_file.write(tableBlock, s_tableBlock);
-			Helpers::align8Bytes(m_file);
+			//Helpers::align8Bytes(m_file); // The size of tableBlock is fixed and is divisible by 8 : no misalignement possible.
 
 			m_file.write(motasListBlock, s_motasListBlock);
-			Helpers::align8Bytes(m_file);
+			//Helpers::align8Bytes(m_file); // The size of motasListBlock is fixed and is divisible by 8 : no misalignement possible.
 
 			m_file.write(nameBlock, s_nameBlock);
 			Helpers::align8Bytes(m_file);
