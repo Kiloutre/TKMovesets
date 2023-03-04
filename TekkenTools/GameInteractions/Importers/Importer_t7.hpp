@@ -8,6 +8,8 @@
 #include "Structs_t7.h"
 #include "MovesetStructs.h"
 
+using namespace StructsT7;
+
 class DLLCONTENT ImporterT7 : public Importer
 {
 private:

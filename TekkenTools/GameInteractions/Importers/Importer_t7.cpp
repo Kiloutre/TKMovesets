@@ -5,8 +5,9 @@
 
 #include "Structs_t7.h"
 
-using namespace t7structs;
-
+// Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
+// Defined here because i don't want any other file to have access to this shortcut
+#define gAddr StructsT7Helpers
 
 // -- Static helpers -- //
 
@@ -52,7 +53,7 @@ void ImporterT7::CorrectMotaList(MovesetHeader& header, char* movesetData, gameA
 
 void ImporterT7::CorrectPtrList(MovesetHeader& header, char* movesetData, gameAddr gameMoveset)
 {
-	MovesetLists* lists = (MovesetLists*)(movesetData + header.offsets.listsBlock);
+	gAddr::MovesetLists* lists = (gAddr::MovesetLists*)(movesetData + header.offsets.listsBlock);
 
 	gameAddr offset = gameMoveset + header.offsets.movesetBlock;
 

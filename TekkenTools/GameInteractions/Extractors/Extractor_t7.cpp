@@ -17,6 +17,12 @@
 #include <algorithm>
 #include <functional>
 
+// Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
+// Defined here because i don't want any other file to have access to this shortcut
+#define gAddr StructsT7Helpers
+
+// Contains the same structures as StructsT7 but with no pointers: gameAddr instead
+
 // -- Static helpers -- //
 
 // Returns a list of anim absolute addresses contained within a mota
@@ -40,76 +46,75 @@ static std::vector<gameAddr> getMotaListAnims(MotaList* mota)
 	return animAddrs;
 }
 
-// Converts abslute ptr into relative offsets before saving to file
-static void fixMovesetOffsets(char* movesetBlock, const MovesetLists &lists, const MovesetLists& listsOffsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
+// Converts absolute ptr into relative offsets before saving to file
+// I know Tekken does the same but convertes to indexes instead of ptrs.
+// I just don't think it's a good idea.
+static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetLists &lists, const gAddr::MovesetLists& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
-	// Todo: maybe turn this into callback for ease of reading?
-
 	size_t i;
 
 	// Convert move ptrs
 	i = 0;
-	for (Move* move = (Move*)(movesetBlock + (uint64_t)listsOffsets.move); i < lists.moveCount; ++i, ++move)
+	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets.move); i < lists.moveCount; ++i, ++move)
 	{
 		move->name -= nameStart;
 		move->anim_name -= nameStart;
-		*(uint64_t*)(&move->anim_addr) = animOffsetMap[(gameAddr)move->anim_addr];
-		printf("cancel addr is %llx, lists cancel is %llx\n", *(gameAddr*)(&move->cancel_addr), (gameAddr)lists.cancel);
-		*(gameAddr*)(&move->cancel_addr) -= (gameAddr)lists.cancel;
-		move->hit_condition_addr -= (gameAddr)lists.hitCondition;
-		move->voicelip_addr -= (gameAddr)lists.voiceclip;
-		move->extra_move_property_addr -= (gameAddr)lists.extraMoveProperty;
+		move->anim_addr = animOffsetMap[move->anim_addr];
+		move->cancel_addr -= lists.cancel;
+		move->hit_condition_addr -= lists.hitCondition;
+		move->voicelip_addr -= lists.voiceclip;
+		move->extra_move_property_addr -= lists.extraMoveProperty;
 	}
 
 	// Convert projectile ptrs
 	i = 0;
-	for (Projectile* projectile = (Projectile*)(movesetBlock + (uint64_t)listsOffsets.projectile); i < lists.projectileCount; ++i, ++projectile)
+	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(movesetBlock + offsets.projectile); i < lists.projectileCount; ++i, ++projectile)
 	{
-		projectile->cancel_addr -= (gameAddr)lists.cancel;
-		projectile->hit_condition_addr -= (gameAddr)lists.hitCondition;
+		projectile->cancel_addr -= lists.cancel;
+		projectile->hit_condition_addr -= lists.hitCondition;
 	}
 
 	// Convert cancel ptrs
 	i = 0;
-	for (Cancel* cancel = (Cancel*)(movesetBlock + (uint64_t)listsOffsets.cancel); i < lists.cancelCount; ++i, ++cancel)
+	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(movesetBlock + offsets.cancel); i < lists.cancelCount; ++i, ++cancel)
 	{
-		cancel->requirement_addr -= (gameAddr)lists.requirement;
-		cancel->extradata_addr -= (gameAddr)lists.cancelExtradata;
+		cancel->requirement_addr -= lists.requirement;
+		cancel->extradata_addr -= lists.cancelExtradata;
 	}
 
 	// Convert reaction ptrs
 	i = 0;
-	for (Reactions* reaction = (Reactions*)(movesetBlock + (uint64_t)listsOffsets.reactions); i < lists.reactionsCount; ++i, ++reaction)
+	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(movesetBlock + offsets.reactions); i < lists.reactionsCount; ++i, ++reaction)
 	{
-		reaction->front_pushback -= (gameAddr)lists.pushback;
-		reaction->backturned_pushback -= (gameAddr)lists.pushback;
-		reaction->left_side_pushback -= (gameAddr)lists.pushback;
-		reaction->right_side_pushback -= (gameAddr)lists.pushback;
-		reaction->front_counterhit_pushback -= (gameAddr)lists.pushback;
-		reaction->downed_pushback -= (gameAddr)lists.pushback;
-		reaction->block_pushback -= (gameAddr)lists.pushback;
+		reaction->front_pushback -= lists.pushback;
+		reaction->backturned_pushback -= lists.pushback;
+		reaction->left_side_pushback -= lists.pushback;
+		reaction->right_side_pushback -= lists.pushback;
+		reaction->front_counterhit_pushback -= lists.pushback;
+		reaction->downed_pushback -= lists.pushback;
+		reaction->block_pushback -= lists.pushback;
 	}
 
 	// Convert input sequence ptrs
 	i = 0;
-	for (InputSequence* inputSequence = (InputSequence*)(movesetBlock + (uint64_t)listsOffsets.inputSequence); i < lists.inputSequenceCount; ++i, ++inputSequence)
+	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(movesetBlock + offsets.inputSequence); i < lists.inputSequenceCount; ++i, ++inputSequence)
 	{
-		inputSequence->input_addr -= (gameAddr)lists.input;
+		inputSequence->input_addr -= lists.input;
 	}
 
 	// Convert throws ptrs
 	i = 0;
-	for (ThrowData* throws = (ThrowData*)(movesetBlock + (uint64_t)listsOffsets.throws); i < lists.throwsCount; ++i, ++throws)
+	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(movesetBlock + offsets.throws); i < lists.throwsCount; ++i, ++throws)
 	{
-		throws->cameradata_addr -= (gameAddr)lists.cameraData;
+		throws->cameradata_addr -= lists.cameraData;
 	}
 
 	// Convert hit conditions ptrs
 	i = 0;
-	for (HitCondition* hitCondition = (HitCondition*)(movesetBlock + (uint64_t)listsOffsets.hitCondition); i < lists.hitConditionCount; ++i, ++hitCondition)
+	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(movesetBlock + offsets.hitCondition); i < lists.hitConditionCount; ++i, ++hitCondition)
 	{
-		hitCondition->requirement_addr -= (gameAddr)lists.requirement;
-		hitCondition->reactions_addr -= (gameAddr)lists.reactions;
+		hitCondition->requirement_addr -= lists.requirement;
+		hitCondition->reactions_addr -= lists.reactions;
 	}
 }
 
@@ -293,8 +298,8 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 
 	// Get the size of the various lists in the moveset, will need that later. We matched the same structure they did so a single read cab fill it.
-	MovesetLists lists{};
-	MovesetLists listsOffsets{}; // Contains the lists but with offsets that we will use to convert ptrs into indexes
+	gAddr::MovesetLists lists{};
+	gAddr::MovesetLists listsOffsets{}; // Contains the lists but converted to offsets that we will use to convert ptrs into indexes
 	MotaList motasList{};
 	m_process->readBytes(movesetAddr + 0x150, &lists, sizeof(MovesetLists));
 	m_process->readBytes(movesetAddr + 0x280, &motasList, sizeof(MotaList));
@@ -314,7 +319,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	// Reads block containing the actual moveset data
 	uint64_t movesetBlockSize = 0;
 	char* movesetBlock = allocateAndReadBlock(firstListAddr, lastListAddr + (sizeof(ThrowData) * lists.throwsCount), movesetBlockSize);
-	Move* movelist = (Move*)((int64_t)movesetBlock + (int64_t)listsOffsets.move);
+	Move* movelist = (Move*)((int64_t)movesetBlock + listsOffsets.move);
 
 	// Prepare anim list to properly guess size of anims
 	std::vector<gameAddr> animList = getMotaListAnims(&motasList);
@@ -335,7 +340,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 
 
 	// Now that we extracted everything, we can properly convert pts to offsets
-	fixMovesetOffsets(movesetBlock, lists, listsOffsets, nameStart, animOffsetMap);
+	convertMovesetPointers(movesetBlock, lists, listsOffsets, nameStart, animOffsetMap);
 
 
 	// Setup our own header to write in the output file containg useful information
@@ -365,7 +370,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, 
 	ExtractionErrcode errcode = ExtractionSuccessful;
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
-		|| movesetBlock == nullptr || animationBlock == nullptr || motaCustomBlock == nullptr) {
+		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
 		// Todo: maybe use new() and delete
 		// Todo: this still isn't safe right now because read/write on those pointers after allocating them
 		errcode = ExtractionAllocationErr;

@@ -8,7 +8,7 @@
 #include "Structs_t7.h"
 #include "GameAddresses.h"
 
-using namespace t7structs;
+using namespace StructsT7;
 
 class DLLCONTENT ExtractorT7 : public Extractor
 {
