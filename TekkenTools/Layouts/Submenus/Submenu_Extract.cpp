@@ -9,7 +9,7 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 
-void Submenu_Extract::Render(GameExtract* extractorHelper)
+void Submenu_Extract::Render(GameExtract& extractorHelper)
 {
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
@@ -17,7 +17,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 	{
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		ImGui::SeparatorText(_("extraction.extraction"));
-		size_t currentGameId = extractorHelper->currentGameId;
+		size_t currentGameId = extractorHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 
 		size_t gameListCount = Games::GetGamesCount();
@@ -28,7 +28,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 				GameInfo* game = Games::GetGameInfo(i);
 				if (game->flags & GameExtractable) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
-						extractorHelper->SetTargetProcess(game->processName, i);
+						extractorHelper.SetTargetProcess(game->processName, i);
 					}
 				}
 			}
@@ -37,7 +37,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 	}
 
 	// If we can't extract, display a warning detailling why
-	GameProcess* p = extractorHelper->process;
+	GameProcess* p = extractorHelper.process;
 	if (p->status != PROC_ATTACHED)
 	{
 		switch (p->status)
@@ -58,25 +58,25 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 			break;
 		}
 	}
-	else if (!extractorHelper->CanStart()) {
+	else if (!extractorHelper.CanStart()) {
 		ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
 	}
 
 	{
-		bool busy = extractorHelper->IsBusy();
-		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper->CanStart();
+		bool busy = extractorHelper.IsBusy();
+		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper.CanStart();
 
 		// Extraction settings
-		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &extractorHelper->overwriteSameFilename);
+		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &extractorHelper.overwriteSameFilename);
 		ImGui::SameLine();
 		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
 
 		// Extraction buttons, will be disabled if we can't extract
-		for (int playerId = 0; playerId < extractorHelper->characterCount; ++playerId)
+		for (int playerId = 0; playerId < extractorHelper.characterCount; ++playerId)
 		{
 			ImGui::SameLine();
 
-			const char* characterName = extractorHelper->characterNames[playerId].c_str();
+			const char* characterName = extractorHelper.characterNames[playerId].c_str();
 			std::string buttonText;
 
 			const char playerIdTranslationId[3] = { '1' + (char)playerId , 'p', '\0' };
@@ -88,20 +88,20 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 			}
 
 			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtract)) {
-				extractorHelper->QueueCharacterExtraction(playerId);
+				extractorHelper.QueueCharacterExtraction(playerId);
 			}
 		}
 
 		ImGui::SameLine();
 		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
-			extractorHelper->QueueCharacterExtraction(-1);
+			extractorHelper.QueueCharacterExtraction(-1);
 		}
 
 		if (busy) {
 			// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
 			// Todo: identify what it is busy with, calculate progress according to total
 			ImGui::SameLine();
-			ImGui::Text(_("extraction.progress"), extractorHelper->progress);
+			ImGui::Text(_("extraction.progress"), extractorHelper.progress);
 		}
 	}
 
@@ -110,7 +110,7 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 	// List of extracted movesets
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	if (ImGui::BeginTable("##", 7, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
-									| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
+		| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
@@ -122,10 +122,10 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 		ImGui::TableHeadersRow();
 
 		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
-		for (size_t i = 0; i < extractorHelper->storage->extractedMovesets.size(); ++i)
+		for (size_t i = 0; i < extractorHelper.storage->extractedMovesets.size(); ++i)
 		{
 			// moveset is guaranteed not to be freed until after this loop
-			movesetInfo* moveset = extractorHelper->storage->extractedMovesets[i];
+			movesetInfo* moveset = extractorHelper.storage->extractedMovesets[i];
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
@@ -156,13 +156,13 @@ void Submenu_Extract::Render(GameExtract* extractorHelper)
 				ImGui::PushID(moveset->filename.c_str());
 				if (ImGui::Button("X"))
 				{
-					extractorHelper->storage->DeleteMoveset(moveset->filename.c_str());
+					extractorHelper.storage->DeleteMoveset(moveset->filename.c_str());
 				}
 				ImGui::PopID();
 			}
 		}
 		// Don't de-allocate moveset infos until we're done iterating on it
-		extractorHelper->storage->CleanupUnusedMovesetInfos();
+		extractorHelper.storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
 	}

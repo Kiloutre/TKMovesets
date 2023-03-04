@@ -277,7 +277,7 @@ uint64_t ExtractorT7::GetAnimationSize(gameAddr anim, size_t maxSize)
 
 // -- Public methods -- //
 
-ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, float* progress, uint8_t gameId, bool overwriteSameFilename)
+ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, float& progress)
 {
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 

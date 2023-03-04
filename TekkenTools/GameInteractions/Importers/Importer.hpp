@@ -29,7 +29,7 @@ protected:
 public:
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float* progress) = 0;
+	virtual ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanImport() = 0;
 };

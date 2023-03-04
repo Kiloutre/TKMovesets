@@ -4,5 +4,5 @@
 
 class Submenu_Extract {
 public:
-	void Render(GameExtract* extractorHelper);
+	void Render(GameExtract& extractorHelper);
 };

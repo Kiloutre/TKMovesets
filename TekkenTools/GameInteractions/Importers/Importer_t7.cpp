@@ -86,7 +86,7 @@ void ImporterT7::ConvertMovesOffsets(MovesetHeader& header, char* movesetData, g
 
 // -- Public methods -- //
 
-ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float* progress)
+ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress)
 {
 	// Read file data
 	std::ifstream file;

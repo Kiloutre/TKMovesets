@@ -4,5 +4,5 @@
 
 class Submenu_Import {
 public:
-	void Render(GameImport* importerHelper);
+	void Render(GameImport& importerHelper);
 };
