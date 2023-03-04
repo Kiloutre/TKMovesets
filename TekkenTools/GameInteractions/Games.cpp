@@ -2,6 +2,7 @@
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
 
+// Should respect the indexes showed in GameId enum
 const GameInfo cg_gamesInfo[] = {
 	{
 		// 	GameId_t7 = 0,

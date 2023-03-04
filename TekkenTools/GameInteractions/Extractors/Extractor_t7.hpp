@@ -14,8 +14,12 @@ using namespace StructsT7;
 class DLLCONTENT ExtractorT7 : public Extractor
 {
 private:
+	/// Main functions
+
 	// Fill the moveset table & its corresponding offset table brother.
 	void FillMovesetTables(gameAddr movesetAddr, StructsT7_gameAddr::MovesetTable* table, StructsT7_gameAddr::MovesetTable* offsets);
+	// Fill moveset header with our own various useful informations
+	void FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress);
 	// Allocate and copy the contents of the moveset block
 	char* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, StructsT7_gameAddr::MovesetTable& table);
 	// Allocate and copy the contents of the name block
@@ -25,6 +29,8 @@ private:
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
 	char* CopyAnimations(Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr>& animList);
 
+	/// Helpers
+
 	// Writes bounds of the block containing anim and move names
 	void getNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
 	// Returns the amount of bytes an animation contains
@@ -32,8 +38,6 @@ private:
 	// Returns an allocated block containing mota block offsets followed by mota blocks
 	char* allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out);
 
-	// Fill moveset header with our own various useful informations
-	void FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress);
 public:
 	using Extractor::Extractor; // Inherit constructor too
 	ExtractionErrcode Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, float& progress) override;
