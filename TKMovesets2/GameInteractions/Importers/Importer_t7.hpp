@@ -30,5 +30,5 @@ public:
 	using Importer::Importer; // Inherit constructor too
 	ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress) override;
 	bool CanImport() override;
-
+	void CleanupUnusedMovesets() override;
 };

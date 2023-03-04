@@ -62,6 +62,11 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 	ImGui::SameLine();
 	ImGuiExtra::HelpMarker(_("importation.apply_instantly_explanation"));
 
+	ImGui::SameLine();
+	ImGui::Checkbox(_("importation.free_unused_movesets"), &importerHelper.free_unused_movesets);
+	ImGui::SameLine();
+	ImGuiExtra::HelpMarker(_("importation.free_unused_movesets_explanation"));
+
 	// If we can't import, display a warning detailling why
 	GameProcess* p = importerHelper.process;
 

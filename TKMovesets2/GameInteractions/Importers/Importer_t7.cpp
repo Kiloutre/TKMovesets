@@ -30,16 +30,6 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 
 void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
 {
-	{
-		// Each player actually holds 5 copies of its moveset ptr.
-		// One of them is the one to default to when going back to aliases move (>= 32768)
-		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
-		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
-		for (size_t i = 0; i < 5; ++i) {
-			m_process->writeInt64(movesetOffset + i * 8, playerMoveset);
-		}
-	}
-
 	if (moveId >= 0x8000) {
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
 		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
@@ -201,6 +191,50 @@ void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, cons
 
 // -- Public methods -- //
 
+void ImporterT7::CleanupUnusedMovesets()
+{
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val_playerstruct_size");
+	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val_motbin_offset");
+
+	std::vector<uint64_t> offsetsToWatch = { 0x218, 0x220, 0x228, 0xBC8, 0xD80, 0x13C0, 0x13E8, 0x13F0, 0x1520, 0x1528, 0x1530, 0x1540};
+
+	for (size_t i = 0; i < m_process->allocatedMemory.size();)
+	{
+		std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
+		gameAddr movesetAddress = block.first;
+		uint64_t movesetEnd = movesetAddress + block.second;
+		bool isUsed = false;
+
+		// Call CanImport() because it's a quick way to see if players are loaded. If they're not, we can free memory worry-free.
+		if (CanImport()) {
+			// Check movesets of both players
+			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid) {
+				gameAddr movesetOffsets = playerAddress + motbinOffset + playerid * playerstructSize;
+
+				// Check a bunch of offsets that are likely to contain moveset
+				for (uint64_t offset : offsetsToWatch) {
+					gameAddr offsetValue = m_process->readInt64(playerAddress + offset + playerid * playerstructSize);
+					if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
+						isUsed = true;
+						break;
+					}
+				}
+			}
+		}
+
+		
+		if (isUsed) {
+			// Skip
+			++i;
+		}
+		else {
+			m_process->freeMem(movesetAddress);
+		}
+		
+	}
+}
+
 ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress)
 {
 	progress = 0;
@@ -271,9 +305,17 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	progress = 99;
 
 	// Then write our moveset address to the current player
-
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"), gameMoveset);
+	{
+		// Each player actually holds 5 copies of its moveset ptr.
+		// One of them is the one to default to when going back to aliases move (>= 32768)
+		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
+		for (size_t i = 0; i < 5; ++i) {
+			m_process->writeInt64(movesetOffset + i * 8, gameMoveset);
+		}
+	}
 	progress = 100;
+
 
 	if (applyInstantly) {
 		SetCurrentMove(playerAddress, gameMoveset, 32769);

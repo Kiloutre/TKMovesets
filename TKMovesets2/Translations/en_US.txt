@@ -73,9 +73,10 @@ importation.deallocate_unused = Deallocate unused movesets
 importation.cant_import = Cannot import because you are not loaded into an active game (training mode, etc).
 importation.import_to = Import to:
 importation.progress = Importing... (%.0f%%)
-importation.play_sound = Play a sound  when importing succeeds
 importation.apply_instantly = Apply instantly
 importation.apply_instantly_explanation = Turning this to off will let the game wait until the current move ends before switching to the new moveset.\nIn the cases of some moves (like Negan's idle animation), this can take pretty long.
+importation.free_unused_movesets = Free unused movesets
+importation.free_unused_movesets_explanation = If turned on, movesets that were previously allocated but are now unused will be freed from memory.\nThis helps prevent this tool from using all your RAM.
 
 # Online #
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.

@@ -44,6 +44,9 @@ void GameImport::RunningUpdate()
 		auto &[filename, playerAddress] = m_plannedImportations[0];
 		// Start Importation
 		m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+		if (free_unused_movesets) {
+			m_importer->CleanupUnusedMovesets();
+		}
 		m_plannedImportations.erase(m_plannedImportations.begin());
 	}
 }
