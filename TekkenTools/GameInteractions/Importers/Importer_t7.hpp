@@ -10,6 +10,7 @@
 
 using namespace StructsT7;
 
+// This class has no storage and i would like to keep it that way. You should be passing values through method calls and no other way.
 class DLLCONTENT ImporterT7 : public Importer
 {
 private:

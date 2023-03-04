@@ -233,8 +233,6 @@ char* ExtractorT7::GetAnimations(Move* movelist, size_t moveCount, uint64_t &siz
 		totalSize += animSize;
 	}
 
-	printf("Anim total size: %lld (%f MB)\n", totalSize, (float)totalSize / 1000000);
-
 	// Allocate block
 	if (!(animationBlock = (char*)malloc(totalSize))) {
 		size_out = 0;
@@ -275,57 +273,98 @@ uint64_t ExtractorT7::GetAnimationSize(gameAddr anim, size_t maxSize)
 	}
 }
 
+void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* table, gAddr::MovesetTable* offsets)
+{
+	// Fill table
+	m_process->readBytes(movesetAddr + 0x150, table, sizeof(MovesetTable));
+	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
+	gameAddr tableStartAddr = (gameAddr)table->reactions;
+	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
+	memcpy(offsets, table, sizeof(MovesetTable));
+	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, sizeof(MovesetTable) / 8 / 2);
+}
+
+char* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, gAddr::MovesetTable& table)
+{
+	gameAddr blockStart = (gameAddr)table.reactions;
+	gameAddr blockEnd = (gameAddr)table.throws + (sizeof(ThrowData) * table.throwsCount);
+	return allocateAndReadBlock(blockStart, blockEnd, size_out);
+}
+
+char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+{
+	gameAddr nameBlockEnd;
+	getNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
+	return allocateAndReadBlock(nameBlockStart, nameBlockEnd, size_out);
+}
+
 // -- Public methods -- //
 
 ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, float& progress)
 {
-	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
+	//
+	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
+	char* headerBlock;
+	char* movesetInfoBlock;
+	char* tableBlock;
+	char* motasListBlock;
+	char* nameBlock;
+	char* movesetBlock;
+	char* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
+	char* motaCustomBlock; // This is also a custom block because not contiguously stored
 
-	// Get the size of the various lists in the moveset, will need that later. We matched the same structure they did so a single read cab fill it.
+	// The size in bytes of the same blocks
+	uint64_t s_headerBlock = sizeof(MovesetHeader);
+	uint64_t s_movesetInfoBlock;
+	uint64_t s_tableBlock = sizeof(MovesetTable);
+	uint64_t s_motasListBlock = sizeof(MotaList);
+	uint64_t s_nameBlock;
+	uint64_t s_movesetBlock;
+	uint64_t s_animationBlock;
+	uint64_t s_motaCustomBlock;
+
+	// The address of the moveset we will be extracting
+	gameAddr movesetAddr;
+	movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
+
+	// We will read the table containing <list_ptr:list_size>, in here.
+	// Offsets will contain the same as table but converted to offsets, in order to convert the absolute pointers contained within the moveset to offsets
 	gAddr::MovesetTable table{};
-	gAddr::MovesetTable offsets{}; // Contains the lists but converted to offsets that we will use to convert ptrs into indexes
+	gAddr::MovesetTable offsets{};
+
+	// Contains absolute addresses of mota file within the game's memory
 	MotaList motasList{};
-	m_process->readBytes(movesetAddr + 0x150, &table, sizeof(MovesetTable));
-	m_process->readBytes(movesetAddr + 0x280, &motasList, sizeof(MotaList));
 
-	// Keep these two separated cause the list will lose them (on purpose) but need them for covnerting ptr into offsets
-	gameAddr firstListAddr = (gameAddr)table.reactions;
-	gameAddr lastListAddr = (gameAddr)table.throws;
-
-	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
-	memcpy(&offsets, &table, sizeof(MovesetTable));
-	Helpers::convertPtrsToOffsets(&offsets, firstListAddr, 16, sizeof(table) / 8 / 2);
-
-	// Reads block containing basic moveset infos and aliases
-	uint64_t movesetInfoBlockSize = 0;
-	char* movesetInfoBlock = allocateAndReadBlock(movesetAddr, movesetAddr + 0x150, movesetInfoBlockSize);
+	// Fill table
+	FillMovesetTables(movesetAddr, &table, &offsets);
 
 	// Reads block containing the actual moveset data
-	uint64_t movesetBlockSize = 0;
-	char* movesetBlock = allocateAndReadBlock(firstListAddr, lastListAddr + (sizeof(ThrowData) * table.throwsCount), movesetBlockSize);
-	Move* movelist = (Move*)((int64_t)movesetBlock + offsets.move);
+	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
+	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
+	Move* movelist = (Move*)(movesetBlock + offsets.move);
 
-	// Prepare anim list to properly guess size of anims
+	// Read mota list and prepare anim list to properly guess size of anims
+	m_process->readBytes(movesetAddr + 0x280, &motasList, sizeof(MotaList));
 	std::vector<gameAddr> animList = getMotaListAnims(&motasList);
-	// Extract animations and build a map for their old address -> their new offset
+	// Extract animations and build a map for their old address -> their new offset in our blocks
 	std::map<gameAddr, uint64_t> animOffsetMap;
-	uint64_t animationBlockSize = 0;
-	char* animationBlock = GetAnimations(movelist, table.moveCount, animationBlockSize, animOffsetMap, animList);
+	animationBlock = GetAnimations(movelist, table.moveCount, s_animationBlock, animOffsetMap, animList);
 
 	// Reads block containing names of moves and animations
-	gameAddr nameStart = 0;
-	gameAddr nameEnd = 0;
-	getNamesBlockBounds(movelist, table.moveCount, nameStart, nameEnd);
-	uint64_t nameBlockSize = 0;
-	char* nameBlock = allocateAndReadBlock(nameStart, nameEnd, nameBlockSize);
+	gameAddr nameBlockStart = 0;
+	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock, movelist, table.moveCount, nameBlockStart);
 
 	uint64_t motaCustomBlockSize = 0;
-	char* motaCustomBlock = allocateMotaCustomBlock(&motasList, motaCustomBlockSize);
+	motaCustomBlock = allocateMotaCustomBlock(&motasList, s_motaCustomBlock);
+
+	// Reads block containing basic moveset infos and aliases
+	 movesetInfoBlock = allocateAndReadBlock(movesetAddr, movesetAddr + 0x150, s_movesetInfoBlock);
 
 
 	// Now that we extracted everything, we can properly convert pts to offsets
-	convertMovesetPointers(movesetBlock, table, offsets, nameStart, animOffsetMap);
+	convertMovesetPointers(movesetBlock, table, offsets, nameBlockStart, animOffsetMap);
 
+	// -- Extraction finished --
 
 	// Setup our own header to write in the output file containg useful information
 	MovesetHeader header{0};
@@ -344,14 +383,16 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
 	// This is bceause you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
 	header.offsets.movesetInfoBlock = 0x0;
-	header.offsets.tableBlock = header.offsets.movesetInfoBlock + movesetInfoBlockSize;
-	header.offsets.motalistsBlock = header.offsets.tableBlock + sizeof(offsets);
-	header.offsets.nameBlock = header.offsets.motalistsBlock + sizeof(motasList);
-	header.offsets.movesetBlock = header.offsets.nameBlock + nameBlockSize;
-	header.offsets.animationBlock = header.offsets.movesetBlock + movesetBlockSize;
-	header.offsets.motaBlock = header.offsets.animationBlock + animationBlockSize;
+	header.offsets.tableBlock = header.offsets.movesetInfoBlock + s_movesetInfoBlock;
+	header.offsets.motalistsBlock = header.offsets.tableBlock + s_tableBlock;
+	header.offsets.nameBlock = header.offsets.motalistsBlock + s_motasListBlock;
+	header.offsets.movesetBlock = header.offsets.nameBlock + s_nameBlock;
+	header.offsets.animationBlock = header.offsets.movesetBlock + s_movesetBlock;
+	header.offsets.motaBlock = header.offsets.animationBlock + s_animationBlock;
 
 	ExtractionErrcode errcode = ExtractionSuccessful;
+
+	// -- Writing the file -- 
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
 		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
@@ -363,15 +404,19 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 		// Create the file
 		if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
 		{
+			headerBlock = (char*)&header;
+			tableBlock = (char*)&offsets;
+			motasListBlock = (char*)&motasList;
+
 			// Start writing what we extracted into the file
-			m_file.write((char*)&header, sizeof(header));
-			m_file.write(movesetInfoBlock, movesetInfoBlockSize);
-			m_file.write((char*)&offsets, sizeof(offsets));
-			m_file.write((char*)&motasList, sizeof(motasList));
-			m_file.write(nameBlock, nameBlockSize);
-			m_file.write(movesetBlock, movesetBlockSize);
-			m_file.write(animationBlock, animationBlockSize);
-			m_file.write(motaCustomBlock, motaCustomBlockSize);
+			m_file.write(headerBlock, s_headerBlock);
+			m_file.write(movesetInfoBlock, s_movesetInfoBlock);
+			m_file.write(tableBlock, s_tableBlock);
+			m_file.write(motasListBlock, s_motaCustomBlock);
+			m_file.write(nameBlock, s_nameBlock);
+			m_file.write(movesetBlock, s_movesetBlock);
+			m_file.write(animationBlock, s_animationBlock);
+			m_file.write(motaCustomBlock, s_motaCustomBlock);
 
 			// Extraction is over
 			CloseMovesetFile();
@@ -384,8 +429,11 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 
 
-	// Cleanup our temp allocated memory blocks
+	/// Cleanup our temp allocated memory blocks
+	// headerBlock: not allocated, don't free()
 	free(movesetInfoBlock);
+	// tableBlock: not allocated, don't free()
+	// motasListBlock: not allocated, don't free()
 	free(nameBlock);
 	free(movesetBlock);
 	free(animationBlock);
