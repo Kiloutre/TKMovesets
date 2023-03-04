@@ -69,6 +69,14 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 		TO_INDEX(cancel->extradata_addr, table.cancelExtradata, CancelExtradata);
 	}
 
+	// Convert groupCancel cancel ptrs
+	i = 0;
+	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(movesetBlock + offsets.groupCancel); i < table.groupCancelCount; ++i, ++groupCancel)
+	{
+		TO_INDEX(groupCancel->requirement_addr, table.requirement, Requirement);
+		TO_INDEX(groupCancel->extradata_addr, table.cancelExtradata, CancelExtradata);
+	}
+
 	// Convert reaction ptrs
 	i = 0;
 	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(movesetBlock + offsets.reactions); i < table.reactionsCount; ++i, ++reaction)

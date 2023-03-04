@@ -159,7 +159,7 @@ namespace StructsT7
 
 	struct ThrowData
 	{
-		int32_t _0x0_int;
+		int64_t _0x0_int;
 		CameraData* cameradata_addr;
 	};
 
@@ -216,8 +216,8 @@ namespace StructsT7
 
 	struct unknown_0x200
 	{
-		Cancel* cancel_addr;
-		uint32_t requirement_req; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
+		Requirement requirements_addr;
+		uint32_t extraprop; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
 		uint32_t _0xC_int; // Often small values
 	};
 
@@ -415,14 +415,14 @@ namespace StructsT7_gameAddr
 
 	struct ThrowData
 	{
-		int32_t _0x0_int;
+		int64_t _0x0_int;
 		gameAddr cameradata_addr;
 	};
 
 	struct unknown_0x200
 	{
-		gameAddr cancel_addr;
-		uint32_t requirement_req; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
+		gameAddr requirements_addr;
+		uint32_t extraprop; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
 		uint32_t _0xC_int; // Often small values
 	};
 

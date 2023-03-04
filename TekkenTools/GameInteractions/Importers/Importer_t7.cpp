@@ -113,6 +113,13 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const 
 		FROM_INDEX(cancel->requirement_addr, blockOffset + offsets->requirement, Requirement);
 		FROM_INDEX(cancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
 	}
+	i = 0;
+
+	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(moveset + blockOffsets.movesetBlock + offsets->groupCancel); i < offsets->groupCancelCount; ++i, ++groupCancel)
+	{
+		FROM_INDEX(groupCancel->requirement_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(groupCancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
+	}
 
 	// Convert reaction ptrs
 	i = 0;
@@ -160,7 +167,7 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const 
 	i = 0;
 	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(moveset + blockOffsets.movesetBlock + offsets->unknown_0x200); i < offsets->unknown_0x200_size; ++i, ++unknown)
 	{
-		FROM_INDEX(unknown->cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(unknown->requirements_addr, blockOffset + offsets->cancel, Requirement);
 	}
 }
 
