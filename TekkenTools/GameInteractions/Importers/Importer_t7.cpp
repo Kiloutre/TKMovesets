@@ -81,12 +81,11 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 
 void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
 {
-	// todo:: this isnt correct
-	gAddr::Move* move = (gAddr::Move*)(moveset + blockOffsets.movesetBlock + offsets->move);
-	uint64_t moveCount = offsets->moveCount;
+	size_t i;
 	gameAddr movesetBlockOffset = gameMoveset + blockOffsets.movesetBlock;
 
-	for (size_t i = 0; i < moveCount; ++i)
+	i = 0;
+	for (gAddr::Move* move = (gAddr::Move*)(moveset + blockOffsets.movesetBlock + offsets->move); i < offsets->moveCount; ++i, ++move)
 	{
 		move->name_addr += gameMoveset + blockOffsets.nameBlock;
 		move->anim_name_addr += gameMoveset + blockOffsets.nameBlock;
@@ -96,8 +95,6 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const 
 		FROM_INDEX(move->hit_condition_addr, movesetBlockOffset + offsets->hitCondition, HitCondition);
 		FROM_INDEX(move->voicelip_addr, movesetBlockOffset + offsets->voiceclip, Voiceclip);
 		FROM_INDEX(move->extra_move_property_addr, movesetBlockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
-
-		++move;
 	}
 }
 
