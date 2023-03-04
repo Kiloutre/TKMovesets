@@ -18,11 +18,11 @@ class DLLCONTENT ImporterT7 : public Importer
 {
 private:
 	// In our locally allocated moveset, correct the mota lists offsets or copy the motas from the currently loaded character if we can't provide them
-	void ConvertMotaListOffsets(MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress);
+	void ConvertMotaListOffsets(uint64_t motalistsBlock, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress);
 	// In our locally allocated movest, correct the lists pointing to the various moveset structure lists
-	void ConvertMovesetTableOffsets(MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset);
+	void ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset);
 	//  Convert offsets of moves into ptrs
-	void ConvertMovesOffsets(char* movesetData, gameAddr gameMoveset, StructsT7_gameAddr::MovesetTable* offsets, MovesetHeader_offsets& blockOffsets);
+	void ConvertMovesOffsets(char* movesetData, gameAddr gameMoveset, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets);
 
 public:
 	using Importer::Importer; // Inherit constructor too

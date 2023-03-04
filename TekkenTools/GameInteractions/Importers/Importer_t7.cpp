@@ -27,13 +27,13 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 
 // -- Private methods -- //
 
-void ImporterT7::ConvertMotaListOffsets(MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
+void ImporterT7::ConvertMotaListOffsets(uint64_t motalistsBlock, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 	m_process->readBytes(currentMovesetAddr + 0x280, &currentMotasList, sizeof(MotaList));
 
-	MotaList* motaList = (MotaList*)(movesetData + offsets.motalistsBlock);
+	MotaList* motaList = (MotaList*)(movesetData + motalistsBlock);
 
 	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
 	uint64_t* fileMotaCursor = (uint64_t*)motaList;
@@ -53,12 +53,10 @@ void ImporterT7::ConvertMotaListOffsets(MovesetHeader_offsets& offsets, char* mo
 	}
 }
 
-void ImporterT7::ConvertMovesetTableOffsets(MovesetHeader_offsets& offsets, char* moveset, gameAddr gameMoveset)
+void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, char* moveset, gameAddr gameMoveset)
 {
 	gAddr::MovesetTable* table = (gAddr::MovesetTable*)(moveset + offsets.tableBlock);
 	gameAddr offset = gameMoveset + offsets.movesetBlock;
-
-	printf("moveset block at %llx\n", offsets.movesetBlock + sizeof(MovesetHeader_infos));
 
 	table->reactions += offset;
 	table->requirement += offset;
@@ -81,7 +79,7 @@ void ImporterT7::ConvertMovesetTableOffsets(MovesetHeader_offsets& offsets, char
 	table->throws += offset;
 }
 
-void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, gAddr::MovesetTable* offsets, MovesetHeader_offsets& blockOffsets)
+void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
 {
 	// todo:: this isnt correct
 	gAddr::Move* move = (gAddr::Move*)(moveset + blockOffsets.movesetBlock + offsets->move);
@@ -159,7 +157,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(header.offsets, moveset, gameMoveset, playerAddress);
+	ConvertMotaListOffsets(header.offsets.motalistsBlock, moveset, gameMoveset, playerAddress);
 
 
 	// -- Allocation &Conversion finished -- //
