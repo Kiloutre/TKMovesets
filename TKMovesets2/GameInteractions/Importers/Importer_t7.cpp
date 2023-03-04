@@ -30,6 +30,17 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 
 void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
 {
+	{
+		/// Yes, this needs to be done here, this is only useful when we really want to set the current move
+		// Each player actually holds 5 copies of its moveset ptr.
+		// One of them is the one to default to when going back to aliases move (>= 32768)
+		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
+		for (size_t i = 1; i < 5; ++i) {
+			m_process->writeInt64(movesetOffset + i * 8, playerMoveset);
+		}
+	}
+
 	if (moveId >= 0x8000) {
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
 		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
@@ -305,17 +316,9 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	progress = 99;
 
 	// Then write our moveset address to the current player
-	{
-		// Each player actually holds 5 copies of its moveset ptr.
-		// One of them is the one to default to when going back to aliases move (>= 32768)
-		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
-		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
-		for (size_t i = 0; i < 5; ++i) {
-			m_process->writeInt64(movesetOffset + i * 8, gameMoveset);
-		}
-	}
-	progress = 100;
 
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"), gameMoveset);
+	progress = 100;
 
 	if (applyInstantly) {
 		SetCurrentMove(playerAddress, gameMoveset, 32769);
