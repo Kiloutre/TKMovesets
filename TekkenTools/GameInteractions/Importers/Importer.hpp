@@ -8,7 +8,7 @@
 #include "constants.h"
 
 // If not MOVESET_ADDR_NULL, will add [offset} to [field]. Else, will set it to 0.
-# define ADD_IF_NOT_NULL_ADDR(field, offset) (field == MOVESET_ADDR_NULL ? 0 : (field + offset))
+# define ADD_IF_NOT_NULL_ADDR(field, offset) (field = (field == MOVESET_ADDR_NULL ? 0 : (field + offset)))
 
 // todo: actually handle these error codes and display an err message
 enum ImportationErrcode

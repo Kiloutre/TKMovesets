@@ -88,8 +88,6 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, gAddr:
 	uint64_t moveCount = offsets->moveCount;
 	gameAddr movesetBlockOffset = gameMoveset + blockOffsets.movesetBlock;
 
-	printf("%llx - %llx - %llx\n", +blockOffsets.movesetBlock + offsets->move, blockOffsets.movesetBlock, offsets->move);
-
 	for (size_t i = 0; i < moveCount; ++i)
 	{
 		move->name_addr += gameMoveset + blockOffsets.nameBlock;
@@ -97,7 +95,6 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, gAddr:
 		move->anim_addr += gameMoveset + blockOffsets.animationBlock;
 		move->cancel_addr += movesetBlockOffset + offsets->cancel; // this doesnt work
 
-		printf("%lld - %d\n", move->hit_condition_addr, move->hit_condition_addr == MOVESET_ADDR_NULL);
 		ADD_IF_NOT_NULL_ADDR(move->hit_condition_addr, movesetBlockOffset + offsets->hitCondition);
 		ADD_IF_NOT_NULL_ADDR(move->voicelip_addr, movesetBlockOffset + offsets->voiceclip);
 		ADD_IF_NOT_NULL_ADDR(move->extra_move_property_addr, movesetBlockOffset + offsets->extraMoveProperty);
