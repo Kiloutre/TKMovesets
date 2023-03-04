@@ -104,6 +104,13 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 		TO_INDEX(hitCondition->reactions_addr, table.reactions, Reactions);
 	}
 
+	// Convert pushback ptrs
+	i = 0;
+	for (gAddr::Pushback* pushback = (gAddr::Pushback*)(movesetBlock + offsets.pushback); i < table.pushbackCount; ++i, ++pushback)
+	{
+		TO_INDEX(pushback->extradata_addr, table.pushbackExtradata, PushbackExtradata);
+	}
+
 	// Convert ??? ptrs
 	i = 0;
 	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(movesetBlock + offsets.unknown_0x200); i < table.unknown_0x200_size; ++i, ++unknown)

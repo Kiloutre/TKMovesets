@@ -82,7 +82,7 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
 {
 	size_t i;
-	gameAddr movesetBlockOffset = gameMoveset + blockOffsets.movesetBlock;
+	gameAddr blockOffset = gameMoveset + blockOffsets.movesetBlock;
 
 	i = 0;
 	for (gAddr::Move* move = (gAddr::Move*)(moveset + blockOffsets.movesetBlock + offsets->move); i < offsets->moveCount; ++i, ++move)
@@ -90,11 +90,77 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, const 
 		move->name_addr += gameMoveset + blockOffsets.nameBlock;
 		move->anim_name_addr += gameMoveset + blockOffsets.nameBlock;
 		move->anim_addr += gameMoveset + blockOffsets.animationBlock;
-		move->cancel_addr += movesetBlockOffset + offsets->cancel; // this doesnt work
 
-		FROM_INDEX(move->hit_condition_addr, movesetBlockOffset + offsets->hitCondition, HitCondition);
-		FROM_INDEX(move->voicelip_addr, movesetBlockOffset + offsets->voiceclip, Voiceclip);
-		FROM_INDEX(move->extra_move_property_addr, movesetBlockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
+		FROM_INDEX(move->cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
+		FROM_INDEX(move->voicelip_addr, blockOffset + offsets->voiceclip, Voiceclip);
+		FROM_INDEX(move->extra_move_property_addr, blockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
+	}
+
+	// Convert projectile ptrs
+	i = 0;
+	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(moveset + blockOffsets.movesetBlock + offsets->projectile); i < offsets->projectileCount; ++i, ++projectile)
+	{
+		// One projectile actually has both at 0 for some reason ?
+		FROM_INDEX(projectile->cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(projectile->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
+	}
+
+	// Convert cancel ptrs
+	i = 0;
+	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(moveset + blockOffsets.movesetBlock + offsets->cancel); i < offsets->cancelCount; ++i, ++cancel)
+	{
+		FROM_INDEX(cancel->requirement_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(cancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
+	}
+
+	// Convert reaction ptrs
+	i = 0;
+	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(moveset + blockOffsets.movesetBlock + offsets->reactions); i < offsets->reactionsCount; ++i, ++reaction)
+	{
+		FROM_INDEX(reaction->front_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction->backturned_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction->left_side_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction->right_side_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction->front_counterhit_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction->downed_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction->block_pushback, blockOffset + offsets->pushback, Pushback);
+	}
+
+	// Convert input sequence ptrs
+	i = 0;
+	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(moveset + blockOffsets.movesetBlock + offsets->inputSequence); i < offsets->inputSequenceCount; ++i, ++inputSequence)
+	{
+		FROM_INDEX(inputSequence->input_addr, blockOffset + offsets->input, Input);
+	}
+
+	// Convert throws ptrs
+	i = 0;
+	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(moveset + blockOffsets.movesetBlock + offsets->throws); i < offsets->throwsCount; ++i, ++throws)
+	{
+		FROM_INDEX(throws->cameradata_addr, blockOffset + offsets->cameraData, CameraData);
+	}
+
+	// Convert hit conditions ptrs
+	i = 0;
+	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(moveset + blockOffsets.movesetBlock + offsets->hitCondition); i < offsets->hitConditionCount; ++i, ++hitCondition)
+	{
+		FROM_INDEX(hitCondition->requirement_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(hitCondition->reactions_addr, blockOffset + offsets->reactions, Reactions);
+	}
+
+	// Convert pushback ptrs
+	i = 0;
+	for (gAddr::Pushback* pushback = (gAddr::Pushback*)(moveset + blockOffsets.movesetBlock + offsets->pushback); i < offsets->pushbackCount; ++i, ++pushback)
+	{
+		FROM_INDEX(pushback->extradata_addr, blockOffset + offsets->pushbackExtradata, PushbackExtradata);
+	}
+
+	// Convert ??? ptrs
+	i = 0;
+	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(moveset + blockOffsets.movesetBlock + offsets->unknown_0x200); i < offsets->unknown_0x200_size; ++i, ++unknown)
+	{
+		FROM_INDEX(unknown->cancel_addr, blockOffset + offsets->cancel, Cancel);
 	}
 }
 
