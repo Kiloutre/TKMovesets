@@ -14,6 +14,8 @@
 #include "GameAddresses.h"
 
 // -- Private methods -- //
+// debug
+
 
 void GameExtract::LoadCharacterNames()
 {
