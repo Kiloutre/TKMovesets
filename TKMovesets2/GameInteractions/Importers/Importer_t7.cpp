@@ -11,15 +11,16 @@
 
 // -- Static helpers -- //
 
-static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& movesetSize)
+// Reads the moveset header size, the moveset size (post header), allocate the moveset in our own memory and write to it
+static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& size_out)
 {
 	file.read((char*)header, sizeof(MovesetHeader));
 	file.seekg(0, std::ios::end);
-	movesetSize = file.tellg();
-	char* movesetData = (char*)malloc(movesetSize);
+	size_out = file.tellg();
+	char* movesetData = (char*)malloc(size_out - header->infos.header_size);
 	if (movesetData != nullptr) {
-		file.seekg(header->offsets.movesetInfoBlock + header->infos.header_size, std::ios::beg);
-		file.read(movesetData, movesetSize);
+		file.seekg( header->infos.header_size + header->offsets.movesetInfoBlock, std::ios::beg);
+		file.read(movesetData, size_out);
 	}
 	file.close();
 	return movesetData;
@@ -28,7 +29,6 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 // -- Private methods -- //
 
 void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
-
 {
 	{
 		// Each player actually holds 5 copies of its moveset ptr.
