@@ -130,7 +130,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 	uint64_t motaCustomBlockSize = 0;
 
 	// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
-	uint16_t motasToExport = StructsT7Helpers::MOTA_HANDS | StructsT7Helpers::MOTA_CAMERAS;
+	uint16_t motasToExport = cm_defaultMotaFlags;
 
 	// Normally you would go up to (i < 12), but i don't care about the last two and i do care about working with a reliable motaSize, so this is what i am doing
 	for (size_t i = 0; i < 10; ++i)
@@ -172,7 +172,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 			}
 		}
 
-		// Use bitfligs to sore which one we want to store
+		// Use bitfligs to store which one we want to store
 		if ((1 << i) & motasToExport) {
 			offsetMap[motaAddr] = motaCustomBlockSize;
 			motaCustomBlockSize += motaSize;

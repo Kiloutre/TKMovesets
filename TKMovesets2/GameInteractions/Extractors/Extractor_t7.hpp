@@ -17,6 +17,8 @@ using namespace StructsT7;
 class DLLCONTENT ExtractorT7 : public Extractor
 {
 private:
+	const uint16_t cm_defaultMotaFlags = StructsT7Helpers::MOTA_HANDS | StructsT7Helpers::MOTA_CAMERAS;
+
 	/// Main functions
 
 	// Fill the moveset table & its corresponding offset table brother.

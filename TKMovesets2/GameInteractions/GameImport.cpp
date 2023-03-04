@@ -13,6 +13,8 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
+/// Class storing an importation queue and an Importer* instance to feed it to
+
 // -- Private methods -- //
 
 void GameImport::OnProcessAttach()

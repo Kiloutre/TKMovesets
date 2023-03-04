@@ -13,6 +13,8 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
+/// Class storing an extraction queue and an Extractor* instance to feed it to
+
 // -- Private methods -- //
 
 void GameExtract::LoadCharacterNames()
@@ -39,7 +41,6 @@ void GameExtract::InstantiateFactory()
 	if (m_extractor != nullptr) {
 		delete m_extractor;
 	}
-
 	m_extractor = Games::FactoryGetExtractor(currentGameId, process, game);
 }
 
