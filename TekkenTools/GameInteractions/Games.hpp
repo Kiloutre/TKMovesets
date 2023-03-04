@@ -45,7 +45,7 @@ namespace Games
 	DLLCONTENT GameInfo* GetGameInfo(uint8_t idx);
 
 	// Returns the amount of supported games
-	DLLCONTENT size_t GetGamesCount();
+	DLLCONTENT uint8_t GetGamesCount();
 
 	// Istantiate a new game-dependant extractor
 	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game);

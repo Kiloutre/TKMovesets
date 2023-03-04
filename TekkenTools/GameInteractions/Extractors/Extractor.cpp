@@ -8,6 +8,8 @@
 
 #include "GameAddresses.h"
 
+// -- helpers -- //
+
 namespace ExtractorUtils
 {
 	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim)

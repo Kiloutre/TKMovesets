@@ -10,7 +10,10 @@
 
 using namespace StructsT7;
 
-// This class has no storage and i would like to keep it that way. You should be passing values through method calls and no other way.
+// This class has no storage and i would like to keep it that way.
+// You should be passing values through method calls and no other way.
+// It should be able to call Export() while another Export() is going on in another thread and this without breaking anything
+
 class DLLCONTENT ExtractorT7 : public Extractor
 {
 private:
@@ -32,11 +35,11 @@ private:
 	/// Helpers
 
 	// Writes bounds of the block containing anim and move names
-	void getNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
+	void GetNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
 	// Returns the amount of bytes an animation contains
 	uint64_t GetAnimationSize(gameAddr anim, size_t maxSize);
 	// Returns an allocated block containing mota block offsets followed by mota blocks
-	char* allocateMotaCustomBlock(MotaList* motas, uint64_t& size_out);
+	char* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out);
 
 public:
 	using Extractor::Extractor; // Inherit constructor too

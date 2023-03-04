@@ -170,8 +170,8 @@ namespace StructsT7
 	struct Move
 	{
 		// 0 = 0 when writing (might be a ptr)
-		char* name;
-		char* anim_name;
+		char* name_addr;
+		char* anim_name_addr;
 		void* anim_addr;
 		uint32_t vuln;
 		uint32_t hitlevel;
@@ -406,8 +406,8 @@ namespace StructsT7_gameAddr
 	struct Move
 	{
 		// 0 = 0 when writing (might be a ptr)
-		gameAddr name;
-		gameAddr anim_name;
+		gameAddr name_addr;
+		gameAddr anim_name_addr;
 		gameAddr anim_addr;
 		uint32_t vuln;
 		uint32_t hitlevel;

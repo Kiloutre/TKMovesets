@@ -17,13 +17,13 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	{
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		ImGui::SeparatorText(_("extraction.extraction"));
-		size_t currentGameId = extractorHelper.currentGameId;
+		uint8_t currentGameId = extractorHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 
-		size_t gameListCount = Games::GetGamesCount();
+		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
-			for (size_t i = 0; i < gameListCount; ++i)
+			for (uint8_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
 				if (game->flags & GameExtractable) {
@@ -135,6 +135,16 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			if (moveset->origin == "INVALID") {
 				// Badly formatted file. Display it, but mention it is invalid
 				ImGui::TextUnformatted(_("moveset.invalid"));
+				ImGui::TableNextColumn();
+				ImGui::TableNextColumn();
+				ImGui::TableNextColumn();
+				ImGui::TableNextColumn();
+				ImGui::TableNextColumn();
+				ImGui::PushID(moveset->filename.c_str());
+				if (ImGui::Button("X")) {
+					extractorHelper.storage->DeleteMoveset(moveset->filename.c_str());
+				}
+				ImGui::PopID();
 			}
 			else {
 				ImGui::TextUnformatted(moveset->origin.c_str());
@@ -154,8 +164,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
-				if (ImGui::Button("X"))
-				{
+				if (ImGui::Button("X")) {
 					extractorHelper.storage->DeleteMoveset(moveset->filename.c_str());
 				}
 				ImGui::PopID();

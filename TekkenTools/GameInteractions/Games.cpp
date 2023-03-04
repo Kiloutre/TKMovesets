@@ -34,7 +34,7 @@ namespace Games
 		return (GameInfo*)&cg_gamesInfo[idx];
 	}
 
-	size_t GetGamesCount()
+	uint8_t GetGamesCount()
 	{
 		return sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo);
 	}

@@ -7,6 +7,7 @@
 
 #include "constants.h"
 
+// todo: actually handle these error codes and display an err message
 enum ImportationErrcode
 {
 	ImportationSuccessful = 0,

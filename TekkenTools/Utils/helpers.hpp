@@ -8,6 +8,12 @@
 
 namespace Helpers
 {
+    // Make sure a value is divislbe by 8
+    uint64_t align8Bytes(uint64_t value);
+
+    // Make sure a file's cursor is divisble by 8
+    void align8Bytes(std::ofstream& file);
+
     // Gets the current date format in 'hour:minutes day/month/year'
     std::string currentDateTime(uint64_t date);
 
