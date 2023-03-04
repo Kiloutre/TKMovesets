@@ -49,10 +49,10 @@ static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetTable
 		move->name_addr -= nameStart;
 		move->anim_name_addr -= nameStart;
 		move->anim_addr = animOffsetMap[move->anim_addr];
-		move->cancel_addr -= table.cancel;
-		SUBSTRACT_BY_IF_NOT_NULL_ADDR(move->hit_condition_addr, table.hitCondition);
-		SUBSTRACT_BY_IF_NOT_NULL_ADDR(move->voicelip_addr, table.voiceclip);
-		SUBSTRACT_BY_IF_NOT_NULL_ADDR(move->extra_move_property_addr, table.extraMoveProperty);
+		TO_INDEX(move->cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move->hit_condition_addr, table.hitCondition, HitCondition);
+		TO_INDEX(move->voicelip_addr, table.voiceclip, Voiceclip);
+		TO_INDEX(move->extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
 	}
 
 	// Convert projectile ptrs
@@ -60,51 +60,51 @@ static void convertMovesetPointers(char* movesetBlock, const gAddr::MovesetTable
 	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(movesetBlock + offsets.projectile); i < table.projectileCount; ++i, ++projectile)
 	{
 		// One projectile actually has both at 0 for some reason ?
-		SUBSTRACT_BY_IF_NOT_NULL_ADDR(projectile->cancel_addr, table.cancel);
-		SUBSTRACT_BY_IF_NOT_NULL_ADDR(projectile->hit_condition_addr, table.hitCondition);
+		TO_INDEX(projectile->cancel_addr, table.cancel, Cancel);
+		TO_INDEX(projectile->hit_condition_addr, table.hitCondition, HitCondition);
 	}
 
 	// Convert cancel ptrs
 	i = 0;
 	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(movesetBlock + offsets.cancel); i < table.cancelCount; ++i, ++cancel)
 	{
-		cancel->requirement_addr -= table.requirement;
-		cancel->extradata_addr -= table.cancelExtradata;
+		TO_INDEX(cancel->requirement_addr, table.requirement, Requirement);
+		TO_INDEX(cancel->extradata_addr, table.cancelExtradata, CancelExtradata);
 	}
 
 	// Convert reaction ptrs
 	i = 0;
 	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(movesetBlock + offsets.reactions); i < table.reactionsCount; ++i, ++reaction)
 	{
-		reaction->front_pushback -= table.pushback;
-		reaction->backturned_pushback -= table.pushback;
-		reaction->left_side_pushback -= table.pushback;
-		reaction->right_side_pushback -= table.pushback;
-		reaction->front_counterhit_pushback -= table.pushback;
-		reaction->downed_pushback -= table.pushback;
-		reaction->block_pushback -= table.pushback;
+		TO_INDEX(reaction->front_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction->backturned_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction->left_side_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction->right_side_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction->front_counterhit_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction->downed_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction->block_pushback, table.pushback, Pushback);
 	}
 
 	// Convert input sequence ptrs
 	i = 0;
 	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(movesetBlock + offsets.inputSequence); i < table.inputSequenceCount; ++i, ++inputSequence)
 	{
-		inputSequence->input_addr -= table.input;
+		TO_INDEX(inputSequence->input_addr, table.input, Input);
 	}
 
 	// Convert throws ptrs
 	i = 0;
 	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(movesetBlock + offsets.throws); i < table.throwsCount; ++i, ++throws)
 	{
-		throws->cameradata_addr -= table.cameraData;
+		TO_INDEX(throws->cameradata_addr, table.cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs
 	i = 0;
 	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(movesetBlock + offsets.hitCondition); i < table.hitConditionCount; ++i, ++hitCondition)
 	{
-		hitCondition->requirement_addr -= table.requirement;
-		hitCondition->reactions_addr -= table.reactions;
+		TO_INDEX(hitCondition->requirement_addr, table.requirement, Requirement);
+		TO_INDEX(hitCondition->reactions_addr, table.reactions, Reactions);
 	}
 }
 

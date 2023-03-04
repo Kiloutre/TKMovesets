@@ -95,9 +95,9 @@ void ImporterT7::ConvertMovesOffsets(char* moveset, gameAddr gameMoveset, gAddr:
 		move->anim_addr += gameMoveset + blockOffsets.animationBlock;
 		move->cancel_addr += movesetBlockOffset + offsets->cancel; // this doesnt work
 
-		ADD_IF_NOT_NULL_ADDR(move->hit_condition_addr, movesetBlockOffset + offsets->hitCondition);
-		ADD_IF_NOT_NULL_ADDR(move->voicelip_addr, movesetBlockOffset + offsets->voiceclip);
-		ADD_IF_NOT_NULL_ADDR(move->extra_move_property_addr, movesetBlockOffset + offsets->extraMoveProperty);
+		FROM_INDEX(move->hit_condition_addr, movesetBlockOffset + offsets->hitCondition, HitCondition);
+		FROM_INDEX(move->voicelip_addr, movesetBlockOffset + offsets->voiceclip, Voiceclip);
+		FROM_INDEX(move->extra_move_property_addr, movesetBlockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
 
 		++move;
 	}

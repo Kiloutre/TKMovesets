@@ -7,8 +7,8 @@
 
 #include "constants.h"
 
-// If not MOVESET_ADDR_NULL, will add [offset} to [field]. Else, will set it to 0.
-# define ADD_IF_NOT_NULL_ADDR(field, offset) (field = (field == MOVESET_ADDR_NULL ? 0 : (field + offset)))
+// Turns an index into an absolute address, or NULL (0) if index is -1
+# define FROM_INDEX(field, listStartAddr, type) (field = (field == -1 ? 0 : listStartAddr + (field * sizeof(type))))
 
 // todo: actually handle these error codes and display an err message
 enum ImportationErrcode

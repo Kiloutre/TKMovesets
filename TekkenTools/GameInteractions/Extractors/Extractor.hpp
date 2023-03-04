@@ -8,8 +8,8 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
-// If not null, will decrement [field] by [offset]. Else, will set [field] to MOVESET_ADDR_NULL to indicate optional moveset ptrs
-# define SUBSTRACT_BY_IF_NOT_NULL_ADDR(field, offset) (field = (field == 0 ? MOVESET_ADDR_NULL : (field - offset)))
+// Converts a ptr to an index, -1 if the address is null
+# define TO_INDEX(field, listStartAddr, type) (field = (field == 0 ? -1 : (field - listStartAddr) / sizeof(type)))
 
 enum ExtractionErrcode
 {
