@@ -18,7 +18,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # (Developer) Setting up the project locally
 
-## Compilation
+## Infos
 This project uses CMake, so if you're new to this, your best way to get started is to install **Visual Studio Community**, and making sure to install the **C++ modules**. If you already have Visual Studio but without those modules, you can still install them.
 
 ## Dependencies
