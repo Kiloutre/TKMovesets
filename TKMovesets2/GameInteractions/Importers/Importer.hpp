@@ -23,7 +23,6 @@ enum ImportationErrcode
 class DLLCONTENT Importer
 {
 protected:
-	// Stores the extraction directory
 	// Stores the process to read on
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt

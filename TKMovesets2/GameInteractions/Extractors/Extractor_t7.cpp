@@ -32,7 +32,7 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x28_llong);
 		}
 		if (move->_0x5E_short != 0) {
-			printf("move offset 0x5e is not 0, please look into importing it, see if it can be useful\n", move->_0x5E_short);
+			printf("move offset 0x5e is not 0, please look into importing it, see if it can be useful. value is %x\n", move->_0x5E_short);
 		}
 		if (move->_0x48_llong != 0) {
 			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x48_llong);
@@ -196,7 +196,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::v
 			m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
 			for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
 			{
-				uint64_t animAddr = motaAddr + animOffsetList[i];
+				uint64_t animAddr = motaAddr + animOffsetList[motaAnimIdx];
 				if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
 					boundaries.push_back(animAddr);
 				}
@@ -410,9 +410,9 @@ void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, ga
 	infos.flags = 0; // Currently unused
 	infos.gameId = gameId;
 	infos.characterId = GetCharacterID(playerAddress);
-	strcpy(infos.version_string, MOVESET_VERSION_STRING);
-	strcpy(infos.origin, GetGameOriginString());
-	strcpy(infos.target_character, GetPlayerCharacterName(playerAddress).c_str());
+	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
+	strcpy_s(infos.origin, sizeof(infos.origin), GetGameOriginString());
+	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
 	infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();;
 	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(MovesetHeader));
 }
@@ -529,8 +529,12 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 		errcode = ExtractionAllocationErr;
 	}
 	else {
-		// Create the file
-		if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
+		// Create the file*
+
+		std::string filepath = GetFilepath(characterName.c_str(), overwriteSameFilename);
+		std::ofstream m_file(filepath.c_str(), std::ios::binary | std::ios::out);
+
+		if (!m_file.fail())
 		{
 			//
 			progress = 80;
@@ -568,7 +572,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 			m_file.write(motaCustomBlock, s_motaCustomBlock);
 			Helpers::align8Bytes(m_file);
 
-			CloseMovesetFile();
+			m_file.close();
 
 			progress = 100;
 			// Extraction is over

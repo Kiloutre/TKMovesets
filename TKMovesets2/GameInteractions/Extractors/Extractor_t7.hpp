@@ -45,6 +45,10 @@ private:
 	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
 	uint64_t CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap);
 
+
+	const char* GetGameIdentifierString() override { return "T7_"; }
+	const char* GetGameOriginString() override { return "Tekken 7"; }
+
 public:
 	using Extractor::Extractor; // Inherit constructor too
 	ExtractionErrcode Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, uint8_t& progress) override;
@@ -52,8 +56,4 @@ public:
 
 	std::string GetPlayerCharacterName(gameAddr playerAddress) override;
 	uint32_t GetCharacterID(gameAddr playerAddress) override;
-
-
-	const char* GetGameIdentifierString() override { return "T7_"; }
-	const char* GetGameOriginString() override { return "Tekken 7"; }
 };

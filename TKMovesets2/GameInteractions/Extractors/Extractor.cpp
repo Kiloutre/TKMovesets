@@ -40,7 +40,7 @@ char* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	return block;
 }
 
-std::string Extractor::GetFilename(const char* characterName, const char* gameIdentifierString, unsigned int suffixId)
+std::string Extractor::GenerateFilename(const char* characterName, const char* gameIdentifierString, unsigned int suffixId)
 {
 	if (suffixId <= 1) {
 		return std::format("{}/{}{}" MOVESET_FILENAME_EXTENSION, cm_extractionDir, gameIdentifierString, characterName);
@@ -50,26 +50,23 @@ std::string Extractor::GetFilename(const char* characterName, const char* gameId
 	}
 }
 
-bool Extractor::CreateMovesetFile(const char* characterName, const char* gameIdentifierstring, bool overwriteSameFilename)
+std::string Extractor::GetFilepath(const char* characterName, bool overwriteSameFilename)
 {
 	CreateDirectory(cm_extractionDir, NULL);
+	// Make sure the directory for extraction exists 
 
-	std::string filePath = GetFilename(characterName, gameIdentifierstring);
+	const char* gameIdentifierstring = GetGameIdentifierString();
+
+	std::string filePath = GenerateFilename(characterName, gameIdentifierstring, 0);
 
 	if (!overwriteSameFilename && Helpers::fileExists(filePath.c_str())) {
-		filePath = GetFilename(characterName, gameIdentifierstring, 1);
+		filePath = GenerateFilename(characterName, gameIdentifierstring, 1);
 		unsigned int counter = 1;
 		while (Helpers::fileExists(filePath.c_str())) {
 			counter++;
-			filePath = GetFilename(characterName, gameIdentifierstring, counter);
+			filePath = GenerateFilename(characterName, gameIdentifierstring, counter);
 		}
 	}
 
-	m_file.open(filePath.c_str(), std::ios::binary | std::ios::out);
-	return !m_file.fail();
-}
-
-void Extractor::CloseMovesetFile()
-{
-	m_file.close();
+	return filePath;
 }
