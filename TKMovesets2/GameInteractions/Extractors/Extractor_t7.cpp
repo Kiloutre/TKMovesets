@@ -172,13 +172,18 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 			continue;
 		}
 
-		// Read of the mota file offset list, which is a list of 4 bytes offsets relative to the mota file start itself
-		for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
-		{
-			uint64_t animAddr = motaAddr + m_process->readInt32(motaAddr + 0x14 + (motaAnimIdx - 1) * 4);
-			if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
-				boundaries.push_back(animAddr);
+		// Read mota file's offset list, which is a list of 4 bytes offsets relative to the mota file start itself
+		uint32_t* animOffsetList = (uint32_t*)malloc(sizeof(uint32_t) * animCount);
+		if (animOffsetList != nullptr) {
+			m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
+			for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
+			{
+				uint64_t animAddr = motaAddr + animOffsetList[i];
+				if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
+					boundaries.push_back(animAddr);
+				}
 			}
+			free(animOffsetList);
 		}
 	}
 	return motaCustomBlockSize;
