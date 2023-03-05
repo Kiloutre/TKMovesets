@@ -22,12 +22,16 @@ private:
 	void InstantiateFactory() override;
 	// Function ran in the parallel thread, used to latch on to process
 	void RunningUpdate() override;
+	// Called before detaching form the current process
+	void PreProcessDetach() override;
+
 public:
 	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
 	// true = force the 32769 move from the new moveset to apply 
 	bool apply_instantly = true;
-	// todo: garbage collector or something
+	// Whether to free unused movesets after each importation
+	bool free_unused_movesets = true;
 
 	// Default flags are raed-only, so the importer needs this
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }

@@ -51,6 +51,8 @@ public:
 	gameAddr moduleAddr{ (gameAddr)0x0 };
 	// Contains the size of the module in bytes
 	uint64_t moduleSize{ 0 };
+	// List of allocated blocks within the game's memory
+	std::vector<std::pair<gameAddr, uint64_t>> allocatedMemory;
 	// Base address. Every read & write will be done on base + addr.
 	//gameAddr baseAddress{ (gameAddr)0x0 };
 

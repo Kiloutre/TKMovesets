@@ -44,7 +44,17 @@ void GameImport::RunningUpdate()
 		auto &[filename, playerAddress] = m_plannedImportations[0];
 		// Start Importation
 		m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+		if (free_unused_movesets) {
+			m_importer->CleanupUnusedMovesets();
+		}
 		m_plannedImportations.erase(m_plannedImportations.begin());
+	}
+}
+
+void GameImport::PreProcessDetach()
+{
+	if (free_unused_movesets) {
+		m_importer->CleanupUnusedMovesets();
 	}
 }
 
@@ -57,6 +67,9 @@ void GameImport::StopThreadAndCleanup()
 	m_t.join();
 
 	if (m_importer != nullptr) {
+		if (free_unused_movesets && process->IsAttached()) {
+			m_importer->CleanupUnusedMovesets();
+		}
 		delete m_importer;
 	}
 }

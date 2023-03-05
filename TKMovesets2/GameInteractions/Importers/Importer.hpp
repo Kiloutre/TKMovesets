@@ -35,4 +35,6 @@ public:
 	virtual ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanImport() = 0;
+	// Look through movesets that we previously allocated in the game and free the unused ones
+	virtual void CleanupUnusedMovesets() = 0;
 };

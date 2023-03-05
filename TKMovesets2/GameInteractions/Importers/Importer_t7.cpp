@@ -31,11 +31,12 @@ static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_
 void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
 {
 	{
+		/// Yes, this needs to be done here, this is only useful when we really want to set the current move
 		// Each player actually holds 5 copies of its moveset ptr.
 		// One of them is the one to default to when going back to aliases move (>= 32768)
 		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
 		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
-		for (size_t i = 0; i < 5; ++i) {
+		for (size_t i = 1; i < 5; ++i) {
 			m_process->writeInt64(movesetOffset + i * 8, playerMoveset);
 		}
 	}
@@ -55,13 +56,22 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 	m_process->writeInt64(playerAddress + 0x350, moveId);
 }
 
-void ImporterT7::ConvertMotaListOffsets(uint64_t motalistsBlock, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
+void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
+{
+	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + 0x2C0);
+	gameAddr cameraMota2 = m_process->readInt64(movesetAddr + 0x2C8);
+
+	m_process->writeInt64(playerAddress + 0x14a0, cameraMota1);
+	m_process->writeInt64(playerAddress + 0x14a8, cameraMota2);
+}
+
+void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 	m_process->readBytes(currentMovesetAddr + 0x280, &currentMotasList, sizeof(MotaList));
 
-	MotaList* motaList = (MotaList*)(movesetData + motalistsBlock);
+	MotaList* motaList = (MotaList*)(movesetData + offsets.motalistsBlock);
 
 	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
 	uint64_t* fileMotaCursor = (uint64_t*)motaList;
@@ -69,14 +79,14 @@ void ImporterT7::ConvertMotaListOffsets(uint64_t motalistsBlock, char* movesetDa
 	// This is just a list of uint64_t anyway so might as well do this
 	for (size_t i = 0; i <= 12; ++i)
 	{
-		if (fileMotaCursor[i] == 0 || true) {
+		if (fileMotaCursor[i] == MOVESET_ADDR_MISSING) {
 			// Moveset block was not included in the file: copy the currently used one
 			fileMotaCursor[i] = gameMotaCursor[i];
 		}
 		else
 		{
 			// Todo: check if this works. I believe we are off.
-			fileMotaCursor[i] += gameMoveset;
+			fileMotaCursor[i] += gameMoveset + offsets.motaBlock;
 		}
 	}
 }
@@ -105,6 +115,29 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 	table->unknownParryRelated += offset;
 	table->cameraData += offset;
 	table->throws += offset;
+}
+
+void ImporterT7::ApplyCharacterIDFixes(char* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const MovesetHeader& header)
+{
+	// In movesets, some moves (for some reason) can be transitionned into only on specific character IDs
+	// I am taking about mundane moves such as EWHF not working where WHF does
+	// The why is hard to understand and might possibly be linked to Mokujin/Combot, but anyway, this fixes things
+	uint16_t movesetCharacterId = header.infos.characterId;
+	uint16_t currentCharacterId = m_process->readInt16(playerAddress + 0xD8);
+
+	Requirement* requirement = (Requirement*)(moveset + header.offsets.movesetBlock + offsets->requirement);
+
+	for (size_t i = 0; i < offsets->requirementCount; ++i)
+	{
+		// 217 = Is current char specific ID
+		// When the requirement ask "am i X character ID", X = extracted character ID,
+		// i will change that X character ID to be the one of the current character, to make it always true.
+		// When the requirement ask for any other character ID, i will supply a character ID that ISN'T the current one, to make it always false.
+
+		if (requirement[i].req == 217) {
+			requirement[i].param = requirement[i].param == movesetCharacterId ? currentCharacterId : currentCharacterId + 1;
+		}
+	}
 }
 
 void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
@@ -201,6 +234,56 @@ void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, cons
 
 // -- Public methods -- //
 
+void ImporterT7::CleanupUnusedMovesets()
+{
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val_playerstruct_size");
+	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val_motbin_offset");
+
+	uint64_t offsetsToWatch[] = {
+		0x218, 0x220, 0x228, // Move
+		0xBC8, 0xD80, // ???
+		0x13C0, 0x13E8, 0x13F0, // ???
+		0x14a0, 0x14a8, // Static camera mota
+		0x1520, 0x1528, 0x1530, 0x1540 // Moveset
+	};
+
+	for (size_t i = 0; i + 1 < m_process->allocatedMemory.size();)
+	{
+		std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
+		gameAddr movesetAddress = block.first;
+		uint64_t movesetEnd = movesetAddress + block.second;
+		bool isUsed = false;
+
+		// Call CanImport() because it's a quick way to see if players are loaded. If they're not, we can free memory worry-free.
+		if (CanImport()) {
+			// Check movesets of both players
+			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid) {
+				gameAddr movesetOffsets = playerAddress + motbinOffset + playerid * playerstructSize;
+
+				// Check a bunch of offsets that are likely to contain moveset
+				for (size_t j = 0; j < sizeof(offsetsToWatch) / sizeof(offsetsToWatch[0]); ++j) {
+					gameAddr offsetValue = m_process->readInt64(playerAddress + offsetsToWatch[i] + playerid * playerstructSize);
+					if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
+						isUsed = true;
+						break;
+					}
+				}
+			}
+		}
+
+		
+		if (isUsed) {
+			// Skip
+			++i;
+		}
+		else {
+			m_process->freeMem(movesetAddress);
+		}
+		
+	}
+}
+
 ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress)
 {
 	progress = 0;
@@ -219,7 +302,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	MovesetHeader header;
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
-	gAddr::MovesetTable* offsets;
+	gAddr::MovesetTable* table;
 
 	// Moveset allocated IN-GAME. 
 	gameAddr gameMoveset;
@@ -248,21 +331,24 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 
 	// Get the table address
-	offsets = (gAddr::MovesetTable*)(moveset + header.offsets.tableBlock);
+	table = (gAddr::MovesetTable*)(moveset + header.offsets.tableBlock);
 
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, offsets, header.offsets);
+	ConvertMovesetIndexes(moveset, gameMoveset, table, header.offsets);
 	progress = 70;
+
+	// Fix moves that use characterID conditions to work
+	ApplyCharacterIDFixes(moveset, playerAddress, table, header);
+	progress = 75;
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(header.offsets.motalistsBlock, moveset, gameMoveset, playerAddress);
+	ConvertMotaListOffsets(header.offsets, moveset, gameMoveset, playerAddress);
 	progress = 90;
-
 
 	// -- Allocation &Conversion finished -- //
 
@@ -271,13 +357,16 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	progress = 99;
 
 	// Then write our moveset address to the current player
-
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"), gameMoveset);
 	progress = 100;
+
+	// Also write camera mota offsts to the player structure if those motas have been exported
+	WriteCameraMotasToPlayer(gameMoveset, playerAddress);
 
 	if (applyInstantly) {
 		SetCurrentMove(playerAddress, gameMoveset, 32769);
 	}
+
 
 	// -- Cleanup -- //
 

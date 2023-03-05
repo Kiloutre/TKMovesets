@@ -1,4 +1,4 @@
-#include <ImGui.h>
+﻿#include <ImGui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
@@ -28,9 +28,10 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-	io.Fonts->AddFontDefault();
 	// Font import example
-	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msgothic.ttc", 13, NULL, io.Fonts->GetGlyphRangesDefault());
+	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesDefault());
+	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesJapanese());
+	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesKorean());
 }
 
 void MainWindow::NewFrame()
@@ -63,6 +64,7 @@ void MainWindow::Update(int width, int height)
 		ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
 		ImGui::SetNextWindowSizeConstraints(ImVec2(width - navMenuWidth, height - c_statusBarHeight), ImVec2(width - navMenuWidth, height - c_statusBarHeight));
 		ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+
 		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:

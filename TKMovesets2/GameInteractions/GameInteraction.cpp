@@ -18,6 +18,7 @@ void GameInteraction::SetTargetProcess(const char* processName, uint8_t gameId)
 	currentGameId = gameId;
 
 	if (process->IsAttached()) {
+		PreProcessDetach();
 		process->Detach();
 	}
 }

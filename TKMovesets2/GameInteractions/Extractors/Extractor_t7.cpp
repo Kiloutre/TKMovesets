@@ -1,9 +1,10 @@
+#include <set>
 #include <string>
 #include <cctype>
 #include <stddef.h>
 #include <iterator>
-#include <algorithm>
 #include <vector>
+#include <algorithm>
 
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
@@ -139,8 +140,16 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 		gameAddr motaSize = ((uint64_t*)motas)[i + 2] - motaAddr;
 		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
 
+
 		if (offsetMap.find(motaAddr) != offsetMap.end()) {
+			// Already saved this one, not saving it again
 			continue;
+		}
+
+		// Use bitwise flags to store which one we want to store
+		if ((1 << i) & motasToExport) {
+			offsetMap[motaAddr] = motaCustomBlockSize;
+			motaCustomBlockSize += motaSize;
 		}
 
 		char buf[0x10];
@@ -163,19 +172,18 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 			continue;
 		}
 
-		// Read of the mota file offset list, which is a list of 4 bytes offsets relative to the mota file start itself
-		for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
-		{
-			uint64_t animAddr = motaAddr + m_process->readInt32(motaAddr + 0x14 + (motaAnimIdx - 1) * 4);
-			if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
-				boundaries.push_back(animAddr);
+		// Read mota file's offset list, which is a list of 4 bytes offsets relative to the mota file start itself
+		uint32_t* animOffsetList = (uint32_t*)malloc(sizeof(uint32_t) * animCount);
+		if (animOffsetList != nullptr) {
+			m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
+			for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
+			{
+				uint64_t animAddr = motaAddr + animOffsetList[i];
+				if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
+					boundaries.push_back(animAddr);
+				}
 			}
-		}
-
-		// Use bitfligs to store which one we want to store
-		if ((1 << i) & motasToExport) {
-			offsetMap[motaAddr] = motaCustomBlockSize;
-			motaCustomBlockSize += motaSize;
+			free(animOffsetList);
 		}
 	}
 	return motaCustomBlockSize;
@@ -196,18 +204,23 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 		return nullptr;
 	}
 	
-	//11 motas + 1 unknown (still clearly a ptr)
+	//12 motas + 1 unknown (still clearly a ptr)
 	gameAddr* motaAddr = (gameAddr*)motas;
-	for (size_t i = 0; i < 10; ++i)
+	// In case the same mota is present twice, i'm using this set to avoid exporting it again
+	std::set<gameAddr> exportedMotas;
+	for (size_t i = 0; i <= 12; ++i)
 	{
-		if (offsetMap.find(motaAddr[i]) != offsetMap.end()) {
-			gameAddr motaSize = motaAddr[i + 2] - motaAddr[i];
-			m_process->readBytes(motaAddr[i], customBlock + offsetMap[motaAddr[i]], motaSize);
+		if (i < 10 && offsetMap.find(motaAddr[i]) != offsetMap.end()) {
+			if (!exportedMotas.contains(motaAddr[i])) {
+				gameAddr motaSize = motaAddr[i + 2] - motaAddr[i];
+				m_process->readBytes(motaAddr[i], customBlock + offsetMap[motaAddr[i]], motaSize);
+				exportedMotas.insert(motaAddr[i]);
+			}
 			motaAddr[i] = offsetMap[motaAddr[i]];
 		}
 		else {
 			// Set to 0 for mota block we aren't exporting
-			motaAddr[i] = 0;
+			motaAddr[i] = MOVESET_ADDR_MISSING;
 		}
 	}
 
@@ -321,10 +334,10 @@ uint64_t ExtractorT7::GetAnimationSize(gameAddr anim, size_t maxSize)
 	else {
 		// We do not know how to figure out the size of a 0x64 anim yet
 
-		if (maxSize >= 1000000) {
-			// Arbitrary 1MB max size of an animation. Not a good idea tbh
+		if (maxSize >= 100000) {
+			// Arbitrary 100kb max size of an animation. Not a good idea.
 			// todo : change this
-			return 1000000;
+			return 100000;
 		}
 
 		return maxSize;

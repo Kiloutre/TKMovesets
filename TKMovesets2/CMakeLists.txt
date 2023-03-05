@@ -64,6 +64,7 @@ set(IMPORTEXPORT_SOURCES
                     "GameInteractions/Importers/Importer_t7.cpp"
 )
 
+## Build ##
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
 add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} )
 target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
@@ -75,12 +76,15 @@ target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)
 
+
+## Ressources ##
 # Addresses file #
-configure_file("game_addresses.txt" "game_addresses.txt" COPYONLY)
-
+configure_file("Ressources/game_addresses.txt" "game_addresses.txt" COPYONLY)
 # Translations #
-add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
+add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Ressources/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
 
+
+## Extra dependencies ##
 # Link the other libraries that we use #
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE glad::glad)

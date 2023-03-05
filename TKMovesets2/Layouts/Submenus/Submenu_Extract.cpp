@@ -111,8 +111,8 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 
 	// List of extracted moveset
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
-	if (ImGui::BeginTable("##", 7, ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_RowBg
-		| ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
+	if (ImGui::BeginTable("##", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+				| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_NoHostExtendY, ImVec2(0, ImGui::GetContentRegionAvail().y)))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
