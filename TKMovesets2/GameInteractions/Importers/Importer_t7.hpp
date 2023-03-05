@@ -23,8 +23,11 @@ private:
 	void ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset);
 	//  Convert indexes of moves, cancels, hit conditions, etc... into ptrs
 	void ConvertMovesetIndexes(char* movesetData, gameAddr gameMoveset, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets);
+
 	// Write the player's camera motas to his structure. This is required for proper camera mota importation, and does not break anything of those camera mota have not been imported by us
 	void WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress);
+	// Fixes move that rely on correct character IDs to work
+	void ApplyCharacterIDFixes(char* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader& header);
 
 	// Sets the move of the player
 	void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId);
