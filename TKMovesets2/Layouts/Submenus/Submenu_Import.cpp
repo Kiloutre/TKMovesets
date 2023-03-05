@@ -16,13 +16,13 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		ImGui::SameLine();
 
 		// todo: show console or something? need status
-		size_t currentGameId = importerHelper.currentGameId;
+		uint8_t currentGameId = importerHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-		size_t gameListCount = Games::GetGamesCount();
+		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
-			for (size_t i = 0; i < gameListCount; ++i)
+			for (uint8_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
 				if (game->importer != nullptr) {
@@ -109,10 +109,6 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	case PROC_ATTACH_ERR:
 		ImGuiExtra_TextboxError(_("process.game_attach_err"));
 		break;
-	}
-
-	else if (!importerHelper.CanStart()) {
-		ImGuiExtra_TextboxWarning(_("importation.cant_import"));
 	}
 
 	ImGui::SeparatorText(_("importation.select_moveset"));

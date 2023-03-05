@@ -265,7 +265,6 @@ void ImporterT7::CleanupUnusedMovesets()
 				gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
 
 				// Maybe overkill to check every offset, but drastically reduces the chance of a crash
-
 				gameAddr pStart = currentPlayerAddress;
 				gameAddr pEnd = pStart + playerstructSize;
 				while (pStart < pEnd)

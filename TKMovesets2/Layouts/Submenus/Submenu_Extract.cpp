@@ -19,13 +19,13 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::TextUnformatted(_("extraction.extract_from"));
 
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
-		size_t currentGameId = extractorHelper.currentGameId;
+		uint8_t currentGameId = extractorHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-		size_t gameListCount = Games::GetGamesCount();
+		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
-			for (size_t i = 0; i < gameListCount; ++i)
+			for (uint8_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
 				if (game->extractor != nullptr) {
