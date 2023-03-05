@@ -101,7 +101,7 @@ edition.save = Save
 
 about.explanation = TKMovesets is a software made by independant modders who are not legally affiliated in any way with the games this software interacts with.\nThis software is licensed under the GPLv3: It is free software (as in freedom) that you are free to obtain, modify and redistribute as long as you do not change the license.\nIf you paid for this software, you have been scammed.
 about.credits = Credits:
-about.kilo_explanation = Main developer behind the moveset extractor, responsible of reverse engineering the vast majority of the data structures, establishing the export/import methodology, and writing this moveset export/import/edition softwares.
+about.kilo_explanation = Main developer behind the moveset extractor, responsible for reverse engineering the vast majority of the data structures, establishing the export/import methodology, and writing this moveset export/import/edition softwares.
 about.ali_explanation = Among other things helped reverse engineer moveset structures, helped significantly figuring out IDs for moveset editing, created moveset editing tutorials and brought about many features like camera and hand animations
 about.fletch_explanation = Brought moveset edition to great lengths by creating documentation of a significant number of moveset editing properties and creating many tutorials for it
 about.koenji_explanation = Got on moveset edition early and helped understand its workflow a ton, also contributed to deciphering many moveset properties
