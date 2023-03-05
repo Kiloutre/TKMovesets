@@ -29,7 +29,7 @@ moveset.invalid = INVALIDE
 moveset.size = Taille
 moveset.size_mb = MO
 moveset.import = Importer
-moveset.delete = Supprimer
+moveset.delete = Suppr.
 
 ## Principal ##
 

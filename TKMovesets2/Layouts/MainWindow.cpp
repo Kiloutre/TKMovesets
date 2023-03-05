@@ -65,8 +65,6 @@ void MainWindow::Update(int width, int height)
 		ImGui::SetNextWindowSizeConstraints(ImVec2(width - navMenuWidth, height - c_statusBarHeight), ImVec2(width - navMenuWidth, height - c_statusBarHeight));
 		ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
 
-		ImGui::TextUnformatted((const char*) (u8"salut test ééé ひらが"));
-
 		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:
