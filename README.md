@@ -22,8 +22,8 @@ If you have any contribution to bring, feel free, there is room for improvement 
 This project uses CMake, so if you're new to this, your best way to get started is to install **Visual Studio Community**, and making sure to install the **C++ modules**. If you already have Visual Studio but without those modules, you can still install them.
 
 ## Dependencies
-This project requires external libraries to be downloaded & built to function. Thankfully, this can be done quite quickly by downloading (https://vcpkg.io/en/getting-started.html)[vcpkg].
-- Download the vcpkg by running `git clone https://github.com/Microsoft/vcpkg.git`, or simply (https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip)[downloading the .zip file]
+This project requires external libraries to be downloaded & built to function. Thankfully, this can be done quite quickly by downloading [vcpkg](https://vcpkg.io/en/getting-started.html).
+- Download the vcpkg by running `git clone https://github.com/Microsoft/vcpkg.git`, or simply [downloading the .zip file](https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip)
 - Place the folder anywhere you want in your system, decide on a good place now because moving it later will break stuff
 - Run `bootstrap-vcpkg.bat` off the vcpkg folder
 - Add the path of vcpkg to your PATH system environment variable
