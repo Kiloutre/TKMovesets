@@ -1,0 +1,94 @@
+# Ceci est un commentaire
+# clé = Text
+# Chaque ligne représente une entrée différente
+# '\n' peut être utilisé pour insérer un retour à la ligne dans un paragraphe. Les espaces en début et fin des clés et textes sont supprimés.
+
+# Utilitaires #
+
+1p = Joueur 1
+2p = Joueur 2
+3p = Joueur 3
+4p = Joueur 4
+select_game = Sélectionner un jeu
+
+# Processus #
+
+process.status = Status:
+process.attaching = Attachement...
+process.game_not_attached = Sélectionnez un jeu.
+process.game_not_running = Le jeu n'est pas lancé ou n'a pas pu être trouvé.
+process.game_version_mismatch = La version actuelle du jeu n'est pas compatible avec ce logiciel.
+process.game_attach_err = Jeu trouvé mais impossible de s'y attacher. Cela peut être causé par un manque de droits du processus.
+process.game_unexpected_exit = Le jeu s'est fermé inopinément.
+
+# Moveset #
+moveset.origin = Origine
+moveset.target_character = Personnage cible
+moveset.date = Date
+moveset.invalid = INVALIDE
+moveset.size = Taille
+moveset.size_mb = MO
+moveset.import = Importer
+moveset.delete = Supprimer
+
+## Main ##
+
+# Navmenu #
+navmenu.category_moveset = Personnages
+navmenu.extraction = Extraction
+navmenu.import = Importation
+navmenu.online = Jeu en ligne
+
+navmenu.category_tools   = Outils
+navmenu.moveset_edit = Modification de moveset
+navmenu.camera = Caméra
+
+navmenu.category_other   = Autre
+navmenu.documentation = Documentation
+navmenu.about = À propos
+
+## Submenus ##
+
+# Extraction #
+extraction.explanation = Les personnages doivent d'abord se faire extraire du jeu pour être utilisés. N'extrait que les animations/mouvements : pas les modèles, effets visuels, audio, etc.\nL'extraction est faite depuis la mémoire avec le jeu lancé, en ayant les personnages chargés et visible à l'écran (le mode de jeu n'importe pas).
+extraction.extraction = Extraction
+extraction.extract = Extraire
+extraction.extract_both = Extraire (J1 & J2)
+extraction.extract_from = Extraire depuis:
+extraction.overwrite_duplicate = Écraser les personnages avec un nom identique
+extraction.overwrite_explanation = Activer pour écraser les personnages présents si ceux extraits ont le même nom.\nDésactiver pour que le conflit de nom soit résolu avec des suffixes.\nExemple: T7_JIN (2)
+extraction.progress = Progrès: (%0.f%%)
+extraction.extracted_movesets = Personnages extraits 
+extraction.rename = Renommer le perosnnage
+extraction.cant_extract = Impossible d'extraire car aucun personnage chargé.
+
+# Importation #
+importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours(ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
+importation.importation = Importation
+importation.select_moveset = Choisissez le personnage à importer
+importation.cant_import = Impossible d'extraire pas dans une partie active (mode d'entraînement, mode histoire, etc...)
+importation.import_to = Importer sur :
+importation.progress = Progrès: (%.0f%%)
+importation.apply_instantly = Appliquer instantanément
+importation.apply_instantly_explanation = Désactiver ceci indiquera au jeu de transitionner vers le nouveau personnage de manière lente, attendant la fin de votre animation actuelle.\nCela peut prendre du temps, alors préférez laisser cette option activée.
+importation.free_unused_movesets = Déallouer les personnages non-utilisés
+importation.free_unused_movesets_explanation = Si activé, les personnages anciennements importés mais maintenant inutilisés seront déalloués de la mémoire, vous économisant de la mémoire vive.
+
+# Online #
+
+
+# Moveset Edition #
+
+
+# Documentation #
+
+# About #
+
+about.explanation = TKMovesets est un logiciel conçu par des moddeurs indépendants, aucunement associés légalement aux jeux affectés.\nCe logiciel est licensé selon la GPLv3: C'est un logiciel libre, gratuit d'accès, dont la modification et redistribution est permise tant que la license dans votre projet dérivé ne change pas.\nSi vous avez payé pour ce logiciel, vous avez été arnaqués.
+about.credits = Crédits:
+about.kilo_explanation = Développeur principal de ce logiciel, a éffectué le plus gros du travail de rétroingénierie sur les structures de donnée du jeu, a établi la méthodologie d'importation et d'exportation de personnage.
+about.ali_explanation = ...
+about.fletch_explanation = ...
+about.koenji_explanation = ...
+about.sadamitsu_explanation = ...
+about.dennis_stanistan_explanation = ...
