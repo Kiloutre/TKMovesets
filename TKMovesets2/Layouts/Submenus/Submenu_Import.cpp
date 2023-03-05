@@ -47,8 +47,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 			for (int8_t i = 0; i < importerHelper.characterCount; ++i)
 			{
 				buf[0] = '1' + i;
-				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0)))
-				{
+				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
 					importerHelper.currentPlayerId = i;
 				}
 			}

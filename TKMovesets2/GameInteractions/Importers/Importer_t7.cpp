@@ -240,13 +240,16 @@ void ImporterT7::CleanupUnusedMovesets()
 	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val_playerstruct_size");
 	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val_motbin_offset");
 
+	/*
 	uint64_t offsetsToWatch[] = {
 		0x218, 0x220, 0x228, // Move
-		0xBC8, 0xD80, // ???
+		0xBC8, 0xD80, 0xDA0, // ???
 		0x13C0, 0x13E8, 0x13F0, // ???
 		0x14a0, 0x14a8, // Static camera mota
+		0x1460, 0x1468, 0x1480, 0x1488,// ??
 		0x1520, 0x1528, 0x1530, 0x1540 // Moveset
 	};
+	*/
 
 	for (size_t i = 0; i + 1 < m_process->allocatedMemory.size();)
 	{
@@ -259,16 +262,21 @@ void ImporterT7::CleanupUnusedMovesets()
 		if (CanImport()) {
 			// Check movesets of both players
 			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid) {
-				gameAddr movesetOffsets = playerAddress + motbinOffset + playerid * playerstructSize;
+				gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
 
-				// Check a bunch of offsets that are likely to contain moveset
-				for (size_t j = 0; j < sizeof(offsetsToWatch) / sizeof(offsetsToWatch[0]); ++j) {
-					gameAddr offsetValue = m_process->readInt64(playerAddress + offsetsToWatch[i] + playerid * playerstructSize);
+				// Maybe overkill to check every offset, but drastically reduces the chance of a crash
+
+				gameAddr pStart = currentPlayerAddress;
+				gameAddr pEnd = pStart + playerstructSize;
+				while (pStart < pEnd)
+				{
+					uint64_t offsetValue = m_process->readInt64(pStart);
 					if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
 						isUsed = true;
-						break;
 					}
+					pStart += 8;
 				}
+
 			}
 		}
 
@@ -376,6 +384,8 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 bool ImporterT7::CanImport()
 {
+	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
+	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
