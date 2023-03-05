@@ -2,28 +2,32 @@
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
 
-// Should respect the indexes showed in GameId enum
+// You should never reorder the list because it would change the game ids which are contained within movesets
+// THe IDs correspond to the index of the game in the list
 const GameInfo cg_gamesInfo[] = {
 	{
-		// 	GameId_t7 = 0,
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
 		.characterCount = 2,
-		.flags = GameExtractable | GameImportable | GameCamera
+		.flags = GameMovesetEdition,
+		.extractor = new FactoryType<ExtractorT7>,
+		.importer = new FactoryType<ImporterT7>,
 	},
 	{
-		// 	GameId_t8 = 1,
 		.name = "Tekken 8",
 		.processName = "Tekken8.exe",
 		.characterCount = 2,
-		.flags = GameExtractable | GameImportable | GameCamera
+		.flags = 0,
+		.extractor = new FactoryType<ExtractorT7>,
+		.importer = nullptr
 	},
 	{
-		// 	GameId_t8 = 2,
 		.name = "Tekken Tag 2",
-		.processName = ".exe",
+		.processName = "Cemu.exe",
 		.characterCount = 2,
-		.flags = GameExtractable
+		.flags = 0,
+		.extractor = nullptr,
+		.importer = new FactoryType<ImporterT7>,
 	},
 };
 
@@ -39,26 +43,14 @@ namespace Games
 		return sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo);
 	}
 
-
 	Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
 	{
-		switch (gameId)
-		{
-		case GameId_t7:
-			return new ExtractorT7(process, game);
-			break;
-		}
-		return nullptr;
+		return (Extractor*)cg_gamesInfo[gameId].extractor->allocate(process, game);
 	}
 
 	Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game)
 	{
-		switch (gameId)
-		{
-		case GameId_t7:
-			return new ImporterT7(process, game);
-			break;
-		}
+		return (Importer*)cg_gamesInfo[gameId].importer->allocate(process, game);
 		return nullptr;
 	}
 };

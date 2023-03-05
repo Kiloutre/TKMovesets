@@ -28,7 +28,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			for (size_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
-				if (game->flags & GameImportable) {
+				if (game->extractor != nullptr) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 						extractorHelper.SetTargetProcess(game->processName, i);
 					}

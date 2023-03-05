@@ -25,7 +25,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 			for (size_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
-				if (game->flags & GameImportable) {
+				if (game->importer != nullptr) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 						importerHelper.SetTargetProcess(game->processName, i);
 					}
