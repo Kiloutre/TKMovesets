@@ -50,12 +50,16 @@ void GameExtract::RunningUpdate()
 	LoadCharacterNames();
 
 	// Extraction queue is a FIFO (first in first out) queue
+	bool errored = false;
 	while (m_playerAddress.size() > 0)
 	{
-		// Start extraction
-		ExtractionErrcode err = m_extractor->Extract(m_playerAddress[0], currentGameId, overwriteSameFilename, progress);
-		if (err != ExtractionSuccessful) {
-			m_errors.push_back(err);
+		if (!errored) {
+			// Start extraction
+			ExtractionErrcode err = m_extractor->Extract(m_playerAddress[0], currentGameId, overwriteSameFilename, progress);
+			if (err != ExtractionSuccessful) {
+				m_errors.push_back(err);
+				errored = true;
+			}
 		}
 		m_playerAddress.erase(m_playerAddress.begin());
 	}

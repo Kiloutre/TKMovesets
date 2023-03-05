@@ -105,7 +105,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		}
 
 		if (extractorHelper.progress > 0) {
-			// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
+			// Progress text.
 			ImGui::SameLine();
 			if (extractorHelper.progress == 100) {
 				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("extraction.progress_done"));

@@ -74,13 +74,18 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	bool canImport = p->status == PROC_ATTACHED && !busy && importerHelper.CanStart();
 
 	if (importerHelper.progress > 0) {
-		// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
+		// Progress text.
 		ImGui::SameLine();
 		if (importerHelper.progress == 100) {
-			ImGui::Text(_("importation.progress_done"));
+			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("importation.progress_done"));
 		}
 		else {
-			ImGui::Text(_("importation.progress"), importerHelper.progress);
+			if (busy) {
+				ImGui::Text(_("importation.progress"), importerHelper.progress);
+			}
+			else {
+				ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), importerHelper.progress);
+			}
 		}
 	}
 

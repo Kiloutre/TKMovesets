@@ -45,16 +45,20 @@ void GameImport::RunningUpdate()
 {
 
 	// Extraction queue is a FIFO (first in first out) queue
+	bool errored = false;
 	while (m_plannedImportations.size() > 0)
 	{
-		auto &[filename, playerAddress] = m_plannedImportations[0];
-		// Start Importation
-		ImportationErrcode err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
-		if (free_unused_movesets) {
-			m_importer->CleanupUnusedMovesets();
-		}
-		if (err != ImportationSuccessful) {
-			m_errors.push_back(err);
+		if (!errored) {
+			auto& [filename, playerAddress] = m_plannedImportations[0];
+			// Start Importation
+			ImportationErrcode err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+			if (free_unused_movesets) {
+				m_importer->CleanupUnusedMovesets();
+			}
+			if (err != ImportationSuccessful) {
+				m_errors.push_back(err);
+				errored = true;
+			}
 		}
 		m_plannedImportations.erase(m_plannedImportations.begin());
 	}

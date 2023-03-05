@@ -14,7 +14,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 - Code injection to force current moveset to stay among loading screens
 - **Moveset editor**
 - Auto-updater
-
+- Fix free-related crash. Maybe AOB scan the player structure for dangling pointers before freeing/
 
 # (Developer) Setting up the project locally
 
