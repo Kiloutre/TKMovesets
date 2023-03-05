@@ -96,8 +96,8 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 	table->groupCancel += offset;
 	table->cancelExtradata += offset;
 	table->extraMoveProperty += offset;
-	table->unknown_0x1f0 += offset;
-	table->unknown_0x200 += offset;
+	table->moveBeginningProp += offset;
+	table->moveEndingProp += offset;
 	table->move += offset;
 	table->voiceclip += offset;
 	table->inputSequence += offset;
@@ -193,7 +193,7 @@ void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, cons
 
 	// Convert ??? ptrs
 	i = 0;
-	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(moveset + blockOffsets.movesetBlock + offsets->unknown_0x200); i < offsets->unknown_0x200_size; ++i, ++unknown)
+	for (gAddr::OtherMoveProperty* unknown = (gAddr::OtherMoveProperty*)(moveset + blockOffsets.movesetBlock + offsets->moveEndingProp); i < offsets->moveEndingPropCount; ++i, ++unknown)
 	{
 		FROM_INDEX(unknown->requirements_addr, blockOffset + offsets->requirement, Requirement);
 	}

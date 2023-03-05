@@ -101,11 +101,11 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 		TO_INDEX(pushback->extradata_addr, table.pushbackExtradata, PushbackExtradata);
 	}
 
-	// Convert ??? ptrs
+	// Convert move end prop ptrs
 	i = 0;
-	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(movesetBlock + offsets.unknown_0x200); i < table.unknown_0x200_size; ++i, ++unknown)
+	for (gAddr::OtherMoveProperty* moveEndingProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets.moveEndingProp); i < table.moveEndingPropCount; ++i, ++moveEndingProp)
 	{
-		TO_INDEX(unknown->requirements_addr, table.requirement, Cancel);
+		TO_INDEX(moveEndingProp->requirements_addr, table.requirement, Requirement);
 	}
 }
 
