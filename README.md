@@ -14,4 +14,3 @@ If you have any contribution to bring, feel free, there is room for improvement 
 - Code injection to force current moveset to stay among loading screens
 - **Moveset editor**
 - Auto-updater
-- Import MOTA

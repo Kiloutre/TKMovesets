@@ -63,7 +63,7 @@ extraction.rename = Renommer le personnage
 extraction.cant_extract = Impossible d'extraire car aucun personnage chargé.
 
 # Importation #
-importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours(ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
+importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
 importation.importation = Importation
 importation.select_moveset = Choisissez le personnage à importer
 importation.cant_import = Impossible d'extraire pas dans une partie active (mode d'entraînement, mode histoire, etc...)
