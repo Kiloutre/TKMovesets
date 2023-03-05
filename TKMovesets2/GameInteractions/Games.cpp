@@ -18,7 +18,7 @@ const GameInfo cg_gamesInfo[] = {
 		.processName = "Tekken8.exe",
 		.characterCount = 2,
 		.flags = 0,
-		.extractor = new FactoryType<ExtractorT7>,
+		.extractor = nullptr,
 		.importer = nullptr
 	},
 	{
@@ -27,7 +27,7 @@ const GameInfo cg_gamesInfo[] = {
 		.characterCount = 2,
 		.flags = 0,
 		.extractor = nullptr,
-		.importer = new FactoryType<ImporterT7>,
+		.importer = nullptr,
 	},
 };
 
@@ -41,6 +41,30 @@ namespace Games
 	uint8_t GetGamesCount()
 	{
 		return sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo);
+	}
+
+	size_t GetExtractableGamesCount()
+	{
+		size_t count = 0;
+		for (size_t i = 0; i < sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo); ++i)
+		{
+			if (cg_gamesInfo[i].extractor != nullptr) {
+				++count;
+			}
+		}
+		return count;
+	}
+
+	size_t GetImportableGamesCount()
+	{
+		size_t count = 0;
+		for (size_t i = 0; i < sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo); ++i)
+		{
+			if (cg_gamesInfo[i].importer != nullptr) {
+				++count;
+			}
+		}
+		return count;
 	}
 
 	Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)

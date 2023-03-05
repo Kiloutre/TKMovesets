@@ -57,6 +57,10 @@ namespace Games
 
 	// Returns the amount of supported games
 	DLLCONTENT uint8_t GetGamesCount();
+	// Returns the amount of games that upport extraction
+	DLLCONTENT size_t GetExtractableGamesCount();
+	// Returns the amount of games that upport importation
+	DLLCONTENT size_t GetImportableGamesCount();
 
 	// Istantiate a new game-dependant extractor
 	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game);
