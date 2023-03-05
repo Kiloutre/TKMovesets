@@ -111,7 +111,7 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 }
 
 // Find the closest anim address in order to establish the current anim's end. A bit hacky, but does the job until we can understand how to get 0x64 anims sizes
-static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> boundaries)
+static int64_t getClosestBoundary(gameAddr animAddr, const std::vector<gameAddr>& boundaries)
 {
 	for (gameAddr comp : boundaries)
 	{
@@ -126,7 +126,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 
 // -- Private methods - //
 
-uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap)
+uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap)
 {
 	uint64_t motaCustomBlockSize = 0;
 
@@ -227,7 +227,7 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	return customBlock;
 }
 
-void ExtractorT7::GetNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
+void ExtractorT7::GetNamesBlockBounds(const Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
 	uint64_t smallest = (int64_t)move[0].name_addr;
 	uint64_t highest = smallest;
@@ -263,7 +263,7 @@ void ExtractorT7::GetNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& 
 }
 
 
-char* ExtractorT7::CopyAnimations(Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
+char* ExtractorT7::CopyAnimations(const Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
@@ -273,7 +273,7 @@ char* ExtractorT7::CopyAnimations(Move* movelist, size_t moveCount, uint64_t &si
 	// Get animation list and sort it
 	for (size_t i = 0; i < moveCount; ++i)
 	{
-		Move* move = &movelist[i];
+		const Move* move = &movelist[i];
 		gameAddr anim_addr = (gameAddr)move->anim_addr;
 
 		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
@@ -355,14 +355,14 @@ void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, sizeof(MovesetTable) / 8 / 2);
 }
 
-char* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, gAddr::MovesetTable& table)
+char* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
 {
 	gameAddr blockStart = (gameAddr)table.reactions;
 	gameAddr blockEnd = (gameAddr)table.throws + (sizeof(ThrowData) * table.throwsCount);
 	return allocateAndReadBlock(blockStart, blockEnd, size_out);
 }
 
-char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
 {
 	gameAddr nameBlockEnd;
 	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
