@@ -2,5 +2,11 @@
 
 #include "GameExtract.hpp"
 
-// Render the extraction submenu
-void RenderSubmenu_Extract(GameExtract& extractorHelper);
+class Submenu_Extract
+{
+private:
+	ExtractionErrcode m_err;
+
+public:
+	void Render(GameExtract& extractorHelper);
+};

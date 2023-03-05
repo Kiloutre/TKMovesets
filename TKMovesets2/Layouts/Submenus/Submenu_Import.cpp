@@ -6,7 +6,7 @@
 #include "imgui_extras.hpp"
 #include "Helpers.hpp"
 
-void RenderSubmenu_Import(GameImport& importerHelper)
+void Submenu_Import::Render(GameImport& importerHelper)
 {
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
 	ImGui::SeparatorText(_("importation.importation"));
@@ -73,10 +73,15 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 	bool busy = importerHelper.IsBusy();
 	bool canImport = p->status == PROC_ATTACHED && !busy && importerHelper.CanStart();
 
-	if (busy) {
-		// Progress text. Importation should generally be fast enough that this will be displayed briefly, but it's still nice to have
+	if (importerHelper.progress > 0) {
+		// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
 		ImGui::SameLine();
-		ImGui::Text(_("importation.progress"), importerHelper.progress);
+		if (importerHelper.progress == 100) {
+			ImGui::Text(_("importation.progress_done"));
+		}
+		else {
+			ImGui::Text(_("importation.progress"), importerHelper.progress);
+		}
 	}
 
 	if (p->status != PROC_ATTACHED)
@@ -146,8 +151,8 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
-				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport))
-				{
+
+				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 					importerHelper.QueueCharacterImportation(moveset->filename);
 				}
 				ImGui::PopID();
@@ -159,5 +164,35 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 		importerHelper.storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
+	}
+
+	ImportationErrcode err = importerHelper.GetLastError();
+	if (err != ImportationSuccessful) {
+		ImGui::OpenPopup("ImportationErrPopup");
+		m_err = err;
+	}
+
+	if (ImGui::BeginPopupModal("ImportationErrPopup"))
+	{
+		switch (m_err)
+		{
+		case ImportationAllocationErr:
+			ImGui::Text(_("importation.error_allocation"));
+			break;
+		case ImportationGameAllocationErr:
+			ImGui::Text(_("importation.error_game_allocation"));
+			break;
+		case ImportationFileReadErr:
+			ImGui::Text(_("importation.error_file_creation"));
+			break;
+		}
+
+		if (ImGui::Button(_("close")))
+		{
+			m_err = ImportationSuccessful;
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
 	}
 }

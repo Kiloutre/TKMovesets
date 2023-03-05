@@ -9,7 +9,7 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 
-void RenderSubmenu_Extract(GameExtract& extractorHelper)
+void Submenu_Extract::Render(GameExtract& extractorHelper)
 {
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
@@ -77,6 +77,7 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 		// Extraction buttons, will be disabled if we can't extract
 		for (int playerId = 0; playerId < extractorHelper.characterCount; ++playerId)
 		{
+			bool canExtractThisMoveset = canExtract;
 			ImGui::SameLine();
 
 			const char* characterName = extractorHelper.characterNames[playerId].c_str();
@@ -88,9 +89,12 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 			}
 			else {
 				buttonText = std::format("{} ({}, {})", _("extraction.extract"), _(playerIdTranslationId), characterName);
+				if (strncmp(characterName, MOVESET_EXTRACTED_NAME_PREFIX, sizeof(MOVESET_EXTRACTED_NAME_PREFIX) - 1) == 0) {
+					canExtractThisMoveset = false;
+				}
 			}
 
-			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtract)) {
+			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtractThisMoveset)) {
 				extractorHelper.QueueCharacterExtraction(playerId);
 			}
 		}
@@ -100,10 +104,20 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 			extractorHelper.QueueCharacterExtraction(-1);
 		}
 
-		if (busy) {
+		if (extractorHelper.progress > 0) {
 			// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
 			ImGui::SameLine();
-			ImGui::Text(_("extraction.progress"), extractorHelper.progress);
+			if (extractorHelper.progress == 100) {
+				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("extraction.progress_done"));
+			}
+			else {
+				if (busy) {
+					ImGui::Text(_("extraction.progress"), extractorHelper.progress);
+				}
+				else {
+					ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("extraction.progress_error"), extractorHelper.progress);
+				}
+			}
 		}
 	}
 
@@ -176,5 +190,34 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 		extractorHelper.storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
+	}
+
+	ExtractionErrcode err = extractorHelper.GetLastError();
+	if (err != ExtractionSuccessful) {
+		ImGui::OpenPopup("ExtractionErrPopup");
+		m_err = err;
+	}
+
+	// Show popup containing the error description
+	if (ImGui::BeginPopupModal("ExtractionErrPopup"))
+	{
+		switch (m_err)
+		{
+		case ExtractionAllocationErr:
+			ImGui::Text(_("extraction.error_allocation"));
+			break;
+		case ExtractionFileCreationErr:
+			ImGui::Text(_("extraction.error_file_creation"));
+			break;
+		}
+
+		if (ImGui::Button(_("close")))
+		{
+			// Reset the errcode
+			m_err = ExtractionSuccessful;
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
 	}
 }

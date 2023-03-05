@@ -49,7 +49,7 @@ protected:
 public:
 	Extractor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual ExtractionErrcode Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, float& progress) = 0;
+	virtual ExtractionErrcode Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, uint8_t& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanExtract() = 0;
 	// Returns a string containing the character name of the provided playerId.

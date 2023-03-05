@@ -39,8 +39,8 @@ public:
 	GameProcess* process = nullptr;
 	// Helper to read on address from their game_addresses.txt identifier
 	GameData* game = nullptr;
-	// Progress of the current task, between 0.0f and 100.0f
-	float progress{ 0.0f };
+	// Progress of the current task, between 0 and 100
+	uint8_t progress = 0;
 	// Max character count of the game
 	int characterCount = 2;
 

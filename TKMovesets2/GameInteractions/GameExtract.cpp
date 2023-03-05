@@ -53,12 +53,25 @@ void GameExtract::RunningUpdate()
 	while (m_playerAddress.size() > 0)
 	{
 		// Start extraction
-		m_extractor->Extract(m_playerAddress[0], currentGameId, overwriteSameFilename, progress);
+		ExtractionErrcode err = m_extractor->Extract(m_playerAddress[0], currentGameId, overwriteSameFilename, progress);
+		if (err != ExtractionSuccessful) {
+			m_errors.push_back(err);
+		}
 		m_playerAddress.erase(m_playerAddress.begin());
 	}
 }
 
 // -- Public methods -- //
+
+ExtractionErrcode GameExtract::GetLastError()
+{
+	if (m_errors.size() > 0) {
+		ExtractionErrcode err = m_errors[0];
+		m_errors.erase(m_errors.begin());
+		return err;
+	}
+	return ExtractionSuccessful;
+}
 
 void GameExtract::StopThreadAndCleanup()
 {

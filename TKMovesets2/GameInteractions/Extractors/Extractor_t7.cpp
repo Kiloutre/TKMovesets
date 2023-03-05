@@ -198,6 +198,7 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 
 	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap);
 
+
 	char* customBlock = (char*)malloc(size_out);
 	if (customBlock == nullptr) {
 		size_out = 0;
@@ -365,10 +366,19 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 {
 	gameAddr nameBlockEnd;
 	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
-	// There is some stuff before the move names i want to get (character name, date string and stuff)
-	// So i hardcode the address because i know it
-	nameBlockStart = movesetAddr + 0x2E8;
-	return allocateAndReadBlock(nameBlockStart, nameBlockEnd, size_out);
+
+	// Prefix we apply to recognize movesets we extracted
+	const char* namePrefix = MOVESET_EXTRACTED_NAME_PREFIX;
+	const size_t toCopy = strlen(namePrefix);
+	const size_t charactersToReplace = 1;
+
+	// There is some stuff before the² move names i want to get (character name, date string and stuff)
+	// So i hardcode the offset 0x2E8 because i know it
+	nameBlockStart = movesetAddr + 0x2E8 - (toCopy - charactersToReplace);
+	char* nameBlock = allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
+	memcpy(nameBlock, namePrefix, toCopy);
+
+	return nameBlock;
 }
 
 char* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
@@ -391,7 +401,7 @@ void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, ga
 
 // -- Public methods -- //
 
-ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, float& progress)
+ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, uint8_t& progress)
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
@@ -473,9 +483,11 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 	// Setup our own header to write in the output file containg useful information
 	std::string characterName = GetPlayerCharacterName(playerAddress);
+	progress = 77;
 
 	// Fill the header with our own useful informations
 	FillHeaderInfos(header.infos, gameId, playerAddress);
+	progress = 79;
 
 	// Calculate each offsets according to the previous block offset + its size
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
@@ -627,7 +639,7 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 			} else if (isalpha((unsigned char)characterName[i])) {
 				characterName[i] = isWordStart ? toupper(characterName[i]) : tolower(characterName[i]);
 			}
-			isWordStart = strchr(" -.", characterName[i]) != nullptr;
+			isWordStart = strchr(" -.:", characterName[i]) != nullptr;
 		}
 	}
 	return characterName;

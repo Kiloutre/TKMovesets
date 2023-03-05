@@ -284,7 +284,7 @@ void ImporterT7::CleanupUnusedMovesets()
 	}
 }
 
-ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress)
+ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
 	progress = 0;
 	// Read file data

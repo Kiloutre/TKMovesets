@@ -7,8 +7,6 @@
 #include "GameExtract.hpp"
 #include "GameProcess.hpp"
 // Submenus
-#include "Submenu_Extract.hpp"
-#include "Submenu_Import.hpp"
 #include "Submenu_About.hpp"
 
 // -- Public methods -- //
@@ -68,10 +66,10 @@ void MainWindow::Update(int width, int height)
 		switch (navMenu.menuId)
 		{
 		case NAV__MENU_EXTRACT:
-			RenderSubmenu_Extract(extractor);
+			extractMenu.Render(extractor);
 			break;
 		case NAV__MENU_IMPORT:
-			RenderSubmenu_Import(importer);
+			importMenu.Render(importer);
 			break;
 		case NAV__MENU_ONLINE_PLAY:
 			onlineMenu.Render();

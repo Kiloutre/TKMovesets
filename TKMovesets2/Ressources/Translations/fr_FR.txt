@@ -5,6 +5,7 @@
 
 # Utilitaires #
 
+close = Fermer
 1p = Joueur 1
 2p = Joueur 2
 3p = Joueur 3
@@ -57,10 +58,15 @@ extraction.extract_both = Extraire (J1 & J2)
 extraction.extract_from = Extraire depuis:
 extraction.overwrite_duplicate = Écraser les personnages avec un nom identique
 extraction.overwrite_explanation = Activer pour écraser les personnages présents si ceux extraits ont le même nom.\nDésactiver pour que le conflit de nom soit résolu avec des suffixes.\nExemple: T7_JIN (2)
-extraction.progress = Progrès: (%0.f%%)
+extraction.progress = Progrès: (%u%%)
+extraction.progress_error = Erreur (%u%%)
+extraction.progress_done = Progrès: Fini !
 extraction.extracted_movesets = Personnages extraits 
 extraction.rename = Renommer le personnage
 extraction.cant_extract = Impossible d'extraire car aucun personnage chargé.
+extraction.error = Il y a eu une erreur lors de l'extraction du moveset
+extraction.error_file_creation = Il y a eu une erreur lors de la création du fichier du personnage
+extraction.error_allocation = Il y a eu une erreur d'allocation lors de la copie des données du personnage
 
 # Importation #
 importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
@@ -68,11 +74,16 @@ importation.importation = Importation
 importation.select_moveset = Choisissez le personnage à importer
 importation.cant_import = Impossible d'extraire pas dans une partie active (mode d'entraînement, mode histoire, etc...)
 importation.import_to = Importer sur :
-importation.progress = Progrès: (%.0f%%)
+importation.progress = Progrès: (%u%%)
+importation.progress_error = Erreur (%u%%)
+importation.progress_done = Progrès: Fini !
 importation.apply_instantly = Appliquer instantanément
 importation.apply_instantly_explanation = Désactiver ceci indiquera au jeu de transitionner vers le nouveau personnage de manière lente, attendant la fin de votre animation actuelle.\nCela peut prendre du temps, alors préférez laisser cette option activée.
 importation.free_unused_movesets = Déallouer les personnages non-utilisés
 importation.free_unused_movesets_explanation = Si activé, les personnages anciennements importés mais maintenant inutilisés seront déalloués de la mémoire, vous économisant de la mémoire vive.
+importation.error_file_reading = Il y a eu une erreur lors de la création du fichier du personnage
+importation.error_allocation = Il y a eu une erreur d'allocation lors de lecture des données du personnage
+importation.error_game_allocation = Il y a eu une erreur d'allocation dans le jeu lors de l'écriture des données du personnage
 
 # Jeu en ligne #
 

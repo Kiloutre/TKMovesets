@@ -3,8 +3,10 @@
 
 // Toplevel menus
 #include "NavigationMenu.hpp"
-#include "StatusBar.hpp"
+//#include "StatusBar.hpp"
 // Submenus
+#include "Submenu_Extract.hpp"
+#include "Submenu_Import.hpp"
 #include "Submenu_OnlinePlay.hpp"
 
 // Other
@@ -16,6 +18,8 @@ class MainWindow {
 private:
 	NavigationMenu     navMenu;
 	//StatusBar          statusBar;
+	Submenu_Extract extractMenu;
+	Submenu_Import importMenu;
 	Submenu_OnlinePlay onlineMenu;
 public:
 	GameExtract extractor;
