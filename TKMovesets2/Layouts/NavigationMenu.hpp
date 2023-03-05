@@ -20,8 +20,17 @@ struct NavMenuBtn
 	//const char* icon;
 };
 
+struct LangSelect
+{
+	const char* name;
+	const char* filename;
+};
+
 class NavigationMenu {
 private:
+	// Selected lang ID
+	int m_languageId = 0;
+
 	// Render a list of buttons with predetermined size for use in the navbar
 	void RenderBtnList(const NavMenuBtn* c_btns, size_t count);
 public:

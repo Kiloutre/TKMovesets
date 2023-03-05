@@ -31,7 +31,7 @@ moveset.size_mb = MO
 moveset.import = Importer
 moveset.delete = Supprimer
 
-## Main ##
+## Principal ##
 
 # Navmenu #
 navmenu.category_moveset = Personnages
@@ -40,14 +40,14 @@ navmenu.import = Importation
 navmenu.online = Jeu en ligne
 
 navmenu.category_tools   = Outils
-navmenu.moveset_edit = Modification de moveset
+navmenu.moveset_edit = Modif. de perso
 navmenu.camera = Caméra
 
 navmenu.category_other   = Autre
 navmenu.documentation = Documentation
 navmenu.about = À propos
 
-## Submenus ##
+## Sous-menus ##
 
 # Extraction #
 extraction.explanation = Les personnages doivent d'abord se faire extraire du jeu pour être utilisés. N'extrait que les animations/mouvements : pas les modèles, effets visuels, audio, etc.\nL'extraction est faite depuis la mémoire avec le jeu lancé, en ayant les personnages chargés et visible à l'écran (le mode de jeu n'importe pas).
@@ -59,7 +59,7 @@ extraction.overwrite_duplicate = Écraser les personnages avec un nom identique
 extraction.overwrite_explanation = Activer pour écraser les personnages présents si ceux extraits ont le même nom.\nDésactiver pour que le conflit de nom soit résolu avec des suffixes.\nExemple: T7_JIN (2)
 extraction.progress = Progrès: (%0.f%%)
 extraction.extracted_movesets = Personnages extraits 
-extraction.rename = Renommer le perosnnage
+extraction.rename = Renommer le personnage
 extraction.cant_extract = Impossible d'extraire car aucun personnage chargé.
 
 # Importation #
@@ -74,7 +74,7 @@ importation.apply_instantly_explanation = Désactiver ceci indiquera au jeu de t
 importation.free_unused_movesets = Déallouer les personnages non-utilisés
 importation.free_unused_movesets_explanation = Si activé, les personnages anciennements importés mais maintenant inutilisés seront déalloués de la mémoire, vous économisant de la mémoire vive.
 
-# Online #
+# Jeu en ligne #
 
 
 # Moveset Edition #
@@ -82,7 +82,7 @@ importation.free_unused_movesets_explanation = Si activé, les personnages ancie
 
 # Documentation #
 
-# About #
+# À propos #
 
 about.explanation = TKMovesets est un logiciel conçu par des moddeurs indépendants, aucunement associés légalement aux jeux affectés.\nCe logiciel est licensé selon la GPLv3: C'est un logiciel libre, gratuit d'accès, dont la modification et redistribution est permise tant que la license dans votre projet dérivé ne change pas.\nSi vous avez payé pour ce logiciel, vous avez été arnaqués.
 about.credits = Crédits:
