@@ -227,7 +227,7 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	return customBlock;
 }
 
-void ExtractorT7::GetNamesBlockBounds(const Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
+void ExtractorT7::GetNamesBlockBounds(const gAddr::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
 	uint64_t smallest = (int64_t)move[0].name_addr;
 	uint64_t highest = smallest;
@@ -263,7 +263,7 @@ void ExtractorT7::GetNamesBlockBounds(const Move* move, uint64_t moveCount, game
 }
 
 
-char* ExtractorT7::CopyAnimations(const Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
+char* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
@@ -273,8 +273,7 @@ char* ExtractorT7::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 	// Get animation list and sort it
 	for (size_t i = 0; i < moveCount; ++i)
 	{
-		const Move* move = &movelist[i];
-		gameAddr anim_addr = (gameAddr)move->anim_addr;
+		gameAddr anim_addr = movelist[i].anim_addr;
 
 		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
 			// Avoid adding duplicates
@@ -362,7 +361,7 @@ char* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, co
 	return allocateAndReadBlock(blockStart, blockEnd, size_out);
 }
 
-char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
 {
 	gameAddr nameBlockEnd;
 	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
@@ -444,7 +443,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	// Reads block containing the actual moveset data
 	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
 	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
-	Move* movelist = (Move*)(movesetBlock + offsets.move);
+	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets.move);
 	progress = 20;
 
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
