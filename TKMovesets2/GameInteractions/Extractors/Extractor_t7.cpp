@@ -26,6 +26,24 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets.move); i < table.moveCount; ++i, ++move)
 	{
+		// DEBUG STUFF
+		// LEAVE FOR NOW
+		if (move->_0x28_llong != 0) {
+			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x28_llong);
+		}
+		if (move->_0x5E_short != 0) {
+			printf("move offset 0x5e is not 0, please look into importing it, see if it can be useful\n", move->_0x5E_short);
+		}
+		if (move->_0x48_llong != 0) {
+			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x48_llong);
+		}
+		if (move->_0x90_llong != 0) {
+			printf("move offset 0x90 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x90_llong);
+		}
+		if (move->_0x88_llong != 0) {
+			printf("move offset 0x88 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x88_llong);
+		}
+
 		move->name_addr -= nameStart;
 		move->anim_name_addr -= nameStart;
 		move->anim_addr = animOffsetMap[move->anim_addr];
@@ -608,6 +626,7 @@ bool ExtractorT7::CanExtract()
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
+
 	std::string characterName;
 	if (movesetAddr == 0) {
 		return characterName;
