@@ -41,28 +41,28 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 	// If we can't extract, display a warning detailling why
 	GameProcess* p = extractorHelper.process;
-	if (p->status != PROC_ATTACHED)
+
+	switch (p->status)
 	{
-		switch (p->status)
-		{
-		case PROC_NOT_ATTACHED:
-		case PROC_EXITED:
-		case PROC_ATTACHING:
-			ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
-			break;
-		case PROC_NOT_FOUND:
-			ImGuiExtra_TextboxWarning(_("process.game_not_running"));
-			break;
-		case PROC_VERSION_MISMATCH:
-			ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
-			break;
-		case PROC_ATTACH_ERR:
-			ImGuiExtra_TextboxError(_("process.game_attach_err"));
-			break;
+	case PROC_ATTACHED:
+		if (!extractorHelper.CanStart()) {
+			ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
 		}
-	}
-	else if (!extractorHelper.CanStart()) {
-		ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
+		break;
+	case PROC_NOT_ATTACHED:
+	case PROC_EXITED:
+	case PROC_ATTACHING:
+		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
+		break;
+	case PROC_NOT_FOUND:
+		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
+		break;
+	case PROC_VERSION_MISMATCH:
+		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
+		break;
+	case PROC_ATTACH_ERR:
+		ImGuiExtra_TextboxError(_("process.game_attach_err"));
+		break;
 	}
 
 	{

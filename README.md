@@ -5,6 +5,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Fix crash some moves have/ Reproductible reliably: extract eddy's moveset, put in on kazuya, get knocked down face up feet towards, wait a bit (no quick roll), hold back to get up.
 - Unicode support for ImGui. The translation file should be able to contain extended latin, korean, japanese, russian and arabic characters. Moveset files hould also be able to contain these, and possibly moveset header strings too
 - Export tag2
 - Movest compression. It should be viable to store movesets in a compressed format: even the fastest compression in 7zip yiels a 50% size reduction, which is nothing to scoff at

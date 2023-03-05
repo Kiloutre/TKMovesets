@@ -88,26 +88,29 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		}
 	}
 
-	if (p->status != PROC_ATTACHED)
+	switch (p->status)
 	{
-		switch (p->status)
-		{
-		case PROC_NOT_ATTACHED:
-		case PROC_EXITED:
-		case PROC_ATTACHING:
-			ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
-			break;
-		case PROC_NOT_FOUND:
-			ImGuiExtra_TextboxWarning(_("process.game_not_running"));
-			break;
-		case PROC_VERSION_MISMATCH:
-			ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
-			break;
-		case PROC_ATTACH_ERR:
-			ImGuiExtra_TextboxError(_("process.game_attach_err"));
-			break;
+	case PROC_ATTACHED:
+		if (!importerHelper.CanStart()) {
+			ImGuiExtra_TextboxWarning(_("importation.cant_import"));
 		}
+		break;
+	case PROC_NOT_ATTACHED:
+	case PROC_EXITED:
+	case PROC_ATTACHING:
+		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
+		break;
+	case PROC_NOT_FOUND:
+		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
+		break;
+	case PROC_VERSION_MISMATCH:
+		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
+		break;
+	case PROC_ATTACH_ERR:
+		ImGuiExtra_TextboxError(_("process.game_attach_err"));
+		break;
 	}
+
 	else if (!importerHelper.CanStart()) {
 		ImGuiExtra_TextboxWarning(_("importation.cant_import"));
 	}
