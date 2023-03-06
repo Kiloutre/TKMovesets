@@ -51,7 +51,7 @@ private:
 
 public:
 	using Extractor::Extractor; // Inherit constructor too
-	ExtractionErrcode Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, uint8_t& progress) override;
+	ExtractionErrcode Extract(gameAddr playerAddress, ExtractionOptions::Settings settings, uint8_t gameId, uint8_t& progress) override;
 	bool CanExtract() override;
 
 	std::string GetPlayerCharacterName(gameAddr playerAddress) override;

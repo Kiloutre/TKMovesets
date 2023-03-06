@@ -9,6 +9,35 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 
+// -- Private methods -- //
+
+Submenu_Extract::Submenu_Extract()
+{
+	m_motaExport[2] = true; // Hands
+	m_motaExport[3] = true; // Hands
+	m_motaExport[8] = true; // Camera
+	m_motaExport[9] = true; // Camera
+}
+
+ExtractionOptions::Settings Submenu_Extract::GetExtractionSettings()
+{
+	ExtractionOptions::Settings settings = 0;
+
+	if (m_overwriteSameFilename) {
+		settings |= ExtractionOptions::OVERWRITE_SAME_FILENAME;
+	}
+
+	for (uint8_t i = 0; i < 10; ++i) {
+		if (m_motaExport[i]) {
+			settings |= ((uint64_t)1 << i);
+		}
+	}
+
+	return settings;
+}
+
+// -- Public methods -- //
+
 void Submenu_Extract::Render(GameExtract& extractorHelper)
 {
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
@@ -37,11 +66,98 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			ImGui::EndCombo();
 		}
 		ImGui::PopID();
+
+
+		// Extraction settings
+		ImGui::SameLine();
+		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwriteSameFilename);
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
 	}
 
-	// If we can't extract, display a warning detailling why
+	if (ImGui::Button(_("extraction.settings"))) {
+		ImGui::OpenPopup("ExtractionSettingsPopup");
+	}
+
+	if (ImGui::BeginPopupModal("ExtractionSettingsPopup"))
+	{
+		ImGui::TextUnformatted(_("extraction.mota_explanation"));
+
+		for (uint8_t motaId = 0; motaId < 10; ++motaId) {
+			char buf[8] = {"mota_00"};
+			buf[5] += motaId / 10;
+			buf[6] += motaId % 10;
+			ImGui::Checkbox(_(buf), &m_motaExport[motaId]);
+
+			if ((motaId & 1) == 0) {
+				ImGui::SameLine();
+			}
+
+		}
+
+		ImGui::NewLine();
+		if (ImGui::Button(_("close"))) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
 	GameProcess* p = extractorHelper.process;
 
+	{
+		ImGui::SameLine();
+
+		bool busy = extractorHelper.IsBusy();
+		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper.CanStart();
+
+		// Extraction buttons, will be disabled if we can't extract
+		for (int playerId = 0; playerId < extractorHelper.characterCount; ++playerId)
+		{
+			bool canExtractThisMoveset = canExtract;
+
+			const char* characterName = extractorHelper.characterNames[playerId].c_str();
+			std::string buttonText;
+
+			const char playerIdTranslationId[3] = { '1' + (char)playerId , 'p', '\0' };
+			if (characterName[0] == '\0') {
+				buttonText = std::format("{} ({})", _("extraction.extract"), _(playerIdTranslationId));
+			}
+			else {
+				buttonText = std::format("{} ({}, {})", _("extraction.extract"), _(playerIdTranslationId), characterName);
+				if (strncmp(characterName, MOVESET_EXTRACTED_NAME_PREFIX, sizeof(MOVESET_EXTRACTED_NAME_PREFIX) - 1) == 0) {
+					canExtractThisMoveset = false;
+				}
+			}
+
+			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtractThisMoveset)) {
+				extractorHelper.QueueCharacterExtraction(playerId, GetExtractionSettings());
+			}
+			ImGui::SameLine();
+		}
+
+		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
+			extractorHelper.QueueCharacterExtraction(-1, GetExtractionSettings());
+		}
+
+		if (extractorHelper.progress > 0) {
+			// Progress text.
+			ImGui::SameLine();
+			if (extractorHelper.progress == 100) {
+				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("extraction.progress_done"));
+			}
+			else {
+				if (busy) {
+					ImGui::Text(_("extraction.progress"), extractorHelper.progress);
+				}
+				else {
+					ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("extraction.progress_error"), extractorHelper.progress);
+				}
+			}
+		}
+	}
+
+
+	// If we can't extract, display a warning detailling why
 	switch (p->status)
 	{
 	case PROC_ATTACHED:
@@ -63,62 +179,6 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	case PROC_ATTACH_ERR:
 		ImGuiExtra_TextboxError(_("process.game_attach_err"));
 		break;
-	}
-
-	{
-		bool busy = extractorHelper.IsBusy();
-		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper.CanStart();
-
-		// Extraction settings
-		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &extractorHelper.overwriteSameFilename);
-		ImGui::SameLine();
-		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
-
-		// Extraction buttons, will be disabled if we can't extract
-		for (int playerId = 0; playerId < extractorHelper.characterCount; ++playerId)
-		{
-			bool canExtractThisMoveset = canExtract;
-			ImGui::SameLine();
-
-			const char* characterName = extractorHelper.characterNames[playerId].c_str();
-			std::string buttonText;
-
-			const char playerIdTranslationId[3] = { '1' + (char)playerId , 'p', '\0' };
-			if (characterName[0] == '\0') {
-				buttonText = std::format("{} ({})", _("extraction.extract"), _(playerIdTranslationId));
-			}
-			else {
-				buttonText = std::format("{} ({}, {})", _("extraction.extract"), _(playerIdTranslationId), characterName);
-				if (strncmp(characterName, MOVESET_EXTRACTED_NAME_PREFIX, sizeof(MOVESET_EXTRACTED_NAME_PREFIX) - 1) == 0) {
-					canExtractThisMoveset = false;
-				}
-			}
-
-			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtractThisMoveset)) {
-				extractorHelper.QueueCharacterExtraction(playerId);
-			}
-		}
-
-		ImGui::SameLine();
-		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_both"), canExtract)) {
-			extractorHelper.QueueCharacterExtraction(-1);
-		}
-
-		if (extractorHelper.progress > 0) {
-			// Progress text.
-			ImGui::SameLine();
-			if (extractorHelper.progress == 100) {
-				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("extraction.progress_done"));
-			}
-			else {
-				if (busy) {
-					ImGui::Text(_("extraction.progress"), extractorHelper.progress);
-				}
-				else {
-					ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("extraction.progress_error"), extractorHelper.progress);
-				}
-			}
-		}
 	}
 
 	//ImGui::EndTable()

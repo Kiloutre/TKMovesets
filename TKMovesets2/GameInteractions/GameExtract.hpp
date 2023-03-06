@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "Extractor.hpp"
 #include "GameInteraction.hpp"
 
@@ -10,8 +12,8 @@ class GameExtract : public virtual GameInteraction
 private:
 	// Extractor class, never stores an Extractor*, used for polymorphism
 	Extractor* m_extractor = nullptr;
-	// Player address to extract
-	std::vector<gameAddr> m_playerAddress;
+	// Player addresses to extract and their respective extraction settings
+	std::vector<std::pair<gameAddr, ExtractionOptions::Settings>> m_extractionQueue;
 	// List of errors, one extraction fail = 1 error
 	std::vector<ExtractionErrcode> m_errors;
 
@@ -26,8 +28,6 @@ private:
 public:
 	// Contains the character names
 	std::string characterNames[4];
-	// Determine whether to ovewrite existing movesets when extracting or to append a number to the name
-	bool overwriteSameFilename = false;
 
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
@@ -36,7 +36,7 @@ public:
 	// Is currently busy with an extraction
 	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters
-	void QueueCharacterExtraction(int playerId);
+	void QueueCharacterExtraction(int playerId, ExtractionOptions::Settings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ExtractionErrcode GetLastError();
 };

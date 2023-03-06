@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <format>
 #include <windows.h>
+#include <locale>
 #include <filesystem>
 
 #include "MainWindow.hpp"
@@ -21,6 +22,38 @@ using namespace std;
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+static bool LoadLocaleTranslation()
+{
+	char name[LOCALE_NAME_MAX_LENGTH];
+	{
+		wchar_t w_name[LOCALE_NAME_MAX_LENGTH];
+		if (LCIDToLocaleName(GetThreadLocale(), w_name, LOCALE_NAME_MAX_LENGTH, 0) == 0) {
+			return false;
+		}
+
+		size_t retval = 0;
+		if (wcstombs_s(&retval, name, LOCALE_NAME_MAX_LENGTH, w_name, LOCALE_NAME_MAX_LENGTH - 1) != 0) {
+			return false;
+		}
+	}
+
+	const uint64_t filenameMaxSize = LOCALE_NAME_MAX_LENGTH + 5 + sizeof(PROGRAM_LANG_FOLDER);
+	char filename[filenameMaxSize];
+
+	strcpy_s(filename, filenameMaxSize, PROGRAM_LANG_FOLDER);
+	strcat_s(filename, filenameMaxSize, "/");
+	strcat_s(filename, filenameMaxSize, name);
+	strcat_s(filename, filenameMaxSize, ".txt");
+
+	struct stat buffer;
+	if (stat(filename, &buffer) == 0) {
+		Localization::LoadFile(name);
+		return true;
+	}
+
+	return false;
 }
 
 // Initialize the important members of mainwindow. I prefer doing it here because it is mostly a layout and GUI-related class
@@ -71,8 +104,9 @@ static void DestroyMainClasses(MainWindow& program)
 
 // -- main -- //
 
-int main(int argc, wchar_t** argv)
+int main(int argc, wchar_t** argv, char** env)
 {
+
 	{
 		// Make sure working dir is same as .exe
 		wchar_t currPath[MAX_PATH] = { 0 };
@@ -122,7 +156,9 @@ int main(int argc, wchar_t** argv)
 	}
 
 	// Load translation
-	Localization::LoadFile(PROGRAM_DEFAULT_LANG);
+	if (!LoadLocaleTranslation()) {
+		Localization::LoadFile(PROGRAM_DEFAULT_LANG);
+	}
 
 	// Init main program. This will get most things going and create the important threads
 	MainWindow program(window, c_glsl_version);

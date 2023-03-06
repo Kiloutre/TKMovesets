@@ -6,7 +6,10 @@
 
 #include "Localization.hpp"
 
+#include "constants.h"
+
 std::map<std::string, std::string> g_translations;
+std::string g_currentLangId;
 
 namespace Localization
 {
@@ -21,7 +24,8 @@ namespace Localization
 		std::ifstream infile;
 		std::string line;
 
-		infile.open(std::format("Translations/{}.txt", c_langId));
+		infile.open(std::format("{}/{}.txt", PROGRAM_LANG_FOLDER, c_langId));
+		g_currentLangId = std::string(c_langId);
 		while (std::getline(infile, line))
 		{
 			size_t commentStart = line.find_first_of('#');
@@ -66,6 +70,11 @@ namespace Localization
 
 			g_translations[key] = value;
 		}
+	}
+
+	const char* GetCurrLangId()
+	{
+		return g_currentLangId.c_str();
 	}
 
 	const char* GetText(const char* c_stringId)

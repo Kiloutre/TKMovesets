@@ -6,6 +6,18 @@
 
 # Utils #
 
+mota_00 = Anims 1
+mota_01 = Anims 2
+mota_02 = Hands 1
+mota_03 = Hands 2
+mota_04 = Face 1
+mota_05 = Face 2
+mota_06 = Wings 1
+mota_07 = Wings 2
+mota_08 = Camera 1
+mota_09 = Camera 2
+mota_10 = Unknown 1
+mota_11 = Unknown 2
 close = Close
 1p = Player 1
 2p = Player 2
@@ -69,6 +81,8 @@ extraction.rename = Rename moveset
 extraction.cant_extract = Cannot extract because characters aren't loaded.
 extraction.error_file_creation = There was an error while creating the moveset file
 extraction.error_allocation = There was a memory allocation error while copying the moveset data
+extraction.mota_explanation = Additional animations
+extraction.settings = Settings
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.

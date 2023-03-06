@@ -23,7 +23,7 @@ struct NavMenuBtn
 struct LangSelect
 {
 	const char* name;
-	const char* filename;
+	const char* langId;
 };
 
 class NavigationMenu {
@@ -37,6 +37,7 @@ public:
 	// Stores the ID of the current menu to ender
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
 
+	NavigationMenu();
 	// Main render function
 	void Render();
 

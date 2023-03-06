@@ -419,7 +419,7 @@ void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, ga
 
 // -- Public methods -- //
 
-ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, uint8_t& progress)
+ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions::Settings settings, uint8_t gameId, uint8_t& progress)
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
@@ -533,7 +533,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	else {
 		// Create the file*
 
-		std::string filepath = GetFilepath(characterName.c_str(), overwriteSameFilename);
+		std::string filepath = GetFilepath(characterName.c_str(), (settings & ExtractionOptions::OVERWRITE_SAME_FILENAME) != 0);
 		std::ofstream m_file(filepath.c_str(), std::ios::binary | std::ios::out);
 
 		if (!m_file.fail())

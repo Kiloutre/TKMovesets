@@ -5,6 +5,18 @@
 
 # Utilitaires #
 
+mota_00 = Anims 1
+mota_01 = Anims 2
+mota_02 = Mains 1
+mota_03 = Mains 2
+mota_04 = Visage 1
+mota_05 = Visage 2
+mota_06 = Ailes 1
+mota_07 = Ailes 2
+mota_08 = Camera 1
+mota_09 = Camera 2
+mota_10 = Inconnu 1
+mota_11 = Inconnu 2
 close = Fermer
 1p = Joueur 1
 2p = Joueur 2
@@ -67,6 +79,8 @@ extraction.cant_extract = Impossible d'extraire car aucun personnage chargé.
 extraction.error = Il y a eu une erreur lors de l'extraction du moveset
 extraction.error_file_creation = Il y a eu une erreur lors de la création du fichier du personnage
 extraction.error_allocation = Il y a eu une erreur d'allocation lors de la copie des données du personnage
+extraction.mota_explanation = Animations additionnelles 
+extraction.settings = Paramètres
 
 # Importation #
 importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
