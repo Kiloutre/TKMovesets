@@ -30,7 +30,7 @@ struct MovesetHeader_offsets
 {
 	// Store moveid aliases and some more i don't understand
 	uint64_t movesetInfoBlock;
-	// Store a list of offsets toward various structure lists paired with thei rsize
+	// Store a list of offsets toward various structure lists paired with their size
 	uint64_t tableBlock;
 	// Store a list of offets pointing to mota files
 	uint64_t motalistsBlock;

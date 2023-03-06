@@ -26,24 +26,6 @@ static void convertMovesetPointersToIndexes(byte* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets.move); i < table.moveCount; ++i, ++move)
 	{
-		// DEBUG STUFF
-		// LEAVE FOR NOW
-		if (move->_0x28_llong != 0) {
-			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x28_llong);
-		}
-		if (move->_0x5E_short != 0) {
-			printf("move offset 0x5e is not 0, please look into importing it, see if it can be useful. value is %x\n", move->_0x5E_short);
-		}
-		if (move->_0x48_llong != 0) {
-			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x48_llong);
-		}
-		if (move->_0x90_llong != 0) {
-			printf("move offset 0x90 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x90_llong);
-		}
-		if (move->_0x88_llong != 0) {
-			printf("move offset 0x88 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x88_llong);
-		}
-
 		move->name_addr -= nameStart;
 		move->anim_name_addr -= nameStart;
 		move->anim_addr = animOffsetMap[move->anim_addr];
@@ -51,6 +33,8 @@ static void convertMovesetPointersToIndexes(byte* movesetBlock, const gAddr::Mov
 		TO_INDEX(move->hit_condition_addr, table.hitCondition, HitCondition);
 		TO_INDEX(move->voicelip_addr, table.voiceclip, Voiceclip);
 		TO_INDEX(move->extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
+		TO_INDEX(move->move_start_extraprop_addr, table.moveBeginningProp, OtherMoveProperty);
+		TO_INDEX(move->move_end_extraprop_addr, table.moveEndingProp, OtherMoveProperty);
 	}
 
 	// Convert projectile ptrs
@@ -120,11 +104,18 @@ static void convertMovesetPointersToIndexes(byte* movesetBlock, const gAddr::Mov
 		TO_INDEX(pushback->extradata_addr, table.pushbackExtradata, PushbackExtradata);
 	}
 
-	// Convert ??? ptrs
+	// Convert move start prop ptrs
 	i = 0;
-	for (gAddr::unknown_0x200* unknown = (gAddr::unknown_0x200*)(movesetBlock + offsets.unknown_0x200); i < table.unknown_0x200_size; ++i, ++unknown)
+	for (gAddr::OtherMoveProperty* moveBeginningProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets.moveBeginningProp); i < table.moveBeginningPropCount; ++i, ++moveBeginningProp)
 	{
-		TO_INDEX(unknown->requirements_addr, table.requirement, Cancel);
+		TO_INDEX(moveBeginningProp->requirements_addr, table.requirement, Requirement);
+	}
+
+	// Convert move end prop ptrs
+	i = 0;
+	for (gAddr::OtherMoveProperty* moveEndingProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets.moveEndingProp); i < table.moveEndingPropCount; ++i, ++moveEndingProp)
+	{
+		TO_INDEX(moveEndingProp->requirements_addr, table.requirement, Requirement);
 	}
 }
 

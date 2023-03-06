@@ -168,6 +168,15 @@ namespace StructsT7
 		uint32_t value;
 	};
 
+
+	// Struct for Extra Move Properties that play when a move starts or ends
+	struct OtherMoveProperty
+	{
+		Requirement* requirements_addr;
+		uint32_t extraprop; // 881 list end value
+		uint32_t param;
+	};
+
 	struct Move
 	{
 		// 0 = 0 when writing (might be a ptr)
@@ -196,8 +205,8 @@ namespace StructsT7
 		uint32_t ground_fall;
 		Voiceclip* voicelip_addr; // Can be NULL
 		ExtraMoveProperty* extra_move_property_addr; // Can be NULL
-		int64_t _0x88_llong; // 0
-		int64_t _0x90_llong; // 0
+		OtherMoveProperty* move_start_extraprop_addr; // Can be NULL
+		OtherMoveProperty* move_end_extraprop_addr; // Can be NULL
 		int32_t _0x98_int;
 		int32_t hitbox_location;
 		uint32_t first_active_frame;
@@ -206,21 +215,6 @@ namespace StructsT7
 		uint16_t distance;
 		int16_t _0xAC_short;
 	};
-
-	// THE SIZE FOR THIS ONE IS NOT KNOWN
-	// Todo: extract __every__ character. See who has this filled to establish struct size.
-	struct unknown_0x1f0__unknown_size
-	{
-		char content[1];
-	};
-
-	struct unknown_0x200
-	{
-		Requirement requirements_addr;
-		uint32_t extraprop; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
-		uint32_t _0xC_int; // Often small values
-	};
-
 
 	// -- Other -- //
 
@@ -273,11 +267,11 @@ namespace StructsT7
 		ExtraMoveProperty* extraMoveProperty;
 		uint64_t extraMovePropertyCount;
 
-		void* unknown_0x1f0;
-		uint64_t unknown_0x1f8;
+		OtherMoveProperty* moveBeginningProp; // Extraprops that play when a move starts
+		uint64_t moveBeginningPropCount;
 
-		void* unknown_0x200;
-		uint64_t unknown_0x208;
+		OtherMoveProperty* moveEndingProp; // Extraprops that play when a move ends
+		uint64_t moveEndingPropCount;
 
 		Move* move;
 		uint64_t moveCount;
@@ -419,11 +413,11 @@ namespace StructsT7_gameAddr
 		gameAddr cameradata_addr;
 	};
 
-	struct unknown_0x200
+	struct OtherMoveProperty
 	{
 		gameAddr requirements_addr;
-		uint32_t extraprop; // Values often above 0x8000 like extra props, and some 881 (req list end) found too
-		uint32_t _0xC_int; // Often small values
+		uint32_t extraprop; // 881 list end
+		uint32_t param; // Often small values
 	};
 
 	struct Move
@@ -454,8 +448,8 @@ namespace StructsT7_gameAddr
 		uint32_t ground_fall;
 		gameAddr voicelip_addr; // Can be NULL
 		gameAddr extra_move_property_addr; // Can be NULL
-		int64_t _0x88_llong; // 0
-		int64_t _0x90_llong; // 0
+		gameAddr move_start_extraprop_addr; // Can be NULL
+		gameAddr move_end_extraprop_addr; // Can be NULL
 		int32_t _0x98_int;
 		int32_t hitbox_location;
 		uint32_t first_active_frame;
@@ -499,11 +493,11 @@ namespace StructsT7_gameAddr
 		gameAddr extraMoveProperty;
 		uint64_t extraMovePropertyCount;
 
-		gameAddr unknown_0x1f0;
-		uint64_t unknown_0x1f0_size;
+		gameAddr moveBeginningProp; // Extraprops that play when a move starts
+		uint64_t moveBeginningPropCount;
 
-		gameAddr unknown_0x200;
-		uint64_t unknown_0x200_size;
+		gameAddr moveEndingProp; // Extraprops that play when a move ends
+		uint64_t moveEndingPropCount;
 
 		gameAddr move;
 		uint64_t moveCount;
