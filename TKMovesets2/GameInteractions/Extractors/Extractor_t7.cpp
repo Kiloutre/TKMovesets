@@ -472,6 +472,10 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
 	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
 	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets.move);
+	if (movesetBlock == nullptr) { 
+		// Since movesetBlock is used by those Copy functions, we have to check for allocation failure here
+		return ExtractionAllocationErr;
+	}
 	progress = 20;
 
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
@@ -524,8 +528,6 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
 		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
-		// Todo: maybe use new() and delete
-		// Todo: this still isn't safe right now because read/write on those pointers after allocating them
 		errcode = ExtractionAllocationErr;
 	}
 	else {
