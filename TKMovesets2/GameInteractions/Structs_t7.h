@@ -2,34 +2,6 @@
 
 #include <stdint.h>
 
-// Helpers that arent related to actual in-game structure
-namespace StructsT7Helpers
-{
-	// This one is used to help determine which mota to export
-	enum MOTA_FLAGS
-	{
-		MOTA_0_ANIM = (1 << 0),
-		MOTA_1_ANIM = (1 << 1),
-		MOTA_2_HAND = (1 << 2),
-		MOTA_3_HAND = (1 << 3),
-		MOTA_4_FACE = (1 << 4),
-		MOTA_5_FACE = (1 << 5),
-		MOTA_6_WINGS = (1 << 6),
-		MOTA_7_WINGS = (1 << 7),
-		MOTA_8_CAMERA = (1 << 8),
-		MOTA_9_CAMERA = (1 << 9),
-		MOTA_10_UNKNOWN = (1 << 10),
-		MOTA_11_UNKNOWN = (1 << 11),
-
-		MOTA_ANIM = MOTA_0_ANIM | MOTA_1_ANIM,
-		MOTA_HANDS = MOTA_2_HAND | MOTA_3_HAND,
-		MOTA_FACES = MOTA_4_FACE | MOTA_5_FACE,
-		MOTA_CAMERAS = MOTA_8_CAMERA | MOTA_9_CAMERA,
-		MOTA_WINGS = MOTA_6_WINGS | MOTA_7_WINGS,
-		MOTA_UNKNOWNS = MOTA_10_UNKNOWN | MOTA_11_UNKNOWN,
-	};
-};
-
 // Contains the structs used for Extraction/Importation
 namespace StructsT7
 {
