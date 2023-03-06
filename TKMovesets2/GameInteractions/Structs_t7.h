@@ -200,7 +200,7 @@ namespace StructsT7
 	// Struct for Extra Move Properties that play when a move starts or ends
 	struct OtherMoveProperty
 	{
-		Requirement requirements_addr;
+		Requirement* requirements_addr;
 		uint32_t extraprop; // 881 list end value
 		uint32_t param;
 	};
