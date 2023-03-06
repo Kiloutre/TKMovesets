@@ -35,9 +35,19 @@ static void InitMainClasses(MainWindow& program)
 	program.extractor.game = new GameData(program.extractor.process, addrFile);
 	program.extractor.storage = &program.storage;
 
+	if (Games::GetExtractableGamesCount() == 1) {
+		program.extractor.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
+		// todo : remove this when we implement more extractors. or maybe make T7 the default period?
+	}
+
 	program.importer.process = new GameProcess;
 	program.importer.game = new GameData(program.importer.process, addrFile);
 	program.importer.storage = &program.storage;
+
+	if (Games::GetImportableGamesCount() == 1) {
+		program.importer.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
+		// todo : remove this when we implement more importers. or maybe make T7 the default period?
+	}
 
 	program.storage.StartThread();
 	program.extractor.StartThread();

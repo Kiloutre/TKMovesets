@@ -6,6 +6,7 @@
 
 # Utils #
 
+close = Close
 1p = Player 1
 2p = Player 2
 3p = Player 3
@@ -60,10 +61,14 @@ extraction.extract_both = Extract (1P & 2P)
 extraction.extract_from = Extract from:
 extraction.overwrite_duplicate = Overwrite moveset with same name
 extraction.overwrite_explanation = Enable to overwrite moveset with same names.\nDisable to have name conflicts resolved with number suffixes.\nEx: T7_JIN (2)
-extraction.progress = Extracting... (%.0f%%)
+extraction.progress = Extracting... (%u%%)
+extraction.progress_error = Extracting error (%u%%)
+extraction.progress_done = Extracting... Done!
 extraction.extracted_movesets = Extracted movesets
 extraction.rename = Rename moveset
 extraction.cant_extract = Cannot extract because characters aren't loaded.
+extraction.error_file_creation = There was an error while creating the moveset file
+extraction.error_allocation = There was a memory allocation error while copying the moveset data
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
@@ -72,11 +77,17 @@ importation.select_moveset = Select moveset to import
 importation.deallocate_unused = Deallocate unused movesets
 importation.cant_import = Cannot import because you are not loaded into an active game (training mode, etc).
 importation.import_to = Import to:
-importation.progress = Importing... (%.0f%%)
+importation.progress = Importing... (%u%%)
+importation.progress_error = Importing error (%u%%)
+importation.progress_done = Importing... Done!
 importation.apply_instantly = Apply instantly
 importation.apply_instantly_explanation = Turning this to off will let the game wait until the current move ends before switching to the new moveset.\nIn the cases of some moves (like Negan's idle animation), this can take pretty long.
 importation.free_unused_movesets = Free unused movesets
 importation.free_unused_movesets_explanation = If turned on, movesets that were previously allocated but are now unused will be freed from memory.\nThis helps prevent this tool from using all your RAM.
+importation.error = There was an error while importing the moveset
+importation.error_file_reading = There was an error while reading the moveset file
+importation.error_allocation = There was a memory allocation error while reading the moveset data
+importation.error_game_allocation = There was a game memory allocation error while writing the moveset data
 
 # Online #
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.

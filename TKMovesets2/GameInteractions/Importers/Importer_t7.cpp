@@ -12,18 +12,18 @@
 // -- Static helpers -- //
 
 // Reads the moveset header size, the moveset size (post header), allocate the moveset in our own memory and write to it
-static char* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& size_out)
+static byte* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& size_out)
 {
 	file.read((char*)header, sizeof(MovesetHeader));
 	file.seekg(0, std::ios::end);
 	size_out = file.tellg();
-	char* movesetData = (char*)malloc(size_out - header->infos.header_size);
-	if (movesetData != nullptr) {
+	byte* moveset = (byte*)malloc(size_out - header->infos.header_size);
+	if (moveset != nullptr) {
 		file.seekg( header->infos.header_size + header->offsets.movesetInfoBlock, std::ios::beg);
-		file.read(movesetData, size_out);
+		file.read((char*)moveset, size_out);
 	}
 	file.close();
-	return movesetData;
+	return moveset;
 }
 
 // -- Private methods -- //
@@ -65,13 +65,13 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 	m_process->writeInt64(playerAddress + 0x14a8, cameraMota2);
 }
 
-void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, char* movesetData, gameAddr gameMoveset, gameAddr playerAddress)
+void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
 	m_process->readBytes(currentMovesetAddr + 0x280, &currentMotasList, sizeof(MotaList));
 
-	MotaList* motaList = (MotaList*)(movesetData + offsets.motalistsBlock);
+	MotaList* motaList = (MotaList*)(moveset + offsets.motalistsBlock);
 
 	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
 	uint64_t* fileMotaCursor = (uint64_t*)motaList;
@@ -91,7 +91,7 @@ void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, ch
 	}
 }
 
-void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, char* moveset, gameAddr gameMoveset)
+void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset)
 {
 	gAddr::MovesetTable* table = (gAddr::MovesetTable*)(moveset + offsets.tableBlock);
 	gameAddr offset = gameMoveset + offsets.movesetBlock;
@@ -117,7 +117,7 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 	table->throws += offset;
 }
 
-void ImporterT7::ApplyCharacterIDFixes(char* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const MovesetHeader& header)
+void ImporterT7::ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const MovesetHeader& header)
 {
 	// In movesets, some moves (for some reason) can be transitionned into only on specific character IDs
 	// I am taking about mundane moves such as EWHF not working where WHF does
@@ -140,7 +140,7 @@ void ImporterT7::ApplyCharacterIDFixes(char* moveset, gameAddr playerAddress, co
 	}
 }
 
-void ImporterT7::ConvertMovesetIndexes(char* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
+void ImporterT7::ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
 {
 	size_t i;
 	gameAddr blockOffset = gameMoveset + blockOffsets.movesetBlock;
@@ -240,13 +240,16 @@ void ImporterT7::CleanupUnusedMovesets()
 	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val_playerstruct_size");
 	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val_motbin_offset");
 
+	/*
 	uint64_t offsetsToWatch[] = {
 		0x218, 0x220, 0x228, // Move
-		0xBC8, 0xD80, // ???
+		0xBC8, 0xD80, 0xDA0, // ???
 		0x13C0, 0x13E8, 0x13F0, // ???
 		0x14a0, 0x14a8, // Static camera mota
+		0x1460, 0x1468, 0x1480, 0x1488,// ??
 		0x1520, 0x1528, 0x1530, 0x1540 // Moveset
 	};
+	*/
 
 	for (size_t i = 0; i + 1 < m_process->allocatedMemory.size();)
 	{
@@ -259,16 +262,20 @@ void ImporterT7::CleanupUnusedMovesets()
 		if (CanImport()) {
 			// Check movesets of both players
 			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid) {
-				gameAddr movesetOffsets = playerAddress + motbinOffset + playerid * playerstructSize;
+				gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
 
-				// Check a bunch of offsets that are likely to contain moveset
-				for (size_t j = 0; j < sizeof(offsetsToWatch) / sizeof(offsetsToWatch[0]); ++j) {
-					gameAddr offsetValue = m_process->readInt64(playerAddress + offsetsToWatch[i] + playerid * playerstructSize);
+				// Maybe overkill to check every offset, but drastically reduces the chance of a crash
+				gameAddr pStart = currentPlayerAddress;
+				gameAddr pEnd = pStart + playerstructSize;
+				while (pStart < pEnd)
+				{
+					uint64_t offsetValue = m_process->readInt64(pStart);
 					if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
 						isUsed = true;
-						break;
 					}
+					pStart += 8;
 				}
+
 			}
 		}
 
@@ -284,7 +291,7 @@ void ImporterT7::CleanupUnusedMovesets()
 	}
 }
 
-ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, float& progress)
+ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
 	progress = 0;
 	// Read file data
@@ -296,7 +303,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 	// Variables that will store the moveset size & the moveset itself in our own memory
 	uint64_t s_moveset;
-	char* moveset;
+	byte* moveset;
 
 	// Header of the moveset that will contain our own information about it
 	MovesetHeader header;
@@ -376,6 +383,8 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 
 bool ImporterT7::CanImport()
 {
+	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
+	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.

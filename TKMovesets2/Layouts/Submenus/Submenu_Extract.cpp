@@ -9,7 +9,7 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 
-void RenderSubmenu_Extract(GameExtract& extractorHelper)
+void Submenu_Extract::Render(GameExtract& extractorHelper)
 {
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
@@ -19,16 +19,16 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 		ImGui::TextUnformatted(_("extraction.extract_from"));
 
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
-		size_t currentGameId = extractorHelper.currentGameId;
+		uint8_t currentGameId = extractorHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-		size_t gameListCount = Games::GetGamesCount();
+		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
-			for (size_t i = 0; i < gameListCount; ++i)
+			for (uint8_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
-				if (game->flags & GameImportable) {
+				if (game->extractor != nullptr) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 						extractorHelper.SetTargetProcess(game->processName, i);
 					}
@@ -41,28 +41,28 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 
 	// If we can't extract, display a warning detailling why
 	GameProcess* p = extractorHelper.process;
-	if (p->status != PROC_ATTACHED)
+
+	switch (p->status)
 	{
-		switch (p->status)
-		{
-		case PROC_NOT_ATTACHED:
-		case PROC_EXITED:
-		case PROC_ATTACHING:
-			ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
-			break;
-		case PROC_NOT_FOUND:
-			ImGuiExtra_TextboxWarning(_("process.game_not_running"));
-			break;
-		case PROC_VERSION_MISMATCH:
-			ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
-			break;
-		case PROC_ATTACH_ERR:
-			ImGuiExtra_TextboxError(_("process.game_attach_err"));
-			break;
+	case PROC_ATTACHED:
+		if (!extractorHelper.CanStart()) {
+			ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
 		}
-	}
-	else if (!extractorHelper.CanStart()) {
-		ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
+		break;
+	case PROC_NOT_ATTACHED:
+	case PROC_EXITED:
+	case PROC_ATTACHING:
+		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
+		break;
+	case PROC_NOT_FOUND:
+		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
+		break;
+	case PROC_VERSION_MISMATCH:
+		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
+		break;
+	case PROC_ATTACH_ERR:
+		ImGuiExtra_TextboxError(_("process.game_attach_err"));
+		break;
 	}
 
 	{
@@ -77,6 +77,7 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 		// Extraction buttons, will be disabled if we can't extract
 		for (int playerId = 0; playerId < extractorHelper.characterCount; ++playerId)
 		{
+			bool canExtractThisMoveset = canExtract;
 			ImGui::SameLine();
 
 			const char* characterName = extractorHelper.characterNames[playerId].c_str();
@@ -88,9 +89,12 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 			}
 			else {
 				buttonText = std::format("{} ({}, {})", _("extraction.extract"), _(playerIdTranslationId), characterName);
+				if (strncmp(characterName, MOVESET_EXTRACTED_NAME_PREFIX, sizeof(MOVESET_EXTRACTED_NAME_PREFIX) - 1) == 0) {
+					canExtractThisMoveset = false;
+				}
 			}
 
-			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtract)) {
+			if (ImGuiExtra::RenderButtonEnabled(buttonText.c_str(), canExtractThisMoveset)) {
 				extractorHelper.QueueCharacterExtraction(playerId);
 			}
 		}
@@ -100,10 +104,20 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 			extractorHelper.QueueCharacterExtraction(-1);
 		}
 
-		if (busy) {
-			// Progress text. Extraction should generally be fast enough that this will be displayed briefly, but it's still nice to have
+		if (extractorHelper.progress > 0) {
+			// Progress text.
 			ImGui::SameLine();
-			ImGui::Text(_("extraction.progress"), extractorHelper.progress);
+			if (extractorHelper.progress == 100) {
+				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("extraction.progress_done"));
+			}
+			else {
+				if (busy) {
+					ImGui::Text(_("extraction.progress"), extractorHelper.progress);
+				}
+				else {
+					ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("extraction.progress_error"), extractorHelper.progress);
+				}
+			}
 		}
 	}
 
@@ -176,5 +190,34 @@ void RenderSubmenu_Extract(GameExtract& extractorHelper)
 		extractorHelper.storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
+	}
+
+	ExtractionErrcode err = extractorHelper.GetLastError();
+	if (err != ExtractionSuccessful) {
+		ImGui::OpenPopup("ExtractionErrPopup");
+		m_err = err;
+	}
+
+	// Show popup containing the error description
+	if (ImGui::BeginPopupModal("ExtractionErrPopup"))
+	{
+		switch (m_err)
+		{
+		case ExtractionAllocationErr:
+			ImGui::Text(_("extraction.error_allocation"));
+			break;
+		case ExtractionFileCreationErr:
+			ImGui::Text(_("extraction.error_file_creation"));
+			break;
+		}
+
+		if (ImGui::Button(_("close")))
+		{
+			// Reset the errcode
+			m_err = ExtractionSuccessful;
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
 	}
 }

@@ -6,7 +6,7 @@
 #include "imgui_extras.hpp"
 #include "Helpers.hpp"
 
-void RenderSubmenu_Import(GameImport& importerHelper)
+void Submenu_Import::Render(GameImport& importerHelper)
 {
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
 	ImGui::SeparatorText(_("importation.importation"));
@@ -16,16 +16,16 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 		ImGui::SameLine();
 
 		// todo: show console or something? need status
-		size_t currentGameId = importerHelper.currentGameId;
+		uint8_t currentGameId = importerHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-		size_t gameListCount = Games::GetGamesCount();
+		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
 		{
-			for (size_t i = 0; i < gameListCount; ++i)
+			for (uint8_t i = 0; i < gameListCount; ++i)
 			{
 				GameInfo* game = Games::GetGameInfo(i);
-				if (game->flags & GameImportable) {
+				if (game->importer != nullptr) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 						importerHelper.SetTargetProcess(game->processName, i);
 					}
@@ -47,8 +47,7 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 			for (int8_t i = 0; i < importerHelper.characterCount; ++i)
 			{
 				buf[0] = '1' + i;
-				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0)))
-				{
+				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
 					importerHelper.currentPlayerId = i;
 				}
 			}
@@ -73,34 +72,43 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 	bool busy = importerHelper.IsBusy();
 	bool canImport = p->status == PROC_ATTACHED && !busy && importerHelper.CanStart();
 
-	if (busy) {
-		// Progress text. Importation should generally be fast enough that this will be displayed briefly, but it's still nice to have
+	if (importerHelper.progress > 0) {
+		// Progress text.
 		ImGui::SameLine();
-		ImGui::Text(_("importation.progress"), importerHelper.progress);
-	}
-
-	if (p->status != PROC_ATTACHED)
-	{
-		switch (p->status)
-		{
-		case PROC_NOT_ATTACHED:
-		case PROC_EXITED:
-		case PROC_ATTACHING:
-			ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
-			break;
-		case PROC_NOT_FOUND:
-			ImGuiExtra_TextboxWarning(_("process.game_not_running"));
-			break;
-		case PROC_VERSION_MISMATCH:
-			ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
-			break;
-		case PROC_ATTACH_ERR:
-			ImGuiExtra_TextboxError(_("process.game_attach_err"));
-			break;
+		if (importerHelper.progress == 100) {
+			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("importation.progress_done"));
+		}
+		else {
+			if (busy) {
+				ImGui::Text(_("importation.progress"), importerHelper.progress);
+			}
+			else {
+				ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), importerHelper.progress);
+			}
 		}
 	}
-	else if (!importerHelper.CanStart()) {
-		ImGuiExtra_TextboxWarning(_("importation.cant_import"));
+
+	switch (p->status)
+	{
+	case PROC_ATTACHED:
+		if (!importerHelper.CanStart()) {
+			ImGuiExtra_TextboxWarning(_("importation.cant_import"));
+		}
+		break;
+	case PROC_NOT_ATTACHED:
+	case PROC_EXITED:
+	case PROC_ATTACHING:
+		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
+		break;
+	case PROC_NOT_FOUND:
+		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
+		break;
+	case PROC_VERSION_MISMATCH:
+		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
+		break;
+	case PROC_ATTACH_ERR:
+		ImGuiExtra_TextboxError(_("process.game_attach_err"));
+		break;
 	}
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
@@ -146,8 +154,8 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
-				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport))
-				{
+
+				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 					importerHelper.QueueCharacterImportation(moveset->filename);
 				}
 				ImGui::PopID();
@@ -159,5 +167,35 @@ void RenderSubmenu_Import(GameImport& importerHelper)
 		importerHelper.storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
+	}
+
+	ImportationErrcode err = importerHelper.GetLastError();
+	if (err != ImportationSuccessful) {
+		ImGui::OpenPopup("ImportationErrPopup");
+		m_err = err;
+	}
+
+	if (ImGui::BeginPopupModal("ImportationErrPopup"))
+	{
+		switch (m_err)
+		{
+		case ImportationAllocationErr:
+			ImGui::Text(_("importation.error_allocation"));
+			break;
+		case ImportationGameAllocationErr:
+			ImGui::Text(_("importation.error_game_allocation"));
+			break;
+		case ImportationFileReadErr:
+			ImGui::Text(_("importation.error_file_creation"));
+			break;
+		}
+
+		if (ImGui::Button(_("close")))
+		{
+			m_err = ImportationSuccessful;
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
 	}
 }

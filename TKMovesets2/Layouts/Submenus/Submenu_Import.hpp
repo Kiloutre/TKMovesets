@@ -2,4 +2,11 @@
 
 #include "GameImport.hpp"
 
-void RenderSubmenu_Import(GameImport& importerHelper);
+class Submenu_Import
+{
+private:
+	ImportationErrcode m_err;
+
+public:
+	void Render(GameImport& importerHelper);
+};

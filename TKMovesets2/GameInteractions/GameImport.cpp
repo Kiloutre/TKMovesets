@@ -34,23 +34,6 @@ void GameImport::InstantiateFactory()
 	m_importer = Games::FactoryGetImporter(currentGameId, process, game);
 }
 
-
-void GameImport::RunningUpdate()
-{
-
-	// Extraction queue is a FIFO (first in first out) queue
-	while (m_plannedImportations.size() > 0)
-	{
-		auto &[filename, playerAddress] = m_plannedImportations[0];
-		// Start Importation
-		m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
-		if (free_unused_movesets) {
-			m_importer->CleanupUnusedMovesets();
-		}
-		m_plannedImportations.erase(m_plannedImportations.begin());
-	}
-}
-
 void GameImport::PreProcessDetach()
 {
 	if (free_unused_movesets) {
@@ -58,7 +41,38 @@ void GameImport::PreProcessDetach()
 	}
 }
 
+void GameImport::RunningUpdate()
+{
+
+	// Extraction queue is a FIFO (first in first out) queue
+	bool errored = false;
+	while (m_plannedImportations.size() > 0)
+	{
+		if (!errored) {
+			auto& [filename, playerAddress] = m_plannedImportations[0];
+			// Start Importation
+			ImportationErrcode err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+			if (free_unused_movesets) {
+				m_importer->CleanupUnusedMovesets();
+			}
+			if (err != ImportationSuccessful) {
+				m_errors.push_back(err);
+				errored = true;
+			}
+		}
+		m_plannedImportations.erase(m_plannedImportations.begin());
+	}
+}
 // -- Public methods -- //
+
+ImportationErrcode GameImport::GetLastError()
+{
+	if (m_errors.size() > 0) {
+		ImportationErrcode err = m_errors[0];
+		m_errors.erase(m_errors.begin());
+	}
+	return ImportationSuccessful;
+}
 
 void GameImport::StopThreadAndCleanup()
 {

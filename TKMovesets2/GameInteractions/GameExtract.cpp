@@ -50,15 +50,32 @@ void GameExtract::RunningUpdate()
 	LoadCharacterNames();
 
 	// Extraction queue is a FIFO (first in first out) queue
+	bool errored = false;
 	while (m_playerAddress.size() > 0)
 	{
-		// Start extraction
-		m_extractor->Extract(m_playerAddress[0], currentGameId, overwriteSameFilename, progress);
+		if (!errored) {
+			// Start extraction
+			ExtractionErrcode err = m_extractor->Extract(m_playerAddress[0], currentGameId, overwriteSameFilename, progress);
+			if (err != ExtractionSuccessful) {
+				m_errors.push_back(err);
+				errored = true;
+			}
+		}
 		m_playerAddress.erase(m_playerAddress.begin());
 	}
 }
 
 // -- Public methods -- //
+
+ExtractionErrcode GameExtract::GetLastError()
+{
+	if (m_errors.size() > 0) {
+		ExtractionErrcode err = m_errors[0];
+		m_errors.erase(m_errors.begin());
+		return err;
+	}
+	return ExtractionSuccessful;
+}
 
 void GameExtract::StopThreadAndCleanup()
 {

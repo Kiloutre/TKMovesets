@@ -18,7 +18,7 @@
 // -- Static helpers -- //
 
 // Converts absolute ptr into indexes before saving to file
-static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
+static void convertMovesetPointersToIndexes(byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
 	size_t i;
 
@@ -26,6 +26,24 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets.move); i < table.moveCount; ++i, ++move)
 	{
+		// DEBUG STUFF
+		// LEAVE FOR NOW
+		if (move->_0x28_llong != 0) {
+			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x28_llong);
+		}
+		if (move->_0x5E_short != 0) {
+			printf("move offset 0x5e is not 0, please look into importing it, see if it can be useful. value is %x\n", move->_0x5E_short);
+		}
+		if (move->_0x48_llong != 0) {
+			printf("move offset 0x28 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x48_llong);
+		}
+		if (move->_0x90_llong != 0) {
+			printf("move offset 0x90 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x90_llong);
+		}
+		if (move->_0x88_llong != 0) {
+			printf("move offset 0x88 is not 0, please look into importing it, see if it's a ptr that can be converted like shown under. 0x28 value: %llx\n", move->_0x88_llong);
+		}
+
 		move->name_addr -= nameStart;
 		move->anim_name_addr -= nameStart;
 		move->anim_addr = animOffsetMap[move->anim_addr];
@@ -111,7 +129,7 @@ static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::Mov
 }
 
 // Find the closest anim address in order to establish the current anim's end. A bit hacky, but does the job until we can understand how to get 0x64 anims sizes
-static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> boundaries)
+static int64_t getClosestBoundary(gameAddr animAddr, const std::vector<gameAddr>& boundaries)
 {
 	for (gameAddr comp : boundaries)
 	{
@@ -126,7 +144,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, std::vector<gameAddr> bound
 
 // -- Private methods - //
 
-uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap)
+uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap)
 {
 	uint64_t motaCustomBlockSize = 0;
 
@@ -178,7 +196,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 			m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
 			for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
 			{
-				uint64_t animAddr = motaAddr + animOffsetList[i];
+				uint64_t animAddr = motaAddr + animOffsetList[motaAnimIdx];
 				if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
 					boundaries.push_back(animAddr);
 				}
@@ -189,7 +207,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(MotaList* motas, std::vector<
 	return motaCustomBlockSize;
 }
 
-char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries)
+byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries)
 {
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
@@ -198,7 +216,8 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 
 	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap);
 
-	char* customBlock = (char*)malloc(size_out);
+
+	byte* customBlock = (byte*)malloc(size_out);
 	if (customBlock == nullptr) {
 		size_out = 0;
 		return nullptr;
@@ -227,7 +246,7 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	return customBlock;
 }
 
-void ExtractorT7::GetNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
+void ExtractorT7::GetNamesBlockBounds(const gAddr::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
 	uint64_t smallest = (int64_t)move[0].name_addr;
 	uint64_t highest = smallest;
@@ -263,18 +282,17 @@ void ExtractorT7::GetNamesBlockBounds(Move* move, uint64_t moveCount, gameAddr& 
 }
 
 
-char* ExtractorT7::CopyAnimations(Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
+byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
-	char* animationBlock = nullptr;
+	byte* animationBlock = nullptr;
 
 	std::vector<gameAddr> addrList;
 	// Get animation list and sort it
 	for (size_t i = 0; i < moveCount; ++i)
 	{
-		Move* move = &movelist[i];
-		gameAddr anim_addr = (gameAddr)move->anim_addr;
+		gameAddr anim_addr = movelist[i].anim_addr;
 
 		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
 			// Avoid adding duplicates
@@ -305,13 +323,13 @@ char* ExtractorT7::CopyAnimations(Move* movelist, size_t moveCount, uint64_t &si
 	}
 
 	// Allocate block
-	if (!(animationBlock = (char*)malloc(totalSize))) {
+	if (!(animationBlock = (byte*)malloc(totalSize))) {
 		size_out = 0;
 		return nullptr;
 	}
 
 	// Read animations and write to our block
-	char *animationBlockCursor = animationBlock;
+	byte *animationBlockCursor = animationBlock;
 	for (gameAddr animAddr : addrList)
 	{
 		int64_t animSize = animSizes[animAddr];
@@ -355,24 +373,33 @@ void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, sizeof(MovesetTable) / 8 / 2);
 }
 
-char* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, gAddr::MovesetTable& table)
+byte* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
 {
 	gameAddr blockStart = (gameAddr)table.reactions;
 	gameAddr blockEnd = (gameAddr)table.throws + (sizeof(ThrowData) * table.throwsCount);
 	return allocateAndReadBlock(blockStart, blockEnd, size_out);
 }
 
-char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
 {
 	gameAddr nameBlockEnd;
 	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
-	// There is some stuff before the move names i want to get (character name, date string and stuff)
-	// So i hardcode the address because i know it
-	nameBlockStart = movesetAddr + 0x2E8;
-	return allocateAndReadBlock(nameBlockStart, nameBlockEnd, size_out);
+
+	// Prefix we apply to recognize movesets we extracted
+	const char* namePrefix = MOVESET_EXTRACTED_NAME_PREFIX;
+	const size_t toCopy = strlen(namePrefix);
+	const size_t charactersToReplace = 1;
+
+	// There is some stuff before the² move names i want to get (character name, date string and stuff)
+	// So i hardcode the offset 0x2E8 because i know it
+	nameBlockStart = movesetAddr + 0x2E8 - (toCopy - charactersToReplace);
+	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
+	memcpy(nameBlock, namePrefix, toCopy);
+
+	return nameBlock;
 }
 
-char* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
+byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
 {
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, boundaries);
@@ -383,27 +410,27 @@ void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, ga
 	infos.flags = 0; // Currently unused
 	infos.gameId = gameId;
 	infos.characterId = GetCharacterID(playerAddress);
-	strcpy(infos.version_string, MOVESET_VERSION_STRING);
-	strcpy(infos.origin, GetGameOriginString());
-	strcpy(infos.target_character, GetPlayerCharacterName(playerAddress).c_str());
+	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
+	strcpy_s(infos.origin, sizeof(infos.origin), GetGameOriginString());
+	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
 	infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();;
 	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(MovesetHeader));
 }
 
 // -- Public methods -- //
 
-ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, float& progress)
+ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, bool overwriteSameFilename, uint8_t& progress)
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
-	char* headerBlock;
-	char* movesetInfoBlock;
-	char* tableBlock;
-	char* motasListBlock;
+	byte* headerBlock;
+	byte* movesetInfoBlock;
+	byte* tableBlock;
+	byte* motasListBlock;
 	char* nameBlock;
-	char* movesetBlock;
-	char* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
-	char* motaCustomBlock; // This is also a custom block because not contiguously stored
+	byte* movesetBlock;
+	byte* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
+	byte* motaCustomBlock; // This is also a custom block because not contiguously stored
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(MovesetHeader);
@@ -432,9 +459,9 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	MotaList motasList{};
 
 	// Assign these blocks right away because they're fixed-size structures we write into
-	headerBlock = (char*)&header;
-	tableBlock = (char*)&offsets;
-	motasListBlock = (char*)&motasList;
+	headerBlock = (byte*)&header;
+	tableBlock = (byte*)&offsets;
+	motasListBlock = (byte*)&motasList;
 
 
 	// Fill table containing lists of move, lists of cancels, etc...
@@ -444,7 +471,11 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	// Reads block containing the actual moveset data
 	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
 	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
-	Move* movelist = (Move*)(movesetBlock + offsets.move);
+	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets.move);
+	if (movesetBlock == nullptr) { 
+		// Since movesetBlock is used by those Copy functions, we have to check for allocation failure here
+		return ExtractionAllocationErr;
+	}
 	progress = 20;
 
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
@@ -474,9 +505,11 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 	// Setup our own header to write in the output file containg useful information
 	std::string characterName = GetPlayerCharacterName(playerAddress);
+	progress = 77;
 
 	// Fill the header with our own useful informations
 	FillHeaderInfos(header.infos, gameId, playerAddress);
+	progress = 79;
 
 	// Calculate each offsets according to the previous block offset + its size
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
@@ -495,13 +528,15 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
 		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
-		// Todo: maybe use new() and delete
-		// Todo: this still isn't safe right now because read/write on those pointers after allocating them
 		errcode = ExtractionAllocationErr;
 	}
 	else {
-		// Create the file
-		if (CreateMovesetFile(characterName.c_str(), GetGameIdentifierString(), overwriteSameFilename))
+		// Create the file*
+
+		std::string filepath = GetFilepath(characterName.c_str(), overwriteSameFilename);
+		std::ofstream m_file(filepath.c_str(), std::ios::binary | std::ios::out);
+
+		if (!m_file.fail())
 		{
 			//
 			progress = 80;
@@ -510,36 +545,36 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 			// We make sure to write every block aligned on 8 bytes because the game is likely to require it for some structures
 
 			// THis is only our header info, it is useful only to us
-			m_file.write(headerBlock, s_headerBlock);
+			m_file.write((char*)headerBlock, s_headerBlock);
 			Helpers::align8Bytes(m_file);
 
 			// The actual full moveset data, all of this will be allocated from the file in one go
-			m_file.write(movesetInfoBlock, s_movesetInfoBlock);
+			m_file.write((char*)movesetInfoBlock, s_movesetInfoBlock);
 			//Helpers::align8Bytes(m_file); // The size of movesetInfoBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write(tableBlock, s_tableBlock);
+			m_file.write((char*)tableBlock, s_tableBlock);
 			//Helpers::align8Bytes(m_file); // The size of tableBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write(motasListBlock, s_motasListBlock);
+			m_file.write((char*)motasListBlock, s_motasListBlock);
 			//Helpers::align8Bytes(m_file); // The size of motasListBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write(nameBlock, s_nameBlock);
+			m_file.write((char*)nameBlock, s_nameBlock);
 			Helpers::align8Bytes(m_file);
 
-			m_file.write(movesetBlock, s_movesetBlock);
+			m_file.write((char*)movesetBlock, s_movesetBlock);
 			Helpers::align8Bytes(m_file);
 
 			//
 			progress = 85;
 			//
 
-			m_file.write(animationBlock, s_animationBlock);
+			m_file.write((char*)animationBlock, s_animationBlock);
 			Helpers::align8Bytes(m_file);
 
-			m_file.write(motaCustomBlock, s_motaCustomBlock);
+			m_file.write((char*)motaCustomBlock, s_motaCustomBlock);
 			Helpers::align8Bytes(m_file);
 
-			CloseMovesetFile();
+			m_file.close();
 
 			progress = 100;
 			// Extraction is over
@@ -568,6 +603,9 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 
 bool ExtractorT7::CanExtract()
 {
+	// todo: this is invalid, because when we import our own moveset and leave back to main menu, this will still return true
+	// this is very bad because some of the data we may export, such as mota offsets, are not allocated.
+
 	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
@@ -594,6 +632,7 @@ bool ExtractorT7::CanExtract()
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
+
 	std::string characterName;
 	if (movesetAddr == 0) {
 		return characterName;
@@ -628,7 +667,7 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 			} else if (isalpha((unsigned char)characterName[i])) {
 				characterName[i] = isWordStart ? toupper(characterName[i]) : tolower(characterName[i]);
 			}
-			isWordStart = strchr(" -.", characterName[i]) != nullptr;
+			isWordStart = strchr(" -.:", characterName[i]) != nullptr;
 		}
 	}
 	return characterName;
