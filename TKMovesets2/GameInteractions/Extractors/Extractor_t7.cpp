@@ -18,7 +18,7 @@
 // -- Static helpers -- //
 
 // Converts absolute ptr into indexes before saving to file
-static void convertMovesetPointersToIndexes(char* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
+static void convertMovesetPointersToIndexes(byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
 {
 	size_t i;
 
@@ -207,7 +207,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::v
 	return motaCustomBlockSize;
 }
 
-char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries)
+byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries)
 {
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
@@ -217,7 +217,7 @@ char* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap);
 
 
-	char* customBlock = (char*)malloc(size_out);
+	byte* customBlock = (byte*)malloc(size_out);
 	if (customBlock == nullptr) {
 		size_out = 0;
 		return nullptr;
@@ -282,11 +282,11 @@ void ExtractorT7::GetNamesBlockBounds(const gAddr::Move* move, uint64_t moveCoun
 }
 
 
-char* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
+byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
-	char* animationBlock = nullptr;
+	byte* animationBlock = nullptr;
 
 	std::vector<gameAddr> addrList;
 	// Get animation list and sort it
@@ -323,13 +323,13 @@ char* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 	}
 
 	// Allocate block
-	if (!(animationBlock = (char*)malloc(totalSize))) {
+	if (!(animationBlock = (byte*)malloc(totalSize))) {
 		size_out = 0;
 		return nullptr;
 	}
 
 	// Read animations and write to our block
-	char *animationBlockCursor = animationBlock;
+	byte *animationBlockCursor = animationBlock;
 	for (gameAddr animAddr : addrList)
 	{
 		int64_t animSize = animSizes[animAddr];
@@ -373,7 +373,7 @@ void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, sizeof(MovesetTable) / 8 / 2);
 }
 
-char* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
+byte* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
 {
 	gameAddr blockStart = (gameAddr)table.reactions;
 	gameAddr blockEnd = (gameAddr)table.throws + (sizeof(ThrowData) * table.throwsCount);
@@ -393,13 +393,13 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	// There is some stuff before the² move names i want to get (character name, date string and stuff)
 	// So i hardcode the offset 0x2E8 because i know it
 	nameBlockStart = movesetAddr + 0x2E8 - (toCopy - charactersToReplace);
-	char* nameBlock = allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
+	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
 	memcpy(nameBlock, namePrefix, toCopy);
 
 	return nameBlock;
 }
 
-char* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
+byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
 {
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, boundaries);
@@ -423,14 +423,14 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
-	char* headerBlock;
-	char* movesetInfoBlock;
-	char* tableBlock;
-	char* motasListBlock;
+	byte* headerBlock;
+	byte* movesetInfoBlock;
+	byte* tableBlock;
+	byte* motasListBlock;
 	char* nameBlock;
-	char* movesetBlock;
-	char* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
-	char* motaCustomBlock; // This is also a custom block because not contiguously stored
+	byte* movesetBlock;
+	byte* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
+	byte* motaCustomBlock; // This is also a custom block because not contiguously stored
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(MovesetHeader);
@@ -459,9 +459,9 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 	MotaList motasList{};
 
 	// Assign these blocks right away because they're fixed-size structures we write into
-	headerBlock = (char*)&header;
-	tableBlock = (char*)&offsets;
-	motasListBlock = (char*)&motasList;
+	headerBlock = (byte*)&header;
+	tableBlock = (byte*)&offsets;
+	motasListBlock = (byte*)&motasList;
 
 
 	// Fill table containing lists of move, lists of cancels, etc...
@@ -543,33 +543,33 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, uint8_t gameId, b
 			// We make sure to write every block aligned on 8 bytes because the game is likely to require it for some structures
 
 			// THis is only our header info, it is useful only to us
-			m_file.write(headerBlock, s_headerBlock);
+			m_file.write((char*)headerBlock, s_headerBlock);
 			Helpers::align8Bytes(m_file);
 
 			// The actual full moveset data, all of this will be allocated from the file in one go
-			m_file.write(movesetInfoBlock, s_movesetInfoBlock);
+			m_file.write((char*)movesetInfoBlock, s_movesetInfoBlock);
 			//Helpers::align8Bytes(m_file); // The size of movesetInfoBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write(tableBlock, s_tableBlock);
+			m_file.write((char*)tableBlock, s_tableBlock);
 			//Helpers::align8Bytes(m_file); // The size of tableBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write(motasListBlock, s_motasListBlock);
+			m_file.write((char*)motasListBlock, s_motasListBlock);
 			//Helpers::align8Bytes(m_file); // The size of motasListBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write(nameBlock, s_nameBlock);
+			m_file.write((char*)nameBlock, s_nameBlock);
 			Helpers::align8Bytes(m_file);
 
-			m_file.write(movesetBlock, s_movesetBlock);
+			m_file.write((char*)movesetBlock, s_movesetBlock);
 			Helpers::align8Bytes(m_file);
 
 			//
 			progress = 85;
 			//
 
-			m_file.write(animationBlock, s_animationBlock);
+			m_file.write((char*)animationBlock, s_animationBlock);
 			Helpers::align8Bytes(m_file);
 
-			m_file.write(motaCustomBlock, s_motaCustomBlock);
+			m_file.write((char*)motaCustomBlock, s_motaCustomBlock);
 			Helpers::align8Bytes(m_file);
 
 			m_file.close();

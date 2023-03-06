@@ -40,7 +40,7 @@ protected:
 	GameData* m_game;
 
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
-	char* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
+	byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
 	// Generates the full filepath to write to
 	std::string GetFilepath(const char* characterName, bool overwriteSameFilename);
 

@@ -24,11 +24,11 @@ namespace ExtractorUtils
 
 // Private methods //
 
-char* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
+byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {
 	size_t blockSize = blockEnd - blockStart;
 
-	char* block = (char*)malloc(blockSize);
+	byte* block = (byte*)malloc(blockSize);
 	if (block == nullptr) {
 		size_out = 0;
 		return nullptr;
