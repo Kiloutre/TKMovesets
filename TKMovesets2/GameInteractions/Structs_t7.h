@@ -37,7 +37,7 @@ namespace StructsT7
 
 	struct PushbackExtradata
 	{
-		uint16_t horizontal_displacement;
+		uint16_t horizontal_offset;
 	};
 
 	struct Pushback
