@@ -196,6 +196,15 @@ namespace StructsT7
 		uint32_t value;
 	};
 
+
+	// Struct for Extra Move Properties that play when a move starts or ends
+	struct OtherMoveProperty
+	{
+		Requirement requirements_addr;
+		uint32_t extraprop; // 881 list end value
+		uint32_t param;
+	};
+
 	struct Move
 	{
 		// 0 = 0 when writing (might be a ptr)
@@ -234,15 +243,6 @@ namespace StructsT7
 		uint16_t distance;
 		int16_t _0xAC_short;
 	};
-
-	// Struct for Extra Move Properties that play when a move starts or ends
-	struct OtherMoveProperty
-	{
-		Requirement requirements_addr;
-		uint32_t extraprop; // 881 list end value
-		uint32_t param;
-	};
-
 
 	// -- Other -- //
 

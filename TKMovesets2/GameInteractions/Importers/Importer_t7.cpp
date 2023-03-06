@@ -156,6 +156,8 @@ void ImporterT7::ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, cons
 		FROM_INDEX(move->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
 		FROM_INDEX(move->voicelip_addr, blockOffset + offsets->voiceclip, Voiceclip);
 		FROM_INDEX(move->extra_move_property_addr, blockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
+		FROM_INDEX(move->move_start_extraprop_addr, blockOffset + offsets->moveBeginningProp, OtherMoveProperty);
+		FROM_INDEX(move->move_end_extraprop_addr, blockOffset + offsets->moveEndingProp, OtherMoveProperty);
 	}
 
 	// Convert projectile ptrs
@@ -224,11 +226,18 @@ void ImporterT7::ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, cons
 		FROM_INDEX(pushback->extradata_addr, blockOffset + offsets->pushbackExtradata, PushbackExtradata);
 	}
 
-	// Convert ??? ptrs
+	// Convert move-start ptrs
 	i = 0;
-	for (gAddr::OtherMoveProperty* unknown = (gAddr::OtherMoveProperty*)(moveset + blockOffsets.movesetBlock + offsets->moveEndingProp); i < offsets->moveEndingPropCount; ++i, ++unknown)
+	for (gAddr::OtherMoveProperty* moveBeginProp = (gAddr::OtherMoveProperty*)(moveset + blockOffsets.movesetBlock + offsets->moveBeginningProp); i < offsets->moveBeginningPropCount; ++i, ++moveBeginProp)
 	{
-		FROM_INDEX(unknown->requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(moveBeginProp->requirements_addr, blockOffset + offsets->requirement, Requirement);
+	}
+
+	// Convert move-end prop ptrs
+	i = 0;
+	for (gAddr::OtherMoveProperty* moveEndProp = (gAddr::OtherMoveProperty*)(moveset + blockOffsets.movesetBlock + offsets->moveEndingProp); i < offsets->moveEndingPropCount; ++i, ++moveEndProp)
+	{
+		FROM_INDEX(moveEndProp->requirements_addr, blockOffset + offsets->requirement, Requirement);
 	}
 }
 
