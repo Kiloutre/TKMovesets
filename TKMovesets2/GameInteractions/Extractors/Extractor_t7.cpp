@@ -144,12 +144,10 @@ static int64_t getClosestBoundary(gameAddr animAddr, const std::vector<gameAddr>
 
 // -- Private methods - //
 
-uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap)
+uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractionOptions::Settings settings)
 {
 	uint64_t motaCustomBlockSize = 0;
 
-	// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
-	uint16_t motasToExport = cm_defaultMotaFlags;
 
 	// Normally you would go up to (i < 12), but i don't care about the last two and i do care about working with a reliable motaSize, so this is what i am doing
 	for (size_t i = 0; i < 10; ++i)
@@ -164,8 +162,9 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::v
 			continue;
 		}
 
+		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
 		// Use bitwise flags to store which one we want to store
-		if ((1 << i) & motasToExport) {
+		if ((1 << i) & settings) {
 			offsetMap[motaAddr] = motaCustomBlockSize;
 			motaCustomBlockSize += motaSize;
 		}
@@ -207,15 +206,14 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::v
 	return motaCustomBlockSize;
 }
 
-byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries)
+byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries, ExtractionOptions::Settings settings)
 {
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
 	std::map<gameAddr, gameAddr> offsetMap;
 	uint64_t sizeToAllocate = 0;
 
-	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap);
-
+	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap, settings);
 
 	byte* customBlock = (byte*)malloc(size_out);
 	if (customBlock == nullptr) {
@@ -399,10 +397,10 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	return nameBlock;
 }
 
-byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries)
+byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractionOptions::Settings settings)
 {
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
-	return AllocateMotaCustomBlock(motasList, size_out, boundaries);
+	return AllocateMotaCustomBlock(motasList, size_out, boundaries, settings);
 }
 
 void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress)
@@ -480,7 +478,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
 	std::vector<gameAddr> animBoundaries;
-	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, animBoundaries);
+	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, animBoundaries, settings);
 	progress = 50;
 
 	// Extract animations and build a map for their old address -> their new offset in our blocks
