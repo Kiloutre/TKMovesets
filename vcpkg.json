@@ -8,6 +8,7 @@
       "features": [ "glfw-binding", "opengl3-binding", "docking-experimental" ]
     },
     "glfw3",
-    "glad"
+    "glad",
+    "liblzma"
   ]
 }

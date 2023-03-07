@@ -522,10 +522,14 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 	else {
 		// Create the file*
 
-		std::string filepath = GetFilepath(characterName.c_str(), (settings & ExtractionOptions::OVERWRITE_SAME_FILENAME) != 0);
-		std::ofstream m_file(filepath.c_str(), std::ios::binary | std::ios::out);
+		std::string filepath;
+		std::string tmp_filepath;
+		
+		GetFilepath(characterName.c_str(), filepath, tmp_filepath, (settings & ExtractionOptions::OVERWRITE_SAME_FILENAME) != 0);
 
-		if (!m_file.fail())
+		std::ofstream file(tmp_filepath.c_str(), std::ios::binary);
+
+		if (!file.fail())
 		{
 			//
 			progress = 80;
@@ -534,36 +538,39 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 			// We make sure to write every block aligned on 8 bytes because the game is likely to require it for some structures
 
 			// THis is only our header info, it is useful only to us
-			m_file.write((char*)headerBlock, s_headerBlock);
-			Helpers::align8Bytes(m_file);
+			file.write((char*)headerBlock, s_headerBlock);
+			Helpers::align8Bytes(file);
 
 			// The actual full moveset data, all of this will be allocated from the file in one go
-			m_file.write((char*)movesetInfoBlock, s_movesetInfoBlock);
-			//Helpers::align8Bytes(m_file); // The size of movesetInfoBlock is fixed and is divisible by 8 : no misalignement possible.
+			file.write((char*)movesetInfoBlock, s_movesetInfoBlock);
+			//Helpers::align8Bytes(file); // The size of movesetInfoBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write((char*)tableBlock, s_tableBlock);
-			//Helpers::align8Bytes(m_file); // The size of tableBlock is fixed and is divisible by 8 : no misalignement possible.
+			file.write((char*)tableBlock, s_tableBlock);
+			//Helpers::align8Bytes(file); // The size of tableBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write((char*)motasListBlock, s_motasListBlock);
-			//Helpers::align8Bytes(m_file); // The size of motasListBlock is fixed and is divisible by 8 : no misalignement possible.
+			file.write((char*)motasListBlock, s_motasListBlock);
+			//Helpers::align8Bytes(file); // The size of motasListBlock is fixed and is divisible by 8 : no misalignement possible.
 
-			m_file.write((char*)nameBlock, s_nameBlock);
-			Helpers::align8Bytes(m_file);
+			file.write((char*)nameBlock, s_nameBlock);
+			Helpers::align8Bytes(file);
 
-			m_file.write((char*)movesetBlock, s_movesetBlock);
-			Helpers::align8Bytes(m_file);
+			file.write((char*)movesetBlock, s_movesetBlock);
+			Helpers::align8Bytes(file);
 
 			//
 			progress = 85;
 			//
 
-			m_file.write((char*)animationBlock, s_animationBlock);
-			Helpers::align8Bytes(m_file);
+			file.write((char*)animationBlock, s_animationBlock);
+			Helpers::align8Bytes(file);
 
-			m_file.write((char*)motaCustomBlock, s_motaCustomBlock);
-			Helpers::align8Bytes(m_file);
+			file.write((char*)motaCustomBlock, s_motaCustomBlock);
+			Helpers::align8Bytes(file);
 
-			m_file.close();
+			file.close();
+
+			progress = 90;
+			ExtractorUtils::CompressFile(filepath, tmp_filepath);
 
 			progress = 100;
 			// Extraction is over
