@@ -44,3 +44,10 @@ void GameInteraction::Update()
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
 }
+
+void GameInteraction::Init(GameAddressesFile* addrFile, LocalStorage* t_storage)
+{
+	process = new GameProcess;
+	game = new GameData(process, addrFile);
+	storage = t_storage;
+}

@@ -51,7 +51,10 @@ enum ExtractionErrcode
 
 namespace ExtractorUtils
 {
+	// Returns the size in bytes of a 0xC8 in 
 	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim);
+	// Compress
+	void CompressFile(std::string dest_filename, std::string src_filename);
 };
 
 // Base class for extracting from a game
@@ -59,7 +62,7 @@ class DLLCONTENT Extractor
 {
 private:
 	// Generates the filename to write, with a suffix (or not if [suffixId] is 0)
-	std::string GenerateFilename(const char* characterName, const char* gameIdentifierstring, unsigned int suffixId);
+	std::string GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId=0);
 protected:
 	// Stores the extraction directory
 	const char* cm_extractionDir = MOVESET_DIRECTORY;
@@ -70,8 +73,8 @@ protected:
 
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
 	byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
-	// Generates the full filepath to write to
-	std::string GetFilepath(const char* characterName, bool overwriteSameFilename);
+	// Generates the full filepath and the full tmp filepath to write to
+	void GetFilepath(const char* characterName, std::string& out, std::string& out_tmp, bool overwriteSameFilename);
 
 	// Returns the game identifier string, used for moveset file pefix
 	virtual const char* GetGameIdentifierString() = 0;

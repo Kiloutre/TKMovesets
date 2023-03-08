@@ -50,4 +50,6 @@ public:
 	virtual bool IsBusy() = 0;
 	// Set the process to open
 	void SetTargetProcess(const char* processName, uint8_t gameId);
+	// Inits the member that needs to be created (.process, .game). Those Must be deleted afterward.
+	void Init(GameAddressesFile* addrFile, LocalStorage* t_storage);
 };

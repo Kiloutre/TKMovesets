@@ -24,6 +24,7 @@ static void glfw_error_callback(int error, const char* description)
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
+// Tries to find a translation file for the current system locale, return false on failure
 static bool LoadLocaleTranslation()
 {
 	char name[LOCALE_NAME_MAX_LENGTH];
@@ -63,19 +64,13 @@ static void InitMainClasses(MainWindow& program)
 
 	GameAddressesFile* addrFile = new GameAddressesFile();
 
-	// Todo: maybe do this in the damn constructor...
-	program.extractor.process = new GameProcess;
-	program.extractor.game = new GameData(program.extractor.process, addrFile);
-	program.extractor.storage = &program.storage;
+	program.extractor.Init(addrFile, &program.storage);
+	program.importer.Init(addrFile, &program.storage);
 
 	if (Games::GetExtractableGamesCount() == 1) {
 		program.extractor.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
 		// todo : remove this when we implement more extractors. or maybe make T7 the default period?
 	}
-
-	program.importer.process = new GameProcess;
-	program.importer.game = new GameData(program.importer.process, addrFile);
-	program.importer.storage = &program.storage;
 
 	if (Games::GetImportableGamesCount() == 1) {
 		program.importer.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
