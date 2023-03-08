@@ -32,7 +32,7 @@ public:
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
 	virtual void NewFrame();
 	// Main layout rendering function
-	virtual void Update(int width, int height);
+	virtual void Update();
 	// Makes the final ImGui and GLSL calls to display the window's content
 	void Render();
 	// Cleanup function

@@ -21,6 +21,7 @@ namespace Helpers
 		uint64_t cursor = (uint64_t)file.tellp();
 		if ((cursor & 0x3) != 0)
 		{
+			// pad file with 0
 			char b[8]{ 0 };
 			file.write(b, 8 - cursor % 8);
 		}

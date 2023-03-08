@@ -167,14 +167,11 @@ int main(int argc, wchar_t** argv, char** env)
 		glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		int width, height;
-		glfwGetWindowSize(window, &width, &height);
-
 		// Probably framebuffer related? Required
 		program.NewFrame();
 		
 		// Main layout function : every we display is in there
-		program.Update(width, height);
+		program.Update();
 
 		// Finishing touch. There shouldn't be any reason to ever touch these.
 		program.Render();

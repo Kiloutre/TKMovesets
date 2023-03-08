@@ -17,10 +17,43 @@ namespace ImGuiExtra
 		ImGui::TextDisabled("(?)");
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
 		{
+			// All these calcualtions are here to prevent tooltip from going outside of the current window's bound
+			// With multiple viewports, going outside of bounds completely break the program
+
+			// This serves as a safety margin: having a tooltip exactly the window's size or even slightly smaller still breaks things.
+			const unsigned int margin = 20;
+
+			ImGuiViewport* currentView = ImGui::GetWindowViewport();
+			ImVec2 maxSize = currentView->Size;
+			ImVec2 minBound = currentView->Pos;
+			ImVec2 maxBound = minBound + maxSize;
+
+			float textWrapPos = ImGui::GetFontSize() * 35.0f;
+			ImVec2 windowSize = ImGui::CalcTextSize(desc, nullptr, false, textWrapPos);
+
+			if ((windowSize.x + margin + 1) >= maxSize.x || (windowSize.y + margin + 1) >= maxSize.y) {
+				// We could try different sizes here, try a couple times until we find the right on
+				// todo, but low priority honestly
+				return;
+			}
+
+			ImVec2 windowPos = ImGui::GetMousePos();
+
+			if (windowPos.x + windowSize.x >= maxBound.x) {
+				windowPos.x = maxBound.x - windowSize.x - margin;
+			}
+
+			if (windowPos.y + windowSize.y >= maxBound.y) {
+				windowPos.y = maxBound.y - windowSize.y - margin;
+			}
+
+			ImGui::SetNextWindowPos(windowPos);
 			ImGui::BeginTooltip();
-			//ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+
+			ImGui::PushTextWrapPos(textWrapPos);
 			ImGui::TextUnformatted(desc);
-			//ImGui::PopTextWrapPos();
+			ImGui::PopTextWrapPos();
+
 			ImGui::EndTooltip();
 		}
 	}
