@@ -35,7 +35,7 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 		// Each player actually holds 5 copies of its moveset ptr.
 		// One of them is the one to default to when going back to aliases move (>= 32768)
 		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
-		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset");
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
 		for (size_t i = 1; i < 5; ++i) {
 			m_process->writeInt64(movesetOffset + i * 8, playerMoveset);
 		}
@@ -68,7 +68,7 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
-	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"));
+	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
 	m_process->readBytes(currentMovesetAddr + 0x280, &currentMotasList, sizeof(MotaList));
 
 	MotaList* motaList = (MotaList*)(moveset + offsets.motalistsBlock);
@@ -123,7 +123,7 @@ void ImporterT7::ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, co
 	// I am taking about mundane moves such as EWHF not working where WHF does
 	// The why is hard to understand and might possibly be linked to Mokujin/Combot, but anyway, this fixes things
 	uint16_t movesetCharacterId = header.infos.characterId;
-	uint16_t currentCharacterId = m_process->readInt16(playerAddress + 0xD8);
+	uint16_t currentCharacterId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_chara_id_offset"));
 
 	Requirement* requirement = (Requirement*)(moveset + header.offsets.movesetBlock + offsets->requirement);
 
@@ -248,9 +248,9 @@ void ImporterT7::ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, cons
 
 void ImporterT7::CleanupUnusedMovesets()
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
-	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val_playerstruct_size");
-	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val_motbin_offset");
+	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
+	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
 
 	/*
 	uint64_t offsetsToWatch[] = {
@@ -276,7 +276,7 @@ void ImporterT7::CleanupUnusedMovesets()
 			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid) {
 				gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
 
-				// Maybe overkill to check every offset, but drastically reduces the chance of a crash
+				// Maybe overkill to check every offset, but drastically reduces the chance of a crash, and isn't that slow
 				gameAddr pStart = currentPlayerAddress;
 				gameAddr pEnd = pStart + playerstructSize;
 				while (pStart < pEnd)
@@ -376,7 +376,7 @@ ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddr
 	progress = 99;
 
 	// Then write our moveset address to the current player
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val_motbin_offset"), gameMoveset);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"), gameMoveset);
 	progress = 100;
 
 	// Also write camera mota offsts to the player structure if those motas have been exported
@@ -397,7 +397,7 @@ bool ImporterT7::CanImport()
 {
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
@@ -405,7 +405,7 @@ bool ImporterT7::CanImport()
 		return false;
 	}
 
-	gameAddr currentMove = m_process->readInt64(playerAddress + 0x220);
+	gameAddr currentMove = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_offset"));
 	if (currentMove == 0 || currentMove == -1) {
 		return false;
 	}
@@ -417,4 +417,13 @@ bool ImporterT7::CanImport()
 
 	uint8_t animType = m_process->readInt8(animAddr);
 	return animType == 0x64 || animType == 0xC8;
+}
+
+gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
+{
+	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
+	if (playerId > 0) {
+		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+	}
+	return playerAddress;
 }

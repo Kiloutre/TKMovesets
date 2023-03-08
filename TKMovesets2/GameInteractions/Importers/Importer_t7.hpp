@@ -36,4 +36,5 @@ public:
 	ImportationErrcode_ Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;
+	gameAddr GetCharacterAddress(uint8_t playerId) override;
 };

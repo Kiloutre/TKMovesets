@@ -41,9 +41,9 @@ public:
 	GameData* game = nullptr;
 	// Progress of the current task, between 0 and 100
 	uint8_t progress = 0;
-	// Max character count of the game
-	int characterCount = 2;
 
+	// Returns the amount of characters we are able to interact with
+	virtual uint8_t GetCharacterCount() = 0;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
 	virtual bool CanStart() = 0;
 	// Is currently busy

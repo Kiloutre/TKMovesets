@@ -78,6 +78,10 @@ protected:
 	// Returns the game name, used in moveset headers
 	virtual const char* GetGameOriginString() = 0;
 public:
+	// Stores the number of character we are expected to extract if asked to extract every char
+	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
+	uint8_t characterCount = 1;
+
 	Extractor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
 	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress) = 0;
@@ -87,4 +91,8 @@ public:
 	virtual std::string GetPlayerCharacterName(gameAddr playerAddress) = 0;
 	// Returns the ID of the character, actually important toward making movesets work properly
 	virtual uint32_t GetCharacterID(gameAddr playerAddress) = 0;
+	// Returns a character address depending on the provided playerid
+	virtual gameAddr GetCharacterAddress(uint8_t playerId) = 0;
+	// Returns every character addresses we can extract
+	virtual std::vector<gameAddr> GetCharacterAddresses() = 0;
 };

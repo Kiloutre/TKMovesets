@@ -69,12 +69,15 @@ namespace Games
 
 	Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
 	{
-		return (Extractor*)cg_gamesInfo[gameId].extractor->allocate(process, game);
+		Extractor* ex = (Extractor*)cg_gamesInfo[gameId].extractor->allocate(process, game);
+		ex->characterCount = cg_gamesInfo[gameId].characterCount;
+		return ex;
 	}
 
 	Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game)
 	{
-		return (Importer*)cg_gamesInfo[gameId].importer->allocate(process, game);
-		return nullptr;
+		Importer* im = (Importer*)cg_gamesInfo[gameId].importer->allocate(process, game);
+		im->characterCount = cg_gamesInfo[gameId].characterCount;
+		return im;
 	}
 };

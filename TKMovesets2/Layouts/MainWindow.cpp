@@ -1,4 +1,6 @@
-﻿#include <ImGui.h>
+﻿#pragma warning( disable: 4244 )
+
+#include <ImGui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 

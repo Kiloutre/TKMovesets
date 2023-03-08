@@ -47,4 +47,6 @@ public:
 	void QueueCharacterImportation(std::string filename);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
+	// Returns the amount of characters we are able to import to
+	uint8_t GetCharacterCount() override;
 };

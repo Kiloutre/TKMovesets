@@ -39,4 +39,6 @@ public:
 	void QueueCharacterExtraction(int playerId, ExtractSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ExtractionErrcode_ GetLastError();
+	// Returns the amount of characters we are able to import to
+	uint8_t GetCharacterCount() override;
 };

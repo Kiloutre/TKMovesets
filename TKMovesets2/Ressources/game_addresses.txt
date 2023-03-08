@@ -1,7 +1,11 @@
 # This is a comment
+# 'val:' starts signifies values that should not be computed as addresses but merely stored for quick usage
+# Every other value is considered a pointer path
+# Values and addresses that are expected to change throughout the game's life are expected to be stored here
 
-p1_addr                = +0x34DF630, 0
-val_playerstruct_size  = 0x3670
-val_motbin_offset      = 0x1520
-val_chara_id_offset    = 0xD8
-val_camera_mota_offset = 0x14A0
+t7_p1_addr                = +0x34DF630, 0
+val:t7_playerstruct_size  = 0x3670
+val:t7_motbin_offset      = 0x1520
+val:t7_chara_id_offset    = 0xD8
+val:t7_camera_mota_offset = 0x14A0
+val:t7_currmove_offset    = 0x220

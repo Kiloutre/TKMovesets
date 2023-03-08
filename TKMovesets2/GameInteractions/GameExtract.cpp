@@ -20,11 +20,10 @@
 void GameExtract::LoadCharacterNames()
 {
 	if (m_extractor != nullptr && m_extractor->CanExtract()) {
-		gameAddr playerAddress = game->ReadPtr("p1_addr");
-		gameAddr playerStructSize = game->addrFile->GetSingleValue("val_playerstruct_size");
 
-		for (int playerId = 0; playerId < characterCount; ++playerId) {
-			characterNames[playerId] = m_extractor->GetPlayerCharacterName(playerAddress + playerId * playerStructSize);
+		uint8_t playerId = 0;
+		for (gameAddr playerAddress : m_extractor->GetCharacterAddresses()) {
+			characterNames[playerId++] = m_extractor->GetPlayerCharacterName(playerAddress);
 		}
 	}
 }
@@ -107,19 +106,24 @@ bool GameExtract::IsBusy()
 void GameExtract::QueueCharacterExtraction(int playerId, ExtractSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
-	gameAddr playerAddress = game->ReadPtr("p1_addr");
-	gameAddr playerStructSize = game->addrFile->GetSingleValue("val_playerstruct_size");
 
 	if (playerId == -1) {
 		// Queue the extraction of every character one by one
-		for (playerId = 0; playerId < characterCount; ++playerId) {
-			gameAddr pAddr = playerAddress + playerId * playerStructSize;
-			m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(pAddr, settings));
+		for (gameAddr playerAddress : m_extractor->GetCharacterAddresses()) {
+			m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(playerAddress, settings));
 		}
 	}
 	else {
 		// Queue the extraction of one character
-		gameAddr pAddr = playerAddress + playerId * playerStructSize;
-		m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(pAddr, settings));
+		gameAddr playerAddress = m_extractor->GetCharacterAddress(playerId);
+		m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(playerAddress, settings));
 	}
+}
+
+uint8_t GameExtract::GetCharacterCount()
+{
+	if (m_extractor != nullptr) {
+		return m_extractor->characterCount;
+	}
+	return 2;
 }

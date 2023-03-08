@@ -29,6 +29,10 @@ protected:
 	GameData* m_game;
 
 public:
+	// Stores the number of character we are expected be able to import to
+	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
+	uint8_t characterCount = 1;
+
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
 	virtual ImportationErrcode_ Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) = 0;
@@ -36,4 +40,6 @@ public:
 	virtual bool CanImport() = 0;
 	// Look through movesets that we previously allocated in the game and free the unused ones
 	virtual void CleanupUnusedMovesets() = 0;
+	// Returns a character address depending on the provided playerid
+	virtual gameAddr GetCharacterAddress(uint8_t playerId) = 0;
 };

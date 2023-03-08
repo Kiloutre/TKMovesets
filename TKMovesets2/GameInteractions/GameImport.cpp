@@ -106,8 +106,15 @@ bool GameImport::IsBusy()
 void GameImport::QueueCharacterImportation(std::string filename)
 {
 	// It is safe to call this function even while an extraction is ongoing
-	gameAddr playerStructSize = game->addrFile->GetSingleValue("val_playerstruct_size");
-	gameAddr playerAddress = game->ReadPtr("p1_addr") + currentPlayerId * playerStructSize;
-
+	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
 	m_plannedImportations.push_back(std::pair<std::string, gameAddr>(filename, playerAddress));
+}
+
+
+uint8_t GameImport::GetCharacterCount()
+{
+	if (m_importer != nullptr) {
+		return m_importer->characterCount;
+	}
+	return 2;
 }

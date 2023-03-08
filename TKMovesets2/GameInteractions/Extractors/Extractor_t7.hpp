@@ -54,4 +54,6 @@ public:
 
 	std::string GetPlayerCharacterName(gameAddr playerAddress) override;
 	uint32_t GetCharacterID(gameAddr playerAddress) override;
+	gameAddr GetCharacterAddress(uint8_t playerId) override;
+	std::vector<gameAddr> GetCharacterAddresses() override;
 };
