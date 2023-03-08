@@ -2,6 +2,12 @@
 
 #include <stdint.h>
 
+enum MOVESET_FLAGS
+{
+	// Used to detect whether to not show the "rename moveset?" prompt when editing a moveset
+	MOVESET_MODIFIED = (1 << 0),
+};
+
 // This structure should really not change or it would break compatibility with all previous movesets
 // If you have any change in mind that might be important, do it now
 struct MovesetHeader_infos

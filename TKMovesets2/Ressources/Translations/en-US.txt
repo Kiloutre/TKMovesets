@@ -28,8 +28,6 @@ select_game = Select a game
 # Process #
 
 process.status = Status:
-process.attach = Attach to game
-process.attaching = Attaching...
 process.game_not_attached = Currently not trying to attach. Please select a game.
 process.game_attached = Game is running and attached.
 process.game_not_running = Game is not running or could not be found.
@@ -45,6 +43,7 @@ moveset.invalid = INVALID
 moveset.size = Size
 moveset.size_mb = MB
 moveset.import = Import
+moveset.edit = Edit
 moveset.delete = Delete
 
 ## Main ##

@@ -186,12 +186,14 @@ namespace StructsT7
 		uint32_t vuln;
 		uint32_t hitlevel;
 		Cancel* cancel_addr;
-		int64_t _0x28_llong; // 0
-		int64_t _0x30_llong;
-		int64_t _0x38_llong;
-		int64_t _0x40_llong;
-		int64_t _0x48_llong; // 0
-		int32_t _0x50_int;
+		Cancel* _0x28_cancel_addr;
+		uint32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
+		uint32_t _0x34_int;
+		Cancel* _0x38_cancel_addr;
+		int32_t _0x40_int__0x28_related; // i believe this is 2x4 bytes
+		uint32_t _0x44_int;
+		Cancel* _0x48_cancel_addr;
+		int32_t _0x50_int__0x28_related;
 		uint16_t transition;
 		int16_t _0x56_short;
 		uint16_t moveId_val1; // Clearly related to move ID
@@ -429,12 +431,14 @@ namespace StructsT7_gameAddr
 		uint32_t vuln;
 		uint32_t hitlevel;
 		gameAddr cancel_addr;
-		int64_t _0x28_llong; // 0
-		int64_t _0x30_llong;
-		int64_t _0x38_llong;
-		int64_t _0x40_llong;
-		int64_t _0x48_llong; // 0
-		int32_t _0x50_int;
+		gameAddr _0x28_cancel_addr;
+		uint32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
+		uint32_t _0x34_int;
+		gameAddr _0x38_cancel_addr;
+		int32_t _0x40_int__0x28_related; // i believe this is 2x4 bytes
+		uint32_t _0x44_int;
+		gameAddr _0x48_cancel_addr;
+		int32_t _0x50_int__0x28_related;
 		uint16_t transition;
 		int16_t _0x56_short;
 		uint16_t moveId_val1; // Clearly related to move ID

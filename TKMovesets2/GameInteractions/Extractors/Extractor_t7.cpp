@@ -30,6 +30,9 @@ static void convertMovesetPointersToIndexes(byte* movesetBlock, const gAddr::Mov
 		move->anim_name_addr -= nameStart;
 		move->anim_addr = animOffsetMap[move->anim_addr];
 		TO_INDEX(move->cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move->_0x28_cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move->_0x38_cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move->_0x48_cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move->hit_condition_addr, table.hitCondition, HitCondition);
 		TO_INDEX(move->voicelip_addr, table.voiceclip, Voiceclip);
 		TO_INDEX(move->extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);

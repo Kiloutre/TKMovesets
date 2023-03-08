@@ -153,6 +153,9 @@ void ImporterT7::ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, cons
 		move->anim_addr += gameMoveset + blockOffsets.animationBlock;
 
 		FROM_INDEX(move->cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move->_0x28_cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move->_0x38_cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move->_0x48_cancel_addr, blockOffset + offsets->cancel, Cancel);
 		FROM_INDEX(move->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
 		FROM_INDEX(move->voicelip_addr, blockOffset + offsets->voiceclip, Voiceclip);
 		FROM_INDEX(move->extra_move_property_addr, blockOffset + offsets->extraMoveProperty, ExtraMoveProperty);

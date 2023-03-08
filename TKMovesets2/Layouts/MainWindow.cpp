@@ -72,11 +72,12 @@ void MainWindow::Update(int width, int height)
 			importMenu.Render(importer);
 			break;
 		case NAV__MENU_ONLINE_PLAY:
-			onlineMenu.Render();
+			//onlineMenu.Render();
 			break;
 		case NAV__MENU_CAMERA:
 			break;
 		case NAV__MENU_EDITION:
+			editionMenu.Render();
 			break;
 		case NAV__MENU_DOCUMENTATION:
 			break;
