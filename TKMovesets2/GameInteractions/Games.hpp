@@ -24,14 +24,11 @@ public:
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
 };
 
-enum GameFlag
+typedef uint8_t GameFlag;
+enum GameFlag_
 {
-	// Game can be opened for character extraction
-	GameExtractable = (1 << 0),
-	// Game can be open for character importation
-	GameImportable = (1 << 1),
-	// Game can be opened for camera animations
-	GameMovesetEdition = (1 << 2),
+	// Game can be opened for moveset edition
+	GameFlag_MovesetEditable = (1 << 0),
 };
 
 struct GameInfo
@@ -43,7 +40,7 @@ struct GameInfo
 	// Amount of characters at once the game is able to load
 	uint8_t characterCount;
 	// Determines what can be done with the game. See GameFlag enum for more details
-	uint16_t flags;
+	GameFlag flags;
 	// Dynamic type allocator to store the game's extractor. Can be nullptr for no available extractor.
 	FactoryType_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.

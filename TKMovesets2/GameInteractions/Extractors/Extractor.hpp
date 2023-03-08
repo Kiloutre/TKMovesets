@@ -8,45 +8,42 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
-namespace ExtractionOptions
-{
-	typedef uint64_t Settings; // 64 flags
-
-	enum SettingEnum
-	{
-		MOTA_0_ANIM = (1 << 0),
-		MOTA_1_ANIM = (1 << 1),
-		MOTA_2_HAND = (1 << 2),
-		MOTA_3_HAND = (1 << 3),
-		MOTA_4_FACE = (1 << 4),
-		MOTA_5_FACE = (1 << 5),
-		MOTA_6_WINGS = (1 << 6),
-		MOTA_7_WINGS = (1 << 7),
-		MOTA_8_CAMERA = (1 << 8),
-		MOTA_9_CAMERA = (1 << 9),
-		MOTA_10_UNKNOWN = (1 << 10),
-		MOTA_11_UNKNOWN = (1 << 11),
-
-		MOTA_ANIM = MOTA_0_ANIM | MOTA_1_ANIM,
-		MOTA_HANDS = MOTA_2_HAND | MOTA_3_HAND,
-		MOTA_FACES = MOTA_4_FACE | MOTA_5_FACE,
-		MOTA_CAMERAS = MOTA_8_CAMERA | MOTA_9_CAMERA,
-		MOTA_WINGS = MOTA_6_WINGS | MOTA_7_WINGS,
-		MOTA_UNKNOWNS = MOTA_10_UNKNOWN | MOTA_11_UNKNOWN,
-
-		OVERWRITE_SAME_FILENAME = (1 << 12),
-	};
-}
-
-
 // Converts a ptr to an index, -1 if the address is null
 # define TO_INDEX(field, listStartAddr, type) (field = (field == 0 ? -1 : (field - listStartAddr) / sizeof(type)))
 
-enum ExtractionErrcode
+typedef uint64_t ExtractSettings; // 64 flags
+enum ExtractSettings_
 {
-	ExtractionSuccessful = 0,
-	ExtractionAllocationErr = 1,
-	ExtractionFileCreationErr = 2,
+	ExtractSettings_MOTA_0_ANIM = (1 << 0),
+	ExtractSettings_MOTA_1_ANIM = (1 << 1),
+	ExtractSettings_MOTA_2_HAND = (1 << 2),
+	ExtractSettings_MOTA_3_HAND = (1 << 3),
+	ExtractSettings_MOTA_4_FACE = (1 << 4),
+	ExtractSettings_MOTA_5_FACE = (1 << 5),
+	ExtractSettings_MOTA_6_WINGS = (1 << 6),
+	ExtractSettings_MOTA_7_WINGS = (1 << 7),
+	ExtractSettings_MOTA_8_CAMERA = (1 << 8),
+	ExtractSettings_MOTA_9_CAMERA = (1 << 9),
+	ExtractSettings_MOTA_10_UNKNOWN = (1 << 10),
+	ExtractSettings_MOTA_11_UNKNOWN = (1 << 11),
+
+	// Shortcuts for matching pairs
+	ExtractSettings_MOTA_ANIM = ExtractSettings_MOTA_0_ANIM | ExtractSettings_MOTA_1_ANIM,
+	ExtractSettings_MOTA_HANDS = ExtractSettings_MOTA_2_HAND | ExtractSettings_MOTA_3_HAND,
+	ExtractSettings_MOTA_FACES = ExtractSettings_MOTA_4_FACE | ExtractSettings_MOTA_5_FACE,
+	ExtractSettings_MOTA_CAMERAS = ExtractSettings_MOTA_8_CAMERA | ExtractSettings_MOTA_9_CAMERA,
+	ExtractSettings_MOTA_WINGS = ExtractSettings_MOTA_6_WINGS | ExtractSettings_MOTA_7_WINGS,
+	ExtractSettings_MOTA_UNKNOWNS = ExtractSettings_MOTA_10_UNKNOWN | ExtractSettings_MOTA_11_UNKNOWN,
+
+
+	ExtractSettings_OVERWRITE_SAME_FILENAME = (1 << 12),
+};
+
+enum ExtractionErrcode_
+{
+	ExtractionErrcode_Successful = 0,
+	ExtractionErrcode_AllocationErr = 1,
+	ExtractionErrcode_FileCreationErr = 2,
 };
 
 namespace ExtractorUtils
@@ -83,7 +80,7 @@ protected:
 public:
 	Extractor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual ExtractionErrcode Extract(gameAddr playerAddress, ExtractionOptions::Settings settings, uint8_t gameId, uint8_t& progress) = 0;
+	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanExtract() = 0;
 	// Returns a string containing the character name of the provided playerId.

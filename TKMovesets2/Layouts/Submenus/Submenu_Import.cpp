@@ -70,7 +70,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	GameProcess* p = importerHelper.process;
 
 	bool busy = importerHelper.IsBusy();
-	bool canImport = p->status == PROC_ATTACHED && !busy && importerHelper.CanStart();
+	bool canImport = p->IsAttached() && !busy && importerHelper.CanStart();
 
 	if (importerHelper.progress > 0) {
 		// Progress text.
@@ -90,23 +90,23 @@ void Submenu_Import::Render(GameImport& importerHelper)
 
 	switch (p->status)
 	{
-	case PROC_ATTACHED:
+	case GameProcessErrcode_PROC_ATTACHED:
 		if (!importerHelper.CanStart()) {
 			ImGuiExtra_TextboxWarning(_("importation.cant_import"));
 		}
 		break;
-	case PROC_NOT_ATTACHED:
-	case PROC_EXITED:
-	case PROC_ATTACHING:
+	case GameProcessErrcode_PROC_NOT_ATTACHED:
+	case GameProcessErrcode_PROC_EXITED:
+	case GameProcessErrcode_PROC_ATTACHING:
 		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
 		break;
-	case PROC_NOT_FOUND:
+	case GameProcessErrcode_PROC_NOT_FOUND:
 		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
 		break;
-	case PROC_VERSION_MISMATCH:
+	case GameProcessErrcode_PROC_VERSION_MISMATCH:
 		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
 		break;
-	case PROC_ATTACH_ERR:
+	case GameProcessErrcode_PROC_ATTACH_ERR:
 		ImGuiExtra_TextboxError(_("process.game_attach_err"));
 		break;
 	}
@@ -169,8 +169,8 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		ImGui::EndTable();
 	}
 
-	ImportationErrcode err = importerHelper.GetLastError();
-	if (err != ImportationSuccessful) {
+	ImportationErrcode_ err = importerHelper.GetLastError();
+	if (err != ImportationErrcode_Successful) {
 		ImGui::OpenPopup("ImportationErrPopup");
 		m_err = err;
 	}
@@ -179,20 +179,20 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	{
 		switch (m_err)
 		{
-		case ImportationAllocationErr:
+		case ImportationErrcode_AllocationErr:
 			ImGui::Text(_("importation.error_allocation"));
 			break;
-		case ImportationGameAllocationErr:
+		case ImportationErrcode_GameAllocationErr:
 			ImGui::Text(_("importation.error_game_allocation"));
 			break;
-		case ImportationFileReadErr:
+		case ImportationErrcode_FileReadErr:
 			ImGui::Text(_("importation.error_file_creation"));
 			break;
 		}
 
 		if (ImGui::Button(_("close")))
 		{
-			m_err = ImportationSuccessful;
+			m_err = ImportationErrcode_Successful;
 			ImGui::CloseCurrentPopup();
 		}
 

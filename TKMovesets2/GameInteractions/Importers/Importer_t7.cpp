@@ -303,14 +303,14 @@ void ImporterT7::CleanupUnusedMovesets()
 	}
 }
 
-ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
+ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
 	progress = 0;
 	// Read file data
 	std::ifstream file(filename, std::ios::binary);
 
 	if (file.fail()) {
-		return ImportationFileReadErr;
+		return ImportationErrcode_FileReadErr;
 	}
 
 	// Variables that will store the moveset size & the moveset itself in our own memory
@@ -332,7 +332,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
 	moveset = getMovesetInfos(file, &header, s_moveset);
 	if (moveset == nullptr) {
-		return ImportationAllocationErr;
+		return ImportationErrcode_AllocationErr;
 	}
 	progress = 20;
 
@@ -342,7 +342,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	gameMoveset = m_process->allocateMem(s_moveset);
 	if (gameMoveset == 0) {
 		free(moveset);
-		return ImportationGameAllocationErr;
+		return ImportationErrcode_GameAllocationErr;
 	}
 	progress = 40;
 
@@ -390,7 +390,7 @@ ImportationErrcode ImporterT7::Import(const char* filename, gameAddr playerAddre
 	// -- Cleanup -- //
 
 	free(moveset);
-	return ImportationSuccessful;
+	return ImportationErrcode_Successful;
 }
 
 bool ImporterT7::CanImport()

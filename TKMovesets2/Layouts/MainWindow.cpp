@@ -15,16 +15,16 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(c_glsl_version);
-
 	ImGui::StyleColorsDark();
 
-	// Setup ImGui config
+	// Setup ImGui config. This had to be done before initializing the backends
+	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	// Initialize backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
 	// Font import example
 	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesDefault());
@@ -40,28 +40,30 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
+// Actual rendering function
 void MainWindow::Update(int width, int height)
 {
-	// Actual rendering stuff
-	const float c_statusBarHeight = 0;// 30;
-
-	float navMenuWidth;
+	// Maybe keep the status bar for specific events such as compression
+	const int c_statusBarHeight = 0; // 30
+	const int navMenuWidth = 160;
 
 	// Navbar
+	if (navMenuWidth > 0)
 	{
+		//ImGui::SetNextWindowViewport(mainView->ID);
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, height - c_statusBarHeight), ImVec2(-1, height - c_statusBarHeight));
-		ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
-		navMenu.Render();
-		navMenuWidth = ImGui::GetWindowWidth();
+		ImGui::SetNextWindowSizeConstraints(ImVec2(navMenuWidth, height - c_statusBarHeight), ImVec2(navMenuWidth, height - c_statusBarHeight));
+		ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+		navMenu.Render(navMenuWidth - 10);
 		ImGui::End();
 	}
 
 	// Menus
 	{
+		//ImGui::SetNextWindowViewport(mainView->ID);
 		ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
 		ImGui::SetNextWindowSizeConstraints(ImVec2(width - navMenuWidth, height - c_statusBarHeight), ImVec2(width - navMenuWidth, height - c_statusBarHeight));
-		ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+		ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 		switch (navMenu.menuId)
 		{
@@ -77,7 +79,7 @@ void MainWindow::Update(int width, int height)
 		case NAV__MENU_CAMERA:
 			break;
 		case NAV__MENU_EDITION:
-			editionMenu.Render();
+			editionMenu.Render(storage);
 			break;
 		case NAV__MENU_DOCUMENTATION:
 			break;
@@ -89,13 +91,27 @@ void MainWindow::Update(int width, int height)
 	}
 
 	// Status bar, currently not useful
-	/*
+	if (c_statusBarHeight > 0)
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, height - c_statusBarHeight));
 		ImGui::SetNextWindowSizeConstraints(ImVec2((float)width, c_statusBarHeight), ImVec2((float)width, c_statusBarHeight));
-		ImGui::Begin("StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
-		statusBar.Render();
+		ImGui::Begin("StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+		//statusBar.Render();
 		ImGui::End();
+	}
+
+	// -- Rendering end -- //
+
+	// Do this here so that we're not modifying the moveset list at the same time as we're displaying it
+	storage.CleanupUnusedMovesetInfos();
+
+	// Update and Render additional Platform Windows
+	/*
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::Render();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
 	}
 	*/
 }

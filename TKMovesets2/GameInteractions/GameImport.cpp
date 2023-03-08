@@ -51,11 +51,11 @@ void GameImport::RunningUpdate()
 		if (!errored) {
 			auto& [filename, playerAddress] = m_plannedImportations[0];
 			// Start Importation
-			ImportationErrcode err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+			ImportationErrcode_ err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
 			if (free_unused_movesets) {
 				m_importer->CleanupUnusedMovesets();
 			}
-			if (err != ImportationSuccessful) {
+			if (err != ImportationErrcode_Successful) {
 				m_errors.push_back(err);
 				errored = true;
 			}
@@ -65,13 +65,13 @@ void GameImport::RunningUpdate()
 }
 // -- Public methods -- //
 
-ImportationErrcode GameImport::GetLastError()
+ImportationErrcode_ GameImport::GetLastError()
 {
 	if (m_errors.size() > 0) {
-		ImportationErrcode err = m_errors[0];
+		ImportationErrcode_ err = m_errors[0];
 		m_errors.erase(m_errors.begin());
 	}
-	return ImportationSuccessful;
+	return ImportationErrcode_Successful;
 }
 
 void GameImport::StopThreadAndCleanup()

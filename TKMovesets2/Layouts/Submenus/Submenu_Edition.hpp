@@ -1,6 +1,8 @@
 #pragma once
 
+#include "LocalStorage.hpp"
+
 class Submenu_Edition {
 public:
-	void Render();
+	void Render(LocalStorage &storage);
 };

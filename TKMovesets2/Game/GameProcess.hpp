@@ -8,22 +8,22 @@
 
 #include "GameAddresses.h"
 
-enum GameProcessError
+enum GameProcessErrcode_
 {
 	// This will happen if the process-attaching thread is not started
-	PROC_NOT_ATTACHED = 0,
+	GameProcessErrcode_PROC_NOT_ATTACHED = 0,
 	// Process not found in the process list
-	PROC_NOT_FOUND = 1,
+	GameProcessErrcode_PROC_NOT_FOUND = 1,
 	// Currently searching for the game process or attempting to attach to it
-	PROC_ATTACHING = 2,
+	GameProcessErrcode_PROC_ATTACHING = 2,
 	// Found but not attached 
-	PROC_ATTACH_ERR = 3,
+	GameProcessErrcode_PROC_ATTACH_ERR = 3,
 	// Found, attached, version mismatch
-	PROC_VERSION_MISMATCH = 4,
+	GameProcessErrcode_PROC_VERSION_MISMATCH = 4,
 	// Attached with no error
-	PROC_ATTACHED = 5,
+	GameProcessErrcode_PROC_ATTACHED = 5,
 	// Unexpected exit
-	PROC_EXITED = 6,
+	GameProcessErrcode_PROC_EXITED = 6,
 };
 
 class GameProcess
@@ -35,14 +35,14 @@ private:
 	std::vector<std::pair<gameAddr, uint64_t>> m_moduleInfos;
 
 	// Attach to .processName
-	GameProcessError AttachToNamedProcess(const char* processName, DWORD processExtraFlags);
+	GameProcessErrcode_ AttachToNamedProcess(const char* processName, DWORD processExtraFlags);
 	// Returns the game PID
 	DWORD GetGamePID(const char* processName);
 	// Load the address of the main module in .moduleAddr
 	bool LoadGameMainModule(const char* processName, DWORD pid);
 public:
 	// Status of the process attachment
-	GameProcessError status{ PROC_NOT_ATTACHED };
+	GameProcessErrcode_ status{ GameProcessErrcode_PROC_NOT_ATTACHED };
 	// Determines if a thread with Update() is currently running
 	bool threadStarted{ false };
 	// pid of process we latch on

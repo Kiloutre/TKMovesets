@@ -9,7 +9,7 @@ const GameInfo cg_gamesInfo[] = {
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
 		.characterCount = 2,
-		.flags = GameMovesetEdition,
+		.flags = GameFlag_MovesetEditable,
 		.extractor = new FactoryType<ExtractorT7>,
 		.importer = new FactoryType<ImporterT7>,
 	},

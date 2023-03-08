@@ -16,7 +16,7 @@ private:
 	// Movesets to import and corresponding player id 
 	std::vector<std::pair<std::string, gameAddr>> m_plannedImportations;
 	// List of errors, one extraction fail = 1 error
-	std::vector<ImportationErrcode> m_errors;
+	std::vector<ImportationErrcode_> m_errors;
 
 	// Callback called whenever the process is re-atached
 	void OnProcessAttach() override;
@@ -46,5 +46,5 @@ public:
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterImportation(std::string filename);
 	// Returns an error code to consume instantly through a popup, sound player or such
-	ImportationErrcode GetLastError();
+	ImportationErrcode_ GetLastError();
 };

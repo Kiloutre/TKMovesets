@@ -28,7 +28,7 @@ private:
 	// Allocate and copy the contents of the name block
 	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT7_gameAddr::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart);
 	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
-	byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractionOptions::Settings settings);
+	byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractSettings settings);
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
 	byte* CopyAnimations(const StructsT7_gameAddr::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr>& boundaries);
 
@@ -39,9 +39,9 @@ private:
 	// Returns the amount of bytes an animation contains
 	uint64_t GetAnimationSize(gameAddr anim, size_t maxSize);
 	// Returns an allocated block containing mota block offsets followed by mota blocks
-	byte* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries, ExtractionOptions::Settings settings);
+	byte* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries, ExtractSettings settings);
 	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
-	uint64_t CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractionOptions::Settings settings);
+	uint64_t CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractSettings settings);
 
 
 	const char* GetGameIdentifierString() override { return "T7_"; }
@@ -49,7 +49,7 @@ private:
 
 public:
 	using Extractor::Extractor; // Inherit constructor too
-	ExtractionErrcode Extract(gameAddr playerAddress, ExtractionOptions::Settings settings, uint8_t gameId, uint8_t& progress) override;
+	ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress) override;
 	bool CanExtract() override;
 
 	std::string GetPlayerCharacterName(gameAddr playerAddress) override;

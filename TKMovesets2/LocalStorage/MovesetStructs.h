@@ -2,10 +2,12 @@
 
 #include <stdint.h>
 
-enum MOVESET_FLAGS
+// Never resize this
+typedef uint64_t MovesetFlags;
+enum MovesetFlags_
 {
 	// Used to detect whether to not show the "rename moveset?" prompt when editing a moveset
-	MOVESET_MODIFIED = (1 << 0),
+	MovesetFlags_MOVESET_MODIFIED = (1 << 0),
 };
 
 // This structure should really not change or it would break compatibility with all previous movesets
@@ -18,16 +20,16 @@ struct MovesetHeader_infos
 	uint32_t gameId;
 	// ID of the extracted character, used internally to make some moves that require it work
 	uint32_t characterId;
+	// Small cost for ensuring future compatibility and less annoying cost
+	uint32_t header_size;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
-	uint64_t flags;
+	MovesetFlags flags;
+	// Date of last modification
+	uint64_t date;
 	// Origin (Game name + author if you want)
 	char origin[32];
 	// Target character to play on
 	char target_character[32];
-	// Date of last modification
-	uint64_t date;
-	// Small cost for ensuring future compatibility and less annoying cost
-	uint32_t header_size;
 };
 
 // Offsets of the various blocks contained within the moveset, in the same order they will appear in

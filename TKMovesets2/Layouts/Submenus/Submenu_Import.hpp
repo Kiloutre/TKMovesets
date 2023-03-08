@@ -5,8 +5,10 @@
 class Submenu_Import
 {
 private:
-	ImportationErrcode m_err;
+	// Stores the last error code
+	ImportationErrcode_ m_err;
 
 public:
+	Submenu_Import() { m_err = ImportationErrcode_Successful;  };
 	void Render(GameImport& importerHelper);
 };

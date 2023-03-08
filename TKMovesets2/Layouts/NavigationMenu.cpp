@@ -29,13 +29,13 @@ const LangSelect cg_languages[] = {
 
 // -- Private methods -- //
 
-void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count)
+void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, int width)
 {
 	for (size_t i = 0; i < count; ++i)
 	{
 		ImGui::Spacing();
 		NavMenuBtn navBtn = c_btns[i];
-		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId != navBtn.id, ImVec2(160, 30))) {
+		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId != navBtn.id, ImVec2(width, 30))) {
 			menuId = navBtn.id;
 		}
 	}
@@ -55,19 +55,19 @@ NavigationMenu::NavigationMenu()
 	}
 }
 
-void NavigationMenu::Render()
+void NavigationMenu::Render(int width)
 {
 	ImGui::SeparatorText(_("navmenu.category_moveset"));
-	RenderBtnList(cg_moveset_btns, sizeof(cg_moveset_btns) / sizeof(*cg_moveset_btns));
+	RenderBtnList(cg_moveset_btns, sizeof(cg_moveset_btns) / sizeof(*cg_moveset_btns), width);
 
 	ImGui::SeparatorText(_("navmenu.category_tools"));
-	RenderBtnList(cg_tools_btns, sizeof(cg_tools_btns) / sizeof(*cg_tools_btns));
+	RenderBtnList(cg_tools_btns, sizeof(cg_tools_btns) / sizeof(*cg_tools_btns), width);
 
 	ImGui::SeparatorText(_("navmenu.category_other"));
-	RenderBtnList(cg_other_btns, sizeof(cg_other_btns) / sizeof(*cg_other_btns));
+	RenderBtnList(cg_other_btns, sizeof(cg_other_btns) / sizeof(*cg_other_btns), width);
 
 	// Language list
-	ImGui::PushItemWidth(160);
+	ImGui::PushItemWidth(width);
 	if (ImGui::BeginCombo("##", cg_languages[m_languageId].name))
 	{
 		for (int i = 0; i < sizeof(cg_languages) / sizeof(*cg_languages); ++i)
@@ -82,4 +82,5 @@ void NavigationMenu::Render()
 		}
 		ImGui::EndCombo();
 	}
+	ImGui::PopItemWidth();
 }

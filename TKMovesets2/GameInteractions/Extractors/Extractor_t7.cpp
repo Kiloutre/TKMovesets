@@ -138,7 +138,7 @@ static int64_t getClosestBoundary(gameAddr animAddr, const std::vector<gameAddr>
 
 // -- Private methods - //
 
-uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractionOptions::Settings settings)
+uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractSettings settings)
 {
 	uint64_t motaCustomBlockSize = 0;
 
@@ -200,7 +200,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::v
 	return motaCustomBlockSize;
 }
 
-byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries, ExtractionOptions::Settings settings)
+byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries, ExtractSettings settings)
 {
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
@@ -391,7 +391,7 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	return nameBlock;
 }
 
-byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractionOptions::Settings settings)
+byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractSettings settings)
 {
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, boundaries, settings);
@@ -411,7 +411,7 @@ void ExtractorT7::FillHeaderInfos(MovesetHeader_infos& infos, uint8_t gameId, ga
 
 // -- Public methods -- //
 
-ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions::Settings settings, uint8_t gameId, uint8_t& progress)
+ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress)
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
@@ -466,7 +466,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets.move);
 	if (movesetBlock == nullptr) { 
 		// Since movesetBlock is used by those Copy functions, we have to check for allocation failure here
-		return ExtractionAllocationErr;
+		return ExtractionErrcode_AllocationErr;
 	}
 	progress = 20;
 
@@ -514,13 +514,13 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 	header.offsets.animationBlock = Helpers::align8Bytes(header.offsets.movesetBlock + s_movesetBlock);
 	header.offsets.motaBlock = Helpers::align8Bytes(header.offsets.animationBlock + s_animationBlock);
 
-	ExtractionErrcode errcode;
+	ExtractionErrcode_ errcode;
 
 	// -- Writing the file -- 
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
 		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
-		errcode = ExtractionAllocationErr;
+		errcode = ExtractionErrcode_AllocationErr;
 	}
 	else {
 		// Create the file*
@@ -528,7 +528,7 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 		std::string filepath;
 		std::string tmp_filepath;
 		
-		GetFilepath(characterName.c_str(), filepath, tmp_filepath, (settings & ExtractionOptions::OVERWRITE_SAME_FILENAME) != 0);
+		GetFilepath(characterName.c_str(), filepath, tmp_filepath, (settings & ExtractSettings_OVERWRITE_SAME_FILENAME) != 0);
 
 		std::ofstream file(tmp_filepath.c_str(), std::ios::binary);
 
@@ -577,10 +577,10 @@ ExtractionErrcode ExtractorT7::Extract(gameAddr playerAddress, ExtractionOptions
 
 			progress = 100;
 			// Extraction is over
-			errcode = ExtractionSuccessful;
+			errcode = ExtractionErrcode_Successful;
 		}
 		else {
-			errcode = ExtractionFileCreationErr;
+			errcode = ExtractionErrcode_FileCreationErr;
 		}
 	}
 

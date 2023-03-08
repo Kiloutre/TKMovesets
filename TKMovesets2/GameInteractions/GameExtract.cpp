@@ -56,8 +56,8 @@ void GameExtract::RunningUpdate()
 		if (!errored) {
 			// Start extraction
 			auto&[ playerAddress, settings ] = m_extractionQueue[0];
-			ExtractionErrcode err = m_extractor->Extract(playerAddress, settings, currentGameId, progress);
-			if (err != ExtractionSuccessful) {
+			ExtractionErrcode_ err = m_extractor->Extract(playerAddress, settings, currentGameId, progress);
+			if (err != ExtractionErrcode_Successful) {
 				m_errors.push_back(err);
 				errored = true;
 			}
@@ -68,14 +68,14 @@ void GameExtract::RunningUpdate()
 
 // -- Public methods -- //
 
-ExtractionErrcode GameExtract::GetLastError()
+ExtractionErrcode_ GameExtract::GetLastError()
 {
 	if (m_errors.size() > 0) {
-		ExtractionErrcode err = m_errors[0];
+		ExtractionErrcode_ err = m_errors[0];
 		m_errors.erase(m_errors.begin());
 		return err;
 	}
-	return ExtractionSuccessful;
+	return ExtractionErrcode_Successful;
 }
 
 void GameExtract::StopThreadAndCleanup()
@@ -104,7 +104,7 @@ bool GameExtract::IsBusy()
 	return m_extractionQueue.size() > 0;
 }
 
-void GameExtract::QueueCharacterExtraction(int playerId, ExtractionOptions::Settings settings)
+void GameExtract::QueueCharacterExtraction(int playerId, ExtractSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = game->ReadPtr("p1_addr");
@@ -114,12 +114,12 @@ void GameExtract::QueueCharacterExtraction(int playerId, ExtractionOptions::Sett
 		// Queue the extraction of every character one by one
 		for (playerId = 0; playerId < characterCount; ++playerId) {
 			gameAddr pAddr = playerAddress + playerId * playerStructSize;
-			m_extractionQueue.push_back(std::pair<gameAddr, ExtractionOptions::Settings>(pAddr, settings));
+			m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(pAddr, settings));
 		}
 	}
 	else {
 		// Queue the extraction of one character
 		gameAddr pAddr = playerAddress + playerId * playerStructSize;
-		m_extractionQueue.push_back(std::pair<gameAddr, ExtractionOptions::Settings>(pAddr, settings));
+		m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(pAddr, settings));
 	}
 }

@@ -7,19 +7,19 @@
 
 // -- Private methods  -- //
 
-GameProcessError GameProcess::AttachToNamedProcess(const char* processName, DWORD processExtraFlags)
+GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, DWORD processExtraFlags)
 {
 	DWORD pid = GetGamePID(processName);
 
-	if (pid == (DWORD)-1) return PROC_NOT_FOUND;
+	if (pid == (DWORD)-1) return GameProcessErrcode_PROC_NOT_FOUND;
 	else {
 		m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | processExtraFlags, FALSE, pid);
 		if (m_processHandle != nullptr && LoadGameMainModule(processName, pid)) {
 			processId = pid;
-			return PROC_ATTACHED;
+			return GameProcessErrcode_PROC_ATTACHED;
 		}
 		else {
-			return PROC_ATTACH_ERR;
+			return GameProcessErrcode_PROC_ATTACH_ERR;
 		}
 	}
 }
@@ -103,13 +103,13 @@ bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
 
 bool GameProcess::Attach(const char* processName, DWORD processExtraFlags)
 {
-	if (status == PROC_ATTACHED) {
+	if (status == GameProcessErrcode_PROC_ATTACHED) {
 		return false;
 	}
 
 	allocatedMemory.clear();
 	status = AttachToNamedProcess(processName, processExtraFlags);
-	return status == PROC_ATTACHED;
+	return status == GameProcessErrcode_PROC_ATTACHED;
 }
 
 void GameProcess::Detach()
@@ -118,12 +118,12 @@ void GameProcess::Detach()
 		CloseHandle(m_processHandle);
 		m_processHandle = nullptr;
 	}
-	status = PROC_NOT_ATTACHED;
+	status = GameProcessErrcode_PROC_NOT_ATTACHED;
 }
 
 bool GameProcess::IsAttached()
 {
-	return status == PROC_ATTACHED;
+	return status == GameProcessErrcode_PROC_ATTACHED;
 }
 
 bool GameProcess::CheckRunning()
@@ -133,7 +133,7 @@ bool GameProcess::CheckRunning()
 		if (ReadProcessMemory(m_processHandle, (LPCVOID)moduleAddr, (LPVOID)&value, 4, nullptr) == 0)
 		{
 			Detach();
-			status = PROC_EXITED;
+			status = GameProcessErrcode_PROC_EXITED;
 			return false;
 		}
 	}

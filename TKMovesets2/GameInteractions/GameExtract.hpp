@@ -13,9 +13,9 @@ private:
 	// Extractor class, never stores an Extractor*, used for polymorphism
 	Extractor* m_extractor = nullptr;
 	// Player addresses to extract and their respective extraction settings
-	std::vector<std::pair<gameAddr, ExtractionOptions::Settings>> m_extractionQueue;
+	std::vector<std::pair<gameAddr, ExtractSettings>> m_extractionQueue;
 	// List of errors, one extraction fail = 1 error
-	std::vector<ExtractionErrcode> m_errors;
+	std::vector<ExtractionErrcode_> m_errors;
 
 	// Reads the movesets for the players characters' names. Accessible under .characterNames
 	void LoadCharacterNames();
@@ -36,7 +36,7 @@ public:
 	// Is currently busy with an extraction
 	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters
-	void QueueCharacterExtraction(int playerId, ExtractionOptions::Settings settings=0);
+	void QueueCharacterExtraction(int playerId, ExtractSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
-	ExtractionErrcode GetLastError();
+	ExtractionErrcode_ GetLastError();
 };

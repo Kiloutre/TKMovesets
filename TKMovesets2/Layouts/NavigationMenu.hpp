@@ -32,13 +32,13 @@ private:
 	int m_languageId = 0;
 
 	// Render a list of buttons with predetermined size for use in the navbar
-	void RenderBtnList(const NavMenuBtn* c_btns, size_t count);
+	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, int width);
 public:
 	// Stores the ID of the current menu to ender
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
 
 	NavigationMenu();
 	// Main render function
-	void Render();
+	void Render(int width);
 
 };

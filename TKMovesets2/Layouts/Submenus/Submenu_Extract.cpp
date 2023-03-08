@@ -19,12 +19,12 @@ Submenu_Extract::Submenu_Extract()
 	m_motaExport[9] = true; // Camera
 }
 
-ExtractionOptions::Settings Submenu_Extract::GetExtractionSettings()
+ExtractSettings Submenu_Extract::GetExtractionSettings()
 {
-	ExtractionOptions::Settings settings = 0;
+	ExtractSettings settings = 0;
 
 	if (m_overwriteSameFilename) {
-		settings |= ExtractionOptions::OVERWRITE_SAME_FILENAME;
+		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
 	}
 
 	for (uint8_t i = 0; i < 10; ++i) {
@@ -108,7 +108,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::SameLine();
 
 		bool busy = extractorHelper.IsBusy();
-		bool canExtract = p->status == PROC_ATTACHED && !busy && extractorHelper.CanStart();
+		bool canExtract = p->IsAttached() && !busy && extractorHelper.CanStart();
 
 		// Extraction buttons, will be disabled if we can't extract
 		for (int playerId = 0; playerId < extractorHelper.characterCount; ++playerId)
@@ -160,23 +160,23 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	// If we can't extract, display a warning detailling why
 	switch (p->status)
 	{
-	case PROC_ATTACHED:
+	case GameProcessErrcode_PROC_ATTACHED:
 		if (!extractorHelper.CanStart()) {
 			ImGuiExtra_TextboxWarning(_("extraction.cant_extract"));
 		}
 		break;
-	case PROC_NOT_ATTACHED:
-	case PROC_EXITED:
-	case PROC_ATTACHING:
+	case GameProcessErrcode_PROC_NOT_ATTACHED:
+	case GameProcessErrcode_PROC_EXITED:
+	case GameProcessErrcode_PROC_ATTACHING:
 		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
 		break;
-	case PROC_NOT_FOUND:
+	case GameProcessErrcode_PROC_NOT_FOUND:
 		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
 		break;
-	case PROC_VERSION_MISMATCH:
+	case GameProcessErrcode_PROC_VERSION_MISMATCH:
 		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
 		break;
-	case PROC_ATTACH_ERR:
+	case GameProcessErrcode_PROC_ATTACH_ERR:
 		ImGuiExtra_TextboxError(_("process.game_attach_err"));
 		break;
 	}
@@ -246,14 +246,12 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 				ImGui::PopID();
 			}
 		}
-		// Don't de-allocate moveset infos until we're done iterating on it
-		extractorHelper.storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
 	}
 
-	ExtractionErrcode err = extractorHelper.GetLastError();
-	if (err != ExtractionSuccessful) {
+	ExtractionErrcode_ err = extractorHelper.GetLastError();
+	if (err != ExtractionErrcode_Successful) {
 		ImGui::OpenPopup("ExtractionErrPopup");
 		m_err = err;
 	}
@@ -263,10 +261,10 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	{
 		switch (m_err)
 		{
-		case ExtractionAllocationErr:
+		case ExtractionErrcode_AllocationErr:
 			ImGui::Text(_("extraction.error_allocation"));
 			break;
-		case ExtractionFileCreationErr:
+		case ExtractionErrcode_FileCreationErr:
 			ImGui::Text(_("extraction.error_file_creation"));
 			break;
 		}
@@ -274,7 +272,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		if (ImGui::Button(_("close")))
 		{
 			// Reset the errcode
-			m_err = ExtractionSuccessful;
+			m_err = ExtractionErrcode_Successful;
 			ImGui::CloseCurrentPopup();
 		}
 

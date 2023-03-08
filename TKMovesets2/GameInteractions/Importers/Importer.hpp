@@ -11,12 +11,12 @@
 # define FROM_INDEX(field, listStartAddr, type) (field = (field == -1 ? 0 : listStartAddr + (field * sizeof(type))))
 
 // todo: actually handle these error codes and display an err message
-enum ImportationErrcode
+enum ImportationErrcode_
 {
-	ImportationSuccessful = 0,
-	ImportationAllocationErr = 1,
-	ImportationGameAllocationErr = 2,
-	ImportationFileReadErr = 3,
+	ImportationErrcode_Successful = 0,
+	ImportationErrcode_AllocationErr = 1,
+	ImportationErrcode_GameAllocationErr = 2,
+	ImportationErrcode_FileReadErr = 3,
 };
 
 // Base class for extracting from a game
@@ -31,7 +31,7 @@ protected:
 public:
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual ImportationErrcode Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) = 0;
+	virtual ImportationErrcode_ Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanImport() = 0;
 	// Look through movesets that we previously allocated in the game and free the unused ones
