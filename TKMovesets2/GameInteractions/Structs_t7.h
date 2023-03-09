@@ -220,15 +220,6 @@ namespace StructsT7
 
 	// -- Other -- //
 
-	struct MovesetInfoStart
-	{
-		char _0x0[8];
-		byte* character_name_addr;
-		byte* character_creator_addr;
-		byte* date_addr;
-		byte* fulldate_addr;
-	};
-
 	struct MovesetTable
 	{
 		Reactions* reactions;
@@ -308,7 +299,11 @@ namespace StructsT7
 
 	struct MovesetInfo
 	{
-		MovesetInfoStart start;
+		char _0x0[8];
+		char* character_name_addr;
+		char* character_creator_addr;
+		char* date_addr;
+		char* fulldate_addr;
 		uint16_t aliases1[112];
 		uint16_t aliases2[36];
 		MovesetTable table;

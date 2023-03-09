@@ -49,7 +49,7 @@ enum ExtractionErrcode_
 namespace ExtractorUtils
 {
 	// Write a list of blocks, each aligned on a 8 bytes basis
-	void WriteFileData(std::ofstream& file, std::vector<std::pair<byte*, uint64_t>>& blocks, uint8_t& progress);
+	void WriteFileData(std::ofstream& file, std::vector<std::pair<byte*, uint64_t>>& blocks, uint8_t& progress, uint8_t progress_max);
 	// Calcualte a crc32 from a list of data blocks. Always skip the first one.
 	uint32_t CalculateCrc32(std::vector<std::pair<byte*, uint64_t>>& blocks);
 	// Returns the size in bytes of a 0xC8 in 

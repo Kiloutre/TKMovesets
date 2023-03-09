@@ -303,6 +303,15 @@ void ImporterT7::CleanupUnusedMovesets()
 	}
 }
 
+static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
+{
+	// Todo: write the actual, proper values for these
+	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
+	info->date_addr = (char*)(gameMoveset + 0x2E8);
+	info->fulldate_addr = (char*)(gameMoveset + 0x2E8);
+	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
+}
+
 ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
 	progress = 0;
@@ -352,6 +361,7 @@ ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddr
 	// Get the table address
 	table = (gAddr::MovesetTable*)(moveset + header.offsets.tableBlock);
 
+	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
 	ConvertMovesetIndexes(moveset, gameMoveset, table, header.offsets);

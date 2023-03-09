@@ -534,12 +534,13 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 		if (!file.fail())
 		{
-			//
 			progress = 80;
-			//
 
 			std::vector<std::pair<byte*, uint64_t>> blocks{
+				// Our own header data
 				std::pair<byte*, uint64_t>{headerBlock, s_headerBlock},
+
+				// Actual moveset reproduction
 				std::pair<byte*, uint64_t>{movesetInfoBlock, s_movesetInfoBlock},
 				std::pair<byte*, uint64_t>{tableBlock, s_tableBlock },
 				std::pair<byte*, uint64_t>{motasListBlock, s_motasListBlock},
@@ -550,13 +551,10 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 			};
 
 			header.infos.crc32 = ExtractorUtils::CalculateCrc32(blocks);
-			ExtractorUtils::WriteFileData(file, blocks, progress);
-
-			printf("crc 32 is: %X\n", header.infos.crc32);
+			ExtractorUtils::WriteFileData(file, blocks, progress, 95);
 
 			file.close();
 
-			progress = 90;
 			ExtractorUtils::CompressFile(filepath, tmp_filepath);
 
 			progress = 100;
