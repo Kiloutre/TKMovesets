@@ -23,7 +23,8 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	// Setup ImGui config. This had to be done before initializing the backends
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	// Initialize backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -134,8 +135,9 @@ void MainWindow::Render()
 	// Render the frame buffer
 	ImGui::Render();
 
-	ImGui::UpdatePlatformWindows();
-	ImGui::RenderPlatformWindowsDefault();
+	// Multi view
+	//ImGui::UpdatePlatformWindows();
+	//ImGui::RenderPlatformWindowsDefault();
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

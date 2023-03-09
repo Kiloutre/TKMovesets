@@ -22,6 +22,40 @@ namespace ExtractorUtils
 		return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
 	}
 
+	uint32_t CalculateCrc32(std::vector<std::pair<byte*, uint64_t>>& blocks)
+	{
+		// Skip the first item which is always the MovesetHeader
+		uint32_t crc32 = 0;
+		uint32_t table[256];
+
+		Helpers::crc32_generate_table(table);
+		for (size_t i = 1; i < blocks.size(); ++i) {
+			char* blockData = (char*)blocks[i].first;
+			uint64_t blockSize = blocks[i].second;
+
+			printf("block %d crc: %X\n", i,  Helpers::crc32_update(table, 0, blockData, blockSize));
+
+			crc32 = Helpers::crc32_update(table, crc32, blockData, blockSize);
+		}
+		return crc32;
+	}
+
+	void WriteFileData(std::ofstream &file, std::vector<std::pair<byte*, uint64_t>>& blocks, uint8_t&progress)
+	{
+		uint8_t remainingProgress = 100 - progress;
+		uint8_t step = remainingProgress / blocks.size();
+
+		for (std::pair<byte*, uint64_t> block : blocks) {
+			char* blockData = (char*)block.first;
+			uint64_t blockSize = block.second;
+
+			file.write(blockData, blockSize);
+			Helpers::align8Bytes(file);
+
+			progress += step;
+		}
+	}
+
 	void CompressFile(std::string dest_filename, std::string src_filename)
 	{
 		std::rename(src_filename.c_str(), dest_filename.c_str());

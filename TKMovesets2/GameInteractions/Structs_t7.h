@@ -220,21 +220,13 @@ namespace StructsT7
 
 	// -- Other -- //
 
-	struct MotaList
+	struct MovesetInfoStart
 	{
-		void* mota_0; // Anims
-		void* mota_1; // Anims
-		void* mota_2; // Hand
-		void* mota_3; // Hand
-		void* mota_4; // Face
-		void* mota_5; // Face
-		void* mota_6; // Wings (probably more to it)
-		void* mota_7; // Wings (probablty more to it)
-		void* mota_8; // Camera
-		void* mota_9; // Camera
-		void* mota_10; // Unknown
-		void* mota_11; // Unknown
-		void* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+		char _0x0[8];
+		byte* character_name_addr;
+		byte* character_creator_addr;
+		byte* date_addr;
+		byte* fulldate_addr;
 	};
 
 	struct MovesetTable
@@ -295,6 +287,32 @@ namespace StructsT7
 
 		ThrowData* throws;
 		uint64_t throwsCount;
+	};
+
+	struct MotaList
+	{
+		void* mota_0; // Anims
+		void* mota_1; // Anims
+		void* mota_2; // Hand
+		void* mota_3; // Hand
+		void* mota_4; // Face
+		void* mota_5; // Face
+		void* mota_6; // Wings (probably more to it)
+		void* mota_7; // Wings (probablty more to it)
+		void* mota_8; // Camera
+		void* mota_9; // Camera
+		void* mota_10; // Unknown
+		void* mota_11; // Unknown
+		void* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+	};
+
+	struct MovesetInfo
+	{
+		MovesetInfoStart start;
+		uint16_t aliases1[112];
+		uint16_t aliases2[36];
+		MovesetTable table;
+		MotaList motas;
 	};
 }
 

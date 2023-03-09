@@ -6,6 +6,11 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 
+static void StartEditingMoveset(std::string filename)
+{
+
+}
+
 void Submenu_Edition::Render(LocalStorage& storage)
 {
 	ImGuiExtra::RenderTextbox(_("edition.explanation"));
@@ -55,7 +60,7 @@ void Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::PushID(moveset->filename.c_str());
 
 				if (ImGui::Button(_("moveset.edit"))) {
-					//importerHelper.QueueCharacterImportation(moveset->filename);
+					StartEditingMoveset(moveset->filename);
 				}
 				ImGui::PopID();
 			}

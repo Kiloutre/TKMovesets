@@ -33,4 +33,9 @@ namespace Helpers
 
     // Returns true if file exists
     bool fileExists(const char* name);
+
+    // Update a crc32 with new data
+    uint32_t crc32_update(uint32_t(&table)[256], uint32_t initial, const void* buf, size_t len);
+    // Create a table required for the crc32 generation
+    void crc32_generate_table(uint32_t(&table)[256]);
 }

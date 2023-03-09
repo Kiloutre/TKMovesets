@@ -538,37 +538,21 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 			progress = 80;
 			//
 
-			// We make sure to write every block aligned on 8 bytes because the game is likely to require it for some structures
+			std::vector<std::pair<byte*, uint64_t>> blocks{
+				std::pair<byte*, uint64_t>{headerBlock, s_headerBlock},
+				std::pair<byte*, uint64_t>{movesetInfoBlock, s_movesetInfoBlock},
+				std::pair<byte*, uint64_t>{tableBlock, s_tableBlock },
+				std::pair<byte*, uint64_t>{motasListBlock, s_motasListBlock},
+				std::pair<byte*, uint64_t>{(byte*)nameBlock, s_nameBlock},
+				std::pair<byte*, uint64_t>{movesetBlock, s_movesetBlock},
+				std::pair<byte*, uint64_t>{animationBlock, s_animationBlock},
+				std::pair<byte*, uint64_t>{motaCustomBlock, s_motaCustomBlock},
+			};
 
-			// THis is only our header info, it is useful only to us
-			file.write((char*)headerBlock, s_headerBlock);
-			Helpers::align8Bytes(file);
+			header.infos.crc32 = ExtractorUtils::CalculateCrc32(blocks);
+			ExtractorUtils::WriteFileData(file, blocks, progress);
 
-			// The actual full moveset data, all of this will be allocated from the file in one go
-			file.write((char*)movesetInfoBlock, s_movesetInfoBlock);
-			//Helpers::align8Bytes(file); // The size of movesetInfoBlock is fixed and is divisible by 8 : no misalignement possible.
-
-			file.write((char*)tableBlock, s_tableBlock);
-			//Helpers::align8Bytes(file); // The size of tableBlock is fixed and is divisible by 8 : no misalignement possible.
-
-			file.write((char*)motasListBlock, s_motasListBlock);
-			//Helpers::align8Bytes(file); // The size of motasListBlock is fixed and is divisible by 8 : no misalignement possible.
-
-			file.write((char*)nameBlock, s_nameBlock);
-			Helpers::align8Bytes(file);
-
-			file.write((char*)movesetBlock, s_movesetBlock);
-			Helpers::align8Bytes(file);
-
-			//
-			progress = 85;
-			//
-
-			file.write((char*)animationBlock, s_animationBlock);
-			Helpers::align8Bytes(file);
-
-			file.write((char*)motaCustomBlock, s_motaCustomBlock);
-			Helpers::align8Bytes(file);
+			printf("crc 32 is: %X\n", header.infos.crc32);
 
 			file.close();
 

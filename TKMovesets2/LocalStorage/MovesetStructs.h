@@ -26,6 +26,8 @@ struct MovesetHeader_infos
 	MovesetFlags flags;
 	// Date of last modification
 	uint64_t date;
+	// Stores a hash of the moveset data (everything past our MovesetHeader_infos structure)
+	uint32_t crc32;
 	// Origin (Game name + author if you want)
 	char origin[32];
 	// Target character to play on
