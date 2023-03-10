@@ -114,15 +114,11 @@ edition.last_saved = Last save:
 edition.save = Save
 edition.process_err = Error
 edition.live_edition = Live edition
+edition.live_edition_explanation = Turn on so that trivial changes such as simple value modifications can be applied directory in the game memory, without requing a new moveset importation.
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
-edition.no_custom_loaded = Load a custom moveset in memory to be able turn on live edition
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.
-edition.target_player = Target player:
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?
-edition.custom_loaded = Custom moveset loaded
-edition.enable_live = Enable live edition
-edition.disable_live = Disable live edition
 
 # Documentation #
 

@@ -1,5 +1,4 @@
 #include <ImGui.h>
-#include <format>
 
 #include "EditorWindow.hpp"
 #include "Localization.hpp"
@@ -16,6 +15,7 @@ void EditorWindow::Save()
 
 void EditorWindow::RenderToolBar()
 {
+	// todo: ImGuiWindowFlags_MenuBar ?
 	ImGui::Text("TOOLS");
 }
 
@@ -102,6 +102,8 @@ void EditorWindow::RenderStatusBar()
 	// Live edition
 	ImGui::SameLine();
 	ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition);
+	ImGui::SameLine();
+	ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"));
 }
 
 void EditorWindow::RenderMovesetData(ImGuiID dockId)
@@ -123,13 +125,20 @@ EditorWindow::EditorWindow(movesetInfo* moveset)
 void EditorWindow::Render(int dockid)
 {
 	ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Once);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(9999, 9999));
 
 	if (setFocus) {
 		ImGui::SetNextWindowFocus();
 		setFocus = false;
 	}
 
-	if (ImGui::Begin(m_loadedCharacter.name.c_str(), &popen, ImGuiWindowFlags_NoDocking))
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
+	// ImGuiWindowFlags_MenuBar
+	if (!m_savedLastChange) {
+		windowFlags |= ImGuiWindowFlags_UnsavedDocument;
+	}
+
+	if (ImGui::Begin(m_loadedCharacter.name.c_str(), &popen, windowFlags))
 	{
 		RenderToolBar();
 

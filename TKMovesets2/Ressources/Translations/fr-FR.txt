@@ -111,15 +111,12 @@ edition.last_saved = Dernière sauvegarde le:
 edition.save = Sauvegarder
 edition.process_err = Error
 edition.live_edition = Édition en direct
+edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.
 
-edition.no_custom_loaded = 
+edition.suggest_new_name = 
 edition.non_trivial_detected = 
-edition.target_player = Joueur cible:
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?
-edition.custom_loaded =
-edition.enable_live = Activer les modifications en direct
-edition.disable_live = Désactiver les modifications en direct
-edition.select_moveset = Choisissez le personnage à modifier
+
 
 
 
