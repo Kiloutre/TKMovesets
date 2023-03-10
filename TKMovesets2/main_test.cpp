@@ -72,6 +72,9 @@ int main(int argc, wchar_t** argv, char** env)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
+	bool opened1 = false;
+	bool opened2 = false;
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		
@@ -87,6 +90,9 @@ int main(int argc, wchar_t** argv, char** env)
 		ImGui::Begin("window1");
 		if (ImGui::Button("Click me"))
 		{
+			opened1 = !opened1;
+		}
+		if (opened1) {
 			ImGui::Text("test");
 		}
 		ImGui::End();
@@ -94,6 +100,9 @@ int main(int argc, wchar_t** argv, char** env)
 		ImGui::Begin("window2");
 		if (ImGui::Button("Click me"))
 		{
+			opened2 = !opened2;
+		}
+		if (opened1) {
 			ImGui::Text("test");
 		}
 		ImGui::End();
