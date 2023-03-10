@@ -7,6 +7,7 @@
 
 #include "LocalStorage.hpp"
 #include "Helpers.hpp"
+#include "Games.hpp"
 
 #include "MovesetStructs.h"
 #include "constants.h"
@@ -50,7 +51,8 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 				.version_string = std::string(movesetInfos->version_string),
 				.date = movesetInfos->date,
 				.size = (float)totalSize / 1000 / 1000,
-				.modificationDate = buffer.st_mtime
+				.modificationDate = buffer.st_mtime,
+				.editable = (Games::GetGameInfo(movesetInfos->gameId)->flags & GameFlag_MovesetEditable) != 0
 			};
 		}
 
@@ -120,7 +122,8 @@ void LocalStorage::ReloadMovesetList()
 				   .target_character = std::string(""),
 				   .date = 0,
 				   .size = 0,
-				   .modificationDate = 0
+				   .modificationDate = 0,
+				   .editable = true // We do want to show it in the moveset edition list
 				};
 			}
 

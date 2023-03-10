@@ -59,7 +59,7 @@ void Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
 
-				if (ImGui::Button(_("moveset.edit"))) {
+				if (ImGuiExtra::RenderButtonEnabled(_("moveset.edit"), moveset->editable)) {
 					StartEditingMoveset(moveset->filename);
 				}
 				ImGui::PopID();
