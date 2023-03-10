@@ -12,12 +12,13 @@ set(INCLUDE_FOLDERS
                     "GameInteractions/Importers"
                     "LocalStorage"
                     "Utils"
+                    "imgui"
 )
 
 # This will be included in the .exe
 set(BINARY_SOURCES
                     # Main sources
-                    "main.cpp"
+                    "main_test.cpp"
                     "Game/GameProcess.cpp"
                     "Game/GameData.cpp"
                     "GameInteractions/GameInteraction.cpp"
@@ -42,6 +43,16 @@ set(BINARY_SOURCES
                     "Utils/Localization.cpp"
                     "Utils/GameAddressesFile.cpp"
                     "Utils/ThreadedClass.cpp"
+
+
+                    "imgui/imgui.cpp"
+                    "imgui/imgui_draw.cpp"
+                    "imgui/imgui_impl_opengl3.cpp"
+                    "imgui/imgui_impl_glfw.cpp"
+                    
+                    "imgui/imgui_stdlib.cpp"
+                    "imgui/imgui_tables.cpp"
+                    "imgui/imgui_widgets.cpp"
 )
 
 # This will be included in the .dll and should only be related to extraction/importation
@@ -92,9 +103,6 @@ target_link_libraries(TKMovesets2 PRIVATE glad::glad)
 
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE glfw)
-
-find_package(imgui CONFIG REQUIRED)
-target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
 
 #find_package(liblzma CONFIG REQUIRED)
 #target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)
