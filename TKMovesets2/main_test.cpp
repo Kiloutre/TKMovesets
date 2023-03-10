@@ -102,7 +102,7 @@ int main(int argc, wchar_t** argv, char** env)
 		{
 			opened2 = !opened2;
 		}
-		if (opened1) {
+		if (opened2) {
 			ImGui::Text("test");
 		}
 		ImGui::End();
@@ -111,8 +111,10 @@ int main(int argc, wchar_t** argv, char** env)
 		////
 
 		ImGui::Render();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
