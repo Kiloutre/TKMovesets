@@ -64,10 +64,10 @@ static void InitMainClasses(MainWindow& program)
 	program.storage.ReloadMovesetList();
 
 	GameAddressesFile* addrFile = new GameAddressesFile();
+	program.addrFile = addrFile;
 
 	program.extractor.Init(addrFile, &program.storage);
 	program.importer.Init(addrFile, &program.storage);
-	program.editionMenu.importer.Init(addrFile, &program.storage);
 
 	if (Games::GetExtractableGamesCount() == 1) {
 		program.extractor.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
@@ -82,16 +82,11 @@ static void InitMainClasses(MainWindow& program)
 	program.storage.StartThread();
 	program.extractor.StartThread();
 	program.importer.StartThread();
-	// Separate importer for editor, less prone to bugs
-	program.editionMenu.importer.StartThread();
 }
 
 // Free up memory and stop threads cleanly before exiting the program
 static void DestroyMainClasses(MainWindow& program)
 {
-	// We allocated addrFile ocec even though multiple classes have a reference to it.
-	GameAddressesFile* addrFile = program.importer.game->addrFile;
-
 	// todo: Clean this up, we don't need to instantiate multiple GameData classes.
 	// Maybe do the delete of .process inside StopThreadAndCleanup() as well
 	program.extractor.StopThreadAndCleanup();
@@ -102,17 +97,18 @@ static void DestroyMainClasses(MainWindow& program)
 	delete program.importer.process;
 	delete program.importer.game;
 
-	program.editionMenu.importer.StopThreadAndCleanup();
-	delete program.editionMenu.importer.process;
-	delete program.editionMenu.importer.game;
+	for (EditorWindow* win : program.editorWindows)
+	{
+		win->importer.StopThreadAndCleanup();
+		delete win->importer.process;
+		delete win->importer.game;
+	}
 
 	// Now that every thread that uses addrFile has stopped, we can free it
-	delete addrFile;
+	delete program.addrFile;
 
 	// Once every thread that may use storage has been stopped, we can finally stop storage
 	program.storage.StopThreadAndCleanup();
-
-
 }
 
 // -- main -- //

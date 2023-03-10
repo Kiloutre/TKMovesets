@@ -3,7 +3,8 @@
 
 // Toplevel menus
 #include "NavigationMenu.hpp"
-//#include "StatusBar.hpp"
+// Editor window
+#include "EditorWindow.hpp"
 // Submenus
 #include "Submenu_Import.hpp"
 #include "Submenu_Extract.hpp"
@@ -14,12 +15,14 @@
 #include "GameExtract.hpp"
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
+#include "GameAddressesFile.hpp"
 
 class MainWindow {
 private:
 	NavigationMenu navMenu;
-	//StatusBar          statusBar;
-	//Submenu_OnlinePlay onlineMenu;
+
+	// Attempt to load a moveset, open a new editor window on success
+	void LoadMoveset(movesetInfo* movesetInfos);
 public:
 	// Extractor instance, can attach to its own process separately from everyone else
 	GameExtract extractor;
@@ -27,15 +30,17 @@ public:
 	GameImport importer;
 	// Storage instance, use to access local moveset informations
 	LocalStorage storage;
+	// Addrfile to pass on child classes (mainly editorWindows)
+	GameAddressesFile* addrFile = nullptr;
 
-	// Extraction menu
+	// Extraction submenu
 	Submenu_Extract extractMenu;
-
-	// Importation menu
+	// Importation submenu
 	Submenu_Import importMenu;
-
-	// Edition menu
+	// Edition submenu
 	Submenu_Edition editionMenu;
+	// Edition windows
+	std::vector<EditorWindow*> editorWindows;
 
 	MainWindow(GLFWwindow* window, const char* c_glsl_version);
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there

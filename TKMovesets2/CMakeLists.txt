@@ -6,6 +6,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(INCLUDE_FOLDERS
                     "Layouts"
                     "Layouts/Submenus"
+                    "Layouts/Editor"
                     "Game"
                     "GameInteractions"
                     "GameInteractions/Extractors"
@@ -28,7 +29,8 @@ set(BINARY_SOURCES
                     # Layout
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
-                    "Layouts/StatusBar.cpp"
+                    # Layout: editor window
+                    "Layouts/Editor/EditorWindow.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
@@ -72,7 +74,7 @@ target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe
-add_executable (TKMovesets2 ${BINARY_SOURCES})
+add_executable (TKMovesets2 ${BINARY_SOURCES} )
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)

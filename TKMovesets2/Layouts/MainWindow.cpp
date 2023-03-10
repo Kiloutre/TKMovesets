@@ -12,6 +12,27 @@
 #include "Submenu_About.hpp"
 #include "imgui_extras.hpp"
 
+// -- Private methods -- //
+
+void MainWindow::LoadMoveset(movesetInfo* movesetInfos)
+{
+	for (EditorWindow* win : editorWindows)
+	{
+		if (win->filename == movesetInfos->filename)
+		{
+			win->setFocus = true;
+			// Moveset already opened in editor, don't open it again
+			return;
+		}
+	}
+
+	// todo: attempt to load. popup if fail. open window and std vector push back if not
+	EditorWindow* newWin = new EditorWindow(movesetInfos);
+	newWin->importer.Init(addrFile, &storage);
+	newWin->importer.StartThread();
+	editorWindows.push_back(newWin);
+}
+
 // -- Public methods -- //
 
 MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
@@ -49,8 +70,6 @@ void MainWindow::Update()
 {
 	// Main window rendering
 	{
-		// Maybe keep the status bar for specific events such as compression
-		const int c_statusBarHeight = 0; // 30
 		const int navMenuWidth = 160;
 
 		ImGuiViewport* mainView = ImGui::GetMainViewport();
@@ -61,7 +80,7 @@ void MainWindow::Update()
 		if (navMenuWidth > 0)
 		{
 			ImGui::SetNextWindowPos(mainView->Pos);
-			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height - c_statusBarHeight));
+			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height));
 			ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 			navMenu.Render(navMenuWidth - 10);
 			ImGui::End();
@@ -71,7 +90,7 @@ void MainWindow::Update()
 		// Menus
 		{
 			ImGui::SetNextWindowPos(ImVec2(mainView->Pos.x + navMenuWidth, mainView->Pos.y));
-			ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height - c_statusBarHeight));
+			ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height));
 			ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 			switch (navMenu.menuId)
@@ -87,7 +106,12 @@ void MainWindow::Update()
 			case NAV__MENU_CAMERA:
 				break;
 			case NAV__MENU_EDITION:
-				editionMenu.Render();
+				{
+					movesetInfo* moveset = editionMenu.Render(storage);
+					if (moveset != nullptr) {
+						LoadMoveset(moveset);
+					}
+				}
 				break;
 			case NAV__MENU_DOCUMENTATION:
 				break;
@@ -99,25 +123,23 @@ void MainWindow::Update()
 			ImGui::End();
 		}
 
-		// Status bar, currently not useful
-		if (c_statusBarHeight > 0)
+		// Editor windows
+		for (unsigned int i = 0; i < editorWindows.size();)
 		{
-			ImGui::SetNextWindowPos(ImVec2(0.0f, height - c_statusBarHeight));
-			ImGui::SetNextWindowSizeConstraints(ImVec2((float)width, c_statusBarHeight), ImVec2((float)width, c_statusBarHeight));
-			ImGui::Begin("StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
-			//statusBar.Render();
-			ImGui::End();
+			EditorWindow* w = editorWindows[i];
+			if (w->popen) {
+				w->Render(i + 2);
+				++i;
+			}
+			else {
+				editorWindows.erase(editorWindows.begin() + i);
+				// Free thread data
+				w->importer.StopThreadAndCleanup();
+				delete w->importer.process;
+				delete w->importer.game;
+			}
 		}
-
 	}
-
-	/*
-	ImGui::Begin("MainWindow22", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
-	ImGui::Text("yfsdefdsfdsfdso");
-	ImGui::Button("gkioregoregore");
-	ImGui::End();
-	*/
-
 
 	// -- Rendering end -- //
 
