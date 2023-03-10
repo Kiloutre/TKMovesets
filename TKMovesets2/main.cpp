@@ -87,15 +87,8 @@ static void InitMainClasses(MainWindow& program)
 // Free up memory and stop threads cleanly before exiting the program
 static void DestroyMainClasses(MainWindow& program)
 {
-	// todo: Clean this up, we don't need to instantiate multiple GameData classes.
-	// Maybe do the delete of .process inside StopThreadAndCleanup() as well
 	program.extractor.StopThreadAndCleanup();
-	delete program.extractor.process;
-	delete program.extractor.game;
-
 	program.importer.StopThreadAndCleanup();
-	delete program.importer.process;
-	delete program.importer.game;
 
 	for (EditorWindow* win : program.editorWindows) {
 		delete win;

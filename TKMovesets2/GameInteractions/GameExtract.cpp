@@ -86,6 +86,9 @@ void GameExtract::StopThreadAndCleanup()
 	if (m_extractor != nullptr) {
 		delete m_extractor;
 	}
+
+	delete process;
+	delete game;
 }
 
 bool GameExtract::CanStart()

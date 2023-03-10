@@ -86,6 +86,9 @@ void GameImport::StopThreadAndCleanup()
 		}
 		delete m_importer;
 	}
+
+	delete process;
+	delete game;
 }
 
 bool GameImport::CanStart()
