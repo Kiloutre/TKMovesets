@@ -22,7 +22,7 @@ private:
 	NavigationMenu navMenu;
 
 	// Attempt to load a moveset, open a new editor window on success
-	void LoadMoveset(movesetInfo* movesetInfos);
+	void LoadMovesetEditor(movesetInfo* movesetInfos);
 public:
 	// Extractor instance, can attach to its own process separately from everyone else
 	GameExtract extractor;

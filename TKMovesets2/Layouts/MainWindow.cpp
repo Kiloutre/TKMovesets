@@ -14,7 +14,8 @@
 
 // -- Private methods -- //
 
-void MainWindow::LoadMoveset(movesetInfo* movesetInfos)
+//
+void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 {
 	for (EditorWindow* win : editorWindows)
 	{
@@ -27,10 +28,15 @@ void MainWindow::LoadMoveset(movesetInfo* movesetInfos)
 	}
 
 	// todo: attempt to load. popup if fail. open window and std vector push back if not
-	EditorWindow* newWin = new EditorWindow(movesetInfos);
-	newWin->importer.Init(addrFile, &storage);
-	newWin->importer.StartThread();
-	editorWindows.push_back(newWin);
+	try {
+		EditorWindow* newWin = new EditorWindow(movesetInfos);
+		newWin->importer.Init(addrFile, &storage);
+		newWin->importer.StartThread();
+		editorWindows.push_back(newWin);
+	}
+	catch(EditorWindow_MovesetLoadFail) {
+		// Memory of the constructor was freed 
+	}
 }
 
 // -- Public methods -- //
@@ -109,7 +115,7 @@ void MainWindow::Update()
 				{
 					movesetInfo* moveset = editionMenu.Render(storage);
 					if (moveset != nullptr) {
-						LoadMoveset(moveset);
+						LoadMovesetEditor(moveset);
 					}
 				}
 				break;
@@ -133,10 +139,7 @@ void MainWindow::Update()
 			}
 			else {
 				editorWindows.erase(editorWindows.begin() + i);
-				// Free thread data
-				w->importer.StopThreadAndCleanup();
-				delete w->importer.process;
-				delete w->importer.game;
+				delete w;
 			}
 		}
 	}

@@ -11,18 +11,28 @@ struct EditorInfos
 	uint32_t gameId;
 };
 
+class EditorWindow_MovesetLoadFail : public std::exception
+{
+public:
+	const char* what() {
+		return "Error while loading moveset";
+	}
+};
+
 class EditorWindow {
 private:
 	// Contains basic informations about the currently loaded character
 	EditorInfos m_loadedCharacter;
 	// True if we need to enable the save button
 	bool m_savedLastChange = true;
-	// Contains the moveset data, allocated within our memory
-	void* m_moveset = nullptr;
 	// True if moveset changes are to be applied to the game instantly
 	bool m_liveEdition = false;
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
+	// Current moveset, will be written to memory on next import
+	byte* m_moveset = nullptr;
+	// Size of the moveset currently loaded
+	uint64_t m_movesetSize = 0;
 
 	// Render the top toolbar containing useful moveset editing tools
 	void RenderToolBar();
@@ -44,6 +54,8 @@ public:
 
 	// Constructor that loads the moveset
 	EditorWindow(movesetInfo* moveset);
+	// Destructor that deallocates the resources we allocated
+	~EditorWindow();
 	// Render the window
 	void Render(int dockid);
 };

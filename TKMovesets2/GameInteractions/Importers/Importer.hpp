@@ -34,11 +34,11 @@ public:
 	uint8_t characterCount = 1;
 
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
-	// Pure virtual base method meant to do the heavy lifting
-	virtual ImportationErrcode_ Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) = 0;
-	// Secondary import method taking bytes instead ofa file
+	// Import moveset from filename. Just a wrapper for Import(byte*...). Does not need to be overriden, will send the entire file to the Import() function.
+	ImportationErrcode_ Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress);
+	// Secondary import method taking bytes instead of a file
 	virtual ImportationErrcode_ Import(byte* moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) = 0;
-	// Returns true if extraction is possible (characters have been loaded)...
+	// Returns true if importation is possible
 	virtual bool CanImport() = 0;
 	// Look through movesets that we previously allocated in the game and free the unused ones
 	virtual void CleanupUnusedMovesets() = 0;

@@ -9,22 +9,6 @@
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
 
-// -- Static helpers -- //
-
-// Reads the the moveset size, allocate the moveset in our own memory and write to it
-static byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
-{
-	file.seekg(0, std::ios::end);
-	size_out = file.tellg();
-	byte* moveset = (byte*)malloc(size_out);
-	if (moveset != nullptr) {
-		file.seekg(0, std::ios::beg);
-		file.read((char*)moveset, size_out);
-	}
-	file.close();
-	return moveset;
-}
-
 // -- Private methods -- //
 
 void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
@@ -366,7 +350,7 @@ ImportationErrcode_ ImporterT7::Import(byte* moveset, uint64_t s_moveset, gameAd
 	ConvertMotaListOffsets(header.offsets, moveset, gameMoveset, playerAddress);
 	progress = 90;
 
-	// -- Allocation &Conversion finished -- //
+	// -- Allocation & Conversion finished -- //
 
 	// Finally write our moveset to the game's memory
 	m_process->writeBytes(gameMoveset, moveset, s_moveset);
@@ -386,32 +370,6 @@ ImportationErrcode_ ImporterT7::Import(byte* moveset, uint64_t s_moveset, gameAd
 	// -- Cleanup -- //
 
 	return ImportationErrcode_Successful;
-}
-
-ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
-{
-	progress = 0;
-	// Read file data
-	std::ifstream file(filename, std::ios::binary);
-
-	if (file.fail()) {
-		return ImportationErrcode_FileReadErr;
-	}
-
-	// Variables that will store the moveset size & the moveset itself in our own memory
-	uint64_t s_moveset;
-	byte* moveset;
-
-	// Allocate a copy of the moveset locally. This is NOT in the game's memory
-	moveset = getMovesetInfos(file, s_moveset);
-	if (moveset == nullptr) {
-		return ImportationErrcode_AllocationErr;
-	}
-
-	ImportationErrcode_ errcode = Import(moveset, s_moveset, playerAddress, applyInstantly, progress);
-
-	free(moveset);
-	return errcode;
 }
 
 bool ImporterT7::CanImport()

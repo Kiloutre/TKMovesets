@@ -97,11 +97,8 @@ static void DestroyMainClasses(MainWindow& program)
 	delete program.importer.process;
 	delete program.importer.game;
 
-	for (EditorWindow* win : program.editorWindows)
-	{
-		win->importer.StopThreadAndCleanup();
-		delete win->importer.process;
-		delete win->importer.game;
+	for (EditorWindow* win : program.editorWindows) {
+		delete win;
 	}
 
 	// Now that every thread that uses addrFile has stopped, we can free it

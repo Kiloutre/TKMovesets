@@ -114,13 +114,41 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 
 // -- Public methods -- //
 
-EditorWindow::EditorWindow(movesetInfo* moveset)
+EditorWindow::~EditorWindow()
 {
-	m_loadedCharacter.filename = moveset->filename;
-	m_loadedCharacter.name = moveset->name;
-	m_loadedCharacter.lastSavedDate = moveset->date;
-	m_loadedCharacter.gameId = moveset->gameId;
-	filename = moveset->filename;
+	importer.StopThreadAndCleanup();
+	delete importer.process;
+	delete importer.game;
+	free(m_moveset);
+}
+
+EditorWindow::EditorWindow(movesetInfo* movesetInfo)
+{
+
+	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
+
+	if (file.fail()) {
+		throw EditorWindow_MovesetLoadFail();
+	}
+
+	file.seekg(0, std::ios::end);
+	m_movesetSize = file.tellg();
+
+	m_moveset = (byte*)malloc(m_movesetSize);
+	if (m_moveset == nullptr) {
+		throw EditorWindow_MovesetLoadFail();
+	}
+
+	file.seekg(0, std::ios::beg);
+	file.read((char*)m_moveset, m_movesetSize);
+
+	file.close();
+
+	m_loadedCharacter.filename = movesetInfo->filename;
+	m_loadedCharacter.name = movesetInfo->name;
+	m_loadedCharacter.lastSavedDate = movesetInfo->date;
+	m_loadedCharacter.gameId = movesetInfo->gameId;
+	filename = movesetInfo->filename;
 }
 
 void EditorWindow::Render(int dockid)
