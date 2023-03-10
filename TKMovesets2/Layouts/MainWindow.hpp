@@ -19,14 +19,23 @@ class MainWindow {
 private:
 	NavigationMenu navMenu;
 	//StatusBar          statusBar;
-	Submenu_Extract extractMenu;
-	Submenu_Import importMenu;
 	//Submenu_OnlinePlay onlineMenu;
-	Submenu_Edition editionMenu;
 public:
+	// Extractor instance, can attach to its own process separately from everyone else
 	GameExtract extractor;
+	// Importer instance, can attach to its own process separately from everyone else
 	GameImport importer;
+	// Storage instance, use to access local moveset informations
 	LocalStorage storage;
+
+	// Extraction menu
+	Submenu_Extract extractMenu;
+
+	// Importation menu
+	Submenu_Import importMenu;
+
+	// Edition menu
+	Submenu_Edition editionMenu;
 
 	MainWindow(GLFWwindow* window, const char* c_glsl_version);
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there

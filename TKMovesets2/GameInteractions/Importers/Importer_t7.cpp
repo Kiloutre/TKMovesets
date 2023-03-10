@@ -49,20 +49,21 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
-	m_process->writeInt32(playerAddress + 0x1D4, 99999);
+	m_process->writeInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_timer"), 99999);
 	// Tell the game which move to play NEXT
-	m_process->writeInt64(playerAddress + 0xDA0, moveAddr);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + 0x350, moveId);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_id"), moveId);
 }
 
 void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
 {
+	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
 	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + 0x2C0);
 	gameAddr cameraMota2 = m_process->readInt64(movesetAddr + 0x2C8);
 
-	m_process->writeInt64(playerAddress + 0x14a0, cameraMota1);
-	m_process->writeInt64(playerAddress + 0x14a8, cameraMota2);
+	m_process->writeInt64(playerAddress + staticCameraOffset, cameraMota1);
+	m_process->writeInt64(playerAddress + staticCameraOffset + 0x8, cameraMota2);
 }
 
 void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)

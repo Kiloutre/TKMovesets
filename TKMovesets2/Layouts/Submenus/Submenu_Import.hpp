@@ -9,6 +9,6 @@ private:
 	ImportationErrcode_ m_err;
 
 public:
-	Submenu_Import() { m_err = ImportationErrcode_Successful;  };
+	Submenu_Import();
 	void Render(GameImport& importerHelper);
 };

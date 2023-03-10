@@ -6,12 +6,136 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 
-static void StartEditingMoveset(std::string filename)
-{
+// -- Static helpers -- //
 
+
+// -- Private methods -- //
+
+void Submenu_Edition::Save()
+{
+	// todo
+	m_savedLastChange = true;
 }
 
-void Submenu_Edition::Render(LocalStorage& storage)
+void Submenu_Edition::RenderToolBar(float navbarWidth)
+{
+	const ImVec2& Size = ImGui::GetMainViewport()->Size;
+	const float height = 30;
+	const float width = Size.x - navbarWidth;
+
+	ImGui::SetNextWindowPos(ImVec2(navbarWidth, 0));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(width, height), ImVec2(width, height));
+	ImGui::Begin("Editor ToolBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+	ImGui::Text("TOOLS");
+	ImGui::End();
+}
+
+void Submenu_Edition::RenderStatusBar(float navbarWidth)
+{
+	const ImVec2& Size = ImGui::GetMainViewport()->Size;
+	const float height = 30;
+	const float width = Size.x - navbarWidth;
+
+	ImGui::SetNextWindowPos(ImVec2(navbarWidth, Size.y - height));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(width, height), ImVec2(width, height));
+	ImGui::Begin("Editor StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.save"), !m_savedLastChange)) {
+		Save();
+	}
+	ImGui::SameLine();
+	
+	ImGui::TextUnformatted(_("edition.last_saved"));
+	ImGui::SameLine();
+	ImGui::TextUnformatted(Helpers::currentDateTime(m_loadedCharacter.lastSavedDate).c_str());
+	ImGui::SameLine();
+
+	// Vertical separator
+	ImGui::TextUnformatted("|");
+	ImGui::SameLine();
+
+	// Game list
+	int8_t currentGameId = importer.currentGameId;
+	ImGui::PushItemWidth(100.0f);
+	ImGui::PushID(&importer); // Have to push an ID here because extraction.select_game would cause a conflict
+	uint8_t gameListCount = Games::GetGamesCount();
+
+	if (ImGui::BeginCombo("##", (currentGameId == -1) ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
+	{
+		for (uint8_t i = 0; i < gameListCount; ++i)
+		{
+			GameInfo* game = Games::GetGameInfo(i);
+			if (game->importer != nullptr) {
+				if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
+					importer.SetTargetProcess(game->processName, i);
+				}
+			}
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::PopID();
+	ImGui::SameLine();
+
+
+	// Process error
+	bool isAttached = importer.process->IsAttached();
+	if (currentGameId != -1 && !isAttached) {
+		// Short process error message
+		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 0.0f);
+		ImGui::SameLine();
+	}
+
+	// Vertical separator
+	ImGui::TextUnformatted("|");
+	ImGui::SameLine();
+
+	// Player list
+	{
+		ImGui::SameLine();
+		char buf[3] = { '1' + importer.currentPlayerId, 'p', '\0' };
+		ImGui::PushItemWidth(100.0f);
+
+		uint8_t playerCount = min(2, importer.GetCharacterCount());
+		if (ImGui::BeginCombo("##", _(buf)))
+		{
+			size_t currentPlayerId = importer.currentPlayerId;
+			for (int8_t i = 0; i < playerCount; ++i)
+			{
+				buf[0] = '1' + i;
+				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
+					importer.currentPlayerId = i;
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
+	
+	// Import button
+	ImGui::SameLine();
+	bool canImport = isAttached && m_importNeeded && !importer.IsBusy();
+	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
+		importer.QueueCharacterImportation(m_loadedCharacter.filename);
+	}
+
+	// Live edition
+	ImGui::SameLine();
+	ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition);
+
+	ImGui::End();
+}
+
+bool Submenu_Edition::LoadMoveset(movesetInfo* moveset)
+{
+	m_loadedCharacter.filename = moveset->filename;
+	m_loadedCharacter.name = moveset->name;
+	m_loadedCharacter.lastSavedDate = moveset->date;
+	m_loadedCharacter.gameId = moveset->gameId;
+	return true;
+}
+
+//
+
+void Submenu_Edition::RenderMovesetSelector()
 {
 	ImGuiExtra::RenderTextbox(_("edition.explanation"));
 
@@ -28,11 +152,11 @@ void Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::TableHeadersRow();
 
 		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
-		ImGui::PushID(&storage);
-		for (size_t i = 0; i < storage.extractedMovesets.size(); ++i)
+		ImGui::PushID(&importer.storage);
+		for (size_t i = 0; i < importer.storage->extractedMovesets.size(); ++i)
 		{
 			// moveset is guaranteed not to be freed until after this loop
-			movesetInfo* moveset = storage.extractedMovesets[i];
+			movesetInfo* moveset = importer.storage->extractedMovesets[i];
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
@@ -60,7 +184,13 @@ void Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::PushID(moveset->filename.c_str());
 
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.edit"), moveset->editable)) {
-					StartEditingMoveset(moveset->filename);
+					if (LoadMoveset(moveset)) {
+						isEditing = true;
+						// todo: popup detecting moveset name change etc
+					}
+					else {
+						// todo : Show error
+					}
 				}
 				ImGui::PopID();
 			}
@@ -70,4 +200,16 @@ void Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::EndTable();
 	}
 
+}
+
+// -- Public methods -- //
+
+void Submenu_Edition::Render(float navbarWidth)
+{
+	if (isEditing) {
+		RenderToolBar(navbarWidth);
+		RenderStatusBar(navbarWidth);
+	} else {
+		RenderMovesetSelector();
+	}
 }

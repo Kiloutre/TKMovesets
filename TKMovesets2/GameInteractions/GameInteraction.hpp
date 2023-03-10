@@ -29,7 +29,7 @@ protected:
 	// Function ran in the parallel thread, executed regularly
 	void Update();
 public:
-	// Everything that is related to files is done through .storage. Listing, deleting, etc.
+	// Everything that is related to files is done through .storage. Listing, deleting, etc. We store this here because GameData* needs a storage copy anyway.
 	LocalStorage* storage = nullptr;
 	// Stores the ID of the currently opened game
 	int8_t currentGameId = -1;

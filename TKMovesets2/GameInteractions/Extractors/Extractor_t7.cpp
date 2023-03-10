@@ -209,7 +209,8 @@ byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 
 	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap, settings);
 
-	byte* customBlock = (byte*)malloc(size_out);
+	// Allocate 8 bytes minimum. Allocating 0 might cause problem, so this is safer.
+	byte* customBlock = (byte*)malloc(max(8, size_out));
 	if (customBlock == nullptr) {
 		size_out = 0;
 		return nullptr;

@@ -80,15 +80,13 @@ namespace ImGuiExtra
 
 	// This is a mess, does not work properly  and needs to be re-done entirely, to be honest.
 	// Todo: min / max size, allow centering of text
-	
-	void RenderTextbox2(const char* c_text, ImU32 borderColor, ImU32 fillColor, ImVec2 padding, ImVec2 minSize, ImVec2 maxSize)
-	{
-		// Todo
-	}
-	
 
-	void RenderTextbox(const char* c_text, ImU32 borderColor, ImU32 fillColor)
+	void RenderTextbox(const char* c_text, ImU32 borderColor, ImU32 fillColor, float padding)
 	{
+		float HORIZ_PADDING = (padding < 0.0f ) ? TEXTBOX_HORIZ_PADDING : padding;
+		float VERTICAL_PADDING = (padding < 0.0f) ? TEXTBOX_VERT_PADDING : padding;
+
+
 		// Get starting drawing pos (useful for border)
 		ImVec2 c_drawStart = ImGui::GetCursorPos();
 		// Todo: correct start pos when scrolling. This actually does not work for some reason. Must test more.
@@ -98,8 +96,8 @@ namespace ImGuiExtra
 		ImVec2 rectEnd;
 		{
 			{
-				ImVec2 textSize = ImGui::CalcTextSize(c_text, nullptr, false, ImGui::GetContentRegionAvail().x - (TEXTBOX_HORIZ_PADDING * 2.0f));
-				rectEnd = c_drawStart + textSize + (ImVec2(TEXTBOX_HORIZ_PADDING, TEXTBOX_VERT_PADDING) * 2.0f);
+				ImVec2 textSize = ImGui::CalcTextSize(c_text, nullptr, false, ImGui::GetContentRegionAvail().x - (HORIZ_PADDING * 2.0f));
+				rectEnd = c_drawStart + textSize + (ImVec2(HORIZ_PADDING, VERTICAL_PADDING) * 2.0f);
 			}
 
 			ImDrawList* drawlist = ImGui::GetWindowDrawList();
@@ -112,16 +110,16 @@ namespace ImGuiExtra
 		}
 
 		// Shift cursor position according to padding to not draw text at the top left of the box
-		ImGui::SetCursorPos(c_drawStart + ImVec2(TEXTBOX_HORIZ_PADDING, TEXTBOX_VERT_PADDING));
+		ImGui::SetCursorPos(c_drawStart + ImVec2(HORIZ_PADDING, VERTICAL_PADDING));
 
 		// Draw text
 		// I can't manage to reproduce the TextWrapped calculations so this works out for now
-		ImGui::PushTextWrapPos(rectEnd.x - TEXTBOX_HORIZ_PADDING);
+		ImGui::PushTextWrapPos(rectEnd.x - HORIZ_PADDING);
 		ImGui::Text(c_text);
 		ImGui::PopTextWrapPos();
 
 		// Fix cursor position that is incorrect after drawing the text
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + TEXTBOX_VERT_PADDING);
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + VERTICAL_PADDING);
 	}
 }
 

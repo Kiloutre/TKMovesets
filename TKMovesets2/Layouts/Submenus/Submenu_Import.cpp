@@ -6,6 +6,12 @@
 #include "imgui_extras.hpp"
 #include "Helpers.hpp"
 
+
+Submenu_Import::Submenu_Import()
+{
+	m_err = ImportationErrcode_Successful;
+};
+
 void Submenu_Import::Render(GameImport& importerHelper)
 {
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
@@ -15,8 +21,8 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		ImGui::TextUnformatted(_("importation.import_to"));
 		ImGui::SameLine();
 
-		// todo: show console or something? need status
-		uint8_t currentGameId = importerHelper.currentGameId;
+		// Game list
+		int8_t currentGameId = importerHelper.currentGameId;
 		ImGui::PushItemWidth(ImGui::CalcTextSize(_("select_game")).x * 1.5f);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 		uint8_t gameListCount = Games::GetGamesCount();

@@ -18,6 +18,7 @@ struct movesetInfo
 	uint64_t date;
 	float size;
 	time_t modificationDate;
+	uint32_t gameId;
 	bool editable;
 };
 

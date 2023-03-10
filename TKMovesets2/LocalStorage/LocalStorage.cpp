@@ -52,7 +52,8 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 				.date = movesetInfos->date,
 				.size = (float)totalSize / 1000 / 1000,
 				.modificationDate = buffer.st_mtime,
-				.editable = (Games::GetGameInfo(movesetInfos->gameId)->flags & GameFlag_MovesetEditable) != 0
+				.gameId = movesetInfos->gameId,
+				.editable = Games::IsGameEditable(movesetInfos->gameId)
 			};
 		}
 

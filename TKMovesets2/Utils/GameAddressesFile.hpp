@@ -17,7 +17,6 @@ private:
 	// Mutex used to avoid m_entries iterator crashing because of concurrent m_entries modification
 	std::mutex m_entries_mutex;
 public:
-
 	GameAddressesFile();
 
 	// Reload the game addresses file.

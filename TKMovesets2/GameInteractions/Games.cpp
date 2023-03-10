@@ -43,6 +43,8 @@ namespace Games
 		return sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo);
 	}
 
+	//
+
 	size_t GetExtractableGamesCount()
 	{
 		size_t count = 0;
@@ -67,6 +69,15 @@ namespace Games
 		return count;
 	}
 
+	//
+
+	bool IsGameEditable(uint8_t gameId)
+	{
+		return (GetGameInfo(gameId)->flags & GameFlag_MovesetEditable) > 0;
+	}
+
+	//
+	
 	Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
 	{
 		Extractor* ex = (Extractor*)cg_gamesInfo[gameId].extractor->allocate(process, game);

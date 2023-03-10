@@ -24,7 +24,7 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	// Initialize backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -57,26 +57,31 @@ void MainWindow::Update()
 		const float width = mainView->Size.x;
 		const float height = mainView->Size.y;
 
-		ImGui::SetNextWindowViewport(mainView->ID);
-		ImGui::SetNextWindowPos(mainView->Pos);
-		ImGui::SetNextWindowSize(mainView->Size);
-		ImGui::Begin("MainWindow", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
-
 		// Navbar
 		if (navMenuWidth > 0)
 		{
-			ImGui::SetNextWindowPos(mainView->Pos);
+			ImGui::SetNextWindowPos(ImVec2(0, 0));
 			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height - c_statusBarHeight));
 			ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 			navMenu.Render(navMenuWidth - 10);
 			ImGui::End();
 		}
 
+
 		// Menus
 		{
-			ImGui::SetNextWindowPos(ImVec2(mainView->Pos.x + navMenuWidth, mainView->Pos.y));
-			ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height - c_statusBarHeight));
-			ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+			bool renderMainContainer = true;
+
+			if (navMenu.menuId == NAV__MENU_EDITION && editionMenu.isEditing) {
+				renderMainContainer = false;
+			}
+
+			if (renderMainContainer)
+			{
+				ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
+				ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height - c_statusBarHeight));
+				ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+			}
 
 			switch (navMenu.menuId)
 			{
@@ -87,12 +92,11 @@ void MainWindow::Update()
 				importMenu.Render(importer);
 				break;
 			case NAV__MENU_ONLINE_PLAY:
-				//onlineMenu.Render();
 				break;
 			case NAV__MENU_CAMERA:
 				break;
 			case NAV__MENU_EDITION:
-				editionMenu.Render(storage);
+				editionMenu.Render(navMenuWidth);
 				break;
 			case NAV__MENU_DOCUMENTATION:
 				break;
@@ -100,9 +104,12 @@ void MainWindow::Update()
 				RenderSubmenu_About();
 				break;
 			}
-			ImGui::End();
+
+			if (renderMainContainer) {
+				ImGui::End();
+			}
+
 		}
-		ImGui::End();
 
 		// Status bar, currently not useful
 		if (c_statusBarHeight > 0)

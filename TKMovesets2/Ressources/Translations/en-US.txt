@@ -110,6 +110,10 @@ online.no_selected_moveset = No moveset selected
 # Moveset Edition #
 edition.explanation = You can hereedit extracted movesets. Refer to documentation for tutorials and helpful ressources.\nTurn on 'Live edition' for quickly modifying the custom moveset: Simple values changes will be instantly applied in memory with zero loading time.
 edition.select_moveset = Chose the moveset to modify
+edition.last_saved = Last save:
+edition.save = Save
+edition.process_err = Error
+edition.live_edition = Live edition
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.no_custom_loaded = Load a custom moveset in memory to be able turn on live edition
@@ -119,7 +123,6 @@ edition.warning_target_change = Changing selected player while live edition is o
 edition.custom_loaded = Custom moveset loaded
 edition.enable_live = Enable live edition
 edition.disable_live = Disable live edition
-edition.save = Save
 
 # Documentation #
 

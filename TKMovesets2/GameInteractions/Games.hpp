@@ -59,6 +59,9 @@ namespace Games
 	// Returns the amount of games that upport importation
 	DLLCONTENT size_t GetImportableGamesCount();
 
+	// Returns true if moveset edition on the moveset is allowed
+	bool IsGameEditable(uint8_t gameId);
+
 	// Istantiate a new game-dependant extractor
 	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game);
 
