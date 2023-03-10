@@ -21,6 +21,7 @@ namespace ImGuiExtra
 			// With multiple viewports, going outside of bounds completely break the program
 
 			// This serves as a safety margin: having a tooltip exactly the window's size or even slightly smaller still breaks things.
+			/*
 			const unsigned int margin = 20;
 
 			ImGuiViewport* currentView = ImGui::GetWindowViewport();
@@ -46,10 +47,12 @@ namespace ImGuiExtra
 			if (windowPos.y + windowSize.y >= maxBound.y) {
 				windowPos.y = maxBound.y - windowSize.y - margin;
 			}
+			*/
 
-			ImGui::SetNextWindowPos(windowPos);
+			//ImGui::SetNextWindowPos(windowPos);
 			ImGui::BeginTooltip();
 
+			float textWrapPos = ImGui::GetFontSize() * 35.0f;
 			ImGui::PushTextWrapPos(textWrapPos);
 			ImGui::TextUnformatted(desc);
 			ImGui::PopTextWrapPos();

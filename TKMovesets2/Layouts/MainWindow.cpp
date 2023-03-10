@@ -23,7 +23,7 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	// Setup ImGui config. This had to be done before initializing the backends
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	// Initialize backends
@@ -60,7 +60,7 @@ void MainWindow::Update()
 		// Navbar
 		if (navMenuWidth > 0)
 		{
-			ImGui::SetNextWindowPos(ImVec2(0, 0));
+			ImGui::SetNextWindowPos(mainView->Pos);
 			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height - c_statusBarHeight));
 			ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 			navMenu.Render(navMenuWidth - 10);
@@ -70,18 +70,9 @@ void MainWindow::Update()
 
 		// Menus
 		{
-			bool renderMainContainer = true;
-
-			if (navMenu.menuId == NAV__MENU_EDITION && editionMenu.isEditing) {
-				renderMainContainer = false;
-			}
-
-			if (renderMainContainer)
-			{
-				ImGui::SetNextWindowPos(ImVec2(navMenuWidth, 0));
-				ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height - c_statusBarHeight));
-				ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
-			}
+			ImGui::SetNextWindowPos(ImVec2(mainView->Pos.x + navMenuWidth, mainView->Pos.y));
+			ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height - c_statusBarHeight));
+			ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 			switch (navMenu.menuId)
 			{
@@ -96,7 +87,7 @@ void MainWindow::Update()
 			case NAV__MENU_CAMERA:
 				break;
 			case NAV__MENU_EDITION:
-				editionMenu.Render(navMenuWidth);
+				editionMenu.Render();
 				break;
 			case NAV__MENU_DOCUMENTATION:
 				break;
@@ -105,10 +96,7 @@ void MainWindow::Update()
 				break;
 			}
 
-			if (renderMainContainer) {
-				ImGui::End();
-			}
-
+			ImGui::End();
 		}
 
 		// Status bar, currently not useful
@@ -135,18 +123,6 @@ void MainWindow::Update()
 
 	// Do this here so that we're not modifying the moveset list at the same time as we're displaying it
 	storage.CleanupUnusedMovesetInfos();
-}
-
-void MainWindow::Render()
-{
-	// Render the frame buffer
-	ImGui::Render();
-
-	// Multi view
-	//ImGui::UpdatePlatformWindows();
-	//ImGui::RenderPlatformWindowsDefault();
-
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void MainWindow::Shutdown()

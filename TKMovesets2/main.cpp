@@ -1,7 +1,8 @@
-﻿// CMakeProject1.cpp : définit le point d'entrée de l'application.
-
-#include "glad/glad.h"
+﻿#include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <stdio.h>
 #include <format>
@@ -174,15 +175,13 @@ int main(int argc, wchar_t** argv, char** env)
 
 	// Init main program. This will get most things going and create the important threads
 	MainWindow program(window, c_glsl_version);
+	ImGuiIO& io = ImGui::GetIO();
 	InitMainClasses(program);
 
-	while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(window))
+	{
 		// Poll and handle events such as MKB inputs, window resize. Required
 		glfwPollEvents();
-		
-		// Set window BG
-		glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
-		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Probably framebuffer related? Required
 		program.NewFrame();
@@ -190,8 +189,24 @@ int main(int argc, wchar_t** argv, char** env)
 		// Main layout function : every we display is in there
 		program.Update();
 
-		// Finishing touch. There shouldn't be any reason to ever touch these.
-		program.Render();
+		// Let imgui do its stuff
+		ImGui::Render();
+		{
+			int display_w, display_h;
+			glfwGetFramebufferSize(window, &display_w, &display_h);
+			glViewport(0, 0, display_w, display_h);
+		}
+		glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
 		glfwSwapBuffers(window);
 	}
 

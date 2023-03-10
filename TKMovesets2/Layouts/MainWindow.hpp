@@ -42,8 +42,6 @@ public:
 	virtual void NewFrame();
 	// Main layout rendering function
 	virtual void Update();
-	// Makes the final ImGui and GLSL calls to display the window's content
-	void Render();
 	// Cleanup function
 	void Shutdown();
 };

@@ -17,28 +17,32 @@ void Submenu_Edition::Save()
 	m_savedLastChange = true;
 }
 
-void Submenu_Edition::RenderToolBar(float navbarWidth)
+void Submenu_Edition::RenderToolBar()
 {
-	const ImVec2& Size = ImGui::GetMainViewport()->Size;
-	const float height = 30;
-	const float width = Size.x - navbarWidth;
+	const ImVec2& Size = ImGui::GetWindowSize();
+	const ImVec2& Pos = ImGui::GetWindowPos();
+	const float height = 60;
+	const float width = Size.x;
 
-	ImGui::SetNextWindowPos(ImVec2(navbarWidth, 0));
-	ImGui::SetNextWindowSizeConstraints(ImVec2(width, height), ImVec2(width, height));
-	ImGui::Begin("Editor ToolBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+	//ImGui::SetNextWindowPos(Pos);
+	//ImGui::SetNextWindowSizeConstraints(ImVec2(0, height), ImVec2(width, height));
+	//ImGui::Begin("Editor ToolBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+	//ImGui::Begin("Editor ToolBar");
 	ImGui::Text("TOOLS");
-	ImGui::End();
+	//ImGui::End();
 }
 
-void Submenu_Edition::RenderStatusBar(float navbarWidth)
+void Submenu_Edition::RenderStatusBar()
 {
-	const ImVec2& Size = ImGui::GetMainViewport()->Size;
-	const float height = 30;
-	const float width = Size.x - navbarWidth;
+	const ImVec2& Size = ImGui::GetWindowSize();
+	const ImVec2& Pos = ImGui::GetWindowPos();
+	const float height = 60;
+	const float width = Size.x;
 
-	ImGui::SetNextWindowPos(ImVec2(navbarWidth, Size.y - height));
-	ImGui::SetNextWindowSizeConstraints(ImVec2(width, height), ImVec2(width, height));
-	ImGui::Begin("Editor StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+	//ImGui::SetNextWindowPos(ImVec2(Pos.x, Pos.y + Size.y - height));
+	//ImGui::SetNextWindowSizeConstraints(ImVec2(0, height), ImVec2(width, height));
+	//ImGui::Begin("Editor StatusBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav);
+
 
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.save"), !m_savedLastChange)) {
 		Save();
@@ -81,7 +85,7 @@ void Submenu_Edition::RenderStatusBar(float navbarWidth)
 	bool isAttached = importer.process->IsAttached();
 	if (currentGameId != -1 && !isAttached) {
 		// Short process error message
-		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 0.0f);
+		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 2.5f);
 		ImGui::SameLine();
 	}
 
@@ -121,7 +125,7 @@ void Submenu_Edition::RenderStatusBar(float navbarWidth)
 	ImGui::SameLine();
 	ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition);
 
-	ImGui::End();
+	//ImGui::End();
 }
 
 bool Submenu_Edition::LoadMoveset(movesetInfo* moveset)
@@ -185,7 +189,7 @@ void Submenu_Edition::RenderMovesetSelector()
 
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.edit"), moveset->editable)) {
 					if (LoadMoveset(moveset)) {
-						isEditing = true;
+						popen = true;
 						// todo: popup detecting moveset name change etc
 					}
 					else {
@@ -204,12 +208,23 @@ void Submenu_Edition::RenderMovesetSelector()
 
 // -- Public methods -- //
 
-void Submenu_Edition::Render(float navbarWidth)
+void Submenu_Edition::Render()
 {
-	if (isEditing) {
-		RenderToolBar(navbarWidth);
-		RenderStatusBar(navbarWidth);
-	} else {
-		RenderMovesetSelector();
+	RenderMovesetSelector();
+
+	ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Once);
+	if (m_popen)
+	{
+		// todo: title should be character name based
+		if (ImGui::Begin("newin", &m_popen, ImGuiWindowFlags_NoDocking))
+		{
+			RenderToolBar();
+			const ImVec2& Size = ImGui::GetContentRegionAvail();
+			ImGuiID dockId = ImGui::DockSpace(2, ImVec2(Size.x, Size.y - 40));
+			// Render windows, send dockId
+			// RenderEditorWindows(dockId);
+			RenderStatusBar();
+		}
+		ImGui::End();
 	}
 }
