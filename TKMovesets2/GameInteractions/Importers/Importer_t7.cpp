@@ -58,7 +58,7 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 
 void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
 {
-	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
+	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_camera_mota_offset");
 	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + 0x2C0);
 	gameAddr cameraMota2 = m_process->readInt64(movesetAddr + 0x2C8);
 
@@ -333,9 +333,6 @@ ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddr
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
 
-	// Moveset allocated IN-GAME. 
-	gameAddr gameMoveset;
-
 	// -- File reading & allocations -- //
 
 
@@ -349,7 +346,7 @@ ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddr
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
-	gameMoveset = m_process->allocateMem(s_moveset);
+	const gameAddr gameMoveset = m_process->allocateMem(s_moveset);
 	if (gameMoveset == 0) {
 		free(moveset);
 		return ImportationErrcode_GameAllocationErr;

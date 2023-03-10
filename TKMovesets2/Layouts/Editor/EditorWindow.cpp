@@ -61,7 +61,8 @@ void EditorWindow::RenderStatusBar()
 
 	// Process error
 	bool isAttached = importer.process->IsAttached();
-	if (currentGameId != -1 && !isAttached) {
+	if (currentGameId != -1 && !isAttached)
+	{
 		// Short process error message
 		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 2.5f);
 		ImGui::SameLine();
@@ -94,7 +95,7 @@ void EditorWindow::RenderStatusBar()
 	
 	// Import button
 	ImGui::SameLine();
-	bool canImport = isAttached && m_importNeeded && !importer.IsBusy();
+	bool canImport = isAttached && m_importNeeded && !importer.IsBusy() && importer.CanStart();
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		importer.QueueCharacterImportation(m_loadedCharacter.filename);
 	}
