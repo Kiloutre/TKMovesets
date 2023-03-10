@@ -11,15 +11,14 @@
 
 // -- Static helpers -- //
 
-// Reads the moveset header size, the moveset size (post header), allocate the moveset in our own memory and write to it
-static byte* getMovesetInfos(std::ifstream& file, MovesetHeader* header, uint64_t& size_out)
+// Reads the the moveset size, allocate the moveset in our own memory and write to it
+static byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
 {
-	file.read((char*)header, sizeof(MovesetHeader));
 	file.seekg(0, std::ios::end);
 	size_out = file.tellg();
-	byte* moveset = (byte*)malloc(size_out - header->infos.header_size);
+	byte* moveset = (byte*)malloc(size_out);
 	if (moveset != nullptr) {
-		file.seekg( header->infos.header_size + header->offsets.movesetInfoBlock, std::ios::beg);
+		file.seekg(0, std::ios::beg);
 		file.read((char*)moveset, size_out);
 	}
 	file.close();
@@ -131,7 +130,7 @@ void ImporterT7::ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, co
 	for (size_t i = 0; i < offsets->requirementCount; ++i)
 	{
 		// 217 = Is current char specific ID
-		// When the requirement ask "am i X character ID", X = extracted character ID,
+		// When the requirement ask "am i X character ID", X = extracted character ID
 		// i will change that X character ID to be the one of the current character, to make it always true.
 		// When the requirement ask for any other character ID, i will supply a character ID that ISN'T the current one, to make it always false.
 
@@ -313,20 +312,8 @@ static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
 	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
 }
 
-ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
+ImportationErrcode_ ImporterT7::Import(byte* moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
-	progress = 0;
-	// Read file data
-	std::ifstream file(filename, std::ios::binary);
-
-	if (file.fail()) {
-		return ImportationErrcode_FileReadErr;
-	}
-
-	// Variables that will store the moveset size & the moveset itself in our own memory
-	uint64_t s_moveset;
-	byte* moveset;
-
 	// Header of the moveset that will contain our own information about it
 	MovesetHeader header;
 
@@ -335,14 +322,16 @@ ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddr
 
 	// -- File reading & allocations -- //
 
-
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
-	moveset = getMovesetInfos(file, &header, s_moveset);
-	if (moveset == nullptr) {
-		return ImportationErrcode_AllocationErr;
-	}
+	memcpy_s(&header, sizeof(MovesetHeader), moveset, sizeof(MovesetHeader));
 	progress = 20;
 
+	{
+		// Correct moveset & s_moveset : skip our own header
+		uint64_t movesetStartOffset = header.infos.header_size + header.offsets.movesetInfoBlock;
+		moveset += movesetStartOffset;
+		s_moveset -= movesetStartOffset;
+	}
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
@@ -394,11 +383,35 @@ ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddr
 		SetCurrentMove(playerAddress, gameMoveset, 32769);
 	}
 
-
 	// -- Cleanup -- //
 
-	free(moveset);
 	return ImportationErrcode_Successful;
+}
+
+ImportationErrcode_ ImporterT7::Import(const char* filename, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
+{
+	progress = 0;
+	// Read file data
+	std::ifstream file(filename, std::ios::binary);
+
+	if (file.fail()) {
+		return ImportationErrcode_FileReadErr;
+	}
+
+	// Variables that will store the moveset size & the moveset itself in our own memory
+	uint64_t s_moveset;
+	byte* moveset;
+
+	// Allocate a copy of the moveset locally. This is NOT in the game's memory
+	moveset = getMovesetInfos(file, s_moveset);
+	if (moveset == nullptr) {
+		return ImportationErrcode_AllocationErr;
+	}
+
+	ImportationErrcode_ errcode = Import(moveset, s_moveset, playerAddress, applyInstantly, progress);
+
+	free(moveset);
+	return errcode;
 }
 
 bool ImporterT7::CanImport()
