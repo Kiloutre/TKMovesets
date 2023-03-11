@@ -3,12 +3,13 @@
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
 
+#include "GameAddresses.h"
+
 struct EditorMovelist_Move
 {
 	std::string name;
 	uint16_t aliasId;
-	bool isAttack;
-	bool isThrow;
+	uint16_t flags;
 };
 
 struct EditorInfos
@@ -17,6 +18,12 @@ struct EditorInfos
 	std::string name;
 	uint64_t lastSavedDate;
 	uint32_t gameId;
+};
+
+struct MovesetInfos
+{
+	std::vector<uint16_t> aliases;
+	std::vector<void*> moves;
 };
 
 class EditorWindow_MovesetLoadFail : public std::exception
@@ -44,7 +51,11 @@ private:
 	// If the moveset can be live edited or not
 	bool m_liveEditable = true;
 	// Stores the address, in-game, of the moveset we loaded. 0 if none loaded.
-	gameAddr loadedMoveset = 0;
+	gameAddr m_loadedMoveset = 0;
+	// Buffer containing the move to play text
+	char m_moveToPlayBuf[7]{ 0 };
+	//
+	int32_t m_moveToPlay = -1;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -56,6 +67,7 @@ private:
 	// Render the list of moves
 	void RenderMovelist();
 
+	int16_t ValidateMoveId(const char* buf);
 	// Returns true if our allocated moveset is still loaded on our character
 	bool MovesetStillLoaded();
 	// Save the loaded moveset to a file

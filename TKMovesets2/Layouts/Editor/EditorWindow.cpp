@@ -9,11 +9,27 @@
 
 // -- Private methods -- //
 
+int16_t EditorWindow::ValidateMoveId(const char* buf)
+{
+	int moveId = atoi(buf);
+
+	const int movelistSize = 2000; // todo
+	if (moveId >= movelistSize)
+	{
+		const int aliasesCount = 100; // todo
+		if (moveId < 0x8000 || moveId > (0x8000 + aliasesCount)) {
+			return -1;
+		}
+	}
+
+	return (int16_t)moveId;
+}
+
 bool EditorWindow::MovesetStillLoaded()
 {
 	// todo: check if moveset
 	gameAddr movesetAddress = importerHelper.importer->GetMovesetAddress(importerHelper.currentPlayerId);
-	return movesetAddress == loadedMoveset;
+	return movesetAddress == m_loadedMoveset;
 }
 
 void EditorWindow::Save()
@@ -59,7 +75,7 @@ void EditorWindow::RenderStatusBar()
 			if (game->importer != nullptr) {
 				if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 					importerHelper.SetTargetProcess(game->processName, i);
-					loadedMoveset = 0;
+					m_loadedMoveset = 0;
 					m_liveEdition = false;
 					m_importNeeded = true;
 				}
@@ -111,7 +127,7 @@ void EditorWindow::RenderStatusBar()
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		importerHelper.lastLoadedMoveset = 0;
 		importerHelper.QueueCharacterImportation(m_moveset, m_movesetSize);
-		loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
+		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
 		m_liveEdition = false;
 		m_importNeeded = false;
 	}
@@ -119,14 +135,14 @@ void EditorWindow::RenderStatusBar()
 	// Live edition. Might not be implemented for every game.
 	if (m_liveEditable)
 	{
-		if (loadedMoveset == 0) {
+		if (m_loadedMoveset == 0) {
 			ImGui::BeginDisabled();
 		}
 		ImGui::SameLine();
 		ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition);
 		ImGui::SameLine();
 		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"));
-		if (loadedMoveset == 0) {
+		if (m_loadedMoveset == 0) {
 			ImGui::EndDisabled();
 		}
 	}
@@ -177,41 +193,55 @@ void EditorWindow::RenderMovelist()
 	}
 
 	// Movelist. Leave some 50 units of space for move player
-	ImVec2 Size = ImVec2(0, ImGui::GetContentRegionAvail().y - 60);
-	ImGui::BeginTable("MovelistTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY
-	| ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit, Size);
-	ImGui::TableSetupColumn("ID");
-	ImGui::TableSetupColumn(_("edition.move_name"));
-
-	for (unsigned int i = 0; i < 2000; ++i)
+	ImVec2 Size = ImGui::GetContentRegionAvail();
+	Size.y -= 30;
+	if (ImGui::BeginTable("MovelistTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+		| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY, Size))
 	{
-		ImGui::TableNextColumn();
-		ImGui::TextUnformatted(std::format("{}", i).c_str());
+		ImGui::TableSetupColumn("move ID");
+		ImGui::TableSetupColumn(_("edition.move_name"));
+		ImGui::TableHeadersRow();
 
-		ImGui::TableNextColumn();
-		ImGui::TextUnformatted("nom");
-		ImGui::TableNextRow();
+		for (unsigned int i = 0; i < 2000; ++i)
+		{
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(std::format("{}", i).c_str());
+
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted("nom");
+			ImGui::TableNextRow();
+		}
+
+		ImGui::EndTable();
 	}
 
-	ImGui::EndTable();
 
-	// Move player
-	uint16_t moveId = 32769;
-	ImGui::BeginTable("MovelistPlay", 2);
-	ImGui::TableNextRow();
-	ImGui::TableNextColumn();
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), loadedMoveset != 0))
+	// Set player move
+	if (ImGui::InputText("##", m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1))
+	{
+		for (size_t i = 0; m_moveToPlayBuf[i]; ++i)
+		{
+			char c = m_moveToPlayBuf[i];
+			if (!isdigit(c)) {
+				m_moveToPlayBuf[i] = '\0';
+				break;
+			}
+		}
+
+		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
+	}
+
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1))
 	{
 		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(0);
-		importerHelper.importer->SetCurrentMove(playerAddress, loadedMoveset, moveId);
+		importerHelper.importer->SetCurrentMove(playerAddress, m_loadedMoveset, m_moveToPlay);
 	}
-	ImGui::TableNextColumn();
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), loadedMoveset != 0))
+	ImGui::SameLine();
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), m_loadedMoveset != 0 && m_moveToPlay != -1))
 	{
 		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(1);
-		importerHelper.importer->SetCurrentMove(playerAddress, loadedMoveset, moveId);
+		importerHelper.importer->SetCurrentMove(playerAddress, m_loadedMoveset, m_moveToPlay);
 	}
-	ImGui::EndTable();
 }
 
 // -- Public methods -- //
@@ -255,17 +285,17 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 void EditorWindow::Render(int dockid)
 {
 	// Check for important changes here
-	if (loadedMoveset != 0) {
+	if (m_loadedMoveset != 0) {
 		if (!MovesetStillLoaded())
 		{
 			m_liveEdition = false;
 			m_importNeeded = true;
-			loadedMoveset = 0;
+			m_loadedMoveset = 0;
 		}
 	}
 	else {
 		// If the moveset was successfully imported, this will be filled with a nonzero value
-		loadedMoveset = importerHelper.lastLoadedMoveset;
+		m_loadedMoveset = importerHelper.lastLoadedMoveset;
 	}
 
 	// Layout start
@@ -287,20 +317,19 @@ void EditorWindow::Render(int dockid)
 	{
 		RenderToolBar();
 
-		const ImVec2& Size = ImGui::GetContentRegionAvail();
-
+		ImVec2 Size = ImGui::GetContentRegionAvail();
+		Size.y -= 30;
 		if (ImGui::BeginTable("MovesetMainTable", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders
-		| ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_SizingFixedSame))
+		| ImGuiTableFlags_RowBg | ImGuiTableFlags_NoHostExtendY, Size))
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-
 			RenderMovelist();
-
 
 			ImGui::TableNextColumn();
 
-			ImGuiID dockId = ImGui::DockSpace(dockid + 2);
+
+			ImGuiID dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - 5));
 			RenderMovesetData(dockId);
 
 			ImGui::EndTable();
