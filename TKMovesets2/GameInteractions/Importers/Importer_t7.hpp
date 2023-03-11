@@ -18,20 +18,20 @@ class DLLCONTENT ImporterT7 : public Importer
 {
 private:
 	// In our locally allocated moveset, correct the mota lists offsets or copy the motas from the currently loaded character if we can't provide them
-	void ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset, gameAddr playerAddress);
+	void ConvertMotaListOffsets(const TKMovesetHeader_offsets& offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress);
 	// In our locally allocated movest, correct the lists pointing to the various moveset structure lists
-	void ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset);
+	void ConvertMovesetTableOffsets(const TKMovesetHeader_offsets& offsets, Byte* moveset, gameAddr gameMoveset);
 	//  Convert indexes of moves, cancels, hit conditions, etc... into ptrs
-	void ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets);
+	void ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, const StructsT7_gameAddr::MovesetTable* offsets, const TKMovesetHeader_offsets& blockOffsets);
 
 	// Write the player's camera motas to his structure. This is required for proper camera mota importation, and does not break anything of those camera mota have not been imported by us
 	void WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress);
 	// Fixes move that rely on correct character IDs to work
-	void ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader& header);
+	void ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* offsets, const TKMovesetHeader& header);
 
 public:
 	using Importer::Importer; // Inherit constructor too
-	ImportationErrcode_ Import(const byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
+	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;
 

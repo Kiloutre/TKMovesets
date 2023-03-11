@@ -49,9 +49,9 @@ enum ExtractionErrcode_
 namespace ExtractorUtils
 {
 	// Write a list of blocks, each aligned on a 8 bytes basis
-	void WriteFileData(std::ofstream& file, std::vector<std::pair<byte*, uint64_t>>& blocks, uint8_t& progress, uint8_t progress_max);
+	void WriteFileData(std::ofstream& file, std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t& progress, uint8_t progress_max);
 	// Calcualte a crc32 from a list of data blocks. Always skip the first one.
-	uint32_t CalculateCrc32(std::vector<std::pair<byte*, uint64_t>>& blocks);
+	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks);
 	// Returns the size in bytes of a 0xC8 in 
 	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim);
 	// Compress
@@ -73,7 +73,7 @@ protected:
 	GameData* m_game;
 
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
-	byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
+	Byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
 	// Generates the full filepath and the full tmp filepath to write to
 	void GetFilepath(const char* characterName, std::string& out, std::string& out_tmp, bool overwriteSameFilename);
 

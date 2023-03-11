@@ -115,6 +115,7 @@ void EditorWindow::RenderStatusBar()
 				buf[0] = '1' + i;
 				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
 					importerHelper.currentPlayerId = i;
+					importerHelper.lastLoadedMoveset = 0;
 				}
 			}
 			ImGui::EndCombo();
@@ -194,22 +195,22 @@ void EditorWindow::RenderMovelist()
 
 	// Movelist. Leave some 50 units of space for move player
 	ImVec2 Size = ImGui::GetContentRegionAvail();
-	Size.y -= 30;
+	Size.y -= 80;
 	if (ImGui::BeginTable("MovelistTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
-		| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY, Size))
+		| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedFit, Size))
 	{
-		ImGui::TableSetupColumn("move ID");
+		ImGui::TableSetupColumn("ID");
 		ImGui::TableSetupColumn(_("edition.move_name"));
 		ImGui::TableHeadersRow();
 
-		for (unsigned int i = 0; i < 2000; ++i)
+		for (DisplayableMove* move : m_movelist)
 		{
+			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(std::format("{}", i).c_str());
+			ImGui::TextUnformatted(std::format("{}", move->moveId).c_str());
 
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted("nom");
-			ImGui::TableNextRow();
+			ImGui::TextUnformatted(move->name.c_str());
 		}
 
 		ImGui::EndTable();
@@ -217,8 +218,11 @@ void EditorWindow::RenderMovelist()
 
 
 	// Set player move
-	if (ImGui::InputText("##", m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1))
+	float inputWidth = ImGui::GetContentRegionAvail().x;
+	ImGui::PushItemWidth(inputWidth);
+	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1), ImGuiInputTextFlags_CharsDecimal)
 	{
+		// todo: the flag and this loop should filter out bad characters. As it stands, it doesn't. Fix.
 		for (size_t i = 0; m_moveToPlayBuf[i]; ++i)
 		{
 			char c = m_moveToPlayBuf[i];
@@ -230,14 +234,16 @@ void EditorWindow::RenderMovelist()
 
 		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
 	}
+	ImGui::PopItemWidth();
 
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1))
+	ImVec2 buttonSize = ImVec2(inputWidth / 2 - 5, 0);
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize))
 	{
 		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(0);
 		importerHelper.importer->SetCurrentMove(playerAddress, m_loadedMoveset, m_moveToPlay);
 	}
 	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), m_loadedMoveset != 0 && m_moveToPlay != -1))
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize))
 	{
 		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(1);
 		importerHelper.importer->SetCurrentMove(playerAddress, m_loadedMoveset, m_moveToPlay);
@@ -249,11 +255,14 @@ void EditorWindow::RenderMovelist()
 EditorWindow::~EditorWindow()
 {
 	importerHelper.StopThreadAndCleanup();
+	delete m_editor;
 	free(m_moveset);
 }
 
 EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 {
+	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, importerHelper.process, importerHelper.game);
+
 	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
 
 	if (file.fail()) {
@@ -263,7 +272,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 	file.seekg(0, std::ios::end);
 	m_movesetSize = file.tellg();
 
-	m_moveset = (byte*)malloc(m_movesetSize);
+	m_moveset = (Byte*)malloc(m_movesetSize);
 	if (m_moveset == nullptr) {
 		throw EditorWindow_MovesetLoadFail();
 	}
@@ -273,6 +282,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 
 	file.close();
 
+	m_editor->LoadMoveset(m_moveset, m_movesetSize);
 	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId);
 
 	m_loadedCharacter.filename = movesetInfo->filename;
@@ -280,6 +290,9 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 	m_loadedCharacter.lastSavedDate = movesetInfo->date;
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 	filename = movesetInfo->filename;
+
+	// Read what needs to be read and potentially displayed right away
+	m_movelist = m_editor->GetDisplayableMoveList();
 }
 
 void EditorWindow::Render(int dockid)

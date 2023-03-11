@@ -86,6 +86,22 @@ namespace Helpers
 		return true;
 	}
 
+	bool startsWith(std::string str, std::string prefix)
+	{
+		if (str.length() < prefix.length())
+			return false;
+
+		for (size_t i = 0; prefix[i]; ++i)
+		{
+			if (prefix[i] != str[i]) {
+				return false;
+			}
+			++i;
+		}
+
+		return true;
+	}
+
 	std::string getMovesetNameFromFilename(std::string filename)
 	{
 		size_t lastSlash = filename.find_last_of("/\\");

@@ -11,6 +11,7 @@ set(INCLUDE_FOLDERS
                     "GameInteractions"
                     "GameInteractions/Extractors"
                     "GameInteractions/Importers"
+                    "Editors"
                     "LocalStorage"
                     "Utils"
 )
@@ -65,6 +66,7 @@ set(IMPORTEXPORT_SOURCES
                     # Game-specific
                     "GameInteractions/Extractors/Extractor_t7.cpp"
                     "GameInteractions/Importers/Importer_t7.cpp"
+                    "Editors/Editor_t7.cpp"
 )
 
 ## Build ##

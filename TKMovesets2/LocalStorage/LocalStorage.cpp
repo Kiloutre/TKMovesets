@@ -22,17 +22,17 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 
 	if (!file.fail()) {
 
-		MovesetHeader header{ 0 };
-		file.read((char*)&header, sizeof(MovesetHeader));
+		TKMovesetHeader header{ 0 };
+		file.read((char*)&header, sizeof(TKMovesetHeader));
 
 		size_t readBytes = file.gcount();
 		file.seekg(0, std::ios::end);
 		size_t totalSize = file.tellg();
 		file.close();
 
-		MovesetHeader_infos* movesetInfos = (MovesetHeader_infos*)&header;
+		TKMovesetHeader_infos* movesetInfos = (TKMovesetHeader_infos*)&header;
 
-		if (readBytes != sizeof(MovesetHeader) ||
+		if (readBytes != sizeof(TKMovesetHeader) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->version_string, sizeof(movesetInfos->version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->origin, sizeof(movesetInfos->origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->target_character, sizeof(movesetInfos->target_character))) {

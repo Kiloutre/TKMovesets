@@ -15,7 +15,7 @@ private:
 	// Movesets (files) to import and corresponding player address 
 	std::vector<std::pair<std::string, gameAddr>> m_plannedFileImportations;
 	// Movesets (data, size) to import and corresponding player address
-	std::vector<std::tuple<byte*, uint64_t, gameAddr>> m_plannedImportations;
+	std::vector<std::tuple<Byte*, uint64_t, gameAddr>> m_plannedImportations;
 	// List of errors, one extraction fail = 1 error
 	std::vector<ImportationErrcode_> m_errors;
 
@@ -51,7 +51,7 @@ public:
 	// Queue a character importation from file
 	void QueueCharacterImportation(std::string filename);
 	// Queue a character importation from moveset data.
-	void QueueCharacterImportation(byte* moveset, uint64_t movesetSize);
+	void QueueCharacterImportation(Byte* moveset, uint64_t movesetSize);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to

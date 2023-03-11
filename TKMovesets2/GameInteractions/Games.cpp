@@ -1,6 +1,8 @@
 #include "Games.hpp"
+
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
+#include "Editor_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
 // THe IDs correspond to the index of the game in the list
@@ -12,6 +14,7 @@ const GameInfo cg_gamesInfo[] = {
 		.flags = GameFlag_MovesetEditable | GameFlag_MovesetLiveEditable,
 		.extractor = new FactoryType<ExtractorT7>,
 		.importer = new FactoryType<ImporterT7>,
+		.editor = new FactoryType <EditorT7>
 	},
 	{
 		.name = "Tekken 8",
@@ -19,7 +22,8 @@ const GameInfo cg_gamesInfo[] = {
 		.characterCount = 2,
 		.flags = 0,
 		.extractor = nullptr,
-		.importer = nullptr
+		.importer = nullptr,
+		.editor = nullptr
 	},
 	{
 		.name = "Tekken Tag 2",
@@ -28,6 +32,7 @@ const GameInfo cg_gamesInfo[] = {
 		.flags = 0,
 		.extractor = nullptr,
 		.importer = nullptr,
+		.editor = nullptr
 	},
 };
 
@@ -95,5 +100,12 @@ namespace Games
 		Importer* im = (Importer*)cg_gamesInfo[gameId].importer->allocate(process, game);
 		im->characterCount = cg_gamesInfo[gameId].characterCount;
 		return im;
+	}
+
+	Editor* FactoryGetEditor(uint8_t gameId, GameProcess* process, GameData* game)
+	{
+		Editor* ed = (Editor*)cg_gamesInfo[gameId].editor->allocate(process, game);
+		//ed->characterCount = cg_gamesInfo[gameId].characterCount;
+		return ed;
 	}
 };

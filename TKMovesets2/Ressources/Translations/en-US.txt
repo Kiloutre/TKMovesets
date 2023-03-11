@@ -120,6 +120,7 @@ edition.moves_all = All
 edition.moves_attacks = Attacks
 edition.moves_generic = Generic
 edition.moves_throws = Throws
+edition.move_id_hint = Move ID...
 edition.play_move_1p = Play (1P)
 edition.play_move_2p = Play (2P)
 

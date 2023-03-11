@@ -2,6 +2,7 @@
 
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
+#include "Editor.hpp"
 
 #include "GameAddresses.h"
 
@@ -45,7 +46,7 @@ private:
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
 	// Current moveset, will be written to memory on next import
-	byte* m_moveset = nullptr;
+	Byte* m_moveset = nullptr;
 	// Size of the moveset currently loaded
 	uint64_t m_movesetSize = 0;
 	// If the moveset can be live edited or not
@@ -54,8 +55,14 @@ private:
 	gameAddr m_loadedMoveset = 0;
 	// Buffer containing the move to play text
 	char m_moveToPlayBuf[7]{ 0 };
-	//
+	// Store the move to play as a int32_t, or -1 if the move id is invalid (checks are made against the moveset data)
 	int32_t m_moveToPlay = -1;
+	// Access moveset data through this variable. Uses polymorphism.
+	Editor* m_editor = nullptr;
+	// Contains the backup of movelist displayed at all times
+	std::vector<DisplayableMove*> m_movelist;
+	// Contains the movelist displayed at all times, may get sorted and/or filtered
+	std::vector<DisplayableMove*> m_filteredMovelist;
 
 
 	// Render the top toolbar containing useful moveset editing tools

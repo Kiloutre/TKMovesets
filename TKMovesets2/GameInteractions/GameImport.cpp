@@ -115,11 +115,11 @@ bool GameImport::IsBusy()
 	return m_plannedFileImportations.size() > 0 || m_plannedImportations.size() > 0;
 }
 
-void GameImport::QueueCharacterImportation(byte* moveset, uint64_t movesetSize)
+void GameImport::QueueCharacterImportation(Byte* moveset, uint64_t movesetSize)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = importer->GetCharacterAddress(currentPlayerId);
-	m_plannedImportations.push_back(std::tuple<byte*, uint64_t, gameAddr>(moveset, movesetSize, playerAddress));
+	m_plannedImportations.push_back(std::tuple<Byte*, uint64_t, gameAddr>(moveset, movesetSize, playerAddress));
 }
 
 void GameImport::QueueCharacterImportation(std::string filename)

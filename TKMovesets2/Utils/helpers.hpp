@@ -23,6 +23,8 @@ namespace Helpers
 
     // Returns true if a string ends with [suffix]
     bool endsWith(std::string str, std::string suffix);
+    // Returns true if a string starts with [prefix]
+    bool startsWith(std::string str, std::string prefix);
     //bool endsWith(std::u32string str, std::u32string suffix);
 
     // Converts filename into displayable name. U32 for UTF8

@@ -49,7 +49,7 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 	m_process->writeInt64(playerAddress + staticCameraOffset + 0x8, cameraMota2);
 }
 
-void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
+void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeader_offsets& offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
@@ -75,7 +75,7 @@ void ImporterT7::ConvertMotaListOffsets(const MovesetHeader_offsets& offsets, by
 	}
 }
 
-void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets, byte* moveset, gameAddr gameMoveset)
+void ImporterT7::ConvertMovesetTableOffsets(const TKMovesetHeader_offsets& offsets, Byte* moveset, gameAddr gameMoveset)
 {
 	gAddr::MovesetTable* table = (gAddr::MovesetTable*)(moveset + offsets.tableBlock);
 	gameAddr offset = gameMoveset + offsets.movesetBlock;
@@ -101,7 +101,7 @@ void ImporterT7::ConvertMovesetTableOffsets(const MovesetHeader_offsets& offsets
 	table->throws += offset;
 }
 
-void ImporterT7::ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const MovesetHeader& header)
+void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const TKMovesetHeader& header)
 {
 	// In movesets, some moves (for some reason) can be transitionned into only on specific character IDs
 	// I am taking about mundane moves such as EWHF not working where WHF does
@@ -124,7 +124,7 @@ void ImporterT7::ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, co
 	}
 }
 
-void ImporterT7::ConvertMovesetIndexes(byte* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const MovesetHeader_offsets& blockOffsets)
+void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const TKMovesetHeader_offsets& blockOffsets)
 {
 	size_t i;
 	gameAddr blockOffset = gameMoveset + blockOffsets.movesetBlock;
@@ -296,13 +296,13 @@ static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
 	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
 }
 
-ImportationErrcode_ ImporterT7::Import(const byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
+ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
 	// Will contain our moveset copy. We do not modify orig_moveset.
-	byte* moveset;
+	Byte* moveset;
 
 	// Header of the moveset that will contain our own information about it
-	MovesetHeader header;
+	TKMovesetHeader header;
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -310,14 +310,14 @@ ImportationErrcode_ ImporterT7::Import(const byte* orig_moveset, uint64_t s_move
 	// -- File reading & allocations -- //
 
 	// Read important header information (our own header)
-	memcpy_s(&header, sizeof(MovesetHeader), orig_moveset, sizeof(MovesetHeader));
+	memcpy_s(&header, sizeof(TKMovesetHeader), orig_moveset, sizeof(TKMovesetHeader));
 	progress = 20;
 
 	{
 		// Make a copy of the moveset that we can modify freely and quickly before importing
 		uint64_t movesetStartOffset = header.infos.header_size + header.offsets.movesetInfoBlock;
 		s_moveset -= movesetStartOffset;
-		moveset = (byte*)malloc(s_moveset);
+		moveset = (Byte*)malloc(s_moveset);
 		if (moveset == nullptr) {
 			return ImportationErrcode_AllocationErr;
 		}
@@ -413,7 +413,9 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 	{
 	
 		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
-		m_process->writeInt64(movesetOffset + 8, playerMoveset);
+		m_process->writeInt64(movesetOffset + 0x8, playerMoveset);
+		m_process->writeInt64(movesetOffset + 0x10, playerMoveset);
+		m_process->writeInt64(movesetOffset + 0x18, playerMoveset);
 		// + 8 = offset of the moveset that is currently playing but that will revert after transitioning to a generic anim
 	}
 

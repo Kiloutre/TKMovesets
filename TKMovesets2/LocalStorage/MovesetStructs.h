@@ -12,7 +12,7 @@ enum MovesetFlags_
 
 // This structure should really not change or it would break compatibility with all previous movesets
 // If you have any change in mind that might be important, do it now
-struct MovesetHeader_infos
+struct TKMovesetHeader_infos
 {
 	// Version string of the extracted moveset
 	char version_string[32];
@@ -26,7 +26,7 @@ struct MovesetHeader_infos
 	MovesetFlags flags;
 	// Date of last modification
 	uint64_t date;
-	// Stores a hash of the moveset data (everything past our MovesetHeader_infos structure)
+	// Stores a hash of the moveset data (everything past our TKMovesetHeader_infos structure)
 	uint32_t crc32;
 	// Origin (Game name + author if you want)
 	char origin[32];
@@ -36,7 +36,7 @@ struct MovesetHeader_infos
 
 // Offsets of the various blocks contained within the moveset, in the same order they will appear in
 // You can append new members to this structure without breaking compatibility
-struct MovesetHeader_offsets
+struct TKMovesetHeader_offsets
 {
 	// Store moveid aliases and some more i don't understand
 	uint64_t movesetInfoBlock;
@@ -55,11 +55,11 @@ struct MovesetHeader_offsets
 };
 
 
-// Data contained at the head of every extracted movesets
-struct MovesetHeader
+// Custom data contained at the head of every extracted movesets
+struct TKMovesetHeader
 {
 	// Useful infos regarding the moveset : extracting date, game origin, game id, extractor version
-	MovesetHeader_infos infos;
+	TKMovesetHeader_infos infos;
 	// Absolute offsets of the moveset-related data blocks within the file
-	MovesetHeader_offsets offsets;
+	TKMovesetHeader_offsets offsets;
 };

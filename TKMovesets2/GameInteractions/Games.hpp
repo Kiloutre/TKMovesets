@@ -4,8 +4,9 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
-#include "Importer_t7.hpp"
-#include "Extractor_t7.hpp"
+#include "Importer.hpp"
+#include "Extractor.hpp"
+#include "Editor.hpp"
 
 #include "constants.h"
 
@@ -47,6 +48,8 @@ struct GameInfo
 	FactoryType_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.
 	FactoryType_Base* importer;
+	// Dynamic type allocator to store the game's editor. Can be nullptr for no available editor.
+	FactoryType_Base* editor;
 };
 
 namespace Games
@@ -71,4 +74,7 @@ namespace Games
 
 	// Istantiate a new game-dependant importer
 	DLLCONTENT Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game);
+
+	// Istantiate a new game-dependant importer
+	DLLCONTENT Editor* FactoryGetEditor(uint8_t gameId, GameProcess* process, GameData* game);
 }

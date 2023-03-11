@@ -22,9 +22,9 @@ namespace ExtractorUtils
 		return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
 	}
 
-	uint32_t CalculateCrc32(std::vector<std::pair<byte*, uint64_t>>& blocks)
+	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks)
 	{
-		// Skip the first item which is always the MovesetHeader
+		// Skip the first item which is always the TKMovesetHeader
 		// also skip the second, for now, because there's 4 pointer in there we need to change (todo)
 		uint32_t crc32 = 0;
 		uint32_t table[256];
@@ -39,12 +39,12 @@ namespace ExtractorUtils
 		return crc32;
 	}
 
-	void WriteFileData(std::ofstream &file, std::vector<std::pair<byte*, uint64_t>>& blocks, uint8_t&progress, uint8_t progress_max)
+	void WriteFileData(std::ofstream &file, std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t&progress, uint8_t progress_max)
 	{
 		uint8_t remainingProgress = progress_max - progress;
 		uint8_t step = remainingProgress / blocks.size();
 
-		for (std::pair<byte*, uint64_t> block : blocks) {
+		for (std::pair<Byte*, uint64_t> block : blocks) {
 			char* blockData = (char*)block.first;
 			uint64_t blockSize = block.second;
 
@@ -130,11 +130,11 @@ namespace ExtractorUtils
 
 // Private methods //
 
-byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
+Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {
 	size_t blockSize = blockEnd - blockStart;
 
-	byte* block = (byte*)malloc(blockSize);
+	Byte* block = (Byte*)malloc(blockSize);
 	if (block == nullptr) {
 		size_out = 0;
 		return nullptr;

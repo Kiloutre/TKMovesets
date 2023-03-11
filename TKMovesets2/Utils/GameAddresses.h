@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 # define GAME_ADDR_NULL (0)
 
 // Used for ptr or offsets in movesets that can be set to 0
@@ -9,5 +11,5 @@
 typedef uint64_t gameAddr;
 typedef uint32_t gameAddr32;
 
-// Used for ptr to byte*, i really don't like using char* for those, char* should be explicity for characters
-typedef unsigned char byte;
+// Used for ptr to Byte*, i really don't like using char* for those, char* should be explicity for characters
+typedef unsigned char Byte;

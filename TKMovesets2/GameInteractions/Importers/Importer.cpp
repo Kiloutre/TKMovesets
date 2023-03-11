@@ -3,11 +3,11 @@
 // -- Static helpers -- //
 
 // Reads the the moveset size, allocate the moveset in our own memory and write to it
-static byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
+static Byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
 {
 	file.seekg(0, std::ios::end);
 	size_out = file.tellg();
-	byte* moveset = (byte*)malloc(size_out);
+	Byte* moveset = (Byte*)malloc(size_out);
 	if (moveset != nullptr) {
 		file.seekg(0, std::ios::beg);
 		file.read((char*)moveset, size_out);
@@ -28,7 +28,7 @@ ImportationErrcode_ Importer::Import(const char* filename, gameAddr playerAddres
 
 	// Variables that will store the moveset size & the moveset itself in our own memory
 	uint64_t s_moveset;
-	byte* moveset;
+	Byte* moveset;
 
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
 	moveset = getMovesetInfos(file, s_moveset);

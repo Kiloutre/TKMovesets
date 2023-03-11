@@ -117,6 +117,7 @@ edition.moves_all = Tout
 edition.moves_attacks = Attaques
 edition.moves_generic = Génériques
 edition.moves_throws = Prises
+edition.move_id_hint = ID...
 edition.play_move_1p = Lancer (J1)
 edition.play_move_2p = Lancer (J2)
 
