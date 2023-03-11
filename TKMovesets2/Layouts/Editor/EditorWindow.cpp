@@ -1,5 +1,6 @@
 #include <ImGui.h>
 
+#include <algorithm>
 #include <format>
 
 #include "EditorWindow.hpp"
@@ -8,6 +9,53 @@
 #include "helpers.hpp"
 
 // -- Private methods -- //
+
+struct sortByAlias {
+	bool operator()(DisplayableMove const* a, DisplayableMove const* b) const {
+		return a->aliasId < b->aliasId;
+	}
+};
+
+void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
+{
+	m_filteredMovelist.clear();
+
+	m_movelistFilter = filter;
+	if (filter == EditorMovelistFilter_All) {
+		m_filteredMovelist = m_movelist;
+		return;
+	}
+
+	EditorMoveFlags flags = 0;
+
+	switch (filter)
+	{
+	case EditorMovelistFilter_Attacks:
+		flags |= EditorMoveFlags_Attack | EditorMoveFlags_OtherAttack;
+		break;
+	case EditorMovelistFilter_Generic:
+		flags |= EditorMoveFlags_Generic;
+		break;
+	case EditorMovelistFilter_Throws:
+		flags |= EditorMoveFlags_Throw;
+		break;
+	case EditorMovelistFilter_Custom:
+		flags |= EditorMoveFlags_Custom;
+		break;
+	}
+
+	for (DisplayableMove* move : m_movelist)
+	{
+		if (move->flags & flags) {
+			m_filteredMovelist.push_back(move);
+		}
+	}
+
+	// If displaying generic moves, sort by generic id
+	if (filter & EditorMovelistFilter_Generic) {
+		std::sort(m_filteredMovelist.begin(), m_filteredMovelist.end(), sortByAlias());
+	}
+}
 
 int16_t EditorWindow::ValidateMoveId(const char* buf)
 {
@@ -170,24 +218,38 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 
 void EditorWindow::RenderMovelist()
 {
-	uint8_t moveFilter = 0;
-	// Filter
+	// Filter / Sorting
 	if (ImGui::BeginTabBar("MovelistTabs"))
 	{
+		// Todo: Do not do this using tab bars but buttons
 		if (ImGui::BeginTabItem(_("edition.moves_all"))) {
-			moveFilter = 0xFF;
+			if (m_movelistFilter != EditorMovelistFilter_All) {
+				FilterMovelist(EditorMovelistFilter_All);
+			}
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem(_("edition.moves_attacks"))) {
-			moveFilter = 0xFF;
+			if (m_movelistFilter != EditorMovelistFilter_Attacks) {
+				FilterMovelist(EditorMovelistFilter_Attacks);
+			}
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem(_("edition.moves_generic"))) {
-			moveFilter = 0xFF;
+			if (m_movelistFilter != EditorMovelistFilter_Generic) {
+				FilterMovelist(EditorMovelistFilter_Generic);
+			}
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem(_("edition.moves_throws"))) {
-			moveFilter = 0xFF;
+			if (m_movelistFilter != EditorMovelistFilter_Throws) {
+				FilterMovelist(EditorMovelistFilter_Throws);
+			}
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem(_("edition.moves_custom"))) {
+			if (m_movelistFilter != EditorMovelistFilter_Custom) {
+				FilterMovelist(EditorMovelistFilter_Custom);
+			}
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
@@ -196,14 +258,15 @@ void EditorWindow::RenderMovelist()
 	// Movelist. Leave some 50 units of space for move player
 	ImVec2 Size = ImGui::GetContentRegionAvail();
 	Size.y -= 80;
-	if (ImGui::BeginTable("MovelistTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+	if (ImGui::BeginTable("MovelistTable", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
 		| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedFit, Size))
 	{
 		ImGui::TableSetupColumn("ID");
 		ImGui::TableSetupColumn(_("edition.move_name"));
+		ImGui::TableSetupColumn(_("edition.move_generic_id"));
 		ImGui::TableHeadersRow();
 
-		for (DisplayableMove* move : m_movelist)
+		for (DisplayableMove* move : m_filteredMovelist)
 		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
@@ -211,6 +274,13 @@ void EditorWindow::RenderMovelist()
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(move->name.c_str());
+
+			if (move->aliasId != 0) {
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(std::format("{}", move->aliasId).c_str());
+			}
+
+			// todo: one empty column is always displayed here for some reason. fix it. to fix.
 		}
 
 		ImGui::EndTable();
@@ -218,8 +288,8 @@ void EditorWindow::RenderMovelist()
 
 
 	// Set player move
-	float inputWidth = ImGui::GetContentRegionAvail().x;
-	ImGui::PushItemWidth(inputWidth);
+	ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x / 2 - 5, 0);
+	ImGui::PushItemWidth(buttonSize.x);
 	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1), ImGuiInputTextFlags_CharsDecimal)
 	{
 		// todo: the flag and this loop should filter out bad characters. As it stands, it doesn't. Fix.
@@ -234,9 +304,13 @@ void EditorWindow::RenderMovelist()
 
 		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
 	}
+	ImGui::SameLine();
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize))
+	{
+		// todo: scroll to current move
+	}
 	ImGui::PopItemWidth();
 
-	ImVec2 buttonSize = ImVec2(inputWidth / 2 - 5, 0);
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize))
 	{
 		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(0);
@@ -293,6 +367,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 
 	// Read what needs to be read and potentially displayed right away
 	m_movelist = m_editor->GetDisplayableMoveList();
+	m_filteredMovelist = m_movelist;
 }
 
 void EditorWindow::Render(int dockid)

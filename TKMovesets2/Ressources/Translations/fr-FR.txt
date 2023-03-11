@@ -113,11 +113,14 @@ edition.process_err = Error
 edition.live_edition = Édition en direct
 edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.
 edition.move_name = Nom
+edition.move_generic_id = Alias
 edition.moves_all = Tout
 edition.moves_attacks = Attaques
 edition.moves_generic = Génériques
 edition.moves_throws = Prises
+edition.moves_custom = Crées
 edition.move_id_hint = ID...
+edition.move_current = Actuel
 edition.play_move_1p = Lancer (J1)
 edition.play_move_2p = Lancer (J2)
 

@@ -44,6 +44,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 		for (uint8_t j = 0; j < aliasesCount; ++j) {
 			if (aliases[j] == moveId) {
 				aliasId = 0x8000 + j;
+				flags |= EditorMoveFlags_Generic;
 				break;
 			}
 		}

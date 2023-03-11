@@ -6,6 +6,15 @@
 
 #include "GameAddresses.h"
 
+enum EditorMovelistFilter_
+{
+	EditorMovelistFilter_All = 0,
+	EditorMovelistFilter_Attacks = 1,
+	EditorMovelistFilter_Generic = 2,
+	EditorMovelistFilter_Throws = 3,
+	EditorMovelistFilter_Custom = 4,
+};
+
 struct EditorMovelist_Move
 {
 	std::string name;
@@ -63,6 +72,8 @@ private:
 	std::vector<DisplayableMove*> m_movelist;
 	// Contains the movelist displayed at all times, may get sorted and/or filtered
 	std::vector<DisplayableMove*> m_filteredMovelist;
+	// Contains the current display filter of the displayed movelist
+	EditorMovelistFilter_ m_movelistFilter = EditorMovelistFilter_All;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -74,6 +85,8 @@ private:
 	// Render the list of moves
 	void RenderMovelist();
 
+	void FilterMovelist(EditorMovelistFilter_ filter);
+	// Vlidates the move ID against the movelist and alias list
 	int16_t ValidateMoveId(const char* buf);
 	// Returns true if our allocated moveset is still loaded on our character
 	bool MovesetStillLoaded();
