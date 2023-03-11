@@ -43,15 +43,24 @@ void GameImport::PreProcessDetach()
 
 void GameImport::RunningUpdate()
 {
-
-	// Extraction queue is a FIFO (first in first out) queue
 	bool errored = false;
-	while (m_plannedImportations.size() > 0)
+	while (IsBusy())
 	{
 		if (!errored) {
-			auto& [filename, playerAddress] = m_plannedImportations[0];
-			// Start Importation
-			ImportationErrcode_ err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+			ImportationErrcode_ err;
+
+			// Two different ways to import movesets, from filename or from actual moveset data
+			if (m_plannedFileImportations.size() > 0) {
+				auto& [filename, playerAddress] = m_plannedFileImportations[0];
+				err = m_importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
+				m_plannedFileImportations.erase(m_plannedFileImportations.begin());
+			}
+			else {
+				auto& [moveset, movesetSize, playerAddress] = m_plannedImportations[0];
+				err = m_importer->Import(moveset, movesetSize, playerAddress, apply_instantly, progress);
+				m_plannedImportations.erase(m_plannedImportations.begin());
+			}
+
 			if (free_unused_movesets) {
 				m_importer->CleanupUnusedMovesets();
 			}
@@ -60,7 +69,6 @@ void GameImport::RunningUpdate()
 				errored = true;
 			}
 		}
-		m_plannedImportations.erase(m_plannedImportations.begin());
 	}
 }
 // -- Public methods -- //
@@ -103,14 +111,21 @@ bool GameImport::CanStart()
 bool GameImport::IsBusy()
 {
 	// There are still playerAddresss to extract from
-	return m_plannedImportations.size() > 0;
+	return m_plannedFileImportations.size() > 0 || m_plannedImportations.size() > 0;
+}
+
+void GameImport::QueueCharacterImportation(byte* moveset, uint64_t movesetSize)
+{
+	// It is safe to call this function even while an extraction is ongoing
+	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
+	m_plannedImportations.push_back(std::tuple<byte*, uint64_t, gameAddr>(moveset, movesetSize, playerAddress));
 }
 
 void GameImport::QueueCharacterImportation(std::string filename)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
-	m_plannedImportations.push_back(std::pair<std::string, gameAddr>(filename, playerAddress));
+	m_plannedFileImportations.push_back(std::pair<std::string, gameAddr>(filename, playerAddress));
 }
 
 

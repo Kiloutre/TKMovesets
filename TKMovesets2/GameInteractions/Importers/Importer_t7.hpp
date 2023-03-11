@@ -33,7 +33,7 @@ private:
 	void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId);
 public:
 	using Importer::Importer; // Inherit constructor too
-	ImportationErrcode_ Import(byte* moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
+	ImportationErrcode_ Import(const byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;
 	gameAddr GetCharacterAddress(uint8_t playerId) override;

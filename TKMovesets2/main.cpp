@@ -159,46 +159,48 @@ int main(int argc, wchar_t** argv, char** env)
 		Localization::LoadFile(PROGRAM_DEFAULT_LANG);
 	}
 
-	// Init main program. This will get most things going and create the important threads
-	MainWindow program(window, c_glsl_version);
-	ImGuiIO& io = ImGui::GetIO();
-	InitMainClasses(program);
-
-	while (!glfwWindowShouldClose(window))
 	{
-		// Poll and handle events such as MKB inputs, window resize. Required
-		glfwPollEvents();
+		// Init main program. This will get most things going and create the important threads
+		MainWindow program(window, c_glsl_version);
+		ImGuiIO& io = ImGui::GetIO();
+		InitMainClasses(program);
 
-		// Probably framebuffer related? Required
-		program.NewFrame();
-		
-		// Main layout function : every we display is in there
-		program.Update();
-
-		// Let imgui do its stuff
-		ImGui::Render();
+		while (!glfwWindowShouldClose(window))
 		{
-			int display_w, display_h;
-			glfwGetFramebufferSize(window, &display_w, &display_h);
-			glViewport(0, 0, display_w, display_h);
-		}
-		glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			// Poll and handle events such as MKB inputs, window resize. Required
+			glfwPollEvents();
 
-		//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
+			// Probably framebuffer related? Required
+			program.NewFrame();
+
+			// Main layout function : every we display is in there
+			program.Update();
+
+			// Let imgui do its stuff
+			ImGui::Render();
+			{
+				int display_w, display_h;
+				glfwGetFramebufferSize(window, &display_w, &display_h);
+				glViewport(0, 0, display_w, display_h);
+			}
+			glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				GLFWwindow* backup_current_context = glfwGetCurrentContext();
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+				glfwMakeContextCurrent(backup_current_context);
+			}
+			glfwSwapBuffers(window);
 		}
-		glfwSwapBuffers(window);
+
+		DestroyMainClasses(program);
+		// Cleanup what needs to be cleaned up
+		program.Shutdown();
 	}
-
-	DestroyMainClasses(program);
-	// Cleanup what needs to be cleaned up
-	program.Shutdown();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

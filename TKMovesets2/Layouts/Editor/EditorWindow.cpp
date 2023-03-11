@@ -97,7 +97,7 @@ void EditorWindow::RenderStatusBar()
 	ImGui::SameLine();
 	bool canImport = isAttached && m_importNeeded && !importer.IsBusy() && importer.CanStart();
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
-		importer.QueueCharacterImportation(m_loadedCharacter.filename);
+		importer.QueueCharacterImportation(m_moveset, m_movesetSize);
 	}
 
 	// Live edition

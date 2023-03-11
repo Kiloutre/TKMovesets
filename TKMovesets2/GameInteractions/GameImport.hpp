@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <utility>
 #include <sys/stat.h>
 
@@ -13,8 +14,10 @@ class GameImport : public virtual GameInteraction
 private:
 	// Importer class, never stores an Importer*, used for polymorphism
 	Importer* m_importer = nullptr;
-	// Movesets to import and corresponding player id 
-	std::vector<std::pair<std::string, gameAddr>> m_plannedImportations;
+	// Movesets (files) to import and corresponding player address 
+	std::vector<std::pair<std::string, gameAddr>> m_plannedFileImportations;
+	// Movesets (data, size) to import and corresponding player address
+	std::vector<std::tuple<byte*, uint64_t, gameAddr>> m_plannedImportations;
 	// List of errors, one extraction fail = 1 error
 	std::vector<ImportationErrcode_> m_errors;
 
@@ -39,12 +42,14 @@ public:
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
-	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
+	// Returns true if the extractor will allow an importation (false if it won't, like if characters aren't loaded)
 	bool CanStart() override;
-	// Is currently busy with an extraction
+	// Is currently busy with an importation
 	bool IsBusy() override;
-	// Queue a character extraction. -1 of all characters
+	// Queue a character importation from file
 	void QueueCharacterImportation(std::string filename);
+	// Queue a character importation from moveset data.
+	void QueueCharacterImportation(byte* moveset, uint64_t movesetSize);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to

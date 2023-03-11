@@ -296,8 +296,11 @@ static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
 	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
 }
 
-ImportationErrcode_ ImporterT7::Import(byte* moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
+ImportationErrcode_ ImporterT7::Import(const byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
 {
+	// Will contain our moveset copy. We do not modify orig_moveset.
+	byte* moveset;
+
 	// Header of the moveset that will contain our own information about it
 	MovesetHeader header;
 
@@ -306,15 +309,19 @@ ImportationErrcode_ ImporterT7::Import(byte* moveset, uint64_t s_moveset, gameAd
 
 	// -- File reading & allocations -- //
 
-	// Allocate a copy of the moveset locally. This is NOT in the game's memory
-	memcpy_s(&header, sizeof(MovesetHeader), moveset, sizeof(MovesetHeader));
+	// Read important header information (our own header)
+	memcpy_s(&header, sizeof(MovesetHeader), orig_moveset, sizeof(MovesetHeader));
 	progress = 20;
 
 	{
-		// Correct moveset & s_moveset : skip our own header
+		// Make a copy of the moveset that we can modify freely and quickly before importing
 		uint64_t movesetStartOffset = header.infos.header_size + header.offsets.movesetInfoBlock;
-		moveset += movesetStartOffset;
 		s_moveset -= movesetStartOffset;
+		moveset = (byte*)malloc(s_moveset);
+		if (moveset == nullptr) {
+			return ImportationErrcode_AllocationErr;
+		}
+		memcpy(moveset, orig_moveset + movesetStartOffset, s_moveset);
 	}
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
@@ -368,6 +375,8 @@ ImportationErrcode_ ImporterT7::Import(byte* moveset, uint64_t s_moveset, gameAd
 	}
 
 	// -- Cleanup -- //
+	// Destroy our local copy
+	free(moveset);
 
 	return ImportationErrcode_Successful;
 }

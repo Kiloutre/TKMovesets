@@ -31,6 +31,8 @@ private:
 	bool m_importNeeded = true;
 	// Current moveset, will be written to memory on next import
 	byte* m_moveset = nullptr;
+	// Moveset copy that we'll write our changes to before importing
+	byte* m_moveset_to_load = nullptr;
 	// Size of the moveset currently loaded
 	uint64_t m_movesetSize = 0;
 
