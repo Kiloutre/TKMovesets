@@ -29,12 +29,16 @@ private:
 	// Fixes move that rely on correct character IDs to work
 	void ApplyCharacterIDFixes(byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* offsets, const MovesetHeader& header);
 
-	// Sets the move of the player
-	void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId);
 public:
 	using Importer::Importer; // Inherit constructor too
 	ImportationErrcode_ Import(const byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;
+
+	// Forces the new moveset on the player and play a specific move
+	void ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId);
+
 	gameAddr GetCharacterAddress(uint8_t playerId) override;
+	gameAddr GetMovesetAddress(uint8_t playerId) override;
+	void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId) override;
 };

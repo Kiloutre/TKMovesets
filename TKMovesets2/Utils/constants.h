@@ -13,7 +13,7 @@
 # define PROGRAM_DEFAULT_LANG    "en-US"
 # define PROGRAM_LANG_FOLDER     "Translations"
 
-# define MOVESET_EXTRACTED_NAME_PREFIX  "Tkm:"
+# define MOVESET_EXTRACTED_NAME_PREFIX  "[Tkm:"
 # define MOVESET_DIRECTORY              "./extracted_chars"
 # define MOVESET_FILENAME_EXTENSION     ".tkbin"
 # define MOVESET_TMPFILENAME_EXTENSION "._tmp_tkbin"

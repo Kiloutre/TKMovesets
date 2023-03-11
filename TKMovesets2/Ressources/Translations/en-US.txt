@@ -115,6 +115,13 @@ edition.save = Save
 edition.process_err = Error
 edition.live_edition = Live edition
 edition.live_edition_explanation = Turn on so that trivial changes such as simple value modifications can be applied directory in the game memory, without requing a new moveset importation.
+edition.move_name = Name
+edition.moves_all = All
+edition.moves_attacks = Attacks
+edition.moves_generic = Generic
+edition.moves_throws = Throws
+edition.play_move_1p = Play (1P)
+edition.play_move_2p = Play (2P)
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

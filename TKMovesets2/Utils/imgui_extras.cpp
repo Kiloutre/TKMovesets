@@ -66,18 +66,9 @@ namespace ImGuiExtra
 		if (enabled) {
 			return ImGui::Button(c_text, size);
 		}
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetColorU32(ImGuiCol_ButtonHovered));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetColorU32(ImGuiCol_ButtonHovered));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetColorU32(ImGuiCol_ButtonHovered));
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-
+		ImGui::BeginDisabled();
 		ImGui::Button(c_text, size);
-
-		ImGui::PopStyleVar();
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
+		ImGui::EndDisabled();
 		return false;
 	}
 

@@ -3,6 +3,14 @@
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
 
+struct EditorMovelist_Move
+{
+	std::string name;
+	uint16_t aliasId;
+	bool isAttack;
+	bool isThrow;
+};
+
 struct EditorInfos
 {
 	std::string filename;
@@ -31,10 +39,13 @@ private:
 	bool m_importNeeded = true;
 	// Current moveset, will be written to memory on next import
 	byte* m_moveset = nullptr;
-	// Moveset copy that we'll write our changes to before importing
-	byte* m_moveset_to_load = nullptr;
 	// Size of the moveset currently loaded
 	uint64_t m_movesetSize = 0;
+	// If the moveset can be live edited or not
+	bool m_liveEditable = true;
+	// Stores the address, in-game, of the moveset we loaded. 0 if none loaded.
+	gameAddr loadedMoveset = 0;
+
 
 	// Render the top toolbar containing useful moveset editing tools
 	void RenderToolBar();
@@ -42,13 +53,18 @@ private:
 	void RenderMovesetData(ImGuiID dockId);
 	// Render the bottom statusbar that shows the save button and more
 	void RenderStatusBar();
+	// Render the list of moves
+	void RenderMovelist();
+
+	// Returns true if our allocated moveset is still loaded on our character
+	bool MovesetStillLoaded();
 	// Save the loaded moveset to a file
 	void Save();
 public:
 	// Determines if the main window is open or not. If not, this tells the MainWindow parent class to free the ressources we have allocated
 	bool popen = true;
 	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
-	GameImport importer;
+	GameImport importerHelper;
 	// Stores the filename
 	std::string filename;
 	// True is we need to call SetNextWindowFocus() before rendering our own

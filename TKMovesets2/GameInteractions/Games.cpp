@@ -9,7 +9,7 @@ const GameInfo cg_gamesInfo[] = {
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
 		.characterCount = 2,
-		.flags = GameFlag_MovesetEditable,
+		.flags = GameFlag_MovesetEditable | GameFlag_MovesetLiveEditable,
 		.extractor = new FactoryType<ExtractorT7>,
 		.importer = new FactoryType<ImporterT7>,
 	},
@@ -74,6 +74,11 @@ namespace Games
 	bool IsGameEditable(uint8_t gameId)
 	{
 		return (GetGameInfo(gameId)->flags & GameFlag_MovesetEditable) > 0;
+	}
+
+	bool IsGameLiveEditable(uint8_t gameId)
+	{
+		return (GetGameInfo(gameId)->flags & GameFlag_MovesetLiveEditable) > 0;
 	}
 
 	//

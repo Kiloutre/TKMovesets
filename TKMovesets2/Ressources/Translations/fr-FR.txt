@@ -112,11 +112,17 @@ edition.save = Sauvegarder
 edition.process_err = Error
 edition.live_edition = Édition en direct
 edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.
+edition.move_name = Nom
+edition.moves_all = Tout
+edition.moves_attacks = Attaques
+edition.moves_generic = Génériques
+edition.moves_throws = Prises
+edition.play_move_1p = Lancer (J1)
+edition.play_move_2p = Lancer (J2)
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?
-
 
 
 

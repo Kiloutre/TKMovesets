@@ -32,6 +32,8 @@ public:
 	// Stores the number of character we are expected be able to import to
 	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
 	uint8_t characterCount = 1;
+	// Stores the in-game address of the moveset successfully loaded by the last Import() call
+	gameAddr lastLoadedMoveset = 0;
 
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Import moveset from filename. Just a wrapper for Import(byte*...). Does not need to be overriden, will send the entire file to the Import() function.
@@ -42,6 +44,11 @@ public:
 	virtual bool CanImport() = 0;
 	// Look through movesets that we previously allocated in the game and free the unused ones
 	virtual void CleanupUnusedMovesets() = 0;
+
 	// Returns a character address depending on the provided playerid
 	virtual gameAddr GetCharacterAddress(uint8_t playerId) = 0;
+	// Returns the moveset address of the given playerid. Used by live editor.
+	virtual gameAddr GetMovesetAddress(uint8_t playerId) = 0;
+	// Sets the current move of a player
+	virtual void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId) = 0;
 };

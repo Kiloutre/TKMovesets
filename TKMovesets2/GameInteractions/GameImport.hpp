@@ -12,8 +12,6 @@
 class GameImport : public virtual GameInteraction
 {
 private:
-	// Importer class, never stores an Importer*, used for polymorphism
-	Importer* m_importer = nullptr;
 	// Movesets (files) to import and corresponding player address 
 	std::vector<std::pair<std::string, gameAddr>> m_plannedFileImportations;
 	// Movesets (data, size) to import and corresponding player address
@@ -31,12 +29,16 @@ private:
 	void PreProcessDetach() override;
 
 public:
+	// Importer class, never stores an Importer*, used for polymorphism
+	Importer* importer = nullptr;
 	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
 	// true = force the 32769 move from the new moveset to apply 
 	bool apply_instantly = true;
 	// Whether to free unused movesets after each importation
 	bool free_unused_movesets = true;
+	// Stores the in-game addresses of the last moveset loaded by the last Queue() call
+	gameAddr lastLoadedMoveset = 0;
 
 	// Default flags are raed-only, so the importer needs this
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }

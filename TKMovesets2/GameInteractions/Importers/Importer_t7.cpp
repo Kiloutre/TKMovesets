@@ -11,7 +11,7 @@
 
 // -- Private methods -- //
 
-void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
+void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
 {
 	{
 		/// Yes, this needs to be done here, this is only useful when we really want to set the current move
@@ -28,7 +28,7 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
 		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
 	}
-	
+
 	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
@@ -378,6 +378,7 @@ ImportationErrcode_ ImporterT7::Import(const byte* orig_moveset, uint64_t s_move
 	// Destroy our local copy
 	free(moveset);
 
+	lastLoadedMoveset = gameMoveset;
 	return ImportationErrcode_Successful;
 }
 
@@ -407,6 +408,30 @@ bool ImporterT7::CanImport()
 	return animType == 0x64 || animType == 0xC8;
 }
 
+void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
+{
+	{
+	
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
+		m_process->writeInt64(movesetOffset + 8, playerMoveset);
+		// + 8 = offset of the moveset that is currently playing but that will revert after transitioning to a generic anim
+	}
+
+	if (moveId >= 0x8000) {
+		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
+		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
+	}
+
+	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
+
+	// Write a big number to the frame timer to force the current move end
+	m_process->writeInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_timer"), 99999);
+	// Tell the game which move to play NEXT
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
+	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_id"), moveId);
+}
+
 gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
@@ -414,4 +439,14 @@ gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
 		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
 	}
 	return playerAddress;
+}
+
+gameAddr ImporterT7::GetMovesetAddress(uint8_t playerId)
+{
+	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
+	if (playerAddress > 0) {
+		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		return m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
+	}
+	return 0;
 }

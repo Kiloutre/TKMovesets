@@ -30,8 +30,8 @@ void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 	// todo: attempt to load. popup if fail. open window and std vector push back if not
 	try {
 		EditorWindow* newWin = new EditorWindow(movesetInfos);
-		newWin->importer.Init(addrFile, &storage);
-		newWin->importer.StartThread();
+		newWin->importerHelper.Init(addrFile, &storage);
+		newWin->importerHelper.StartThread();
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
@@ -138,6 +138,7 @@ void MainWindow::Update()
 				++i;
 			}
 			else {
+				// Window was closed, close the associated editor and free its ressources
 				editorWindows.erase(editorWindows.begin() + i);
 				delete w;
 			}
