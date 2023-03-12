@@ -124,6 +124,9 @@ edition.move_current = Actuel
 edition.play_move_1p = Lancer (J1)
 edition.play_move_2p = Lancer (J2)
 edition.window_title = Édition :
+edition.window_title_move = Move
+edition.move = Move
+edition.requirement = Condition
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 

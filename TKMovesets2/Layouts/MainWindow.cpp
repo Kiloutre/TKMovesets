@@ -42,7 +42,7 @@ void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
-		// Memory of the constructor was freed 
+		// Memory was freed so no need to do anything
 	}
 }
 

@@ -10,11 +10,19 @@
 
 // -- Private methods -- //
 
-struct sortByAlias {
-	bool operator()(DisplayableMove const* a, DisplayableMove const* b) const {
-		return a->aliasId < b->aliasId;
+void EditorWindow::OpenMoveWindow(uint16_t moveId)
+{
+	for (EditorMove* moveWin : m_moveWindows) {
+		if (moveWin->moveId == moveId) {
+			moveWin->setFocus = true;
+			// Prevent duplicate move window creation
+			return;
+		}
 	}
-};
+
+	EditorMove* newWin = new EditorMove(m_windowTitle, moveId);
+	m_moveWindows.push_back(newWin);
+}
 
 void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 {
@@ -53,6 +61,11 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 
 	// If displaying generic moves, sort by generic id
 	if (filter & EditorMovelistFilter_Generic) {
+		struct sortByAlias {
+			bool operator()(DisplayableMove const* a, DisplayableMove const* b) const {
+				return a->aliasId < b->aliasId;
+			}
+		};
 		std::sort(m_filteredMovelist.begin(), m_filteredMovelist.end(), sortByAlias());
 	}
 }
@@ -61,10 +74,10 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 {
 	int32_t moveId = atoi(buf);
 
-	const int movelistSize = m_movelist.size();
+	const size_t movelistSize = m_movelist.size();
 	if (moveId >= movelistSize)
 	{
-		const int aliasesCount = m_editorTable.aliases.size();
+		const size_t aliasesCount = m_editorTable.aliases.size();
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
@@ -89,7 +102,7 @@ void EditorWindow::Save()
 void EditorWindow::RenderToolBar()
 {
 	// todo: ImGuiWindowFlags_MenuBar ?
-	ImGui::Text("TOOLS");
+	ImGui::Text("TOOLS: TODO");
 }
 
 void EditorWindow::RenderStatusBar()
@@ -200,30 +213,22 @@ void EditorWindow::RenderStatusBar()
 
 void EditorWindow::RenderMovesetData(ImGuiID dockId)
 {
-	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
-	ImGui::Begin("Move");
-	ImGui::Text("o");
-	ImGui::End();
-
-	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
-	ImGui::Begin("Move2");
-	ImGui::Text("o2");
-	ImGui::End();
-
-	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
-	ImGui::Begin("Move3");
-	ImGui::Text("o3");
-	ImGui::End();
-
-	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
-	ImGui::Begin("Move4");
-	ImGui::Text("o3");
-	ImGui::End();
-
-	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
-	ImGui::Begin("Move5");
-	ImGui::Text("o3");
-	ImGui::End();
+	for (size_t i = 0; i < m_moveWindows.size();)
+	{
+		EditorMove* moveWin = m_moveWindows[i];
+		if (moveWin->popen)
+		{
+			ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
+			moveWin->Render();
+			if (moveWin->unsavedChanges) {
+				m_savedLastChange = false;
+			}
+			++i;
+		}
+		else {
+			delete moveWin;
+		}
+	}
 }
 
 void EditorWindow::RenderMovelist()
@@ -295,7 +300,12 @@ void EditorWindow::RenderMovelist()
 				ImGui::TextUnformatted(std::format("{}", move->moveId).c_str());
 
 				ImGui::TableNextColumn();
-				ImGui::TextUnformatted(move->name.c_str());
+				if (ImGui::Selectable(move->name.c_str(), move->moveId == m_highlightedMoveId)) {
+					m_highlightedMoveId = move->moveId;
+					m_moveToPlay = move->moveId;
+					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
+					OpenMoveWindow(move->moveId);
+				}
 
 				if (move->aliasId != 0) {
 					ImGui::TableNextColumn();
@@ -336,6 +346,7 @@ void EditorWindow::RenderMovelist()
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
+		m_highlightedMoveId = m_moveToScrollTo;
 	}
 	ImGui::PopItemWidth();
 
@@ -440,6 +451,8 @@ void EditorWindow::Render(int dockid)
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, windowFlags))
 	{
+		// Set this to false here : we will have to detect in subclasses if there are unsaved changes
+		m_savedLastChange = true;
 		RenderToolBar();
 
 		ImVec2 Size = ImGui::GetContentRegionAvail();

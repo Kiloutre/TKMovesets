@@ -3,6 +3,7 @@
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
 #include "Editor.hpp"
+#include "EditorMove.hpp"
 
 #include "GameAddresses.h"
 
@@ -82,6 +83,10 @@ private:
 	EditorTable m_editorTable;
 	// Contains the window title, used to prefix any window created by this editor
 	std::string m_windowTitle;
+	// id of the highlithed move in the movelist
+	int16_t m_highlightedMoveId = -1;
+	// Store the list of move windows to render
+	std::vector<EditorMove*> m_moveWindows;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -93,6 +98,10 @@ private:
 	// Render the list of moves
 	void RenderMovelist();
 
+	// Create a new window containing data about the given move
+	void OpenMoveWindow(uint16_t moveId);
+
+	//
 	void FilterMovelist(EditorMovelistFilter_ filter);
 	// Vlidates the move ID against the movelist and alias list
 	int32_t ValidateMoveId(const char* buf);
