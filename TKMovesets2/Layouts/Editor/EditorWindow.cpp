@@ -12,16 +12,29 @@
 
 void EditorWindow::OpenMoveWindow(uint16_t moveId)
 {
-	for (EditorMove* moveWin : m_moveWindows) {
+
+	int availableOverwriteIndex = -1;
+	for (int i = 0; i < m_moveWindows.size(); ++i) {
+		EditorMove* moveWin = m_moveWindows[i];
 		if (moveWin->moveId == moveId) {
 			moveWin->setFocus = true;
 			// Prevent duplicate move window creation
 			return;
 		}
+		if (moveWin->unsavedChanges == false) {
+			availableOverwriteIndex = i;
+		}
 	}
 
+	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor);
-	m_moveWindows.push_back(newWin);
+	if (openNew || availableOverwriteIndex == -1) {
+		m_moveWindows.push_back(newWin);
+	}
+	else {
+		delete m_moveWindows[availableOverwriteIndex];
+		m_moveWindows[availableOverwriteIndex] = newWin;
+	}
 }
 
 void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
@@ -107,6 +120,8 @@ void EditorWindow::RenderToolBar()
 {
 	// todo: ImGuiWindowFlags_MenuBar ?
 	ImGui::Text("TOOLS: TODO");
+	ImGui::SameLine();
+	ImGuiExtra::HelpMarker(_("edition.window_controls_explanation"));
 }
 
 void EditorWindow::RenderStatusBar()
@@ -408,7 +423,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 	filename = movesetInfo->filename;
 
-	m_windowTitle = std::format("{} {}", _("edition.window_title"), m_loadedCharacter.name.c_str());
+	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
 
 	// Read what needs to be read and potentially displayed right away
 	m_movelist = m_editor->GetDisplayableMoveList();

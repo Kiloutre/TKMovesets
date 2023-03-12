@@ -15,7 +15,7 @@ EditorMove::~EditorMove()
 
 EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* editor)
 {
-	m_windowTitle = std::format("{} {} {}", windowTitleBase.c_str(), _("edition.window_title_move"), t_moveId);
+	m_windowTitle = std::format("{} {} - {}", _("edition.window_title_move"), t_moveId, windowTitleBase.c_str());
 	moveId = t_moveId;
 	m_editor = editor;
 
@@ -23,7 +23,6 @@ EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* e
 	m_inputMap = editor->GetMoveInputs(t_moveId, drawOrder);
 
 	for (std::string fieldName : drawOrder) {
-		printf("%s, %lld\n", fieldName.c_str(), m_inputMap[fieldName]);
 		m_inputs.push_back(m_inputMap[fieldName]);
 	}
 
@@ -47,7 +46,7 @@ void EditorMove::Render()
 	{
 		for (uint8_t category = 0; category < m_categoryAmount; ++category)
 		{
-			if (category != 0 && !ImGui::TreeNode(_(std::format("edition.move_field.category_{}", category).c_str()))) {
+			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("edition.move_field.category_{}", category).c_str()), ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
 				// Only show titles for category > 0, and if tree is not open: no need to render anything
 				continue;
 			}
@@ -75,10 +74,6 @@ void EditorMove::Render()
 				}
 			}
 			ImGui::PopItemWidth();
-
-			if (category != 0) {
-				ImGui::TreePop();
-			}
 		}
 
 		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), unsavedChanges)) {

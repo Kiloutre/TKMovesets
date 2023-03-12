@@ -122,9 +122,10 @@ edition.move_id_hint = ID...
 edition.move_current = Actuel
 edition.play_move_1p = Lancer (J1)
 edition.play_move_2p = Lancer (J2)
-edition.window_title = Édition :
+edition.window_title = Édition
 edition.window_title_move = Move
 edition.apply = Appliquer
+edition.window_controls_explanation = Cliquez sur un Move dans la liste des moves pour ouvrir sa fenêtre associée. Elle viendra écraser toute fenêtre précédemment ouverte, sauf si cette ancienne fenêtre contient du contenu non-sauvegardé OU si vous maintenez CTRL GAUCHE avant de cliquer. Les fenêtres ouvertes peuvent être déplacées où vous le souhaitez, peuvent être assemblées et il est possible de les positionner de diverses manières.
 
 edition.move_field.category_0 = Principal
 edition.move_field.category_1 = Références

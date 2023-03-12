@@ -18,6 +18,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, fieldBytesAmount, category, imguiInputFlag, EditorInputFlag, format, value)
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->vuln);
 	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->hitlevel);
 	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->transition);
@@ -32,6 +33,13 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std
 	CREATE_FIELD("beginning_extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_start_extraprop_addr);
 	CREATE_FIELD("ending_extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_end_extraprop_addr);
 	CREATE_FIELD("voiceclip_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->voicelip_addr);
+
+	CREATE_FIELD("cancel_id_2", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x28_cancel_addr);
+	CREATE_FIELD("cancel_id_2_related", 4, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x30_int__0x28_related);
+	CREATE_FIELD("cancel_id_3", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x38_cancel_addr);
+	CREATE_FIELD("cancel_id_3_related", 4, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x40_int__0x38_related);
+	CREATE_FIELD("cancel_id_4", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x48_cancel_addr);
+	CREATE_FIELD("cancel_id_4_related", 4, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x50_int__0x48_related);
 
 	// Finishing touch
 	for (auto& [name, input] : inputMap) {
