@@ -20,4 +20,5 @@ public:
 	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
 	EditorTable GetMovesetTable() override;
 	std::vector<DisplayableMove*> GetDisplayableMoveList() override;
+	uint16_t GetCurrentMoveID(uint8_t playerId) override;
 };

@@ -302,6 +302,11 @@ void EditorWindow::RenderMovelist()
 					ImGui::TextUnformatted(std::format("{}", move->aliasId).c_str());
 				}
 
+				if (m_moveToScrollTo == move->moveId) {
+					ImGui::SetScrollHereY();
+					m_moveToScrollTo = -1;
+				}
+
 				// todo: one empty column is always displayed here for some reason. fix it. to fix.
 			}
 
@@ -328,9 +333,9 @@ void EditorWindow::RenderMovelist()
 		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
 	}
 	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize))
-	{
-		// todo: scroll to current move
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
+		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
+		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
 	}
 	ImGui::PopItemWidth();
 
@@ -356,8 +361,11 @@ EditorWindow::~EditorWindow()
 	free(m_moveset);
 }
 
-EditorWindow::EditorWindow(movesetInfo* movesetInfo)
+EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
 {
+	importerHelper.Init(addrFile, storage);
+	importerHelper.StartThread();
+
 	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, importerHelper.process, importerHelper.game);
 
 	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);

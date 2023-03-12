@@ -29,9 +29,7 @@ void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 
 	// todo: attempt to load. popup if fail. open window and std vector push back if not
 	try {
-		EditorWindow* newWin = new EditorWindow(movesetInfos);
-		newWin->importerHelper.Init(addrFile, &storage);
-		newWin->importerHelper.StartThread();
+		EditorWindow* newWin = new EditorWindow(movesetInfos, addrFile, &storage);
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {

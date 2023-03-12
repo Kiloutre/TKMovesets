@@ -65,12 +65,14 @@ protected:
 public:
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
-	//
+	// Loads important moveset data in our class, required to start functionning
 	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	//
 	virtual EditorTable GetMovesetTable() = 0;
 	// Return the movelist in a quickly displayable format
 	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
+	//
+	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
 	//
 	//AddMove();
 };

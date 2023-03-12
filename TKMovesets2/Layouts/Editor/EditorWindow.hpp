@@ -76,6 +76,7 @@ private:
 	std::vector<DisplayableMove*> m_filteredMovelist;
 	// Contains the current display filter of the displayed movelist
 	EditorMovelistFilter_ m_movelistFilter = EditorMovelistFilter_All;
+	int16_t m_moveToScrollTo = -1;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -104,8 +105,8 @@ public:
 	// True is we need to call SetNextWindowFocus() before rendering our own
 	bool setFocus = false;
 
-	// Constructor that loads the moveset
-	EditorWindow(movesetInfo* moveset);
+	// Constructor that loads the moveset and starts its own importer
+	EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
 	// Destructor that deallocates the resources we allocated
 	~EditorWindow();
 	// Render the window

@@ -78,3 +78,20 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 
 	return moves;
 }
+
+
+uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
+{
+	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
+	if (playerId > 0) {
+		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+	}
+
+	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"));
+	if (moveId >= 0x8000) {
+		uint16_t* aliases = m_infos->aliases1;
+		moveId = aliases[moveId - 0x8000];
+	}
+
+	return moveId;
+}

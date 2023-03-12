@@ -36,7 +36,7 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 	// Tell the game which move to play NEXT
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_id"), moveId);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
 }
 
 void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
@@ -394,7 +394,7 @@ bool ImporterT7::CanImport()
 		return false;
 	}
 
-	gameAddr currentMove = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_offset"));
+	gameAddr currentMove = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove"));
 	if (currentMove == 0 || currentMove == -1) {
 		return false;
 	}
@@ -431,7 +431,7 @@ void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, 
 	// Tell the game which move to play NEXT
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_id"), moveId);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
 }
 
 gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)

@@ -11,7 +11,7 @@ const GameInfo cg_gamesInfo[] = {
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
 		.characterCount = 2,
-		.flags = GameFlag_MovesetEditable | GameFlag_MovesetLiveEditable,
+		.flags = GameFlag_MovesetLiveEditable,
 		.extractor = new FactoryType<ExtractorT7>,
 		.importer = new FactoryType<ImporterT7>,
 		.editor = new FactoryType <EditorT7>
@@ -78,7 +78,7 @@ namespace Games
 
 	bool IsGameEditable(uint8_t gameId)
 	{
-		return (GetGameInfo(gameId)->flags & GameFlag_MovesetEditable) > 0;
+		return GetGameInfo(gameId)->editor != nullptr;
 	}
 
 	bool IsGameLiveEditable(uint8_t gameId)
@@ -105,7 +105,7 @@ namespace Games
 	Editor* FactoryGetEditor(uint8_t gameId, GameProcess* process, GameData* game)
 	{
 		Editor* ed = (Editor*)cg_gamesInfo[gameId].editor->allocate(process, game);
-		//ed->characterCount = cg_gamesInfo[gameId].characterCount;
+		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
 	}
 };

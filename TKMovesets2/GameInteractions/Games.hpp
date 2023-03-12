@@ -28,10 +28,8 @@ public:
 typedef uint8_t GameFlag;
 enum GameFlag_
 {
-	// Game can be opened for moveset edition
-	GameFlag_MovesetEditable = (1 << 0),
 	// Game can be opened for live moveset edition : This requires some extra methods to be implemented in the Importer
-	GameFlag_MovesetLiveEditable = (1 << 1),
+	GameFlag_MovesetLiveEditable = (1 << 0),
 };
 
 struct GameInfo
