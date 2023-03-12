@@ -18,8 +18,9 @@ enum EditorInputType_
 {
 	EditorInputType_signed,
 	EditorInputType_unsigned,
-	EditorInputType_hexnumber,
+	EditorInputType_string,
 
+	EditorInputType_hexnumber,
 	EditorInputType_float,
 	EditorInputType_negativeFloat,
 	EditorInputType_bool,

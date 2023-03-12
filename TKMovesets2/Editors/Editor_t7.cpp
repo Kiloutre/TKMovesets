@@ -5,6 +5,7 @@
 
 #define gAddr StructsT7_gameAddr
 #define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
+#define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .memberSize = 0, .category = c, .imguiInputFlags = 0, .flags = EditorInputType_string }, SET_DEFAULT_VAL(a, "%s", g)
 #define CREATE_FIELD(a, b, c, d, e, f, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .memberSize = b, .category = c, .imguiInputFlags = d, .flags = e }, SET_DEFAULT_VAL(a, f, g)
 
 // ===== MOVES ===== //
@@ -16,9 +17,13 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
 
+	char* nameBlock = (char*)(m_movesetData + m_header->offsets.nameBlock);
+
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, fieldBytesAmount, category, imguiInputFlag, EditorInputFlag, format, value)
+	CREATE_STRING_FIELD("move_name", 0, nameBlock + move->name_addr);
+	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->vuln);
 	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->hitlevel);
 	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->transition);
@@ -56,9 +61,29 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
 
+	// todo: move name
+	// todo: anim name
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
 	move->hitlevel = (uint32_t)atoi(inputs["hitlevel"]->buffer);
+	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
+	move->anim_len = (uint32_t)atoi(inputs["anim_len"]->buffer);
+	move->hitbox_location = (uint32_t)atoi(inputs["hitbox_location"]->buffer);
+	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
+	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
+
 	move->cancel_addr = atoll(inputs["cancel_id"]->buffer);
+	move->hit_condition_addr = atoll(inputs["hit_condition_id"]->buffer);
+	move->extra_move_property_addr = atoll(inputs["extra_properties_id"]->buffer);
+	move->move_start_extraprop_addr = atoll(inputs["beginning_extra_properties_id"]->buffer);
+	move->move_end_extraprop_addr = atoll(inputs["ending_extra_properties_id"]->buffer);
+	move->voicelip_addr = atoll(inputs["voiceclip_id"]->buffer);
+
+	move->_0x28_cancel_addr = atoll(inputs["cancel_id_2"]->buffer);
+	move->_0x30_int__0x28_related = atoi(inputs["cancel_id_2_related"]->buffer);
+	move->_0x38_cancel_addr = atoll(inputs["cancel_id_3"]->buffer);
+	move->_0x40_int__0x38_related = atoi(inputs["cancel_id_3_related"]->buffer);
+	move->_0x48_cancel_addr = atoll(inputs["cancel_id_4"]->buffer);
+	move->_0x50_int__0x48_related = atoi(inputs["cancel_id_4_related"]->buffer);
 }
 
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
