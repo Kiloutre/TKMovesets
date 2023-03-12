@@ -13,13 +13,18 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	m_header = (TKMovesetHeader*)t_moveset;
 	m_movesetData = t_moveset + m_header->offsets.movesetInfoBlock + m_header->infos.header_size;
 	m_infos = (MovesetInfo*)m_movesetData;
+
+	// Get aliases as a vector
+	uint16_t* aliasesPtr = m_infos->aliases1;
+	for (size_t i = 0; i < 112 + 36; ++i) {
+		m_aliases.push_back(aliasesPtr[i]);
+	}
 }
 
 EditorTable EditorT7::GetMovesetTable()
 {
-	std::vector<uint16_t> aliases;
 	return EditorTable{
-		.aliases = aliases,
+		.aliases = m_aliases,
 	};
 }
 
@@ -32,7 +37,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
 
 	uint16_t* aliases = m_infos->aliases1;
-	uint8_t aliasesCount = 112 + 36;// sizeof(m_infos->aliases1);
+	uint8_t aliasesCount = m_aliases.size();
 
 	uint16_t moveId = 0;
 	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
@@ -89,8 +94,7 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"));
 	if (moveId >= 0x8000) {
-		uint16_t* aliases = m_infos->aliases1;
-		moveId = aliases[moveId - 0x8000];
+		moveId = m_aliases[moveId - 0x8000];
 	}
 
 	return moveId;

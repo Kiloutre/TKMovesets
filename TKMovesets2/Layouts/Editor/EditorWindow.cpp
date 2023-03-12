@@ -57,20 +57,20 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 	}
 }
 
-int16_t EditorWindow::ValidateMoveId(const char* buf)
+int32_t EditorWindow::ValidateMoveId(const char* buf)
 {
-	int moveId = atoi(buf);
+	int32_t moveId = atoi(buf);
 
-	const int movelistSize = 2000; // todo
+	const int movelistSize = m_movelist.size();
 	if (moveId >= movelistSize)
 	{
-		const int aliasesCount = 100; // todo
-		if (moveId < 0x8000 || moveId > (0x8000 + aliasesCount)) {
+		const int aliasesCount = editorTable.aliases.size();
+		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
 	}
 
-	return (int16_t)moveId;
+	return moveId;
 }
 
 bool EditorWindow::MovesetStillLoaded()
@@ -399,6 +399,8 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	// Read what needs to be read and potentially displayed right away
 	m_movelist = m_editor->GetDisplayableMoveList();
 	m_filteredMovelist = m_movelist;
+
+	editorTable = m_editor->GetMovesetTable();
 }
 
 void EditorWindow::Render(int dockid)

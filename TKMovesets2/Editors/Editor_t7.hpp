@@ -11,7 +11,9 @@ using namespace StructsT7;
 class EditorT7 : public Editor
 {
 private:
+	// Stores the moveset table containing lists offsets & count, aliases too
 	MovesetInfo* m_infos = nullptr;
+	std::vector<uint16_t> m_aliases;
 
 public:
 	// Inherit constructor

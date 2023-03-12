@@ -76,7 +76,10 @@ private:
 	std::vector<DisplayableMove*> m_filteredMovelist;
 	// Contains the current display filter of the displayed movelist
 	EditorMovelistFilter_ m_movelistFilter = EditorMovelistFilter_All;
-	int16_t m_moveToScrollTo = -1;
+	// The move to scroll to in the next frame
+	int32_t m_moveToScrollTo = -1;
+	// Stores important moveset informations such as aliases, etc...
+	EditorTable editorTable;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -90,7 +93,7 @@ private:
 
 	void FilterMovelist(EditorMovelistFilter_ filter);
 	// Vlidates the move ID against the movelist and alias list
-	int16_t ValidateMoveId(const char* buf);
+	int32_t ValidateMoveId(const char* buf);
 	// Returns true if our allocated moveset is still loaded on our character
 	bool MovesetStillLoaded();
 	// Save the loaded moveset to a file
