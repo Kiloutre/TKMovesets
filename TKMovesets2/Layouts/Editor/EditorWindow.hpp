@@ -46,6 +46,8 @@ public:
 
 class EditorWindow {
 private:
+	// True if the game and characters are loaded and we can start interacting with it
+	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
 	EditorInfos m_loadedCharacter;
 	// True if we need to enable the save button

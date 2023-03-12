@@ -30,12 +30,20 @@ struct DisplayableMove
 	uint16_t aliasId;
 	// Store useful flags for quick filtering / coloring
 	EditorMoveFlags flags;
+	// Store the color to display incase of move with flags
+	unsigned int color;
 };
 
 struct EditorTable
 {
 	std::vector<uint16_t> aliases;
 };
+
+
+namespace EditorUtils
+{
+	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
+}
 
 class DLLCONTENT Editor
 {

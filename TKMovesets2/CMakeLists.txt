@@ -62,6 +62,7 @@ set(IMPORTEXPORT_SOURCES
                     # Base classes for our extractor & importers
                     "GameInteractions/Extractors/Extractor.cpp"
                     "GameInteractions/Importers/Importer.cpp"
+                    "Editors/Editor.cpp"
 
                     # Game-specific
                     "GameInteractions/Extractors/Extractor_t7.cpp"
@@ -71,12 +72,12 @@ set(IMPORTEXPORT_SOURCES
 
 ## Build ##
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
-add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} )
+add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES}  "Editors/Editor.cpp")
 target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe
-add_executable (TKMovesets2 ${BINARY_SOURCES} )
+add_executable (TKMovesets2 ${BINARY_SOURCES}  "Editors/Editor.cpp")
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)

@@ -172,7 +172,7 @@ void EditorWindow::RenderStatusBar()
 	
 	// Import button
 	ImGui::SameLine();
-	bool canImport = isAttached && m_importNeeded && !importerHelper.IsBusy() && importerHelper.CanStart();
+	bool canImport = isAttached && m_importNeeded && !importerHelper.IsBusy() && m_canInteractWithGame;
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		importerHelper.lastLoadedMoveset = 0;
 		importerHelper.QueueCharacterImportation(m_moveset, m_movesetSize);
@@ -212,6 +212,16 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 
 	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
 	ImGui::Begin("Move3");
+	ImGui::Text("o3");
+	ImGui::End();
+
+	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
+	ImGui::Begin("Move4");
+	ImGui::Text("o3");
+	ImGui::End();
+
+	ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
+	ImGui::Begin("Move5");
 	ImGui::Text("o3");
 	ImGui::End();
 }
@@ -256,34 +266,47 @@ void EditorWindow::RenderMovelist()
 	}
 
 	// Movelist. Leave some 50 units of space for move player
-	ImVec2 Size = ImGui::GetContentRegionAvail();
-	Size.y -= 80;
-	if (ImGui::BeginTable("MovelistTable", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
-		| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedFit, Size))
 	{
-		ImGui::TableSetupColumn("ID");
-		ImGui::TableSetupColumn(_("edition.move_name"));
-		ImGui::TableSetupColumn(_("edition.move_generic_id"));
-		ImGui::TableHeadersRow();
-
-		for (DisplayableMove* move : m_filteredMovelist)
+		ImVec2 TableSize = ImGui::GetContentRegionAvail();
+		TableSize.y -= 80;
+		if (ImGui::BeginTable("MovelistTable", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+			| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedFit, TableSize))
 		{
-			ImGui::TableNextRow();
-			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(std::format("{}", move->moveId).c_str());
+			ImGui::TableSetupColumn("ID");
+			ImGui::TableSetupColumn(_("edition.move_name"));
+			ImGui::TableSetupColumn(_("edition.move_generic_id"));
+			ImGui::TableHeadersRow();
 
-			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(move->name.c_str());
-
-			if (move->aliasId != 0) {
+			for (DisplayableMove* move : m_filteredMovelist)
+			{
+				ImGui::TableNextRow();
 				ImGui::TableNextColumn();
-				ImGui::TextUnformatted(std::format("{}", move->aliasId).c_str());
+
+				if (move->flags != 0)
+				{
+					ImVec2 drawStart = ImGui::GetWindowPos() + ImGui::GetCursorPos();
+					drawStart.y -= ImGui::GetScrollY();
+					ImVec2 drawArea = ImVec2(TableSize.x, ImGui::GetTextLineHeight());
+					ImDrawList* drawlist = ImGui::GetWindowDrawList();
+					drawlist->AddRectFilled(drawStart, drawStart + drawArea, move->color);
+					// Draw BG
+				}
+
+				ImGui::TextUnformatted(std::format("{}", move->moveId).c_str());
+
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(move->name.c_str());
+
+				if (move->aliasId != 0) {
+					ImGui::TableNextColumn();
+					ImGui::TextUnformatted(std::format("{}", move->aliasId).c_str());
+				}
+
+				// todo: one empty column is always displayed here for some reason. fix it. to fix.
 			}
 
-			// todo: one empty column is always displayed here for some reason. fix it. to fix.
+			ImGui::EndTable();
 		}
-
-		ImGui::EndTable();
 	}
 
 
@@ -373,8 +396,10 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo)
 void EditorWindow::Render(int dockid)
 {
 	// Check for important changes here
+	m_canInteractWithGame = importerHelper.CanStart();
+
 	if (m_loadedMoveset != 0) {
-		if (!MovesetStillLoaded())
+		if (!m_canInteractWithGame || !MovesetStillLoaded())
 		{
 			m_liveEdition = false;
 			m_importNeeded = true;

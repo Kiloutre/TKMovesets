@@ -62,6 +62,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 		} else if (Helpers::endsWith(moveName, "_n")) {
 			flags |= EditorMoveFlags_ThrowReaction;
 		}
+
 		if (Helpers::startsWith(moveName, "c_")) {
 			flags |= EditorMoveFlags_Custom;
 		}
@@ -70,7 +71,8 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 			.moveId = moveId,
 			.name = moveName,
 			.aliasId = aliasId,
-			.flags = flags
+			.flags = flags,
+			.color = EditorUtils::GetMoveColorFromFlag(flags)
 		});
 	}
 

@@ -96,7 +96,6 @@ namespace Helpers
 			if (prefix[i] != str[i]) {
 				return false;
 			}
-			++i;
 		}
 
 		return true;
