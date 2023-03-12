@@ -64,7 +64,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 	const int movelistSize = m_movelist.size();
 	if (moveId >= movelistSize)
 	{
-		const int aliasesCount = editorTable.aliases.size();
+		const int aliasesCount = m_editorTable.aliases.size();
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
@@ -396,11 +396,13 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 	filename = movesetInfo->filename;
 
+	m_windowTitle = std::format("{} {}", _("edition.window_title"), m_loadedCharacter.name.c_str());
+
 	// Read what needs to be read and potentially displayed right away
 	m_movelist = m_editor->GetDisplayableMoveList();
 	m_filteredMovelist = m_movelist;
 
-	editorTable = m_editor->GetMovesetTable();
+	m_editorTable = m_editor->GetMovesetTable();
 }
 
 void EditorWindow::Render(int dockid)
@@ -436,7 +438,7 @@ void EditorWindow::Render(int dockid)
 		windowFlags |= ImGuiWindowFlags_UnsavedDocument;
 	}
 
-	if (ImGui::Begin(m_loadedCharacter.name.c_str(), &popen, windowFlags))
+	if (ImGui::Begin(m_windowTitle.c_str(), &popen, windowFlags))
 	{
 		RenderToolBar();
 

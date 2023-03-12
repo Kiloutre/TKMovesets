@@ -123,6 +123,7 @@ edition.move_id_hint = ID...
 edition.move_current = Actuel
 edition.play_move_1p = Lancer (J1)
 edition.play_move_2p = Lancer (J2)
+edition.window_title = Édition :
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 

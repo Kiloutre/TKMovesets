@@ -79,7 +79,9 @@ private:
 	// The move to scroll to in the next frame
 	int32_t m_moveToScrollTo = -1;
 	// Stores important moveset informations such as aliases, etc...
-	EditorTable editorTable;
+	EditorTable m_editorTable;
+	// Contains the window title, used to prefix any window created by this editor
+	std::string m_windowTitle;
 
 
 	// Render the top toolbar containing useful moveset editing tools
