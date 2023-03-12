@@ -226,6 +226,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 			++i;
 		}
 		else {
+			m_moveWindows.erase(m_moveWindows.begin() + i);
 			delete moveWin;
 		}
 	}
