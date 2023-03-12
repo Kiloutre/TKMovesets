@@ -1,5 +1,6 @@
 #include <ImGui.h>
 #include <format>
+#include <string>
 
 #include "imgui_extras.hpp"
 #include "EditorMove.hpp"
@@ -18,7 +19,13 @@ EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* e
 	moveId = t_moveId;
 	m_editor = editor;
 
-	m_inputMap = editor->GetMoveInputs(t_moveId, m_inputs);
+	std::vector<std::string> drawOrder;
+	m_inputMap = editor->GetMoveInputs(t_moveId, drawOrder);
+
+	for (std::string fieldName : drawOrder) {
+		printf("%s, %lld\n", fieldName.c_str(), m_inputMap[fieldName]);
+		m_inputs.push_back(m_inputMap[fieldName]);
+	}
 
 	for (auto& field : m_inputs) {
 		if (field->category >= m_categoryAmount) {

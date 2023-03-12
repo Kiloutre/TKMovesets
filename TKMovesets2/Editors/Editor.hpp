@@ -135,7 +135,7 @@ public:
 	virtual bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) = 0;
 
 	// Move-related
-	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, std::vector<EditorInput*>& drawOrder) = 0;
+	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, std::vector<std::string>& drawOrder) = 0;
 	virtual void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) = 0;
 
 	// -- Iteractons -- //

@@ -210,7 +210,7 @@ namespace StructsT7
 		OtherMoveProperty* move_start_extraprop_addr; // Can be NULL
 		OtherMoveProperty* move_end_extraprop_addr; // Can be NULL
 		int32_t _0x98_int;
-		int32_t hitbox_location;
+		uint32_t hitbox_location;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
 		int16_t _0xA8_short; // facing/extras
@@ -468,7 +468,7 @@ namespace StructsT7_gameAddr
 		gameAddr move_start_extraprop_addr; // Can be NULL
 		gameAddr move_end_extraprop_addr; // Can be NULL
 		int32_t _0x98_int;
-		int32_t hitbox_location;
+		uint32_t hitbox_location;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
 		int16_t _0xA8_short; // facing/extras

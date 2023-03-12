@@ -4,57 +4,44 @@
 # include "Helpers.hpp"
 
 #define gAddr StructsT7_gameAddr
+#define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
+#define CREATE_FIELD(a, b, c, d, e, f, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .memberSize = b, .category = c, .imguiInputFlags = d, .flags = e }, SET_DEFAULT_VAL(a, f, g)
 
 // ===== MOVES ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std::vector<EditorInput*>& drawOrder)
+std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std::vector<std::string>& drawOrder)
 {
-
 	std::map<std::string, EditorInput*> inputMap;
 
-	// Set up fields
-	inputMap["vulnerability"] = new EditorInput{
-		.memberSize = 4,
-		.category = 0,
-		.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-		.flags = EditorInputType_unsigned
-	};
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
 
-	inputMap["hitlevel"] = new EditorInput{
-		.memberSize = 4,
-		.category = 0,
-		.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-		.flags = EditorInputType_unsigned
-	};
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->vuln);
+	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->hitlevel);
+	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->transition);
+	CREATE_FIELD("anim_len", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->anim_len);
+	CREATE_FIELD("hitbox_location", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->hitbox_location);
+	CREATE_FIELD("first_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->first_active_frame);
+	CREATE_FIELD("last_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->last_active_frame);
 
-	inputMap["cancel_id"] = new EditorInput{
-		.memberSize = 8,
-		.category = 0,
-		.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-	};
+	CREATE_FIELD("cancel_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->cancel_addr);
+	CREATE_FIELD("hit_condition_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->hit_condition_addr);
+	CREATE_FIELD("extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->extra_move_property_addr);
+	CREATE_FIELD("beginning_extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_start_extraprop_addr);
+	CREATE_FIELD("ending_extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_end_extraprop_addr);
+	CREATE_FIELD("voiceclip_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->voicelip_addr);
 
+	// Finishing touch
 	for (auto& [name, input] : inputMap) {
-		// Duplicate the name inside the structure, this is more convenient for me
+		// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
 		input->name = name;
 		input->field_fullname = "edition.move_field." + name;
 	}
 
-	// Set up draw order
-	drawOrder.push_back(inputMap["vulnerability"]);
-	drawOrder.push_back(inputMap["hitlevel"]);
-	drawOrder.push_back(inputMap["cancel_id"]);
-
-	// Set up default field values (read from moveset data
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
-
-	sprintf_s(inputMap["vulnerability"]->buffer, FORM_INPUT_BUFSIZE, "%u", move->vuln);
-	sprintf_s(inputMap["hitlevel"]->buffer, FORM_INPUT_BUFSIZE, "%u", move->hitlevel);
-	sprintf_s(inputMap["cancel_id"]->buffer, FORM_INPUT_BUFSIZE, "%lld", move->cancel_addr);
-	
 	return inputMap;
 }
-
 
 void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs)
 {
@@ -129,7 +116,9 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 
 bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field)
 {
-	if (field->memberSize == 4) {
+	switch (field->memberSize)
+	{
+	case 4:
 		if (field->flags & EditorInputType_signed) {
 			long long num = atoll(field->buffer);
 			if (num > INT_MAX || num < INT_MIN) {
@@ -142,9 +131,9 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 				return false;
 			}
 		}
-	}
+		break;
 
-	if (field->memberSize == 2) {
+	case 2:
 		if (field->flags & EditorInputType_signed) {
 			int num = atoi(field->buffer);
 			if (num > SHRT_MAX || num < SHRT_MIN) {
@@ -157,6 +146,7 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 				return false;
 			}
 		}
+		break;
 	}
 
 	if (fieldType == "move") {
