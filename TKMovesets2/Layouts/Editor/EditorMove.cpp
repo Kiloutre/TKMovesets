@@ -66,7 +66,7 @@ void EditorMove::Render()
 				if (ImGui::InputText(_(field->name.c_str()), field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 				{
 					unsavedChanges = true;
-					m_erroredFields[i] = !m_editor->ValidateField(field->name, field->buffer);
+					m_erroredFields[i] = !m_editor->ValidateField(field);
 				}
 
 				if (erroredBg) {

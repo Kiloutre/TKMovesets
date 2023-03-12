@@ -132,8 +132,11 @@ edition.move_field.vulnerability = Vuln
 edition.move_field.hitlevel = Hauteur de coup
 edition.move_field.cancel_id = ID de cancel
 edition.move_field.cancel_id_2 = ID de cancel 2
+edition.move_field.cancel_id_2_related = ID de cancel 2 (lié)
 edition.move_field.cancel_id_3 = ID de cancel 3
+edition.move_field.cancel_id_3_related = ID de cancel 3 (lié)
 edition.move_field.cancel_id_4 = ID de cancel 4
+edition.move_field.cancel_id_4_related = ID de cancel 4 (lié)
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 

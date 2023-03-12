@@ -14,9 +14,10 @@
 typedef uint16_t EditorInputType;
 enum EditorInputType_
 {
-	EditorInputType_positiveNumber,
-	EditorInputType_negativeNumber,
+	EditorInputType_signed,
+	EditorInputType_unsigned,
 	EditorInputType_hexnumber,
+
 	EditorInputType_float,
 	EditorInputType_negativeFloat,
 	EditorInputType_bool,
@@ -28,9 +29,10 @@ struct EditorInput
 	std::string name;
 	uint16_t offset;
 	uint8_t memberSize;
-	uint8_t category;
-	char buffer[32];
-	ImGuiInputTextFlags imguiInputFlags;
+	uint8_t category = 0;
+	ImGuiInputTextFlags imguiInputFlags = 0;
+	EditorInputType flags = 0;
+	char buffer[32] = "";
 };
 
 // Pre-calculate these flags in order to color-code, sort and filter the movelist
@@ -122,5 +124,5 @@ public:
 	virtual std::vector<EditorInput*> GetFormInputs(std::string identifier) = 0;
 	//AddMove();
 	// Returns true if the given field is valid
-	virtual bool ValidateField(std::string fieldIdentifier, const char* buffer) = 0;
+	virtual bool ValidateField(EditorInput* field) = 0;
 };

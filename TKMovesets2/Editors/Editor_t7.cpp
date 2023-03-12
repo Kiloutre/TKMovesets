@@ -3,6 +3,83 @@
 
 #define gAddr StructsT7_gameAddr
 
+// -- Static helpers -- //
+
+static std::vector<EditorInput*> GetMoveInputs()
+{
+	return {
+		new EditorInput{
+			.name = "edition.move_field.vulnerability",
+			.offset = offsetof(Move, vuln),
+			.memberSize = 4,
+			.category = 0,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			.flags = EditorInputType_unsigned
+		},
+		new EditorInput{
+			.name = "edition.move_field.hitlevel",
+			.offset = offsetof(Move, hitlevel),
+			.memberSize = 4,
+			.category = 0,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			.flags = EditorInputType_unsigned
+		},
+		new EditorInput{
+			.name = "edition.move_field.cancel_id",
+			.offset = offsetof(Move, cancel_addr),
+			.memberSize = 8,
+			.category = 0,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+		},
+
+		new EditorInput{
+			.name = "edition.move_field.cancel_id_2",
+			.offset = offsetof(Move, _0x28_cancel_addr),
+			.memberSize = 8,
+			.category = 1,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+		},
+		new EditorInput{
+			.name = "edition.move_field.cancel_id_2_related",
+			.offset = offsetof(Move, _0x30_int__0x28_related),
+			.memberSize = 4,
+			.category = 1,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			.flags = EditorInputType_unsigned
+		},
+		new EditorInput{
+			.name = "edition.move_field.cancel_id_3",
+			.offset = offsetof(Move, _0x38_cancel_addr),
+			.memberSize = 8,
+			.category = 1,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+		},
+		new EditorInput{
+			.name = "edition.move_field.cancel_id_3_related",
+			.offset = offsetof(Move, _0x40_int__0x38_related),
+			.memberSize = 4,
+			.category = 1,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			.flags = EditorInputType_unsigned
+		},
+		new EditorInput{
+			.name = "edition.move_field.cancel_id_4",
+			.offset = offsetof(Move, _0x48_cancel_addr),
+			.memberSize = 8,
+			.category = 1,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+		},
+		new EditorInput{
+			.name = "edition.move_field.cancel_id_4_related",
+			.offset = offsetof(Move, _0x50_int__0x48_related),
+			.memberSize = 4,
+			.category = 1,
+			.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			.flags = EditorInputType_unsigned
+		},
+	};
+}
+
 // -- Private methods -- //
 
 // -- Public methods -- //
@@ -25,15 +102,44 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	}
 }
 
-// - Field methods - //
-
-bool EditorT7::ValidateField(std::string fieldIdentifier, const char* buffer)
+bool EditorT7::ValidateField(EditorInput* field)
 {
+	if (field->memberSize == 4) {
+		if (field->flags & EditorInputType_signed) {
+			long long num = atoll(field->buffer);
+			if (num > INT_MAX || num < INT_MIN) {
+				return false;
+			}
+		}
+		else if (field->flags & EditorInputType_unsigned) {
+			long long num = atoll(field->buffer);
+			if (num > UINT_MAX || num < 0) {
+				return false;
+			}
+		}
+	}
+
+	if (field->memberSize == 2) {
+		if (field->flags & EditorInputType_signed) {
+			int num = atoi(field->buffer);
+			if (num > SHRT_MAX || num < SHRT_MIN) {
+				return false;
+			}
+		}
+		else if (field->flags & EditorInputType_unsigned) {
+			int num = atoi(field->buffer);
+			if (num > USHRT_MAX || num < 0) {
+				return false;
+			}
+		}
+	}
+
+	std::string fieldIdentifier = field->name;
 	if (fieldIdentifier == "edition.move_field.cancel_id" ||
 		fieldIdentifier == "edition.move_field.cancel_id_2" ||
 		fieldIdentifier == "edition.move_field.cancel_id_3" ||
 		fieldIdentifier == "edition.move_field.cancel_id_4") {
-		int cancelIdx = atoi(buffer);
+		int cancelIdx = atoi(field->buffer);
 		if (cancelIdx < 0 || cancelIdx >= m_infos->table.cancelCount) {
 			return false;
 		}
@@ -41,56 +147,12 @@ bool EditorT7::ValidateField(std::string fieldIdentifier, const char* buffer)
 	return true;
 }
 
-std::vector<EditorInput*> EditorT7::GetFormInputs(std::string identifier)
+std::vector<EditorInput*> EditorT7::GetFormInputs(std::string formIdentifier)
 {
-	if (identifier == "move") {
-		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-
-		return {
-			new EditorInput{
-				.name = "edition.move_field.vulnerability",
-				.offset = offsetof(Move, vuln),
-				.memberSize = 4,
-				.category = 0,
-				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal
-			},
-			new EditorInput{
-				.name = "edition.move_field.hitlevel",
-				.offset = offsetof(Move, hitlevel),
-				.memberSize = 4,
-				.category = 0,
-				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-			},
-			new EditorInput{
-				.name = "edition.move_field.cancel_id",
-				.offset = offsetof(Move, cancel_addr),
-				.memberSize = 8,
-				.category = 0,
-				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-			},
-			new EditorInput{
-				.name = "edition.move_field.cancel_id_2",
-				.offset = offsetof(Move, _0x28_cancel_addr),
-				.memberSize = 8,
-				.category = 1,
-				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-			},
-			new EditorInput{
-				.name = "edition.move_field.cancel_id_3",
-				.offset = offsetof(Move, _0x38_cancel_addr),
-				.memberSize = 8,
-				.category = 1,
-				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-			},
-			new EditorInput{
-				.name = "edition.move_field.cancel_id_4",
-				.offset = offsetof(Move, _0x48_cancel_addr),
-				.memberSize = 8,
-				.category = 1,
-				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
-			},
-		};
+	if (formIdentifier == "move") {
+		//uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		//gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
+		return GetMoveInputs();
 	}
 
 	return std::vector<EditorInput*>();
@@ -143,7 +205,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 			flags |= EditorMoveFlags_ThrowReaction;
 		}
 
-		if (Helpers::startsWith(moveName, "c_")) {
+		if (Helpers::startsWith(moveName, "tkm_")) {
 			flags |= EditorMoveFlags_Custom;
 		}
 
