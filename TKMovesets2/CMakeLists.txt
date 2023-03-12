@@ -101,6 +101,7 @@ target_link_libraries(TKMovesets2 PRIVATE glfw)
 
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
+target_link_libraries(ExportImport PRIVATE imgui::imgui)
 
 #find_package(liblzma CONFIG REQUIRED)
 #target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)

@@ -3,6 +3,10 @@
 
 #define gAddr StructsT7_gameAddr
 
+// -- Private methods -- //
+
+// -- Public methods -- //
+
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
 	m_moveset = t_moveset;
@@ -21,6 +25,77 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	}
 }
 
+// - Field methods - //
+
+bool EditorT7::ValidateField(std::string fieldIdentifier, const char* buffer)
+{
+	if (fieldIdentifier == "edition.move_field.cancel_id" ||
+		fieldIdentifier == "edition.move_field.cancel_id_2" ||
+		fieldIdentifier == "edition.move_field.cancel_id_3" ||
+		fieldIdentifier == "edition.move_field.cancel_id_4") {
+		int cancelIdx = atoi(buffer);
+		if (cancelIdx < 0 || cancelIdx >= m_infos->table.cancelCount) {
+			return false;
+		}
+	}
+	return true;
+}
+
+std::vector<EditorInput*> EditorT7::GetFormInputs(std::string identifier)
+{
+	if (identifier == "move") {
+		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
+
+		return {
+			new EditorInput{
+				.name = "edition.move_field.vulnerability",
+				.offset = offsetof(Move, vuln),
+				.memberSize = 4,
+				.category = 0,
+				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal
+			},
+			new EditorInput{
+				.name = "edition.move_field.hitlevel",
+				.offset = offsetof(Move, hitlevel),
+				.memberSize = 4,
+				.category = 0,
+				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			},
+			new EditorInput{
+				.name = "edition.move_field.cancel_id",
+				.offset = offsetof(Move, cancel_addr),
+				.memberSize = 8,
+				.category = 0,
+				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			},
+			new EditorInput{
+				.name = "edition.move_field.cancel_id_2",
+				.offset = offsetof(Move, _0x28_cancel_addr),
+				.memberSize = 8,
+				.category = 1,
+				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			},
+			new EditorInput{
+				.name = "edition.move_field.cancel_id_3",
+				.offset = offsetof(Move, _0x38_cancel_addr),
+				.memberSize = 8,
+				.category = 1,
+				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			},
+			new EditorInput{
+				.name = "edition.move_field.cancel_id_4",
+				.offset = offsetof(Move, _0x48_cancel_addr),
+				.memberSize = 8,
+				.category = 1,
+				.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+			},
+		};
+	}
+
+	return std::vector<EditorInput*>();
+}
+
 EditorTable EditorT7::GetMovesetTable()
 {
 	return EditorTable{
@@ -31,7 +106,7 @@ EditorTable EditorT7::GetMovesetTable()
 std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 {
 	std::vector<DisplayableMove*> moves;
-	
+
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
@@ -83,7 +158,6 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 
 	return moves;
 }
-
 
 uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 {

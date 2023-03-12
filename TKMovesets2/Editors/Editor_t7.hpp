@@ -23,4 +23,6 @@ public:
 	EditorTable GetMovesetTable() override;
 	std::vector<DisplayableMove*> GetDisplayableMoveList() override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
+	std::vector<EditorInput*> GetFormInputs(std::string identifier) override;
+	bool ValidateField(std::string fieldIdentifier, const char* buffer) override;
 };

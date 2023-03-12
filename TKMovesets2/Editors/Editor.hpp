@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ImGui.h>
 #include <string>
 #include <stdint.h>
 
@@ -10,6 +11,29 @@
 #include "GameAddresses.h"
 #include "MovesetStructs.h"
 
+typedef uint16_t EditorInputType;
+enum EditorInputType_
+{
+	EditorInputType_positiveNumber,
+	EditorInputType_negativeNumber,
+	EditorInputType_hexnumber,
+	EditorInputType_float,
+	EditorInputType_negativeFloat,
+	EditorInputType_bool,
+	EditorInputType_text,
+};
+
+struct EditorInput
+{
+	std::string name;
+	uint16_t offset;
+	uint8_t memberSize;
+	uint8_t category;
+	char buffer[32];
+	ImGuiInputTextFlags imguiInputFlags;
+};
+
+// Pre-calculate these flags in order to color-code, sort and filter the movelist
 typedef uint16_t EditorMoveFlags;
 enum EditorMoveFlags_
 {
@@ -21,7 +45,7 @@ enum EditorMoveFlags_
 	EditorMoveFlags_Custom = (1 << 5),
 };
 
-
+// Used for the move list
 struct DisplayableMove
 {
 	uint16_t moveId;
@@ -88,12 +112,15 @@ public:
 
 	// Loads important moveset data in our class, required to start functionning
 	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;
-	//
+	// Returns useful informations contained within the moveset  actual header
 	virtual EditorTable GetMovesetTable() = 0;
 	// Return the movelist in a quickly displayable format
 	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
-	//
+	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
-	//
+	// Returns a list of inputs to build forms with
+	virtual std::vector<EditorInput*> GetFormInputs(std::string identifier) = 0;
 	//AddMove();
+	// Returns true if the given field is valid
+	virtual bool ValidateField(std::string fieldIdentifier, const char* buffer) = 0;
 };

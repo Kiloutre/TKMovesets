@@ -187,13 +187,13 @@ namespace StructsT7
 		uint32_t hitlevel;
 		Cancel* cancel_addr;
 		Cancel* _0x28_cancel_addr;
-		uint32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
+		uint32_t _0x30_int__0x28_related;
 		uint32_t _0x34_int;
 		Cancel* _0x38_cancel_addr;
-		int32_t _0x40_int__0x28_related; // i believe this is 2x4 bytes
+		uint32_t _0x40_int__0x28_related;
 		uint32_t _0x44_int;
 		Cancel* _0x48_cancel_addr;
-		int32_t _0x50_int__0x28_related;
+		uint32_t _0x50_int__0x28_related;
 		uint16_t transition;
 		int16_t _0x56_short;
 		uint16_t moveId_val1; // Clearly related to move ID

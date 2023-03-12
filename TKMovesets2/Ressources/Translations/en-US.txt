@@ -127,6 +127,16 @@ edition.move_current = Current
 edition.play_move_1p = Play (1P)
 edition.play_move_2p = Play (2P)
 edition.window_title = Editor:
+edition.apply = Apply
+
+edition.move_field.category_0 = Main
+edition.move_field.category_1 = Extras 
+edition.move_field.vulnerability = Vuln
+edition.move_field.hitlevel = Hit level
+edition.move_field.cancel_id = Cancel ID
+edition.move_field.cancel_id_2 = Cancel ID 2
+edition.move_field.cancel_id_3 = Cancel ID 3
+edition.move_field.cancel_id_4 = Cancel ID 4
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

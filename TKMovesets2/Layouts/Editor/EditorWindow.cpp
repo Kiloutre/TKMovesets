@@ -20,7 +20,7 @@ void EditorWindow::OpenMoveWindow(uint16_t moveId)
 		}
 	}
 
-	EditorMove* newWin = new EditorMove(m_windowTitle, moveId);
+	EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor);
 	m_moveWindows.push_back(newWin);
 }
 
@@ -452,8 +452,6 @@ void EditorWindow::Render(int dockid)
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, windowFlags))
 	{
-		// Set this to false here : we will have to detect in subclasses if there are unsaved changes
-		m_savedLastChange = true;
 		RenderToolBar();
 
 		ImVec2 Size = ImGui::GetContentRegionAvail();

@@ -8,10 +8,10 @@ t7_p1_addr                = +0x34DF630, 0
 val:t7_playerstruct_size  = 0x3670
 val:t7_motbin_offset      = 0x1520
 val:t7_chara_id_offset    = 0xD8
+val:t7_currmove           = 0x220
 # Required for importation
 val:t7_camera_mota_offset = 0x14A0
-# Fancy importation
-val:t7_currmove           = 0x220
+# Extras for fancier importation
 val:t7_currmove_timer     = 0x1D4
 val:t7_currmove_id        = 0x350
 val:t7_nextmove_addr      = 0xDA0
