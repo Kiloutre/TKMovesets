@@ -24,5 +24,6 @@ public:
 	std::vector<DisplayableMove*> GetDisplayableMoveList() override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
 	std::vector<EditorInput*> GetFormInputs(std::string identifier) override;
+	void FillField(std::string identifier, EditorInput* field, uint32_t id) override;
 	bool ValidateField(EditorInput* field) override;
 };

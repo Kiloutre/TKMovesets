@@ -1,9 +1,40 @@
+#include <map>
+
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
 
 #define gAddr StructsT7_gameAddr
 
 // -- Static helpers -- //
+
+/*
+static std::map<std::string, EditorInput*> GetMoveInputs()
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	inputMap["edition.move_field.vulnerability"] = new EditorInput{
+		.memberSize = 4,
+		.category = 0,
+		.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+		.flags = EditorInputType_unsigned
+	};
+
+	inputMap["edition.move_field.hitlevel"] = new EditorInput{
+		.memberSize = 4,
+		.category = 0,
+		.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+		.flags = EditorInputType_unsigned
+	};
+
+	inputMap["edition.move_field.cancel_id"] = new EditorInput{
+		.memberSize = 8,
+		.category = 0,
+		.imguiInputFlags = ImGuiInputTextFlags_CharsDecimal,
+	};
+	
+	return inputMap;
+}
+*/
 
 static std::vector<EditorInput*> GetMoveInputs()
 {
@@ -84,21 +115,32 @@ static std::vector<EditorInput*> GetMoveInputs()
 
 // -- Public methods -- //
 
-void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
+void EditorT7::FillField(std::string identifier, EditorInput* field, uint32_t id)
 {
-	m_moveset = t_moveset;
-	m_movesetSize = t_movesetSize;
+	if (identifier == "move")
+	{
+		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
+		movePtr += id;
 
-	// Start getting pointers toward useful data structures
-	// Also get the actual game-moveset (past our header) pointer
-	m_header = (TKMovesetHeader*)t_moveset;
-	m_movesetData = t_moveset + m_header->offsets.movesetInfoBlock + m_header->infos.header_size;
-	m_infos = (MovesetInfo*)m_movesetData;
-
-	// Get aliases as a vector
-	uint16_t* aliasesPtr = m_infos->aliases1;
-	for (size_t i = 0; i < 112 + 36; ++i) {
-		m_aliases.push_back(aliasesPtr[i]);
+		if (field->name == "edition.move_field.vulnerability") {
+			sprintf(field->buffer, "%u", movePtr->vuln);
+		}
+		else if (field->name == "edition.move_field.hitlevel") {
+			sprintf(field->buffer, "%u", movePtr->hitlevel);
+		}
+		else if (field->name == "edition.move_field.cancel_id") {
+			sprintf(field->buffer, "%lld", movePtr->cancel_addr);
+		}
+		else if (field->name == "edition.move_field.cancel_id_2") {
+			sprintf(field->buffer, "%lld", movePtr->_0x28_cancel_addr);
+		}
+		else if (field->name == "edition.move_field.cancel_id_3") {
+			sprintf(field->buffer, "%lld", movePtr->_0x38_cancel_addr);
+		}
+		else if (field->name == "edition.move_field.cancel_id_4") {
+			sprintf(field->buffer, "%lld", movePtr->_0x48_cancel_addr);
+		}
 	}
 }
 
@@ -140,7 +182,7 @@ bool EditorT7::ValidateField(EditorInput* field)
 		fieldIdentifier == "edition.move_field.cancel_id_3" ||
 		fieldIdentifier == "edition.move_field.cancel_id_4") {
 		int cancelIdx = atoi(field->buffer);
-		if (cancelIdx < 0 || cancelIdx >= m_infos->table.cancelCount) {
+		if (cancelIdx < -1 || cancelIdx >= m_infos->table.cancelCount) {
 			return false;
 		}
 	}
@@ -150,12 +192,30 @@ bool EditorT7::ValidateField(EditorInput* field)
 std::vector<EditorInput*> EditorT7::GetFormInputs(std::string formIdentifier)
 {
 	if (formIdentifier == "move") {
-		//uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-		//gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 		return GetMoveInputs();
 	}
 
 	return std::vector<EditorInput*>();
+}
+
+// ==================
+
+void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
+{
+	m_moveset = t_moveset;
+	m_movesetSize = t_movesetSize;
+
+	// Start getting pointers toward useful data structures
+	// Also get the actual game-moveset (past our header) pointer
+	m_header = (TKMovesetHeader*)t_moveset;
+	m_movesetData = t_moveset + m_header->offsets.movesetInfoBlock + m_header->infos.header_size;
+	m_infos = (MovesetInfo*)m_movesetData;
+
+	// Get aliases as a vector
+	uint16_t* aliasesPtr = m_infos->aliases1;
+	for (size_t i = 0; i < 112 + 36; ++i) {
+		m_aliases.push_back(aliasesPtr[i]);
+	}
 }
 
 EditorTable EditorT7::GetMovesetTable()

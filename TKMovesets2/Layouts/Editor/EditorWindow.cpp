@@ -88,14 +88,18 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 
 bool EditorWindow::MovesetStillLoaded()
 {
-	// todo: check if moveset
 	gameAddr movesetAddress = importerHelper.importer->GetMovesetAddress(importerHelper.currentPlayerId);
 	return movesetAddress == m_loadedMoveset;
 }
 
 void EditorWindow::Save()
 {
-	// todo
+	TKMovesetHeader* header = (TKMovesetHeader*)m_moveset;
+	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
+	file.write((char*)m_moveset, m_movesetSize);
+	file.close();
 	m_savedLastChange = true;
 }
 

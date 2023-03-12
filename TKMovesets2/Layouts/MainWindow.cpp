@@ -13,12 +13,12 @@
 #include "imgui_extras.hpp"
 
 const ImU32 editorTitleColors[] = {
-	IM_COL32(77, 131, 219, 50),
-	IM_COL32(119, 58, 199, 50),
-	IM_COL32(210, 100, 222, 50),
-	IM_COL32(186, 54, 54, 50),
-	IM_COL32(140, 0, 0, 50),
-	IM_COL32(119, 175, 58, 50),
+	IM_COL32(77, 131, 219, 125),
+	IM_COL32(119, 58, 199, 125),
+	IM_COL32(210, 100, 222, 125),
+	IM_COL32(186, 54, 54, 125),
+	IM_COL32(140, 0, 0, 125),
+	IM_COL32(119, 175, 58, 125),
 };
 
 // -- Private methods -- //
@@ -144,7 +144,11 @@ void MainWindow::Update()
 				const ImU32 colorCount = sizeof(editorTitleColors) / sizeof(editorTitleColors[0]);
 				ImGui::PushStyleColor(ImGuiCol_TitleBg, editorTitleColors[i % colorCount]);
 				ImGui::PushStyleColor(ImGuiCol_TitleBgActive, editorTitleColors[i % colorCount]);
+				ImGui::PushStyleColor(ImGuiCol_Tab, editorTitleColors[i % colorCount]);
+				ImGui::PushStyleColor(ImGuiCol_TabActive, editorTitleColors[i % colorCount]);
 				w->Render(i + 2);
+				ImGui::PopStyleColor();
+				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
 				++i;

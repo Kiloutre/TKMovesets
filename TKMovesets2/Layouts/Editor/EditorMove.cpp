@@ -21,6 +21,10 @@ EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* e
 
 	m_inputs = editor->GetFormInputs("move");
 
+	for (auto field : m_inputs) {
+		m_editor->FillField("move", field, moveId);
+	}
+
 	for (auto in : m_inputs) {
 		if (in->category >= m_categoryAmount) {
 			m_categoryAmount = in->category + 1;
@@ -41,8 +45,6 @@ void EditorMove::Render()
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
-		//float winWidth = ImGui::GetWindowWidth();
-		//printf("%f\n", winWidth);
 		for (uint8_t category = 0; category < m_categoryAmount; ++category)
 		{
 			if (category != 0 && !ImGui::TreeNode(_(std::format("edition.move_field.category_{}", category).c_str()))) {

@@ -122,7 +122,8 @@ public:
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
 	// Returns a list of inputs to build forms with
 	virtual std::vector<EditorInput*> GetFormInputs(std::string identifier) = 0;
-	//AddMove();
+	// Fill a field with a value related to the identifier and id
+	virtual void FillField(std::string identifier, EditorInput* field, uint32_t id) = 0;
 	// Returns true if the given field is valid
 	virtual bool ValidateField(EditorInput* field) = 0;
 };

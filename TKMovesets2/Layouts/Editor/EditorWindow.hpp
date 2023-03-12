@@ -103,7 +103,7 @@ private:
 
 	//
 	void FilterMovelist(EditorMovelistFilter_ filter);
-	// Vlidates the move ID against the movelist and alias list
+	// Validates the move ID against the movelist size and alias list
 	int32_t ValidateMoveId(const char* buf);
 	// Returns true if our allocated moveset is still loaded on our character
 	bool MovesetStillLoaded();
