@@ -49,6 +49,4 @@ public:
 	virtual gameAddr GetCharacterAddress(uint8_t playerId) = 0;
 	// Returns the moveset address of the given playerid. Used by live editor.
 	virtual gameAddr GetMovesetAddress(uint8_t playerId) = 0;
-	// Sets the current move of a player
-	virtual void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId) = 0;
 };

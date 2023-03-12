@@ -9,8 +9,7 @@
 
 EditorMove::~EditorMove()
 {
-
-	delete m_erroredFields;
+	// This used to deallocate stuff but doesn't because it isn't needed anymore
 }
 
 EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* editor)
@@ -19,19 +18,13 @@ EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* e
 	moveId = t_moveId;
 	m_editor = editor;
 
-	m_inputs = editor->GetFormInputs("move");
+	m_inputMap = editor->GetMoveInputs(t_moveId, m_inputs);
 
-	for (auto field : m_inputs) {
-		m_editor->FillField("move", field, moveId);
-	}
-
-	for (auto in : m_inputs) {
-		if (in->category >= m_categoryAmount) {
-			m_categoryAmount = in->category + 1;
+	for (auto& field : m_inputs) {
+		if (field->category >= m_categoryAmount) {
+			m_categoryAmount = field->category + 1;
 		}
 	}
-
-	m_erroredFields = new bool[m_inputs.size()] {false};
 }
 
 void EditorMove::Render()
@@ -48,27 +41,26 @@ void EditorMove::Render()
 		for (uint8_t category = 0; category < m_categoryAmount; ++category)
 		{
 			if (category != 0 && !ImGui::TreeNode(_(std::format("edition.move_field.category_{}", category).c_str()))) {
+				// Only show titles for category > 0, and if tree is not open: no need to render anything
 				continue;
 			}
 
 			ImGui::PushItemWidth(150.0f);
-			for (size_t i = 0; i < m_inputs.size(); ++i)
+			for (auto& field : m_inputs)
 			{
-				EditorInput* field = m_inputs[i];
-
 				if (field->category != category) {
 					continue;
 				}
 
-				bool erroredBg = m_erroredFields[i];
+				bool erroredBg = field->errored;
 				if (erroredBg) {
 					ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
 				}
 
-				if (ImGui::InputText(_(field->name.c_str()), field->buffer, sizeof(field->buffer), field->imguiInputFlags))
+				if (ImGui::InputText(_(field->field_fullname.c_str()), field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 				{
 					unsavedChanges = true;
-					m_erroredFields[i] = !m_editor->ValidateField(field);
+					field->errored = m_editor->ValidateField(m_fieldType, field->name, field) == false;
 				}
 
 				if (erroredBg) {
@@ -96,12 +88,13 @@ void EditorMove::Render()
 
 void EditorMove::Apply()
 {
-	for (size_t i = 0; i < m_inputs.size(); ++i) {
-		if (m_erroredFields[i]) {
+	for (auto& field : m_inputs) {
+		if (field->errored) {
 			//popup
 			return;
 		}
 	}
 
+	m_editor->SaveMove(moveId, m_inputMap);
 	unsavedChanges = false;
 }

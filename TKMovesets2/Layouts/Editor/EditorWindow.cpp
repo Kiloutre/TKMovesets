@@ -355,16 +355,12 @@ void EditorWindow::RenderMovelist()
 	}
 	ImGui::PopItemWidth();
 
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize))
-	{
-		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(0);
-		importerHelper.importer->SetCurrentMove(playerAddress, m_loadedMoveset, m_moveToPlay);
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize)) {
+		m_editor->SetCurrentMove(0, m_loadedMoveset, m_moveToPlay);
 	}
 	ImGui::SameLine();
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize))
-	{
-		gameAddr playerAddress = importerHelper.importer->GetCharacterAddress(1);
-		importerHelper.importer->SetCurrentMove(playerAddress, m_loadedMoveset, m_moveToPlay);
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize)) {
+		m_editor->SetCurrentMove(1, m_loadedMoveset, m_moveToPlay);
 	}
 }
 

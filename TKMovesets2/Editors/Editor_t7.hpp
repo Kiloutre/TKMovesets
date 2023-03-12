@@ -8,7 +8,7 @@
 
 using namespace StructsT7;
 
-class EditorT7 : public Editor
+class DLLCONTENT EditorT7 : public Editor
 {
 private:
 	// Stores the moveset table containing lists offsets & count, aliases too
@@ -23,7 +23,14 @@ public:
 	EditorTable GetMovesetTable() override;
 	std::vector<DisplayableMove*> GetDisplayableMoveList() override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
-	std::vector<EditorInput*> GetFormInputs(std::string identifier) override;
-	void FillField(std::string identifier, EditorInput* field, uint32_t id) override;
-	bool ValidateField(EditorInput* field) override;
+	bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) override;
+	
+	// Moves
+	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, std::vector<EditorInput*>& drawOrder) override;
+	void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) override;
+	bool ValidateMoveField(std::string name, EditorInput* field);
+
+	// -- Iteractons -- //
+	// Sets the current move of a player
+	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
 };

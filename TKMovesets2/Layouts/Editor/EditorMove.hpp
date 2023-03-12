@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <map>
 
 #include "Editor.hpp"
 
@@ -9,14 +10,16 @@ class EditorMove
 private:
 	// Contains the window title to display
 	std::string m_windowTitle;
-	// The form's fields
+	// The form's fields, contains the field buffer along with its validity as a boolean and more useful data 
+	std::map<std::string, EditorInput*> m_inputMap;
+	// The form's fields ordered in their draw order. Same data as m_inputMap.
 	std::vector<EditorInput*> m_inputs;
-	// List of bool that state which field is invalid
-	bool* m_erroredFields;
 	// Used when saving
 	Editor* m_editor = nullptr;
 	// Stores the amount of categories within the form
 	uint8_t m_categoryAmount = 0;
+	// Contain the field type to pass to generic Editor methods
+	std::string m_fieldType = "move";
 
 public:
 	// Stores the state of the window. If close, this class will be destroyed soon

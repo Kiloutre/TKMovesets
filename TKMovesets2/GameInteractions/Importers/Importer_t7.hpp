@@ -40,5 +40,4 @@ public:
 
 	gameAddr GetCharacterAddress(uint8_t playerId) override;
 	gameAddr GetMovesetAddress(uint8_t playerId) override;
-	void SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId) override;
 };

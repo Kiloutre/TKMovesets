@@ -11,6 +11,8 @@
 #include "GameAddresses.h"
 #include "MovesetStructs.h"
 
+# define FORM_INPUT_BUFSIZE (32)
+
 typedef uint16_t EditorInputType;
 enum EditorInputType_
 {
@@ -26,13 +28,22 @@ enum EditorInputType_
 
 struct EditorInput
 {
+	// CContains the field name in short format, used for easy-to-read checks, better than having to type the full name
 	std::string name;
-	uint16_t offset;
+	// Contains the field name, used to show the correct translation string
+	std::string field_fullname;
+	// Used to check for overflow
 	uint8_t memberSize;
+	// Use to split various fields into various tree-like categories
 	uint8_t category = 0;
+	// Sets the allowed charset for the input
 	ImGuiInputTextFlags imguiInputFlags = 0;
+	// Our own flags, required for our overflow checks
 	EditorInputType flags = 0;
-	char buffer[32] = "";
+	// The string buffer containing the input text
+	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
+	// Contains true if the buffer contains invalid data
+	bool errored = false;
 };
 
 // Pre-calculate these flags in order to color-code, sort and filter the movelist
@@ -120,10 +131,14 @@ public:
 	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
-	// Returns a list of inputs to build forms with
-	virtual std::vector<EditorInput*> GetFormInputs(std::string identifier) = 0;
-	// Fill a field with a value related to the identifier and id
-	virtual void FillField(std::string identifier, EditorInput* field, uint32_t id) = 0;
 	// Returns true if the given field is valid
-	virtual bool ValidateField(EditorInput* field) = 0;
+	virtual bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) = 0;
+
+	// Move-related
+	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, std::vector<EditorInput*>& drawOrder) = 0;
+	virtual void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) = 0;
+
+	// -- Iteractons -- //
+	// Sets the current move of a player
+	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
 };

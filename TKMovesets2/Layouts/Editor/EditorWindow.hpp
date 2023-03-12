@@ -28,7 +28,7 @@ struct EditorInfos
 	std::string filename;
 	std::string name;
 	uint64_t lastSavedDate;
-	uint32_t gameId;
+	int32_t gameId;
 };
 
 struct MovesetInfos
@@ -50,7 +50,7 @@ private:
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
-	EditorInfos m_loadedCharacter;
+	EditorInfos m_loadedCharacter = { "", "", 0, -1 };
 	// True if we need to enable the save button
 	bool m_savedLastChange = true;
 	// True if moveset changes are to be applied to the game instantly

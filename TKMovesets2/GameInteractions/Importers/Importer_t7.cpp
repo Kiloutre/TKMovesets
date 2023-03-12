@@ -371,7 +371,7 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	WriteCameraMotasToPlayer(gameMoveset, playerAddress);
 
 	if (applyInstantly) {
-		SetCurrentMove(playerAddress, gameMoveset, 32769);
+		ForcePlayerMove(playerAddress, gameMoveset, 32769);
 	}
 
 	// -- Cleanup -- //
@@ -406,32 +406,6 @@ bool ImporterT7::CanImport()
 
 	uint8_t animType = m_process->readInt8(animAddr);
 	return animType == 0x64 || animType == 0xC8;
-}
-
-void ImporterT7::SetCurrentMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
-{
-	{
-	
-		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
-		m_process->writeInt64(movesetOffset + 0x8, playerMoveset);
-		m_process->writeInt64(movesetOffset + 0x10, playerMoveset);
-		m_process->writeInt64(movesetOffset + 0x18, playerMoveset);
-		// + 8 = offset of the moveset that is currently playing but that will revert after transitioning to a generic anim
-	}
-
-	if (moveId >= 0x8000) {
-		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
-		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
-	}
-
-	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
-
-	// Write a big number to the frame timer to force the current move end
-	m_process->writeInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_timer"), 99999);
-	// Tell the game which move to play NEXT
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
-	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
 }
 
 gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
