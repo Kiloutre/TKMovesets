@@ -241,6 +241,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 			moveWin->Render();
 			if (moveWin->unsavedChanges) {
 				m_savedLastChange = false;
+				m_importNeeded = true;
 			}
 			++i;
 		}

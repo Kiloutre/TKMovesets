@@ -96,35 +96,35 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 		}
 	}
 
-	if (name == "extraproperty") {
-		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.extraMovePropertyCount) {
-			return false;
-		}
-	}
-
-	if (name == "hitcondition") {
+	if (name == "hit_condition_id") {
 		int listIdx = atoi(field->buffer);
 		if (listIdx < -1 || listIdx >= m_infos->table.hitConditionCount) {
 			return false;
 		}
 	}
 
-	if (name == "start_extraproperty") {
+	if (name == "extra_properties_id") {
+		int listIdx = atoi(field->buffer);
+		if (listIdx < -1 || listIdx >= m_infos->table.extraMovePropertyCount) {
+			return false;
+		}
+	}
+
+	if (name == "beginning_extra_properties_id") {
 		int listIdx = atoi(field->buffer);
 		if (listIdx < -1 || listIdx >= m_infos->table.moveBeginningPropCount) {
 			return false;
 		}
 	}
 
-	if (name == "end_extraproperty") {
+	if (name == "ending_extra_properties_id") {
 		int listIdx = atoi(field->buffer);
 		if (listIdx < -1 || listIdx >= m_infos->table.moveEndingPropCount) {
 			return false;
 		}
 	}
 
-	if (name == "voiceclip") {
+	if (name == "voiceclip_id") {
 		int listIdx = atoi(field->buffer);
 		if (listIdx < -1 || listIdx >= m_infos->table.voiceclipCount) {
 			return false;
