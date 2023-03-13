@@ -32,6 +32,7 @@ set(BINARY_SOURCES
                     "Layouts/NavigationMenu.cpp"
                     # Layout: editor window
                     "Layouts/Editor/EditorWindow.cpp"
+                    "Layouts/Editor/EditorForm.cpp"
                     "Layouts/Editor/EditorMove.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"

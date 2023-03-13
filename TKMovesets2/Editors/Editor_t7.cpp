@@ -27,7 +27,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std
 	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->vuln);
 	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->hitlevel);
-	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->transition);
+	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned | EditorInput_Clickable, "%u", move->transition);
 	CREATE_FIELD("anim_len", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->anim_len);
 	CREATE_FIELD("hitbox_location", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->hitbox_location);
 	CREATE_FIELD("first_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->first_active_frame);

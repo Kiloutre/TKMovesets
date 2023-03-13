@@ -10,7 +10,7 @@
 
 // -- Private methods -- //
 
-void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buffer)
+void EditorWindow::OnFormFieldClick(uint32_t id, std::string fieldIdentifier, const char* buffer)
 {
 	if (fieldIdentifier == "edition.move_field.cancel_id") {
 
@@ -19,11 +19,10 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 
 void EditorWindow::OpenMoveWindow(uint16_t moveId)
 {
-
 	int availableOverwriteIndex = -1;
 	for (int i = 0; i < m_moveWindows.size(); ++i) {
 		EditorMove* moveWin = m_moveWindows[i];
-		if (moveWin->moveId == moveId) {
+		if (moveWin->id == moveId) {
 			moveWin->setFocus = true;
 			// Prevent duplicate move window creation
 			return;
@@ -260,7 +259,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 
 			ClickableFieldEvent* ev = moveWin->GetFormClickEvent();
 			if (ev != nullptr) {
-				OnFormFieldClick(ev->eventName, ev->buffer);
+				OnFormFieldClick(moveWin->id, ev->eventName, ev->buffer);
 			}
 
 			if (moveWin->unsavedChanges) {

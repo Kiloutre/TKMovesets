@@ -131,7 +131,7 @@ edition.window_title = Editor
 edition.apply = Apply
 edition.window_controls_explanation = Click on a move in the movelist to open its associated window. The new window will replace the previous one opened UNLESS there are unsaved changes in the previous one OR if you were holding CTRL LEFT while clicking the move in the movelist. Windows can be dragged anywhere, be docked together and can form various layouts.
 
-
+edition.move_field.window_name = Move
 edition.move_field.category_2 = References
 edition.move_field.category_3 = Extras
 edition.move_field.category_5 = Unnamed fields

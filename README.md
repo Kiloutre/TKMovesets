@@ -5,6 +5,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Move hitlevel: hexadecimal
 - Hint for each field label
 - For lists: detect that we aren't at the true beginning of the list (i - 1) and warn
 - Allow random extra properties to be played
