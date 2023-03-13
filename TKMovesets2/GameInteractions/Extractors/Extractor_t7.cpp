@@ -593,19 +593,16 @@ bool ExtractorT7::CanExtract()
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
 	if (playerAddress == 0 || playerAddress == -1) {
-		printf("1\n");
 		return false;
 	}
 
 	gameAddr currentMove = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove"));
 	if (currentMove == 0 || currentMove == -1) {
-		printf("2\n");
 		return false;
 	}
 
 	gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
 	if (animAddr == 0 || animAddr == -1) {
-		printf("3\n");
 		return false;
 	}
 

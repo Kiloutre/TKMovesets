@@ -8,53 +8,26 @@
 
 # define FORM_BUFFER_SIZE (32)
 
-EditorMove::~EditorMove()
+// -- Static helpers -- //
+
+static int GetColumnCount()
 {
-	// This used to deallocate stuff but doesn't because it isn't needed anymore
+	float windowWidth = ImGui::GetWindowWidth();
+
+	if (windowWidth > 1200) {
+		return 8;
+	}
+	if (windowWidth > 460) {
+		return 4;
+	}
+	if (windowWidth > 230) {
+		return 2;
+	}
+
+	return 1;
 }
 
-EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* editor)
-{
-	moveId = t_moveId;
-	m_editor = editor;
-
-	std::vector<std::string> drawOrder;
-	m_inputMap = editor->GetMoveInputs(t_moveId, drawOrder);
-
-	// Tries to find a name to show in the window title
-	// Also figure out the max amount of categories
-	char name[32] = "";
-	for (std::string fieldName : drawOrder) {
-		EditorInput* field = m_inputMap[fieldName];
-		if (field->category >= m_categoryAmount) {
-			m_categoryAmount = field->category + 1;
-		}
-		if (fieldName == "move_name") {
-			strcpy_s(name, sizeof(name), field->buffer);
-		}
-	}
-
-	// Builds the <category : fields> map
-	for (size_t i = 0; i < m_categoryAmount; ++i)
-	{
-		std::vector<EditorInput*> inputs;
-		for (std::string fieldName : drawOrder) {
-			EditorInput* field = m_inputMap[fieldName];
-			if (field->category == i) {
-				inputs.push_back(field);
-			}
-		}
-		m_inputs[i] = inputs;
-	}
-
-	// Builds the window title. Currently, switching translations does not update this. Todo 
-	if (name[0] == '\0') {
-		m_windowTitle = std::format("{} {} - {}", _("edition.window_title_move"), t_moveId, windowTitleBase.c_str());
-	}
-	else {
-		m_windowTitle = std::format("{} {} {} - {}", _("edition.window_title_move"), t_moveId, name, windowTitleBase.c_str());
-	}
-}
+// -- Private methods -- //
 
 void EditorMove::RenderInput(EditorInput* field)
 {
@@ -70,6 +43,7 @@ void EditorMove::RenderInput(EditorInput* field)
 		unsavedChanges = true;
 		field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
 	}
+	/*
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
 		// Have to manually implement copy pasting
@@ -85,6 +59,7 @@ void EditorMove::RenderInput(EditorInput* field)
 			field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
 		}
 	}
+	*/
 	ImGui::PopID();
 	ImGui::PopItemWidth();
 
@@ -93,21 +68,67 @@ void EditorMove::RenderInput(EditorInput* field)
 	}
 }
 
-static int GetColumnCount()
+void EditorMove::Apply()
 {
-	float windowWidth = ImGui::GetWindowWidth();
-
-	if (windowWidth > 1200) {
-		return 8;
-	}
-	if (windowWidth > 600) {
-		return 4;
-	}
-	if (windowWidth > 230) {
-		return 2;
+	for (auto& [category, fields] : m_inputs) {
+		for (auto& field : fields) {
+			if (field->errored) {
+				//popup
+				return;
+			}
+		}
 	}
 
-	return 1;
+	m_editor->SaveMove(moveId, m_inputMap);
+	unsavedChanges = false;
+}
+
+// -- Public methods -- //
+
+EditorMove::~EditorMove()
+{
+	// This used to deallocate stuff but doesn't because it isn't needed anymore
+}
+
+EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* editor)
+{
+	moveId = t_moveId;
+	m_editor = editor;
+
+	std::vector<std::string> drawOrder;
+	m_inputMap = editor->GetMoveInputs(t_moveId, drawOrder);
+
+	// Tries to find a name to show in the window title
+	// Also figure out the categories
+	char name[32] = "";
+	for (std::string fieldName : drawOrder) {
+		EditorInput* field = m_inputMap[fieldName];
+		m_categories.insert(field->category);
+		if (fieldName == "move_name") {
+			strcpy_s(name, sizeof(name), field->buffer);
+		}
+	}
+
+	// Builds the <category : fields> map
+	for (uint8_t category : m_categories)
+	{
+		std::vector<EditorInput*> inputs;
+		for (std::string fieldName : drawOrder) {
+			EditorInput* field = m_inputMap[fieldName];
+			if (field->category == category) {
+				inputs.push_back(field);
+			}
+		}
+		m_inputs[category] = inputs;
+	}
+
+	// Builds the window title. Currently, switching translations does not update this. Todo 
+	if (name[0] == '\0') {
+		m_windowTitle = std::format("{} {} - {}", _("edition.window_title_move"), t_moveId, windowTitleBase.c_str());
+	}
+	else {
+		m_windowTitle = std::format("{} {} {} - {}", _("edition.window_title_move"), t_moveId, name, windowTitleBase.c_str());
+	}
 }
 
 void EditorMove::Render()
@@ -121,9 +142,10 @@ void EditorMove::Render()
 	{
 		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 		const int columnCount = GetColumnCount();
-		for (int category = 0; category < m_categoryAmount; ++category)
+		for (uint8_t category : m_categories)
 		{
-			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("edition.move_field.category_{}", category).c_str()))) {
+			const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
+			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("edition.move_field.category_{}", category).c_str()), headerFlags)) {
 				// Only show titles for category > 0, and if tree is not open: no need to render anything
 				continue;
 			}
@@ -156,9 +178,6 @@ void EditorMove::Render()
 			}
 		}
 
-
-
-
 		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), unsavedChanges)) {
 			Apply();
 		}
@@ -169,19 +188,4 @@ void EditorMove::Render()
 		// Ordered to close, but changes remain
 		// todo: show popup, force popen = true
 	}
-}
-
-void EditorMove::Apply()
-{
-	for (auto& [category, fields] : m_inputs) {
-		for (auto& field : fields) {
-			if (field->errored) {
-				//popup
-				return;
-			}
-		}
-	}
-
-	m_editor->SaveMove(moveId, m_inputMap);
-	unsavedChanges = false;
 }

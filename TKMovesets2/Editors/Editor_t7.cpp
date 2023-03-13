@@ -22,6 +22,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, fieldBytesAmount, category, imguiInputFlag, EditorInputFlag, format, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_STRING_FIELD("move_name", 0, nameBlock + move->name_addr);
 	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->vuln);
@@ -32,19 +33,19 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std
 	CREATE_FIELD("first_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->first_active_frame);
 	CREATE_FIELD("last_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInputType_unsigned, "%u", move->last_active_frame);
 
-	CREATE_FIELD("cancel_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->cancel_addr);
-	CREATE_FIELD("hit_condition_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->hit_condition_addr);
-	CREATE_FIELD("extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->extra_move_property_addr);
-	CREATE_FIELD("beginning_extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_start_extraprop_addr);
-	CREATE_FIELD("ending_extra_properties_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_end_extraprop_addr);
-	CREATE_FIELD("voiceclip_id", 8, 1, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->voicelip_addr);
+	CREATE_FIELD("cancel_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->cancel_addr);
+	CREATE_FIELD("hit_condition_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->hit_condition_addr);
+	CREATE_FIELD("extra_properties_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->extra_move_property_addr);
+	CREATE_FIELD("beginning_extra_properties_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_start_extraprop_addr);
+	CREATE_FIELD("ending_extra_properties_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->move_end_extraprop_addr);
+	CREATE_FIELD("voiceclip_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->voicelip_addr);
 
-	CREATE_FIELD("cancel_id_2", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x28_cancel_addr);
-	CREATE_FIELD("cancel_id_2_related", 4, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x30_int__0x28_related);
-	CREATE_FIELD("cancel_id_3", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x38_cancel_addr);
-	CREATE_FIELD("cancel_id_3_related", 4, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x40_int__0x38_related);
-	CREATE_FIELD("cancel_id_4", 8, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x48_cancel_addr);
-	CREATE_FIELD("cancel_id_4_related", 4, 2, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x50_int__0x48_related);
+	CREATE_FIELD("cancel_id_2", 8, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x28_cancel_addr);
+	CREATE_FIELD("cancel_id_2_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x30_int__0x28_related);
+	CREATE_FIELD("cancel_id_3", 8, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x38_cancel_addr);
+	CREATE_FIELD("cancel_id_3_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x40_int__0x38_related);
+	CREATE_FIELD("cancel_id_4", 8, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%lld", move->_0x48_cancel_addr);
+	CREATE_FIELD("cancel_id_4_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x50_int__0x48_related);
 
 	// Finishing touch
 	for (auto& [name, input] : inputMap) {
@@ -92,7 +93,6 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 		name == "cancel_id_3" || name == "cancel_id_4") {
 		int listIdx = atoi(field->buffer);
 		if (listIdx < -1 || listIdx >= m_infos->table.cancelCount) {
-			printf("ret false");
 			return false;
 		}
 	}
@@ -212,7 +212,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 
 	// Get aliases as a vector
 	uint16_t* aliasesPtr = m_infos->aliases1;
-	for (size_t i = 0; i < 112 + 36; ++i) {
+	for (uint16_t i = 0; i < 112 + 36; ++i) {
 		m_aliases.push_back(aliasesPtr[i]);
 	}
 }
