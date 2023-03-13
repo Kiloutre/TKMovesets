@@ -25,7 +25,6 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_STRING_FIELD("move_name", 0, nameBlock + move->name_addr);
 	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
-	// todo: animation
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->vuln);
 	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08X", move->hitlevel);
 	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned | EditorInput_Clickable, "%u", move->transition);
@@ -78,9 +77,8 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
 
-	// todo: move name
-	// todo: anim name
-	// todo: anim address
+	// todo: move name, allow edition
+	move->anim_addr = m_animNameMap[inputs["anim_name"]->buffer];
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
 	move->hitlevel = (uint32_t)strtol(inputs["hitlevel"]->buffer, nullptr, 16);
 	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
@@ -121,6 +119,12 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 {
+	if (name == "anim_name") {
+		if (m_animNameMap.find(field->buffer) == m_animNameMap.end()) {
+			return false;
+		}
+	}
+
 	if (name == "cancel_id" || name == "cancel_id_2" ||
 		name == "cancel_id_3" || name == "cancel_id_4") {
 		int listIdx = atoi(field->buffer);
@@ -260,6 +264,20 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+	
+	for (size_t i = 0; i < m_infos->table.moveCount; ++i)
+	{
+		const char* animName = namePtr + movePtr[i].anim_name_addr;
+		gameAddr animOffset = movePtr[i].anim_addr;
+
+		if (m_animNameMap.find(animName) != m_animNameMap.end() && m_animNameMap[animName] != animOffset) {
+			printf("Error: The same animation name refers to two different offsets. [%s] = [%x] and [%x]\n", animName, animOffset, m_animNameMap[animName]);
+			throw std::exception();
+		}
+
+		m_animNameMap[animName] = animOffset;
+		m_animNameMap_reverse[animOffset] = animName;
+	}
 }
 
 EditorTable EditorT7::GetMovesetTable()

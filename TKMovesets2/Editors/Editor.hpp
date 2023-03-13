@@ -143,6 +143,11 @@ protected:
 	// Contains the moveset, without our header
 	byte* m_movesetData = nullptr;
 
+	// Stores a <name, offset> animation map
+	std::map<std::string, gameAddr> m_animNameMap;
+	// Stores the same animation map but in <offset, name> 
+	std::map<gameAddr, std::string> m_animNameMap_reverse;
+
 public:
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
