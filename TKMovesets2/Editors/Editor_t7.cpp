@@ -3,10 +3,12 @@
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
 
+using namespace EditorUtils;
+
 #define gAddr StructsT7_gameAddr
 #define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
-#define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .memberSize = 0, .category = c, .imguiInputFlags = 0, .flags = EditorInput_String }, SET_DEFAULT_VAL(a, "%s", g)
-#define CREATE_FIELD(a, b, c, d, e, f, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .memberSize = b, .category = c, .imguiInputFlags = d, .flags = e }, SET_DEFAULT_VAL(a, f, g)
+#define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String }, SET_DEFAULT_VAL(a, "%s", g)
+#define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g)
 
 // ===== MOVES ===== //
 
@@ -21,46 +23,46 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
-	// (fieldName, fieldBytesAmount, category, imguiInputFlag, EditorInputFlag, format, value)
+	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_STRING_FIELD("move_name", 0, nameBlock + move->name_addr);
 	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
-	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->vuln);
-	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08X", move->hitlevel);
-	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned | EditorInput_Clickable, "%u", move->transition);
-	CREATE_FIELD("moveId_val1", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->moveId_val1);
-	CREATE_FIELD("moveId_val2", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->moveId_val2);
-	CREATE_FIELD("anim_len", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->anim_len);
-	CREATE_FIELD("airborne_start", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->airborne_start);
-	CREATE_FIELD("airborne_end", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->airborne_end);
-	CREATE_FIELD("ground_fall", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->ground_fall);
-	CREATE_FIELD("hitbox_location", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08X", move->hitbox_location);
-	CREATE_FIELD("first_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->first_active_frame);
-	CREATE_FIELD("last_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->last_active_frame);
-	CREATE_FIELD("distance", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->distance);
+	CREATE_FIELD("vulnerability", 0, EditorInput_U32, move->vuln);
+	CREATE_FIELD("hitlevel", 0, EditorInput_H32, move->hitlevel);
+	CREATE_FIELD("transition", 0, EditorInput_U16 | EditorInput_Clickable, move->transition);
+	CREATE_FIELD("moveId_val1", 0, EditorInput_U16, move->moveId_val1);
+	CREATE_FIELD("moveId_val2", 0, EditorInput_U16, move->moveId_val2);
+	CREATE_FIELD("anim_len", 0, EditorInput_U32, move->anim_len);
+	CREATE_FIELD("airborne_start", 0, EditorInput_U32, move->airborne_start);
+	CREATE_FIELD("airborne_end", 0, EditorInput_U32, move->airborne_end);
+	CREATE_FIELD("ground_fall", 0, EditorInput_U32, move->ground_fall);
+	CREATE_FIELD("hitbox_location", 0 , EditorInput_H32, move->hitbox_location);
+	CREATE_FIELD("first_active_frame", 0, EditorInput_U32, move->first_active_frame);
+	CREATE_FIELD("last_active_frame", 0, EditorInput_U32, move->last_active_frame);
+	CREATE_FIELD("distance", 0, EditorInput_U16, move->distance);
 
-	CREATE_FIELD("cancel_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->cancel_addr);
-	CREATE_FIELD("hit_condition_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->hit_condition_addr);
-	CREATE_FIELD("extra_properties_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->extra_move_property_addr);
-	CREATE_FIELD("beginning_extra_properties_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->move_start_extraprop_addr);
-	CREATE_FIELD("ending_extra_properties_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->move_end_extraprop_addr);
-	CREATE_FIELD("voiceclip_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->voicelip_addr);
+	CREATE_FIELD("cancel_id", 2, EditorInput_PTR,  move->cancel_addr);
+	CREATE_FIELD("hit_condition_id", 2, EditorInput_PTR, move->hit_condition_addr);
+	CREATE_FIELD("extra_properties_id", 2, EditorInput_PTR, move->extra_move_property_addr);
+	CREATE_FIELD("beginning_extra_properties_id", 2, EditorInput_PTR, move->move_start_extraprop_addr);
+	CREATE_FIELD("ending_extra_properties_id", 2, EditorInput_PTR, move->move_end_extraprop_addr);
+	CREATE_FIELD("voiceclip_id", 2, EditorInput_PTR, move->voicelip_addr);
 
-	CREATE_FIELD("cancel_id_2", 8, 3, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->_0x28_cancel_addr);
-	CREATE_FIELD("cancel_id_2_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x30_int__0x28_related);
-	CREATE_FIELD("cancel_id_3", 8, 3, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->_0x38_cancel_addr);
-	CREATE_FIELD("cancel_id_3_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x40_int__0x38_related);
-	CREATE_FIELD("cancel_id_4", 8, 3, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->_0x48_cancel_addr);
-	CREATE_FIELD("cancel_id_4_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x50_int__0x48_related);
+	CREATE_FIELD("cancel_id_2", 3, EditorInput_PTR, move->_0x28_cancel_addr);
+	CREATE_FIELD("cancel_id_2_related", 3, EditorInput_U32, move->_0x30_int__0x28_related);
+	CREATE_FIELD("cancel_id_3", 3, EditorInput_PTR, move->_0x38_cancel_addr);
+	CREATE_FIELD("cancel_id_3_related", 3, EditorInput_U32, move->_0x40_int__0x38_related);
+	CREATE_FIELD("cancel_id_4", 3, EditorInput_PTR, move->_0x48_cancel_addr);
+	CREATE_FIELD("cancel_id_4_related", 3, EditorInput_U32, move->_0x50_int__0x48_related);
 
-	CREATE_FIELD("_0x34_int", 4, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x34_int);
-	CREATE_FIELD("_0x44_int", 4, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x44_int);
-	CREATE_FIELD("_0x56_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x56_short);
-	CREATE_FIELD("_0x5C_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x5C_short);
-	CREATE_FIELD("_0x5E_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x5E_short);
-	CREATE_FIELD("_0x98_int", 4, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x98_int);
-	CREATE_FIELD("_0xA8_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0xA8_short);
-	CREATE_FIELD("_0xAC_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0xAC_short);
+	CREATE_FIELD("_0x34_int", 5, EditorInput_U32, move->_0x34_int);
+	CREATE_FIELD("_0x44_int", 5, EditorInput_U32, move->_0x44_int);
+	CREATE_FIELD("_0x56_short", 5, EditorInput_U16, move->_0x56_short);
+	CREATE_FIELD("_0x5C_short", 5, EditorInput_U16, move->_0x5C_short);
+	CREATE_FIELD("_0x5E_short", 5, EditorInput_U16, move->_0x5E_short);
+	CREATE_FIELD("_0x98_int", 5, EditorInput_U32, move->_0x98_int);
+	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16, move->_0xA8_short);
+	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16, move->_0xAC_short);
 
 	// Finishing touch
 	for (auto& [name, input] : inputMap) {
@@ -122,56 +124,42 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 {
 	if (name == "anim_name") {
-		if (m_animNameMap.find(field->buffer) == m_animNameMap.end()) {
-			return false;
-		}
+		return m_animNameMap.find(field->buffer) != m_animNameMap.end();
 	}
 
-	if (name == "cancel_id" || name == "cancel_id_2" ||
+	else if (name == "cancel_id" || name == "cancel_id_2" ||
 		name == "cancel_id_3" || name == "cancel_id_4") {
 		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.cancelCount) {
-			return false;
-		}
+		return -1 <= listIdx && listIdx < (int)m_infos->table.cancelCount;
 	}
 
-	if (name == "hit_condition_id") {
+	else if (name == "hit_condition_id") {
 		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.hitConditionCount) {
-			return false;
-		}
+		return -1 <= listIdx && listIdx < (int)m_infos->table.hitConditionCount;
 	}
 
-	if (name == "extra_properties_id") {
+	else if (name == "extra_properties_id") {
 		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.extraMovePropertyCount) {
-			return false;
-		}
+		return -1 <= listIdx && listIdx < (int)m_infos->table.extraMovePropertyCount;
 	}
 
-	if (name == "beginning_extra_properties_id") {
+	else if (name == "beginning_extra_properties_id") {
 		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.moveBeginningPropCount) {
-			return false;
-		}
+		return -1 <= listIdx && listIdx < (int)m_infos->table.moveBeginningPropCount;
 	}
 
-	if (name == "ending_extra_properties_id") {
+	else if (name == "ending_extra_properties_id") {
 		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.moveEndingPropCount) {
-			return false;
-		}
+		return -1 <= listIdx && listIdx < (int)m_infos->table.moveEndingPropCount;
 	}
 
-	if (name == "voiceclip_id") {
+	else if (name == "voiceclip_id") {
 		int listIdx = atoi(field->buffer);
-		if (listIdx < -1 || listIdx >= m_infos->table.voiceclipCount) {
-			return false;
-		}
+		return -1 <= listIdx && listIdx < (int)m_infos->table.voiceclipCount;
 	}
 
-	if (name == "transition") {
-		uint16_t moveId = atoi(field->buffer);
+	else if (name == "transition") {
+		int moveId = atoi(field->buffer);
 		if (moveId >= m_infos->table.moveCount) {
 			if (moveId < 0x8000) {
 				return false;
@@ -179,8 +167,11 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 			if (moveId >= (0x8000 + m_aliases.size())) {
 				return false;
 			}
+		}else if (moveId < 0) {
+			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -193,49 +184,52 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 		return false;
 	}
 
-	switch (field->memberSize)
-	{
-	case 4:
-		if (field->flags & EditorInput_Hex) {
-			if (strlen(field->buffer) > 8) {
-				return false;
-			}
-		}
-		if (field->flags & EditorInput_Signed) {
-			long long num = atoll(field->buffer);
-			if (num > INT_MAX || num < INT_MIN) {
-				return false;
-			}
-		}
-		else if (field->flags & EditorInput_Unsigned) {
-			long long num = atoll(field->buffer);
-			if (num > UINT_MAX || num < 0) {
-				return false;
-			}
-		}
-		break;
+	auto flags = field->flags;
 
-	case 2:
-		if (field->flags & EditorInput_Hex) {
-			if (strlen(field->buffer) > 4) {
-				return false;
-			}
+	if (flags & EditorInput_H32) {
+		if (strlen(field->buffer) > 8) {
+			return false;
 		}
-		if (field->flags & EditorInput_Signed) {
-			int num = atoi(field->buffer);
-			if (num > SHRT_MAX || num < SHRT_MIN) {
-				return false;
-			}
+	}
+	else if (flags & EditorInput_H16) {
+		if (strlen(field->buffer) > 4) {
+			return false;
 		}
-		else if (field->flags & EditorInput_Unsigned) {
-			int num = atoi(field->buffer);
-			if (num > USHRT_MAX || num < 0) {
-				return false;
-			}
+	}
+	else if (flags & (EditorInput_U64 | EditorInput_S64)) {
+		if (strlen(field->buffer) > 19) {
+			return false;
 		}
-		break;
+		if ((flags & EditorInput_U64) && atoll(field->buffer) < 0) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_U32) {
+		long long num = atoll(field->buffer);
+		if (num > UINT_MAX || num < 0) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_S32) {
+		long long num = atoll(field->buffer);
+		if (num > INT_MAX || num < INT_MIN) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_U16) {
+		int num = atoi(field->buffer);
+		if (num > USHRT_MAX || num < 0) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_S16) {
+		int num = atoi(field->buffer);
+		if (num > SHRT_MAX || num < SHRT_MIN) {
+			return false;
+		}
 	}
 
+	printf("[%s] 1\n", field->buffer);
 	if (fieldType == "move") {
 		return ValidateMoveField(fieldShortName, field);
 	}
@@ -273,7 +267,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		gameAddr animOffset = movePtr[i].anim_addr;
 
 		if (m_animNameMap.find(animName) != m_animNameMap.end() && m_animNameMap[animName] != animOffset) {
-			printf("Error: The same animation name refers to two different offsets. [%s] = [%x] and [%x]\n", animName, animOffset, m_animNameMap[animName]);
+			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameMap[animName]);
 			throw std::exception();
 		}
 

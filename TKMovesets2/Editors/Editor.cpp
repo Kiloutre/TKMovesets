@@ -52,4 +52,32 @@ namespace EditorUtils
 
 		return 0;
 	}
+
+	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags)
+	{
+		if (flags & (EditorInput_H32 | EditorInput_H16)) {
+			return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
+		}
+		return ImGuiInputTextFlags_CharsDecimal;
+	}
+
+	const char* GetFieldFormat(EditorInputFlag flags)
+	{
+		if (flags & EditorInput_H32) {
+			return "%08X";
+		}
+		if (flags & EditorInput_H16) {
+			return "%04X";
+		}
+		if (flags & EditorInput_S64) {
+			return "%lld";
+		}
+		if (flags & EditorInput_U64) {
+			return "%llu";
+		}
+		if (flags & (EditorInput_U32 | EditorInput_U16)) {
+			return "%u";
+		}
+		return "%d";
+	}
 }

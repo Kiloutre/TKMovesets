@@ -32,17 +32,26 @@ public:
 	}
 };
 
-typedef uint16_t EditorInputFlags;
-enum EditorInput_
+typedef uint16_t EditorInputFlag;
+enum EditorInputFlag_
 {
-	EditorInput_Signed    = (1 << 0),
-	EditorInput_Unsigned  = (1 << 1),
-	EditorInput_String    = (1 << 2),
-	EditorInput_Clickable = (1 << 3),
-	EditorInput_Hex       = (1 << 4),
+	EditorInput_String    = (1 << 0),
+	EditorInput_Clickable = (1 << 1),
+
+	// todo
+	EditorInput_U64       = (1 << 2),
+	EditorInput_S64       = (1 << 3),
+	EditorInput_U32       = (1 << 4),
+	EditorInput_H32       = (1 << 5),
+	EditorInput_S32       = (1 << 6),
+	EditorInput_U16       = (1 << 7),
+	EditorInput_H16       = (1 << 8),
+	EditorInput_S16       = (1 << 9),
+
+
+	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
 
 	/*
-	EditorInput_hexnumber,
 	EditorInput_float,
 	EditorInput_negativeFloat,
 	EditorInput_bool,
@@ -55,14 +64,12 @@ struct EditorInput
 	std::string name;
 	// Contains the field name, used to show the correct translation string
 	std::string field_fullname;
-	// Used to check for overflow
-	uint8_t memberSize;
 	// Use to split various fields into various tree-like categories
 	uint8_t category = 0;
 	// Sets the allowed charset for the input
 	ImGuiInputTextFlags imguiInputFlags = 0;
 	// Our own flags, required for our overflow checks
-	EditorInputFlags flags = 0;
+	EditorInputFlag flags = 0;
 	// The string buffer containing the input text
 	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
 	// Contains true if the buffer contains invalid data
@@ -123,7 +130,12 @@ struct EditorTable
 
 namespace EditorUtils
 {
+	// Used for color-coding the movelist
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
+	// Returns a format depending on the input type
+	const char* GetFieldFormat(EditorInputFlag flags);
+	// Returns an imgui Input() charset depending on the input type
+	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags);
 }
 
 class DLLCONTENT Editor

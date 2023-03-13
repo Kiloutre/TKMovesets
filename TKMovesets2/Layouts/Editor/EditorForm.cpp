@@ -64,12 +64,14 @@ void EditorForm::RenderInput(EditorInput* field)
 	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 	{
 		unsavedChanges = true;
-		field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
+		bool t = m_editor->ValidateField(m_windowType, field->name, field);
+		printf("Returned %d\n", t);
+		field->errored = t == false;
 	}
 	/*
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
-		// Have to manually implement copy pasting
+		// Have to manually implement copy pasting	
 		// todo: make this actually work. writing to field->buffer somehow does nothing to the input text
 		if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
 			printf("copy - [%s]\n", field->buffer);
