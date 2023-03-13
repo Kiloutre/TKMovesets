@@ -133,8 +133,8 @@ edition.window_controls_explanation = Click on a move in the movelist to open it
 
 
 edition.move_field.category_0 = ...
-edition.move_field.category_1 = References 
-edition.move_field.category_2 = Extras
+edition.move_field.category_2 = Extras 
+edition.move_field.category_3 = Unnamed fields
 
 edition.move_field.move_name = Name
 edition.move_field.anim_name = Animation name
