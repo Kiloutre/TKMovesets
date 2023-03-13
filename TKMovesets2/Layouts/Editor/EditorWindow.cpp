@@ -19,6 +19,7 @@ void EditorWindow::OnFormFieldClick(uint32_t id, std::string fieldIdentifier, co
 
 void EditorWindow::OpenMoveWindow(uint16_t moveId)
 {
+	// todo: template this functio,
 	int availableOverwriteIndex = -1;
 	for (int i = 0; i < m_moveWindows.size(); ++i) {
 		EditorMove* moveWin = m_moveWindows[i];
@@ -35,7 +36,6 @@ void EditorWindow::OpenMoveWindow(uint16_t moveId)
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor);
-	//EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor, this);
 	if (openNew || availableOverwriteIndex == -1) {
 		m_moveWindows.push_back(newWin);
 	}

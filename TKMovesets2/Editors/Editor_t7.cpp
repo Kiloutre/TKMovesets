@@ -10,7 +10,7 @@
 
 // ===== MOVES ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, std::vector<std::string>& drawOrder)
+std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder)
 {
 	std::map<std::string, EditorInput*> inputMap;
 

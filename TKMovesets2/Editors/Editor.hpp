@@ -3,6 +3,9 @@
 #include <ImGui.h>
 #include <string>
 #include <stdint.h>
+#include <vector>
+#include <utility>
+#include <algorithm>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -12,6 +15,22 @@
 #include "MovesetStructs.h"
 
 # define FORM_INPUT_BUFSIZE (32)
+
+// Vector with unique elements
+template < typename T >
+class VectorSet : public std::vector<T> {
+public:
+	using iterator = typename std::vector<T>::iterator;
+	using value_type = typename std::vector<T>::value_type;
+
+	std::pair<iterator, bool> push_back(const value_type& val) {
+		auto it = ::std::find(this->begin(), this->end(), val);
+		if (it == this->end())
+			it = ::std::vector<T>::insert(this->end(), val);
+
+		return std::pair<iterator, bool>(it, true);
+	}
+};
 
 typedef uint16_t EditorInputFlags;
 enum EditorInput_
@@ -138,7 +157,7 @@ public:
 	virtual bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) = 0;
 
 	// Move-related
-	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, std::vector<std::string>& drawOrder) = 0;
+	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder) = 0;
 	virtual void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) = 0;
 
 	// -- Iteractons -- //

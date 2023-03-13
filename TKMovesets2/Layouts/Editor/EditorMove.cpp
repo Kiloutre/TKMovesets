@@ -14,7 +14,7 @@ void EditorMove::Apply()
 		return;
 	}
 
-	m_editor->SaveMove(id, m_inputMap);
+	m_editor->SaveMove(id, m_fieldIdentifierMap);
 	unsavedChanges = false;
 }
 
@@ -25,7 +25,7 @@ EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* edito
 	m_windowType = "move";
 	m_identifierPrefix = "edition.move_field";
 
-	std::vector<std::string> drawOrder;
-	m_inputMap = editor->GetMoveInputs(t_id, drawOrder);
+	VectorSet<std::string> drawOrder;
+	m_fieldIdentifierMap = editor->GetMoveInputs(t_id, drawOrder);
 	InitForm(windowTitleBase, t_id, editor, drawOrder);
 }

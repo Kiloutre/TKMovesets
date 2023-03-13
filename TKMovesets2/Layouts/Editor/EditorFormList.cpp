@@ -3,102 +3,50 @@
 #include <string>
 
 #include "imgui_extras.hpp"
-#include "EditorForm.hpp"
+#include "EditorFormList.hpp"
 #include "Localization.hpp"
 
-// -- Helpers -- //
+// -- Static helpers -- //
 
-namespace EditorFormUtils
+static int GetColumnCount()
 {
-	int GetColumnCount()
-	{
-		float windowWidth = ImGui::GetWindowWidth();
+	float windowWidth = ImGui::GetWindowWidth();
 
-		if (windowWidth > 1200) {
-			return 8;
-		}
-		if (windowWidth > 460) {
-			return 4;
-		}
-		if (windowWidth > 230) {
-			return 2;
-		}
-
-		return 1;
+	if (windowWidth > 1200) {
+		return 8;
 	}
+	if (windowWidth > 460) {
+		return 4;
+	}
+	if (windowWidth > 230) {
+		return 2;
+	}
+
+	return 1;
 }
 
-
-// -- Private methods -- //
-
-void EditorForm::RenderLabel(EditorInput* field)
+bool EditorFormList::IsFormValid()
 {
-	if (field->flags & EditorInput_Clickable) {
-		if (ImGui::Selectable(_(field->field_fullname.c_str()), !field->errored)) {
-			m_consumedEvent = false;
-			m_event.eventName = field->field_fullname;
-			m_event.buffer = field->buffer;
-		}
-	} else {
-		ImGui::TextUnformatted(_(field->field_fullname.c_str()));
-	}
-}
-
-void EditorForm::RenderInput(EditorInput* field)
-{
-	bool erroredBg = field->errored;
-	if (erroredBg) {
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
-	}
-
-	ImGui::PushID(field);
-	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
-	{
-		unsavedChanges = true;
-		field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
-	}
 	/*
-	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	for (auto& itemInputs : m_inputs)
 	{
-		// Have to manually implement copy pasting
-		// todo: make this actually work. writing to field->buffer somehow does nothing to the input text
-		if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
-			printf("copy - [%s]\n", field->buffer);
-			ImGui::SetClipboardText(field->buffer);
-		}
-		else if (ImGui::IsKeyPressed(ImGuiKey_V, true)) {
-			printf("paste - [%s]\n", field->buffer);
-			field->buffer[0] = '\0';
-			//strcpy_s(field->buffer, sizeof(field->buffer), ImGui::GetClipboardText());
-			field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
-		}
-	}
-	*/
-	ImGui::PopID();
-	ImGui::PopItemWidth();
-
-	if (erroredBg) {
-		ImGui::PopStyleColor();
-	}
-}
-
-bool EditorForm::IsFormValid()
-{
-	for (auto& [category, fields] : m_fieldsCategoryMap) {
-		for (auto& field : fields) {
-			if (field->errored) {
-				return false;
+		for (auto& [category, fields] : itemInputs) {
+			for (auto& field : fields) {
+				if (field->errored) {
+					return false;
+				}
 			}
 		}
 	}
+	*/
 	return true;
 }
 
 // -- Public methods -- //
 
-void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, VectorSet<std::string>& drawOrder)
+void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, std::vector<std::string>& drawOrder)
 {
+	/*
 	id = t_id;
 	m_editor = editor;
 
@@ -106,7 +54,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	// Also figure out the categories
 	char name[32] = "";
 	for (std::string fieldName : drawOrder) {
-		EditorInput* field = m_fieldIdentifierMap[fieldName];
+		EditorInput* field = m_inputMaps[0][fieldName];
 		m_categories.insert(field->category);
 
 		// Moves are the only named fields so there is no reason to write any more complex code for now
@@ -120,12 +68,12 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	{
 		std::vector<EditorInput*> inputs;
 		for (std::string fieldName : drawOrder) {
-			EditorInput* field = m_fieldIdentifierMap[fieldName];
+			EditorInput* field = m_inputMaps[0][fieldName];
 			if (field->category == category) {
 				inputs.push_back(field);
 			}
 		}
-		m_fieldsCategoryMap[category] = inputs;
+		m_inputs[category] = inputs;
 	}
 
 	// Builds the window title. Currently, switching translations does not update this. Todo 
@@ -136,9 +84,10 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	else {
 		m_windowTitle = std::format("{} {} {} - {}", windowName, id, name, windowTitleBase.c_str());
 	}
+	*/
 }
 
-void EditorForm::Render()
+void EditorFormList::Render()
 {
 	if (setFocus) {
 		ImGui::SetNextWindowFocus();
@@ -147,8 +96,11 @@ void EditorForm::Render()
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
+		/*
 		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
-		const int columnCount = EditorFormUtils::GetColumnCount();
+		const int columnCount = GetColumnCount();
+
+
 		for (uint8_t category : m_categories)
 		{
 			const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
@@ -159,7 +111,7 @@ void EditorForm::Render()
 
 			if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
 			{
-				std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
+				std::vector<EditorInput*>& inputs = m_inputs[category];
 				for (size_t i = 0; i < inputs.size(); ++i)
 				{
 					EditorInput* field = inputs[i];
@@ -188,6 +140,7 @@ void EditorForm::Render()
 		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), unsavedChanges)) {
 			Apply();
 		}
+	*/
 	}
 	ImGui::End();
 	
@@ -195,14 +148,4 @@ void EditorForm::Render()
 		// Ordered to close, but changes remain
 		// todo: show popup, force popen = true
 	}
-}
-
-ClickableFieldEvent* EditorForm::GetFormClickEvent()
-{
-	if (!m_consumedEvent)
-	{
-		m_consumedEvent = true;
-		return &m_event;
-	}
-	return nullptr;
 }

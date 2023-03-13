@@ -26,7 +26,7 @@ public:
 	bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) override;
 	
 	// Moves
-	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, std::vector<std::string>& drawOrder) override;
+	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder) override;
 	void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) override;
 	bool ValidateMoveField(std::string name, EditorInput* field);
 

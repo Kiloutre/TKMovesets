@@ -5,6 +5,8 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Implement copy paste in forms
+- Move transition: change label as the move id changes
 - Move hitlevel: hexadecimal
 - Hint for each field label
 - For lists: detect that we aren't at the true beginning of the list (i - 1) and warn

@@ -33,6 +33,7 @@ set(BINARY_SOURCES
                     # Layout: editor window
                     "Layouts/Editor/EditorWindow.cpp"
                     "Layouts/Editor/EditorForm.cpp"
+                    "Layouts/Editor/EditorFormList.cpp"
                     "Layouts/Editor/EditorMove.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
@@ -49,7 +50,7 @@ set(BINARY_SOURCES
                     "Utils/ThreadedClass.cpp"
 )
 
-# This will be included in the .dll and should only be related to extraction/importation
+# This will be included in the .dll and should only be related to extraction/importation/edition (anything game specific)
 set(IMPORTEXPORT_SOURCES
                     # Keep a copy of these since Extractor & Importers are reliant on them
                     "Game/GameProcess.cpp"
@@ -74,12 +75,12 @@ set(IMPORTEXPORT_SOURCES
 
 ## Build ##
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
-add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES}  "Editors/Editor.cpp")
+add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES})
 target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe
-add_executable (TKMovesets2 ${BINARY_SOURCES}  "Editors/Editor.cpp")
+add_executable (TKMovesets2 ${BINARY_SOURCES})
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)

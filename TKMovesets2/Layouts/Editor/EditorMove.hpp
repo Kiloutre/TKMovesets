@@ -1,12 +1,7 @@
 #pragma once
 
-#include <map>
-#include <set>
-#include <string>
-
 #include "Editor.hpp"
 #include "EditorForm.hpp"
-
 
 // Windowed class managing a single move
 class EditorMove : public EditorForm
