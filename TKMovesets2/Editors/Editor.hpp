@@ -39,6 +39,7 @@ enum EditorInput_
 	EditorInput_Unsigned  = (1 << 1),
 	EditorInput_String    = (1 << 2),
 	EditorInput_Clickable = (1 << 3),
+	EditorInput_Hex       = (1 << 4),
 
 	/*
 	EditorInput_hexnumber,

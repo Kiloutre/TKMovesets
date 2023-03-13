@@ -26,7 +26,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 	CREATE_STRING_FIELD("move_name", 0, nameBlock + move->name_addr);
 	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->vuln);
-	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->hitlevel);
+	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08x", move->hitlevel);
 	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned | EditorInput_Clickable, "%u", move->transition);
 	CREATE_FIELD("anim_len", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->anim_len);
 	CREATE_FIELD("hitbox_location", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->hitbox_location);
@@ -65,7 +65,7 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 	// todo: move name
 	// todo: anim name
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
-	move->hitlevel = (uint32_t)atoi(inputs["hitlevel"]->buffer);
+	move->hitlevel = (uint32_t)strtol(inputs["hitlevel"]->buffer, nullptr, 16);
 	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
 	move->anim_len = (uint32_t)atoi(inputs["anim_len"]->buffer);
 	move->hitbox_location = (uint32_t)atoi(inputs["hitbox_location"]->buffer);
@@ -150,16 +150,17 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 
 bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field)
 {
-	if (field->flags & EditorInput_String) {
-		if (field->buffer[0] == '\0') {
-			// Don't accept empty strings
-			return false;
-		}
+	if (field->buffer[0] == '\0') {
+		// There are no fields that should be allowed to be empty
+		return false;
 	}
 
 	switch (field->memberSize)
 	{
 	case 4:
+		if (field->flags & EditorInput_Hex) {
+			return strlen(field->buffer) <= 8;
+		}
 		if (field->flags & EditorInput_Signed) {
 			long long num = atoll(field->buffer);
 			if (num > INT_MAX || num < INT_MIN) {
@@ -175,6 +176,9 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 		break;
 
 	case 2:
+		if (field->flags & EditorInput_Hex) {
+			return strlen(field->buffer) <= 4;
+		}
 		if (field->flags & EditorInput_Signed) {
 			int num = atoi(field->buffer);
 			if (num > SHRT_MAX || num < SHRT_MIN) {
