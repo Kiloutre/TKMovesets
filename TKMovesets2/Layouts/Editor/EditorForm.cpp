@@ -41,6 +41,14 @@ void EditorForm::RenderLabel(EditorInput* field)
 		}
 	} else {
 		ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+			// todo: maybe use this for a full-on description
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
 	}
 }
 

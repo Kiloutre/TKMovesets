@@ -25,13 +25,20 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_STRING_FIELD("move_name", 0, nameBlock + move->name_addr);
 	CREATE_STRING_FIELD("anim_name", 0, nameBlock + move->anim_name_addr);
+	// todo: animation
 	CREATE_FIELD("vulnerability", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->vuln);
-	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08x", move->hitlevel);
+	CREATE_FIELD("hitlevel", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08X", move->hitlevel);
 	CREATE_FIELD("transition", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned | EditorInput_Clickable, "%u", move->transition);
+	CREATE_FIELD("moveId_val1", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->moveId_val1);
+	CREATE_FIELD("moveId_val2", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->moveId_val2);
 	CREATE_FIELD("anim_len", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->anim_len);
-	CREATE_FIELD("hitbox_location", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->hitbox_location);
+	CREATE_FIELD("airborne_start", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->airborne_start);
+	CREATE_FIELD("airborne_end", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->airborne_end);
+	CREATE_FIELD("ground_fall", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->ground_fall);
+	CREATE_FIELD("hitbox_location", 4, 0, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase, EditorInput_Hex, "%08X", move->hitbox_location);
 	CREATE_FIELD("first_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->first_active_frame);
 	CREATE_FIELD("last_active_frame", 4, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->last_active_frame);
+	CREATE_FIELD("distance", 2, 0, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->distance);
 
 	CREATE_FIELD("cancel_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->cancel_addr);
 	CREATE_FIELD("hit_condition_id", 8, 2, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->hit_condition_addr);
@@ -46,6 +53,15 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 	CREATE_FIELD("cancel_id_3_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x40_int__0x38_related);
 	CREATE_FIELD("cancel_id_4", 8, 3, ImGuiInputTextFlags_CharsDecimal, EditorInput_Clickable, "%lld", move->_0x48_cancel_addr);
 	CREATE_FIELD("cancel_id_4_related", 4, 3, ImGuiInputTextFlags_CharsDecimal, 0, "%u", move->_0x50_int__0x48_related);
+
+	CREATE_FIELD("_0x34_int", 4, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x34_int);
+	CREATE_FIELD("_0x44_int", 4, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x44_int);
+	CREATE_FIELD("_0x56_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x56_short);
+	CREATE_FIELD("_0x5C_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x5C_short);
+	CREATE_FIELD("_0x5E_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x5E_short);
+	CREATE_FIELD("_0x98_int", 4, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0x98_int);
+	CREATE_FIELD("_0xA8_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0xA8_short);
+	CREATE_FIELD("_0xAC_short", 2, 5, ImGuiInputTextFlags_CharsDecimal, EditorInput_Unsigned, "%u", move->_0xAC_short);
 
 	// Finishing touch
 	for (auto& [name, input] : inputMap) {
@@ -64,13 +80,20 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 
 	// todo: move name
 	// todo: anim name
+	// todo: anim address
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
 	move->hitlevel = (uint32_t)strtol(inputs["hitlevel"]->buffer, nullptr, 16);
 	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
+	move->moveId_val1 = (uint16_t)atoi(inputs["moveId_val1"]->buffer);
+	move->moveId_val2 = (uint16_t)atoi(inputs["moveId_val2"]->buffer);
 	move->anim_len = (uint32_t)atoi(inputs["anim_len"]->buffer);
-	move->hitbox_location = (uint32_t)atoi(inputs["hitbox_location"]->buffer);
+	move->airborne_start = (uint32_t)atoi(inputs["airborne_start"]->buffer);
+	move->airborne_end = (uint32_t)atoi(inputs["airborne_end"]->buffer);
+	move->ground_fall = (uint32_t)atoi(inputs["ground_fall"]->buffer);
+	move->hitbox_location = (uint32_t)strtol(inputs["hitbox_location"]->buffer, nullptr, 16);
 	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
 	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
+	move->distance = (uint16_t)atoi(inputs["distance"]->buffer);
 
 	move->cancel_addr = atoll(inputs["cancel_id"]->buffer);
 	move->hit_condition_addr = atoll(inputs["hit_condition_id"]->buffer);
@@ -85,6 +108,15 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 	move->_0x40_int__0x38_related = atoi(inputs["cancel_id_3_related"]->buffer);
 	move->_0x48_cancel_addr = atoll(inputs["cancel_id_4"]->buffer);
 	move->_0x50_int__0x48_related = atoi(inputs["cancel_id_4_related"]->buffer);
+
+	move->_0x34_int = atoi(inputs["_0x34_int"]->buffer);
+	move->_0x44_int = atoi(inputs["_0x44_int"]->buffer);
+	move->_0x56_short = atoi(inputs["_0x56_short"]->buffer);
+	move->_0x5C_short = atoi(inputs["_0x5C_short"]->buffer);
+	move->_0x5E_short = atoi(inputs["_0x5E_short"]->buffer);
+	move->_0x98_int = atoi(inputs["_0x98_int"]->buffer);
+	move->_0xA8_short = atoi(inputs["_0xA8_short"]->buffer);
+	move->_0xAC_short = atoi(inputs["_0xAC_short"]->buffer);
 }
 
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
@@ -159,7 +191,9 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 	{
 	case 4:
 		if (field->flags & EditorInput_Hex) {
-			return strlen(field->buffer) <= 8;
+			if (strlen(field->buffer) > 8) {
+				return false;
+			}
 		}
 		if (field->flags & EditorInput_Signed) {
 			long long num = atoll(field->buffer);
@@ -177,7 +211,9 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 
 	case 2:
 		if (field->flags & EditorInput_Hex) {
-			return strlen(field->buffer) <= 4;
+			if (strlen(field->buffer) > 4) {
+				return false;
+			}
 		}
 		if (field->flags & EditorInput_Signed) {
 			int num = atoi(field->buffer);
@@ -219,6 +255,11 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	for (uint16_t i = 0; i < 112 + 36; ++i) {
 		m_aliases.push_back(aliasesPtr[i]);
 	}
+
+	// Build anim name : offset list
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
+	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
 }
 
 EditorTable EditorT7::GetMovesetTable()

@@ -187,11 +187,11 @@ namespace StructsT7
 		uint32_t hitlevel;
 		Cancel* cancel_addr;
 		Cancel* _0x28_cancel_addr;
-		uint32_t _0x30_int__0x28_related;
-		uint32_t _0x34_int;
+		int32_t _0x30_int__0x28_related;
+		int32_t _0x34_int;
 		Cancel* _0x38_cancel_addr;
-		uint32_t _0x40_int__0x38_related;
-		uint32_t _0x44_int;
+		int32_t _0x40_int__0x38_related;
+		int32_t _0x44_int;
 		Cancel* _0x48_cancel_addr;
 		uint32_t _0x50_int__0x48_related;
 		uint16_t transition;
@@ -201,7 +201,7 @@ namespace StructsT7
 		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
 		int16_t _0x5E_short; // 0
 		HitCondition* hit_condition_addr;
-		uint32_t anim_len;
+		int32_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
 		uint32_t ground_fall;
@@ -445,8 +445,8 @@ namespace StructsT7_gameAddr
 		uint32_t hitlevel;
 		gameAddr cancel_addr;
 		gameAddr _0x28_cancel_addr;
-		uint32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
-		uint32_t _0x34_int;
+		int32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
+		int32_t _0x34_int;
 		gameAddr _0x38_cancel_addr;
 		int32_t _0x40_int__0x38_related; // i believe this is 2x4 bytes
 		uint32_t _0x44_int;

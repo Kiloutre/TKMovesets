@@ -5,6 +5,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Maybe show explanation when hovering move field names and not just a repeat of the field name
 - Implement copy paste in forms
 - Move transition: change label as the move id changes
 - Move hitlevel: hexadecimal
