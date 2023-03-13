@@ -78,7 +78,9 @@ void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& in
 	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
 
 	// todo: move name, allow edition
-	move->anim_addr = m_animNameMap[inputs["anim_name"]->buffer];
+	if (m_animNameMap.find(inputs["anim_name"]->buffer) != m_animNameMap.end()) {
+		move->anim_addr = m_animNameMap[inputs["anim_name"]->buffer];
+	}
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
 	move->hitlevel = (uint32_t)strtol(inputs["hitlevel"]->buffer, nullptr, 16);
 	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
