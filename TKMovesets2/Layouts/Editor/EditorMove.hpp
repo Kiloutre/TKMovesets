@@ -6,6 +6,12 @@
 
 #include "Editor.hpp"
 
+struct ClickableFieldEvent
+{
+	std::string eventName;
+	char* buffer;
+};
+
 // Windowed class managing a single move
 class EditorMove
 {
@@ -22,9 +28,15 @@ private:
 	Editor* m_editor = nullptr;
 	// Contain the field type to pass to generic Editor methods
 	std::string m_windowType = "move";
+	// If a field is clicked, this will contain its full name and buffer 
+	ClickableFieldEvent m_event{ "", nullptr };
+	// Contains false if we need to send the event to the next GetFormClickEvent() call
+	bool m_consumedEvent = true;
 
 	// Render a single input field in the form
 	void RenderInput(EditorInput* field);
+	// Render a single input label in the form
+	void RenderLabel(EditorInput* field);
 	// Apply the change to the moveset
 	void Apply();
 public:
@@ -40,4 +52,6 @@ public:
 	EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* editor);
 	~EditorMove();
 	void Render();
+	// Returns a ptr to a clickable event info (field full name, buffer) or nullptr if no new event to fetch
+	ClickableFieldEvent* GetFormClickEvent();
 };

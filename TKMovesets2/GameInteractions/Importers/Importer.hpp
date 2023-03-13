@@ -12,10 +12,10 @@
 
 enum ImportationErrcode_
 {
-	ImportationErrcode_Successful = 0,
-	ImportationErrcode_AllocationErr = 1,
-	ImportationErrcode_GameAllocationErr = 2,
-	ImportationErrcode_FileReadErr = 3,
+	ImportationErrcode_Successful,
+	ImportationErrcode_AllocationErr,
+	ImportationErrcode_GameAllocationErr,
+	ImportationErrcode_FileReadErr,
 };
 
 // Base class for extracting from a game

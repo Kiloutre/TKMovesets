@@ -9,12 +9,12 @@
 
 enum EditorMovelistFilter_
 {
-	EditorMovelistFilter_All = 0,
-	EditorMovelistFilter_Attacks = 1,
-	EditorMovelistFilter_Generic = 2,
-	EditorMovelistFilter_Throws = 3,
-	EditorMovelistFilter_Custom = 4,
-	EditorMovelistFilter_PostIdle = 5,
+	EditorMovelistFilter_All,
+	EditorMovelistFilter_Attacks,
+	EditorMovelistFilter_Generic,
+	EditorMovelistFilter_Throws,
+	EditorMovelistFilter_Custom,
+	EditorMovelistFilter_PostIdle,
 };
 
 struct EditorMovelist_Move
@@ -120,4 +120,6 @@ public:
 	~EditorWindow();
 	// Render the window
 	void Render(int dockid);
+	// Called by forms when one of their clickable labels are clicked
+	void OnFormFieldClick(std::string fieldIdentifier, const char* buffer);
 };

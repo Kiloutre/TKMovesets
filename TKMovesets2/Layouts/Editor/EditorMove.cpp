@@ -29,6 +29,19 @@ static int GetColumnCount()
 
 // -- Private methods -- //
 
+void EditorMove::RenderLabel(EditorInput* field)
+{
+	if (field->flags & EditorInput_Clickable) {
+		if (ImGui::Selectable(_(field->field_fullname.c_str()), !field->errored)) {
+			m_consumedEvent = false;
+			m_event.eventName = field->field_fullname;
+			m_event.buffer = field->buffer;
+		}
+	} else {
+		ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+	}
+}
+
 void EditorMove::RenderInput(EditorInput* field)
 {
 	bool erroredBg = field->errored;
@@ -92,6 +105,8 @@ EditorMove::~EditorMove()
 
 EditorMove::EditorMove(std::string windowTitleBase, uint16_t t_moveId, Editor* editor)
 {
+	//m_mainWindow = mainWindow;
+	
 	moveId = t_moveId;
 	m_editor = editor;
 
@@ -165,7 +180,7 @@ void EditorMove::Render()
 						ImGui::TableNextRow();
 					}
 					ImGui::TableNextColumn();
-					ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+					RenderLabel(field);
 
 					// Render input field
 					if (columnCount == 1) {
@@ -188,4 +203,14 @@ void EditorMove::Render()
 		// Ordered to close, but changes remain
 		// todo: show popup, force popen = true
 	}
+}
+
+ClickableFieldEvent* EditorMove::GetFormClickEvent()
+{
+	if (!m_consumedEvent)
+	{
+		m_consumedEvent = true;
+		return &m_event;
+	}
+	return nullptr;
 }

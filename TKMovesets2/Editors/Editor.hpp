@@ -13,18 +13,20 @@
 
 # define FORM_INPUT_BUFSIZE (32)
 
-typedef uint16_t EditorInputType;
-enum EditorInputType_
+typedef uint16_t EditorInputFlags;
+enum EditorInput_
 {
-	EditorInputType_signed,
-	EditorInputType_unsigned,
-	EditorInputType_string,
+	EditorInput_Signed    = (1 << 0),
+	EditorInput_Unsigned  = (1 << 1),
+	EditorInput_String    = (1 << 2),
+	EditorInput_Clickable = (1 << 3),
 
-	EditorInputType_hexnumber,
-	EditorInputType_float,
-	EditorInputType_negativeFloat,
-	EditorInputType_bool,
-	EditorInputType_text,
+	/*
+	EditorInput_hexnumber,
+	EditorInput_float,
+	EditorInput_negativeFloat,
+	EditorInput_bool,
+	*/
 };
 
 struct EditorInput
@@ -40,7 +42,7 @@ struct EditorInput
 	// Sets the allowed charset for the input
 	ImGuiInputTextFlags imguiInputFlags = 0;
 	// Our own flags, required for our overflow checks
-	EditorInputType flags = 0;
+	EditorInputFlags flags = 0;
 	// The string buffer containing the input text
 	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
 	// Contains true if the buffer contains invalid data

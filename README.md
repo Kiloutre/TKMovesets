@@ -5,6 +5,8 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Hint for each field label
+- For lists: detect that we aren't at the true beginning of the list (i - 1) and warn
 - Allow random extra properties to be played
 - Movesets between p1 and p2 produce different CRC32. I already know about pointers toward moveset info (name, date, fulldate, creator) i need to correct/void out, but actual moveset data actually seems to change. Why? Cheat engine -> what writes on this address
 - Find better p1_ptr, the current one points toward the current player and not necessarily p1

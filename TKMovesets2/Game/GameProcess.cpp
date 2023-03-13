@@ -5,6 +5,8 @@
 
 #include "GameAddresses.h"
 
+#pragma warning( disable : C6001 )
+
 // -- Private methods  -- //
 
 GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, DWORD processExtraFlags)

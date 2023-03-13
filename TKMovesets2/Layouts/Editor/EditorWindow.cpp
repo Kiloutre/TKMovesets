@@ -10,6 +10,13 @@
 
 // -- Private methods -- //
 
+void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buffer)
+{
+	if (fieldIdentifier == "edition.move_field.cancel_id") {
+
+	}
+}
+
 void EditorWindow::OpenMoveWindow(uint16_t moveId)
 {
 
@@ -29,6 +36,7 @@ void EditorWindow::OpenMoveWindow(uint16_t moveId)
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor);
+	//EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor, this);
 	if (openNew || availableOverwriteIndex == -1) {
 		m_moveWindows.push_back(newWin);
 	}
@@ -249,7 +257,14 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 		{
 			ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
 			moveWin->Render();
+
+			ClickableFieldEvent* ev = moveWin->GetFormClickEvent();
+			if (ev != nullptr) {
+				OnFormFieldClick(ev->eventName, ev->buffer);
+			}
+
 			if (moveWin->unsavedChanges) {
+				// todo: only set m_savedLastChange when Apply() is called
 				m_savedLastChange = false;
 				m_importNeeded = true;
 			}

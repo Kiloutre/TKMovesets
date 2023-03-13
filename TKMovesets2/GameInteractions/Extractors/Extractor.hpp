@@ -41,9 +41,9 @@ enum ExtractSettings_
 
 enum ExtractionErrcode_
 {
-	ExtractionErrcode_Successful = 0,
-	ExtractionErrcode_AllocationErr = 1,
-	ExtractionErrcode_FileCreationErr = 2,
+	ExtractionErrcode_Successful,
+	ExtractionErrcode_AllocationErr,
+	ExtractionErrcode_FileCreationErr,
 };
 
 namespace ExtractorUtils

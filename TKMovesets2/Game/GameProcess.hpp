@@ -11,19 +11,19 @@
 enum GameProcessErrcode_
 {
 	// This will happen if the process-attaching thread is not started
-	GameProcessErrcode_PROC_NOT_ATTACHED = 0,
+	GameProcessErrcode_PROC_NOT_ATTACHED,
 	// Process not found in the process list
-	GameProcessErrcode_PROC_NOT_FOUND = 1,
+	GameProcessErrcode_PROC_NOT_FOUND,
 	// Currently searching for the game process or attempting to attach to it
-	GameProcessErrcode_PROC_ATTACHING = 2,
+	GameProcessErrcode_PROC_ATTACHING,
 	// Found but not attached 
-	GameProcessErrcode_PROC_ATTACH_ERR = 3,
+	GameProcessErrcode_PROC_ATTACH_ERR,
 	// Found, attached, version mismatch
-	GameProcessErrcode_PROC_VERSION_MISMATCH = 4,
+	GameProcessErrcode_PROC_VERSION_MISMATCH,
 	// Attached with no error
-	GameProcessErrcode_PROC_ATTACHED = 5,
+	GameProcessErrcode_PROC_ATTACHED,
 	// Unexpected exit
-	GameProcessErrcode_PROC_EXITED = 6,
+	GameProcessErrcode_PROC_EXITED,
 };
 
 class GameProcess
