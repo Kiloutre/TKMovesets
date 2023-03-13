@@ -14,6 +14,7 @@ enum EditorMovelistFilter_
 	EditorMovelistFilter_Generic = 2,
 	EditorMovelistFilter_Throws = 3,
 	EditorMovelistFilter_Custom = 4,
+	EditorMovelistFilter_PostIdle = 5,
 };
 
 struct EditorMovelist_Move
@@ -29,12 +30,6 @@ struct EditorInfos
 	std::string name;
 	uint64_t lastSavedDate;
 	int32_t gameId;
-};
-
-struct MovesetInfos
-{
-	std::vector<uint16_t> aliases;
-	std::vector<void*> moves;
 };
 
 class EditorWindow_MovesetLoadFail : public std::exception
@@ -101,7 +96,7 @@ private:
 	// Create a new window containing data about the given move
 	void OpenMoveWindow(uint16_t moveId);
 
-	//
+	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorMovelistFilter_ filter);
 	// Validates the move ID against the movelist size and alias list
 	int32_t ValidateMoveId(const char* buf);

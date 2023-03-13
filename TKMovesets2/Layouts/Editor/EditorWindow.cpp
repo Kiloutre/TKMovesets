@@ -22,6 +22,7 @@ void EditorWindow::OpenMoveWindow(uint16_t moveId)
 			return;
 		}
 		if (moveWin->unsavedChanges == false) {
+			// Don't overwrite windows with unsaved changes
 			availableOverwriteIndex = i;
 		}
 	}
@@ -44,6 +45,15 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 	m_movelistFilter = filter;
 	if (filter == EditorMovelistFilter_All) {
 		m_filteredMovelist = m_movelist;
+		return;
+	}
+
+	if (filter == EditorMovelistFilter_PostIdle) {
+		// Get idle move ID, only list moves beyond it
+		size_t startingIndex = m_editorTable.aliases[1];
+		for (; startingIndex < m_movelist.size(); ++startingIndex) {
+			m_filteredMovelist.push_back(m_movelist[startingIndex]);
+		}
 		return;
 	}
 
@@ -288,6 +298,12 @@ void EditorWindow::RenderMovelist()
 			}
 			ImGui::EndTabItem();
 		}
+		if (ImGui::BeginTabItem(_("edition.moves_char_specific"))) {
+			if (m_movelistFilter != EditorMovelistFilter_PostIdle) {
+				FilterMovelist(EditorMovelistFilter_PostIdle);
+			}
+			ImGui::EndTabItem();
+		}
 		ImGui::EndTabBar();
 	}
 
@@ -295,8 +311,8 @@ void EditorWindow::RenderMovelist()
 	{
 		ImVec2 TableSize = ImGui::GetContentRegionAvail();
 		TableSize.y -= 80;
-		if (ImGui::BeginTable("MovelistTable", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
-			| ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedFit, TableSize))
+		if (ImGui::BeginTable("MovelistTable", 3, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+			| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, TableSize))
 		{
 			ImGui::TableSetupColumn("ID");
 			ImGui::TableSetupColumn(_("edition.move_name"));
@@ -337,36 +353,22 @@ void EditorWindow::RenderMovelist()
 					ImGui::SetScrollHereY();
 					m_moveToScrollTo = -1;
 				}
-
-				// todo: one empty column is always displayed here for some reason. fix it. to fix.
 			}
 
 			ImGui::EndTable();
 		}
 	}
-
-
 	// Set player move
 	ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x / 2 - 5, 0);
 	ImGui::PushItemWidth(buttonSize.x);
-	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1), ImGuiInputTextFlags_CharsDecimal)
-	{
-		// todo: the flag and this loop should filter out bad characters. As it stands, it doesn't. Fix.
-		for (size_t i = 0; m_moveToPlayBuf[i]; ++i)
-		{
-			char c = m_moveToPlayBuf[i];
-			if (!isdigit(c)) {
-				m_moveToPlayBuf[i] = '\0';
-				break;
-			}
-		}
-
+	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1), ImGuiInputTextFlags_CharsDecimal) {
 		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
 	}
 	ImGui::SameLine();
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
+		OpenMoveWindow(m_moveToScrollTo);
 		m_highlightedMoveId = m_moveToScrollTo;
 	}
 	ImGui::PopItemWidth();
@@ -453,7 +455,7 @@ void EditorWindow::Render(int dockid)
 
 	// Layout start
 	ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Once);
-	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(9999, 9999));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 400), ImVec2(9999, 9999));
 
 	if (setFocus) {
 		ImGui::SetNextWindowFocus();
@@ -473,16 +475,20 @@ void EditorWindow::Render(int dockid)
 		ImVec2 Size = ImGui::GetContentRegionAvail();
 		Size.y -= 30;
 		if (ImGui::BeginTable("MovesetMainTable", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders
-		| ImGuiTableFlags_RowBg | ImGuiTableFlags_NoHostExtendY, Size))
+		| ImGuiTableFlags_NoHostExtendY, Size))
 		{
+			ImGui::TableSetupColumn("##", ImGuiTableColumnFlags_WidthFixed, 300.0f);
+			ImGui::TableSetupColumn("##");
+			ImGui::TableHeadersRow();
+
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			RenderMovelist();
 
 			ImGui::TableNextColumn();
-
-
-			ImGuiID dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - 5));
+			// -7 because the dockspace overflows past the table fo rsome reason.
+			// -18 (GetLineHeight()) because i haven't managed to hdie the header row yet. todo?
+			ImGuiID dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - 7 - 18));
 			RenderMovesetData(dockId);
 
 			ImGui::EndTable();

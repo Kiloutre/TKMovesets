@@ -12,6 +12,7 @@
 #include "Submenu_About.hpp"
 #include "imgui_extras.hpp"
 
+// todo: fix inactive/collapsed tabs looking too similar to active ones
 const ImU32 editorTitleColors[] = {
 	IM_COL32(77, 131, 219, 125),
 	IM_COL32(119, 58, 199, 125),
@@ -19,6 +20,14 @@ const ImU32 editorTitleColors[] = {
 	IM_COL32(186, 54, 54, 125),
 	IM_COL32(140, 0, 0, 125),
 	IM_COL32(119, 175, 58, 125),
+};
+const ImU32 editorTitleInactiveColors[] = {
+	IM_COL32(36, 64, 107, 0),
+	IM_COL32(119, 58, 199, 0),
+	IM_COL32(210, 100, 222, 0),
+	IM_COL32(186, 54, 54, 0),
+	IM_COL32(140, 0, 0, 0),
+	IM_COL32(119, 175, 58, 0),
 };
 
 // -- Private methods -- //
@@ -36,7 +45,6 @@ void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 		}
 	}
 
-	// todo: attempt to load. popup if fail. open window and std vector push back if not
 	try {
 		EditorWindow* newWin = new EditorWindow(movesetInfos, addrFile, &storage);
 		editorWindows.push_back(newWin);
@@ -142,11 +150,15 @@ void MainWindow::Update()
 			EditorWindow* w = editorWindows[i];
 			if (w->popen) {
 				const ImU32 colorCount = sizeof(editorTitleColors) / sizeof(editorTitleColors[0]);
-				ImGui::PushStyleColor(ImGuiCol_TitleBg, editorTitleColors[i % colorCount]);
+				ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, editorTitleInactiveColors[i % colorCount]);
+				ImGui::PushStyleColor(ImGuiCol_TitleBg, editorTitleInactiveColors[i % colorCount]);
 				ImGui::PushStyleColor(ImGuiCol_TitleBgActive, editorTitleColors[i % colorCount]);
-				ImGui::PushStyleColor(ImGuiCol_Tab, editorTitleColors[i % colorCount]);
+				ImGui::PushStyleColor(ImGuiCol_TabUnfocused, editorTitleInactiveColors[i % colorCount]);
+				ImGui::PushStyleColor(ImGuiCol_Tab, editorTitleInactiveColors[i % colorCount]);
 				ImGui::PushStyleColor(ImGuiCol_TabActive, editorTitleColors[i % colorCount]);
 				w->Render(i + 2);
+				ImGui::PopStyleColor();
+				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();

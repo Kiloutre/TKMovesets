@@ -15,7 +15,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	movesetInfo* movesetToLoad = nullptr;
 
 	ImGui::SeparatorText(_("edition.select_moveset"));
-	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetEditionList", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(0, ImGui::GetContentRegionAvail().y)))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);

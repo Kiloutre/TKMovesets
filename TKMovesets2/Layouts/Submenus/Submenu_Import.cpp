@@ -118,7 +118,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	}
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
-	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetImportationList", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImVec2(0, ImGui::GetContentRegionAvail().y)))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);

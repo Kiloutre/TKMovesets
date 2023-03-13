@@ -67,9 +67,7 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeader_offsets& offsets, 
 			// Moveset block was not included in the file: copy the currently used one
 			fileMotaCursor[i] = gameMotaCursor[i];
 		}
-		else
-		{
-			// Todo: check if this works. I believe we are off.
+		else {
 			fileMotaCursor[i] += gameMoveset + offsets.motaBlock;
 		}
 	}

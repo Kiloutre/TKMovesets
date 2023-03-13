@@ -19,7 +19,7 @@ private:
 	// Stores the amount of categories within the form
 	uint8_t m_categoryAmount = 0;
 	// Contain the field type to pass to generic Editor methods
-	std::string m_fieldType = "move";
+	std::string m_windowType = "move";
 
 public:
 	// Stores the state of the window. If close, this class will be destroyed soon

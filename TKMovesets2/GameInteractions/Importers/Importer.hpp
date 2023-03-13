@@ -10,7 +10,6 @@
 // Turns an index into an absolute address, or NULL (0) if index is -1
 # define FROM_INDEX(field, listStartAddr, type) (field = (field == -1 ? 0 : listStartAddr + (field * sizeof(type))))
 
-// todo: actually handle these error codes and display an err message
 enum ImportationErrcode_
 {
 	ImportationErrcode_Successful = 0,

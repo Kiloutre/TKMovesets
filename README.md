@@ -6,14 +6,13 @@ If you have any contribution to bring, feel free, there is room for improvement 
 # Todo list:
 
 - Allow random extra properties to be played
-- Editor: fix play move button
-- Movesets between p1 and p2 produce different CRC32. I already know about pointers toward moveset info (name, date, fulldate, creator) i need to correct/void out, but actual moveset data actually seems to change. Why?
+- Movesets between p1 and p2 produce different CRC32. I already know about pointers toward moveset info (name, date, fulldate, creator) i need to correct/void out, but actual moveset data actually seems to change. Why? Cheat engine -> what writes on this address
 - Find better p1_ptr, the current one points toward the current player and not necessarily p1
 - Unicode support for ImGui. The translation file should be able to contain extended latin, korean, japanese, russian and arabic characters. Moveset files hould also be able to contain these, and possibly moveset header strings too
 - Export tag2
 - Movest compression. It should be viable to store movesets in a compressed format: even the fastest compression in 7zip yiels a 50% size reduction, which is nothing to scoff at
 - Figure out how to get 0x64 animation sizes in bytes. This would make moveset smallers AND fix bugs with some animations that are not extracted completely (rare, but happens for some fringe ones)
-- Moveset rename button in moveset extraction list
+- Moveset rename button in moveset extraction list & moveset edition
 - Code injection to force current moveset to stay through loading screens
 - Auto-updater
 - Make a fun program icon

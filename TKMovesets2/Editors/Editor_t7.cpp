@@ -92,6 +92,7 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 		name == "cancel_id_3" || name == "cancel_id_4") {
 		int listIdx = atoi(field->buffer);
 		if (listIdx < -1 || listIdx >= m_infos->table.cancelCount) {
+			printf("ret false");
 			return false;
 		}
 	}
@@ -149,6 +150,13 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 
 bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field)
 {
+	if (field->flags & EditorInputType_string) {
+		if (field->buffer[0] == '\0') {
+			// Don't accept empty strings
+			return false;
+		}
+	}
+
 	switch (field->memberSize)
 	{
 	case 4:

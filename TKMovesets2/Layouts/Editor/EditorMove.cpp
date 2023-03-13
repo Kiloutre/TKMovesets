@@ -40,40 +40,42 @@ void EditorMove::Render()
 		setFocus = false;
 	}
 
-	// todo: anim name, anim offset
-
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
-		for (uint8_t category = 0; category < m_categoryAmount; ++category)
+		for (auto& field : m_inputs)
 		{
-			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("edition.move_field.category_{}", category).c_str()), ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) {
-				// Only show titles for category > 0, and if tree is not open: no need to render anything
-				continue;
+			bool erroredBg = field->errored;
+			if (erroredBg) {
+				ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
 			}
 
-			ImGui::PushItemWidth(150.0f);
-			for (auto& field : m_inputs)
+			ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+			ImGui::SameLine();
+			ImGui::PushID(this);
+
+			if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 			{
-				if (field->category != category) {
-					continue;
-				}
-
-				bool erroredBg = field->errored;
-				if (erroredBg) {
-					ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
-				}
-
-				if (ImGui::InputText(_(field->field_fullname.c_str()), field->buffer, sizeof(field->buffer), field->imguiInputFlags))
-				{
-					unsavedChanges = true;
-					field->errored = m_editor->ValidateField(m_fieldType, field->name, field) == false;
-				}
-
-				if (erroredBg) {
-					ImGui::PopStyleColor();
+				unsavedChanges = true;
+				field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
+			} else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+			{
+				// Have to manually implement copy pasting
+				// todo: make this actually work. writing to field->buffer somehow does nothing to the input text
+				if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
+					printf("copy - [%s]\n", field->buffer);
+					ImGui::SetClipboardText(field->buffer);
+				} else if (ImGui::IsKeyPressed(ImGuiKey_V, true)) {
+					printf("paste - [%s]\n", field->buffer);
+					field->buffer[0] = '\0';
+					//strcpy_s(field->buffer, sizeof(field->buffer), ImGui::GetClipboardText());
+					field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
 				}
 			}
-			ImGui::PopItemWidth();
+			ImGui::PopID();
+
+			if (erroredBg) {
+				ImGui::PopStyleColor();
+			}
 		}
 
 		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), unsavedChanges)) {

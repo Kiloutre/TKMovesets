@@ -122,6 +122,7 @@ edition.moves_attacks = Attacks
 edition.moves_generic = Generic
 edition.moves_throws = Throws
 edition.moves_custom = Custom
+edition.moves_char_specific = Character
 edition.move_id_hint = Move ID...
 edition.move_current = Current
 edition.play_move_1p = Play (1P)

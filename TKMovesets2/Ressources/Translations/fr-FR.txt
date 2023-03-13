@@ -118,6 +118,7 @@ edition.moves_attacks = Attaques
 edition.moves_generic = Génériques
 edition.moves_throws = Prises
 edition.moves_custom = Crées
+edition.moves_char_specific = Personnage
 edition.move_id_hint = ID...
 edition.move_current = Actuel
 edition.play_move_1p = Lancer (J1)
