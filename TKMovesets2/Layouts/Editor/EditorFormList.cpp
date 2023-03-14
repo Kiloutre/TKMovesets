@@ -47,7 +47,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	id = t_id;
 	m_editor = editor;
 
-	m_identifierPrefix = "edition." + windowType + "_field";
+	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType) + "_field";
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories

@@ -32,13 +32,26 @@ public:
 	}
 };
 
+enum EditorWindowType_
+{
+	EditorWindowType_Move,
+	EditorWindowType_Extraproperty,
+	EditorWindowType_Voiceclip,
+	EditorWindowType_Cancel,
+	EditorWindowType_CancelExtradata,
+	EditorWindowType_Requirement,
+	EditorWindowType_HitCondition,
+	EditorWindowType_Reactions,
+	EditorWindowType_Pushback,
+	EditorWindowType_PushbackExtradata,
+};
+
 typedef uint16_t EditorInputFlag;
 enum EditorInputFlag_
 {
 	EditorInput_String    = (1 << 0),
 	EditorInput_Clickable = (1 << 1),
 
-	// todo
 	EditorInput_U64       = (1 << 2),
 	EditorInput_S64       = (1 << 3),
 	EditorInput_U32       = (1 << 4),
@@ -53,8 +66,6 @@ enum EditorInputFlag_
 
 	/*
 	EditorInput_float,
-	EditorInput_negativeFloat,
-	EditorInput_bool,
 	*/
 };
 
@@ -172,7 +183,7 @@ public:
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
 	// Returns true if the given field is valid
-	virtual bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) = 0;
+	virtual bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) = 0;
 
 	// Move-related
 	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;

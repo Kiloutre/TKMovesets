@@ -14,17 +14,21 @@
 
 // -- Private methods -- //
 
-EditorForm* EditorWindow::AllocateFormWindow(std::string identifier, uint16_t id)
+EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint16_t id)
 {
-	if (identifier == "voiceclip") {
+	switch (windowType)
+	{
+	case EditorWindowType_Voiceclip:
 		return new EditorVoiceclip(m_windowTitle, id, m_editor);;
-	}
-	if (identifier == "move") {
+		break;
+	case EditorWindowType_Move:
 		return new EditorMove(m_windowTitle, id, m_editor);;
-	}
-	if (identifier == "extraproperty") {
+		break;
+	case EditorWindowType_Extraproperty:
 		return new EditorExtraproperties(m_windowTitle, id, m_editor);;
+		break;
 	}
+
 	return nullptr;
 }
 
@@ -33,21 +37,22 @@ void EditorWindow::OnFormFieldClick(uint32_t windowId, std::string fieldIdentifi
 	int id = atoi(buffer);
 
 	if (fieldIdentifier == "edition.move_field.cancel_id") {
-
+		OpenFormWindow(EditorWindowType_Cancel, id);
+		// todo: also make it work for other cancel IDs
 	}
 	else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
 		if (id >= 0) {
-			OpenFormWindow("voiceclip", id);
+			OpenFormWindow(EditorWindowType_Voiceclip, id);
 		}
 	}
 	else if (fieldIdentifier == "edition.move_field.extra_properties_id") {
 		if (id >= 0) {
-			OpenFormWindow("extraproperty", id);
+			OpenFormWindow(EditorWindowType_Extraproperty, id);
 		}
 	}
 }
 
-void EditorWindow::OpenFormWindow(std::string windowType, uint16_t moveId)
+void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
 {
 	// todo: template this function?
 	int availableOverwriteIndex = -1;
@@ -391,7 +396,7 @@ void EditorWindow::RenderMovelist()
 					m_highlightedMoveId = move->moveId;
 					m_moveToPlay = move->moveId;
 					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
-					OpenFormWindow("move", move->moveId);
+					OpenFormWindow(EditorWindowType_Move, move->moveId);
 				}
 
 				if (move->aliasId != 0) {
@@ -418,7 +423,7 @@ void EditorWindow::RenderMovelist()
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
-		OpenFormWindow("move", m_moveToScrollTo);
+		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
 		m_highlightedMoveId = m_moveToScrollTo;
 	}
 	ImGui::PopItemWidth();

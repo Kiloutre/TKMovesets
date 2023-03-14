@@ -94,9 +94,9 @@ private:
 	void RenderMovelist();
 
 	// Factory instantiating the right class for the right identifier
-	EditorForm* AllocateFormWindow(std::string identifier, uint16_t id);
+	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id);
 	// Create a new window containing data about the given move
-	void OpenFormWindow(std::string windowType, uint16_t moveId);
+	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId);
 
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorMovelistFilter_ filter);

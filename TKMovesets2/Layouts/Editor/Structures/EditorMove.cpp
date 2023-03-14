@@ -23,7 +23,7 @@ void EditorMove::Apply()
 
 EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	windowType = "move";
+	windowType = EditorWindowType_Move;
 
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMap = editor->GetMoveInputs(t_id, drawOrder);

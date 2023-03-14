@@ -11,6 +11,9 @@ namespace EditorFormUtils
 {
 	// Helps calculate the amount of drawable columns for forms
 	int GetColumnCount();
+	
+	// Returns a string used to build translation strings depending on the window type (move, cancel, etc...)
+	std::string GetWindowTypeName(EditorWindowType_ type);
 }
 
 struct ClickableFieldEvent
@@ -64,7 +67,7 @@ public:
 	// Contains our ID or list starting ID for lists (they are contiguous)
 	uint32_t id = 0;
 	// Type of the widnow, passed to editor functions
-	std::string windowType;
+	EditorWindowType_ windowType;
 
 	virtual void Render();
 	// Returns a ptr to a clickable event info (field full name, buffer) or nullptr if no new event to fetch

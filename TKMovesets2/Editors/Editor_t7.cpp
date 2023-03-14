@@ -262,7 +262,7 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 
 // ===== Generic =====
 
-bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field)
+bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field)
 {
 	if (field->buffer[0] == '\0') {
 		// There are no fields that should be allowed to be empty
@@ -314,11 +314,15 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 		}
 	}
 
-	if (fieldType == "move") {
+	
+	switch (fieldType)
+	{
+	case EditorWindowType_Move:
 		return ValidateMoveField(fieldShortName, field);
-	}
-	else if (fieldType == "voiceclip") {
+		break;
+	case EditorWindowType_Voiceclip:
 		return ValidateVoiceclipField(field);
+		break;
 	}
 
 	return true;

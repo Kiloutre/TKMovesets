@@ -164,7 +164,7 @@ edition.voiceclip_field.id = ID
 edition.extraproperty_field.window_name = Extra property
 edition.extraproperty_field.starting_frame = Starting frame
 edition.extraproperty_field.id = ID
-edition.extraproperty_field.param = Paramter
+edition.extraproperty_field.value = Value
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

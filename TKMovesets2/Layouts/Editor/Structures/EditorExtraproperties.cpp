@@ -25,7 +25,7 @@ void EditorExtraproperties::Apply()
 
 EditorExtraproperties::EditorExtraproperties(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	windowType = "extraproperty";
+	windowType = EditorWindowType_Extraproperty;
 
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMaps = editor->GetExtrapropListInputs(t_id, drawOrder);
