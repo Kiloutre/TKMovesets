@@ -161,6 +161,11 @@ edition.move_field.cancel_id_4_related = Cancel ID 4
 edition.voiceclip_field.window_name = Voiceclip
 edition.voiceclip_field.id = ID
 
+edition.extraproperty_field.window_name = Extra property
+edition.extraproperty_field.starting_frame = Starting frame
+edition.extraproperty_field.id = ID
+edition.extraproperty_field.param = Paramter
+
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

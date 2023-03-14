@@ -5,11 +5,10 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Color code input type (decimal, index, hex)
 - Maybe show explanation when hovering move field names and not just a repeat of the field name
 - Implement copy paste in forms
 - Move transition: change label as the move id changes
-- Move hitlevel: hexadecimal
-- Hint for each field label
 - For lists: detect that we aren't at the true beginning of the list (i - 1) and warn
 - Allow random extra properties to be played
 - Movesets between p1 and p2 produce different CRC32. I already know about pointers toward moveset info (name, date, fulldate, creator) i need to correct/void out, but actual moveset data actually seems to change. Why? Cheat engine -> what writes on this address

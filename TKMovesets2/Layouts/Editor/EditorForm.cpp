@@ -31,6 +31,31 @@ namespace EditorFormUtils
 
 // -- Private methods -- //
 
+void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount)
+{
+	for (size_t i = 0; i < inputs.size(); ++i)
+	{
+		EditorInput* field = inputs[i];
+
+		if (field->category != category) {
+			continue;
+		}
+		//Render label
+		if (i % columnCount == 0) {
+			ImGui::TableNextRow();
+		}
+		ImGui::TableNextColumn();
+		RenderLabel(field);
+
+		// Render input field
+		if (columnCount == 1) {
+			ImGui::TableNextRow();
+		}
+		ImGui::TableNextColumn();
+		RenderInput(field);
+	}
+}
+
 void EditorForm::RenderLabel(EditorInput* field)
 {
 	if (field->flags & EditorInput_Clickable) {
@@ -170,27 +195,7 @@ void EditorForm::Render()
 			if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
 			{
 				std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
-				for (size_t i = 0; i < inputs.size(); ++i)
-				{
-					EditorInput* field = inputs[i];
-
-					if (field->category != category) {
-						continue;
-					}
-					//Render label
-					if (i % columnCount == 0) {
-						ImGui::TableNextRow();
-					}
-					ImGui::TableNextColumn();
-					RenderLabel(field);
-
-					// Render input field
-					if (columnCount == 1) {
-						ImGui::TableNextRow();
-					}
-					ImGui::TableNextColumn();
-					RenderInput(field);
-				}
+				RenderInputs(inputs, category, columnCount);
 				ImGui::EndTable();
 			}
 		}

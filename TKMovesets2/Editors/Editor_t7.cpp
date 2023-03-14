@@ -10,6 +10,7 @@ using namespace EditorUtils;
 #define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String }, SET_DEFAULT_VAL(a, "%s", g)
 #define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g)
 
+
 static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier)
 {
 	// Finishing touch
@@ -18,6 +19,53 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 		input->name = name;
 		input->field_fullname = baseIdentifier + name;
 	}
+}
+
+// ===== ExtraProperties ===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInputs(uint16_t extrapropId, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + movesetListOffset) + extrapropId;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	uint32_t idx = 0;
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("starting_frame", 0, EditorInput_U32, prop->starting_frame);
+		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
+		CREATE_FIELD("param", 0, EditorInput_U32, prop->param);
+
+		WriteFieldFullname(inputMap, "edition.extraproperty_field.");
+		inputListMap.push_back(inputMap);
+		++idx;
+	} while ((prop++)->starting_frame != 0);
+
+	return inputListMap;
+}
+
+bool EditorT7::ValidateExtrapropField(EditorInput* field)
+{
+	//
+	return true;
+}
+
+
+void EditorT7::SaveExtrapropList(uint16_t voiceclipId, std::vector<std::map<std::string, EditorInput*>>& inputsList)
+{
+	/*
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
+
+	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
+	*/
 }
 // ===== Voiceclips ===== //
 
@@ -306,6 +354,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		gameAddr animOffset = movePtr[i].anim_addr;
 
 		if (m_animNameMap.find(animName) != m_animNameMap.end() && m_animNameMap[animName] != animOffset) {
+			printf("move id %d\n", i);
 			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameMap[animName]);
 			throw std::exception();
 		}

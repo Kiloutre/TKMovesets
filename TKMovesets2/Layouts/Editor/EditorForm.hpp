@@ -40,6 +40,8 @@ protected:
 	// Contains the identifier with which to prefix translation strings
 	std::string m_identifierPrefix;
 
+	// Render inputs from the <category : input> map
+	void RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount);
 	// Render a single input field in the form
 	void RenderInput(EditorInput* field);
 	// Render a single input label in the form

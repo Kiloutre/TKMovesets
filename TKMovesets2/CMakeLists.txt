@@ -37,6 +37,7 @@ set(BINARY_SOURCES
                     "Layouts/Editor/EditorFormList.cpp"
                     "Layouts/Editor/Structures/EditorMove.cpp"
                     "Layouts/Editor/Structures/EditorVoiceclip.cpp"
+                    "Layouts/Editor/Structures/EditorExtraproperties.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"

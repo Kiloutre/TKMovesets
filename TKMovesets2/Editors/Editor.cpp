@@ -63,11 +63,8 @@ namespace EditorUtils
 
 	const char* GetFieldFormat(EditorInputFlag flags)
 	{
-		if (flags & EditorInput_H32) {
-			return "%08X";
-		}
-		if (flags & EditorInput_H16) {
-			return "%04X";
+		if (flags & (EditorInput_H32 | EditorInput_H16)) {
+			return "%X";
 		}
 		if (flags & EditorInput_S64) {
 			return "%lld";

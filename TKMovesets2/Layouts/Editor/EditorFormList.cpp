@@ -46,15 +46,16 @@ bool EditorFormList::IsFormValid()
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, std::vector<std::string>& drawOrder)
 {
-	/*
 	id = t_id;
 	m_editor = editor;
+
+	m_identifierPrefix = "edition." + windowType + "_field";
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
 	char name[32] = "";
 	for (std::string fieldName : drawOrder) {
-		EditorInput* field = m_inputMaps[0][fieldName];
+		EditorInput* field = m_fieldIdentifierMaps[0][fieldName];
 		m_categories.insert(field->category);
 
 		// Moves are the only named fields so there is no reason to write any more complex code for now
@@ -63,17 +64,22 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 		}
 	}
 
-	// Builds the <category : fields> map
-	for (uint8_t category : m_categories)
+	// Builds the <category : fields> maps
+	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
 	{
-		std::vector<EditorInput*> inputs;
-		for (std::string fieldName : drawOrder) {
-			EditorInput* field = m_inputMaps[0][fieldName];
-			if (field->category == category) {
-				inputs.push_back(field);
-			}
+		std::map<int, std::vector<EditorInput*>> test;
+		m_fieldsCategoryMaps.push_back(test);
+		for (uint8_t category : m_categories)
+		{
+				std::vector<EditorInput*> inputs;
+				for (std::string fieldName : drawOrder) {
+					EditorInput* field = m_fieldIdentifierMaps[listIndex][fieldName];
+					if (field->category == category) {
+						inputs.push_back(field);
+					}
+				}
+				m_fieldsCategoryMaps[listIndex][category] = inputs;
 		}
-		m_inputs[category] = inputs;
 	}
 
 	// Builds the window title. Currently, switching translations does not update this. Todo 
@@ -84,7 +90,6 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	else {
 		m_windowTitle = std::format("{} {} {} - {}", windowName, id, name, windowTitleBase.c_str());
 	}
-	*/
 }
 
 void EditorFormList::Render()
@@ -96,54 +101,50 @@ void EditorFormList::Render()
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
-		/*
-		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
-		const int columnCount = GetColumnCount();
-
-
-		for (uint8_t category : m_categories)
+		const int columnCount = EditorFormUtils::GetColumnCount();
+		for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
 		{
-			const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
-			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
-				// Only show titles for category > 0, and if tree is not open: no need to render anything
+			std::string treeNodeTitle = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIndex, listIndex + id);
+			if (!ImGui::TreeNode(treeNodeTitle.c_str())) {
+				// Tree node hidden so no need to render anything
 				continue;
 			}
-
-			if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
+			for (uint8_t category : m_categories)
 			{
-				std::vector<EditorInput*>& inputs = m_inputs[category];
-				for (size_t i = 0; i < inputs.size(); ++i)
-				{
-					EditorInput* field = inputs[i];
-
-					if (field->category != category) {
-						continue;
-					}
-					//Render label
-					if (i % columnCount == 0) {
-						ImGui::TableNextRow();
-					}
-					ImGui::TableNextColumn();
-					RenderLabel(field);
-
-					// Render input field
-					if (columnCount == 1) {
-						ImGui::TableNextRow();
-					}
-					ImGui::TableNextColumn();
-					RenderInput(field);
+				const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
+				if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
+					// Only show titles for category > 0, and if tree is not open: no need to render anything
+					continue;
 				}
-				ImGui::EndTable();
+
+				// Render each field name / field input in columns
+				if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+				{
+					std::vector<EditorInput*>& inputs = m_fieldsCategoryMaps[listIndex][category];
+					RenderInputs(inputs, category, columnCount);
+					ImGui::EndTable();
+				}
+
 			}
+
+			ImGui::TreePop();
 		}
 
-		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), unsavedChanges)) {
+		bool enabledBtn = unsavedChanges;
+		if (enabledBtn) {
+			ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(64, 161, 154, 255));
+		}
+		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 			Apply();
 		}
-	*/
+		if (enabledBtn) {
+			ImGui::PopStyleColor();
+		}
 	}
 	ImGui::End();
-	
+
+
 	if (!popen && unsavedChanges) {
 		// Ordered to close, but changes remain
 		// todo: show popup, force popen = true

@@ -182,6 +182,10 @@ public:
 	virtual std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder) = 0;
 	virtual void SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs) = 0;
 
+	// Extra properties
+	virtual std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t extrapropId, VectorSet<std::string>& drawOrder) = 0;
+	virtual void SaveExtrapropList(uint16_t voiceclipId, std::vector<std::map<std::string, EditorInput*>>& inputsList) = 0;
+
 	// -- Iteractons -- //
 	// Sets the current move of a player
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;

@@ -35,6 +35,11 @@ public:
 	void SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs) override;
 	bool ValidateVoiceclipField(EditorInput* field);
 
+	// Extra properties
+	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t extrapropId, VectorSet<std::string>& drawOrder) override;
+	void SaveExtrapropList(uint16_t voiceclipId, std::vector<std::map<std::string, EditorInput*>>& inputsList) override;
+	bool ValidateExtrapropField(EditorInput* field);
+
 	// -- Iteractons -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;

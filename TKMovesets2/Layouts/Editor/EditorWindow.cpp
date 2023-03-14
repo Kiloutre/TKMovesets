@@ -10,6 +10,7 @@
 // Structures
 #include "EditorMove.hpp"
 #include "EditorVoiceclip.hpp"
+#include "EditorExtraproperties.hpp"
 
 // -- Private methods -- //
 
@@ -21,6 +22,9 @@ EditorForm* EditorWindow::AllocateFormWindow(std::string identifier, uint16_t id
 	if (identifier == "move") {
 		return new EditorMove(m_windowTitle, id, m_editor);;
 	}
+	if (identifier == "extraproperty") {
+		return new EditorExtraproperties(m_windowTitle, id, m_editor);;
+	}
 	return nullptr;
 }
 
@@ -30,9 +34,15 @@ void EditorWindow::OnFormFieldClick(uint32_t windowId, std::string fieldIdentifi
 
 	if (fieldIdentifier == "edition.move_field.cancel_id") {
 
-	} else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
+	}
+	else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
 		if (id >= 0) {
 			OpenFormWindow("voiceclip", id);
+		}
+	}
+	else if (fieldIdentifier == "edition.move_field.extra_properties_id") {
+		if (id >= 0) {
+			OpenFormWindow("extraproperty", id);
 		}
 	}
 }
