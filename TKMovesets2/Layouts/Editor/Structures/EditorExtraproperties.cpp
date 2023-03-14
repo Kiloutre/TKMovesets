@@ -14,8 +14,11 @@ void EditorExtraproperties::Apply()
 		return;
 	}
 
-	//m_editor->SaveExtraproperties(id, m_fieldIdentifierMap);
+	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex) {
+		m_editor->SaveExtraproperty(id + listIndex, m_fieldIdentifierMaps[listIndex]);
+	}
 	unsavedChanges = false;
+	justAppliedChanges = true;
 }
 
 // -- Public methods -- //

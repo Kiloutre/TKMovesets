@@ -158,6 +158,7 @@ bool EditorWindow::MovesetStillLoaded()
 
 void EditorWindow::Save()
 {
+	printf("Save();\n");
 	TKMovesetHeader* header = (TKMovesetHeader*)m_moveset;
 	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -165,6 +166,7 @@ void EditorWindow::Save()
 	file.write((char*)m_moveset, m_movesetSize);
 	file.close();
 	m_savedLastChange = true;
+	printf("m_savedLastChange = true\n");
 }
 
 void EditorWindow::RenderToolBar()
@@ -296,8 +298,8 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 				OnFormFieldClick(moveWin->id, ev->eventName, ev->buffer);
 			}
 
-			if (moveWin->unsavedChanges) {
-				// todo: only set m_savedLastChange when Apply() is called
+			if (moveWin->justAppliedChanges) {
+				moveWin->justAppliedChanges = false;
 				m_savedLastChange = false;
 				m_importNeeded = true;
 			}

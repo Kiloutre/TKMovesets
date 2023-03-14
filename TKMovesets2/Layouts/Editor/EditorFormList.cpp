@@ -27,10 +27,9 @@ static int GetColumnCount()
 
 bool EditorFormList::IsFormValid()
 {
-	/*
-	for (auto& itemInputs : m_inputs)
+	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
 	{
-		for (auto& [category, fields] : itemInputs) {
+		for (auto& [category, fields] : m_fieldsCategoryMaps[listIndex]) {
 			for (auto& field : fields) {
 				if (field->errored) {
 					return false;
@@ -38,7 +37,6 @@ bool EditorFormList::IsFormValid()
 			}
 		}
 	}
-	*/
 	return true;
 }
 
@@ -67,8 +65,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	// Builds the <category : fields> maps
 	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
 	{
-		std::map<int, std::vector<EditorInput*>> test;
-		m_fieldsCategoryMaps.push_back(test);
+		m_fieldsCategoryMaps.push_back(std::map<int, std::vector<EditorInput*>>());
 		for (uint8_t category : m_categories)
 		{
 				std::vector<EditorInput*> inputs;

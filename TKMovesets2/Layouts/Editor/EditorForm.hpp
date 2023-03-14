@@ -57,9 +57,11 @@ public:
 	bool popen = true;
 	// If set to true, will display an unsaved icon on the window title bar
 	bool unsavedChanges = false;
+	// If is true, changes were just applied. Read by EditorWindows to signal when to highlight the Save/Import button after modifications.
+	bool justAppliedChanges = false;
 	// If true, we must call SetNextWndowFocus() before creating our window
 	bool setFocus = false;
-	// Contains our ID
+	// Contains our ID or list starting ID for lists (they are contiguous)
 	uint32_t id = 0;
 	// Type of the widnow, passed to editor functions
 	std::string windowType;

@@ -175,16 +175,16 @@ public:
 	virtual bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) = 0;
 
 	// Move-related
-	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder) = 0;
-	virtual void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) = 0;
+	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
 
 	// Voiceclips
-	virtual std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder) = 0;
-	virtual void SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs) = 0;
+	virtual std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
 
 	// Extra properties
-	virtual std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t extrapropId, VectorSet<std::string>& drawOrder) = 0;
-	virtual void SaveExtrapropList(uint16_t voiceclipId, std::vector<std::map<std::string, EditorInput*>>& inputsList) = 0;
+	virtual std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
 
 	// -- Iteractons -- //
 	// Sets the current move of a player

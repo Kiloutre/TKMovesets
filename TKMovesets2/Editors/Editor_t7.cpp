@@ -23,12 +23,12 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 
 // ===== ExtraProperties ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInputs(uint16_t extrapropId, VectorSet<std::string>& drawOrder)
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + movesetListOffset) + extrapropId;
+	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + movesetListOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -41,7 +41,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 		CREATE_FIELD("starting_frame", 0, EditorInput_U32, prop->starting_frame);
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
-		CREATE_FIELD("param", 0, EditorInput_U32, prop->param);
+		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
 		WriteFieldFullname(inputMap, "edition.extraproperty_field.");
 		inputListMap.push_back(inputMap);
@@ -58,23 +58,23 @@ bool EditorT7::ValidateExtrapropField(EditorInput* field)
 }
 
 
-void EditorT7::SaveExtrapropList(uint16_t voiceclipId, std::vector<std::map<std::string, EditorInput*>>& inputsList)
+void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	/*
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + movesetListOffset) + id;
 
-	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
-	*/
+	prop->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
+	prop->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
+	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
 }
 // ===== Voiceclips ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder)
+std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::map<std::string, EditorInput*> inputMap;
 
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -93,22 +93,22 @@ bool EditorT7::ValidateVoiceclipField(EditorInput* field)
 }
 
 
-void EditorT7::SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + id;
 
 	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
 }
 
 // ===== MOVES ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder)
+std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::map<std::string, EditorInput*> inputMap;
 
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
+	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + id;
 
 	char* nameBlock = (char*)(m_movesetData + m_header->offsets.nameBlock);
 
@@ -159,10 +159,10 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 	return inputMap;
 }
 
-void EditorT7::SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + moveId;
+	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + id;
 
 	// todo: move name, allow edition
 	if (m_animNameMap.find(inputs["anim_name"]->buffer) != m_animNameMap.end()) {
@@ -354,6 +354,8 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		gameAddr animOffset = movePtr[i].anim_addr;
 
 		if (m_animNameMap.find(animName) != m_animNameMap.end() && m_animNameMap[animName] != animOffset) {
+			// todo: with kazuya & maybe more characters, this is apparently a big problem
+			// change the way anim choosing is done
 			printf("move id %d\n", i);
 			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameMap[animName]);
 			throw std::exception();

@@ -16,6 +16,7 @@ void EditorMove::Apply()
 
 	m_editor->SaveMove(id, m_fieldIdentifierMap);
 	unsavedChanges = false;
+	justAppliedChanges = true;
 }
 
 // -- Public methods -- //

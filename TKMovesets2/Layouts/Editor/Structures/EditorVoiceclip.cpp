@@ -16,6 +16,7 @@ void EditorVoiceclip::Apply()
 
 	m_editor->SaveVoiceclip(id, m_fieldIdentifierMap);
 	unsavedChanges = false;
+	justAppliedChanges = true;
 }
 
 // -- Public methods -- //

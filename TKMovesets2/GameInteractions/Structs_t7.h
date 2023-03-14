@@ -98,7 +98,7 @@ namespace StructsT7
 	{
 		uint32_t starting_frame;
 		uint32_t id;
-		uint32_t param;
+		uint32_t value;
 	};
 
 	struct Input

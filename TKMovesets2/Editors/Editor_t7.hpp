@@ -26,18 +26,18 @@ public:
 	bool ValidateField(std::string fieldType, std::string fieldShortName, EditorInput* field) override;
 	
 	// Moves
-	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder) override;
-	void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) override;
+	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder) override;
+	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 	bool ValidateMoveField(std::string name, EditorInput* field);
 
 	// Voiceclips
-	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder) override;
-	void SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs) override;
+	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder) override;
+	void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 	bool ValidateVoiceclipField(EditorInput* field);
 
 	// Extra properties
-	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t extrapropId, VectorSet<std::string>& drawOrder) override;
-	void SaveExtrapropList(uint16_t voiceclipId, std::vector<std::map<std::string, EditorInput*>>& inputsList) override;
+	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder) override;
+	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 	bool ValidateExtrapropField(EditorInput* field);
 
 	// -- Iteractons -- //
