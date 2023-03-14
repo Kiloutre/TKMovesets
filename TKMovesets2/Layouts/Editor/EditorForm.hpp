@@ -39,8 +39,6 @@ protected:
 	Editor* m_editor = nullptr;
 	// Contains the identifier with which to prefix translation strings
 	std::string m_identifierPrefix;
-	// Type of the widnow, passed to editor functions
-	std::string m_windowType;
 
 	// Render a single input field in the form
 	void RenderInput(EditorInput* field);
@@ -61,6 +59,8 @@ public:
 	bool setFocus = false;
 	// Contains our ID
 	uint32_t id = 0;
+	// Type of the widnow, passed to editor functions
+	std::string windowType;
 
 	virtual void Render();
 	// Returns a ptr to a clickable event info (field full name, buffer) or nullptr if no new event to fetch

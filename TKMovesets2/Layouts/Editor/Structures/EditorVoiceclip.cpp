@@ -22,8 +22,7 @@ void EditorVoiceclip::Apply()
 
 EditorVoiceclip::EditorVoiceclip(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	m_windowType = "voiceclip";
-	m_identifierPrefix = "edition.voiceclip_field";
+	windowType = "voiceclip";
 
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMap = editor->GetVoiceclipInputs(t_id, drawOrder);

@@ -50,8 +50,7 @@ void EditorT7::SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorI
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
 	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
 
-	// todo: move name, allow edition
-	voiceclip->id = (uint32_t)atoi(inputs["id"]->buffer);
+	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
 }
 
 // ===== MOVES ===== //

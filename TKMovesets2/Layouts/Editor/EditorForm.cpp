@@ -64,9 +64,7 @@ void EditorForm::RenderInput(EditorInput* field)
 	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 	{
 		unsavedChanges = true;
-		bool t = m_editor->ValidateField(m_windowType, field->name, field);
-		printf("Returned %d\n", t);
-		field->errored = t == false;
+		field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
 	}
 	/*
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
@@ -81,7 +79,7 @@ void EditorForm::RenderInput(EditorInput* field)
 			printf("paste - [%s]\n", field->buffer);
 			field->buffer[0] = '\0';
 			//strcpy_s(field->buffer, sizeof(field->buffer), ImGui::GetClipboardText());
-			field->errored = m_editor->ValidateField(m_windowType, field->name, field) == false;
+			field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
 		}
 	}
 	*/
@@ -111,6 +109,8 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 {
 	id = t_id;
 	m_editor = editor;
+
+	m_identifierPrefix = "edition." + windowType + "_field";
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories

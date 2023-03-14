@@ -81,7 +81,7 @@ private:
 	// id of the highlithed move in the movelist
 	int16_t m_highlightedMoveId = -1;
 	// Store the list of move windows to render
-	std::vector<EditorForm*> m_moveWindows;
+	std::vector<EditorForm*> m_structWindows;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -93,8 +93,10 @@ private:
 	// Render the list of moves
 	void RenderMovelist();
 
+	// Factory instantiating the right class for the right identifier
+	EditorForm* AllocateFormWindow(std::string identifier, uint16_t id);
 	// Create a new window containing data about the given move
-	void OpenMoveWindow(uint16_t moveId);
+	void OpenFormWindow(std::string windowType, uint16_t moveId);
 
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorMovelistFilter_ filter);

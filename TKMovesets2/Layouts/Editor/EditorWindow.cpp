@@ -7,43 +7,65 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "EditorWindow.hpp"
+// Structures
 #include "EditorMove.hpp"
 #include "EditorVoiceclip.hpp"
 
 // -- Private methods -- //
 
-void EditorWindow::OnFormFieldClick(uint32_t id, std::string fieldIdentifier, const char* buffer)
+EditorForm* EditorWindow::AllocateFormWindow(std::string identifier, uint16_t id)
 {
+	if (identifier == "voiceclip") {
+		return new EditorVoiceclip(m_windowTitle, id, m_editor);;
+	}
+	if (identifier == "move") {
+		return new EditorMove(m_windowTitle, id, m_editor);;
+	}
+	return nullptr;
+}
+
+void EditorWindow::OnFormFieldClick(uint32_t windowId, std::string fieldIdentifier, const char* buffer)
+{
+	int id = atoi(buffer);
+
 	if (fieldIdentifier == "edition.move_field.cancel_id") {
 
+	} else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
+		if (id >= 0) {
+			OpenFormWindow("voiceclip", id);
+		}
 	}
 }
 
-void EditorWindow::OpenMoveWindow(uint16_t moveId)
+void EditorWindow::OpenFormWindow(std::string windowType, uint16_t moveId)
 {
-	// todo: template this functio,
+	// todo: template this function?
 	int availableOverwriteIndex = -1;
-	for (int i = 0; i < m_moveWindows.size(); ++i) {
-		EditorMove* moveWin = (EditorMove*)m_moveWindows[i];
-		if (moveWin->id == moveId) {
-			moveWin->setFocus = true;
+	for (int i = 0; i < m_structWindows.size(); ++i) {
+		EditorForm* structWin = m_structWindows[i];
+		if (structWin->windowType != windowType) {
+			continue;
+		}
+
+		if (structWin->id == moveId) {
+			structWin->setFocus = true;
 			// Prevent duplicate move window creation
 			return;
 		}
-		if (moveWin->unsavedChanges == false) {
+		if (structWin->unsavedChanges == false) {
 			// Don't overwrite windows with unsaved changes
 			availableOverwriteIndex = i;
 		}
 	}
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-	EditorMove* newWin = new EditorMove(m_windowTitle, moveId, m_editor);
+	EditorForm* newWin = AllocateFormWindow(windowType, moveId);
 	if (openNew || availableOverwriteIndex == -1) {
-		m_moveWindows.push_back(newWin);
+		m_structWindows.push_back(newWin);
 	}
 	else {
-		delete m_moveWindows[availableOverwriteIndex];
-		m_moveWindows[availableOverwriteIndex] = newWin;
+		delete m_structWindows[availableOverwriteIndex];
+		m_structWindows[availableOverwriteIndex] = newWin;
 	}
 }
 
@@ -251,9 +273,9 @@ void EditorWindow::RenderStatusBar()
 
 void EditorWindow::RenderMovesetData(ImGuiID dockId)
 {
-	for (size_t i = 0; i < m_moveWindows.size();)
+	for (size_t i = 0; i < m_structWindows.size();)
 	{
-		EditorMove* moveWin = (EditorMove*)m_moveWindows[i];
+		EditorForm* moveWin = m_structWindows[i];
 		if (moveWin->popen)
 		{
 			ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
@@ -272,7 +294,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 			++i;
 		}
 		else {
-			m_moveWindows.erase(m_moveWindows.begin() + i);
+			m_structWindows.erase(m_structWindows.begin() + i);
 			delete moveWin;
 		}
 	}
@@ -357,7 +379,7 @@ void EditorWindow::RenderMovelist()
 					m_highlightedMoveId = move->moveId;
 					m_moveToPlay = move->moveId;
 					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
-					OpenMoveWindow(move->moveId);
+					OpenFormWindow("move", move->moveId);
 				}
 
 				if (move->aliasId != 0) {
@@ -384,7 +406,7 @@ void EditorWindow::RenderMovelist()
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
-		OpenMoveWindow(m_moveToScrollTo);
+		OpenFormWindow("move", m_moveToScrollTo);
 		m_highlightedMoveId = m_moveToScrollTo;
 	}
 	ImGui::PopItemWidth();
