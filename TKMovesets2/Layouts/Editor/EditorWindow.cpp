@@ -3,10 +3,12 @@
 #include <algorithm>
 #include <format>
 
-#include "EditorWindow.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
+#include "EditorWindow.hpp"
+#include "EditorMove.hpp"
+#include "EditorVoiceclip.hpp"
 
 // -- Private methods -- //
 
@@ -22,7 +24,7 @@ void EditorWindow::OpenMoveWindow(uint16_t moveId)
 	// todo: template this functio,
 	int availableOverwriteIndex = -1;
 	for (int i = 0; i < m_moveWindows.size(); ++i) {
-		EditorMove* moveWin = m_moveWindows[i];
+		EditorMove* moveWin = (EditorMove*)m_moveWindows[i];
 		if (moveWin->id == moveId) {
 			moveWin->setFocus = true;
 			// Prevent duplicate move window creation
@@ -251,7 +253,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 {
 	for (size_t i = 0; i < m_moveWindows.size();)
 	{
-		EditorMove* moveWin = m_moveWindows[i];
+		EditorMove* moveWin = (EditorMove*)m_moveWindows[i];
 		if (moveWin->popen)
 		{
 			ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);

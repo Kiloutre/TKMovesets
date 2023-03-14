@@ -153,6 +153,9 @@ edition.move_field.cancel_id_3_related = ID de cancel 3 (lié)
 edition.move_field.cancel_id_4 = ID de cancel 4
 edition.move_field.cancel_id_4_related = ID de cancel 4 (lié)
 
+edition.voiceclip_field.window_name = Voix
+edition.voiceclip_field.id = ID
+
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

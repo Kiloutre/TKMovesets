@@ -7,6 +7,7 @@ set(INCLUDE_FOLDERS
                     "Layouts"
                     "Layouts/Submenus"
                     "Layouts/Editor"
+                    "Layouts/Editor/Structures"
                     "Game"
                     "GameInteractions"
                     "GameInteractions/Extractors"
@@ -34,7 +35,8 @@ set(BINARY_SOURCES
                     "Layouts/Editor/EditorWindow.cpp"
                     "Layouts/Editor/EditorForm.cpp"
                     "Layouts/Editor/EditorFormList.cpp"
-                    "Layouts/Editor/EditorMove.cpp"
+                    "Layouts/Editor/Structures/EditorMove.cpp"
+                    "Layouts/Editor/Structures/EditorVoiceclip.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"

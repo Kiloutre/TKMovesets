@@ -30,6 +30,11 @@ public:
 	void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) override;
 	bool ValidateMoveField(std::string name, EditorInput* field);
 
+	// Voiceclips
+	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder) override;
+	void SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs) override;
+	bool ValidateVoiceclipField(EditorInput* field);
+
 	// -- Iteractons -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;

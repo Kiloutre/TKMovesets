@@ -10,6 +10,50 @@ using namespace EditorUtils;
 #define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String }, SET_DEFAULT_VAL(a, "%s", g)
 #define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g)
 
+static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier)
+{
+	// Finishing touch
+	for (auto& [name, input] : inputMap) {
+		// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
+		input->name = name;
+		input->field_fullname = baseIdentifier + name;
+	}
+}
+// ===== Voiceclips ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
+
+	WriteFieldFullname(inputMap, "edition.voiceclip_field.");
+	return inputMap;
+}
+
+bool EditorT7::ValidateVoiceclipField(EditorInput* field)
+{
+	//
+	return true;
+}
+
+
+void EditorT7::SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + voiceclipId;
+
+	// todo: move name, allow edition
+	voiceclip->id = (uint32_t)atoi(inputs["id"]->buffer);
+}
+
 // ===== MOVES ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder)
@@ -64,13 +108,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t moveId, Vec
 	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16, move->_0xA8_short);
 	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16, move->_0xAC_short);
 
-	// Finishing touch
-	for (auto& [name, input] : inputMap) {
-		// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
-		input->name = name;
-		input->field_fullname = "edition.move_field." + name;
-	}
-
+	WriteFieldFullname(inputMap, "edition.move_field.");
 	return inputMap;
 }
 
@@ -229,9 +267,11 @@ bool EditorT7::ValidateField(std::string fieldType, std::string fieldShortName, 
 		}
 	}
 
-	printf("[%s] 1\n", field->buffer);
 	if (fieldType == "move") {
 		return ValidateMoveField(fieldShortName, field);
+	}
+	else if (fieldType == "voiceclip") {
+		return ValidateVoiceclipField(field);
 	}
 
 	return true;

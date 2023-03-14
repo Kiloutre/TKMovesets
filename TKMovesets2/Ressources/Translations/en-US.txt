@@ -156,7 +156,10 @@ edition.move_field.cancel_id_2_related = Cancel ID 2 related
 edition.move_field.cancel_id_3 = Cancel ID 3 
 edition.move_field.cancel_id_3_related = Cancel ID 3 related
 edition.move_field.cancel_id_4 = Cancel ID 4
-edition.move_field.cancel_id_4_related = Cancel ID 4 related
+edition.move_field.cancel_id_4_related = Cancel ID 4 
+
+edition.voiceclip_field.window_name = Voiceclip
+edition.voiceclip_field.id = ID
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

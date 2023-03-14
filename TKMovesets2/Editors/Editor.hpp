@@ -178,6 +178,10 @@ public:
 	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t moveId, VectorSet<std::string>& drawOrder) = 0;
 	virtual void SaveMove(uint16_t moveId, std::map<std::string, EditorInput*>& inputs) = 0;
 
+	// Voiceclips
+	virtual std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t voiceclipId, VectorSet<std::string>& drawOrder) = 0;
+	virtual void SaveVoiceclip(uint16_t voiceclipId, std::map<std::string, EditorInput*>& inputs) = 0;
+
 	// -- Iteractons -- //
 	// Sets the current move of a player
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;

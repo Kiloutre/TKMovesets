@@ -3,7 +3,7 @@
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
 #include "Editor.hpp"
-#include "EditorMove.hpp"
+#include "EditorForm.hpp"
 
 #include "GameAddresses.h"
 
@@ -81,7 +81,7 @@ private:
 	// id of the highlithed move in the movelist
 	int16_t m_highlightedMoveId = -1;
 	// Store the list of move windows to render
-	std::vector<EditorMove*> m_moveWindows;
+	std::vector<EditorForm*> m_moveWindows;
 
 
 	// Render the top toolbar containing useful moveset editing tools
