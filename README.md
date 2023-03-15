@@ -17,11 +17,12 @@ If you have any contribution to bring, feel free, there is room for improvement 
 - Allow Extra properties to be played with a click
 - Implement copy paste
 - Maybe show explanation when hovering move field names and not just a repeat of the field name
-- Tree node: display label when possible (extra properties & requirements). Color alternating rows/BGs
+- Tree node: display label when possible (extra properties, requirements, cancel moveid). Color alternating rows/BGs
 - For lists: detect that we aren't at the true beginning of the list (i - 1) and warn
 - For lists: Update list size when applying (shouldn't be hard, just call Init again and make sure every vector/map/set is cleared at the top of the init functions)
 - Possibility to rename moveset
 - Category color coding
+- Save up to 5 backups of the file. Each "Save" press is a save.
 
 
  # Other:

@@ -70,7 +70,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
 	char name[32] = "";
-	for (std::string fieldName : drawOrder) {
+	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = m_fieldIdentifierMaps[0][fieldName];
 		m_categories.insert(field->category);
 
@@ -87,7 +87,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 		for (uint8_t category : m_categories)
 		{
 				std::vector<EditorInput*> inputs;
-				for (std::string fieldName : drawOrder) {
+				for (const std::string& fieldName : drawOrder) {
 					EditorInput* field = m_fieldIdentifierMaps[listIndex][fieldName];
 					if (field->category == category) {
 						inputs.push_back(field);

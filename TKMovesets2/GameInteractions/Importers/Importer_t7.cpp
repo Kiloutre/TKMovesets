@@ -149,7 +149,7 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 	i = 0;
 	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(moveset + blockOffsets.movesetBlock + offsets->projectile); i < offsets->projectileCount; ++i, ++projectile)
 	{
-		// One projectile actually has both at 0 for some reason ?
+		// One projectile actually has both at 0 for some reason ? todo : check
 		FROM_INDEX(projectile->cancel_addr, blockOffset + offsets->cancel, Cancel);
 		FROM_INDEX(projectile->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
 	}

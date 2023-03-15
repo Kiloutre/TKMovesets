@@ -101,7 +101,7 @@ void GameAddressesFile::Reload()
 	m_entries_mutex.unlock();
 }
 
-const std::vector<std::string> GameAddressesFile::GetAllEntries()
+const std::vector<std::string>& GameAddressesFile::GetAllEntries()
 {
 	m_entries_mutex.lock();
 	return m_entries;
@@ -120,7 +120,7 @@ const int64_t GameAddressesFile::GetSingleValue(const char* c_addressId)
 	return (int64_t)-1;
 }
 
-const std::vector<gameAddr> GameAddressesFile::GetAddress(const char* c_addressId, bool& isRelative)
+const std::vector<gameAddr>& GameAddressesFile::GetAddress(const char* c_addressId, bool& isRelative)
 {
 	if (m_relative_pointer_paths.find(c_addressId) != m_relative_pointer_paths.end()) {
 		isRelative = true;

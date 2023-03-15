@@ -182,7 +182,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
 	char name[32] = "";
-	for (std::string fieldName : drawOrder) {
+	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = m_fieldIdentifierMap[fieldName];
 		m_categories.insert(field->category);
 

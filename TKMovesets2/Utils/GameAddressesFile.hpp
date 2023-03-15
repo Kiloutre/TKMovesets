@@ -22,11 +22,11 @@ public:
 	// Reload the game addresses file.
 	void Reload();
 	// Returns a list of every game_address.txt entry (key only). Locks a mutex that has to be unlocked by UnlockEntriesMutex() after finishing with the variable.
-	const std::vector<std::string> GetAllEntries();
+	const std::vector<std::string>& GetAllEntries();
 	// Unlocks the mutex locked by GetAllEntries()
 	void UnlockEntriesMutex();
 	// Returns a single numerical value from the file
 	const int64_t GetSingleValue(const char* c_addressId);
 	// Returns a pointer path, that may rely on the base address or not.
-	const std::vector<gameAddr> GetAddress(const char* c_addressId, bool& isRelative);
+	const std::vector<gameAddr>& GetAddress(const char* c_addressId, bool& isRelative);
 };

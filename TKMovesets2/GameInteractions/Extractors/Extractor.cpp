@@ -44,7 +44,7 @@ namespace ExtractorUtils
 		uint8_t remainingProgress = progress_max - progress;
 		uint8_t step = remainingProgress / blocks.size();
 
-		for (std::pair<Byte*, uint64_t> block : blocks) {
+		for (const std::pair<Byte*, uint64_t>& block : blocks) {
 			char* blockData = (char*)block.first;
 			uint64_t blockSize = block.second;
 
