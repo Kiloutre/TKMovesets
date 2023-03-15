@@ -5,23 +5,32 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
-- Implement group-cancel viewing
-- Requirement & Cancels: Update list when applying (shouldn't be hard, just call Init again and make sure every vector/map/set is cleared at the top of the init functions)
-- Cancels: display move name and command for each cancel
-- tree node labels for extra properties, requirements
-- Color code input type (decimal, index, hex)
+## Editor:
+- Group Cancel
+- Input sequence viewing
+- Throw camera viewing
+- "Go to..." for most structures
+- "Create new" and "Delete" for most structures
+- Color code input type (decimal, index, index) & clickable fields
+- Beter collor for apply button
+- Cancel move ID, move transition, pushback moveid: display move name as ID changes (render half an input field)
+- Allow Extra properties to be played with a click
+- Implement copy paste
 - Maybe show explanation when hovering move field names and not just a repeat of the field name
-- Implement copy paste in forms
-- Move transition: change label as the move id changes
+- Tree node: display label when possible (extra properties & requirements). Color alternating rows/BGs
 - For lists: detect that we aren't at the true beginning of the list (i - 1) and warn
-- Allow random extra properties to be played
+- For lists: Update list size when applying (shouldn't be hard, just call Init again and make sure every vector/map/set is cleared at the top of the init functions)
+- Possibility to rename moveset
+- Category color coding
+
+
+ # Other:
 - Movesets between p1 and p2 produce different CRC32. I already know about pointers toward moveset info (name, date, fulldate, creator) i need to correct/void out, but actual moveset data actually seems to change. Why? Cheat engine -> what writes on this address
 - Find better p1_ptr, the current one points toward the current player and not necessarily p1
 - Unicode support for ImGui. The translation file should be able to contain extended latin, korean, japanese, russian and arabic characters. Moveset files hould also be able to contain these, and possibly moveset header strings too
 - Export tag2
 - Movest compression. It should be viable to store movesets in a compressed format: even the fastest compression in 7zip yiels a 50% size reduction, which is nothing to scoff at
 - Figure out how to get 0x64 animation sizes in bytes. This would make moveset smallers AND fix bugs with some animations that are not extracted completely (rare, but happens for some fringe ones)
-- Moveset rename button in moveset extraction list & moveset edition
 - Code injection to force current moveset to stay through loading screens
 - Auto-updater
 - Make a fun program icon
