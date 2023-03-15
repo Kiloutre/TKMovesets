@@ -60,61 +60,92 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	return nullptr;
 }
 
-void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buffer)
+void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string name, const char* buffer)
 {
 	int id = atoi(buffer);
 
-	// Todo: do this in a cleaner way. Maybe handle this in the classes themselves?
-	
-	// Move
-	if (fieldIdentifier == "edition.move.cancel_id") {
-		// todo: also make it work for other cancel IDs
-		if (id >= 0) {
-			OpenFormWindow(EditorWindowType_Cancel, id);
+	switch (windowType)
+	{
+
+		case EditorWindowType_Move:
+		{
+			// Most move fields ptrs can be -1 and still be valid, so have to check them
+			if (name == "cancel_id") {
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_Cancel, id);
+				}
+			}
+			else if (name == "transition") {
+				id = ValidateMoveId(buffer);
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_Move, id);
+				}
+			}
+			else if (name == "voiceclip_id") {
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_Voiceclip, id);
+				}
+			}
+			else if (name == "hit_condition_id") {
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_HitCondition, id);
+				}
+			}
+			else if (name == "extra_properties_id") {
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_Extraproperty, id);
+				}
+			}
+			break;
 		}
-	}
-	else if (fieldIdentifier == "edition.move.transition") {
-		id = ValidateMoveId(buffer);
-		if (id >= 0) {
-			OpenFormWindow(EditorWindowType_Move, id);
+
+		case EditorWindowType_Cancel:
+		{
+			if (name == "move_id") {
+				// todo: this might be a group cancel. detect.
+				OpenFormWindow(EditorWindowType_Move, ValidateMoveId(buffer));
+			}
+			else if (name == "extradata_addr") {
+				OpenFormWindow(EditorWindowType_CancelExtradata, id);
+			}
+			else if (name == "requirement_addr") {
+				OpenFormWindow(EditorWindowType_Requirement, id);
+			}
+			break;
 		}
-	} else if (fieldIdentifier == "edition.move.voiceclip_id") {
-		if (id >= 0) {
-			OpenFormWindow(EditorWindowType_Voiceclip, id);
+
+		case EditorWindowType_HitCondition:
+		{
+			if (name == "requirement_addr") {
+				OpenFormWindow(EditorWindowType_Requirement, id);
+			}
+			else if (name == "reactions_addr") {
+				OpenFormWindow(EditorWindowType_Reactions, id);
+			}
+			break;
 		}
-	}
-	else if (fieldIdentifier == "edition.move.hit_condition_id") {
-		if (id >= 0) {
-			OpenFormWindow(EditorWindowType_HitCondition, id);
+
+		case EditorWindowType_Reactions:
+		{
+			if (Helpers::endsWith(name, "_pushback")) {
+				OpenFormWindow(EditorWindowType_Pushback, id);
+			} else if (Helpers::endsWith(name, "_moveid")) {
+				id = ValidateMoveId(buffer);
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_Move, id);
+				}
+			}
+			break;
 		}
-	}
-	else if (fieldIdentifier == "edition.move.extra_properties_id") {
-		if (id >= 0) {
-			OpenFormWindow(EditorWindowType_Extraproperty, id);
+
+		case EditorWindowType_Pushback:
+		{
+			if (name == "extradata_addr") {
+				OpenFormWindow(EditorWindowType_PushbackExtradata, id);
+			}
+			break;
 		}
-	}
-	// todo: move: other properties
-	// Cancels
-	else if (fieldIdentifier == "edition.cancel.move_id") {
-		// Validate move id will proceed to an alias conversion which i want here
-		OpenFormWindow(EditorWindowType_Move, ValidateMoveId(buffer));
-	}
-	else if (fieldIdentifier == "edition.cancel.extradata_addr") {
-		OpenFormWindow(EditorWindowType_CancelExtradata, id);
-	}
-	else if (fieldIdentifier == "edition.cancel.requirement_addr") {
-		OpenFormWindow(EditorWindowType_Requirement, id);
-	}
-	// Hit conditions
-	else if (fieldIdentifier == "edition.hit_condition.requirement_addr") {
-		OpenFormWindow(EditorWindowType_Requirement, id);
-	}
-	else if (fieldIdentifier == "edition.hit_condition.reactions_addr") {
-		OpenFormWindow(EditorWindowType_Reactions, id);
-	}
-	//Pushback
-	else if (fieldIdentifier == "edition.pushback.extradata_addr") {
-		OpenFormWindow(EditorWindowType_PushbackExtradata, id);
+
 	}
 }
 
@@ -386,7 +417,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 
 			ClickableFieldEvent* ev = moveWin->GetFormClickEvent();
 			if (ev != nullptr) {
-				OnFormFieldClick(ev->eventName, ev->buffer);
+				OnFormFieldClick(moveWin->windowType, ev->eventName, ev->buffer);
 			}
 
 			if (moveWin->justAppliedChanges) {

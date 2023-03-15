@@ -100,7 +100,7 @@ void EditorForm::RenderLabel(EditorInput* field)
 	if (field->flags & EditorInput_Clickable) {
 		if (ImGui::Selectable(_(field->field_fullname.c_str()), !field->errored)) {
 			m_consumedEvent = false;
-			m_event.eventName = field->field_fullname;
+			m_event.eventName = field->name;
 			m_event.buffer = field->buffer;
 		}
 	} else {

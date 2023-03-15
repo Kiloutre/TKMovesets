@@ -123,5 +123,5 @@ public:
 	// Render the window
 	void Render(int dockid);
 	// Called by forms when one of their clickable labels are clicked
-	void OnFormFieldClick(std::string fieldIdentifier, const char* buffer);
+	void OnFormFieldClick(EditorWindowType_ windowType, std::string fieldIdentifier, const char* buffer);
 };
