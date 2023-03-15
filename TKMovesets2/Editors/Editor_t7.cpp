@@ -234,7 +234,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 	{
 		std::map<std::string, EditorInput*> inputMap;
 
-		CREATE_FIELD("requirement_addr", 0, EditorInput_PTR, hitCondition->requirement_addr);
+		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, hitCondition->requirements_addr);
 		CREATE_FIELD("damage", 0, EditorInput_U32, hitCondition->damage);
 		CREATE_FIELD("_0xC_int", 0, EditorInput_U32, hitCondition->_0xC_int);
 		CREATE_FIELD("reactions_addr", 0, EditorInput_PTR, hitCondition->reactions_addr);
@@ -242,7 +242,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		WriteFieldFullname(inputMap, "hit_condition");
 		inputListMap.push_back(inputMap);
 
-		if (req[hitCondition->requirement_addr].condition == 881) {
+		if (req[hitCondition->requirements_addr].condition == 881) {
 			break;
 		}
 
@@ -258,7 +258,7 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 	uint64_t hitConditionOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
 	gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(m_movesetData + hitConditionOffset) + id;
 
-	hitCondition->requirement_addr = (uint64_t)atoi(inputs["requirement_addr"]->buffer);
+	hitCondition->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
 	hitCondition->damage = (uint32_t)atoi(inputs["damage"]->buffer);
 	hitCondition->_0xC_int = (uint32_t)atoi(inputs["_0xC_int"]->buffer);
 	hitCondition->reactions_addr = (uint64_t)atoi(inputs["reactions_addr"]->buffer);
@@ -266,7 +266,7 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 
 bool EditorT7::ValidateHitConditionField(std::string name, EditorInput* field)
 {
-	if (name == "requirement_addr") {
+	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
@@ -365,7 +365,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 		std::map<std::string, EditorInput*> inputMap;
 
 		CREATE_FIELD("command", 0, EditorInput_H64, cancel->command);
-		CREATE_FIELD("requirement_addr", 0, EditorInput_PTR, cancel->requirement_addr);
+		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, cancel->requirements_addr);
 		CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, cancel->extradata_addr);
 		CREATE_FIELD("detection_start", 0, EditorInput_U32, cancel->detection_start);
 		CREATE_FIELD("detection_end", 0, EditorInput_U32, cancel->detection_end);
@@ -387,7 +387,7 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
 
 	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
-	cancel->requirement_addr = (uint64_t)atoi(inputs["requirement_addr"]->buffer);
+	cancel->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
 	cancel->extradata_addr = (uint64_t)atoi(inputs["extradata_addr"]->buffer);
 	cancel->detection_start = (uint32_t)atoi(inputs["detection_start"]->buffer);
 	cancel->detection_end = (uint32_t)atoi(inputs["detection_end"]->buffer);
@@ -412,7 +412,7 @@ bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
 			return false;
 		}
 	}
-	else if (name == "requirement_addr") {
+	else if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
@@ -423,6 +423,88 @@ bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
 	}
 
 	return true;
+}
+
+// ===== Other move properties (start)===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetStartOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	uint32_t idx = 0;
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
+		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
+		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
+
+		WriteFieldFullname(inputMap, "start_other_extraproperty");
+		inputListMap.push_back(inputMap);
+		++idx;
+	} while ((prop++)->extraprop != 881);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveStartOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+
+	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+
+	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
+	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
+	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
+}
+
+// ===== Other move properties (end) ===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetEndOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	uint32_t idx = 0;
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
+		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
+		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
+
+		WriteFieldFullname(inputMap, "end_other_extraproperty");
+		inputListMap.push_back(inputMap);
+		++idx;
+	} while ((prop++)->extraprop != 881);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveEndOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+
+	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+
+	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
+	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
+	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
 }
 
 // ===== ExtraProperties ===== //
@@ -688,6 +770,12 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_PushbackExtradata:
 		SavePushbackExtra(id, inputs);
 		break;
+	case EditorWindowType_StartOtherMoveProperty:
+		SaveStartOtherproperty(id, inputs);
+		break;
+	case EditorWindowType_EndOtherMoveProperty:
+		SaveEndOtherproperty(id, inputs);
+		break;
 	}
 }
 
@@ -725,6 +813,12 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 	{
 	case EditorWindowType_Extraproperty:
 		return GetExtrapropListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_StartOtherMoveProperty:
+		return GetStartOtherpropListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_EndOtherMoveProperty:
+		return GetEndOtherpropListInputs(id, drawOrder);
 		break;
 	case EditorWindowType_Cancel:
 		return GetCancelListInputs(id, drawOrder);

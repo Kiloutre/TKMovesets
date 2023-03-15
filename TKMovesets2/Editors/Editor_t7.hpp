@@ -41,6 +41,14 @@ public:
 	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
+	// Other properties (start)
+	std::vector<std::map<std::string, EditorInput*>> GetStartOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveStartOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
+	// Other properties (end)
+	std::vector<std::map<std::string, EditorInput*>> GetEndOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveEndOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
 	// Cancels
 	std::vector<std::map<std::string, EditorInput*>> GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);

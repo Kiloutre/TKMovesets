@@ -41,6 +41,10 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 		TO_INDEX(move->extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
 		TO_INDEX(move->move_start_extraprop_addr, table.moveBeginningProp, OtherMoveProperty);
 		TO_INDEX(move->move_end_extraprop_addr, table.moveEndingProp, OtherMoveProperty);
+
+		if (move->move_start_extraprop_addr != -1 || move->move_end_extraprop_addr != -1) {
+			printf("move id %d\n", i);
+		}
 	}
 
 	// Convert projectile ptrs
@@ -56,7 +60,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(movesetBlock + offsets.cancel); i < table.cancelCount; ++i, ++cancel)
 	{
-		TO_INDEX(cancel->requirement_addr, table.requirement, Requirement);
+		TO_INDEX(cancel->requirements_addr, table.requirement, Requirement);
 		TO_INDEX(cancel->extradata_addr, table.cancelExtradata, CancelExtradata);
 	}
 
@@ -64,7 +68,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(movesetBlock + offsets.groupCancel); i < table.groupCancelCount; ++i, ++groupCancel)
 	{
-		TO_INDEX(groupCancel->requirement_addr, table.requirement, Requirement);
+		TO_INDEX(groupCancel->requirements_addr, table.requirement, Requirement);
 		TO_INDEX(groupCancel->extradata_addr, table.cancelExtradata, CancelExtradata);
 	}
 
@@ -99,7 +103,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 	i = 0;
 	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(movesetBlock + offsets.hitCondition); i < table.hitConditionCount; ++i, ++hitCondition)
 	{
-		TO_INDEX(hitCondition->requirement_addr, table.requirement, Requirement);
+		TO_INDEX(hitCondition->requirements_addr, table.requirement, Requirement);
 		TO_INDEX(hitCondition->reactions_addr, table.reactions, Reactions);
 	}
 

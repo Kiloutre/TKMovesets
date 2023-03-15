@@ -166,9 +166,19 @@ edition.extraproperty.starting_frame = Frame de début
 edition.extraproperty.id = ID
 edition.extraproperty.value = Value
 
+edition.start_other_extraproperty.window_name = Autre propriété
+edition.start_other_extraproperty.requirements_addr = ID de condition
+edition.start_other_extraproperty.extraprop = Propriété / Condition
+edition.start_other_extraproperty.value = Valeur
+
+edition.end_other_extraproperty.window_name = Autre propriété
+edition.end_other_extraproperty.requirements_addr = ID de condition
+edition.end_other_extraproperty.extraprop =  Propriété / Condition
+edition.end_other_extraproperty.value = Valeur
+
 edition.cancel.window_name = Cancel
 edition.cancel.command = Commande
-edition.cancel.requirement_addr = ID de conditions
+edition.cancel.requirements_addr = ID de conditions
 edition.cancel.extradata_addr = ID d'extradata
 edition.cancel.detection_start = Début de détection
 edition.cancel.detection_end = Fin de détection
@@ -184,7 +194,7 @@ edition.requirement.condition = Condition
 edition.requirement.param = Paramètre
 
 edition.hit_condition.window_name = Hit condition
-edition.hit_condition.requirement_addr = ID de conditions
+edition.hit_condition.requirements_addr = ID de conditions
 edition.hit_condition.damage = Damage
 edition.hit_condition.reactions_addr = Réactions ID
 

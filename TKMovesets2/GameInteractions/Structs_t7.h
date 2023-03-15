@@ -34,7 +34,7 @@ namespace StructsT7
 	struct Cancel
 	{
 		uint64_t command;
-		Requirement* requirement_addr;
+		Requirement* requirements_addr;
 		CancelExtradata* extradata_addr;
 		uint32_t detection_start;
 		uint32_t detection_end;
@@ -84,7 +84,7 @@ namespace StructsT7
 
 	struct HitCondition
 	{
-		Requirement* requirement_addr;
+		Requirement* requirements_addr;
 		uint32_t damage;
 		uint32_t _0xC_int; // What the hell is this? since when has this been here?
 		Reactions* reactions_addr;
@@ -175,7 +175,7 @@ namespace StructsT7
 	{
 		Requirement* requirements_addr;
 		uint32_t extraprop; // 881 list end value
-		uint32_t param;
+		uint32_t value;
 	};
 
 	struct Move
@@ -327,7 +327,7 @@ namespace StructsT7_gameAddr
 	struct Cancel
 	{
 		uint64_t command;
-		gameAddr requirement_addr;
+		gameAddr requirements_addr;
 		gameAddr extradata_addr;
 		uint32_t detection_start;
 		uint32_t detection_end;
@@ -377,7 +377,7 @@ namespace StructsT7_gameAddr
 
 	struct HitCondition
 	{
-		gameAddr requirement_addr;
+		gameAddr requirements_addr;
 		uint32_t damage;
 		uint32_t _0xC_int; // What the hell is this? since when has this been here?
 		gameAddr reactions_addr;
@@ -434,7 +434,7 @@ namespace StructsT7_gameAddr
 	{
 		gameAddr requirements_addr;
 		uint32_t extraprop; // 881 list end
-		uint32_t param; // Often small values
+		uint32_t value; // Often small values
 	};
 
 	struct Move

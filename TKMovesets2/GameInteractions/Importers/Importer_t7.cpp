@@ -158,14 +158,14 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 	i = 0;
 	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(moveset + blockOffsets.movesetBlock + offsets->cancel); i < offsets->cancelCount; ++i, ++cancel)
 	{
-		FROM_INDEX(cancel->requirement_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(cancel->requirements_addr, blockOffset + offsets->requirement, Requirement);
 		FROM_INDEX(cancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
 	}
 	i = 0;
 
 	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(moveset + blockOffsets.movesetBlock + offsets->groupCancel); i < offsets->groupCancelCount; ++i, ++groupCancel)
 	{
-		FROM_INDEX(groupCancel->requirement_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(groupCancel->requirements_addr, blockOffset + offsets->requirement, Requirement);
 		FROM_INDEX(groupCancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
 	}
 
@@ -200,7 +200,7 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 	i = 0;
 	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(moveset + blockOffsets.movesetBlock + offsets->hitCondition); i < offsets->hitConditionCount; ++i, ++hitCondition)
 	{
-		FROM_INDEX(hitCondition->requirement_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(hitCondition->requirements_addr, blockOffset + offsets->requirement, Requirement);
 		FROM_INDEX(hitCondition->reactions_addr, blockOffset + offsets->reactions, Reactions);
 	}
 

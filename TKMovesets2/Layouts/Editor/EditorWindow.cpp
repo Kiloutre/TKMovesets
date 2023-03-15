@@ -18,6 +18,8 @@
 #include "EditorReactions.hpp"
 #include "EditorPushback.hpp"
 #include "EditorPushbackExtra.hpp"
+#include "EditorStartOtherProp.hpp"
+#include "EditorEndOtherProp.hpp"
 
 // -- Private methods -- //
 
@@ -55,6 +57,12 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_PushbackExtradata:
 		return new EditorPushbackExtra(m_windowTitle, id, m_editor);;
 		break;
+	case EditorWindowType_StartOtherMoveProperty:
+		return new EditorStartOtherProp(m_windowTitle, id, m_editor);;
+		break;
+	case EditorWindowType_EndOtherMoveProperty:
+		return new EditorEndOtherProp(m_windowTitle, id, m_editor);;
+		break;
 	}
 
 	return nullptr;
@@ -91,9 +99,14 @@ void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string na
 					OpenFormWindow(EditorWindowType_HitCondition, id);
 				}
 			}
-			else if (name == "extra_properties_id") {
+			else if (name == "beginning_extra_properties_id") {
 				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_Extraproperty, id);
+					OpenFormWindow(EditorWindowType_StartOtherMoveProperty, id);
+				}
+			}
+			else if (name == "ending_extra_properties_id") {
+				if (id >= 0) {
+					OpenFormWindow(EditorWindowType_EndOtherMoveProperty, id);
 				}
 			}
 			break;
@@ -108,7 +121,7 @@ void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string na
 			else if (name == "extradata_addr") {
 				OpenFormWindow(EditorWindowType_CancelExtradata, id);
 			}
-			else if (name == "requirement_addr") {
+			else if (name == "requirements_addr") {
 				OpenFormWindow(EditorWindowType_Requirement, id);
 			}
 			break;
@@ -116,7 +129,7 @@ void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string na
 
 		case EditorWindowType_HitCondition:
 		{
-			if (name == "requirement_addr") {
+			if (name == "requirements_addr") {
 				OpenFormWindow(EditorWindowType_Requirement, id);
 			}
 			else if (name == "reactions_addr") {
@@ -146,6 +159,14 @@ void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string na
 			break;
 		}
 
+		case EditorWindowType_StartOtherMoveProperty:
+		case EditorWindowType_EndOtherMoveProperty:
+		{
+			if (name == "requirements_addr") {
+				OpenFormWindow(EditorWindowType_Requirement, id);
+			}
+			break;
+		}
 	}
 }
 
@@ -511,6 +532,7 @@ void EditorWindow::RenderMovelist()
 				ImGui::TableNextColumn();
 				if (ImGui::Selectable(move->name.c_str(), move->moveId == m_highlightedMoveId)) {
 					// If clicked on the move
+					m_highlightedMoveId = move->moveId;
 					m_moveToPlay = move->moveId;
 					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
 					OpenFormWindow(EditorWindowType_Move, move->moveId);

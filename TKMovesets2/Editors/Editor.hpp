@@ -44,6 +44,8 @@ enum EditorWindowType_
 	EditorWindowType_Reactions,
 	EditorWindowType_Pushback,
 	EditorWindowType_PushbackExtradata,
+	EditorWindowType_StartOtherMoveProperty,
+	EditorWindowType_EndOtherMoveProperty,
 };
 
 typedef uint16_t EditorInputFlag;
