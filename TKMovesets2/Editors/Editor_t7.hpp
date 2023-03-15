@@ -42,17 +42,23 @@ public:
 	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
 	// Other properties (start)
-	std::vector<std::map<std::string, EditorInput*>> GetStartOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveStartOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<std::map<std::string, EditorInput*>> GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateOtherMoveProperty(std::string name, EditorInput* field);
 
 	// Other properties (end)
-	std::vector<std::map<std::string, EditorInput*>> GetEndOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveEndOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<std::map<std::string, EditorInput*>> GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
 	// Cancels
 	std::vector<std::map<std::string, EditorInput*>> GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateCancelField(std::string name, EditorInput* field);
+
+	// Grouped Cancels
+	std::vector<std::map<std::string, EditorInput*>> GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateGroupedCancelField(std::string name, EditorInput* field);
 
 	// Cancel extras
 	std::map<std::string, EditorInput*> GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);

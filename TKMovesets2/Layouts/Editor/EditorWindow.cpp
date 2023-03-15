@@ -13,13 +13,14 @@
 #include "EditorExtraproperties.hpp"
 #include "EditorCancels.hpp"
 #include "EditorCancelExtra.hpp"
+#include "EditorGroupedCancels.hpp"
 #include "EditorRequirements.hpp"
 #include "EditorHitConditions.hpp"
 #include "EditorReactions.hpp"
 #include "EditorPushback.hpp"
 #include "EditorPushbackExtra.hpp"
-#include "EditorStartOtherProp.hpp"
-#include "EditorEndOtherProp.hpp"
+#include "EditorMoveStartProperty.hpp"
+#include "EditorMoveEndProperty.hpp"
 
 // -- Private methods -- //
 
@@ -39,6 +40,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_Cancel:
 		return new EditorCancels(m_windowTitle, id, m_editor);;
 		break;
+	case EditorWindowType_GroupedCancel:
+		return new EditorGroupedCancels(m_windowTitle, id, m_editor);;
+		break;
 	case EditorWindowType_CancelExtradata:
 		return new EditorCancelExtra(m_windowTitle, id, m_editor);;
 		break;
@@ -57,11 +61,11 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_PushbackExtradata:
 		return new EditorPushbackExtra(m_windowTitle, id, m_editor);;
 		break;
-	case EditorWindowType_StartOtherMoveProperty:
-		return new EditorStartOtherProp(m_windowTitle, id, m_editor);;
+	case EditorWindowType_MoveBeginProperty:
+		return new EditorMoveStartProperty(m_windowTitle, id, m_editor);;
 		break;
-	case EditorWindowType_EndOtherMoveProperty:
-		return new EditorEndOtherProp(m_windowTitle, id, m_editor);;
+	case EditorWindowType_MoveEndProperty:
+		return new EditorMoveEndProperty(m_windowTitle, id, m_editor);;
 		break;
 	}
 
@@ -71,6 +75,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string name, const char* buffer)
 {
 	int id = atoi(buffer);
+
+	// Todo: handle all of this within the subclasses that raised this event
+	// This will allow for data-driven custom behaviour 
 
 	switch (windowType)
 	{
@@ -101,12 +108,12 @@ void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string na
 			}
 			else if (name == "beginning_extra_properties_id") {
 				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_StartOtherMoveProperty, id);
+					OpenFormWindow(EditorWindowType_MoveBeginProperty, id);
 				}
 			}
 			else if (name == "ending_extra_properties_id") {
 				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_EndOtherMoveProperty, id);
+					OpenFormWindow(EditorWindowType_MoveEndProperty, id);
 				}
 			}
 			break;
@@ -159,8 +166,8 @@ void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string na
 			break;
 		}
 
-		case EditorWindowType_StartOtherMoveProperty:
-		case EditorWindowType_EndOtherMoveProperty:
+		case EditorWindowType_MoveBeginProperty:
+		case EditorWindowType_MoveEndProperty:
 		{
 			if (name == "requirements_addr") {
 				OpenFormWindow(EditorWindowType_Requirement, id);

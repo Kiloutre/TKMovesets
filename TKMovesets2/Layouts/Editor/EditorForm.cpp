@@ -42,6 +42,8 @@ namespace EditorFormUtils
 		case EditorWindowType_CancelExtradata:
 			return "cancel_extra";
 		case EditorWindowType_Requirement:
+			return "grouped_cancel";
+		case EditorWindowType_GroupedCancel:
 			return "requirement";
 		case EditorWindowType_HitCondition:
 			return "hit_condition";

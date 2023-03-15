@@ -419,9 +419,87 @@ bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
 	return true;
 }
 
-// ===== Other move properties (start)===== //
+// ===== Grouped Cancel ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetStartOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("command", 0, EditorInput_H64, cancel->command);
+		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, cancel->requirements_addr);
+		CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, cancel->extradata_addr);
+		CREATE_FIELD("detection_start", 0, EditorInput_U32, cancel->detection_start);
+		CREATE_FIELD("detection_end", 0, EditorInput_U32, cancel->detection_end);
+		CREATE_FIELD("starting_frame", 0, EditorInput_U32, cancel->starting_frame);
+		CREATE_FIELD("move_id", 0, EditorInput_U16 | EditorInput_Clickable, cancel->move_id);
+		CREATE_FIELD("cancel_option", 0, EditorInput_U16, cancel->cancel_option);
+
+		WriteFieldFullname(inputMap, "grouped_cancel");
+		inputListMap.push_back(inputMap);
+	} while ((cancel++)->command != 0x800C);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
+
+	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
+	cancel->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
+	cancel->extradata_addr = (uint64_t)atoi(inputs["extradata_addr"]->buffer);
+	cancel->detection_start = (uint32_t)atoi(inputs["detection_start"]->buffer);
+	cancel->detection_end = (uint32_t)atoi(inputs["detection_end"]->buffer);
+	cancel->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
+	cancel->move_id = (uint16_t)atoi(inputs["move_id"]->buffer);
+	cancel->cancel_option = (uint16_t)atoi(inputs["cancel_option"]->buffer);
+}
+
+bool EditorT7::ValidateGroupedCancelField(std::string name, EditorInput* field)
+{
+	if (name == "move_id") {
+		int moveId = atoi(field->buffer);
+		if (moveId >= m_infos->table.moveCount) {
+			if (moveId < 0x8000) {
+				return false;
+			}
+			if (moveId >= (0x8000 + m_aliases.size())) {
+				return false;
+			}
+		}
+		else if (moveId < 0) {
+			return false;
+		}
+	}
+	else if (name == "requirements_addr") {
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
+	}
+	else if (name == "extradata_addr") {
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelExtradataCount;
+	}
+
+	return true;
+}
+
+// ===== Other move properties (start) ===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
@@ -440,14 +518,14 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetStartOtherpropList
 		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
 		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
-		WriteFieldFullname(inputMap, "start_other_extraproperty");
+		WriteFieldFullname(inputMap, "move_start_property");
 		inputListMap.push_back(inputMap);
 	} while ((prop++)->extraprop != 881);
 
 	return inputListMap;
 }
 
-void EditorT7::SaveStartOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 
 	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
@@ -460,7 +538,7 @@ void EditorT7::SaveStartOtherproperty(uint16_t id, std::map<std::string, EditorI
 
 // ===== Other move properties (end) ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetEndOtherpropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
@@ -479,22 +557,31 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetEndOtherpropListIn
 		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
 		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
-		WriteFieldFullname(inputMap, "end_other_extraproperty");
+		WriteFieldFullname(inputMap, "move_end_property");
 		inputListMap.push_back(inputMap);
 	} while ((prop++)->extraprop != 881);
 
 	return inputListMap;
 }
 
-void EditorT7::SaveEndOtherproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 
-	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
 
 	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
 	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
 	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
+}
+
+bool EditorT7::ValidateOtherMoveProperty(std::string name, EditorInput* field)
+{
+	if (name == "requirements_addr") {
+		int listIdx = atoi(field->buffer);
+		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
+	}
+	return true;
 }
 
 // ===== ExtraProperties ===== //
@@ -743,6 +830,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_CancelExtradata:
 		SaveCancelExtra(id, inputs);
 		break;
+	case EditorWindowType_GroupedCancel:
+		SaveGroupedCancel(id, inputs);
+		break;
 	case EditorWindowType_Requirement:
 		SaveRequirement(id, inputs);
 		break;
@@ -758,11 +848,11 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_PushbackExtradata:
 		SavePushbackExtra(id, inputs);
 		break;
-	case EditorWindowType_StartOtherMoveProperty:
-		SaveStartOtherproperty(id, inputs);
+	case EditorWindowType_MoveBeginProperty:
+		SaveMoveStartProperty(id, inputs);
 		break;
-	case EditorWindowType_EndOtherMoveProperty:
-		SaveEndOtherproperty(id, inputs);
+	case EditorWindowType_MoveEndProperty:
+		SaveMoveEndProperty(id, inputs);
 		break;
 	}
 }
@@ -802,14 +892,17 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 	case EditorWindowType_Extraproperty:
 		return GetExtrapropListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_StartOtherMoveProperty:
-		return GetStartOtherpropListInputs(id, drawOrder);
+	case EditorWindowType_MoveBeginProperty:
+		return GetMoveStartPropertyListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_EndOtherMoveProperty:
-		return GetEndOtherpropListInputs(id, drawOrder);
+	case EditorWindowType_MoveEndProperty:
+		return GetMoveEndPropertyListInputs(id, drawOrder);
 		break;
 	case EditorWindowType_Cancel:
 		return GetCancelListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_GroupedCancel:
+		return GetGroupedCancelListInputs(id, drawOrder);
 		break;
 	case EditorWindowType_Requirement:
 		return GetRequirementListInputs(id, drawOrder);
@@ -886,6 +979,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 	case EditorWindowType_Cancel:
 		return ValidateCancelField(fieldShortName, field);
 		break;
+	case EditorWindowType_GroupedCancel:
+		return ValidateGroupedCancelField(fieldShortName, field);
+		break;
 	case EditorWindowType_HitCondition:
 		return ValidateHitConditionField(fieldShortName, field);
 		break;
@@ -894,6 +990,10 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 		break;
 	case EditorWindowType_Pushback:
 		return ValidatePushbackField(fieldShortName, field);
+		break;
+	case EditorWindowType_MoveBeginProperty:
+	case EditorWindowType_MoveEndProperty:
+		return ValidateOtherMoveProperty(fieldShortName, field);
 		break;
 	}
 

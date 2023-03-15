@@ -39,13 +39,14 @@ enum EditorWindowType_
 	EditorWindowType_Voiceclip,
 	EditorWindowType_Cancel,
 	EditorWindowType_CancelExtradata,
+	EditorWindowType_GroupedCancel,
 	EditorWindowType_Requirement,
 	EditorWindowType_HitCondition,
 	EditorWindowType_Reactions,
 	EditorWindowType_Pushback,
 	EditorWindowType_PushbackExtradata,
-	EditorWindowType_StartOtherMoveProperty,
-	EditorWindowType_EndOtherMoveProperty,
+	EditorWindowType_MoveBeginProperty,
+	EditorWindowType_MoveEndProperty,
 };
 
 typedef uint16_t EditorInputFlag;

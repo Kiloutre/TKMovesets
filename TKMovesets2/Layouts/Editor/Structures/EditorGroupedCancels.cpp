@@ -3,13 +3,13 @@
 #include <string>
 
 #include "imgui_extras.hpp"
-#include "EditorEndOtherProp.hpp"
+#include "EditorGroupedCancels.hpp"
 #include "Localization.hpp"
 
 // -- Public methods -- //
 
-EditorEndOtherProp::EditorEndOtherProp(std::string windowTitleBase, uint32_t t_id, Editor* editor)
+EditorGroupedCancels::EditorGroupedCancels(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	windowType = EditorWindowType_EndOtherMoveProperty;
+	windowType = EditorWindowType_GroupedCancel;
 	InitForm(windowTitleBase, t_id, editor);
 }
