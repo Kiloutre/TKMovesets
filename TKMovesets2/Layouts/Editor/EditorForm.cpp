@@ -53,9 +53,9 @@ namespace EditorFormUtils
 			return "pushback";
 		case EditorWindowType_PushbackExtradata:
 			return "pushback_extradata";
-		case EditorWindowType_StartOtherMoveProperty:
+		case EditorWindowType_MoveBeginProperty:
 			return "start_other_extraproperty";
-		case EditorWindowType_EndOtherMoveProperty:
+		case EditorWindowType_MoveEndProperty:
 			return "end_other_extraproperty";
 		}
 		return "UNKNOWN";
