@@ -79,6 +79,11 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 		TO_INDEX(reaction->front_counterhit_pushback, table.pushback, Pushback);
 		TO_INDEX(reaction->downed_pushback, table.pushback, Pushback);
 		TO_INDEX(reaction->block_pushback, table.pushback, Pushback);
+
+		if (reaction->_0x44_long != 0) {
+			printf("_0x44_long is %lld (%llx), reaction %d, offset %llx from reaction list start\n", reaction->_0x44_long, reaction->_0x44_long, i, i * sizeof(Reactions));
+			// todo: use this to figure out what
+		}
 	}
 
 	// Convert input sequence ptrs
