@@ -43,6 +43,8 @@ namespace EditorFormUtils
 			return "cancel_extra";
 		case EditorWindowType_Requirement:
 			return "requirement";
+		case EditorWindowType_HitCondition:
+			return "hit_condition";
 			//todo
 		}
 		return "UNKNOWN";

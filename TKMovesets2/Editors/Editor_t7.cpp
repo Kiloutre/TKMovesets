@@ -21,14 +21,81 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
+// ===== Hit conditions ===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t hitConditionOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
+	gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(m_movesetData + hitConditionOffset) + id;
+
+	uint64_t requirementOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	Requirement* req = (Requirement*)(m_movesetData + requirementOffset);
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	uint32_t idx = 0;
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("requirement_addr", 0, EditorInput_PTR, hitCondition->requirement_addr);
+		CREATE_FIELD("damage", 0, EditorInput_U32, hitCondition->damage);
+		CREATE_FIELD("_0xC_int", 0, EditorInput_U32, hitCondition->_0xC_int);
+		CREATE_FIELD("reactions_addr", 0, EditorInput_PTR, hitCondition->reactions_addr);
+
+		WriteFieldFullname(inputMap, "edition.hit_condition_field.");
+		inputListMap.push_back(inputMap);
+
+		if (req[hitCondition->requirement_addr].condition == 881) {
+			break;
+		}
+
+		hitCondition++;
+		++idx;
+	} while (true);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t hitConditionOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
+	gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(m_movesetData + hitConditionOffset) + id;
+
+	hitCondition->requirement_addr = (uint32_t)atoi(inputs["requirement_addr"]->buffer);
+	hitCondition->damage = (uint32_t)atoi(inputs["damage"]->buffer);
+	hitCondition->_0xC_int = (uint32_t)atoi(inputs["_0xC_int"]->buffer);
+	hitCondition->reactions_addr = (uint32_t)atoi(inputs["reactions_addr"]->buffer);
+}
+
+bool EditorT7::ValidateHitConditionField(std::string name, EditorInput* field)
+{
+	if (name == "requirement_addr") {
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
+	}
+	else if (name == "reactions_addr") {
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.reactionsCount;
+	}
+
+	return true;
+}
+
 // ===== Requirements  ===== //
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
-	Requirement* req = (Requirement*)(m_movesetData + movesetListOffset) + id;
+	uint64_t requirementOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	Requirement* req = (Requirement*)(m_movesetData + requirementOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -50,10 +117,11 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 	return inputListMap;
 }
 
+
 void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
-	Requirement* req = (Requirement*)(m_movesetData + movesetListOffset) + id;
+	uint64_t requirementOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	Requirement* req = (Requirement*)(m_movesetData + requirementOffset) + id;
 
 	req->condition = (uint32_t)atoi(inputs["condition"]->buffer);
 	req->param = (uint32_t)atoi(inputs["param"]->buffer);
@@ -65,8 +133,8 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
-	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + movesetListOffset) + id;
+	uint64_t cancelExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
+	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + cancelExtraOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -80,8 +148,8 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 
 void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
-	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + movesetListOffset) + id;
+	uint64_t cancelExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
+	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + cancelExtraOffset) + id;
 
 	cancelExtra->value = (uint32_t)strtol(inputs["value"]->buffer, nullptr, 16);
 }
@@ -92,8 +160,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
-	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + movesetListOffset) + id;
+	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -123,8 +191,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 
 void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
-	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + movesetListOffset) + id;
+	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
 
 	cancel->command = (uint32_t)strtol(inputs["command"]->buffer, nullptr, 16);
 	cancel->requirement_addr = (uint32_t)atoi(inputs["requirement_addr"]->buffer);
@@ -171,8 +239,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + movesetListOffset) + id;
+	uint64_t extraPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + extraPropOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -197,8 +265,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + movesetListOffset) + id;
+	uint64_t extraPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + extraPropOffset) + id;
 
 	prop->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
 	prop->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
@@ -211,8 +279,8 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + id;
+	uint64_t voiceclipOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + voiceclipOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -227,8 +295,8 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 
 void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + movesetListOffset) + id;
+	uint64_t voiceclipOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + voiceclipOffset) + id;
 
 	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
 }
@@ -416,6 +484,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_Requirement:
 		SaveRequirement(id, inputs);
 		break;
+	case EditorWindowType_HitCondition:
+		SaveHitCondition(id, inputs);
+		break;
 	}
 }
 
@@ -450,6 +521,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		break;
 	case EditorWindowType_Requirement:
 		return GetRequirementListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_HitCondition:
+		return GetHitConditionListInputs(id, drawOrder);
 		break;
 	}
 	return std::vector<std::map<std::string, EditorInput*>>();
@@ -520,6 +594,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 		break;
 	case EditorWindowType_Cancel:
 		return ValidateCancelField(fieldShortName, field);
+		break;
+	case EditorWindowType_HitCondition:
+		return ValidateHitConditionField(fieldShortName, field);
 		break;
 	}
 

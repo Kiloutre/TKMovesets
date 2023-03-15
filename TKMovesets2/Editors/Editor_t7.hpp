@@ -50,10 +50,15 @@ public:
 	std::map<std::string, EditorInput*> GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
-	// Extra properties
+	// Requirements
 	std::vector<std::map<std::string, EditorInput*>> GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	;
+
+	// Hit conditions
+	std::vector<std::map<std::string, EditorInput*>> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateHitConditionField(std::string name, EditorInput* field);
+	
 
 	// -- Iteractons -- //
 	// Sets the current move of a player

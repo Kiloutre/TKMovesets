@@ -14,6 +14,7 @@
 #include "EditorCancels.hpp"
 #include "EditorCancelExtra.hpp"
 #include "EditorRequirements.hpp"
+#include "EditorHitConditions.hpp"
 
 // -- Private methods -- //
 
@@ -39,6 +40,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_Requirement:
 		return new EditorRequirements(m_windowTitle, id, m_editor);;
 		break;
+	case EditorWindowType_HitCondition:
+		return new EditorHitConditions(m_windowTitle, id, m_editor);;
+		break;
 	}
 
 	return nullptr;
@@ -63,6 +67,11 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 	} else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Voiceclip, id);
+		}
+	}
+	else if (fieldIdentifier == "edition.move_field.hit_condition_id") {
+		if (id >= 0) {
+			OpenFormWindow(EditorWindowType_HitCondition, id);
 		}
 	}
 	else if (fieldIdentifier == "edition.move_field.extra_properties_id") {

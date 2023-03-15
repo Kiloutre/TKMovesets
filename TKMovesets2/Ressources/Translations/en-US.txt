@@ -144,8 +144,8 @@ edition.move_field.transition = Transition
 edition.move_field.anim_len = Anim length
 edition.move_field.hitbox_location = Hitbox location
 edition.move_field.first_active_frame = First active frame
-edition.move_field.last_active_frame = Last active fram
-edition.move_field.hit_condition_id = Hit condition ID
+edition.move_field.last_active_frame = Last active frame
+edition.move_field.hit_condition_id = Hit conditions ID
 edition.move_field.extra_properties_id = Extra properties ID
 edition.move_field.beginning_extra_properties_id = Beginning extra prop ID
 edition.move_field.ending_extra_properties_id = Ending extra prop ID
@@ -168,7 +168,7 @@ edition.extraproperty_field.value = Value
 
 edition.cancel_field.window_name = Cancel
 edition.cancel_field.command = Command
-edition.cancel_field.requirement_addr = Requirement ID
+edition.cancel_field.requirement_addr = Requirements ID
 edition.cancel_field.extradata_addr = Extradata ID
 edition.cancel_field.detection_start = Detection start
 edition.cancel_field.detection_end = Detection end
@@ -182,6 +182,11 @@ edition.cancel_extra_field.value = Value
 edition.requirement_field.window_name = Requirement
 edition.requirement_field.condition = Condition
 edition.requirement_field.param = Parameter
+
+edition.hit_condition_field.window_name = Hit condition
+edition.hit_condition_field.requirement_addr = Requirements ID
+edition.hit_condition_field.damage = Damage
+edition.hit_condition_field.reactions_addr = Reactions ID
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.
