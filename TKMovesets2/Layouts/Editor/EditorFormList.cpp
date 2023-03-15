@@ -7,7 +7,6 @@
 #include "Localization.hpp"
 
 // -- Static helpers -- //
-
 static int GetColumnCount()
 {
 	float windowWidth = ImGui::GetWindowWidth();
@@ -24,6 +23,22 @@ static int GetColumnCount()
 
 	return 1;
 }
+
+// -- Private methods -- //
+
+void EditorFormList::Apply()
+{
+	if (!IsFormValid()) {
+		return;
+	}
+
+	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex) {
+		m_editor->SaveItem(windowType, id + listIndex, m_fieldIdentifierMaps[listIndex]);
+	}
+	unsavedChanges = false;
+	justAppliedChanges = true;
+}
+
 
 bool EditorFormList::IsFormValid()
 {
@@ -42,12 +57,15 @@ bool EditorFormList::IsFormValid()
 
 // -- Public methods -- //
 
-void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, std::vector<std::string>& drawOrder)
+void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
 	id = t_id;
 	m_editor = editor;
 
 	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType) + "_field";
+
+	VectorSet<std::string> drawOrder;
+	m_fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories

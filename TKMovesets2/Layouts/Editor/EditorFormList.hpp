@@ -16,10 +16,12 @@ protected:
 	// Containst the form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
 	std::vector<std::map<int, std::vector<EditorInput*>>> m_fieldsCategoryMaps;
 
+	// Save every list item individually
+	void Apply() override;
 	// Returns false if any field has an error state
 	bool IsFormValid() override;
 public:
 	//
-	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, std::vector<std::string>& drawOrder);
+	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
 	void Render() override;
 };

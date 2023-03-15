@@ -50,6 +50,17 @@ namespace EditorFormUtils
 
 // -- Private methods -- //
 
+void EditorForm::Apply()
+{
+	if (!IsFormValid()) {
+		return;
+	}
+
+	m_editor->SaveItem(windowType, id, m_fieldIdentifierMap);
+	unsavedChanges = false;
+	justAppliedChanges = true;
+}
+
 void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount)
 {
 	for (size_t i = 0; i < inputs.size(); ++i)
@@ -149,12 +160,15 @@ bool EditorForm::IsFormValid()
 
 // -- Public methods -- //
 
-void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, VectorSet<std::string>& drawOrder)
+void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
 	id = t_id;
 	m_editor = editor;
 
 	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType) + "_field";
+
+	VectorSet<std::string> drawOrder;
+	m_fieldIdentifierMap = editor->GetFormFields(windowType, t_id, drawOrder);
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories

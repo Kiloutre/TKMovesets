@@ -182,20 +182,17 @@ public:
 	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
+
+
+	// Forms
+	// Returns the fields to display to build a single form of a certain type (move, voiceclip, cancel extradata, etc...)
+	virtual std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	// Returns the fields to display to build a list of forms of a certain type (extraproperties, requirements, cancels, etc...)
+	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns true if the given field is valid
 	virtual bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) = 0;
-
-	// Move-related
-	virtual std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;
-	virtual void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
-
-	// Voiceclips
-	virtual std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;
-	virtual void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
-
-	// Extra properties
-	virtual std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder) = 0;
-	virtual void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
+	// Save a single struct in the moveset
+	virtual void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
 
 	// -- Iteractons -- //
 	// Sets the current move of a player

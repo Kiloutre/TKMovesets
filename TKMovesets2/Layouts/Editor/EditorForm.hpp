@@ -49,12 +49,12 @@ protected:
 	void RenderInput(EditorInput* field);
 	// Render a single input label in the form
 	void RenderLabel(EditorInput* field);
-	// Apply the change to the moveset
-	virtual void Apply() = 0;
+	// Called when clicking the apply button, will check for field errors, set variables and then save the data
+	virtual void Apply();
 	// Returns false if any field has an error state
 	virtual bool IsFormValid();
 	// Inits the form
-	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor, VectorSet<std::string>& drawOrder);
+	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
 public:
 	// Stores the state of the window. If close, this class will be destroyed soon
 	bool popen = true;

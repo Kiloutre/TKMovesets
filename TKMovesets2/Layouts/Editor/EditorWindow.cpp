@@ -32,13 +32,15 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	return nullptr;
 }
 
-void EditorWindow::OnFormFieldClick(uint32_t windowId, std::string fieldIdentifier, const char* buffer)
+void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buffer)
 {
 	int id = atoi(buffer);
-
+	
 	if (fieldIdentifier == "edition.move_field.cancel_id") {
-		OpenFormWindow(EditorWindowType_Cancel, id);
 		// todo: also make it work for other cancel IDs
+		if (id >= 0) {
+			OpenFormWindow(EditorWindowType_Cancel, id);
+		}
 	}
 	else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
 		if (id >= 0) {
@@ -300,7 +302,7 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 
 			ClickableFieldEvent* ev = moveWin->GetFormClickEvent();
 			if (ev != nullptr) {
-				OnFormFieldClick(moveWin->id, ev->eventName, ev->buffer);
+				OnFormFieldClick(ev->eventName, ev->buffer);
 			}
 
 			if (moveWin->justAppliedChanges) {

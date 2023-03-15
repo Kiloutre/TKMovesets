@@ -23,21 +23,24 @@ public:
 	EditorTable GetMovesetTable() override;
 	std::vector<DisplayableMove*> GetDisplayableMoveList() override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
+	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) override;
-	
+	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
+
 	// Moves
-	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder) override;
-	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
+	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateMoveField(std::string name, EditorInput* field);
 
 	// Voiceclips
-	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder) override;
-	void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
+	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateVoiceclipField(EditorInput* field);
 
 	// Extra properties
-	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder) override;
-	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
+	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateExtrapropField(EditorInput* field);
 
 	// -- Iteractons -- //

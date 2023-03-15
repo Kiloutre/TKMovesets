@@ -51,13 +51,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 	return inputListMap;
 }
 
-bool EditorT7::ValidateExtrapropField(EditorInput* field)
-{
-	//
-	return true;
-}
-
-
 void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
@@ -84,12 +77,6 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 
 	WriteFieldFullname(inputMap, "edition.voiceclip_field.");
 	return inputMap;
-}
-
-bool EditorT7::ValidateVoiceclipField(EditorInput* field)
-{
-	//
-	return true;
 }
 
 
@@ -262,6 +249,49 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 
 // ===== Generic =====
 
+void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	switch (type)
+	{
+	case EditorWindowType_Move:
+		SaveMove(id, inputs);
+		break;
+	case EditorWindowType_Voiceclip:
+		SaveVoiceclip(id, inputs);
+		break;
+	case EditorWindowType_Extraproperty:
+		SaveExtraproperty(id, inputs);
+		break;
+	}
+}
+
+std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	// Builds an input list for a specific window type (single struct) and fill default values according to the given ID
+	switch (type)
+	{
+	case EditorWindowType_Move:
+		return GetMoveInputs(id, drawOrder);
+		break;
+	case EditorWindowType_Voiceclip:
+		return GetVoiceclipInputs(id, drawOrder);
+		break;
+	}
+	return std::map<std::string, EditorInput*>();
+}
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	// Builds an input list for a specific window type (list of structs) and fill default values according to the given ID
+	switch (type)
+	{
+	case EditorWindowType_Extraproperty:
+		return GetExtrapropListInputs(id, drawOrder);
+		break;
+	}
+	return std::vector<std::map<std::string, EditorInput*>>();
+}
+
 bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field)
 {
 	if (field->buffer[0] == '\0') {
@@ -319,9 +349,6 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 	{
 	case EditorWindowType_Move:
 		return ValidateMoveField(fieldShortName, field);
-		break;
-	case EditorWindowType_Voiceclip:
-		return ValidateVoiceclipField(field);
 		break;
 	}
 
