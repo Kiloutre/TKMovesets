@@ -496,7 +496,7 @@ void EditorWindow::RenderMovelist()
 				ImGui::TableNextRow();
 				ImGui::TableNextColumn();
 
-				if (move->flags != 0)
+				if (move->color != 0)
 				{
 					ImVec2 drawStart = ImGui::GetWindowPos() + ImGui::GetCursorPos();
 					drawStart.y -= ImGui::GetScrollY();
@@ -506,11 +506,11 @@ void EditorWindow::RenderMovelist()
 					// Draw BG
 				}
 
-				ImGui::TextUnformatted(std::format("{}", move->moveId).c_str());
+				ImGui::TextUnformatted(move->moveId_str.c_str());
 
 				ImGui::TableNextColumn();
 				if (ImGui::Selectable(move->name.c_str(), move->moveId == m_highlightedMoveId)) {
-					m_highlightedMoveId = move->moveId;
+					// If clicked on the move
 					m_moveToPlay = move->moveId;
 					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
 					OpenFormWindow(EditorWindowType_Move, move->moveId);
@@ -518,7 +518,7 @@ void EditorWindow::RenderMovelist()
 
 				if (move->aliasId != 0) {
 					ImGui::TableNextColumn();
-					ImGui::TextUnformatted(std::format("{}", move->aliasId).c_str());
+					ImGui::TextUnformatted(move->alias_str.c_str());
 				}
 
 				if (m_moveToScrollTo == move->moveId) {

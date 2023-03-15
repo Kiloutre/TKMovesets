@@ -103,14 +103,20 @@ enum EditorMoveFlags_
 // Used for the move list
 struct DisplayableMove
 {
-	uint16_t moveId;
+	// Avoids having to do a std::format every frame
+	std::string moveId_str;
+	// The actual name of the move
 	std::string name;
+	// Avoids having to do a std::format every frame
+	std::string alias_str;
+	// Store the color to display incase of move with flags
+	unsigned int color;
+	// Index of the move in the movelist
+	uint16_t moveId;
 	// Store the alias of this move, or 0 if none1
 	uint16_t aliasId;
 	// Store useful flags for quick filtering / coloring
 	EditorMoveFlags flags;
-	// Store the color to display incase of move with flags
-	unsigned int color;
 };
 
 struct EditorTable

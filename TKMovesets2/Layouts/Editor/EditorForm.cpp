@@ -97,20 +97,22 @@ void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, i
 
 void EditorForm::RenderLabel(EditorInput* field)
 {
-	if (field->flags & EditorInput_Clickable) {
-		if (ImGui::Selectable(_(field->field_fullname.c_str()), !field->errored)) {
+	const char* fieldLabel = _(field->field_fullname.c_str());
+	if (field->flags & EditorInput_Clickable && !field->errored) {
+		if (ImGui::Selectable(fieldLabel, true)) {
 			m_consumedEvent = false;
 			m_event.eventName = field->name;
 			m_event.buffer = field->buffer;
 		}
 	} else {
-		ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+		ImGui::TextUnformatted(fieldLabel);
 	}
+
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
 		// todo: maybe use this for a full-on description
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(_(field->field_fullname.c_str()));
+		ImGui::TextUnformatted(fieldLabel);
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}

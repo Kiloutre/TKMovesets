@@ -10,7 +10,8 @@ If you have any contribution to bring, feel free, there is room for improvement 
 - Input sequence viewing
 - Throw camera viewing
 - "Go to..." for most structures
-- "Create new" and "Delete" for most structures
+- "Create new" and "Delete" for most structures.
+- "Create new" : For requirement, hit condition and cancel lists, allow appending to/deleting from an existing list with a +/- button
 - Color code input type (decimal, index, index) & clickable fields
 - Beter collor for apply button
 - Cancel move ID, move transition, pushback moveid: display move name as ID changes (render half an input field)

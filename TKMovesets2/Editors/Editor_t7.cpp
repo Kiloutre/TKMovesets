@@ -910,11 +910,13 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 		}
 
 		moves.push_back(new DisplayableMove{
-			.moveId = moveId,
+			.moveId_str = std::to_string(moveId),
 			.name = moveName,
+			.alias_str = aliasId == 0 ? std::string() : std::to_string(aliasId),
+			.color = EditorUtils::GetMoveColorFromFlag(flags),
+			.moveId = moveId,
 			.aliasId = aliasId,
 			.flags = flags,
-			.color = EditorUtils::GetMoveColorFromFlag(flags)
 		});
 	}
 
