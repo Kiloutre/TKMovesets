@@ -138,7 +138,8 @@ std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, Ve
 	CREATE_FIELD("downed_direction", 5, EditorInput_U16, reaction->downed_direction);
 
 	CREATE_FIELD("vertical_pushback", 7, EditorInput_U16, reaction->vertical_pushback);
-	CREATE_FIELD("_0x44_long", 7, EditorInput_U64, reaction->_0x44_long);
+	CREATE_FIELD("_0x44_int", 7, EditorInput_U32, reaction->_0x44_int);
+	CREATE_FIELD("_0x48_int", 7, EditorInput_U32, reaction->_0x48_int);
 
 	WriteFieldFullname(inputMap, "reactions");
 	return inputMap;
@@ -208,7 +209,8 @@ void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& i
 	reaction->downed_moveid = atoi(inputs["downed_moveid"]->buffer);
 
 	reaction->vertical_pushback = atoi(inputs["vertical_pushback"]->buffer);
-	reaction->_0x44_long = atoll(inputs["_0x44_long"]->buffer);
+	reaction->_0x44_int = atoi(inputs["_0x44_int"]->buffer);
+	reaction->_0x48_int = atoi(inputs["_0x48_int"]->buffer);
 }
 
 // ===== Hit conditions ===== //
