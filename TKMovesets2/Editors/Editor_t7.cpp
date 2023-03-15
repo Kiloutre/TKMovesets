@@ -229,7 +229,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	uint32_t idx = 0;
 	do
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -247,7 +246,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		}
 
 		hitCondition++;
-		++idx;
 	} while (true);
 
 	return inputListMap;
@@ -293,7 +291,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	uint32_t idx = 0;
 	do
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -303,7 +300,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
-		++idx;
 	} while ((req++)->condition != 881);
 
 	return inputListMap;
@@ -359,7 +355,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	uint32_t idx = 0;
 	do
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -375,7 +370,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 
 		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
-		++idx;
 	} while ((cancel++)->command != 0x8000);
 
 	return inputListMap;
@@ -438,7 +432,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetStartOtherpropList
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	uint32_t idx = 0;
 	do
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -449,7 +442,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetStartOtherpropList
 
 		WriteFieldFullname(inputMap, "start_other_extraproperty");
 		inputListMap.push_back(inputMap);
-		++idx;
 	} while ((prop++)->extraprop != 881);
 
 	return inputListMap;
@@ -479,7 +471,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetEndOtherpropListIn
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	uint32_t idx = 0;
 	do
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -490,7 +481,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetEndOtherpropListIn
 
 		WriteFieldFullname(inputMap, "end_other_extraproperty");
 		inputListMap.push_back(inputMap);
-		++idx;
 	} while ((prop++)->extraprop != 881);
 
 	return inputListMap;
@@ -520,7 +510,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	uint32_t idx = 0;
 	do
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -531,7 +520,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
-		++idx;
 	} while ((prop++)->starting_frame != 0);
 
 	return inputListMap;
