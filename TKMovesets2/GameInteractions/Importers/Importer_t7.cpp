@@ -116,7 +116,7 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 		// i will change that X character ID to be the one of the current character, to make it always true.
 		// When the requirement ask for any other character ID, i will supply a character ID that ISN'T the current one, to make it always false.
 
-		if (requirement[i].req == 217) {
+		if (requirement[i].condition == 217) {
 			requirement[i].param = requirement[i].param == movesetCharacterId ? currentCharacterId : currentCharacterId + 1;
 		}
 	}

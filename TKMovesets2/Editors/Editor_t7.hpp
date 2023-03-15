@@ -49,6 +49,10 @@ public:
 	// Cancel extras
 	std::map<std::string, EditorInput*> GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
+	// Extra properties
+	std::vector<std::map<std::string, EditorInput*>> GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	;
 
 	// -- Iteractons -- //

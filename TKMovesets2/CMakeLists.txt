@@ -40,6 +40,7 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorExtraproperties.cpp"
                     "Layouts/Editor/Structures/EditorCancels.cpp"
                     "Layouts/Editor/Structures/EditorCancelExtra.cpp"
+                    "Layouts/Editor/Structures/EditorRequirements.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"

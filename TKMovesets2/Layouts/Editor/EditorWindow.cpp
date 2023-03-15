@@ -13,6 +13,7 @@
 #include "EditorExtraproperties.hpp"
 #include "EditorCancels.hpp"
 #include "EditorCancelExtra.hpp"
+#include "EditorRequirements.hpp"
 
 // -- Private methods -- //
 
@@ -34,6 +35,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		break;
 	case EditorWindowType_CancelExtradata:
 		return new EditorCancelExtra(m_windowTitle, id, m_editor);;
+		break;
+	case EditorWindowType_Requirement:
+		return new EditorRequirements(m_windowTitle, id, m_editor);;
 		break;
 	}
 
@@ -74,6 +78,10 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 	else if (fieldIdentifier == "edition.cancel_field.extradata_addr") {
 		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_CancelExtradata, id);
+	}
+	else if (fieldIdentifier == "edition.cancel_field.requirement_addr") {
+		// Validate move id will proceed to an alias conversion which i want here
+		OpenFormWindow(EditorWindowType_Requirement, id);
 	}
 }
 

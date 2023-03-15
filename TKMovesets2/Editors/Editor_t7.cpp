@@ -21,8 +21,45 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
-// ===== Cancel Extradata ===== //
+// ===== Requirements  ===== //
 
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	Requirement* req = (Requirement*)(m_movesetData + movesetListOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	uint32_t idx = 0;
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("condition", 0, EditorInput_U32, req->condition);
+		CREATE_FIELD("param", 0, EditorInput_U32, req->param);
+
+		WriteFieldFullname(inputMap, "edition.requirement_field.");
+		inputListMap.push_back(inputMap);
+		++idx;
+	} while ((req++)->condition != 881);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	Requirement* req = (Requirement*)(m_movesetData + movesetListOffset) + id;
+
+	req->condition = (uint32_t)atoi(inputs["condition"]->buffer);
+	req->param = (uint32_t)atoi(inputs["param"]->buffer);
+}
+
+// ===== Cancel Extradata ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder)
 {
@@ -376,6 +413,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_CancelExtradata:
 		SaveCancelExtra(id, inputs);
 		break;
+	case EditorWindowType_Requirement:
+		SaveRequirement(id, inputs);
+		break;
 	}
 }
 
@@ -407,6 +447,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		break;
 	case EditorWindowType_Cancel:
 		return GetCancelListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_Requirement:
+		return GetRequirementListInputs(id, drawOrder);
 		break;
 	}
 	return std::vector<std::map<std::string, EditorInput*>>();

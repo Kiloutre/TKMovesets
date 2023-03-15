@@ -22,7 +22,7 @@ namespace StructsT7
 
 	struct Requirement
 	{
-		uint32_t req;
+		uint32_t condition;
 		uint32_t param;
 	};
 
