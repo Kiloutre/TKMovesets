@@ -114,21 +114,21 @@ std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, Ve
 	CREATE_FIELD("downed_pushback", 1, EditorInput_PTR, reaction->downed_pushback);
 	CREATE_FIELD("block_pushback", 1, EditorInput_PTR, reaction->block_pushback);
 
-	CREATE_FIELD("default_moveid", 3, EditorInput_U16, reaction->default_moveid);
-	CREATE_FIELD("standing_moveid", 3, EditorInput_U16, reaction->standing_moveid);
-	CREATE_FIELD("crouch_moveid", 3, EditorInput_U16, reaction->crouch_moveid);
-	CREATE_FIELD("counterhit_moveid", 3, EditorInput_U16, reaction->counterhit_moveid);
-	CREATE_FIELD("crouch_counterhit_moveid", 3, EditorInput_U16, reaction->crouch_counterhit_moveid);
-	CREATE_FIELD("left_side_moveid", 3, EditorInput_U16, reaction->left_side_moveid);
-	CREATE_FIELD("crouch_left_side_moveid", 3, EditorInput_U16, reaction->crouch_left_side_moveid);
-	CREATE_FIELD("right_side_moveid", 3, EditorInput_U16, reaction->right_side_moveid);
-	CREATE_FIELD("crouch_right_side_moveid", 3, EditorInput_U16, reaction->crouch_right_side_moveid);
-	CREATE_FIELD("backturned_moveid", 3, EditorInput_U16, reaction->backturned_moveid);
-	CREATE_FIELD("crouch_backturned_moveid", 3, EditorInput_U16, reaction->crouch_backturned_moveid);
-	CREATE_FIELD("block_moveid", 3, EditorInput_U16, reaction->block_moveid);
-	CREATE_FIELD("crouch_block_moveid", 3, EditorInput_U16, reaction->crouch_block_moveid);
-	CREATE_FIELD("wallslump_moveid", 3, EditorInput_U16, reaction->wallslump_moveid);
-	CREATE_FIELD("downed_moveid", 3, EditorInput_U16, reaction->downed_moveid);
+	CREATE_FIELD("default_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->default_moveid);
+	CREATE_FIELD("standing_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->standing_moveid);
+	CREATE_FIELD("crouch_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->crouch_moveid);
+	CREATE_FIELD("counterhit_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->counterhit_moveid);
+	CREATE_FIELD("crouch_counterhit_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->crouch_counterhit_moveid);
+	CREATE_FIELD("left_side_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->left_side_moveid);
+	CREATE_FIELD("crouch_left_side_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->crouch_left_side_moveid);
+	CREATE_FIELD("right_side_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->right_side_moveid);
+	CREATE_FIELD("crouch_right_side_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->crouch_right_side_moveid);
+	CREATE_FIELD("backturned_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->backturned_moveid);
+	CREATE_FIELD("crouch_backturned_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->crouch_backturned_moveid);
+	CREATE_FIELD("block_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->block_moveid);
+	CREATE_FIELD("crouch_block_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->crouch_block_moveid);
+	CREATE_FIELD("wallslump_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->wallslump_moveid);
+	CREATE_FIELD("downed_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->downed_moveid);
 
 	CREATE_FIELD("front_direction", 5, EditorInput_U16, reaction->front_direction);
 	CREATE_FIELD("back_direction", 5, EditorInput_U16, reaction->back_direction);

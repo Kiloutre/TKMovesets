@@ -5,6 +5,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Implement group-cancel viewing
 - Requirement & Cancels: Update list when applying (shouldn't be hard, just call Init again and make sure every vector/map/set is cleared at the top of the init functions)
 - Cancels: display move name and command for each cancel
 - tree node labels for extra properties, requirements
