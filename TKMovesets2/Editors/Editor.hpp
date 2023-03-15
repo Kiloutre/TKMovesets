@@ -52,14 +52,15 @@ enum EditorInputFlag_
 	EditorInput_String    = (1 << 0),
 	EditorInput_Clickable = (1 << 1),
 
-	EditorInput_U64       = (1 << 2),
-	EditorInput_S64       = (1 << 3),
-	EditorInput_U32       = (1 << 4),
-	EditorInput_H32       = (1 << 5),
-	EditorInput_S32       = (1 << 6),
-	EditorInput_U16       = (1 << 7),
-	EditorInput_H16       = (1 << 8),
-	EditorInput_S16       = (1 << 9),
+	EditorInput_H64       = (1 << 2),
+	EditorInput_U64       = (1 << 3),
+	EditorInput_S64       = (1 << 4),
+	EditorInput_U32       = (1 << 5),
+	EditorInput_H32       = (1 << 6),
+	EditorInput_S32       = (1 << 7),
+	EditorInput_U16       = (1 << 8),
+	EditorInput_H16       = (1 << 9),
+	EditorInput_S16       = (1 << 10),
 
 
 	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),

@@ -161,6 +161,16 @@ edition.extraproperty_field.starting_frame = Frame de début
 edition.extraproperty_field.id = ID
 edition.extraproperty_field.value = Value
 
+edition.cancel_field.window_name = Cancel
+edition.cancel_field.command = Commande
+edition.cancel_field.requirement_addr = ID de condition
+edition.cancel_field.extradata_addr = ID d'extradata
+edition.cancel_field.detection_start = Début de détection
+edition.cancel_field.detection_end = Fin de détection
+edition.cancel_field.starting_frame = Frame de commencement
+edition.cancel_field.move_id = ID de move
+edition.cancel_field.cancel_option = Option de cancel
+
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

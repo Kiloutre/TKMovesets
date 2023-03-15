@@ -11,6 +11,7 @@
 #include "EditorMove.hpp"
 #include "EditorVoiceclip.hpp"
 #include "EditorExtraproperties.hpp"
+#include "EditorCancels.hpp"
 
 // -- Private methods -- //
 
@@ -27,6 +28,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_Extraproperty:
 		return new EditorExtraproperties(m_windowTitle, id, m_editor);;
 		break;
+	case EditorWindowType_Cancel:
+		return new EditorCancels(m_windowTitle, id, m_editor);;
+		break;
 	}
 
 	return nullptr;
@@ -36,13 +40,19 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 {
 	int id = atoi(buffer);
 	
+	// Move
 	if (fieldIdentifier == "edition.move_field.cancel_id") {
 		// todo: also make it work for other cancel IDs
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Cancel, id);
 		}
 	}
-	else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
+	else if (fieldIdentifier == "edition.move_field.transition") {
+		id = ValidateMoveId(buffer);
+		if (id >= 0) {
+			OpenFormWindow(EditorWindowType_Move, id);
+		}
+	} else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Voiceclip, id);
 		}
@@ -50,6 +60,13 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 	else if (fieldIdentifier == "edition.move_field.extra_properties_id") {
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Extraproperty, id);
+		}
+	}
+	// Cancels
+	else if (fieldIdentifier == "edition.cancel_field.move_id") {
+		id = ValidateMoveId(buffer);
+		if (id >= 0) {
+			OpenFormWindow(EditorWindowType_Move, id);
 		}
 	}
 }
@@ -152,6 +169,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
+		moveId = m_editorTable.aliases[moveId - 0x8000];
 	}
 
 	return moveId;

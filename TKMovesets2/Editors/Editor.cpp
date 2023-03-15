@@ -55,7 +55,7 @@ namespace EditorUtils
 
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags)
 	{
-		if (flags & (EditorInput_H32 | EditorInput_H16)) {
+		if (flags & (EditorInput_H32 | EditorInput_H32 | EditorInput_H16)) {
 			return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
 		}
 		return ImGuiInputTextFlags_CharsDecimal;
@@ -63,7 +63,7 @@ namespace EditorUtils
 
 	const char* GetFieldFormat(EditorInputFlag flags)
 	{
-		if (flags & (EditorInput_H32 | EditorInput_H16)) {
+		if (flags & (EditorInput_H64 | EditorInput_H32 | EditorInput_H16)) {
 			return "%X";
 		}
 		if (flags & EditorInput_S64) {

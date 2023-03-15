@@ -9,6 +9,9 @@
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
 
+# pragma warning( disable : C4334 )
+# pragma warning( disable : C6297 )
+
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr

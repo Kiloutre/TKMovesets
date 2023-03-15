@@ -27,7 +27,7 @@ public:
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) override;
 	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
-
+	
 	// Moves
 	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
@@ -36,12 +36,15 @@ public:
 	// Voiceclips
 	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateVoiceclipField(EditorInput* field);
 
 	// Extra properties
 	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateExtrapropField(EditorInput* field);
+
+	// Cancels
+	std::vector<std::map<std::string, EditorInput*>> GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateCancelField(std::string name, EditorInput* field);
 
 	// -- Iteractons -- //
 	// Sets the current move of a player

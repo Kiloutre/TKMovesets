@@ -21,6 +21,85 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
+// ===== Cancel ===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + movesetListOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	uint32_t idx = 0;
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("command", 0, EditorInput_H64, cancel->command);
+		CREATE_FIELD("requirement_addr", 0, EditorInput_PTR, cancel->requirement_addr);
+		CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, cancel->extradata_addr);
+		CREATE_FIELD("detection_start", 0, EditorInput_U32, cancel->detection_start);
+		CREATE_FIELD("detection_end", 0, EditorInput_U32, cancel->detection_end);
+		CREATE_FIELD("starting_frame", 0, EditorInput_U32, cancel->starting_frame);
+		CREATE_FIELD("move_id", 0, EditorInput_U16 | EditorInput_Clickable, cancel->move_id);
+		CREATE_FIELD("cancel_option", 0, EditorInput_U16, cancel->cancel_option);
+
+		WriteFieldFullname(inputMap, "edition.cancel_field.");
+		inputListMap.push_back(inputMap);
+		++idx;
+	} while ((cancel++)->command != 0x8000);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + movesetListOffset) + id;
+
+	cancel->command = (uint32_t)strtol(inputs["command"]->buffer, nullptr, 16);
+	cancel->requirement_addr = (uint32_t)atoi(inputs["requirement_addr"]->buffer);
+	cancel->extradata_addr = (uint32_t)atoi(inputs["extradata_addr"]->buffer);
+	cancel->detection_start = (uint32_t)atoi(inputs["detection_start"]->buffer);
+	cancel->detection_end = (uint32_t)atoi(inputs["detection_end"]->buffer);
+	cancel->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
+	cancel->move_id = (uint16_t)atoi(inputs["move_id"]->buffer);
+	cancel->cancel_option = (uint32_t)atoi(inputs["cancel_option"]->buffer);
+}
+
+bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
+{
+	if (name == "move_id") {
+		int moveId = atoi(field->buffer);
+		if (moveId >= m_infos->table.moveCount) {
+			if (moveId < 0x8000) {
+				return false;
+			}
+			if (moveId >= (0x8000 + m_aliases.size())) {
+				return false;
+			}
+		}
+		else if (moveId < 0) {
+			return false;
+		}
+	}
+	else if (name == "requirement_addr") {
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
+	} else if (name == "extradata_addr") {
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelExtradataCount;
+	}
+
+	return true;
+}
+
 // ===== ExtraProperties ===== //
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -60,6 +139,7 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 	prop->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
 	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
 }
+
 // ===== Voiceclips ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -262,6 +342,11 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_Extraproperty:
 		SaveExtraproperty(id, inputs);
 		break;
+	case EditorWindowType_Cancel:
+		SaveCancel(id, inputs);
+		break;
+	case EditorWindowType_CancelExtradata:
+		break;
 	}
 }
 
@@ -276,6 +361,8 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 	case EditorWindowType_Voiceclip:
 		return GetVoiceclipInputs(id, drawOrder);
 		break;
+	case EditorWindowType_CancelExtradata:
+		break;
 	}
 	return std::map<std::string, EditorInput*>();
 }
@@ -287,6 +374,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 	{
 	case EditorWindowType_Extraproperty:
 		return GetExtrapropListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_Cancel:
+		return GetCancelListInputs(id, drawOrder);
 		break;
 	}
 	return std::vector<std::map<std::string, EditorInput*>>();
@@ -301,7 +391,12 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 
 	auto flags = field->flags;
 
-	if (flags & EditorInput_H32) {
+	if (flags & EditorInput_H64) {
+		if (strlen(field->buffer) > 16) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_H32) {
 		if (strlen(field->buffer) > 8) {
 			return false;
 		}
@@ -350,6 +445,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 	case EditorWindowType_Move:
 		return ValidateMoveField(fieldShortName, field);
 		break;
+	case EditorWindowType_Cancel:
+		return ValidateCancelField(fieldShortName, field);
+		break;
 	}
 
 	return true;
@@ -387,7 +485,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		if (m_animNameMap.find(animName) != m_animNameMap.end() && m_animNameMap[animName] != animOffset) {
 			// todo: with kazuya & maybe more characters, this is apparently a big problem
 			// change the way anim choosing is done
-			printf("move id %d\n", i);
+			printf("(Move id %llu)\n", i);
 			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameMap[animName]);
 			throw std::exception();
 		}
