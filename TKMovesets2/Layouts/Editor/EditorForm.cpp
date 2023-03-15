@@ -169,7 +169,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	id = t_id;
 	m_editor = editor;
 
-	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType) + "_field";
+	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
 
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMap = editor->GetFormFields(windowType, t_id, drawOrder);

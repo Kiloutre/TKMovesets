@@ -47,7 +47,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		CREATE_FIELD("_0xC_int", 0, EditorInput_U32, hitCondition->_0xC_int);
 		CREATE_FIELD("reactions_addr", 0, EditorInput_PTR, hitCondition->reactions_addr);
 
-		WriteFieldFullname(inputMap, "edition.hit_condition_field.");
+		WriteFieldFullname(inputMap, "edition.hit_condition.");
 		inputListMap.push_back(inputMap);
 
 		if (req[hitCondition->requirement_addr].condition == 881) {
@@ -109,7 +109,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 		CREATE_FIELD("condition", 0, EditorInput_U32, req->condition);
 		CREATE_FIELD("param", 0, EditorInput_U32, req->param);
 
-		WriteFieldFullname(inputMap, "edition.requirement_field.");
+		WriteFieldFullname(inputMap, "edition.requirement.");
 		inputListMap.push_back(inputMap);
 		++idx;
 	} while ((req++)->condition != 881);
@@ -142,7 +142,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("value", 0, EditorInput_H32, cancelExtra->value);
 
-	WriteFieldFullname(inputMap, "edition.cancel_extra_field.");
+	WriteFieldFullname(inputMap, "edition.cancel_extra.");
 	return inputMap;
 }
 
@@ -181,7 +181,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 		CREATE_FIELD("move_id", 0, EditorInput_U16 | EditorInput_Clickable, cancel->move_id);
 		CREATE_FIELD("cancel_option", 0, EditorInput_U16, cancel->cancel_option);
 
-		WriteFieldFullname(inputMap, "edition.cancel_field.");
+		WriteFieldFullname(inputMap, "edition.cancel.");
 		inputListMap.push_back(inputMap);
 		++idx;
 	} while ((cancel++)->command != 0x8000);
@@ -255,7 +255,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
 		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
-		WriteFieldFullname(inputMap, "edition.extraproperty_field.");
+		WriteFieldFullname(inputMap, "edition.extraproperty.");
 		inputListMap.push_back(inputMap);
 		++idx;
 	} while ((prop++)->starting_frame != 0);
@@ -288,7 +288,7 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
 
-	WriteFieldFullname(inputMap, "edition.voiceclip_field.");
+	WriteFieldFullname(inputMap, "edition.voiceclip.");
 	return inputMap;
 }
 
@@ -355,7 +355,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16, move->_0xA8_short);
 	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16, move->_0xAC_short);
 
-	WriteFieldFullname(inputMap, "edition.move_field.");
+	WriteFieldFullname(inputMap, "edition.move.");
 	return inputMap;
 }
 

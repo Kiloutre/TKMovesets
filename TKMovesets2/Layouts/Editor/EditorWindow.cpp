@@ -53,42 +53,42 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 	int id = atoi(buffer);
 	
 	// Move
-	if (fieldIdentifier == "edition.move_field.cancel_id") {
+	if (fieldIdentifier == "edition.move.cancel_id") {
 		// todo: also make it work for other cancel IDs
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Cancel, id);
 		}
 	}
-	else if (fieldIdentifier == "edition.move_field.transition") {
+	else if (fieldIdentifier == "edition.move.transition") {
 		id = ValidateMoveId(buffer);
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Move, id);
 		}
-	} else if (fieldIdentifier == "edition.move_field.voiceclip_id") {
+	} else if (fieldIdentifier == "edition.move.voiceclip_id") {
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Voiceclip, id);
 		}
 	}
-	else if (fieldIdentifier == "edition.move_field.hit_condition_id") {
+	else if (fieldIdentifier == "edition.move.hit_condition_id") {
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_HitCondition, id);
 		}
 	}
-	else if (fieldIdentifier == "edition.move_field.extra_properties_id") {
+	else if (fieldIdentifier == "edition.move.extra_properties_id") {
 		if (id >= 0) {
 			OpenFormWindow(EditorWindowType_Extraproperty, id);
 		}
 	}
 	// Cancels
-	else if (fieldIdentifier == "edition.cancel_field.move_id") {
+	else if (fieldIdentifier == "edition.cancel.move_id") {
 		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_Move, ValidateMoveId(buffer));
 	}
-	else if (fieldIdentifier == "edition.cancel_field.extradata_addr") {
+	else if (fieldIdentifier == "edition.cancel.extradata_addr") {
 		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_CancelExtradata, id);
 	}
-	else if (fieldIdentifier == "edition.cancel_field.requirement_addr") {
+	else if (fieldIdentifier == "edition.cancel.requirement_addr") {
 		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_Requirement, id);
 	}

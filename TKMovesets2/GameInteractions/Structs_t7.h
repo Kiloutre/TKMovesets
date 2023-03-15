@@ -61,7 +61,7 @@ namespace StructsT7
 		uint16_t front_counterhit_direction;
 		uint16_t downed_direction;
 
-		uint64_t _0x44_long; // 0,  Not actually sure it is a long
+		uint64_t _0x44_long; // 0,  Not actually sure it is a long. todo: check
 
 		uint16_t vertical_pushback;
 		uint16_t standing_moveId;
