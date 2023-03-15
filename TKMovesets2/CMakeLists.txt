@@ -43,6 +43,8 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorRequirements.cpp"
                     "Layouts/Editor/Structures/EditorHitConditions.cpp"
                     "Layouts/Editor/Structures/EditorReactions.cpp"
+                    "Layouts/Editor/Structures/EditorPushback.cpp"
+                    "Layouts/Editor/Structures/EditorPushbackExtra.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"

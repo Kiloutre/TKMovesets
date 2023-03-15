@@ -63,8 +63,16 @@ public:
 	std::map<std::string, EditorInput*> GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateReactionsField(std::string name, EditorInput* field);
-	
 
+	// Pushback
+	std::map<std::string, EditorInput*> GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SavePushback(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidatePushbackField(std::string name, EditorInput* field);
+
+	// Pushback extradata
+	std::map<std::string, EditorInput*> GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	
 	// -- Interactions -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;

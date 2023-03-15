@@ -20,6 +20,79 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
+// ===== Pushback Extra ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	uint64_t pushbackExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
+	PushbackExtradata* pushbackExtra = (PushbackExtradata*)(m_movesetData + pushbackExtraOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("horizontal_offset", 1, EditorInput_U16, pushbackExtra->horizontal_offset);
+
+	WriteFieldFullname(inputMap, "pushback_extradata");
+	return inputMap;
+}
+
+void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t pushbackExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
+	PushbackExtradata* pushbackExtra= (PushbackExtradata*)(m_movesetData + pushbackExtraOffset) + id;
+
+	pushbackExtra->horizontal_offset = atoi(inputs["horizontal_offset"]->buffer);
+}
+
+// ===== Pushback ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	uint64_t pushbackOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback;
+	gAddr::Pushback* pushback = (gAddr::Pushback*)(m_movesetData + pushbackOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("duration", 1, EditorInput_U16, pushback->displacement);
+	CREATE_FIELD("displacement", 1, EditorInput_S16, pushback->duration);
+	CREATE_FIELD("num_of_loops", 1, EditorInput_U32, pushback->num_of_loops);
+	CREATE_FIELD("extradata_addr", 1, EditorInput_PTR, pushback->duration);
+
+	WriteFieldFullname(inputMap, "pushback");
+	return inputMap;
+}
+
+bool EditorT7::ValidatePushbackField(std::string name, EditorInput* field)
+{
+	if (name == "extradata_addr")
+	{
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.pushbackExtradataCount;
+	}
+
+	return true;
+}
+
+void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t pushbackOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback;
+	gAddr::Pushback* pushback = (gAddr::Pushback*)(m_movesetData + pushbackOffset) + id;
+
+	pushback->duration = atoi(inputs["duration"]->buffer);
+	pushback->displacement = atoi(inputs["displacement"]->buffer);
+	pushback->num_of_loops = atoi(inputs["num_of_loops"]->buffer);
+	pushback->extradata_addr = atoi(inputs["extradata_addr"]->buffer);
+
+}
+
 // ===== Reactions ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -607,6 +680,12 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_Reactions:
 		SaveReactions(id, inputs);
 		break;
+	case EditorWindowType_Pushback:
+		SavePushback(id, inputs);
+		break;
+	case EditorWindowType_PushbackExtradata:
+		SavePushbackExtra(id, inputs);
+		break;
 	}
 }
 
@@ -626,6 +705,12 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		break;
 	case EditorWindowType_Reactions:
 		return GetReactionsInputs(id, drawOrder);
+		break;
+	case EditorWindowType_Pushback:
+		return GetPushbackInputs(id, drawOrder);
+		break;
+	case EditorWindowType_PushbackExtradata:
+		return GetPushbackExtraInputs(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -709,7 +794,6 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 		}
 	}
 
-	
 	switch (fieldType)
 	{
 	case EditorWindowType_Move:
@@ -723,6 +807,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 		break;
 	case EditorWindowType_Reactions:
 		return ValidateReactionsField(fieldShortName, field);
+		break;
+	case EditorWindowType_Pushback:
+		return ValidatePushbackField(fieldShortName, field);
 		break;
 	}
 

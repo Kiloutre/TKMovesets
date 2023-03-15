@@ -47,6 +47,10 @@ namespace EditorFormUtils
 			return "hit_condition";
 		case EditorWindowType_Reactions:
 			return "reactions";
+		case EditorWindowType_Pushback:
+			return "pushback";
+		case EditorWindowType_PushbackExtradata:
+			return "pushback_extradata";
 		}
 		return "UNKNOWN";
 	}

@@ -16,6 +16,8 @@
 #include "EditorRequirements.hpp"
 #include "EditorHitConditions.hpp"
 #include "EditorReactions.hpp"
+#include "EditorPushback.hpp"
+#include "EditorPushbackExtra.hpp"
 
 // -- Private methods -- //
 
@@ -47,6 +49,12 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_Reactions:
 		return new EditorReactions(m_windowTitle, id, m_editor);;
 		break;
+	case EditorWindowType_Pushback:
+		return new EditorPushback(m_windowTitle, id, m_editor);;
+		break;
+	case EditorWindowType_PushbackExtradata:
+		return new EditorPushbackExtra(m_windowTitle, id, m_editor);;
+		break;
 	}
 
 	return nullptr;
@@ -56,7 +64,7 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 {
 	int id = atoi(buffer);
 
-	// Todo: do this in a cleaner way. Maybe handle this in the ckasses themselves?
+	// Todo: do this in a cleaner way. Maybe handle this in the classes themselves?
 	
 	// Move
 	if (fieldIdentifier == "edition.move.cancel_id") {
@@ -103,6 +111,10 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 	}
 	else if (fieldIdentifier == "edition.hit_condition.reactions_addr") {
 		OpenFormWindow(EditorWindowType_Reactions, id);
+	}
+	//Pushback
+	else if (fieldIdentifier == "edition.pushback.extradata_addr") {
+		OpenFormWindow(EditorWindowType_PushbackExtradata, id);
 	}
 }
 
@@ -232,9 +244,28 @@ void EditorWindow::Save()
 void EditorWindow::RenderToolBar()
 {
 	// todo: ImGuiWindowFlags_MenuBar ?
-	ImGui::Text("TOOLS: TODO");
-	ImGui::SameLine();
+	ImGui::BeginMenuBar();
+
 	ImGuiExtra::HelpMarker(_("edition.window_controls_explanation"));
+
+	ImGui::Separator();
+
+	// Current move 1P
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_1p"), m_loadedMoveset != 0)) {
+		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(0);
+		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
+		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
+		m_highlightedMoveId = m_moveToScrollTo;
+	}
+	// Current move 2P
+	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_2p"), m_loadedMoveset != 0)) {
+		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(1);
+		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
+		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
+		m_highlightedMoveId = m_moveToScrollTo;
+	}
+
+	ImGui::EndMenuBar();
 }
 
 void EditorWindow::RenderStatusBar()
@@ -572,7 +603,7 @@ void EditorWindow::Render(int dockid)
 		setFocus = false;
 	}
 
-	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking;
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar;
 	// ImGuiWindowFlags_MenuBar
 	if (!m_savedLastChange) {
 		windowFlags |= ImGuiWindowFlags_UnsavedDocument;
