@@ -3,7 +3,6 @@
 #include "Editor.hpp"
 #include "EditorFormList.hpp"
 
-// Windowed class managing a single move
 class EditorCancels : public EditorFormList
 {
 public:

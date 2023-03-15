@@ -10,15 +10,132 @@ using namespace EditorUtils;
 #define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String }, SET_DEFAULT_VAL(a, "%s", g)
 #define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g)
 
-
 static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier)
 {
 	// Finishing touch
 	for (auto& [name, input] : inputMap) {
 		// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
 		input->name = name;
-		input->field_fullname = baseIdentifier + name;
+		input->field_fullname = "edition." + baseIdentifier + "." + name;
 	}
+}
+
+// ===== Reactions ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	uint64_t reactionsOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions;
+	gAddr::Reactions* reaction = (gAddr::Reactions*)(m_movesetData + reactionsOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("front_pushback", 1, EditorInput_PTR, reaction->front_pushback);
+	CREATE_FIELD("backturned_pushback", 1, EditorInput_PTR, reaction->backturned_pushback);
+	CREATE_FIELD("left_side_pushback", 1, EditorInput_PTR, reaction->left_side_pushback);
+	CREATE_FIELD("right_side_pushback", 1, EditorInput_PTR, reaction->right_side_pushback);
+	CREATE_FIELD("front_counterhit_pushback", 1, EditorInput_PTR, reaction->front_counterhit_pushback);
+	CREATE_FIELD("downed_pushback", 1, EditorInput_PTR, reaction->downed_pushback);
+	CREATE_FIELD("block_pushback", 1, EditorInput_PTR, reaction->block_pushback);
+
+	CREATE_FIELD("default_moveid", 3, EditorInput_U16, reaction->default_moveid);
+	CREATE_FIELD("standing_moveid", 3, EditorInput_U16, reaction->standing_moveid);
+	CREATE_FIELD("crouch_moveid", 3, EditorInput_U16, reaction->crouch_moveid);
+	CREATE_FIELD("counterhit_moveid", 3, EditorInput_U16, reaction->counterhit_moveid);
+	CREATE_FIELD("crouch_counterhit_moveid", 3, EditorInput_U16, reaction->crouch_counterhit_moveid);
+	CREATE_FIELD("left_side_moveid", 3, EditorInput_U16, reaction->left_side_moveid);
+	CREATE_FIELD("crouch_left_side_moveid", 3, EditorInput_U16, reaction->crouch_left_side_moveid);
+	CREATE_FIELD("right_side_moveid", 3, EditorInput_U16, reaction->right_side_moveid);
+	CREATE_FIELD("crouch_right_side_moveid", 3, EditorInput_U16, reaction->crouch_right_side_moveid);
+	CREATE_FIELD("backturned_moveid", 3, EditorInput_U16, reaction->backturned_moveid);
+	CREATE_FIELD("crouch_backturned_moveid", 3, EditorInput_U16, reaction->crouch_backturned_moveid);
+	CREATE_FIELD("block_moveid", 3, EditorInput_U16, reaction->block_moveid);
+	CREATE_FIELD("crouch_block_moveid", 3, EditorInput_U16, reaction->crouch_block_moveid);
+	CREATE_FIELD("wallslump_moveid", 3, EditorInput_U16, reaction->wallslump_moveid);
+	CREATE_FIELD("downed_moveid", 3, EditorInput_U16, reaction->downed_moveid);
+
+	CREATE_FIELD("front_direction", 5, EditorInput_U16, reaction->front_direction);
+	CREATE_FIELD("back_direction", 5, EditorInput_U16, reaction->back_direction);
+	CREATE_FIELD("left_side_direction", 5, EditorInput_U16, reaction->left_side_direction);
+	CREATE_FIELD("right_side_direction", 5, EditorInput_U16, reaction->right_side_direction);
+	CREATE_FIELD("front_counterhit_direction", 5, EditorInput_U16, reaction->front_counterhit_direction);
+	CREATE_FIELD("downed_direction", 5, EditorInput_U16, reaction->downed_direction);
+
+	CREATE_FIELD("vertical_pushback", 7, EditorInput_U16, reaction->vertical_pushback);
+	CREATE_FIELD("_0x44_long", 7, EditorInput_U64, reaction->_0x44_long);
+
+	WriteFieldFullname(inputMap, "reactions");
+	return inputMap;
+}
+
+bool EditorT7::ValidateReactionsField(std::string name, EditorInput* field)
+{
+	if (Helpers::endsWith(name, "_moveid"))
+	{
+		int moveId = atoi(field->buffer);
+		if (moveId >= m_infos->table.moveCount) {
+			if (moveId < 0x8000) {
+				return false;
+			}
+			if (moveId >= (0x8000 + m_aliases.size())) {
+				return false;
+			}
+		}
+		else if (moveId < 0) {
+			return false;
+		}
+	}
+	else if (Helpers::endsWith(name, "_pushback"))
+	{
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.pushbackCount;
+	}
+
+	return true;
+}
+
+void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t reactionsOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions;
+	gAddr::Reactions* reaction = (gAddr::Reactions*)(m_movesetData + reactionsOffset) + id;
+
+	reaction->front_pushback = atoi(inputs["front_pushback"]->buffer);
+	reaction->backturned_pushback = atoi(inputs["backturned_pushback"]->buffer);
+	reaction->left_side_pushback = atoi(inputs["left_side_pushback"]->buffer);
+	reaction->right_side_pushback = atoi(inputs["right_side_pushback"]->buffer);
+	reaction->front_counterhit_pushback = atoi(inputs["front_counterhit_pushback"]->buffer);
+	reaction->downed_pushback = atoi(inputs["downed_pushback"]->buffer);
+	reaction->block_pushback = atoi(inputs["block_pushback"]->buffer);
+
+	reaction->front_direction = atoi(inputs["front_direction"]->buffer);
+	reaction->back_direction = atoi(inputs["back_direction"]->buffer);
+	reaction->left_side_direction = atoi(inputs["left_side_direction"]->buffer);
+	reaction->right_side_direction = atoi(inputs["right_side_direction"]->buffer);
+	reaction->front_counterhit_direction = atoi(inputs["front_counterhit_direction"]->buffer);
+	reaction->downed_direction = atoi(inputs["downed_direction"]->buffer);
+
+	reaction->default_moveid = atoi(inputs["default_moveid"]->buffer);
+	reaction->standing_moveid = atoi(inputs["standing_moveid"]->buffer);
+	reaction->crouch_moveid = atoi(inputs["crouch_moveid"]->buffer);
+	reaction->counterhit_moveid = atoi(inputs["counterhit_moveid"]->buffer);
+	reaction->crouch_counterhit_moveid = atoi(inputs["crouch_counterhit_moveid"]->buffer);
+	reaction->left_side_moveid = atoi(inputs["left_side_moveid"]->buffer);
+	reaction->crouch_left_side_moveid = atoi(inputs["crouch_left_side_moveid"]->buffer);
+	reaction->right_side_moveid = atoi(inputs["right_side_moveid"]->buffer);
+	reaction->crouch_right_side_moveid = atoi(inputs["crouch_right_side_moveid"]->buffer);
+	reaction->backturned_moveid = atoi(inputs["backturned_moveid"]->buffer);
+	reaction->crouch_backturned_moveid = atoi(inputs["crouch_backturned_moveid"]->buffer);
+	reaction->block_moveid = atoi(inputs["block_moveid"]->buffer);
+	reaction->crouch_block_moveid = atoi(inputs["crouch_block_moveid"]->buffer);
+	reaction->wallslump_moveid = atoi(inputs["wallslump_moveid"]->buffer);
+	reaction->downed_moveid = atoi(inputs["downed_moveid"]->buffer);
+
+	reaction->vertical_pushback = atoi(inputs["vertical_pushback"]->buffer);
+	reaction->_0x44_long = atoll(inputs["_0x44_long"]->buffer);
 }
 
 // ===== Hit conditions ===== //
@@ -47,7 +164,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		CREATE_FIELD("_0xC_int", 0, EditorInput_U32, hitCondition->_0xC_int);
 		CREATE_FIELD("reactions_addr", 0, EditorInput_PTR, hitCondition->reactions_addr);
 
-		WriteFieldFullname(inputMap, "edition.hit_condition.");
+		WriteFieldFullname(inputMap, "hit_condition");
 		inputListMap.push_back(inputMap);
 
 		if (req[hitCondition->requirement_addr].condition == 881) {
@@ -66,10 +183,10 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 	uint64_t hitConditionOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
 	gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(m_movesetData + hitConditionOffset) + id;
 
-	hitCondition->requirement_addr = (uint32_t)atoi(inputs["requirement_addr"]->buffer);
+	hitCondition->requirement_addr = (uint64_t)atoi(inputs["requirement_addr"]->buffer);
 	hitCondition->damage = (uint32_t)atoi(inputs["damage"]->buffer);
 	hitCondition->_0xC_int = (uint32_t)atoi(inputs["_0xC_int"]->buffer);
-	hitCondition->reactions_addr = (uint32_t)atoi(inputs["reactions_addr"]->buffer);
+	hitCondition->reactions_addr = (uint64_t)atoi(inputs["reactions_addr"]->buffer);
 }
 
 bool EditorT7::ValidateHitConditionField(std::string name, EditorInput* field)
@@ -109,7 +226,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 		CREATE_FIELD("condition", 0, EditorInput_U32, req->condition);
 		CREATE_FIELD("param", 0, EditorInput_U32, req->param);
 
-		WriteFieldFullname(inputMap, "edition.requirement.");
+		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
 		++idx;
 	} while ((req++)->condition != 881);
@@ -142,7 +259,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("value", 0, EditorInput_H32, cancelExtra->value);
 
-	WriteFieldFullname(inputMap, "edition.cancel_extra.");
+	WriteFieldFullname(inputMap, "cancel_extra");
 	return inputMap;
 }
 
@@ -181,7 +298,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 		CREATE_FIELD("move_id", 0, EditorInput_U16 | EditorInput_Clickable, cancel->move_id);
 		CREATE_FIELD("cancel_option", 0, EditorInput_U16, cancel->cancel_option);
 
-		WriteFieldFullname(inputMap, "edition.cancel.");
+		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
 		++idx;
 	} while ((cancel++)->command != 0x8000);
@@ -194,14 +311,14 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
 	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
 
-	cancel->command = (uint32_t)strtol(inputs["command"]->buffer, nullptr, 16);
-	cancel->requirement_addr = (uint32_t)atoi(inputs["requirement_addr"]->buffer);
-	cancel->extradata_addr = (uint32_t)atoi(inputs["extradata_addr"]->buffer);
+	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
+	cancel->requirement_addr = (uint64_t)atoi(inputs["requirement_addr"]->buffer);
+	cancel->extradata_addr = (uint64_t)atoi(inputs["extradata_addr"]->buffer);
 	cancel->detection_start = (uint32_t)atoi(inputs["detection_start"]->buffer);
 	cancel->detection_end = (uint32_t)atoi(inputs["detection_end"]->buffer);
 	cancel->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
 	cancel->move_id = (uint16_t)atoi(inputs["move_id"]->buffer);
-	cancel->cancel_option = (uint32_t)atoi(inputs["cancel_option"]->buffer);
+	cancel->cancel_option = (uint16_t)atoi(inputs["cancel_option"]->buffer);
 }
 
 bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
@@ -255,7 +372,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
 		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
-		WriteFieldFullname(inputMap, "edition.extraproperty.");
+		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
 		++idx;
 	} while ((prop++)->starting_frame != 0);
@@ -269,7 +386,7 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + extraPropOffset) + id;
 
 	prop->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
-	prop->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
+	prop->id = (uint32_t)strtoll(inputs["id"]->buffer, nullptr, 16);
 	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
 }
 
@@ -288,7 +405,7 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
 
-	WriteFieldFullname(inputMap, "edition.voiceclip.");
+	WriteFieldFullname(inputMap, "voiceclip");
 	return inputMap;
 }
 
@@ -355,7 +472,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16, move->_0xA8_short);
 	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16, move->_0xAC_short);
 
-	WriteFieldFullname(inputMap, "edition.move.");
+	WriteFieldFullname(inputMap, "move");
 	return inputMap;
 }
 
@@ -487,6 +604,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_HitCondition:
 		SaveHitCondition(id, inputs);
 		break;
+	case EditorWindowType_Reactions:
+		SaveReactions(id, inputs);
+		break;
 	}
 }
 
@@ -503,6 +623,9 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		break;
 	case EditorWindowType_CancelExtradata:
 		return GetCancelExtraInput(id, drawOrder);
+		break;
+	case EditorWindowType_Reactions:
+		return GetReactionsInputs(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -597,6 +720,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 		break;
 	case EditorWindowType_HitCondition:
 		return ValidateHitConditionField(fieldShortName, field);
+		break;
+	case EditorWindowType_Reactions:
+		return ValidateReactionsField(fieldShortName, field);
 		break;
 	}
 

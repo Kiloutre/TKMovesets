@@ -3,7 +3,6 @@
 #include "Editor.hpp"
 #include "EditorForm.hpp"
 
-// Windowed class managing a single move
 class EditorMove : public EditorForm
 {
 public:

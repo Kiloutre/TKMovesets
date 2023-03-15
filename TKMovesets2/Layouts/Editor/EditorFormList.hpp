@@ -7,7 +7,6 @@
 #include "Editor.hpp"
 #include "EditorForm.hpp"
 
-// Windowed class managing a single move
 class EditorFormList : public EditorForm
 {
 protected:

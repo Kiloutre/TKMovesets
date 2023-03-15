@@ -22,7 +22,7 @@ struct ClickableFieldEvent
 	char* buffer;
 };
 
-// Windowed class managing a single move
+// Windowed class managing a single struct
 class EditorForm
 {
 protected:

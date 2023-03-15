@@ -15,6 +15,7 @@
 #include "EditorCancelExtra.hpp"
 #include "EditorRequirements.hpp"
 #include "EditorHitConditions.hpp"
+#include "EditorReactions.hpp"
 
 // -- Private methods -- //
 
@@ -43,6 +44,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_HitCondition:
 		return new EditorHitConditions(m_windowTitle, id, m_editor);;
 		break;
+	case EditorWindowType_Reactions:
+		return new EditorReactions(m_windowTitle, id, m_editor);;
+		break;
 	}
 
 	return nullptr;
@@ -51,6 +55,8 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buffer)
 {
 	int id = atoi(buffer);
+
+	// Todo: do this in a cleaner way. Maybe handle this in the ckasses themselves?
 	
 	// Move
 	if (fieldIdentifier == "edition.move.cancel_id") {
@@ -79,18 +85,24 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 			OpenFormWindow(EditorWindowType_Extraproperty, id);
 		}
 	}
+	// todo: move: other properties
 	// Cancels
 	else if (fieldIdentifier == "edition.cancel.move_id") {
 		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_Move, ValidateMoveId(buffer));
 	}
 	else if (fieldIdentifier == "edition.cancel.extradata_addr") {
-		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_CancelExtradata, id);
 	}
 	else if (fieldIdentifier == "edition.cancel.requirement_addr") {
-		// Validate move id will proceed to an alias conversion which i want here
 		OpenFormWindow(EditorWindowType_Requirement, id);
+	}
+	// Hit conditions
+	else if (fieldIdentifier == "edition.hit_condition.requirement_addr") {
+		OpenFormWindow(EditorWindowType_Requirement, id);
+	}
+	else if (fieldIdentifier == "edition.hit_condition.reactions_addr") {
+		OpenFormWindow(EditorWindowType_Reactions, id);
 	}
 }
 

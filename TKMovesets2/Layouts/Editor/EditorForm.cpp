@@ -45,7 +45,8 @@ namespace EditorFormUtils
 			return "requirement";
 		case EditorWindowType_HitCondition:
 			return "hit_condition";
-			//todo
+		case EditorWindowType_Reactions:
+			return "reactions";
 		}
 		return "UNKNOWN";
 	}

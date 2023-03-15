@@ -64,7 +64,7 @@ namespace StructsT7
 		uint64_t _0x44_long; // 0,  Not actually sure it is a long. todo: check
 
 		uint16_t vertical_pushback;
-		uint16_t standing_moveId;
+		uint16_t standing_moveid;
 		uint16_t default_moveid;
 		uint16_t crouch_moveid;
 		uint16_t counterhit_moveid;
@@ -356,7 +356,7 @@ namespace StructsT7_gameAddr
 		uint64_t _0x44_long; // 0,  Not actually sure it is a long
 
 		uint16_t vertical_pushback;
-		uint16_t standing_moveId;
+		uint16_t standing_moveid;
 		uint16_t default_moveid;
 		uint16_t crouch_moveid;
 		uint16_t counterhit_moveid;

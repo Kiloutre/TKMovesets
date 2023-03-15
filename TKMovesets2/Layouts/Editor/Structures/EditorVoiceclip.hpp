@@ -3,7 +3,7 @@
 #include "Editor.hpp"
 #include "EditorForm.hpp"
 
-// Windowed class managing a single move
+// Windowed class managing a single struct
 class EditorVoiceclip : public EditorForm
 {
 public:

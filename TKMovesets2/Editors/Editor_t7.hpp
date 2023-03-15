@@ -58,9 +58,14 @@ public:
 	std::vector<std::map<std::string, EditorInput*>> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateHitConditionField(std::string name, EditorInput* field);
+
+	// Reactions
+	std::map<std::string, EditorInput*> GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateReactionsField(std::string name, EditorInput* field);
 	
 
-	// -- Iteractons -- //
+	// -- Interactions -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
 };
