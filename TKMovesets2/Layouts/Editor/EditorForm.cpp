@@ -39,6 +39,8 @@ namespace EditorFormUtils
 			return "extraproperty";
 		case EditorWindowType_Cancel:
 			return "cancel";
+		case EditorWindowType_CancelExtradata:
+			return "cancel_extra";
 		case EditorWindowType_Requirement:
 			return "requirement";
 			//todo

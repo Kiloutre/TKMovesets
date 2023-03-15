@@ -21,6 +21,34 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
+// ===== Cancel Extradata ===== //
+
+
+std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
+	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + movesetListOffset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("value", 0, EditorInput_H32, cancelExtra->value);
+
+	WriteFieldFullname(inputMap, "edition.cancel_extra_field.");
+	return inputMap;
+}
+
+void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
+	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + movesetListOffset) + id;
+
+	cancelExtra->value = (uint32_t)strtol(inputs["value"]->buffer, nullptr, 16);
+}
+
 // ===== Cancel ===== //
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -346,6 +374,7 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 		SaveCancel(id, inputs);
 		break;
 	case EditorWindowType_CancelExtradata:
+		SaveCancelExtra(id, inputs);
 		break;
 	}
 }
@@ -362,6 +391,7 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		return GetVoiceclipInputs(id, drawOrder);
 		break;
 	case EditorWindowType_CancelExtradata:
+		return GetCancelExtraInput(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -569,12 +599,11 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"));
 	if (moveId >= 0x8000) {
-		moveId = m_aliases[moveId - 0x8000];
+		moveId = m_aliases[moveId - (uint16_t)0x8000];
 	}
 
 	return moveId;
 }
-
 
 void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId)
 {

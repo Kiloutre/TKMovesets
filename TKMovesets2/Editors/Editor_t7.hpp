@@ -46,6 +46,11 @@ public:
 	void SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateCancelField(std::string name, EditorInput* field);
 
+	// Cancel extras
+	std::map<std::string, EditorInput*> GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	;
+
 	// -- Iteractons -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;

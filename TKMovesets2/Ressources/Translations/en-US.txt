@@ -176,6 +176,9 @@ edition.cancel_field.starting_frame = Starting frame
 edition.cancel_field.move_id = Move ID
 edition.cancel_field.cancel_option = Cancel option
 
+edition.cancel_extra_field.window_name = Cancel extra
+edition.cancel_extra_field.value = Value
+
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

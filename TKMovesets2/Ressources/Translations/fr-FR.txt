@@ -171,6 +171,9 @@ edition.cancel_field.starting_frame = Frame de commencement
 edition.cancel_field.move_id = ID de move
 edition.cancel_field.cancel_option = Option de cancel
 
+edition.cancel_extra_field.window_name = Cancel extra
+edition.cancel_extra_field.value = Valeur
+
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

@@ -5,6 +5,7 @@ If you have any contribution to bring, feel free, there is room for improvement 
 
 # Todo list:
 
+- Cancels: display move name and command for each cancel
 - tree node labels for extra properties, requirements
 - Color code input type (decimal, index, hex)
 - Maybe show explanation when hovering move field names and not just a repeat of the field name

@@ -12,6 +12,7 @@
 #include "EditorVoiceclip.hpp"
 #include "EditorExtraproperties.hpp"
 #include "EditorCancels.hpp"
+#include "EditorCancelExtra.hpp"
 
 // -- Private methods -- //
 
@@ -19,17 +20,20 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 {
 	switch (windowType)
 	{
-	case EditorWindowType_Voiceclip:
-		return new EditorVoiceclip(m_windowTitle, id, m_editor);;
-		break;
 	case EditorWindowType_Move:
 		return new EditorMove(m_windowTitle, id, m_editor);;
+		break;
+	case EditorWindowType_Voiceclip:
+		return new EditorVoiceclip(m_windowTitle, id, m_editor);;
 		break;
 	case EditorWindowType_Extraproperty:
 		return new EditorExtraproperties(m_windowTitle, id, m_editor);;
 		break;
 	case EditorWindowType_Cancel:
 		return new EditorCancels(m_windowTitle, id, m_editor);;
+		break;
+	case EditorWindowType_CancelExtradata:
+		return new EditorCancelExtra(m_windowTitle, id, m_editor);;
 		break;
 	}
 
@@ -64,10 +68,12 @@ void EditorWindow::OnFormFieldClick(std::string fieldIdentifier, const char* buf
 	}
 	// Cancels
 	else if (fieldIdentifier == "edition.cancel_field.move_id") {
-		id = ValidateMoveId(buffer);
-		if (id >= 0) {
-			OpenFormWindow(EditorWindowType_Move, id);
-		}
+		// Validate move id will proceed to an alias conversion which i want here
+		OpenFormWindow(EditorWindowType_Move, ValidateMoveId(buffer));
+	}
+	else if (fieldIdentifier == "edition.cancel_field.extradata_addr") {
+		// Validate move id will proceed to an alias conversion which i want here
+		OpenFormWindow(EditorWindowType_CancelExtradata, id);
 	}
 }
 
@@ -169,7 +175,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
-		moveId = m_editorTable.aliases[moveId - 0x8000];
+		moveId = m_editorTable.aliases[moveId - (uint16_t)0x8000];
 	}
 
 	return moveId;
@@ -547,8 +553,10 @@ void EditorWindow::Render(int dockid)
 	{
 		RenderToolBar();
 
+		// We will render the statusbar afterward so we need to save FrameHeight of space
 		ImVec2 Size = ImGui::GetContentRegionAvail();
-		Size.y -= 30;
+		Size.y -= ImGui::GetFrameHeightWithSpacing();
+
 		if (ImGui::BeginTable("MovesetMainTable", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders
 		| ImGuiTableFlags_NoHostExtendY, Size))
 		{
@@ -561,9 +569,8 @@ void EditorWindow::Render(int dockid)
 			RenderMovelist();
 
 			ImGui::TableNextColumn();
-			// -7 because the dockspace overflows past the table fo rsome reason.
-			// -18 (GetLineHeight()) because i haven't managed to hdie the header row yet. todo?
-			ImGuiID dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - 7 - 18));
+			// The dockspace loves to overflow past the table end for some reason so we have to re-substract FrameHeight.
+			ImGuiID dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - ImGui::GetFrameHeightWithSpacing()));
 			RenderMovesetData(dockId);
 
 			ImGui::EndTable();
