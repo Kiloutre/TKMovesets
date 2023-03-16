@@ -42,9 +42,9 @@ namespace EditorFormUtils
 		case EditorWindowType_CancelExtradata:
 			return "cancel_extra";
 		case EditorWindowType_Requirement:
-			return "grouped_cancel";
-		case EditorWindowType_GroupedCancel:
 			return "requirement";
+		case EditorWindowType_GroupedCancel:
+			return "grouped_cancel";
 		case EditorWindowType_HitCondition:
 			return "hit_condition";
 		case EditorWindowType_Reactions:
@@ -106,9 +106,7 @@ void EditorForm::RenderLabel(EditorInput* field)
 	const char* fieldLabel = _(field->field_fullname.c_str());
 	if (field->flags & EditorInput_Clickable && !field->errored) {
 		if (ImGui::Selectable(fieldLabel, true)) {
-			m_consumedEvent = false;
-			m_event.eventName = field->name;
-			m_event.buffer = field->buffer;
+			OnFieldLabelClick(field);
 		}
 	} else {
 		ImGui::TextUnformatted(fieldLabel);
@@ -192,6 +190,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	char name[32] = "";
 	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = m_fieldIdentifierMap[fieldName];
+
 		m_categories.insert(field->category);
 
 		// Moves are the only named fields so there is no reason to write any more complex code for now
@@ -237,17 +236,19 @@ void EditorForm::Render()
 		for (uint8_t category : m_categories)
 		{
 			const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
+			// todo: compute this std::format() once and not every frame
 			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
 				// Only show titles for category > 0, and if tree is not open: no need to render anything
-				continue;
+				//continue;
 			}
 
-			if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+			else if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
 			{
 				std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
 				RenderInputs(inputs, category, columnCount);
 				ImGui::EndTable();
 			}
+
 		}
 
 		bool enabledBtn = unsavedChanges;
@@ -267,14 +268,4 @@ void EditorForm::Render()
 		// Ordered to close, but changes remain
 		// todo: show popup, force popen = true
 	}
-}
-
-ClickableFieldEvent* EditorForm::GetFormClickEvent()
-{
-	if (!m_consumedEvent)
-	{
-		m_consumedEvent = true;
-		return &m_event;
-	}
-	return nullptr;
 }

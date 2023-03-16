@@ -29,152 +29,47 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	switch (windowType)
 	{
 	case EditorWindowType_Move:
-		return new EditorMove(m_windowTitle, id, m_editor);;
+		return new EditorMove(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Voiceclip:
-		return new EditorVoiceclip(m_windowTitle, id, m_editor);;
+		return new EditorVoiceclip(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_Extraproperty:
-		return new EditorExtraproperties(m_windowTitle, id, m_editor);;
+		return new EditorExtraproperties(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_Cancel:
-		return new EditorCancels(m_windowTitle, id, m_editor);;
+		return new EditorCancels(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_GroupedCancel:
-		return new EditorGroupedCancels(m_windowTitle, id, m_editor);;
+		return new EditorGroupedCancels(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_CancelExtradata:
-		return new EditorCancelExtra(m_windowTitle, id, m_editor);;
+		return new EditorCancelExtra(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_Requirement:
-		return new EditorRequirements(m_windowTitle, id, m_editor);;
+		return new EditorRequirements(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_HitCondition:
-		return new EditorHitConditions(m_windowTitle, id, m_editor);;
+		return new EditorHitConditions(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Reactions:
-		return new EditorReactions(m_windowTitle, id, m_editor);;
+		return new EditorReactions(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Pushback:
-		return new EditorPushback(m_windowTitle, id, m_editor);;
+		return new EditorPushback(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_PushbackExtradata:
-		return new EditorPushbackExtra(m_windowTitle, id, m_editor);;
+		return new EditorPushbackExtra(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_MoveBeginProperty:
-		return new EditorMoveStartProperty(m_windowTitle, id, m_editor);;
+		return new EditorMoveStartProperty(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_MoveEndProperty:
-		return new EditorMoveEndProperty(m_windowTitle, id, m_editor);;
+		return new EditorMoveEndProperty(m_windowTitle, id, m_editor, this);
 		break;
 	}
 
 	return nullptr;
-}
-
-void EditorWindow::OnFormFieldClick(EditorWindowType_ windowType, std::string name, const char* buffer)
-{
-	int id = atoi(buffer);
-
-	// Todo: handle all of this within the subclasses that raised this event
-	// This will allow for data-driven custom behaviour 
-
-	switch (windowType)
-	{
-
-		case EditorWindowType_Move:
-		{
-			// Most move fields ptrs can be -1 and still be valid, so have to check them
-			if (name == "cancel_id") {
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_Cancel, id);
-				}
-			}
-			else if (name == "transition") {
-				id = ValidateMoveId(buffer);
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_Move, id);
-				}
-			}
-			else if (name == "voiceclip_id") {
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_Voiceclip, id);
-				}
-			}
-			else if (name == "hit_condition_id") {
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_HitCondition, id);
-				}
-			}
-			else if (name == "beginning_extra_properties_id") {
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_MoveBeginProperty, id);
-				}
-			}
-			else if (name == "ending_extra_properties_id") {
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_MoveEndProperty, id);
-				}
-			}
-			break;
-		}
-
-		case EditorWindowType_Cancel:
-		{
-			if (name == "move_id") {
-				// todo: this might be a group cancel. detect.
-				OpenFormWindow(EditorWindowType_Move, ValidateMoveId(buffer));
-			}
-			else if (name == "extradata_addr") {
-				OpenFormWindow(EditorWindowType_CancelExtradata, id);
-			}
-			else if (name == "requirements_addr") {
-				OpenFormWindow(EditorWindowType_Requirement, id);
-			}
-			break;
-		}
-
-		case EditorWindowType_HitCondition:
-		{
-			if (name == "requirements_addr") {
-				OpenFormWindow(EditorWindowType_Requirement, id);
-			}
-			else if (name == "reactions_addr") {
-				OpenFormWindow(EditorWindowType_Reactions, id);
-			}
-			break;
-		}
-
-		case EditorWindowType_Reactions:
-		{
-			if (Helpers::endsWith(name, "_pushback")) {
-				OpenFormWindow(EditorWindowType_Pushback, id);
-			} else if (Helpers::endsWith(name, "_moveid")) {
-				id = ValidateMoveId(buffer);
-				if (id >= 0) {
-					OpenFormWindow(EditorWindowType_Move, id);
-				}
-			}
-			break;
-		}
-
-		case EditorWindowType_Pushback:
-		{
-			if (name == "extradata_addr") {
-				OpenFormWindow(EditorWindowType_PushbackExtradata, id);
-			}
-			break;
-		}
-
-		case EditorWindowType_MoveBeginProperty:
-		case EditorWindowType_MoveEndProperty:
-		{
-			if (name == "requirements_addr") {
-				OpenFormWindow(EditorWindowType_Requirement, id);
-			}
-			break;
-		}
-	}
 }
 
 void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
@@ -204,7 +99,9 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
 		m_structWindows.push_back(newWin);
 	}
 	else {
-		delete m_structWindows[availableOverwriteIndex];
+		// Can't delete here because OpenFormWindow can be called by EditorForm classes
+		// Close the window and let deletion occur during next rendering
+		m_structWindows[availableOverwriteIndex]->popen = false;
 		m_structWindows[availableOverwriteIndex] = newWin;
 	}
 }
@@ -289,7 +186,6 @@ bool EditorWindow::MovesetStillLoaded()
 
 void EditorWindow::Save()
 {
-	printf("Save();\n");
 	TKMovesetHeader* header = (TKMovesetHeader*)m_moveset;
 	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -297,7 +193,6 @@ void EditorWindow::Save()
 	file.write((char*)m_moveset, m_movesetSize);
 	file.close();
 	m_savedLastChange = true;
-	printf("m_savedLastChange = true\n");
 }
 
 void EditorWindow::RenderToolBar()
@@ -442,11 +337,6 @@ void EditorWindow::RenderMovesetData(ImGuiID dockId)
 		{
 			ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
 			moveWin->Render();
-
-			ClickableFieldEvent* ev = moveWin->GetFormClickEvent();
-			if (ev != nullptr) {
-				OnFormFieldClick(moveWin->windowType, ev->eventName, ev->buffer);
-			}
 
 			if (moveWin->justAppliedChanges) {
 				moveWin->justAppliedChanges = false;

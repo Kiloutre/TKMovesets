@@ -55,6 +55,54 @@ bool EditorFormList::IsFormValid()
 	return true;
 }
 
+
+void EditorFormList::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount)
+{
+	for (size_t i = 0; i < inputs.size(); ++i)
+	{
+		EditorInput* field = inputs[i];
+
+		if (field->category != category) {
+			continue;
+		}
+		//Render label
+		if (i % columnCount == 0) {
+			ImGui::TableNextRow();
+		}
+		ImGui::TableNextColumn();
+		RenderLabel(listIdx, field);
+
+		// Render input field
+		if (columnCount == 1) {
+			ImGui::TableNextRow();
+		}
+		ImGui::TableNextColumn();
+		RenderInput(field);
+	}
+}
+
+void EditorFormList::RenderLabel(int listIdx, EditorInput* field)
+{
+	const char* fieldLabel = _(field->field_fullname.c_str());
+	if (field->flags & EditorInput_Clickable && !field->errored) {
+		if (ImGui::Selectable(fieldLabel, true)) {
+			OnFieldLabelClick(listIdx, field);
+		}
+	}
+	else {
+		ImGui::TextUnformatted(fieldLabel);
+	}
+
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+		// todo: maybe use this for a full-on description
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(fieldLabel);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 // -- Public methods -- //
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
@@ -137,7 +185,7 @@ void EditorFormList::Render()
 				if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
 				{
 					std::vector<EditorInput*>& inputs = m_fieldsCategoryMaps[listIndex][category];
-					RenderInputs(inputs, category, columnCount);
+					RenderInputs(listIndex, inputs, category, columnCount);
 					ImGui::EndTable();
 				}
 

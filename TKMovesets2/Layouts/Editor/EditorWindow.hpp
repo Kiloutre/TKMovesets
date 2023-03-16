@@ -4,6 +4,7 @@
 #include "LocalStorage.hpp"
 #include "Editor.hpp"
 #include "EditorForm.hpp"
+#include "EditorWindowBase.hpp"
 
 #include "GameAddresses.h"
 
@@ -40,7 +41,7 @@ public:
 	}
 };
 
-class EditorWindow {
+class EditorWindow : public EditorWindowBase {
 private:
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
@@ -95,13 +96,9 @@ private:
 
 	// Factory instantiating the right class for the right identifier
 	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id);
-	// Create a new window containing data about the given move
-	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId);
 
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorMovelistFilter_ filter);
-	// Validates the move ID against the movelist size and alias list
-	int32_t ValidateMoveId(const char* buf);
 	// Returns true if our allocated moveset is still loaded on our character
 	bool MovesetStillLoaded();
 	// Save the loaded moveset to a file
@@ -122,6 +119,8 @@ public:
 	~EditorWindow();
 	// Render the window
 	void Render(int dockid);
-	// Called by forms when one of their clickable labels are clicked
-	void OnFormFieldClick(EditorWindowType_ windowType, std::string fieldIdentifier, const char* buffer);
+	// Create a new window containing data about the given move. Can be called by subwidnows.
+	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId) override;
+	// Validates the move ID against the movelist size and alias list
+	int32_t ValidateMoveId(const char* buf) override;
 };

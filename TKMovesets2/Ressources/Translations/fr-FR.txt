@@ -105,6 +105,7 @@ importation.error_game_allocation = Il y a eu une erreur d'allocation dans le je
 
 # Moveset Edition #
 edition.explanation = Vous pouvez ici modifier les personnage extraits. Consultez la documentation pour les information utiles et les tutoriels.\nActivez le mode 'Prévisualisation directe' pour rapidement modifier le personnage choisi : Les petits changement seront immédiatement appliqués dans le jeu, sans temps de chargement.
+edition.select_moveset = Choisissez un personnage
 edition.suggest_new_name = Ce personnage possède un nom par défaut, voulez-vous lui donner un nom différent ?
 edition.last_saved = Dernière sauvegarde le:
 edition.save = Sauvegarder
@@ -144,7 +145,8 @@ edition.move.first_active_frame = Première frame active
 edition.move.last_active_frame = Dernière frame active
 edition.move.airborne_start = Aérien (début)
 edition.move.airborne_end = Aérien (fin)
-edition.move.ground_fall = ground_fall
+edition.move.ground_fall = "Ground fall"
+edition.move.distance = Distance
 edition.move.hit_condition_id = ID de hit-conditions
 edition.move.extra_properties_id = ID de propriété
 edition.move.beginning_extra_properties_id = ID de propriété (pré)
@@ -155,7 +157,7 @@ edition.move.cancel_id_2 = ID de cancel 2
 edition.move.cancel_id_2_related = ID de cancel 2 (lié)
 edition.move.cancel_id_3 = ID de cancel 3
 edition.move.cancel_id_3_related = ID de cancel 3 (lié)
-edition.move.cancel_id_4 = ID de cancel 4e
+edition.move.cancel_id_4 = ID de cancel 4
 edition.move.cancel_id_4_related = ID de cancel 4 (lié)
 
 edition.voiceclip.window_name = Voix

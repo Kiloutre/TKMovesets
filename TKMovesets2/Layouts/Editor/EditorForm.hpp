@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Editor.hpp"
+#include "EditorWindowBase.hpp"
 
 
 namespace EditorFormUtils
@@ -15,12 +16,6 @@ namespace EditorFormUtils
 	// Returns a string used to build translation strings depending on the window type (move, cancel, etc...)
 	std::string GetWindowTypeName(EditorWindowType_ type);
 }
-
-struct ClickableFieldEvent
-{
-	std::string eventName;
-	char* buffer;
-};
 
 // Windowed class managing a single struct
 class EditorForm
@@ -34,15 +29,17 @@ protected:
 	std::map<int, std::vector<EditorInput*>> m_fieldsCategoryMap;
 	// Contains the list of category IDs. Does not need to be contiguous. Even categories are open by default, odd ones aren't.
 	std::set<uint8_t> m_categories;
-	// If a field is clicked, this will contain its full name and buffer 
-	ClickableFieldEvent m_event{ "", nullptr };
 	// Contains false if we need to send the event to the next GetFormClickEvent() call
 	bool m_consumedEvent = true;
 	// Used when saving
 	Editor* m_editor = nullptr;
 	// Contains the identifier with which to prefix translation strings
 	std::string m_identifierPrefix;
+	// Contains a reference to the main editor window, used for event handling
+	EditorWindowBase* m_baseWindow = nullptr;
 
+	// Called when clicking a field
+	virtual void OnFieldLabelClick(EditorInput* field) {};
 	// Render inputs from the <category : input> map
 	void RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount);
 	// Render a single input field in the form
@@ -70,6 +67,4 @@ public:
 	EditorWindowType_ windowType;
 
 	virtual void Render();
-	// Returns a ptr to a clickable event info (field full name, buffer) or nullptr if no new event to fetch
-	ClickableFieldEvent* GetFormClickEvent();
 };

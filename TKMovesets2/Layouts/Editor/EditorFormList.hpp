@@ -15,10 +15,15 @@ protected:
 	// Containst the form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
 	std::vector<std::map<int, std::vector<EditorInput*>>> m_fieldsCategoryMaps;
 
+	// Called when clicking a field
+	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};
 	// Save every list item individually
 	void Apply() override;
 	// Returns false if any field has an error state
 	bool IsFormValid() override;
+
+	void RenderLabel(int listIdx, EditorInput* field);
+	void RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount);
 public:
 	//
 	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);

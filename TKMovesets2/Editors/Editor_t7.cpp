@@ -241,7 +241,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		WriteFieldFullname(inputMap, "hit_condition");
 		inputListMap.push_back(inputMap);
 
-		if (req[hitCondition->requirements_addr].condition == 881) {
+		if (req[hitCondition->requirements_addr].condition == constants[EditorConstants_RequirementEnd]) {
 			break;
 		}
 
@@ -300,7 +300,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
-	} while ((req++)->condition != 881);
+	} while ((req++)->condition != constants[EditorConstants_RequirementEnd]);
 
 	return inputListMap;
 }
@@ -370,8 +370,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 
 		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != 0x8000);
-
+	} while ((cancel++)->command != constants[EditorConstants_CancelCommandEnd]);
+	
 	return inputListMap;
 }
 
@@ -425,7 +425,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
 	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -447,14 +447,14 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 
 		WriteFieldFullname(inputMap, "grouped_cancel");
 		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != 0x800C);
+	} while ((cancel++)->command != constants[EditorConstants_GroupedCancelCommandEnd]);
 
 	return inputListMap;
 }
 
 void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
 	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
 
 	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
@@ -1004,6 +1004,13 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
+	constants = {
+		   {EditorConstants_RequirementEnd, 881},
+		   {EditorConstants_CancelCommandEnd, 0x8000},
+		   {EditorConstants_GroupedCancelCommand, 0x800B},
+		   {EditorConstants_GroupedCancelCommandEnd, 0x800C},
+	};
+
 	m_moveset = t_moveset;
 	m_movesetSize = t_movesetSize;
 

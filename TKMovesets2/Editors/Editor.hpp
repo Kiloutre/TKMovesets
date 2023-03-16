@@ -32,6 +32,18 @@ public:
 	}
 };
 
+enum EditorConstants_
+{
+	// Marks the end of a requirements list
+	EditorConstants_RequirementEnd,
+	// Marks a cancel as referring to a group cancel
+	EditorConstants_GroupedCancelCommand,
+	// Marks the end of a cancel list
+	EditorConstants_CancelCommandEnd,
+	// Marks the end of a grouped cancel list
+	EditorConstants_GroupedCancelCommandEnd,
+};
+
 enum EditorWindowType_
 {
 	EditorWindowType_Move,
@@ -192,6 +204,8 @@ public:
 	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
+	// Constants useful constant variables, to be set on a per-game basis
+	std::map<EditorConstants_, int> constants;
 
 
 	// Forms
