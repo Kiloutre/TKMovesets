@@ -77,7 +77,7 @@ void EditorFormList::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs
 			ImGui::TableNextRow();
 		}
 		ImGui::TableNextColumn();
-		RenderInput(field);
+		RenderInput(listIdx, field);
 	}
 }
 
@@ -100,6 +100,38 @@ void EditorFormList::RenderLabel(int listIdx, EditorInput* field)
 		ImGui::TextUnformatted(fieldLabel);
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
+	}
+}
+
+void EditorFormList::RenderInput(int listIdx, EditorInput* field)
+{
+	bool erroredBg = field->errored;
+	if (erroredBg) {
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
+	}
+
+	ImGui::PushID(field);
+	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
+	{
+		unsavedChanges = true;
+		field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
+		if (!field->errored) {
+			OnUpdate(listIdx, field);
+		}
+	}
+	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	{
+		// Have to manually implement copying
+		if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
+			ImGui::SetClipboardText(field->buffer);
+		}
+	}
+	ImGui::PopID();
+	ImGui::PopItemWidth();
+
+	if (erroredBg) {
+		ImGui::PopStyleColor();
 	}
 }
 

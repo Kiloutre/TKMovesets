@@ -23,6 +23,7 @@ protected:
 	bool IsFormValid() override;
 
 	void RenderLabel(int listIdx, EditorInput* field);
+	void RenderInput(int listIdx, EditorInput* field);
 	void RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount);
 public:
 	//

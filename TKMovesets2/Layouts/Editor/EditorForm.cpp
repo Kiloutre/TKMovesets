@@ -135,24 +135,17 @@ void EditorForm::RenderInput(EditorInput* field)
 	{
 		unsavedChanges = true;
 		field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
+		if (!field->errored) {
+			OnUpdate(0, field);
+		}
 	}
-	/*
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
-		// Have to manually implement copy pasting	
-		// todo: make this actually work. writing to field->buffer somehow does nothing to the input text
+		// Have to manually implement copying
 		if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
-			printf("copy - [%s]\n", field->buffer);
 			ImGui::SetClipboardText(field->buffer);
 		}
-		else if (ImGui::IsKeyPressed(ImGuiKey_V, true)) {
-			printf("paste - [%s]\n", field->buffer);
-			field->buffer[0] = '\0';
-			//strcpy_s(field->buffer, sizeof(field->buffer), ImGui::GetClipboardText());
-			field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
-		}
 	}
-	*/
 	ImGui::PopID();
 	ImGui::PopItemWidth();
 

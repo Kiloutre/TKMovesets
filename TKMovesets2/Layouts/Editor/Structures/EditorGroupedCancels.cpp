@@ -23,14 +23,11 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	if (name == "move_id") {
 		uint64_t command = (uint64_t)strtoll(m_fieldIdentifierMaps[listIdx]["command"]->buffer, nullptr, 16);
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
-			// todo : Validate grouped cancel id
-			// Editor_t7 needs changes as well
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, id);
 		}
 		else {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
 		}
-		// todo: this might be a group cancel. detect.
 	}
 	else if (name == "extradata_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_CancelExtradata, id);
@@ -38,4 +35,9 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	else if (name == "requirements_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
 	}
+}
+
+void EditorGroupedCancels::OnUpdate(int listIdx, EditorInput* field)
+{
+	// fancy display
 }

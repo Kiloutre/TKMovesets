@@ -192,6 +192,16 @@ edition.cancel.starting_frame = Starting frame
 edition.cancel.move_id = Move ID
 edition.cancel.cancel_option = Cancel option
 
+edition.grouped_cancel.window_name = Cancel
+edition.grouped_cancel.command = Command
+edition.grouped_cancel.requirements_addr = Requirements ID
+edition.grouped_cancel.extradata_addr = Extradata ID
+edition.grouped_cancel.detection_start = Detection start
+edition.grouped_cancel.detection_end = Detection end
+edition.grouped_cancel.starting_frame = Starting frame
+edition.grouped_cancel.move_id = Move ID
+edition.grouped_cancel.cancel_option = Cancel option
+
 edition.cancel_extra.window_name = Cancel extra
 edition.cancel_extra.value = Value
 

@@ -23,14 +23,11 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	if (name == "move_id") {
 		uint64_t command = (uint64_t)strtoll(m_fieldIdentifierMaps[listIdx]["command"]->buffer, nullptr, 16);
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
-			// todo : Validate grouped cancel id
-			// Editor_t7 needs changes as well
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, id);
 		}
 		else {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
 		}
-		// todo: this might be a group cancel. detect.
 	}
 	else if (name == "extradata_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_CancelExtradata, id);
@@ -38,4 +35,26 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	else if (name == "requirements_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
 	}
+}
+
+void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
+{
+	std::string& name = field->name;
+
+	if (name == "command" || name == "move_id") {
+		EditorInput* commandField = m_fieldIdentifierMaps[listIdx]["command"];
+		EditorInput* moveIdField = m_fieldIdentifierMaps[listIdx]["move_id"];
+		uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
+
+		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+			int groupId = atoi(moveIdField->buffer);
+			moveIdField->errored = groupId >= m_baseWindow->editorTable.groupCancelCount;
+		}
+		else {
+			int moveId = m_baseWindow->ValidateMoveId(moveIdField->buffer);
+			moveIdField->errored = moveId == -1;
+		}
+	}
+
+	// todo fancy display
 }

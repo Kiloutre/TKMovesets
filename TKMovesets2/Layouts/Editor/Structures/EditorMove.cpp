@@ -26,11 +26,8 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 		}
 	}
 	else if (name == "transition") {
-		id = m_baseWindow->ValidateMoveId(field->buffer);
-		// todo: i don't think any validation is needed here, condition or otherwise
-		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_Move, id);
-		}
+		// Validation is only needed here for alias conversion
+		m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
 	}
 	else if (name == "voiceclip_id") {
 		if (id >= 0) {

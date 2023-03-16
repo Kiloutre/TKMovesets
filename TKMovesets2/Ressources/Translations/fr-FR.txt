@@ -188,6 +188,16 @@ edition.cancel.starting_frame = Frame de commencement
 edition.cancel.move_id = ID de move
 edition.cancel.cancel_option = Option de cancel
 
+edition.grouped_cancel.window_name = Cancel de groupe
+edition.grouped_cancel.command = Commande
+edition.grouped_cancel.requirements_addr = ID de conditions
+edition.grouped_cancel.extradata_addr = ID d'extradata
+edition.grouped_cancel.detection_start = Début de détection
+edition.grouped_cancel.detection_end = Fin de détection
+edition.grouped_cancel.starting_frame = Frame de commencement
+edition.grouped_cancel.move_id = ID de move
+edition.grouped_cancel.cancel_option = Option de cancel
+
 edition.cancel_extra.window_name = Cancel extra
 edition.cancel_extra.value = Valeur
 

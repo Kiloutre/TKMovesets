@@ -137,6 +137,7 @@ struct DisplayableMove
 struct EditorTable
 {
 	std::vector<uint16_t> aliases;
+	uint64_t groupCancelCount;
 	/*
 	uint64_t reactionsCount;
 	uint64_t requirementCount;
@@ -145,7 +146,6 @@ struct EditorTable
 	uint64_t pushbackCount;
 	uint64_t pushbackExtradataCount;
 	uint64_t cancelCount;
-	uint64_t groupCancelCount;
 	uint64_t cancelExtradataCount;
 	uint64_t extraMovePropertyCount;
 	uint64_t moveBeginningPropCount;

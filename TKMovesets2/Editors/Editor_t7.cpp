@@ -392,21 +392,8 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 
 bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
 {
-	if (name == "move_id") {
-		int moveId = atoi(field->buffer);
-		if (moveId >= m_infos->table.moveCount) {
-			if (moveId < 0x8000) {
-				return false;
-			}
-			if (moveId >= (0x8000 + m_aliases.size())) {
-				return false;
-			}
-		}
-		else if (moveId < 0) {
-			return false;
-		}
-	}
-	else if (name == "requirements_addr") {
+	// move_id is not validated here but in the cancel class since it can serve as both a group cancel & move id
+	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
@@ -1053,6 +1040,7 @@ EditorTable EditorT7::GetMovesetTable()
 {
 	return EditorTable{
 		.aliases = m_aliases,
+		.groupCancelCount = m_infos->table.groupCancelCount
 	};
 }
 

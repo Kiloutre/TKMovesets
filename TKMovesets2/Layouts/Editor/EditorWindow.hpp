@@ -75,8 +75,6 @@ private:
 	EditorMovelistFilter_ m_movelistFilter = EditorMovelistFilter_All;
 	// The move to scroll to in the next frame
 	int32_t m_moveToScrollTo = -1;
-	// Stores important moveset informations such as aliases, etc...
-	EditorTable m_editorTable;
 	// Contains the window title, used to prefix any window created by this editor
 	std::string m_windowTitle;
 	// id of the highlithed move in the movelist
