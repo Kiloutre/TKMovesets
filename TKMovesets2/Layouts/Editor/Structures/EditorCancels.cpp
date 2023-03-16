@@ -42,6 +42,7 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 	std::string& name = field->name;
 
 	if (name == "command" || name == "move_id") {
+		// More complex validation than what is shown in EditorT7 (multi-field validation)
 		EditorInput* commandField = m_fieldIdentifierMaps[listIdx]["command"];
 		EditorInput* moveIdField = m_fieldIdentifierMaps[listIdx]["move_id"];
 		uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
