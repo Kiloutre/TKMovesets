@@ -1200,6 +1200,8 @@ int32_t EditorT7::CreateNewCancelList()
 
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraSize = sizeof(Cancel) * 2;
+	m_header->offsets.animationBlock += extraSize;
+	m_header->offsets.motaBlock += extraSize;
 	m_infos->table.cancelCount += 2;
 
 	// Increment moveset block offsets
