@@ -243,7 +243,12 @@ void EditorWindow::RenderToolBar()
 		}
 		if (ImGui::MenuItem(_("edition.cancel_list")))
 		{
-
+			int32_t structId = m_editor->CreateNew(EditorWindowType_Cancel);
+			if (structId != -1) {
+				m_savedLastChange = false;
+				m_importNeeded = true;
+				OpenFormWindow(EditorWindowType_Cancel, structId);
+			}
 		}
 		ImGui::EndMenu();
 	}

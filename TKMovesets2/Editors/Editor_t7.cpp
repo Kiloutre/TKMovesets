@@ -1152,6 +1152,69 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
 }
 
+// -- Creations -- //
+
+int32_t EditorT7::CreateNewCancelList()
+{
+	const uint16_t newStructId = m_infos->table.cancelCount;
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + sizeof(Cancel) * 2;
+	newMoveset = (Byte*)malloc(newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new structure 
+	memcpy(newMoveset, m_moveset, newStructOffset);
+
+	// Initialize our structure value
+	gAddr::Cancel cancel1{ 0 };
+	gAddr::Cancel cancel2{ 0 };
+
+	cancel2.command = constants[EditorConstants_CancelCommandEnd];
+
+	// Write our new structure
+	memcpy(newMoveset + newStructOffset, &cancel1, sizeof(Cancel));
+	memcpy(newMoveset + newStructOffset + sizeof(Cancel), &cancel2, sizeof(Cancel));
+
+	// Copy all the data after new the new structure
+	uint64_t newStructPostOffset = newStructOffset + sizeof(Cancel) * 2;
+	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	m_moveset = newMoveset;
+	m_movesetSize = newMovesetSize;
+
+	// Assign useful pointers & variable to the new moveset
+	m_header = (TKMovesetHeader*)m_moveset;
+	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
+	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
+	m_infos = (MovesetInfo*)m_movesetData;
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraSize = sizeof(Cancel) * 2;
+	m_infos->table.cancelCount += 2;
+
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.cancel) {
+			*countOffset += extraSize;
+		}
+		countOffset += 2;
+	}
+
+	return newStructId;
+}
+
 int32_t EditorT7::CreateNewMove()
 {
 	const char* moveName = MOVESET_CUSTOM_MOVE_NAME_PREFIX;
@@ -1217,8 +1280,6 @@ int32_t EditorT7::CreateNewMove()
 	// Write our new structure
 	memcpy(newMoveset + newMoveOffset, &move, sizeof(Move));
 
-	////
-
 	// Copy all the data after new the new structure
 	memcpy(newMoveset + newMoveOffset + sizeof(Move), m_moveset + origMovelistEndOffset, m_movesetSize - origMovelistEndOffset);
 
@@ -1241,14 +1302,15 @@ int32_t EditorT7::CreateNewMove()
 	m_header->offsets.motaBlock += extraNameSize + extraMoveSize;
 	m_infos->table.moveCount++;
 
-	*(uint64_t*)&m_infos->table.voiceclip += extraMoveSize;
-	*(uint64_t*)&m_infos->table.inputSequence += extraMoveSize;
-	*(uint64_t*)&m_infos->table.input += extraMoveSize;
-	*(uint64_t*)&m_infos->table.unknownParryRelated += extraMoveSize;
-	*(uint64_t*)&m_infos->table.cameraData += extraMoveSize;
-	*(uint64_t*)&m_infos->table.throws += extraMoveSize;
-
-	// This still crashes
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.move) {
+			*countOffset += extraMoveSize;
+		}
+		countOffset += 2;
+	}
 
 	return moveId;
 }
@@ -1259,6 +1321,9 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 	{
 	case EditorWindowType_Move:
 		return CreateNewMove();
+		break;
+	case EditorWindowType_Cancel:
+		return CreateNewCancelList();
 		break;
 	}
 	return -1;
