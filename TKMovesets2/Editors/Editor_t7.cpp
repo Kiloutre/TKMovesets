@@ -1154,27 +1154,35 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 int32_t EditorT7::CreateNewMove()
 {
 	const char* moveName = MOVESET_CUSTOM_MOVE_NAME_PREFIX;
-	const size_t moveNameSize = sizeof(moveName);
+	const size_t moveNameSize = strlen(moveName) + 1;
 
-	uint16_t moveId = m_infos->table.moveCount;
+	const uint16_t moveId = m_infos->table.moveCount;
 
-	uint64_t newMovesetSize = m_movesetSize + sizeof(Move) + moveNameSize;
+	uint64_t newMovesetSize = m_movesetSize + sizeof(Move) + Helpers::align8Bytes(moveNameSize);
 	Byte* newMoveset = (Byte*)malloc(newMovesetSize);
 	if (newMoveset == nullptr) {
 		return -1;
 	}
 
-	// Copy all the data up to the new name
-	const uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	// FInd position where to insert new name
+	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	const uint64_t orig_moveNameOffset = moveNameOffset;
+	while (*(m_moveset + (moveNameOffset - 2)) == 0)
+	{
+		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
+		// We want to erase as many empty bytes because of past alignment and then re-align to 8 bytes
+		moveNameOffset--;
+	}
 	memcpy(newMoveset, m_moveset, moveNameOffset);
 
 	// Write our new name
 	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
+	uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
 
 	// Copy all the data up to the new structure (voiceclip is right after the movelist end)
-	memcpy(newMoveset + moveNameOffset + moveNameSize, m_moveset + moveNameOffset, (uint64_t)m_infos->table.voiceclip);
+	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameOffset, (uint64_t)m_infos->table.voiceclip);
 
-	uint64_t moveOffset = moveNameOffset + moveNameSize + (uint64_t)m_infos->table.voiceclip;
+	uint64_t moveOffset = moveNameEndOffset + (uint64_t)m_infos->table.voiceclip;
 	// Initialize our structure value
 	gAddr::Move move{ 0 };
 	move.name_addr = m_header->offsets.movesetBlock - m_header->offsets.nameBlock;

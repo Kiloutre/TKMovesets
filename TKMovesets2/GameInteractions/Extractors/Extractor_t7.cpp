@@ -457,6 +457,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// Will contain our own informations such as date, version, character id
 	TKMovesetHeader customHeader{ 0 };
+	memset(&customHeader, 0, sizeof(customHeader));
 	progress = 5;
 
 	// The address of the moveset we will be extracting
