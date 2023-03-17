@@ -1060,6 +1060,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
 	{
 		std::string moveName = std::string(namePtr + move->name_addr);
+
 		uint16_t aliasId = 0;
 		EditorMoveFlags flags = 0;
 
@@ -1233,19 +1234,19 @@ int32_t EditorT7::CreateNewMove()
 	m_infos = (MovesetInfo*)m_movesetData;
 
 	// Shift offsets in the moveset table & in our header
-	uint64_t extraSize = orig_moveNameEndOffset - moveNameEndOffset;
-	m_header->offsets.movesetBlock += extraSize;
-	extraSize += 0xB0;
-	m_header->offsets.animationBlock += extraSize;
-	m_header->offsets.motaBlock += extraSize;
+	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+	const uint64_t extraMoveSize = sizeof(Move);
+	m_header->offsets.movesetBlock += extraNameSize;
+	m_header->offsets.animationBlock += extraNameSize + extraMoveSize;
+	m_header->offsets.motaBlock += extraNameSize + extraMoveSize;
 	m_infos->table.moveCount++;
 
-	*(uint64_t*)&m_infos->table.voiceclip += extraSize;
-	*(uint64_t*)&m_infos->table.inputSequence += extraSize;
-	*(uint64_t*)&m_infos->table.input += extraSize;
-	*(uint64_t*)&m_infos->table.unknownParryRelated += extraSize;
-	*(uint64_t*)&m_infos->table.cameraData += extraSize;
-	*(uint64_t*)&m_infos->table.throws += extraSize;
+	*(uint64_t*)&m_infos->table.voiceclip += extraMoveSize;
+	*(uint64_t*)&m_infos->table.inputSequence += extraMoveSize;
+	*(uint64_t*)&m_infos->table.input += extraMoveSize;
+	*(uint64_t*)&m_infos->table.unknownParryRelated += extraMoveSize;
+	*(uint64_t*)&m_infos->table.cameraData += extraMoveSize;
+	*(uint64_t*)&m_infos->table.throws += extraMoveSize;
 
 	// This still crashes
 
