@@ -1163,7 +1163,7 @@ int32_t EditorT7::CreateNewMove()
 
 	// Find position where to insert new name
 	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
-	const uint64_t orig_moveNameOffset = moveNameOffset;
+	const uint64_t orig_moveNameEndOffset = moveNameOffset;
 	while (*(m_moveset + (moveNameOffset - 2)) == 0)
 	{
 		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
@@ -1174,7 +1174,7 @@ int32_t EditorT7::CreateNewMove()
 	const uint64_t relativeMoveNameOffset = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
 	const uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
 	const uint64_t newMoveOffset = moveNameEndOffset + (uint64_t)m_infos->table.voiceclip;
-	const uint64_t origMovelistEndOffset = orig_moveNameOffset + (uint64_t)m_infos->table.voiceclip;
+	const uint64_t origMovelistEndOffset = orig_moveNameEndOffset + (uint64_t)m_infos->table.voiceclip;
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = newMoveOffset + sizeof(Move) + (m_movesetSize - origMovelistEndOffset);
@@ -1191,8 +1191,8 @@ int32_t EditorT7::CreateNewMove()
 	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
 
 	// Copy all the data up to the new structure (voiceclip is right after the movelist end)
-	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameOffset, (uint64_t)m_infos->table.voiceclip);
-
+	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, (uint64_t)m_infos->table.voiceclip);
+	
 	/// Move ///
 
 	// Initialize our structure value
@@ -1233,7 +1233,9 @@ int32_t EditorT7::CreateNewMove()
 	m_infos = (MovesetInfo*)m_movesetData;
 
 	// Shift offsets in the moveset table & in our header
-	uint64_t extraSize = moveNameEndOffset - moveNameOffset;
+	uint64_t extraSize = orig_moveNameEndOffset - moveNameEndOffset;
+	m_header->offsets.movesetBlock += extraSize;
+	extraSize += 0xB0;
 	m_header->offsets.animationBlock += extraSize;
 	m_header->offsets.motaBlock += extraSize;
 	m_infos->table.moveCount++;
@@ -1244,6 +1246,8 @@ int32_t EditorT7::CreateNewMove()
 	*(uint64_t*)&m_infos->table.unknownParryRelated += extraSize;
 	*(uint64_t*)&m_infos->table.cameraData += extraSize;
 	*(uint64_t*)&m_infos->table.throws += extraSize;
+
+	// This still crashes
 
 	return moveId;
 }
