@@ -1195,12 +1195,22 @@ int32_t EditorT7::CreateNewMove()
 	uint64_t origCopyOffset = moveOffset - moveNameSize;
 	memcpy(newMoveset + moveOffset + sizeof(Move), m_moveset + origCopyOffset, m_movesetSize - origCopyOffset);
 
-	// Shift offsets in the moveset table & in our header
-
 	// Assign new moveset
 	free(m_moveset);
 	m_moveset = newMoveset;
 	m_movesetSize = newMovesetSize;
+
+	// Assign useful pointers to the new moveset
+	m_header = (TKMovesetHeader*)m_moveset;
+	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
+	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
+	m_infos = (MovesetInfo*)m_movesetData;
+
+	// Shift offsets in the moveset table & in our header
+	uint64_t extraSize = moveNameSize + sizeof(Move);
+	m_infos->table.moveCount++;
+	m_header->offsets.animationBlock += extraSize;
+	m_header->offsets.motaBlock += extraSize;
 
 	return moveId;
 }

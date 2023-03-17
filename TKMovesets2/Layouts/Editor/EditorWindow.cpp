@@ -228,9 +228,13 @@ void EditorWindow::RenderToolBar()
 	{
 		if (ImGui::MenuItem(_("edition.move")))
 		{
-			uint16_t moveId = m_editor->CreateNew(EditorWindowType_Move);
-			//m_moveToScrollTo = moveId;
-			//OpenFormWindow(EditorWindowType_Move, moveId);
+			int32_t moveId = m_editor->CreateNew(EditorWindowType_Move);
+			if (moveId != -1) {
+				m_moveToScrollTo = moveId;
+				OpenFormWindow(EditorWindowType_Move, moveId);
+				m_savedLastChange = false;
+				m_importNeeded = true;
+			}
 		}
 		if (ImGui::MenuItem(_("edition.cancel_list")))
 		{
@@ -502,12 +506,12 @@ void EditorWindow::RenderMovelist()
 EditorWindow::~EditorWindow()
 {
 	importerHelper.StopThreadAndCleanup();
-	delete m_editor;
 
 	uint64_t movesetSize;
 	Byte* moveset = (Byte*)m_editor->GetMoveset(movesetSize);
-
 	free(moveset);
+
+	delete m_editor;
 }
 
 EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
