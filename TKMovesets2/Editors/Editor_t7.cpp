@@ -1158,13 +1158,10 @@ int32_t EditorT7::CreateNewMove()
 
 	const uint16_t moveId = m_infos->table.moveCount;
 
-	uint64_t newMovesetSize = m_movesetSize + sizeof(Move) + Helpers::align8Bytes(moveNameSize);
-	Byte* newMoveset = (Byte*)malloc(newMovesetSize);
-	if (newMoveset == nullptr) {
-		return -1;
-	}
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
 
-	// FInd position where to insert new name
+	// Find position where to insert new name
 	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
 	const uint64_t orig_moveNameOffset = moveNameOffset;
 	while (*(m_moveset + (moveNameOffset - 2)) == 0)
@@ -1173,19 +1170,36 @@ int32_t EditorT7::CreateNewMove()
 		// We want to erase as many empty bytes because of past alignment and then re-align to 8 bytes
 		moveNameOffset--;
 	}
+
+	const uint64_t relativeMoveNameOffset = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
+	const uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
+	const uint64_t newMoveOffset = moveNameEndOffset + (uint64_t)m_infos->table.voiceclip;
+	const uint64_t origMovelistEndOffset = orig_moveNameOffset + (uint64_t)m_infos->table.voiceclip;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = newMoveOffset + sizeof(Move) + (m_movesetSize - origMovelistEndOffset);
+	newMoveset = (Byte*)malloc(newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy start //
+
 	memcpy(newMoveset, m_moveset, moveNameOffset);
 
 	// Write our new name
 	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
-	uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
 
 	// Copy all the data up to the new structure (voiceclip is right after the movelist end)
 	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameOffset, (uint64_t)m_infos->table.voiceclip);
 
-	uint64_t moveOffset = moveNameEndOffset + (uint64_t)m_infos->table.voiceclip;
+	/// Move ///
+
 	// Initialize our structure value
 	gAddr::Move move{ 0 };
-	move.name_addr = m_header->offsets.movesetBlock - m_header->offsets.nameBlock;
+	move.name_addr = relativeMoveNameOffset;
+	move.anim_name_addr = 0;
+	move.anim_addr = 0;
 	move.cancel_addr = -1;
 	move._0x28_cancel_addr = -1;
 	move._0x38_cancel_addr = -1;
@@ -1197,28 +1211,36 @@ int32_t EditorT7::CreateNewMove()
 	move.voicelip_addr = -1;
 
 	// Write our new structure
-	memcpy(newMoveset + moveOffset, &move, sizeof(Move));
+	memcpy(newMoveset + newMoveOffset, &move, sizeof(Move));
+
+	////
 
 	// Copy all the data after new the new structure
-	uint64_t origCopyOffset = moveOffset - moveNameSize;
-	memcpy(newMoveset + moveOffset + sizeof(Move), m_moveset + origCopyOffset, m_movesetSize - origCopyOffset);
+	memcpy(newMoveset + newMoveOffset + sizeof(Move), m_moveset + origMovelistEndOffset, m_movesetSize - origMovelistEndOffset);
 
 	// Assign new moveset
 	free(m_moveset);
 	m_moveset = newMoveset;
 	m_movesetSize = newMovesetSize;
 
-	// Assign useful pointers to the new moveset
+	// Assign useful pointers & variable to the new moveset
 	m_header = (TKMovesetHeader*)m_moveset;
 	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
 	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
 	m_infos = (MovesetInfo*)m_movesetData;
 
 	// Shift offsets in the moveset table & in our header
-	uint64_t extraSize = moveNameSize + sizeof(Move);
-	m_infos->table.moveCount++;
+	uint64_t extraSize = moveNameEndOffset - moveNameOffset;
 	m_header->offsets.animationBlock += extraSize;
 	m_header->offsets.motaBlock += extraSize;
+	m_infos->table.moveCount++;
+
+	*(uint64_t*)&m_infos->table.voiceclip += extraSize;
+	*(uint64_t*)&m_infos->table.inputSequence += extraSize;
+	*(uint64_t*)&m_infos->table.input += extraSize;
+	*(uint64_t*)&m_infos->table.unknownParryRelated += extraSize;
+	*(uint64_t*)&m_infos->table.cameraData += extraSize;
+	*(uint64_t*)&m_infos->table.throws += extraSize;
 
 	return moveId;
 }
