@@ -31,6 +31,8 @@ private:
 	Byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractSettings settings);
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
 	Byte* CopyAnimations(const StructsT7_gameAddr::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr>& boundaries);
+	// Copies the moveset info block (aliases, couple strings)
+	void CopyMovesetInfoBlock(gameAddr movesetAddr, StructsT7_gameAddr::MovesetInfo* movesetHeader);
 
 	/// Helpers
 

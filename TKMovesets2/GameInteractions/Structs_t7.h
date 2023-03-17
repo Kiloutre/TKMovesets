@@ -539,4 +539,17 @@ namespace StructsT7_gameAddr
 		gameAddr throws;
 		uint64_t throwsCount;
 	};
+
+	struct MovesetInfo
+	{
+		char _0x0[8];
+		char* character_name_addr;
+		char* character_creator_addr;
+		char* date_addr;
+		char* fulldate_addr;
+		uint16_t aliases1[112];
+		uint16_t aliases2[36];
+		MovesetTable table;
+		StructsT7::MotaList motas;
+	};
 };

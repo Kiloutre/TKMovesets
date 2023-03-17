@@ -21,13 +21,13 @@
 // -- Static helpers -- //
 
 // Converts absolute ptr into indexes before saving to file
-static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable& offsets, gameAddr nameStart, std::map<gameAddr, uint64_t> &animOffsetMap)
+static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable* offsets, gameAddr nameStart, std::map<gameAddr, uint64_t>& animOffsetMap)
 {
 	size_t i;
 
 	// Convert move ptrs
 	i = 0;
-	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets.move); i < table.moveCount; ++i, ++move)
+	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets->move); i < table.moveCount; ++i, ++move)
 	{
 		move->name_addr -= nameStart;
 		move->anim_name_addr -= nameStart;
@@ -41,15 +41,11 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 		TO_INDEX(move->extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
 		TO_INDEX(move->move_start_extraprop_addr, table.moveBeginningProp, OtherMoveProperty);
 		TO_INDEX(move->move_end_extraprop_addr, table.moveEndingProp, OtherMoveProperty);
-
-		if (move->move_start_extraprop_addr != -1 || move->move_end_extraprop_addr != -1) {
-			printf("move id %d\n", i);
-		}
 	}
 
 	// Convert projectile ptrs
 	i = 0;
-	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(movesetBlock + offsets.projectile); i < table.projectileCount; ++i, ++projectile)
+	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(movesetBlock + offsets->projectile); i < table.projectileCount; ++i, ++projectile)
 	{
 		// One projectile actually has both at 0 for some reason ?
 		TO_INDEX(projectile->cancel_addr, table.cancel, Cancel);
@@ -58,7 +54,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 
 	// Convert cancel ptrs
 	i = 0;
-	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(movesetBlock + offsets.cancel); i < table.cancelCount; ++i, ++cancel)
+	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(movesetBlock + offsets->cancel); i < table.cancelCount; ++i, ++cancel)
 	{
 		TO_INDEX(cancel->requirements_addr, table.requirement, Requirement);
 		TO_INDEX(cancel->extradata_addr, table.cancelExtradata, CancelExtradata);
@@ -66,7 +62,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 
 	// Convert groupCancel cancel ptrs
 	i = 0;
-	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(movesetBlock + offsets.groupCancel); i < table.groupCancelCount; ++i, ++groupCancel)
+	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(movesetBlock + offsets->groupCancel); i < table.groupCancelCount; ++i, ++groupCancel)
 	{
 		TO_INDEX(groupCancel->requirements_addr, table.requirement, Requirement);
 		TO_INDEX(groupCancel->extradata_addr, table.cancelExtradata, CancelExtradata);
@@ -74,7 +70,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 
 	// Convert reaction ptrs
 	i = 0;
-	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(movesetBlock + offsets.reactions); i < table.reactionsCount; ++i, ++reaction)
+	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(movesetBlock + offsets->reactions); i < table.reactionsCount; ++i, ++reaction)
 	{
 		TO_INDEX(reaction->front_pushback, table.pushback, Pushback);
 		TO_INDEX(reaction->backturned_pushback, table.pushback, Pushback);
@@ -87,21 +83,21 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 
 	// Convert input sequence ptrs
 	i = 0;
-	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(movesetBlock + offsets.inputSequence); i < table.inputSequenceCount; ++i, ++inputSequence)
+	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(movesetBlock + offsets->inputSequence); i < table.inputSequenceCount; ++i, ++inputSequence)
 	{
 		TO_INDEX(inputSequence->input_addr, table.input, Input);
 	}
 
 	// Convert throws ptrs
 	i = 0;
-	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(movesetBlock + offsets.throws); i < table.throwsCount; ++i, ++throws)
+	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(movesetBlock + offsets->throws); i < table.throwsCount; ++i, ++throws)
 	{
 		TO_INDEX(throws->cameradata_addr, table.cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs
 	i = 0;
-	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(movesetBlock + offsets.hitCondition); i < table.hitConditionCount; ++i, ++hitCondition)
+	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(movesetBlock + offsets->hitCondition); i < table.hitConditionCount; ++i, ++hitCondition)
 	{
 		TO_INDEX(hitCondition->requirements_addr, table.requirement, Requirement);
 		TO_INDEX(hitCondition->reactions_addr, table.reactions, Reactions);
@@ -109,21 +105,21 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 
 	// Convert pushback ptrs
 	i = 0;
-	for (gAddr::Pushback* pushback = (gAddr::Pushback*)(movesetBlock + offsets.pushback); i < table.pushbackCount; ++i, ++pushback)
+	for (gAddr::Pushback* pushback = (gAddr::Pushback*)(movesetBlock + offsets->pushback); i < table.pushbackCount; ++i, ++pushback)
 	{
 		TO_INDEX(pushback->extradata_addr, table.pushbackExtradata, PushbackExtradata);
 	}
 
 	// Convert move start prop ptrs
 	i = 0;
-	for (gAddr::OtherMoveProperty* moveBeginningProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets.moveBeginningProp); i < table.moveBeginningPropCount; ++i, ++moveBeginningProp)
+	for (gAddr::OtherMoveProperty* moveBeginningProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets->moveBeginningProp); i < table.moveBeginningPropCount; ++i, ++moveBeginningProp)
 	{
 		TO_INDEX(moveBeginningProp->requirements_addr, table.requirement, Requirement);
 	}
 
 	// Convert move end prop ptrs
 	i = 0;
-	for (gAddr::OtherMoveProperty* moveEndingProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets.moveEndingProp); i < table.moveEndingPropCount; ++i, ++moveEndingProp)
+	for (gAddr::OtherMoveProperty* moveEndingProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets->moveEndingProp); i < table.moveEndingPropCount; ++i, ++moveEndingProp)
 	{
 		TO_INDEX(moveEndingProp->requirements_addr, table.requirement, Requirement);
 	}
@@ -144,6 +140,23 @@ static int64_t getClosestBoundary(gameAddr animAddr, const std::vector<gameAddr>
 }
 
 // -- Private methods - //
+
+void ExtractorT7::CopyMovesetInfoBlock(gameAddr movesetAddr, gAddr::MovesetInfo* movesetHeader)
+{
+	m_process->readBytes(movesetAddr, movesetHeader, 0x150);
+
+	// Convert ptrs into offsets
+	movesetHeader->character_name_addr -= movesetAddr;
+	movesetHeader->character_creator_addr -= movesetAddr;
+	movesetHeader->date_addr -= movesetAddr;
+	movesetHeader->fulldate_addr -= movesetAddr;
+
+	// Correct offsets according to our name modifications
+	const size_t namelength = strlen(MOVESET_EXTRACTED_NAME_PREFIX) - 1; // - 1 because we replace one char
+	movesetHeader->character_creator_addr += namelength;
+	movesetHeader->date_addr += namelength;
+	movesetHeader->fulldate_addr += namelength;
+}
 
 uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractSettings settings)
 {
@@ -434,7 +447,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
-	uint64_t s_movesetInfoBlock;
+	uint64_t s_movesetInfoBlock = 0x150; // Yeah, fixed size, this is on purpose. I do want to extract table and mota separately.
 	uint64_t s_tableBlock = sizeof(MovesetTable);
 	uint64_t s_motasListBlock = sizeof(MotaList);
 	uint64_t s_nameBlock;
@@ -443,35 +456,38 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	uint64_t s_motaCustomBlock;
 
 	// Will contain our own informations such as date, version, character id
-	TKMovesetHeader header{ 0 };
+	TKMovesetHeader customHeader{ 0 };
 	progress = 5;
 
 	// The address of the moveset we will be extracting
 	gameAddr movesetAddr;
 	movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
 
+	// Will read the header of the moveset and write it here
+	gAddr::MovesetInfo movesetHeader{ 0 };
+
 	// We will read the table containing <list_ptr:list_size>, in here.
 	// Offsets will contain the same as table but converted to offsets, in order to convert the absolute pointers contained within the moveset to offsets
 	gAddr::MovesetTable table{};
-	gAddr::MovesetTable offsets{};
+	gAddr::MovesetTable* offsets = &movesetHeader.table;
 
 	// Contains absolute addresses of mota file within the game's memory
 	MotaList motasList{};
 
 	// Assign these blocks right away because they're fixed-size structures we write into
-	headerBlock = (Byte*)&header;
-	tableBlock = (Byte*)&offsets;
+	headerBlock = (Byte*)&customHeader;
+	tableBlock = (Byte*)offsets;
 	motasListBlock = (Byte*)&motasList;
-
+	movesetInfoBlock = (Byte*)&movesetHeader;
 
 	// Fill table containing lists of move, lists of cancels, etc...
-	FillMovesetTables(movesetAddr, &table, &offsets);
+	FillMovesetTables(movesetAddr, &table, offsets);
 	progress = 10;
 
 	// Reads block containing the actual moveset data
 	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
 	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
-	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets.move);
+	const gAddr::Move* movelist = (gAddr::Move*)(movesetBlock + offsets->move);
 	if (movesetBlock == nullptr) { 
 		// Since movesetBlock is used by those Copy functions, we have to check for allocation failure here
 		return ExtractionErrcode_AllocationErr;
@@ -493,8 +509,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock, movelist, table.moveCount, nameBlockStart);
 
 	// Reads block containing basic moveset infos and aliases
-	movesetInfoBlock = allocateAndReadBlock(movesetAddr, movesetAddr + 0x150, s_movesetInfoBlock);
-
+	CopyMovesetInfoBlock(movesetAddr, &movesetHeader);
 	progress = 70;
 
 	// Now that we extracted everything, we can properly convert pts to indexes
@@ -508,19 +523,19 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	progress = 77;
 
 	// Fill the header with our own useful informations
-	FillHeaderInfos(header.infos, gameId, playerAddress);
+	FillHeaderInfos(customHeader.infos, gameId, playerAddress);
 	progress = 79;
 
 	// Calculate each offsets according to the previous block offset + its size
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
 	// This is bceause you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
-	header.offsets.movesetInfoBlock = 0x0;
-	header.offsets.tableBlock = Helpers::align8Bytes(header.offsets.movesetInfoBlock + s_movesetInfoBlock);
-	header.offsets.motalistsBlock = Helpers::align8Bytes(header.offsets.tableBlock + s_tableBlock);
-	header.offsets.nameBlock = Helpers::align8Bytes(header.offsets.motalistsBlock + s_motasListBlock);
-	header.offsets.movesetBlock = Helpers::align8Bytes(header.offsets.nameBlock + s_nameBlock);
-	header.offsets.animationBlock = Helpers::align8Bytes(header.offsets.movesetBlock + s_movesetBlock);
-	header.offsets.motaBlock = Helpers::align8Bytes(header.offsets.animationBlock + s_animationBlock);
+	customHeader.offsets.movesetInfoBlock = 0x0;
+	customHeader.offsets.tableBlock = Helpers::align8Bytes(customHeader.offsets.movesetInfoBlock + s_movesetInfoBlock);
+	customHeader.offsets.motalistsBlock = Helpers::align8Bytes(customHeader.offsets.tableBlock + s_tableBlock);
+	customHeader.offsets.nameBlock = Helpers::align8Bytes(customHeader.offsets.motalistsBlock + s_motasListBlock);
+	customHeader.offsets.movesetBlock = Helpers::align8Bytes(customHeader.offsets.nameBlock + s_nameBlock);
+	customHeader.offsets.animationBlock = Helpers::align8Bytes(customHeader.offsets.movesetBlock + s_movesetBlock);
+	customHeader.offsets.motaBlock = Helpers::align8Bytes(customHeader.offsets.animationBlock + s_animationBlock);
 
 	ExtractionErrcode_ errcode;
 
@@ -558,7 +573,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				std::pair<Byte*, uint64_t>{motaCustomBlock, s_motaCustomBlock},
 			};
 
-			header.infos.crc32 = ExtractorUtils::CalculateCrc32(blocks);
+			customHeader.infos.crc32 = ExtractorUtils::CalculateCrc32(blocks);
 			ExtractorUtils::WriteFileData(file, blocks, progress, 95);
 
 			file.close();
@@ -579,7 +594,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	/// Cleanup our temp allocated memory blocks
 	// headerBlock: not allocated, don't free()
-	free(movesetInfoBlock);
+	// movesetInfoBlock: not allocated, don't free()
 	// tableBlock: not allocated, don't free()
 	// motasListBlock: not allocated, don't free()
 	free(nameBlock);

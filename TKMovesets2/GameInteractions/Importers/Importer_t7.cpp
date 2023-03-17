@@ -287,11 +287,10 @@ void ImporterT7::CleanupUnusedMovesets()
 
 static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
 {
-	// Todo: write the actual, proper values for these
-	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
-	info->date_addr = (char*)(gameMoveset + 0x2E8);
-	info->fulldate_addr = (char*)(gameMoveset + 0x2E8);
-	info->character_creator_addr = (char*)(gameMoveset + 0x2E8);
+	info->character_name_addr += gameMoveset;
+	info->character_creator_addr += gameMoveset;
+	info->date_addr += gameMoveset;
+	info->fulldate_addr += gameMoveset;
 }
 
 ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
