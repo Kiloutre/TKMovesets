@@ -90,4 +90,10 @@ public:
 	// -- Interactions -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
+
+	// -- Creation / Deletion -- //
+	// Create a new structure or structure list
+	int32_t CreateNew(EditorWindowType_ type) override;
+	// Creates a new move
+	int32_t CreateNewMove();
 };

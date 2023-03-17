@@ -1004,7 +1004,8 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	// Start getting pointers toward useful data structures
 	// Also get the actual game-moveset (past our header) pointer
 	m_header = (TKMovesetHeader*)t_moveset;
-	m_movesetData = t_moveset + m_header->offsets.movesetInfoBlock + m_header->infos.header_size;
+	m_movesetData = t_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
+	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
 	m_infos = (MovesetInfo*)m_movesetData;
 
 	// Get aliases as a vector
@@ -1084,7 +1085,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 			flags |= EditorMoveFlags_ThrowReaction;
 		}
 
-		if (Helpers::startsWith(moveName, "tkm_")) {
+		if (Helpers::startsWith(moveName, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
 			flags |= EditorMoveFlags_Custom;
 		}
 
@@ -1148,4 +1149,69 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
+}
+
+int32_t EditorT7::CreateNewMove()
+{
+	const char* moveName = MOVESET_CUSTOM_MOVE_NAME_PREFIX;
+	const size_t moveNameSize = sizeof(moveName);
+
+	uint16_t moveId = m_infos->table.moveCount;
+
+	uint64_t newMovesetSize = m_movesetSize + sizeof(Move) + moveNameSize;
+	Byte* newMoveset = (Byte*)malloc(newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new name
+	const uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	memcpy(newMoveset, m_moveset, moveNameOffset);
+
+	// Write our new name
+	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
+
+	// Copy all the data up to the new structure (voiceclip is right after the movelist end)
+	memcpy(newMoveset + moveNameOffset + moveNameSize, m_moveset + moveNameOffset, (uint64_t)m_infos->table.voiceclip);
+
+	uint64_t moveOffset = moveNameOffset + moveNameSize + (uint64_t)m_infos->table.voiceclip;
+	// Initialize our structure value
+	gAddr::Move move{ 0 };
+	move.name_addr = m_header->offsets.movesetBlock - m_header->offsets.nameBlock;
+	move.cancel_addr = -1;
+	move._0x28_cancel_addr = -1;
+	move._0x38_cancel_addr = -1;
+	move._0x48_cancel_addr = -1;
+	move.hit_condition_addr = -1;
+	move.extra_move_property_addr = -1;
+	move.move_start_extraprop_addr = -1;
+	move.move_end_extraprop_addr = -1;
+	move.voicelip_addr = -1;
+
+	// Write our new structure
+	memcpy(newMoveset + moveOffset, &move, sizeof(Move));
+
+	// Copy all the data after new the new structure
+	uint64_t origCopyOffset = moveOffset - moveNameSize;
+	memcpy(newMoveset + moveOffset + sizeof(Move), m_moveset + origCopyOffset, m_movesetSize - origCopyOffset);
+
+	// Shift offsets in the moveset table & in our header
+
+	// Assign new moveset
+	free(m_moveset);
+	m_moveset = newMoveset;
+	m_movesetSize = newMovesetSize;
+
+	return moveId;
+}
+
+int32_t EditorT7::CreateNew(EditorWindowType_ type)
+{
+	switch (type)
+	{
+	case EditorWindowType_Move:
+		return CreateNewMove();
+		break;
+	}
+	return -1;
 }

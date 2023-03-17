@@ -187,6 +187,8 @@ protected:
 	uint64_t m_movesetSize = 0;
 	// Contains the moveset, without our header
 	byte* m_movesetData = nullptr;
+	// Contains the moveset size, without our header
+	uint64_t m_movesetDataSize = 0;
 
 	// Stores a <name, offset> animation map
 	std::map<std::string, gameAddr> m_animNameMap;
@@ -194,6 +196,9 @@ protected:
 	std::map<gameAddr, std::string> m_animNameMap_reverse;
 
 public:
+	// Constants useful constant variables, to be set on a per-game basis
+	std::map<EditorConstants_, int> constants;
+
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
 	// Loads important moveset data in our class, required to start functionning
@@ -204,8 +209,8 @@ public:
 	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
-	// Constants useful constant variables, to be set on a per-game basis
-	std::map<EditorConstants_, int> constants;
+	// Returns the moveset and its size
+	const Byte* GetMoveset(uint64_t& movesetSize_out);
 
 
 	// Forms
@@ -218,7 +223,9 @@ public:
 	// Save a single struct in the moveset
 	virtual void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
 
-	// -- Iteractons -- //
+	// -- Iteractions -- //
 	// Sets the current move of a player
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
+	// Create a new structure or structure list
+	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
 };

@@ -78,3 +78,9 @@ namespace EditorUtils
 		return "%d";
 	}
 }
+
+const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)
+{
+	movesetSize_out = m_movesetSize;
+	return m_moveset;
+}

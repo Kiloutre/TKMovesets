@@ -129,6 +129,9 @@ edition.play_move_2p = Lancer (J2)
 edition.window_title = Édition
 edition.apply = Appliquer
 edition.window_controls_explanation = Cliquez sur un Move dans la liste des moves pour ouvrir sa fenêtre associée. Elle viendra écraser toute fenêtre précédemment ouverte, sauf si cette ancienne fenêtre contient du contenu non-sauvegardé OU si vous maintenez CTRL GAUCHE avant de cliquer. Les fenêtres ouvertes peuvent être déplacées où vous le souhaitez, peuvent être assemblées et il est possible de les positionner de diverses manières.
+edition.create_new = Créer 
+edition.move = Move
+edition.cancel_list = Liste de cancels
 
 edition.move.window_name = Move
 edition.move.category_2 = Références

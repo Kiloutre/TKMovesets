@@ -186,11 +186,14 @@ bool EditorWindow::MovesetStillLoaded()
 
 void EditorWindow::Save()
 {
-	TKMovesetHeader* header = (TKMovesetHeader*)m_moveset;
+	uint64_t movesetSize;
+	const Byte* moveset = m_editor->GetMoveset(movesetSize);
+
+	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
-	file.write((char*)m_moveset, m_movesetSize);
+	file.write((char*)moveset, movesetSize);
 	file.close();
 	m_savedLastChange = true;
 }
@@ -217,6 +220,23 @@ void EditorWindow::RenderToolBar()
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
 		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
 		m_highlightedMoveId = m_moveToScrollTo;
+	}
+
+	ImGui::Separator();
+	
+	if (ImGui::BeginMenu(_("edition.create_new")))
+	{
+		if (ImGui::MenuItem(_("edition.move")))
+		{
+			uint16_t moveId = m_editor->CreateNew(EditorWindowType_Move);
+			//m_moveToScrollTo = moveId;
+			//OpenFormWindow(EditorWindowType_Move, moveId);
+		}
+		if (ImGui::MenuItem(_("edition.cancel_list")))
+		{
+
+		}
+		ImGui::EndMenu();
 	}
 
 	ImGui::EndMenuBar();
@@ -305,7 +325,11 @@ void EditorWindow::RenderStatusBar()
 	bool canImport = isAttached && m_importNeeded && !importerHelper.IsBusy() && m_canInteractWithGame;
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		importerHelper.lastLoadedMoveset = 0;
-		importerHelper.QueueCharacterImportation(m_moveset, m_movesetSize);
+
+		uint64_t movesetSize;
+		const Byte* moveset = m_editor->GetMoveset(movesetSize);
+
+		importerHelper.QueueCharacterImportation(moveset, movesetSize);
 		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
 		m_liveEdition = false;
 		m_importNeeded = false;
@@ -479,7 +503,11 @@ EditorWindow::~EditorWindow()
 {
 	importerHelper.StopThreadAndCleanup();
 	delete m_editor;
-	free(m_moveset);
+
+	uint64_t movesetSize;
+	Byte* moveset = (Byte*)m_editor->GetMoveset(movesetSize);
+
+	free(moveset);
 }
 
 EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
@@ -496,19 +524,19 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	}
 
 	file.seekg(0, std::ios::end);
-	m_movesetSize = file.tellg();
+	uint64_t movesetSize = file.tellg();
 
-	m_moveset = (Byte*)malloc(m_movesetSize);
-	if (m_moveset == nullptr) {
+	Byte* moveset = (Byte*)malloc(movesetSize);
+	if (moveset == nullptr) {
 		throw EditorWindow_MovesetLoadFail();
 	}
 
 	file.seekg(0, std::ios::beg);
-	file.read((char*)m_moveset, m_movesetSize);
+	file.read((char*)moveset, movesetSize);
 
 	file.close();
 
-	m_editor->LoadMoveset(m_moveset, m_movesetSize);
+	m_editor->LoadMoveset(moveset, movesetSize);
 	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId);
 
 	m_loadedCharacter.filename = movesetInfo->filename;

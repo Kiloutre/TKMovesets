@@ -53,10 +53,6 @@ private:
 	bool m_liveEdition = false;
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
-	// Current moveset, will be written to memory on next import
-	Byte* m_moveset = nullptr;
-	// Size of the moveset currently loaded
-	uint64_t m_movesetSize = 0;
 	// If the moveset can be live edited or not
 	bool m_liveEditable = true;
 	// Stores the address, in-game, of the moveset we loaded. 0 if none loaded.
