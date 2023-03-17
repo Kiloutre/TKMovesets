@@ -701,8 +701,8 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + id;
 
 	// todo: move name, allow edition
-	if (m_animNameMap.find(inputs["anim_name"]->buffer) != m_animNameMap.end()) {
-		move->anim_addr = m_animNameMap[inputs["anim_name"]->buffer];
+	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
+		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
 	}
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
 	move->hitlevel = (uint32_t)strtol(inputs["hitlevel"]->buffer, nullptr, 16);
@@ -745,7 +745,7 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 {
 	if (name == "anim_name") {
-		return m_animNameMap.find(field->buffer) != m_animNameMap.end();
+		return m_animNameToOffsetMap.find(field->buffer) != m_animNameToOffsetMap.end();
 	}
 
 	else if (name == "cancel_id" || name == "cancel_id_2" ||
@@ -1024,16 +1024,16 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		const char* animName = namePtr + movePtr[i].anim_name_addr;
 		gameAddr animOffset = movePtr[i].anim_addr;
 
-		if (m_animNameMap.find(animName) != m_animNameMap.end() && m_animNameMap[animName] != animOffset) {
+		if (m_animNameToOffsetMap.find(animName) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap[animName] != animOffset) {
 			// todo: with kazuya & maybe more characters, this is apparently a big problem
 			// change the way anim choosing is done
 			printf("(Move id %llu)\n", i);
-			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameMap[animName]);
+			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameToOffsetMap[animName]);
 			throw std::exception();
 		}
 
-		m_animNameMap[animName] = animOffset;
-		m_animNameMap_reverse[animOffset] = animName;
+		m_animNameToOffsetMap[animName] = animOffset;
+		m_animOffsetToNameOffset[animOffset] = movePtr[i].anim_name_addr;
 	}
 }
 
@@ -1196,10 +1196,13 @@ int32_t EditorT7::CreateNewMove()
 	/// Move ///
 
 	// Initialize our structure value
+	uint64_t animOffset = m_animOffsetToNameOffset.begin()->first;
+	uint64_t animNameOffset = m_animOffsetToNameOffset.begin()->second;
+
 	gAddr::Move move{ 0 };
 	move.name_addr = relativeMoveNameOffset;
-	move.anim_name_addr = 0;
-	move.anim_addr = 0;
+	move.anim_name_addr = animNameOffset;
+	move.anim_addr = animOffset;
 	move.cancel_addr = -1;
 	move._0x28_cancel_addr = -1;
 	move._0x38_cancel_addr = -1;

@@ -230,10 +230,15 @@ void EditorWindow::RenderToolBar()
 		{
 			int32_t moveId = m_editor->CreateNew(EditorWindowType_Move);
 			if (moveId != -1) {
+				m_movelist = m_editor->GetDisplayableMoveList();
+				FilterMovelist(EditorMovelistFilter_All);
+
 				m_moveToScrollTo = moveId;
-				OpenFormWindow(EditorWindowType_Move, moveId);
+				m_highlightedMoveId = moveId;
 				m_savedLastChange = false;
 				m_importNeeded = true;
+
+				OpenFormWindow(EditorWindowType_Move, moveId);
 			}
 		}
 		if (ImGui::MenuItem(_("edition.cancel_list")))

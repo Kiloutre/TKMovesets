@@ -191,9 +191,9 @@ protected:
 	uint64_t m_movesetDataSize = 0;
 
 	// Stores a <name, offset> animation map
-	std::map<std::string, gameAddr> m_animNameMap;
-	// Stores the same animation map but in <offset, name> 
-	std::map<gameAddr, std::string> m_animNameMap_reverse;
+	std::map<std::string, gameAddr> m_animNameToOffsetMap;
+	// Stores a <offset, offset> animation map
+	std::map<gameAddr, gameAddr> m_animOffsetToNameOffset;
 
 public:
 	// Constants useful constant variables, to be set on a per-game basis
