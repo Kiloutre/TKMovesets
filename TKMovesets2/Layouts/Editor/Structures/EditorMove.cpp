@@ -39,6 +39,11 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 			m_baseWindow->OpenFormWindow(EditorWindowType_HitCondition, id);
 		}
 	}
+	else if (name == "extra_properties_id") {
+		if (id >= 0) {
+			m_baseWindow->OpenFormWindow(EditorWindowType_Extraproperty, id);
+		}
+	}
 	else if (name == "beginning_extra_properties_id") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_MoveBeginProperty, id);

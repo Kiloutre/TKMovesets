@@ -250,6 +250,24 @@ void EditorWindow::RenderToolBar()
 				OpenFormWindow(EditorWindowType_Cancel, structId);
 			}
 		}
+		if (ImGui::MenuItem(_("edition.requirement")))
+		{
+			int32_t structId = m_editor->CreateNew(EditorWindowType_Requirement);
+			if (structId != -1) {
+				m_savedLastChange = false;
+				m_importNeeded = true;
+				OpenFormWindow(EditorWindowType_Requirement, structId);
+			}
+		}
+		if (ImGui::MenuItem(_("edition.extra_properties")))
+		{
+			int32_t structId = m_editor->CreateNew(EditorWindowType_Extraproperty);
+			if (structId != -1) {
+				m_savedLastChange = false;
+				m_importNeeded = true;
+				OpenFormWindow(EditorWindowType_Extraproperty, structId);
+			}
+		}
 		ImGui::EndMenu();
 	}
 

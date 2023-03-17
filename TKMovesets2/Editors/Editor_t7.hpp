@@ -96,4 +96,6 @@ public:
 	int32_t CreateNew(EditorWindowType_ type) override;
 	int32_t CreateNewMove();
 	int32_t CreateNewCancelList();
+	int32_t CreateNewRequirements();
+	int32_t CreateNewExtraProperties();
 };
