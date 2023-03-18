@@ -206,6 +206,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 			}
 		}
 		m_fieldsCategoryMap[category] = inputs;
+		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
 	}
 
 	// Builds the window title. Currently, switching translations does not update this. Todo 
@@ -256,7 +257,7 @@ void EditorForm::Render()
 			{
 				const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
 				// todo: compute this std::format() once and not every frame
-				if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
+				if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
 					// Only show titles for category > 0, and if tree is not open: no need to render anything
 					continue;
 				}

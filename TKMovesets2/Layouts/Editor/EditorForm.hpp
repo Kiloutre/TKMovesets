@@ -39,6 +39,8 @@ protected:
 	EditorWindowBase* m_baseWindow = nullptr;
 	// Become true if there were unsaved changes but the user attempted to close the window anyway. Confirmation will be required.
 	bool m_requestedClosure = false;
+	// Contains the string identifiers to avoid having to compute them at every individual Render() call
+	std::map<int, std::string> m_categoryStringIdentifiers;
 
 	// Called whenever the changes are successfully applied
 	virtual void OnApply() {};

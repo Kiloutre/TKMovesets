@@ -193,6 +193,13 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 			}
 			m_fieldsCategoryMaps[listIndex][category] = inputs;
 		}
+
+		m_itemLabels.push_back(BuildItemLabel(listIndex));
+	}
+
+	// Build category names
+	for (uint8_t category : m_categories) {
+		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
 	}
 
 	// Builds the window title. Currently, switching translations does not update this. Todo 
@@ -203,6 +210,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	else {
 		m_windowTitle = std::format("{} {} {} - {}", windowName, id, name, windowTitleBase.c_str());
 	}
+
 }
 
 void EditorFormList::RenderListControlButtons(int listIndex)
@@ -227,8 +235,9 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	}
 	ImGui::SameLine();
 	*/
-
-	if (listIndex != 0) {
+	
+	// Don't allow first item and ending item to shift up
+	if (listIndex != 0 && listIndex + 1 != m_listSize) {
 		ImGui::SetCursorPosX(pos_x + buttonWidth);
 		if (ImGui::Button("^", ImVec2(20, 20)))
 		{
@@ -240,7 +249,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		ImGui::SameLine();
 	}
 
-	if (listIndex + 1 != m_listSize) {
+	// Don't allow last 2 items to shift down
+	if (listIndex + 2 < m_listSize) {
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 2);
 		if (ImGui::Button("V", ImVec2(20, 20)))
 		{
@@ -252,23 +262,29 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		ImGui::SameLine();
 	}
 
-	ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
-	if (ImGui::Button("X", ImVec2(20, 20)))
+	// Don't show delete button on last item
+	if (listIndex + 1 != m_listSize || m_listSize == 1)
 	{
-		// Delete this item
-		--m_listSizeChange;
-		--m_listSize;
+		ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
+		if (ImGui::Button("X", ImVec2(20, 20)))
+		{
+			// Delete this item
+			--m_listSizeChange;
+			--m_listSize;
 
-		// Only delete if we're not at the list end, to avoid destructing the fields before using them
-		// Reducing list size will make things invisible on the next render anyway
-		if (listIndex < m_listSize) {
-			// Shift following items up
-			m_fieldIdentifierMaps.erase(m_fieldIdentifierMaps.begin() + listIndex);
-			m_fieldsCategoryMaps.erase(m_fieldsCategoryMaps.begin() + listIndex);
-			unsavedChanges = true;
+			// Only delete if we're not at the list end, to avoid destructing the fields before using them
+			// Reducing list size will make things invisible on the next render anyway
+			if (listIndex < m_listSize) {
+				// Shift following items up
+				m_fieldIdentifierMaps.erase(m_fieldIdentifierMaps.begin() + listIndex);
+				m_fieldsCategoryMaps.erase(m_fieldsCategoryMaps.begin() + listIndex);
+				m_itemLabels.erase(m_itemLabels.begin() + listIndex);
+				unsavedChanges = true;
+			}
 		}
+		ImGui::SameLine();
 	}
-	ImGui::SameLine();
+
 
 	ImGui::PopID();
 	ImGui::PopID();
@@ -312,8 +328,7 @@ void EditorFormList::Render()
 			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 			{
 				RenderListControlButtons(listIndex);
-				std::string treeNodeTitle = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIndex, listIndex + id);
-				if (!ImGui::TreeNode(treeNodeTitle.c_str())) {
+				if (!ImGui::TreeNode(m_itemLabels[listIndex].c_str())) {
 					// Tree node hidden so no need to render anything
 					continue;
 				}
@@ -321,7 +336,7 @@ void EditorFormList::Render()
 				for (uint8_t category : m_categories)
 				{
 					const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
-					if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
+					if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
 						// Only show titles for category > 0, and if tree is not open: no need to render anything
 						continue;
 					}
@@ -358,4 +373,9 @@ void EditorFormList::Render()
 		m_requestedClosure = true;
 		popen = true;
 	}
+}
+
+std::string EditorFormList::BuildItemLabel(int listIdx)
+{
+	return std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
 }
