@@ -55,3 +55,8 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 		}
 	}
 }
+
+void EditorMove::OnApply()
+{
+	m_baseWindow->ReloadMovelistFilter();
+}

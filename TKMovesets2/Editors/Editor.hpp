@@ -198,6 +198,8 @@ protected:
 public:
 	// Constants useful constant variables, to be set on a per-game basis
 	std::map<EditorConstants_, int> constants;
+	// Contains every move, in a displayable format
+	std::vector<DisplayableMove*>* displayableMovelist = nullptr;
 
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
@@ -208,7 +210,7 @@ public:
 	// Returns useful informations contained within the moveset  actual header
 	virtual EditorTable GetMovesetTable() = 0;
 	// Return the movelist in a quickly displayable format
-	virtual std::vector<DisplayableMove*> GetDisplayableMoveList() = 0;
+	virtual void ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref = nullptr) = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
 	// Returns the moveset and its size
@@ -230,4 +232,7 @@ public:
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
 	// Create a new structure or structure list
 	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
+
+	// todo: remove
+	virtual uint64_t CreateMoveName(const char* newName) = 0;
 };

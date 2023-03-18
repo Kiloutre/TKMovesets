@@ -74,6 +74,8 @@ void EditorForm::Apply()
 	m_editor->SaveItem(windowType, id, m_fieldIdentifierMap);
 	unsavedChanges = false;
 	justAppliedChanges = true;
+
+	OnApply();
 }
 
 void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount)

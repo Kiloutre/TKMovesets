@@ -230,7 +230,7 @@ void EditorWindow::RenderToolBar()
 		{
 			int32_t moveId = m_editor->CreateNew(EditorWindowType_Move);
 			if (moveId != -1) {
-				m_movelist = m_editor->GetDisplayableMoveList();
+				m_editor->ReloadDisplayableMoveList();
 				FilterMovelist(EditorMovelistFilter_All);
 
 				m_moveToScrollTo = moveId;
@@ -267,6 +267,10 @@ void EditorWindow::RenderToolBar()
 				m_importNeeded = true;
 				OpenFormWindow(EditorWindowType_Extraproperty, structId);
 			}
+		}
+		if (ImGui::MenuItem(_("create new name")))
+		{
+			m_editor->CreateMoveName("test_move_name");
 		}
 		ImGui::EndMenu();
 	}
@@ -580,7 +584,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
 
 	// Read what needs to be read and potentially displayed right away
-	m_movelist = m_editor->GetDisplayableMoveList();
+	m_editor->ReloadDisplayableMoveList(&m_movelist);
 	m_filteredMovelist = m_movelist;
 
 	editorTable = m_editor->GetMovesetTable();
@@ -649,4 +653,9 @@ void EditorWindow::Render(int dockid)
 		RenderStatusBar();
 	}
 	ImGui::End();
+}
+
+void EditorWindow::ReloadMovelistFilter()
+{
+	FilterMovelist(m_movelistFilter);
 }

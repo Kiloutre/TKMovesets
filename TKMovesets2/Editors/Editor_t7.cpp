@@ -695,10 +695,54 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	return inputMap;
 }
 
-uint32_t CreateMoveName(const char* newName)
+uint64_t EditorT7::CreateMoveName(const char* moveName)
 {
-	// todo
-	return 0;
+	const size_t moveNameSize = strlen(moveName) + 1;
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	// Find position where to insert new name
+	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	const uint64_t orig_moveNameEndOffset = moveNameOffset;
+	while (*(m_moveset + (moveNameOffset - 2)) == 0)
+	{
+		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
+		// We want to erase as many empty bytes because of past alignment and then re-align to 8 bytes
+		moveNameOffset--;
+	}
+
+	const uint64_t relativeMoveNameOffset = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
+	const uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = moveNameEndOffset + (m_movesetSize - orig_moveNameEndOffset);
+	newMoveset = (Byte*)malloc(newMovesetSize);
+	if (newMoveset == nullptr) {
+		return 0;
+	}
+
+	// Copy start //
+
+	memcpy(newMoveset, m_moveset, moveNameOffset);
+
+	// Write our new name
+	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
+
+	// Copy all the data after our name
+	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, m_movesetSize - orig_moveNameEndOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+	m_header->offsets.movesetBlock += extraNameSize;
+	m_header->offsets.animationBlock += extraNameSize;
+	m_header->offsets.motaBlock += extraNameSize;
+
+	return relativeMoveNameOffset;
 }
 
 void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
@@ -832,6 +876,9 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	else {
 		strcpy(namePtr + move->name_addr, newName);
 	}
+
+	// In case we updated the name, reload the movelist display
+	ReloadDisplayableMoveList();
 }
 
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
@@ -1118,18 +1165,34 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	
 	for (size_t i = 0; i < m_infos->table.moveCount; ++i)
 	{
+		//printf("%d/%d - %llx\n", i, m_infos->table.moveCount, movePtr[i].anim_name_addr);
 		const char* animName = namePtr + movePtr[i].anim_name_addr;
+		std::string animName_str(animName);
 		gameAddr animOffset = movePtr[i].anim_addr;
 
-		if (m_animNameToOffsetMap.find(animName) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap[animName] != animOffset) {
-			// todo: with kazuya & maybe more characters, this is apparently a big problem
-			// change the way anim choosing is done
-			printf("(Move id %llu)\n", i);
-			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameToOffsetMap[animName]);
-			//throw std::exception();
+		if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap[animName_str] != animOffset) {
+			// Same animation name refers to multiple offsets. Create a unique animation name.
+			/*
+			animName_str += "(2)";
+			while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
+				animName_str += "(2)";
+			}
+
+			uint64_t newNameOffset = CreateMoveName(animName_str.c_str());
+			if (newNameOffset != 0) {
+				// Reallocation was done, update the pointers we are using
+				uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+				gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
+				char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+			} else {
+				// Could not generate new name
+				printf("exception");
+				throw std::exception();
+			}
+			*/
 		}
 
-		m_animNameToOffsetMap[animName] = animOffset;
+		m_animNameToOffsetMap[animName_str] = animOffset;
 		m_animOffsetToNameOffset[animOffset] = movePtr[i].anim_name_addr;
 	}
 }
@@ -1142,9 +1205,13 @@ EditorTable EditorT7::GetMovesetTable()
 	};
 }
 
-std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
+void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
 {
-	std::vector<DisplayableMove*> moves;
+	if (ref != nullptr) {
+		displayableMovelist = ref;
+	}
+
+	displayableMovelist->clear();
 
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
@@ -1187,7 +1254,7 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 			flags |= EditorMoveFlags_Custom;
 		}
 
-		moves.push_back(new DisplayableMove{
+		displayableMovelist->push_back(new DisplayableMove{
 			.moveId_str = std::to_string(moveId),
 			.name = moveName,
 			.alias_str = aliasId == 0 ? std::string() : std::to_string(aliasId),
@@ -1197,8 +1264,6 @@ std::vector<DisplayableMove*> EditorT7::GetDisplayableMoveList()
 			.flags = flags,
 		});
 	}
-
-	return moves;
 }
 
 // ===== Utils ===== //
@@ -1453,7 +1518,6 @@ int32_t EditorT7::CreateNewMove()
 	}
 
 	// Copy start //
-
 	memcpy(newMoveset, m_moveset, moveNameOffset);
 
 	// Write our new name

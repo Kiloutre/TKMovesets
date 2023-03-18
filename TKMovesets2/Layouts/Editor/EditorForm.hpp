@@ -38,6 +38,8 @@ protected:
 	// Contains a reference to the main editor window, used for event handling
 	EditorWindowBase* m_baseWindow = nullptr;
 
+	// Called whenever the changes are successfully applied
+	virtual void OnApply() {};
 	// Called whenever a field changes (and is valid). listIdx is always 0 if not a list of structs.
 	virtual void OnUpdate(int listIdx, EditorInput* field) {};
 	// Called when clicking a field

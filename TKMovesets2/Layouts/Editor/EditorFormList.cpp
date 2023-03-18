@@ -37,8 +37,9 @@ void EditorFormList::Apply()
 	}
 	unsavedChanges = false;
 	justAppliedChanges = true;
-}
 
+	OnApply();
+}
 
 bool EditorFormList::IsFormValid()
 {

@@ -63,7 +63,7 @@ private:
 	int32_t m_moveToPlay = -1;
 	// Access moveset data through this variable. Uses polymorphism.
 	Editor* m_editor = nullptr;
-	// Contains the backup of movelist displayed at all times
+	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*> m_movelist;
 	// Contains the movelist displayed at all times, may get sorted and/or filtered
 	std::vector<DisplayableMove*> m_filteredMovelist;
@@ -113,8 +113,11 @@ public:
 	~EditorWindow();
 	// Render the window
 	void Render(int dockid);
+
 	// Create a new window containing data about the given move. Can be called by subwidnows.
 	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId) override;
 	// Validates the move ID against the movelist size and alias list
 	int32_t ValidateMoveId(const char* buf) override;
+	// Reloads the movelist filter, used mostly when a move is renamed
+	void ReloadMovelistFilter() override;
 };
