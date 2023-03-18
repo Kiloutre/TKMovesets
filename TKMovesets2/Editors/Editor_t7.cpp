@@ -1,4 +1,5 @@
 #include <map>
+#include <format>
 
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
@@ -717,7 +718,7 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = moveNameEndOffset + (m_movesetSize - orig_moveNameEndOffset);
-	newMoveset = (Byte*)malloc(newMovesetSize);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return 0;
 	}
@@ -775,7 +776,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 
 	// Now that we know the aligned size of the name block, we can finally allocate
 	newMovesetSize = movelistStartOffset + (m_movesetSize - orig_movelistStartOffset);
-	newMoveset = (Byte*)malloc(newMovesetSize);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return ;
 	}
@@ -1171,25 +1172,27 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		gameAddr animOffset = movePtr[i].anim_addr;
 
 		if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap[animName_str] != animOffset) {
-			// Same animation name refers to multiple offsets. Create a unique animation name.
-			/*
-			animName_str += "(2)";
+			// Same animation name refers to a different offset. Create a unique animation name for it.
+			// Move names being similar is irrelevant, but i build an anim name <-> anim offset map, so i need uniqueness here.
+
+			animName_str += " (2)";
+			unsigned int num = 2;
 			while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
-				animName_str += "(2)";
+				animName_str = std::format("{} {}", animName, ++num);
 			}
 
 			uint64_t newNameOffset = CreateMoveName(animName_str.c_str());
 			if (newNameOffset != 0) {
 				// Reallocation was done, update the pointers we are using
-				uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-				gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-				char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+				movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+				movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
+				namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+				movePtr[i].anim_name_addr = newNameOffset;
+				animName = namePtr + movePtr[i].anim_name_addr;
 			} else {
 				// Could not generate new name
-				printf("exception");
 				throw std::exception();
 			}
-			*/
 		}
 
 		m_animNameToOffsetMap[animName_str] = animOffset;
@@ -1327,11 +1330,10 @@ int32_t EditorT7::CreateNewExtraProperties()
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = m_movesetSize + sizeof(ExtraMoveProperty) * 2;
-	newMoveset = (Byte*)malloc(newMovesetSize);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return -1;
 	}
-	memset(newMoveset, 0, newMovesetSize);
 
 	// Copy all the data up to the new structure 
 	memcpy(newMoveset, m_moveset, newStructOffset);
@@ -1384,7 +1386,7 @@ int32_t EditorT7::CreateNewRequirements()
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = m_movesetSize + sizeof(Requirement) * 2;
-	newMoveset = (Byte*)malloc(newMovesetSize);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return -1;
 	}
@@ -1440,7 +1442,7 @@ int32_t EditorT7::CreateNewCancelList()
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = m_movesetSize + sizeof(Cancel) * 2;
-	newMoveset = (Byte*)malloc(newMovesetSize);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return -1;
 	}
@@ -1512,7 +1514,7 @@ int32_t EditorT7::CreateNewMove()
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = newMoveOffset + sizeof(Move) + (m_movesetSize - origMovelistEndOffset);
-	newMoveset = (Byte*)malloc(newMovesetSize);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return -1;
 	}
