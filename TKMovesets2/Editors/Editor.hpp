@@ -235,4 +235,6 @@ public:
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
 	// Create a new structure or structure list
 	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
+	// Modifies an existing list's size
+	virtual void ModifyListSize(EditorWindowType_ type, uint32_t listId, uint16_t oldSize, uint16_t newSize) = 0;
 };

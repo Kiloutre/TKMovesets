@@ -114,4 +114,9 @@ public:
 	int32_t CreateNewReactions();
 	int32_t CreateNewPushback();
 	int32_t CreateNewPushbackExtra();
+
+	// -- List Creation / Deletion -- //
+	void ModifyListSize(EditorWindowType_ type, uint32_t listId, uint16_t oldSize, uint16_t newSize) override;
+	//
+	void ModifyCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
 };

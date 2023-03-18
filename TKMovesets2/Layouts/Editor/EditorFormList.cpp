@@ -32,7 +32,15 @@ void EditorFormList::Apply()
 		return;
 	}
 
-	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex) {
+	if (m_listSizeChange != 0)
+	{
+		// If items were added/removed, reallocate entire moveset
+		m_editor->ModifyListSize(windowType, id, m_listSize - m_listSizeChange, m_listSize);
+		m_listSizeChange = 0;
+	}
+
+	// Write into every individual item
+	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
 		m_editor->SaveItem(windowType, id + listIndex, m_fieldIdentifierMaps[listIndex]);
 	}
 	unsavedChanges = false;
@@ -44,7 +52,7 @@ void EditorFormList::Apply()
 
 bool EditorFormList::IsFormValid()
 {
-	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
+	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
 		for (auto& [category, fields] : m_fieldsCategoryMaps[listIndex]) {
 			for (auto& field : fields) {
@@ -148,6 +156,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
+	m_listSize = m_fieldIdentifierMaps.size();
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
@@ -163,19 +172,19 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	}
 
 	// Builds the <category : fields> maps
-	for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
+	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
 		m_fieldsCategoryMaps.push_back(std::map<int, std::vector<EditorInput*>>());
 		for (uint8_t category : m_categories)
 		{
-				std::vector<EditorInput*> inputs;
-				for (const std::string& fieldName : drawOrder) {
-					EditorInput* field = m_fieldIdentifierMaps[listIndex][fieldName];
-					if (field->category == category) {
-						inputs.push_back(field);
-					}
+			std::vector<EditorInput*> inputs;
+			for (const std::string& fieldName : drawOrder) {
+				EditorInput* field = m_fieldIdentifierMaps[listIndex][fieldName];
+				if (field->category == category) {
+					inputs.push_back(field);
 				}
-				m_fieldsCategoryMaps[listIndex][category] = inputs;
+			}
+			m_fieldsCategoryMaps[listIndex][category] = inputs;
 		}
 	}
 
@@ -193,41 +202,69 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 {
 	ImVec2 cursor = ImGui::GetCursorPos();
 
-	float max_x = ImGui::GetContentRegionAvail().x;
+	const float buttonWidth = 25;
+	float pos_x = ImGui::GetContentRegionAvail().x - buttonWidth * 4;
 
-	if (listIndex == 0) {
-		ImGui::SetCursorPosX(max_x - 25 * 4);
-		// No point in having the + on every single item
-		if (ImGui::Button("+", ImVec2(20, 20))) {
-			// Insert at this position
+	ImGui::PushID(this);
+	ImGui::PushID(listIndex);
+
+	// No point in having the + on every single item
+	/*
+	ImGui::SetCursorPosX(pos_x);
+	if (ImGui::Button("+", ImVec2(20, 20))) {
+		//++m_listSizeChange;
+		// todo: allocate new field input. copy current one.
+
+		// Insert at this position
 		// This implies shifting of the entire moveset data so the editor must be called
+	}
+	ImGui::SameLine();
+	*/
+
+	if (listIndex != 0) {
+		ImGui::SetCursorPosX(pos_x + buttonWidth);
+		if (ImGui::Button("^", ImVec2(20, 20)))
+		{
+			// Move item UP
+			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex - 1);
+			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex - 1);
+			unsavedChanges = true;
 		}
 		ImGui::SameLine();
 	}
-	else {
-		ImGui::SetCursorPosX(max_x - 25 * 3 + 5);
+
+	if (listIndex + 1 != m_listSize) {
+		ImGui::SetCursorPosX(pos_x + buttonWidth * 2);
+		if (ImGui::Button("V", ImVec2(20, 20)))
+		{
+			// Move item DOWN
+			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex + 1);
+			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex + 1);
+			unsavedChanges = true;
+		}
+		ImGui::SameLine();
 	}
 
-	if (ImGui::Button("^", ImVec2(20, 20)))
-	{
-		// Move item UP
-		// 
-	}
-	ImGui::SameLine();
-
-	if (ImGui::Button("V", ImVec2(20, 20)))
-	{
-		// Move item DOWN
-	}
-	ImGui::SameLine();
-
+	ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
 	if (ImGui::Button("X", ImVec2(20, 20)))
 	{
 		// Delete this item
-		// This implies shifting of the entire moveset data so the editor must be called
+		--m_listSizeChange;
+		--m_listSize;
+
+		// Only delete if we're not at the list end, to avoid destructing the fields before using them
+		// Reducing list size will make things invisible on the next render anyway
+		if (listIndex < m_listSize) {
+			// Shift following items up
+			m_fieldIdentifierMaps.erase(m_fieldIdentifierMaps.begin() + listIndex);
+			m_fieldsCategoryMaps.erase(m_fieldsCategoryMaps.begin() + listIndex);
+			unsavedChanges = true;
+		}
 	}
 	ImGui::SameLine();
 
+	ImGui::PopID();
+	ImGui::PopID();
 	ImGui::SetCursorPos(cursor);
 }
 
@@ -265,7 +302,7 @@ void EditorFormList::Render()
 
 			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 			const int columnCount = EditorFormUtils::GetColumnCount();
-			for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
+			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 			{
 				RenderListControlButtons(listIndex);
 				std::string treeNodeTitle = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIndex, listIndex + id);

@@ -14,6 +14,10 @@ protected:
 	std::vector<std::map<std::string, EditorInput*>> m_fieldIdentifierMaps;
 	// Containst the form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
 	std::vector<std::map<int, std::vector<EditorInput*>>> m_fieldsCategoryMaps;
+	// Contains the size of the current list. Might change.
+	int m_listSize = 0;
+	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
+	int m_listSizeChange = 0;
 
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};
