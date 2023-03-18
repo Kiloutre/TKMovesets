@@ -59,6 +59,9 @@ enum EditorWindowType_
 	EditorWindowType_PushbackExtradata,
 	EditorWindowType_MoveBeginProperty,
 	EditorWindowType_MoveEndProperty,
+
+
+	EditorWindowType_Invalid,
 };
 
 typedef uint16_t EditorInputFlag;

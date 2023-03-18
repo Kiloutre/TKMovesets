@@ -7,6 +7,7 @@ set(INCLUDE_FOLDERS
                     "Layouts"
                     "Layouts/Submenus"
                     "Layouts/Editor"
+                    "Layouts/Editor/EditorWindow"
                     "Layouts/Editor/Structures"
                     "Game"
                     "GameInteractions"
@@ -32,7 +33,8 @@ set(BINARY_SOURCES
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
                     # Layout: editor window
-                    "Layouts/Editor/EditorWindow.cpp"
+                    "Layouts/Editor/EditorWindow/EditorWindow.cpp"
+                    "Layouts/Editor/EditorWindow/EditorWindow_Rendering.cpp"
                     "Layouts/Editor/EditorForm.cpp"
                     "Layouts/Editor/EditorFormList.cpp"
                     "Layouts/Editor/Structures/EditorMove.cpp"
@@ -63,6 +65,10 @@ set(BINARY_SOURCES
                     "Utils/ThreadedClass.cpp"
 )
 
+set(IMPORTEXPORT_INCLUDE_FOLDERS
+                    "Editors/Editor_T7"
+)
+
 # This will be included in the .dll and should only be related to extraction/importation/edition (anything game specific)
 set(IMPORTEXPORT_SOURCES
                     # Keep a copy of these since Extractor & Importers are reliant on them
@@ -83,13 +89,14 @@ set(IMPORTEXPORT_SOURCES
                     # Game-specific
                     "GameInteractions/Extractors/Extractor_t7.cpp"
                     "GameInteractions/Importers/Importer_t7.cpp"
-                    "Editors/Editor_t7.cpp"
+                    "Editors/Editor_t7/Editor_t7.cpp"
+                    "Editors/Editor_t7/Editor_t7_Creations.cpp"
 )
 
 ## Build ##
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
 add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES})
-target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
+target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS} ${IMPORTEXPORT_INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 
 # Build program .exe

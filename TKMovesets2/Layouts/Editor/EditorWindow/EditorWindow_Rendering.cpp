@@ -24,180 +24,6 @@
 
 // -- Private methods -- //
 
-EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint16_t id)
-{
-	switch (windowType)
-	{
-	case EditorWindowType_Move:
-		return new EditorMove(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Voiceclip:
-		return new EditorVoiceclip(m_windowTitle, id, m_editor);
-		break;
-	case EditorWindowType_Extraproperty:
-		return new EditorExtraproperties(m_windowTitle, id, m_editor);
-		break;
-	case EditorWindowType_Cancel:
-		return new EditorCancels(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_GroupedCancel:
-		return new EditorGroupedCancels(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_CancelExtradata:
-		return new EditorCancelExtra(m_windowTitle, id, m_editor);
-		break;
-	case EditorWindowType_Requirement:
-		return new EditorRequirements(m_windowTitle, id, m_editor);
-		break;
-	case EditorWindowType_HitCondition:
-		return new EditorHitConditions(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Reactions:
-		return new EditorReactions(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Pushback:
-		return new EditorPushback(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_PushbackExtradata:
-		return new EditorPushbackExtra(m_windowTitle, id, m_editor);
-		break;
-	case EditorWindowType_MoveBeginProperty:
-		return new EditorMoveStartProperty(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_MoveEndProperty:
-		return new EditorMoveEndProperty(m_windowTitle, id, m_editor, this);
-		break;
-	}
-
-	return nullptr;
-}
-
-void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
-{
-	// todo: template this function?
-	int availableOverwriteIndex = -1;
-	for (int i = 0; i < m_structWindows.size(); ++i) {
-		EditorForm* structWin = m_structWindows[i];
-		if (structWin->windowType != windowType) {
-			continue;
-		}
-
-		if (structWin->id == moveId) {
-			structWin->setFocus = true;
-			// Prevent duplicate move window creation
-			return;
-		}
-		if (structWin->unsavedChanges == false) {
-			// Don't overwrite windows with unsaved changes
-			availableOverwriteIndex = i;
-		}
-	}
-
-	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-	EditorForm* newWin = AllocateFormWindow(windowType, moveId);
-	if (openNew || availableOverwriteIndex == -1) {
-		m_structWindows.push_back(newWin);
-	}
-	else {
-		// Can't delete here because OpenFormWindow can be called by EditorForm classes
-		// Close the window and let deletion occur during next rendering
-		m_structWindows[availableOverwriteIndex]->popen = false;
-		m_structWindows[availableOverwriteIndex] = newWin;
-	}
-}
-
-void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
-{
-	m_filteredMovelist.clear();
-
-	m_movelistFilter = filter;
-	if (filter == EditorMovelistFilter_All) {
-		m_filteredMovelist = m_movelist;
-		return;
-	}
-
-	if (filter == EditorMovelistFilter_PostIdle) {
-		// Get idle move ID, only list moves beyond it
-		size_t startingIndex = editorTable.aliases[1];
-		for (; startingIndex < m_movelist.size(); ++startingIndex) {
-			m_filteredMovelist.push_back(m_movelist[startingIndex]);
-		}
-		return;
-	}
-
-	EditorMoveFlags flags = 0;
-
-	switch (filter)
-	{
-	case EditorMovelistFilter_Attacks:
-		flags |= EditorMoveFlags_Attack | EditorMoveFlags_OtherAttack;
-		break;
-	case EditorMovelistFilter_Generic:
-		flags |= EditorMoveFlags_Generic;
-		break;
-	case EditorMovelistFilter_Throws:
-		flags |= EditorMoveFlags_Throw;
-		break;
-	case EditorMovelistFilter_Custom:
-		flags |= EditorMoveFlags_Custom;
-		break;
-	}
-
-	for (DisplayableMove* move : m_movelist)
-	{
-		if (move->flags & flags) {
-			m_filteredMovelist.push_back(move);
-		}
-	}
-
-	// If displaying generic moves, sort by generic id
-	if (filter & EditorMovelistFilter_Generic) {
-		struct sortByAlias {
-			bool operator()(DisplayableMove const* a, DisplayableMove const* b) const {
-				return a->aliasId < b->aliasId;
-			}
-		};
-		std::sort(m_filteredMovelist.begin(), m_filteredMovelist.end(), sortByAlias());
-	}
-}
-
-int32_t EditorWindow::ValidateMoveId(const char* buf)
-{
-	int32_t moveId = atoi(buf);
-
-	const size_t movelistSize = m_movelist.size();
-	if (moveId >= movelistSize)
-	{
-		const size_t aliasesCount = editorTable.aliases.size();
-		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
-			return -1;
-		}
-		moveId = editorTable.aliases[moveId - (uint16_t)0x8000];
-	}
-
-	return moveId;
-}
-
-bool EditorWindow::MovesetStillLoaded()
-{
-	gameAddr movesetAddress = importerHelper.importer->GetMovesetAddress(importerHelper.currentPlayerId);
-	return movesetAddress == m_loadedMoveset;
-}
-
-void EditorWindow::Save()
-{
-	uint64_t movesetSize;
-	const Byte* moveset = m_editor->GetMoveset(movesetSize);
-
-	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
-	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
-	file.write((char*)moveset, movesetSize);
-	file.close();
-	m_savedLastChange = true;
-}
-
 void EditorWindow::RenderToolBar()
 {
 	// todo: ImGuiWindowFlags_MenuBar ?
@@ -226,46 +52,71 @@ void EditorWindow::RenderToolBar()
 	
 	if (ImGui::BeginMenu(_("edition.create_new")))
 	{
-		if (ImGui::MenuItem(_("edition.move")))
-		{
-			int32_t moveId = m_editor->CreateNew(EditorWindowType_Move);
-			if (moveId != -1) {
-				m_editor->ReloadDisplayableMoveList();
-				FilterMovelist(EditorMovelistFilter_All);
+		EditorWindowType_ structType = EditorWindowType_Invalid;
 
-				m_moveToScrollTo = moveId;
-				m_highlightedMoveId = moveId;
-				m_savedLastChange = false;
-				m_importNeeded = true;
+		if (ImGui::MenuItem(_("edition.requirement"))) {
+			structType = EditorWindowType_Requirement;
+		}
 
-				OpenFormWindow(EditorWindowType_Move, moveId);
-			}
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.move"))) {
+			structType = EditorWindowType_Move;
 		}
-		if (ImGui::MenuItem(_("edition.cancel_list")))
-		{
-			int32_t structId = m_editor->CreateNew(EditorWindowType_Cancel);
+		if (ImGui::MenuItem(_("edition.voiceclip"))) {
+			structType = EditorWindowType_Voiceclip;
+		}
+		if (ImGui::MenuItem(_("edition.cancel_list"))) {
+			structType = EditorWindowType_Cancel;
+		}
+		if (ImGui::MenuItem(_("edition.grouped_cancel_list"))) {
+			structType = EditorWindowType_GroupedCancel;
+		}
+		if (ImGui::MenuItem(_("edition.cancel_extradata"))) {
+			structType = EditorWindowType_CancelExtradata;
+		}
+
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.extra_properties"))) {
+			structType = EditorWindowType_Extraproperty;
+		}
+		if (ImGui::MenuItem(_("edition.move_begin_properties"))) {
+			structType = EditorWindowType_MoveBeginProperty;
+		}
+		if (ImGui::MenuItem(_("edition.move_end_properties"))) {
+			structType = EditorWindowType_MoveEndProperty;
+		}
+
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.hit_conditions"))) {
+			structType = EditorWindowType_HitCondition;
+		}
+		if (ImGui::MenuItem(_("edition.reactions"))) {
+			structType = EditorWindowType_Reactions;
+		}
+		if (ImGui::MenuItem(_("edition.pushback"))) {
+			structType = EditorWindowType_Pushback;
+		}
+		if (ImGui::MenuItem(_("edition.pushback_extra"))) {
+			structType = EditorWindowType_PushbackExtradata;
+		}
+
+		if (structType != EditorWindowType_Invalid) {
+			int32_t structId = m_editor->CreateNew(structType);
 			if (structId != -1) {
 				m_savedLastChange = false;
 				m_importNeeded = true;
-				OpenFormWindow(EditorWindowType_Cancel, structId);
-			}
-		}
-		if (ImGui::MenuItem(_("edition.requirement")))
-		{
-			int32_t structId = m_editor->CreateNew(EditorWindowType_Requirement);
-			if (structId != -1) {
-				m_savedLastChange = false;
-				m_importNeeded = true;
-				OpenFormWindow(EditorWindowType_Requirement, structId);
-			}
-		}
-		if (ImGui::MenuItem(_("edition.extra_properties")))
-		{
-			int32_t structId = m_editor->CreateNew(EditorWindowType_Extraproperty);
-			if (structId != -1) {
-				m_savedLastChange = false;
-				m_importNeeded = true;
-				OpenFormWindow(EditorWindowType_Extraproperty, structId);
+				OpenFormWindow(structType, structId);
+
+				// Custom pre-creation behaviour implementations
+				switch (structType)
+				{
+				case EditorWindowType_Move:
+					m_editor->ReloadDisplayableMoveList();
+					FilterMovelist(EditorMovelistFilter_All);
+					m_moveToScrollTo = structId;
+					m_highlightedMoveId = structId;
+					break;
+				}
 			}
 		}
 
@@ -530,63 +381,6 @@ void EditorWindow::RenderMovelist()
 	}
 }
 
-// -- Public methods -- //
-
-EditorWindow::~EditorWindow()
-{
-	importerHelper.StopThreadAndCleanup();
-
-	uint64_t movesetSize;
-	Byte* moveset = (Byte*)m_editor->GetMoveset(movesetSize);
-	free(moveset);
-
-	delete m_editor;
-}
-
-EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
-{
-	importerHelper.Init(addrFile, storage);
-	importerHelper.StartThread();
-
-	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, importerHelper.process, importerHelper.game);
-
-	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
-
-	if (file.fail()) {
-		throw EditorWindow_MovesetLoadFail();
-	}
-
-	file.seekg(0, std::ios::end);
-	uint64_t movesetSize = file.tellg();
-
-	Byte* moveset = (Byte*)malloc(movesetSize);
-	if (moveset == nullptr) {
-		throw EditorWindow_MovesetLoadFail();
-	}
-
-	file.seekg(0, std::ios::beg);
-	file.read((char*)moveset, movesetSize);
-
-	file.close();
-
-	m_editor->LoadMoveset(moveset, movesetSize);
-	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId);
-
-	m_loadedCharacter.filename = movesetInfo->filename;
-	m_loadedCharacter.name = movesetInfo->name;
-	m_loadedCharacter.lastSavedDate = movesetInfo->date;
-	m_loadedCharacter.gameId = movesetInfo->gameId;
-	filename = movesetInfo->filename;
-
-	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
-
-	// Read what needs to be read and potentially displayed right away
-	m_editor->ReloadDisplayableMoveList(&m_movelist);
-	m_filteredMovelist = m_movelist;
-
-	editorTable = m_editor->GetMovesetTable();
-}
-
 void EditorWindow::Render(int dockid)
 {
 	// Check for important changes here
@@ -650,9 +444,4 @@ void EditorWindow::Render(int dockid)
 		RenderStatusBar();
 	}
 	ImGui::End();
-}
-
-void EditorWindow::ReloadMovelistFilter()
-{
-	FilterMovelist(m_movelistFilter);
 }
