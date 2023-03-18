@@ -232,6 +232,7 @@ void EditorForm::Render()
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
 		lastDockId = ImGui::GetWindowDockID();
+
 		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 		const int columnCount = EditorFormUtils::GetColumnCount();
 		for (uint8_t category : m_categories)
@@ -240,7 +241,7 @@ void EditorForm::Render()
 			// todo: compute this std::format() once and not every frame
 			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
 				// Only show titles for category > 0, and if tree is not open: no need to render anything
-				//continue;
+				continue;
 			}
 
 			else if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))

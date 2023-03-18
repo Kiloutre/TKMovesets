@@ -195,8 +195,16 @@ void EditorFormList::Render()
 		setFocus = false;
 	}
 
+	if (nextDockId != -1) {
+		ImGui::SetNextWindowDockID(nextDockId);
+		nextDockId = -1;
+	}
+
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
+		lastDockId = ImGui::GetWindowDockID();
+
+		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 		const int columnCount = EditorFormUtils::GetColumnCount();
 		for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
 		{
