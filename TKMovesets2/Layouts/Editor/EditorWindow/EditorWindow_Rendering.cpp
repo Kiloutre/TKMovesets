@@ -241,15 +241,17 @@ void EditorWindow::RenderMovesetData()
 	for (size_t i = 0; i < m_structWindows.size();)
 	{
 		EditorForm* moveWin = m_structWindows[i];
+
+		if (moveWin->justAppliedChanges)
+		{
+			moveWin->justAppliedChanges = false;
+			m_savedLastChange = false;
+			m_importNeeded = true;
+		}
+
 		if (moveWin->popen)
 		{
 			moveWin->Render();
-
-			if (moveWin->justAppliedChanges) {
-				moveWin->justAppliedChanges = false;
-				m_savedLastChange = false;
-				m_importNeeded = true;
-			}
 			++i;
 		}
 		else {

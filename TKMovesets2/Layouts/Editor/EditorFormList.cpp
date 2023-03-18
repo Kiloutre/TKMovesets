@@ -39,13 +39,20 @@ void EditorFormList::Apply()
 		m_listSizeChange = 0;
 	}
 
+	unsavedChanges = false;
+	justAppliedChanges = true;
+	m_requestedClosure = false;
+
+	if (m_listSize == 0) {
+		// List is now empty, no nede to kepe this open
+		popen = false;
+		return;
+	}
+
 	// Write into every individual item
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
 		m_editor->SaveItem(windowType, id + listIndex, m_fieldIdentifierMaps[listIndex]);
 	}
-	unsavedChanges = false;
-	justAppliedChanges = true;
-	m_requestedClosure = false;
 
 	OnApply();
 }
