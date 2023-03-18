@@ -182,22 +182,22 @@ edition.move.cancel_id_4_related = ID de cancel 4 (lié)
 edition.voiceclip.window_name = Voix
 edition.voiceclip.id = ID
 
-edition.extraproperty.window_name = Propriété
+edition.extraproperty.window_name = Liste de propriété
 edition.extraproperty.starting_frame = Frame de début
 edition.extraproperty.id = ID
 edition.extraproperty.value = Value
 
-edition.start_other_extraproperty.window_name = Autre propriété
+edition.start_other_extraproperty.window_name = Liste de propriété de début
 edition.start_other_extraproperty.requirements_addr = ID de condition
 edition.start_other_extraproperty.extraprop = Propriété / Condition
 edition.start_other_extraproperty.value = Valeur
 
-edition.end_other_extraproperty.window_name = Autre propriété
+edition.end_other_extraproperty.window_name = Liste de propriété de fin
 edition.end_other_extraproperty.requirements_addr = ID de condition
 edition.end_other_extraproperty.extraprop =  Propriété / Condition
 edition.end_other_extraproperty.value = Valeur
 
-edition.cancel.window_name = Cancel
+edition.cancel.window_name = Liste de Cancel
 edition.cancel.command = Commande
 edition.cancel.requirements_addr = ID de conditions
 edition.cancel.extradata_addr = ID d'extradata
@@ -207,7 +207,7 @@ edition.cancel.starting_frame = Frame de commencement
 edition.cancel.move_id = ID de move
 edition.cancel.cancel_option = Option de cancel
 
-edition.grouped_cancel.window_name = Cancel de groupe
+edition.grouped_cancel.window_name = Liste de Cancel groupés
 edition.grouped_cancel.command = Commande
 edition.grouped_cancel.requirements_addr = ID de conditions
 edition.grouped_cancel.extradata_addr = ID d'extradata
@@ -220,11 +220,11 @@ edition.grouped_cancel.cancel_option = Option de cancel
 edition.cancel_extra.window_name = Cancel extra
 edition.cancel_extra.value = Valeur
 
-edition.requirement.window_name = Condition
+edition.requirement.window_name = Liste de condition
 edition.requirement.condition = Condition
 edition.requirement.param = Paramètre
 
-edition.hit_condition.window_name = Hit condition
+edition.hit_condition.window_name = Liste de Hit condition
 edition.hit_condition.requirements_addr = ID de conditions
 edition.hit_condition.damage = Damage
 edition.hit_condition.reactions_addr = Réactions ID
