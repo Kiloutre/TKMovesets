@@ -77,12 +77,14 @@ private:
 	int16_t m_highlightedMoveId = -1;
 	// Store the list of move windows to render
 	std::vector<EditorForm*> m_structWindows;
+	// The dock id that new windows might dock on
+	ImGuiID m_dockId;
 
 
 	// Render the top toolbar containing useful moveset editing tools
 	void RenderToolBar();
 	// Render the moveset data in the main dockspace of the window
-	void RenderMovesetData(ImGuiID dockId);
+	void RenderMovesetData();
 	// Render the bottom statusbar that shows the save button and more
 	void RenderStatusBar();
 	// Render the list of moves

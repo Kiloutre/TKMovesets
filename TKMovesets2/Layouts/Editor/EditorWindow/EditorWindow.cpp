@@ -87,14 +87,17 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
 			// Prevent duplicate move window creation
 			return;
 		}
-		if (structWin->unsavedChanges == false) {
-			// Don't overwrite windows with unsaved changes
+
+		if (structWin->unsavedChanges == false && structWin->lastDockId == m_dockId) {
+			// Don't overwrite windows with unsaved changes OR that have been detached
 			availableOverwriteIndex = i;
 		}
 	}
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorForm* newWin = AllocateFormWindow(windowType, moveId);
+	newWin->nextDockId = m_dockId;
+	newWin->lastDockId = m_dockId;
 	if (openNew || availableOverwriteIndex == -1) {
 		m_structWindows.push_back(newWin);
 	}

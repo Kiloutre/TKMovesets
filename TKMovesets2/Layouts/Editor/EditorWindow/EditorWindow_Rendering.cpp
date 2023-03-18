@@ -236,14 +236,13 @@ void EditorWindow::RenderStatusBar()
 
 }
 
-void EditorWindow::RenderMovesetData(ImGuiID dockId)
+void EditorWindow::RenderMovesetData()
 {
 	for (size_t i = 0; i < m_structWindows.size();)
 	{
 		EditorForm* moveWin = m_structWindows[i];
 		if (moveWin->popen)
 		{
-			ImGui::SetNextWindowDockID(dockId, ImGuiCond_Once);
 			moveWin->Render();
 
 			if (moveWin->justAppliedChanges) {
@@ -435,8 +434,8 @@ void EditorWindow::Render(int dockid)
 
 			ImGui::TableNextColumn();
 			// The dockspace loves to overflow past the table end for some reason so we have to re-substract FrameHeight.
-			ImGuiID dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - ImGui::GetFrameHeightWithSpacing()));
-			RenderMovesetData(dockId);
+			m_dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - ImGui::GetFrameHeightWithSpacing()));
+			RenderMovesetData();
 
 			ImGui::EndTable();
 		}

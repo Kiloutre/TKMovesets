@@ -69,6 +69,10 @@ public:
 	uint32_t id = 0;
 	// Type of the widnow, passed to editor functions
 	EditorWindowType_ windowType;
+	// The dock ID to set during the next render (will happen only once)
+	int nextDockId = -1;
+	// Stores the last dock id the window was rendered in. If isn't the main window's dock ID, this window can't be deleted.
+	ImGuiID lastDockId = 0;
 
 	virtual void Render();
 };
