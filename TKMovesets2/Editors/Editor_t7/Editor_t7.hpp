@@ -118,5 +118,14 @@ public:
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, uint32_t listId, uint16_t oldSize, uint16_t newSize) override;
 	//
+	void ModifyRequirementListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	//
 	void ModifyCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyGroupedCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	//
+	void ModifyExtraPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyStartPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyEndPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	//
+	void ModifyHitConditionListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
 };
