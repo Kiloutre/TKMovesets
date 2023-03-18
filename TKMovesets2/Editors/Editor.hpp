@@ -203,6 +203,8 @@ public:
 
 	// Loads important moveset data in our class, required to start functionning
 	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;
+	// Assigns the moveset pointer and useful ptrs to it
+	virtual void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	// Returns useful informations contained within the moveset  actual header
 	virtual EditorTable GetMovesetTable() = 0;
 	// Return the movelist in a quickly displayable format

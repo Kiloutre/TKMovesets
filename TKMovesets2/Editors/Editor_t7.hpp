@@ -19,6 +19,7 @@ public:
 	// Inherit constructor
 	using Editor::Editor;
 
+	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
 	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
 	EditorTable GetMovesetTable() override;
 	std::vector<DisplayableMove*> GetDisplayableMoveList() override;
@@ -30,6 +31,8 @@ public:
 	
 	// Moves
 	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	uint32_t CreateMoveName(const char* newName);
+	void SaveMoveName(const char* newName, gameAddr move_name_addr);
 	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateMoveField(std::string name, EditorInput* field);
 

@@ -695,12 +695,91 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	return inputMap;
 }
 
+uint32_t CreateMoveName(const char* newName)
+{
+	// todo
+	return 0;
+}
+
+void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
+{
+	const size_t moveNameSize = strlen(moveName) + 1;
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	// Find position where to insert new name
+	const uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.nameBlock + move_name_addr;
+	const uint64_t moveNameEndOffset = moveNameOffset + moveNameSize;
+	const uint64_t orig_moveNameEndOffset = moveNameOffset + strlen((char*)m_moveset + moveNameOffset) + 1;
+
+	// Find the very last move name ending offset
+	uint64_t lastNameEndOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	while (*(m_moveset + (lastNameEndOffset - 2)) == 0)
+	{
+		// Because the block after the nameBlock needs to be aligned, we also have to find the last offset and see
+		// - the impact of our insertion, see if it misaligns the ending position
+		lastNameEndOffset--;
+	}
+	// Shift by the new size difference
+	const uint64_t orig_moveNameSize = strlen((char*)m_moveset + moveNameOffset) + 1;
+	const uint64_t orig_movelistStartOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	lastNameEndOffset += moveNameSize - orig_moveNameSize;
+
+	// Align the end of the name block to 8 bytes to get the start of the movelist block
+	const uint64_t movelistStartOffset = Helpers::align8Bytes(lastNameEndOffset);
+
+	// Now that we know the aligned size of the name block, we can finally allocate
+	newMovesetSize = movelistStartOffset + (m_movesetSize - orig_movelistStartOffset);
+	newMoveset = (Byte*)malloc(newMovesetSize);
+	if (newMoveset == nullptr) {
+		return ;
+	}
+	memset(newMoveset, 0, newMovesetSize);
+
+	// Copy start //
+
+	memcpy(newMoveset, m_moveset, moveNameOffset);
+
+	// Write our new name
+	strcpy((char*)newMoveset + moveNameOffset, moveName);
+
+	// Copy all the data after new name until the end of the name block
+	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, orig_movelistStartOffset - orig_moveNameEndOffset);
+
+	// Copy all the data from the start of the moveset block to the end
+	memcpy(newMoveset + movelistStartOffset, m_moveset + orig_movelistStartOffset, m_movesetSize - orig_movelistStartOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraBlockSize = movelistStartOffset - orig_movelistStartOffset;
+	m_header->offsets.movesetBlock += extraBlockSize;
+	m_header->offsets.animationBlock += extraBlockSize;
+	m_header->offsets.motaBlock += extraBlockSize;
+
+	// Shift moveset name addr offsets
+	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset);
+	for (size_t i = 0; i < m_infos->table.moveCount; ++i)
+	{
+		if (move[i].name_addr > move_name_addr) {
+			move[i].name_addr += extraNameSize;
+		}
+		if (move[i].anim_name_addr > move_name_addr) {
+			move[i].anim_name_addr += extraNameSize;
+		}
+	}
+}
+
 void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + id;
 
-	// todo: move name, allow edition
 	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
 		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
 	}
@@ -740,6 +819,19 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	move->_0x98_int = atoi(inputs["_0x98_int"]->buffer);
 	move->_0xA8_short = atoi(inputs["_0xA8_short"]->buffer);
 	move->_0xAC_short = atoi(inputs["_0xAC_short"]->buffer);
+
+	// Save move name at the end because it may implay reallocation and invalidation of existing pointers
+	char* newName = inputs["move_name"]->buffer;
+	char* namePtr = (char*)(m_movesetData + m_header->offsets.nameBlock);
+
+	if (strlen(newName) != strlen(namePtr + move->name_addr)) {
+		// Only re-allocate moveset & shift offsets if the length doesn't match
+		// todo: detect name collision
+		SaveMoveName(newName, move->name_addr);
+	}
+	else {
+		strcpy(namePtr + move->name_addr, newName);
+	}
 }
 
 bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
@@ -989,15 +1081,8 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 
 // ===== Other ===== //
 
-void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
+void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 {
-	constants = {
-		   {EditorConstants_RequirementEnd, 881},
-		   {EditorConstants_CancelCommandEnd, 0x8000},
-		   {EditorConstants_GroupedCancelCommand, 0x800B},
-		   {EditorConstants_GroupedCancelCommandEnd, 0x800C},
-	};
-
 	m_moveset = t_moveset;
 	m_movesetSize = t_movesetSize;
 
@@ -1007,6 +1092,18 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	m_movesetData = t_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
 	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
 	m_infos = (MovesetInfo*)m_movesetData;
+}
+
+void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
+{
+	constants = {
+		   {EditorConstants_RequirementEnd, 881},
+		   {EditorConstants_CancelCommandEnd, 0x8000},
+		   {EditorConstants_GroupedCancelCommand, 0x800B},
+		   {EditorConstants_GroupedCancelCommandEnd, 0x800C},
+	};
+
+	LoadMovesetPtr(t_moveset, t_movesetSize);
 
 	// Get aliases as a vector
 	uint16_t* aliasesPtr = m_infos->aliases1;
@@ -1029,7 +1126,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 			// change the way anim choosing is done
 			printf("(Move id %llu)\n", i);
 			printf("Error: The same animation name refers to two different offsets. [%s] = [%llx] and [%llx]\n", animName, animOffset, m_animNameToOffsetMap[animName]);
-			throw std::exception();
+			//throw std::exception();
 		}
 
 		m_animNameToOffsetMap[animName] = animOffset;
@@ -1169,6 +1266,7 @@ int32_t EditorT7::CreateNewExtraProperties()
 	if (newMoveset == nullptr) {
 		return -1;
 	}
+	memset(newMoveset, 0, newMovesetSize);
 
 	// Copy all the data up to the new structure 
 	memcpy(newMoveset, m_moveset, newStructOffset);
@@ -1189,14 +1287,7 @@ int32_t EditorT7::CreateNewExtraProperties()
 
 	// Assign new moveset
 	free(m_moveset);
-	m_moveset = newMoveset;
-	m_movesetSize = newMovesetSize;
-
-	// Assign useful pointers & variable to the new moveset
-	m_header = (TKMovesetHeader*)m_moveset;
-	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_infos = (MovesetInfo*)m_movesetData;
+	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraSize = sizeof(ExtraMoveProperty) * 2;
@@ -1252,14 +1343,7 @@ int32_t EditorT7::CreateNewRequirements()
 
 	// Assign new moveset
 	free(m_moveset);
-	m_moveset = newMoveset;
-	m_movesetSize = newMovesetSize;
-
-	// Assign useful pointers & variable to the new moveset
-	m_header = (TKMovesetHeader*)m_moveset;
-	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_infos = (MovesetInfo*)m_movesetData;
+	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraSize = sizeof(Requirement) * 2;
@@ -1315,14 +1399,7 @@ int32_t EditorT7::CreateNewCancelList()
 
 	// Assign new moveset
 	free(m_moveset);
-	m_moveset = newMoveset;
-	m_movesetSize = newMovesetSize;
-
-	// Assign useful pointers & variable to the new moveset
-	m_header = (TKMovesetHeader*)m_moveset;
-	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_infos = (MovesetInfo*)m_movesetData;
+	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraSize = sizeof(Cancel) * 2;
@@ -1413,14 +1490,7 @@ int32_t EditorT7::CreateNewMove()
 
 	// Assign new moveset
 	free(m_moveset);
-	m_moveset = newMoveset;
-	m_movesetSize = newMovesetSize;
-
-	// Assign useful pointers & variable to the new moveset
-	m_header = (TKMovesetHeader*)m_moveset;
-	m_movesetData = m_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_infos = (MovesetInfo*)m_movesetData;
+	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
