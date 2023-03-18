@@ -6,6 +6,8 @@
 
 # Utilitaires #
 
+yes = Oui
+no = No
 mota_00 = Anims 1
 mota_01 = Anims 2
 mota_02 = Mains 1
@@ -109,6 +111,7 @@ edition.select_moveset = Choisissez un personnage
 edition.suggest_new_name = Ce personnage possède un nom par défaut, voulez-vous lui donner un nom différent ?
 edition.last_saved = Dernière sauvegarde le:
 edition.save = Sauvegarder
+edition.discard_changes = Abandonner les changements ?
 edition.process_err = Error
 edition.live_edition = Édition en direct
 edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.

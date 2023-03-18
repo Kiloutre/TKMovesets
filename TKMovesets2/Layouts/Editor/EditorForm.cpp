@@ -74,6 +74,7 @@ void EditorForm::Apply()
 	m_editor->SaveItem(windowType, id, m_fieldIdentifierMap);
 	unsavedChanges = false;
 	justAppliedChanges = true;
+	m_requestedClosure = false;
 
 	OnApply();
 }
@@ -231,43 +232,62 @@ void EditorForm::Render()
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
-		lastDockId = ImGui::GetWindowDockID();
-
-		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
-		const int columnCount = EditorFormUtils::GetColumnCount();
-		for (uint8_t category : m_categories)
+		if (m_requestedClosure)
 		{
-			const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
-			// todo: compute this std::format() once and not every frame
-			if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
-				// Only show titles for category > 0, and if tree is not open: no need to render anything
-				continue;
-			}
+			ImGui::TextUnformatted(_("edition.discard_changes"));
 
-			else if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+			if (ImGui::Button(_("yes")))
 			{
-				std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
-				RenderInputs(inputs, category, columnCount);
-				ImGui::EndTable();
+				unsavedChanges = false;
+				popen = false;
 			}
 
+			if (ImGui::Button(_("no"))) {
+				m_requestedClosure = false;
+			}
 		}
+		else
+		{
+			lastDockId = ImGui::GetWindowDockID();
 
-		bool enabledBtn = unsavedChanges;
-		if (enabledBtn) {
-			ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(64, 161, 154, 255));
-		}
-		if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
-			Apply();
-		}
-		if (enabledBtn) {
-			ImGui::PopStyleColor();
+			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
+			const int columnCount = EditorFormUtils::GetColumnCount();
+			for (uint8_t category : m_categories)
+			{
+				const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
+				// todo: compute this std::format() once and not every frame
+				if (category != 0 && !ImGui::CollapsingHeader(_(std::format("{}.category_{}", m_identifierPrefix, category).c_str()), headerFlags)) {
+					// Only show titles for category > 0, and if tree is not open: no need to render anything
+					continue;
+				}
+
+				else if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+				{
+					std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
+					RenderInputs(inputs, category, columnCount);
+					ImGui::EndTable();
+				}
+
+			}
+
+			bool enabledBtn = unsavedChanges;
+			if (enabledBtn) {
+				ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(64, 161, 154, 255));
+			}
+			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+				Apply();
+			}
+			if (enabledBtn) {
+				ImGui::PopStyleColor();
+			}
 		}
 	}
+
 	ImGui::End();
-	
+
 	if (!popen && unsavedChanges) {
-		// Ordered to close, but changes remain
-		// todo: show popup, force popen = true
+
+		m_requestedClosure = true;
+		popen = true;
 	}
 }

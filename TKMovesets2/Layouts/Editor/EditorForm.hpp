@@ -37,6 +37,8 @@ protected:
 	std::string m_identifierPrefix;
 	// Contains a reference to the main editor window, used for event handling
 	EditorWindowBase* m_baseWindow = nullptr;
+	// Become true if there were unsaved changes but the user attempted to close the window anyway. Confirmation will be required.
+	bool m_requestedClosure = false;
 
 	// Called whenever the changes are successfully applied
 	virtual void OnApply() {};

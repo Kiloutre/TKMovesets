@@ -6,6 +6,8 @@
 
 # Utils #
 
+yes = Yes
+no = No
 mota_00 = Anims 1
 mota_01 = Anims 2
 mota_02 = Hands 1
@@ -112,6 +114,7 @@ edition.explanation = You can hereedit extracted movesets. Refer to documentatio
 edition.select_moveset = Chose the moveset to modify
 edition.last_saved = Last save:
 edition.save = Save
+edition.discard_changes = Discard changes?
 edition.process_err = Error
 edition.live_edition = Live edition
 edition.live_edition_explanation = Turn on so that trivial changes such as simple value modifications can be applied directory in the game memory, without requing a new moveset importation.
