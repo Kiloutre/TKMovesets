@@ -304,7 +304,7 @@ void EditorWindow::RenderMovelist()
 		ImGui::EndTabBar();
 	}
 
-	// Movelist. Leave some 50 units of space for move player
+	// Movelist. Leave some 80 units of space for buttons & inputs under it
 	{
 		ImVec2 TableSize = ImGui::GetContentRegionAvail();
 		TableSize.y -= 80;
@@ -356,16 +356,18 @@ void EditorWindow::RenderMovelist()
 			ImGui::EndTable();
 		}
 	}
-	// Set player move
+
+	// Move search / play
 	ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x / 2 - 5, 0);
 	ImGui::PushItemWidth(buttonSize.x);
-	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1), ImGuiInputTextFlags_CharsDecimal) {
+	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1, ImGuiInputTextFlags_CharsDecimal)) {
 		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
 		if (m_moveToPlay != -1) {
 			m_moveToScrollTo = m_moveToPlay;
 			m_highlightedMoveId = m_moveToPlay;
 		}
 	}
+
 	ImGui::SameLine();
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
@@ -375,6 +377,7 @@ void EditorWindow::RenderMovelist()
 	}
 	ImGui::PopItemWidth();
 
+	// Set player move
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize)) {
 		m_editor->SetCurrentMove(0, m_loadedMoveset, m_moveToPlay);
 	}
