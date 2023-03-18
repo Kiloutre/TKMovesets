@@ -361,6 +361,10 @@ void EditorWindow::RenderMovelist()
 	ImGui::PushItemWidth(buttonSize.x);
 	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1), ImGuiInputTextFlags_CharsDecimal) {
 		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
+		if (m_moveToPlay != -1) {
+			m_moveToScrollTo = m_moveToPlay;
+			m_highlightedMoveId = m_moveToPlay;
+		}
 	}
 	ImGui::SameLine();
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
@@ -443,4 +447,11 @@ void EditorWindow::Render(int dockid)
 		RenderStatusBar();
 	}
 	ImGui::End();
+
+
+	// todo: if unsaved changes, prevent closure, popup to force saving
+	if (!popen && !m_savedLastChange)
+	{
+		//popen = true;
+	}
 }

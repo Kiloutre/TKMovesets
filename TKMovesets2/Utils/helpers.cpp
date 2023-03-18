@@ -22,7 +22,7 @@ namespace Helpers
 		if ((cursor & 0x3) != 0)
 		{
 			// pad file with 0
-			char b[8]{ 0 };
+			char b[7] = { 0 };
 			file.write(b, 8 - cursor % 8);
 		}
 	}

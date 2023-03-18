@@ -148,6 +148,7 @@ void MainWindow::Update()
 		for (unsigned int i = 0; i < editorWindows.size();)
 		{
 			EditorWindow* w = editorWindows[i];
+
 			if (w->popen) {
 				const ImU32 colorCount = sizeof(editorTitleColors) / sizeof(editorTitleColors[0]);
 				ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, editorTitleInactiveColors[i % colorCount]);
