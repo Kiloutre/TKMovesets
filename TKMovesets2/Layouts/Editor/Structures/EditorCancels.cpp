@@ -84,11 +84,5 @@ void EditorCancels::BuildItemLabel(int listIdx)
 		}
 	}
 
-	label += std::format(" / {} {}", _("edition.form_list.item"), id + listIdx);
-
-	if (listIdx + 1 == m_listSize) {
-		label += std::format(" - {}", _("edition.form_list.end"));
-	}
-
 	m_itemLabels[listIdx] = label;
 }

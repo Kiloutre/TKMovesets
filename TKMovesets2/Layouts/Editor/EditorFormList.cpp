@@ -218,6 +218,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 {
 	ImVec2 cursor = ImGui::GetCursorPos();
 
+	const ImVec2 buttonSize(18, 18);
 	const float buttonWidth = 25;
 	float pos_x = ImGui::GetContentRegionAvail().x - buttonWidth * 4;
 
@@ -225,22 +226,43 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	ImGui::PushID(listIndex);
 
 	// No point in having the + on every single item
-	/*
-	ImGui::SetCursorPosX(pos_x);
-	if (ImGui::Button("+", ImVec2(20, 20))) {
-		//++m_listSizeChange;
-		// todo: allocate new field input. copy current one.
+	if (listIndex + 1 != m_listSize || m_listSize == 1) {
+		ImGui::SetCursorPosX(pos_x);
+		if (ImGui::Button("+", ImVec2(20, 20))) {
+			VectorSet<std::string> drawOrder;
+			auto fieldMap = m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0];
 
-		// Insert at this position
-		// This implies shifting of the entire moveset data so the editor must be called
+			m_fieldIdentifierMaps.insert(m_fieldIdentifierMaps.begin() + listIndex, fieldMap);
+
+			for (uint8_t category : m_categories)
+			{
+				m_fieldsCategoryMaps.insert(m_fieldsCategoryMaps.begin() + listIndex, std::map<int, std::vector<EditorInput*>>());
+				std::vector<EditorInput*> inputs;
+				for (const std::string& fieldName : drawOrder) {
+					EditorInput* field = fieldMap[fieldName];
+					if (field->category == category) {
+						inputs.push_back(field);
+					}
+				}
+				m_fieldsCategoryMaps[listIndex][category] = inputs;
+			}
+
+			++m_listSizeChange;
+			++m_listSize;
+
+			m_itemLabels.push_back("");
+			for (int i = listIndex; i < m_listSize; ++i) {
+				BuildItemLabel(i);
+			}
+			unsavedChanges = true;
+		}
+		ImGui::SameLine();
 	}
-	ImGui::SameLine();
-	*/
 	
 	// Don't allow first item and ending item to shift up
 	if (listIndex != 0 && listIndex + 1 != m_listSize) {
 		ImGui::SetCursorPosX(pos_x + buttonWidth);
-		if (ImGui::Button("^", ImVec2(20, 20)))
+		if (ImGui::Button("^", buttonSize))
 		{
 			// Move item UP
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex - 1);
@@ -255,7 +277,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	// Don't allow last 2 items to shift down
 	if (listIndex + 2 < m_listSize) {
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 2);
-		if (ImGui::Button("V", ImVec2(20, 20)))
+		if (ImGui::Button("V", buttonSize))
 		{
 			// Move item DOWN
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex + 1);
@@ -271,7 +293,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	if (listIndex + 1 != m_listSize || m_listSize == 1)
 	{
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
-		if (ImGui::Button("X", ImVec2(20, 20)))
+		if (ImGui::Button("X", buttonSize))
 		{
 			// Delete this item
 			--m_listSizeChange;
@@ -339,10 +361,13 @@ void EditorFormList::Render()
 			{
 				bool test = false;
 				RenderListControlButtons(listIndex);
+				ImGui::PushID(listIndex);
 				if (!ImGui::TreeNode(this + listIndex, m_itemLabels[listIndex].c_str())) {
 					// Tree node hidden so no need to render anything
+					ImGui::PopID();
 					continue;
 				}
+				ImGui::PopID();
 
 				// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 				for (uint8_t category : m_categories)
