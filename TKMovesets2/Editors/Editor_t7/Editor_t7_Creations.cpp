@@ -6,6 +6,162 @@
 
 #define gAddr StructsT7_gameAddr
 
+int32_t EditorT7::CreateNewPushbackExtra()
+{
+	const uint16_t newStructId = m_infos->table.pushbackExtradataCount;
+	const size_t structSize = sizeof(PushbackExtradata);
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata + newStructId * structSize;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + structSize;
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new structure 
+	memcpy(newMoveset, m_moveset, newStructOffset);
+
+	// Initialize our structure value
+	PushbackExtradata newStruct{ 0 };
+
+	// Write our new structure
+	memcpy(newMoveset + newStructOffset, &newStruct, structSize);
+
+	// Copy all the data after new the new structure
+	uint64_t newStructPostOffset = newStructOffset + structSize;
+	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	m_header->offsets.animationBlock += structSize;
+	m_header->offsets.motaBlock += structSize;
+	m_infos->table.pushbackExtradataCount++;
+
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.pushbackExtradata) {
+			*countOffset += structSize;
+		}
+		countOffset += 2;
+	}
+
+	return newStructId;
+}
+
+int32_t EditorT7::CreateNewPushback()
+{
+	const uint16_t newStructId = m_infos->table.pushbackCount;
+	const size_t structSize = sizeof(Pushback);
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback + newStructId * structSize;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + structSize;
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new structure 
+	memcpy(newMoveset, m_moveset, newStructOffset);
+
+	// Initialize our structure value
+	Pushback newStruct{ 0 };
+
+	// Write our new structure
+	memcpy(newMoveset + newStructOffset, &newStruct, structSize);
+
+	// Copy all the data after new the new structure
+	uint64_t newStructPostOffset = newStructOffset + structSize;
+	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	m_header->offsets.animationBlock += structSize;
+	m_header->offsets.motaBlock += structSize;
+	m_infos->table.pushbackCount++;
+
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.pushback) {
+			*countOffset += structSize;
+		}
+		countOffset += 2;
+	}
+
+	return newStructId;
+}
+
+int32_t EditorT7::CreateNewReactions()
+{
+	const uint16_t newStructId = m_infos->table.reactionsCount;
+	const size_t structSize = sizeof(Reactions);
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions + newStructId * structSize;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + structSize;
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new structure 
+	memcpy(newMoveset, m_moveset, newStructOffset);
+
+	// Initialize our structure value
+	Reactions newStruct{ 0 };
+
+	// Write our new structure
+	memcpy(newMoveset + newStructOffset, &newStruct, structSize);
+
+	// Copy all the data after new the new structure
+	uint64_t newStructPostOffset = newStructOffset + structSize;
+	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	m_header->offsets.animationBlock += structSize;
+	m_header->offsets.motaBlock += structSize;
+	m_infos->table.reactionsCount++;
+
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.reactions) {
+			*countOffset += structSize;
+		}
+		countOffset += 2;
+	}
+
+	return newStructId;
+}
+
 int32_t EditorT7::CreateNewExtraProperties()
 {
 	const uint16_t newStructId = m_infos->table.extraMovePropertyCount;
@@ -581,12 +737,16 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 		break;
 
 	case EditorWindowType_HitCondition:
+		//return CreateNewHitConditions();
 		break;
 	case EditorWindowType_Reactions:
+		return CreateNewReactions();
 		break;
 	case EditorWindowType_Pushback:
+		return CreateNewPushback();
 		break;
 	case EditorWindowType_PushbackExtradata:
+		return CreateNewPushbackExtra();
 		break;
 	}
 	return -1;

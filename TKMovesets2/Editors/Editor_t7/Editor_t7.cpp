@@ -34,7 +34,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("horizontal_offset", 1, EditorInput_U16, pushbackExtra->horizontal_offset);
+	CREATE_FIELD("horizontal_offset", 0, EditorInput_U16, pushbackExtra->horizontal_offset);
 
 	WriteFieldFullname(inputMap, "pushback_extradata");
 	return inputMap;

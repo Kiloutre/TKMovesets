@@ -109,4 +109,9 @@ public:
 	int32_t CreateNewExtraProperties();
 	int32_t CreateNewMoveBeginProperties();
 	int32_t CreateNewMoveEndProperties();
+	//
+	//int32_t CreateNewHitConditions();
+	int32_t CreateNewReactions();
+	int32_t CreateNewPushback();
+	int32_t CreateNewPushbackExtra();
 };
