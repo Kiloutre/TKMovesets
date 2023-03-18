@@ -97,9 +97,14 @@ public:
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
 	int32_t CreateNew(EditorWindowType_ type) override;
-	int32_t CreateNewMove();
-	int32_t CreateNewCancelList();
-	//int32_t CreateNewGroupedCancelList();
+	//
 	int32_t CreateNewRequirements();
+	//
+	int32_t CreateNewMove();
+	int32_t CreateNewVoiceclip();
+	int32_t CreateNewCancelList();
+	int32_t CreateNewGroupedCancelList();
+	int32_t CreateNewCancelExtra();
+	//
 	int32_t CreateNewExtraProperties();
 };
