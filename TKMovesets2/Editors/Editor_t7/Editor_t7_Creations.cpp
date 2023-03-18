@@ -63,6 +63,121 @@ int32_t EditorT7::CreateNewExtraProperties()
 	return newStructId;
 }
 
+int32_t EditorT7::CreateNewMoveBeginProperties()
+{
+	const uint16_t newStructId = m_infos->table.moveBeginningPropCount;
+	const size_t structSize = sizeof(OtherMoveProperty);
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp + newStructId * structSize;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + structSize * 2;
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new structure 
+	memcpy(newMoveset, m_moveset, newStructOffset);
+
+	// Initialize our structure value
+	OtherMoveProperty prop{ 0 };
+	OtherMoveProperty prop2{ 0 };
+
+	prop2.extraprop = constants[EditorConstants_RequirementEnd];
+
+	// Write our new structure
+	memcpy(newMoveset + newStructOffset, &prop, structSize);
+	memcpy(newMoveset + newStructOffset + structSize, &prop2, structSize);
+
+	// Copy all the data after new the new structure
+	uint64_t newStructPostOffset = newStructOffset + structSize * 2;
+	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraSize = structSize * 2;
+	m_header->offsets.animationBlock += extraSize;
+	m_header->offsets.motaBlock += extraSize;
+	m_infos->table.moveBeginningPropCount += 2;
+
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.moveBeginningProp) {
+			*countOffset += extraSize;
+		}
+		countOffset += 2;
+	}
+
+	return newStructId;
+}
+
+int32_t EditorT7::CreateNewMoveEndProperties()
+{
+	const uint16_t newStructId = m_infos->table.moveEndingPropCount;
+	const size_t structSize = sizeof(OtherMoveProperty);
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp + newStructId * structSize;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + structSize * 2;
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		return -1;
+	}
+
+	// Copy all the data up to the new structure 
+	memcpy(newMoveset, m_moveset, newStructOffset);
+
+	// Initialize our structure value
+	OtherMoveProperty prop{ 0 };
+	OtherMoveProperty prop2{ 0 };
+
+	prop2.extraprop = constants[EditorConstants_RequirementEnd];
+
+	// Write our new structure
+	memcpy(newMoveset + newStructOffset, &prop, structSize);
+	memcpy(newMoveset + newStructOffset + structSize, &prop2, structSize);
+
+	// Copy all the data after new the new structure
+	uint64_t newStructPostOffset = newStructOffset + structSize * 2;
+	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraSize = structSize * 2;
+	m_header->offsets.animationBlock += extraSize;
+	m_header->offsets.motaBlock += extraSize;
+	m_infos->table.moveEndingPropCount += 2;
+
+	// Increment moveset block offsets
+	uint64_t* countOffset = (uint64_t*)&m_infos->table;
+	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	{
+		if (*countOffset > (uint64_t)m_infos->table.moveEndingProp) {
+			*countOffset += extraSize;
+		}
+		countOffset += 2;
+	}
+
+	return newStructId;
+}
+
+
 int32_t EditorT7::CreateNewRequirements()
 {
 	const uint16_t newStructId = m_infos->table.requirementCount;
@@ -459,8 +574,10 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 		return CreateNewExtraProperties();
 		break;
 	case EditorWindowType_MoveBeginProperty:
+		return CreateNewMoveBeginProperties();
 		break;
 	case EditorWindowType_MoveEndProperty:
+		return CreateNewMoveEndProperties();
 		break;
 
 	case EditorWindowType_HitCondition:

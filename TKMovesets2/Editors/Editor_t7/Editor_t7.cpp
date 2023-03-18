@@ -508,7 +508,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 
 		WriteFieldFullname(inputMap, "move_start_property");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != 881);
+	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
 
 	return inputListMap;
 }
@@ -547,7 +547,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 
 		WriteFieldFullname(inputMap, "move_end_property");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != 881);
+	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
 
 	return inputListMap;
 }

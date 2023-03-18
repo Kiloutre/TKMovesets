@@ -107,4 +107,6 @@ public:
 	int32_t CreateNewCancelExtra();
 	//
 	int32_t CreateNewExtraProperties();
+	int32_t CreateNewMoveBeginProperties();
+	int32_t CreateNewMoveEndProperties();
 };
