@@ -31,7 +31,7 @@ public:
 	
 	// Moves
 	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	uint64_t CreateMoveName(const char* newName) override;
+	uint64_t CreateMoveName(const char* newName);
 	void SaveMoveName(const char* newName, gameAddr move_name_addr);
 	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateMoveField(std::string name, EditorInput* field);

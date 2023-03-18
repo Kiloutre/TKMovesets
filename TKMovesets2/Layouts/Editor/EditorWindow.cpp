@@ -269,23 +269,6 @@ void EditorWindow::RenderToolBar()
 			}
 		}
 
-
-		if (ImGui::MenuItem(_("nom 'test_move_name'")))
-		{
-			m_editor->CreateMoveName("test_move_name");
-			m_savedLastChange = false;
-		}
-		if (ImGui::MenuItem(_("nom 'te'")))
-		{
-			m_editor->CreateMoveName("te");
-			m_savedLastChange = false;
-		}
-		if (ImGui::MenuItem(_("nom 't'")))
-		{
-			m_editor->CreateMoveName("t");
-			m_savedLastChange = false;
-		}
-
 		ImGui::EndMenu();
 	}
 

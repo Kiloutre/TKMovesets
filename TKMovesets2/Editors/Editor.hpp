@@ -232,7 +232,4 @@ public:
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
 	// Create a new structure or structure list
 	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
-
-	// todo: remove
-	virtual uint64_t CreateMoveName(const char* newName) = 0;
 };
