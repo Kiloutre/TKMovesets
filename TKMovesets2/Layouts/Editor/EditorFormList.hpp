@@ -21,6 +21,8 @@ protected:
 	void Apply() override;
 	// Returns false if any field has an error state
 	bool IsFormValid() override;
+	// Displays buttons to move, create or delete individual list items
+	void RenderListControlButtons(int listIdx);
 
 	void RenderLabel(int listIdx, EditorInput* field);
 	void RenderInput(int listIdx, EditorInput* field);

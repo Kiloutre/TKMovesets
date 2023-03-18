@@ -189,6 +189,48 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	}
 }
 
+void EditorFormList::RenderListControlButtons(int listIndex)
+{
+	ImVec2 cursor = ImGui::GetCursorPos();
+
+	float max_x = ImGui::GetContentRegionAvail().x;
+
+	if (listIndex == 0) {
+		ImGui::SetCursorPosX(max_x - 25 * 4);
+		// No point in having the + on every single item
+		if (ImGui::Button("+", ImVec2(20, 20))) {
+			// Insert at this position
+		// This implies shifting of the entire moveset data so the editor must be called
+		}
+		ImGui::SameLine();
+	}
+	else {
+		ImGui::SetCursorPosX(max_x - 25 * 3 + 5);
+	}
+
+	if (ImGui::Button("^", ImVec2(20, 20)))
+	{
+		// Move item UP
+		// 
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("V", ImVec2(20, 20)))
+	{
+		// Move item DOWN
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button("X", ImVec2(20, 20)))
+	{
+		// Delete this item
+		// This implies shifting of the entire moveset data so the editor must be called
+	}
+	ImGui::SameLine();
+
+	ImGui::SetCursorPos(cursor);
+}
+
 void EditorFormList::Render()
 {
 	if (setFocus) {
@@ -225,6 +267,7 @@ void EditorFormList::Render()
 			const int columnCount = EditorFormUtils::GetColumnCount();
 			for (uint32_t listIndex = 0; listIndex < m_fieldIdentifierMaps.size(); ++listIndex)
 			{
+				RenderListControlButtons(listIndex);
 				std::string treeNodeTitle = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIndex, listIndex + id);
 				if (!ImGui::TreeNode(treeNodeTitle.c_str())) {
 					// Tree node hidden so no need to render anything
