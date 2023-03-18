@@ -178,7 +178,8 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 		}
 	}
 
-	// Builds the <category : fields> maps
+	// Builds the <category : fields> maps & the item labels
+	m_itemLabels = std::vector<std::string>(m_listSize);
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
 		m_fieldsCategoryMaps.push_back(std::map<int, std::vector<EditorInput*>>());
@@ -194,7 +195,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 			m_fieldsCategoryMaps[listIndex][category] = inputs;
 		}
 
-		m_itemLabels.push_back(BuildItemLabel(listIndex));
+		BuildItemLabel(listIndex);
 	}
 
 	// Build category names
@@ -244,6 +245,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Move item UP
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex - 1);
 			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex - 1);
+			BuildItemLabel(listIndex);
+			BuildItemLabel(listIndex - 1);
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -257,6 +260,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Move item DOWN
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex + 1);
 			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex + 1);
+			BuildItemLabel(listIndex);
+			BuildItemLabel(listIndex + 1);
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -280,6 +285,11 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_fieldsCategoryMaps.erase(m_fieldsCategoryMaps.begin() + listIndex);
 				m_itemLabels.erase(m_itemLabels.begin() + listIndex);
 				unsavedChanges = true;
+				
+				// Rebuild labels
+				for (int i = listIndex; i < m_listSize; ++i) {
+					BuildItemLabel(i);
+				}
 			}
 		}
 		ImGui::SameLine();
@@ -327,11 +337,13 @@ void EditorFormList::Render()
 			const int columnCount = EditorFormUtils::GetColumnCount();
 			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 			{
+				bool test = false;
 				RenderListControlButtons(listIndex);
-				if (!ImGui::TreeNode(m_itemLabels[listIndex].c_str())) {
+				if (!ImGui::TreeNode(this + listIndex, m_itemLabels[listIndex].c_str())) {
 					// Tree node hidden so no need to render anything
 					continue;
 				}
+
 				// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 				for (uint8_t category : m_categories)
 				{
@@ -375,7 +387,9 @@ void EditorFormList::Render()
 	}
 }
 
-std::string EditorFormList::BuildItemLabel(int listIdx)
+void EditorFormList::BuildItemLabel(int listIdx)
 {
-	return std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
+	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
+
+	m_itemLabels[listIdx] = label;
 }

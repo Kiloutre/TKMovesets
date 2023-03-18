@@ -57,5 +57,38 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 		}
 	}
 
-	// todo fancy display
+	BuildItemLabel(listIdx);
+}
+
+void EditorCancels::BuildItemLabel(int listIdx)
+{
+	std::string label;
+
+	EditorInput* commandField = m_fieldIdentifierMaps[listIdx]["command"];
+	EditorInput* moveIdField = m_fieldIdentifierMaps[listIdx]["move_id"];
+	uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
+
+	int move_id = atoi(moveIdField->buffer);
+	if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+		label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
+	}
+	else {
+		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
+		if (validated_move_id == -1) {
+			label = std::format("{} ({}) ", _("edition.form_list.invalid"), move_id);
+		}
+		else
+		{
+			const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
+			label = std::format("{} / {}", move_id, moveName);
+		}
+	}
+
+	label += std::format(" / {} {}", _("edition.form_list.item"), id + listIdx);
+
+	if (listIdx + 1 == m_listSize) {
+		label += std::format(" - {}", _("edition.form_list.end"));
+	}
+
+	m_itemLabels[listIdx] = label;
 }

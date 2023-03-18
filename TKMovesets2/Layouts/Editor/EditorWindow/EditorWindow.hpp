@@ -63,8 +63,6 @@ private:
 	int32_t m_moveToPlay = -1;
 	// Access moveset data through this variable. Uses polymorphism.
 	Editor* m_editor = nullptr;
-	// Contains the movelist displayed at all times
-	std::vector<DisplayableMove*> m_movelist;
 	// Contains the movelist displayed at all times, may get sorted and/or filtered
 	std::vector<DisplayableMove*> m_filteredMovelist;
 	// Contains the current display filter of the displayed movelist

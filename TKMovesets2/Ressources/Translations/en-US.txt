@@ -6,6 +6,8 @@
 
 # Utils #
 
+item = Item
+end = END
 yes = Yes
 no = No
 mota_00 = Anims 1
@@ -209,7 +211,7 @@ edition.cancel.starting_frame = Starting frame
 edition.cancel.move_id = Move ID
 edition.cancel.cancel_option = Cancel option
 
-edition.grouped_cancel.window_name = Cancel
+edition.grouped_cancel.window_name = Grouped Cancel
 edition.grouped_cancel.command = Command
 edition.grouped_cancel.requirements_addr = Requirements ID
 edition.grouped_cancel.extradata_addr = Extradata ID
@@ -266,6 +268,10 @@ edition.reactions.block_moveid = Blocking
 edition.reactions.crouch_block_moveid = Crouch blocking
 edition.reactions.wallslump_moveid = Wallslump
 edition.reactions.downed_moveid = Downed
+
+edition.form_list.item = Item
+edition.form_list.end = END
+edition.form_list.invalid = INVALID
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

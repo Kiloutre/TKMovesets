@@ -24,7 +24,7 @@ protected:
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};
 	// Builds a string label that will be shown as the title of the item tree view
-	virtual std::string BuildItemLabel(int listIdx);
+	virtual void BuildItemLabel(int listIdx);
 	// Save every list item individually
 	void Apply() override;
 	// Returns false if any field has an error state

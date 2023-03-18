@@ -6,6 +6,8 @@
 
 # Utilitaires #
 
+item = Item
+end = FIN
 yes = Oui
 no = No
 mota_00 = Anims 1
@@ -262,6 +264,10 @@ edition.reactions.block_moveid = Garde
 edition.reactions.crouch_block_moveid = Garde accroupi
 edition.reactions.wallslump_moveid = Bas du mur
 edition.reactions.downed_moveid = À terre
+
+edition.form_list.item = Élément
+edition.form_list.end = FIN
+edition.form_list.invalid = INVALIDE
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
