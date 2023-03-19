@@ -23,105 +23,92 @@
 // Converts absolute ptr into indexes before saving to file
 static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::MovesetTable& table, const gAddr::MovesetTable* offsets, gameAddr nameStart, std::map<gameAddr, uint64_t>& animOffsetMap)
 {
-	size_t i;
-
 	// Convert move ptrs
-	i = 0;
-	for (gAddr::Move* move = (gAddr::Move*)(movesetBlock + offsets->move); i < table.moveCount; ++i, ++move)
+	for (auto& move : StructIterator<gAddr::Move>(movesetBlock, offsets->move, table.moveCount))
 	{
-		move->name_addr -= nameStart;
-		move->anim_name_addr -= nameStart;
-		move->anim_addr = animOffsetMap[move->anim_addr];
-		TO_INDEX(move->cancel_addr, table.cancel, Cancel);
-		TO_INDEX(move->_0x28_cancel_addr, table.cancel, Cancel);
-		TO_INDEX(move->_0x38_cancel_addr, table.cancel, Cancel);
-		TO_INDEX(move->_0x48_cancel_addr, table.cancel, Cancel);
-		TO_INDEX(move->hit_condition_addr, table.hitCondition, HitCondition);
-		TO_INDEX(move->voicelip_addr, table.voiceclip, Voiceclip);
-		TO_INDEX(move->extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
-		TO_INDEX(move->move_start_extraprop_addr, table.moveBeginningProp, OtherMoveProperty);
-		TO_INDEX(move->move_end_extraprop_addr, table.moveEndingProp, OtherMoveProperty);
+		move.name_addr -= nameStart;
+		move.anim_name_addr -= nameStart;
+		move.anim_addr = animOffsetMap[move.anim_addr];
+		TO_INDEX(move.cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move._0x28_cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move._0x38_cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move._0x48_cancel_addr, table.cancel, Cancel);
+		TO_INDEX(move.hit_condition_addr, table.hitCondition, HitCondition);
+		TO_INDEX(move.voicelip_addr, table.voiceclip, Voiceclip);
+		TO_INDEX(move.extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
+		TO_INDEX(move.move_start_extraprop_addr, table.moveBeginningProp, OtherMoveProperty);
+		TO_INDEX(move.move_end_extraprop_addr, table.moveEndingProp, OtherMoveProperty);
 	}
 
 	// Convert projectile ptrs
-	i = 0;
-	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(movesetBlock + offsets->projectile); i < table.projectileCount; ++i, ++projectile)
+	for (auto& projectile : StructIterator<gAddr::Projectile>(movesetBlock, offsets->projectile, table.projectileCount))
 	{
 		// One projectile actually has both at 0 for some reason ?
-		TO_INDEX(projectile->cancel_addr, table.cancel, Cancel);
-		TO_INDEX(projectile->hit_condition_addr, table.hitCondition, HitCondition);
+		TO_INDEX(projectile.cancel_addr, table.cancel, Cancel);
+		TO_INDEX(projectile.hit_condition_addr, table.hitCondition, HitCondition);
 	}
 
 	// Convert cancel ptrs
-	i = 0;
-	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(movesetBlock + offsets->cancel); i < table.cancelCount; ++i, ++cancel)
+	for (auto& cancel : StructIterator<gAddr::Cancel>(movesetBlock, offsets->cancel, table.cancelCount))
 	{
-		TO_INDEX(cancel->requirements_addr, table.requirement, Requirement);
-		TO_INDEX(cancel->extradata_addr, table.cancelExtradata, CancelExtradata);
+		TO_INDEX(cancel.requirements_addr, table.requirement, Requirement);
+		TO_INDEX(cancel.extradata_addr, table.cancelExtradata, CancelExtradata);
 	}
 
 	// Convert groupCancel cancel ptrs
-	i = 0;
-	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(movesetBlock + offsets->groupCancel); i < table.groupCancelCount; ++i, ++groupCancel)
+	for (auto& groupCancel : StructIterator<gAddr::Cancel>(movesetBlock, offsets->groupCancel, table.groupCancelCount))
 	{
-		TO_INDEX(groupCancel->requirements_addr, table.requirement, Requirement);
-		TO_INDEX(groupCancel->extradata_addr, table.cancelExtradata, CancelExtradata);
+		TO_INDEX(groupCancel.requirements_addr, table.requirement, Requirement);
+		TO_INDEX(groupCancel.extradata_addr, table.cancelExtradata, CancelExtradata);
 	}
 
 	// Convert reaction ptrs
-	i = 0;
-	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(movesetBlock + offsets->reactions); i < table.reactionsCount; ++i, ++reaction)
+	for (auto& reaction : StructIterator<gAddr::Reactions>(movesetBlock, offsets->reactions, table.reactionsCount))
 	{
-		TO_INDEX(reaction->front_pushback, table.pushback, Pushback);
-		TO_INDEX(reaction->backturned_pushback, table.pushback, Pushback);
-		TO_INDEX(reaction->left_side_pushback, table.pushback, Pushback);
-		TO_INDEX(reaction->right_side_pushback, table.pushback, Pushback);
-		TO_INDEX(reaction->front_counterhit_pushback, table.pushback, Pushback);
-		TO_INDEX(reaction->downed_pushback, table.pushback, Pushback);
-		TO_INDEX(reaction->block_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.front_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.backturned_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.left_side_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.right_side_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.front_counterhit_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.downed_pushback, table.pushback, Pushback);
+		TO_INDEX(reaction.block_pushback, table.pushback, Pushback);
 	}
 
 	// Convert input sequence ptrs
-	i = 0;
-	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(movesetBlock + offsets->inputSequence); i < table.inputSequenceCount; ++i, ++inputSequence)
+	for (auto& inputSequence : StructIterator<gAddr::InputSequence>(movesetBlock, offsets->inputSequence, table.inputSequenceCount))
 	{
-		TO_INDEX(inputSequence->input_addr, table.input, Input);
+		TO_INDEX(inputSequence.input_addr, table.input, Input);
 	}
 
 	// Convert throws ptrs
-	i = 0;
-	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(movesetBlock + offsets->throws); i < table.throwsCount; ++i, ++throws)
+	for (auto& throws : StructIterator<gAddr::ThrowData>(movesetBlock, offsets->throws, table.throwsCount))
 	{
-		TO_INDEX(throws->cameradata_addr, table.cameraData, CameraData);
+		TO_INDEX(throws.cameradata_addr, table.cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs
-	i = 0;
-	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(movesetBlock + offsets->hitCondition); i < table.hitConditionCount; ++i, ++hitCondition)
+	for (auto& hitCondition : StructIterator<gAddr::HitCondition>(movesetBlock, offsets->hitCondition, table.hitConditionCount))
 	{
-		TO_INDEX(hitCondition->requirements_addr, table.requirement, Requirement);
-		TO_INDEX(hitCondition->reactions_addr, table.reactions, Reactions);
+		TO_INDEX(hitCondition.requirements_addr, table.requirement, Requirement);
+		TO_INDEX(hitCondition.reactions_addr, table.reactions, Reactions);
 	}
 
 	// Convert pushback ptrs
-	i = 0;
-	for (gAddr::Pushback* pushback = (gAddr::Pushback*)(movesetBlock + offsets->pushback); i < table.pushbackCount; ++i, ++pushback)
+	for (auto& pushback : StructIterator<gAddr::Pushback>(movesetBlock, offsets->pushback, table.pushbackCount))
 	{
-		TO_INDEX(pushback->extradata_addr, table.pushbackExtradata, PushbackExtradata);
+		TO_INDEX(pushback.extradata_addr, table.pushbackExtradata, PushbackExtradata);
 	}
 
 	// Convert move start prop ptrs
-	i = 0;
-	for (gAddr::OtherMoveProperty* moveBeginningProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets->moveBeginningProp); i < table.moveBeginningPropCount; ++i, ++moveBeginningProp)
+	for (auto& moveBeginningProp : StructIterator<gAddr::OtherMoveProperty>(movesetBlock, offsets->moveBeginningProp, table.moveBeginningPropCount))
 	{
-		TO_INDEX(moveBeginningProp->requirements_addr, table.requirement, Requirement);
+		TO_INDEX(moveBeginningProp.requirements_addr, table.requirement, Requirement);
 	}
 
 	// Convert move end prop ptrs
-	i = 0;
-	for (gAddr::OtherMoveProperty* moveEndingProp = (gAddr::OtherMoveProperty*)(movesetBlock + offsets->moveEndingProp); i < table.moveEndingPropCount; ++i, ++moveEndingProp)
+	for (auto& moveEndingProp : StructIterator<gAddr::OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, table.moveEndingPropCount))
 	{
-		TO_INDEX(moveEndingProp->requirements_addr, table.requirement, Requirement);
+		TO_INDEX(moveEndingProp.requirements_addr, table.requirement, Requirement);
 	}
 }
 

@@ -2,9 +2,54 @@
 
 #include <map>
 #include <string>
+#include <iterator>
 
 #include "GameAddresses.h"
 
+// Helper class to iterate on struct pts
+template<class T>
+class StructIterator
+{
+public:
+	struct Iterator
+	{
+		using iterator_category = std::forward_iterator_tag;
+		using difference_type = std::ptrdiff_t;
+		using value_type = T;
+		using pointer = T*;
+		using reference = T&;
+
+		Iterator(T* ptr) : m_ptr(ptr) {}
+
+		reference operator*() const { return *m_ptr; }
+		pointer operator->() { return m_ptr; }
+		Iterator& operator++() { m_ptr++; return *this; }
+		Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
+		friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; }
+		friend bool operator!= (const Iterator& a, const Iterator& b) { return a.m_ptr != b.m_ptr; }
+
+	private:
+		T* m_ptr;
+	};
+
+	Iterator begin() { return Iterator(&m_ptr[0]); }
+	Iterator end() { return Iterator(&m_ptr[m_size > 0 ? (m_size- 1) : 0]); }
+
+	StructIterator() { m_ptr = nullptr, m_size = 0; }
+	StructIterator(void* ptr, size_t size) { Set(ptr, size); }
+	StructIterator(void* base_ptr, void* ptr, size_t size) { Set(base_ptr, ptr, size); }
+	StructIterator(void* base_ptr, uint64_t ptr, size_t size) { Set(base_ptr, ptr, size); }
+	StructIterator(uint64_t base_ptr, void* ptr, size_t size) { Set(base_ptr, ptr, size); }
+	StructIterator(uint64_t base_ptr, uint64_t ptr, size_t size) { Set(base_ptr, ptr, size); }
+	void Set(void* ptr, size_t size) { m_ptr = (T*)ptr, m_size = size; }
+	void Set(void* base_ptr, void* ptr, size_t size) { m_ptr = (T*)((uint64_t)base_ptr + (uint64_t)ptr), m_size = size; }
+	void Set(void* base_ptr, uint64_t ptr, size_t size) { m_ptr = (T*)((uint64_t)base_ptr + ptr), m_size = size; }
+	void Set(uint64_t base_ptr, void* ptr, size_t size) { m_ptr = (T*)(base_ptr + (uint64_t)ptr), m_size = size; }
+	void Set(uint64_t base_ptr, uint64_t ptr, size_t size) { m_ptr = (T*)(base_ptr + ptr), m_size = size; }
+private:
+	T* m_ptr = nullptr;
+	size_t m_size = 0;
+};
 
 namespace Helpers
 {

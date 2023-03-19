@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Editor.hpp"
+#include "Helpers.hpp"
 
 #include "Structs_t7.h"
 
