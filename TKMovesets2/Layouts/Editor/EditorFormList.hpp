@@ -9,28 +9,33 @@
 
 enum EditorFormTreeview_
 {
-	EditorFormTreeview_Default,
 	EditorFormTreeview_Opened,
 	EditorFormTreeview_Closed,
 	EditorFormTreeview_ForceOpen,
 	EditorFormTreeview_ForceClose,
 };
 
+struct FieldItem
+{
+	// The form's fields, contains the field buffer along with its validity as a boolean and more useful data 
+	std::map<std::string, EditorInput*> identifierMaps;
+	// Containst the form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
+	std::map<int, std::vector<EditorInput*>> categoryMaps;
+	// Determines what tree node should be open
+	std::string itemLabel;
+	// Determines what tree node should be open
+	EditorFormTreeview_ openStatus = EditorFormTreeview_Closed;
+	int color = 0;
+};
+
 class EditorFormList : public EditorForm
 {
 protected:
-	// The form's fields, contains the field buffer along with its validity as a boolean and more useful data 
-	std::vector<std::map<std::string, EditorInput*>> m_fieldIdentifierMaps;
-	// Containst the form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
-	std::vector<std::map<int, std::vector<EditorInput*>>> m_fieldsCategoryMaps;
-	// The label of each list item
-	std::vector<std::string> m_itemLabels;
+	std::vector<FieldItem*> m_items;
 	// Contains the size of the current list. Value can change.
 	size_t m_listSize = 0;
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
 	int m_listSizeChange = 0;
-	// Determines what tree node should be open
-	std::vector<EditorFormTreeview_> m_itemOpenStatus;
 
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};

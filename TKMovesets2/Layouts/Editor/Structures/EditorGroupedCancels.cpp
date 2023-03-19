@@ -19,9 +19,10 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;
+	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
-		uint64_t command = (uint64_t)strtoll(m_fieldIdentifierMaps[listIdx]["command"]->buffer, nullptr, 16);
+		uint64_t command = (uint64_t)strtoll(item->identifierMaps["command"]->buffer, nullptr, 16);
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, id);
 		}

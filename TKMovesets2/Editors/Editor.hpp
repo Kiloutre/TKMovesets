@@ -43,7 +43,9 @@ enum EditorConstants_
 	// Marks the end of a grouped cancel list
 	EditorConstants_GroupedCancelCommandEnd,
 	// Marks the end of an extra property list
-	EditorConstants_ExtraPropertyEnd
+	EditorConstants_ExtraPropertyEnd,
+	// Marks that the cancel command refers to an input sequence
+	EditorConstants_InputSequenceCommandStart
 };
 
 enum EditorWindowType_

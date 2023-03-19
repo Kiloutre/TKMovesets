@@ -87,9 +87,10 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;
+	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
-		uint64_t command = (uint64_t)strtoll(m_fieldIdentifierMaps[listIdx]["command"]->buffer, nullptr, 16);
+		uint64_t command = (uint64_t)strtoll(item->identifierMaps["command"]->buffer, nullptr, 16);
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, id);
 		}
@@ -108,11 +109,12 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 {
 	std::string& name = field->name;
+	auto& item = m_items[listIdx];
 
 	if (name == "command" || name == "move_id") {
 		// More complex validation than what is shown in EditorT7 (multi-field validation)
-		EditorInput* commandField = m_fieldIdentifierMaps[listIdx]["command"];
-		EditorInput* moveIdField = m_fieldIdentifierMaps[listIdx]["move_id"];
+		EditorInput* commandField = item->identifierMaps["command"];
+		EditorInput* moveIdField = item->identifierMaps["move_id"];
 		uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
@@ -132,26 +134,37 @@ void EditorCancels::BuildItemDetails(int listIdx)
 {
 	std::string label;
 
-	EditorInput* commandField = m_fieldIdentifierMaps[listIdx]["command"];
-	EditorInput* moveIdField = m_fieldIdentifierMaps[listIdx]["move_id"];
+	auto& item = m_items[listIdx];
+
+	EditorInput* commandField = item->identifierMaps["command"];
+	EditorInput* moveIdField = item->identifierMaps["move_id"];
 	uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
-	int move_id = atoi(moveIdField->buffer);
-	if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
-		label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
+	if ((command & 0xFFFFFFFF) >= m_editor->constants[EditorConstants_InputSequenceCommandStart]) {
+		commandField->flags |= EditorInput_Clickable;
 	}
 	else {
-		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
-		std::string commandStr = GetCancelCommandStr(command);
-		if (validated_move_id == -1) {
-			label = std::format("{} ({}) / {}", _("edition.form_list.invalid"), move_id, commandStr);
+		if (commandField->flags & EditorInput_Clickable) {
+			commandField->flags -= EditorInput_Clickable;
 		}
-		else
-		{
-			const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
-			label = std::format("{} / {} / {}", move_id, moveName, commandStr);
+
+		int move_id = atoi(moveIdField->buffer);
+		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+			label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
+		}
+		else {
+			int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
+			std::string commandStr = GetCancelCommandStr(command);
+			if (validated_move_id == -1) {
+				label = std::format("{} ({}) / {}", _("edition.form_list.invalid"), move_id, commandStr);
+			}
+			else
+			{
+				const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
+				label = std::format("{} / {} / {}", move_id, moveName, commandStr);
+			}
 		}
 	}
 
-	m_itemLabels[listIdx] = label;
+	item->itemLabel = label;
 }

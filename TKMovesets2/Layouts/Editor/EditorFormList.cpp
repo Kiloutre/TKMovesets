@@ -51,7 +51,8 @@ void EditorFormList::Apply()
 
 	// Write into every individual item
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
-		m_editor->SaveItem(windowType, id + listIndex, m_fieldIdentifierMaps[listIndex]);
+		
+		m_editor->SaveItem(windowType, id + listIndex, m_items[listIndex]->identifierMaps);
 	}
 
 	OnApply();
@@ -61,7 +62,7 @@ bool EditorFormList::IsFormValid()
 {
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
-		for (auto& [category, fields] : m_fieldsCategoryMaps[listIndex]) {
+		for (auto& [category, fields] : m_items[listIndex]->categoryMaps) {
 			for (auto& field : fields) {
 				if (field->errored) {
 					return false;
@@ -162,14 +163,14 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
 
 	VectorSet<std::string> drawOrder;
-	m_fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
-	m_listSize = m_fieldIdentifierMaps.size();
+	auto fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
+	m_listSize = fieldIdentifierMaps.size();
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
 	char name[32] = "";
 	for (const std::string& fieldName : drawOrder) {
-		EditorInput* field = m_fieldIdentifierMaps[0][fieldName];
+		EditorInput* field = fieldIdentifierMaps[0][fieldName];
 		m_categories.insert(field->category);
 
 		// Moves are the only named fields so there is no reason to write any more complex code for now
@@ -179,23 +180,25 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	}
 
 	// Builds the <category : fields> maps & the item labels
-	m_itemLabels = std::vector<std::string>(m_listSize);
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
-		m_fieldsCategoryMaps.push_back(std::map<int, std::vector<EditorInput*>>());
+		m_items.push_back(new FieldItem);
+		auto& item = m_items[listIndex];
+
+		item->identifierMaps = fieldIdentifierMaps[listIndex];
+
 		for (uint8_t category : m_categories)
 		{
 			std::vector<EditorInput*> inputs;
 			for (const std::string& fieldName : drawOrder) {
-				EditorInput* field = m_fieldIdentifierMaps[listIndex][fieldName];
+				EditorInput* field = fieldIdentifierMaps[listIndex][fieldName];
 				if (field->category == category) {
 					inputs.push_back(field);
 				}
 			}
-			m_fieldsCategoryMaps[listIndex][category] = inputs;
+			item->categoryMaps[category] = inputs;
 		}
 
-		m_itemOpenStatus.push_back(EditorFormTreeview_Default);
 		BuildItemDetails(listIndex);
 	}
 
@@ -237,28 +240,27 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		if (ImGui::Button("+", buttonSize)) {
 			VectorSet<std::string> drawOrder;
 
-			m_fieldIdentifierMaps.insert(m_fieldIdentifierMaps.begin() + listIndex, m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0]);
-			m_itemOpenStatus.insert(m_itemOpenStatus.begin() + listIndex, EditorFormTreeview_ForceOpen);
+			m_items.insert(m_items.begin() + listIndex, new FieldItem);
+			auto& item = m_items[listIndex];
 
-			auto& fieldMap = m_fieldIdentifierMaps[listIndex];
+			item->identifierMaps = m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0];
+			item->openStatus = EditorFormTreeview_ForceOpen;
 
 			for (uint8_t category : m_categories)
 			{
-				m_fieldsCategoryMaps.insert(m_fieldsCategoryMaps.begin() + listIndex, std::map<int, std::vector<EditorInput*>>());
 				std::vector<EditorInput*> inputs;
 				for (const std::string& fieldName : drawOrder) {
-					EditorInput* field = fieldMap[fieldName];
+					EditorInput* field = item->identifierMaps[fieldName];
 					if (field->category == category) {
 						inputs.push_back(field);
 					}
 				}
-				m_fieldsCategoryMaps[listIndex][category] = inputs;
+				item->categoryMaps[category] = inputs;
 			}
 
 			++m_listSizeChange;
 			++m_listSize;
 
-			m_itemLabels.push_back("");
 			for (int i = listIndex; i < m_listSize; ++i) {
 				BuildItemDetails(i);
 			}
@@ -273,22 +275,20 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		if (ImGui::Button("^", buttonSize))
 		{
 			// Move item UP
-			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex - 1);
-			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex - 1);
-			std::iter_swap(m_itemOpenStatus.begin() + listIndex, m_itemOpenStatus.begin() + listIndex - 1);
+			std::iter_swap(m_items.begin() + listIndex, m_items.begin() + listIndex - 1);
 
 			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
-			if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Opened) {
-				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceOpen;
-			} else if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Closed) {
-				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceClose;
+			if (m_items[listIndex]->openStatus == EditorFormTreeview_Opened) {
+				m_items[listIndex]->openStatus = EditorFormTreeview_ForceOpen;
+			} else if (m_items[listIndex]->openStatus == EditorFormTreeview_Closed) {
+				m_items[listIndex]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
-			if (m_itemOpenStatus[listIndex - 1] == EditorFormTreeview_Opened) {
-				m_itemOpenStatus[listIndex - 1] = EditorFormTreeview_ForceOpen;
+			if (m_items[listIndex - 1]->openStatus == EditorFormTreeview_Opened) {
+				m_items[listIndex - 1]->openStatus = EditorFormTreeview_ForceOpen;
 			}
-			else if (m_itemOpenStatus[listIndex - 1] == EditorFormTreeview_Closed) {
-				m_itemOpenStatus[listIndex - 1] = EditorFormTreeview_ForceClose;
+			else if (m_items[listIndex - 1]->openStatus == EditorFormTreeview_Closed) {
+				m_items[listIndex - 1]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
 			BuildItemDetails(listIndex);
@@ -304,23 +304,21 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		if (ImGui::Button("V", buttonSize))
 		{
 			// Move item DOWN
-			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex + 1);
-			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex + 1);
-			std::iter_swap(m_itemOpenStatus.begin() + listIndex, m_itemOpenStatus.begin() + listIndex + 1);
+			std::iter_swap(m_items.begin() + listIndex, m_items.begin() + listIndex + 1);
 
 			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
-			if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Opened) {
-				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceOpen;
+			if (m_items[listIndex]->openStatus == EditorFormTreeview_Opened) {
+				m_items[listIndex]->openStatus = EditorFormTreeview_ForceOpen;
 			}
-			else if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Closed) {
-				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceClose;
+			else if (m_items[listIndex]->openStatus == EditorFormTreeview_Closed) {
+				m_items[listIndex]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
-			if (m_itemOpenStatus[listIndex + 1] == EditorFormTreeview_Opened) {
-				m_itemOpenStatus[listIndex + 1] = EditorFormTreeview_ForceOpen;
+			if (m_items[listIndex + 1]->openStatus == EditorFormTreeview_Opened) {
+				m_items[listIndex + 1]->openStatus = EditorFormTreeview_ForceOpen;
 			}
-			else if (m_itemOpenStatus[listIndex + 1] == EditorFormTreeview_Closed) {
-				m_itemOpenStatus[listIndex + 1] = EditorFormTreeview_ForceClose;
+			else if (m_items[listIndex + 1]->openStatus == EditorFormTreeview_Closed) {
+				m_items[listIndex + 1]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
 			BuildItemDetails(listIndex);
@@ -345,10 +343,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Reducing list size will make things invisible on the next render anyway
 			if (listIndex < m_listSize) {
 				// Shift following items up
-				m_fieldIdentifierMaps.erase(m_fieldIdentifierMaps.begin() + listIndex);
-				m_fieldsCategoryMaps.erase(m_fieldsCategoryMaps.begin() + listIndex);
-				m_itemLabels.erase(m_itemLabels.begin() + listIndex);
-				m_itemOpenStatus.erase(m_itemOpenStatus.begin() + listIndex);
+				delete m_items[listIndex];
+				m_items.erase(m_items.begin() + listIndex);
 				unsavedChanges = true;
 				
 				// Rebuild labels
@@ -407,21 +403,23 @@ void EditorFormList::Render()
 					RenderListControlButtons(listIndex);
 				}
 
+				auto& item = m_items[listIndex];
+
 				// This allows us to force some treenode to open at certain times, without forcing them to be closed
-				auto openStatus = m_itemOpenStatus[listIndex];
+				auto openStatus = item->openStatus;
 				if (openStatus == EditorFormTreeview_ForceOpen || openStatus == EditorFormTreeview_ForceClose) {
-					ImGui::SetNextItemOpen(m_itemOpenStatus[listIndex] == EditorFormTreeview_ForceOpen);
+					ImGui::SetNextItemOpen(openStatus == EditorFormTreeview_ForceOpen);
 				}
 
 				ImGui::PushID(listIndex);
-				if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, m_itemLabels[listIndex].c_str(), va_list())) {
+				if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, item->itemLabel.c_str(), va_list())) {
 					// Tree node hidden so no need to render anything
 					ImGui::PopID();
-					m_itemOpenStatus[listIndex] = EditorFormTreeview_Closed;
+					item->openStatus = EditorFormTreeview_Closed;
 					continue;
 				}
 				ImGui::PopID();
-				m_itemOpenStatus[listIndex] = EditorFormTreeview_Opened;
+				item->openStatus = EditorFormTreeview_Opened;
 
 				// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 				for (uint8_t category : m_categories)
@@ -435,7 +433,7 @@ void EditorFormList::Render()
 					// Render each field name / field input in columns
 					if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
 					{
-						std::vector<EditorInput*>& inputs = m_fieldsCategoryMaps[listIndex][category];
+						std::vector<EditorInput*>& inputs = item->categoryMaps[category];
 						RenderInputs(listIndex, inputs, category, columnCount);
 						ImGui::EndTable();
 					}
@@ -470,5 +468,5 @@ void EditorFormList::BuildItemDetails(int listIdx)
 {
 	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
 
-	m_itemLabels[listIdx] = label;
+	m_items[listIdx]->itemLabel = label;
 }
