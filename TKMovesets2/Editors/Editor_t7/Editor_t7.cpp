@@ -734,7 +734,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("extra_move_property_addr", 2, EditorInput_PTR, move->extra_move_property_addr);
 	CREATE_FIELD("move_start_extraprop_addr", 2, EditorInput_PTR, move->move_start_extraprop_addr);
 	CREATE_FIELD("move_end_extraprop_addr", 2, EditorInput_PTR, move->move_end_extraprop_addr);
-	CREATE_FIELD("voicelip_addr", 2, EditorInput_PTR, move->voicelip_addr);
+	CREATE_FIELD("voiceclip_addr", 2, EditorInput_PTR, move->voicelip_addr);
 
 	CREATE_FIELD("cancel_id_2", 3, EditorInput_PTR, move->_0x28_cancel_addr);
 	CREATE_FIELD("cancel_related_id_2", 3, EditorInput_U32, move->_0x30_int__0x28_related);
@@ -907,7 +907,7 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	move->extra_move_property_addr = atoll(inputs["extra_move_property_addr"]->buffer);
 	move->move_start_extraprop_addr = atoll(inputs["move_start_extraprop_addr"]->buffer);
 	move->move_end_extraprop_addr = atoll(inputs["move_end_extraprop_addr"]->buffer);
-	move->voicelip_addr = atoll(inputs["voicelip_addr"]->buffer);
+	move->voicelip_addr = atoll(inputs["voiceclip_addr"]->buffer);
 
 	move->_0x28_cancel_addr = atoll(inputs["cancel_id_2"]->buffer);
 	move->_0x30_int__0x28_related = atoi(inputs["cancel_related_id_2"]->buffer);
