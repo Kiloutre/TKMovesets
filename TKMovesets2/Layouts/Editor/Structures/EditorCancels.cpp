@@ -48,7 +48,7 @@ static std::string GetCancelCommandStr(uint64_t command)
 			}
 		}
 
-		if (directionBits >> 10) {
+		if (directionBits >> 10 || directionBits & 1) {
 			if (retVal.size() != 0) {
 				retVal += "|";
 			}

@@ -1,0 +1,183 @@
+0,Always true
+1,Practice mode move demo
+2,Attack to Throw
+3,Throw Hits Forward (Standing)
+4,Throw Hits Backward (Standing)
+5,Throw Hits Left Side (Standing)
+6,Throw Hits Right Side (Standing)
+7,Throw Hits Forward (Crouching)
+8,Throw Hits Backward (Crouching)
+9,Throw Hits Left Side (Crouching)
+10,Throw Hits Right Side (Crouching)
+11,Throw Hits Forward (Face Up)
+12,Throw Hits Backward (Face Up)
+13,Throw Hits Left Side (Face Up)
+14,Throw Hits Right Side (Face Up)
+15,Throw Hits Forward (Face Down)
+16,Throw Hits Backward (Face Down)
+17,Throw Hits Left Side (Face Down)
+18,Throw Hits Right Side (Face Down)
+23,Attack to Throw (Forward)
+24,Attack to Throw (Backward)
+25,Attack to Throw (Left Side)
+26,Attack to Throw (Right Side)
+27,Airborne Throw Hit (Forward)
+28,Airborne Throw Hit (Backward)
+29,Airborne Throw Hit (Left Side)
+30,Airborne Throw Hit (Right Side)
+35,Opponent distance <= param
+36,Opponent distance >= param
+43,On Hit
+44,On Hit
+47,On block
+48,On whiff
+49,On hit/block
+51,On hit
+61,Check opponent VULN
+66,Opponent Standing
+67,Opponent Crouching
+68,Incoming high attack
+69,Incoming mid attack
+70,Incoming low attack
+71,Incoming high/mid attack
+72,Backturned
+73,Not Backturned
+92,Opponent facing Forward
+93,Opponent facing Left
+94,Opponent facing Right
+95,Opponent facing Back
+96,Opponent facing Forward
+97,Opponent facing Left
+98,Opponent facing Right
+99,Opponent facing Back
+100,Enemy within 1792 units & last active frame not reached & attack is high
+101,Enemy first active frame - curr frame < X
+102,Enemy first active frame - curr frame >= X
+103,Enemy first active frame - curr frame = X
+104,Enemy last active frame - curr frame < X
+105,Enemy last active frame - curr frame >= X
+106,Enemy last active frame - curr frame = X
+110,Enemy move frame >= X
+111,Enemy move frame < X
+112,Enemy move frame == X
+113,Enemy move frame >= X
+114,Enemy move frame >= X
+126,Opponent downed
+127,Opponent on their feet
+130,Counterhit
+131,Pressed ONLY LP (1)
+132,Pressed ONLY RP (2)
+133,Pressed ONLY LP+RP (1+2)
+135,On death
+137,Opponent HP < 50%
+138,Player HP >= param
+139,Player HP < param
+140,Opponent HP >= param
+141,Opponent HP > param
+142,Player HP %age >= param
+143,Player HP %age < param
+144,Opponent HP <= param
+145,Player HP <= param
+146,Standing on left side
+147,Standing on right side
+148,On ground (right side)
+149,On ground (left side)
+155,If Ki Charged
+157,Player is in rage
+176,Geese in Max-Mode
+182,Near Wall
+216,Something wallsplat related
+217,Player character ID
+218,Player NOT character ID
+219,Opponent character ID
+220,Opponent NOT character ID
+221,Player character ID
+222,Player NOT Character ID
+223,Opponent character ID
+224,Opponent NOT character ID
+225,Character Controller
+253,Bryan taunt value >= param
+255,Value (prop 0x807c) >= param
+256,Bryan taunted
+273,prop 0x80c8 >= param
+274,prop 0x80cb >= param
+284,_ 
+285,prop 0x810c >= param
+308,Chloe Points <= param
+310,prop 0x80c8 <= param
+311,prop 0x80cb <= param
+321,player flag <= param
+322,prop 0x810c <= param
+323,prop 0x80ed <= param
+329,Check value (prop 0x807c)
+344,Kazuya Devil Form
+345,Chloe points == param
+346,Check value (prop 0x80c5)
+347,Check value (prop 0x80c8)
+348,Check value (prop 0x80cb)
+351,Claudio Starburst
+352,Check value (prop 0x80a6)
+353,Check value (prop 0x80a9)
+359,_ 
+361,Check value (prop 0x80ed)
+532,Player speed >= param
+533,Player speed <= param
+534,Player speed == param
+552,Random number generator (uniform)
+553,Random number generator (weighted)
+556,Arcade Battle
+558,Story Battle
+559,Story Battle Number
+560,Customization seq#
+563,Gamemode
+564,Gamemode(?)
+566,Outro Related(?)
+569,Intro(?)
+570,Outro Related(?)
+573,Check Stage ID
+579,Player check (P1/P2)
+583,Character is male
+584,Character is female
+607,Opponent is Airborne
+608,Opponent is Not Airborne
+609,Has item
+614,Juggle
+615,Screw available
+629,Meter >= param
+634,Treasure Battle Special Match
+636,Assist button pressed
+637,Check Match Point
+639,Parry Zoom
+641,Once per match (Leroy Cane)
+643,is Kuni mask On?
+765,Arcade Cutscene
+785,Projectile on-hit
+786,Projectile on-block
+807,prop 0x8414 >= param
+808,prop 0x8414 <= param
+809,Check value (prop 0x8414)
+811,Basic combo enabled
+813,Parry high
+814,Parry mid
+815,Parry low
+816,Parry high and mid
+817,Parry group
+830,Attack absorption (Power Crush)
+842,Parry high
+843,Parry mid
+844,Parry low
+845,Parry high and mid
+846,Parry group
+859,Parry high (special)
+860,Parry mid (special)
+861,Parry low (special)
+862,Parry high and mid (special)
+863,Parry high
+864,Parry mid
+865,Parry low
+866,Parry high and mid
+871,Parry high
+872,Parry mid
+873,Parry low
+874,Parry high and mid
+881,Requirements end

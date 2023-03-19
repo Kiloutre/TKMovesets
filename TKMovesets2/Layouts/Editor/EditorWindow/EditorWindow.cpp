@@ -138,7 +138,7 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 		flags |= EditorMoveFlags_Generic;
 		break;
 	case EditorMovelistFilter_Throws:
-		flags |= EditorMoveFlags_Throw;
+		flags |= EditorMoveFlags_Throw | EditorMoveFlags_ThrowReaction;
 		break;
 	case EditorMovelistFilter_Custom:
 		flags |= EditorMoveFlags_Custom;
