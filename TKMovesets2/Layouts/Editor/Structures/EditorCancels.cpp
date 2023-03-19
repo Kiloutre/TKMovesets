@@ -157,6 +157,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		commandField->flags |= EditorInput_Clickable;
 		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
 		label = std::format("{}: {}", _("edition.input_sequence.window_name"), inputSequenceId);
+		item->color = MOVEID_INPUT_SEQUENCE;
 	}
 	else {
 		if (commandField->flags & EditorInput_Clickable) {
@@ -170,8 +171,10 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
 			moveIdField->displayName = "edition.cancel.group_id";
 			label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
+			item->color = MOVEID_GROUP_CANCEL;
 		}
 		else {
+			item->color = 0;
 			moveIdField->displayName = "edition.cancel.move_id";
 			int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 			std::string commandStr = GetCancelCommandStr(command);

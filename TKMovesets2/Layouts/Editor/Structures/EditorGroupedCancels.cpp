@@ -130,8 +130,10 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		commandField->flags |= EditorInput_Clickable;
 		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
 		label = std::format("{}: {}", _("edition.input_sequence.window_name"), inputSequenceId);
+		item->color = MOVEID_INPUT_SEQUENCE;
 	}
 	else {
+		item->color = 0;
 		if (commandField->flags & EditorInput_Clickable) {
 			commandField->flags -= EditorInput_Clickable;
 		}

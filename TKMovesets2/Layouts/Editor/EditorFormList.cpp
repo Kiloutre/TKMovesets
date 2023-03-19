@@ -257,13 +257,11 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				}
 				item->categoryMaps[category] = inputs;
 			}
+			BuildItemDetails(listIndex);
 
 			++m_listSizeChange;
 			++m_listSize;
 
-			for (int i = listIndex; i < m_listSize; ++i) {
-				BuildItemDetails(i);
-			}
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -291,8 +289,6 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_items[listIndex - 1]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
-			BuildItemDetails(listIndex);
-			BuildItemDetails(listIndex - 1);
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -321,8 +317,6 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_items[listIndex + 1]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
-			BuildItemDetails(listIndex);
-			BuildItemDetails(listIndex + 1);
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -346,11 +340,6 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				delete m_items[listIndex];
 				m_items.erase(m_items.begin() + listIndex);
 				unsavedChanges = true;
-				
-				// Rebuild labels
-				for (int i = listIndex; i < m_listSize; ++i) {
-					BuildItemDetails(i);
-				}
 			}
 		}
 		ImGui::PopStyleColor();
@@ -395,7 +384,9 @@ void EditorFormList::Render()
 				{
 					ImVec2 drawStart = c_winPos + ImGui::GetCursorPos();
 					drawStart.y -= ImGui::GetScrollY() + 2;
-					drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), listIndex & 1 ? FORM_BG_1 : FORM_BG_2);
+					int color = m_items[listIndex]->color;
+					color = color == 0 ? (listIndex & 1 ? FORM_BG_1 : FORM_BG_2) : color;
+					drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), color);
 				}
 
 				if (id > 1) {
