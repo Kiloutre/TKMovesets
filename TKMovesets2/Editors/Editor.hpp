@@ -14,7 +14,7 @@
 #include "GameAddresses.h"
 #include "MovesetStructs.h"
 
-# define FORM_INPUT_BUFSIZE (32)
+# define FORM_INPUT_BUFSIZE (64)
 
 // Vector with unique elements
 template < typename T >
@@ -71,6 +71,11 @@ enum EditorWindowType_
 	EditorWindowType_Extraproperty,
 	EditorWindowType_MoveBeginProperty,
 	EditorWindowType_MoveEndProperty,
+
+	EditorWindowType_Projectile,
+
+	EditorWindowType_CameraData,
+	EditorWindowType_ThrowData,
 
 
 	EditorWindowType_Invalid,

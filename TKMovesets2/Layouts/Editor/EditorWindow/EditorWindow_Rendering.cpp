@@ -179,7 +179,7 @@ void EditorWindow::RenderStatusBar()
 	if (currentGameId != -1 && !isAttached)
 	{
 		// Short process error message
-		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 2.5f);
+		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 2.0f);
 		ImGui::SameLine();
 	}
 

@@ -211,6 +211,7 @@ edition.cancel.detection_end = Detection end
 edition.cancel.starting_frame = Starting frame
 edition.cancel.move_id = Move ID
 edition.cancel.group_id = Cancel group ID
+edition.cancel.sequence_id = ID de sequence
 edition.cancel.cancel_option = Cancel option
 
 edition.grouped_cancel.window_name = Grouped Cancel list

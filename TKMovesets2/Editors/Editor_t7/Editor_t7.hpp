@@ -25,8 +25,10 @@ struct StructIterators
 	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
 	StructIterator<StructsT7_gameAddr::Projectile> projectiles;
 	StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
+	StructIterator<StructsT7_gameAddr::ThrowData> throw_datas;
 	StructIterator<Input> inputs;
 	StructIterator<Voiceclip> voiceclips;
+	StructIterator<CameraData> camera_datas;
 };
 
 class DLLCONTENT EditorT7 : public Editor

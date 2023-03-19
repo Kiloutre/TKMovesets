@@ -158,8 +158,10 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
 		label = std::format("{}: {}", _("edition.input_sequence.window_name"), inputSequenceId);
 		item->color = MOVEID_INPUT_SEQUENCE;
+		commandField->displayName = "edition.cancel.sequence_id";
 	}
 	else {
+		commandField->displayName = "edition.cancel.command";
 		if (commandField->flags & EditorInput_Clickable) {
 			commandField->flags -= EditorInput_Clickable;
 		}

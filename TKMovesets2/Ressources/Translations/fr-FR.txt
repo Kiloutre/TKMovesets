@@ -114,7 +114,7 @@ edition.suggest_new_name = Ce personnage possède un nom par défaut, voulez-vou
 edition.last_saved = Dernière sauvegarde le:
 edition.save = Sauvegarder
 edition.discard_changes = Abandonner les changements ?
-edition.process_err = Error
+edition.process_err = Erreur
 edition.live_edition = Édition en direct
 edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.
 edition.move_name = Nom
@@ -207,6 +207,7 @@ edition.cancel.detection_end = Fin de détection
 edition.cancel.starting_frame = Frame de commencement
 edition.cancel.move_id = ID de move
 edition.cancel.group_id = ID de cancel de groupe
+edition.cancel.sequence_id = ID de sequence
 edition.cancel.cancel_option = Option de cancel
 
 edition.grouped_cancel.window_name = Liste de Cancel groupés

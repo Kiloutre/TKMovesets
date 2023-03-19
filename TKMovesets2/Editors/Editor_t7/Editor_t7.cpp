@@ -676,6 +676,8 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 
 	char* nameBlock = (char*)(m_movesetData + m_header->offsets.nameBlock);
 
+	// TODO to do TOFIX to fix : crash on move->anim_name_addr
+
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
@@ -1143,6 +1145,8 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.input_sequences.Set(movesetBlock, m_infos->table.inputSequence, m_infos->table.inputSequenceCount);
 	m_iterators.inputs.Set(movesetBlock, m_infos->table.input, m_infos->table.inputCount);
 	m_iterators.voiceclips.Set(movesetBlock, m_infos->table.voiceclip, m_infos->table.voiceclipCount);
+	m_iterators.throw_datas.Set(movesetBlock, m_infos->table.throws, m_infos->table.throwsCount);
+	m_iterators.camera_datas.Set(movesetBlock, m_infos->table.cameraData, m_infos->table.cameraDataCount);
 }
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
