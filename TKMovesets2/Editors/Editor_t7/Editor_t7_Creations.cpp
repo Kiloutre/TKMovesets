@@ -64,6 +64,14 @@ template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2
 	return newStructId;
 }
 
+int32_t EditorT7::CreateInputSequence()
+{
+	InputSequence newStruct{ 0 };
+
+	int32_t newStructId = CreateNewGeneric<InputSequence>(&newStruct, nullptr, offsetof(m_infos->table, inputSequence));
+	return newStructId;
+}
+
 int32_t EditorT7::CreateNewPushbackExtra()
 {
 	PushbackExtradata newStruct{ 0 };
@@ -323,6 +331,10 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 		break;
 	case EditorWindowType_PushbackExtradata:
 		return CreateNewPushbackExtra();
+		break;
+
+	case EditorWindowType_InputSequence:
+		return CreateInputSequence();
 		break;
 	}
 	return -1;

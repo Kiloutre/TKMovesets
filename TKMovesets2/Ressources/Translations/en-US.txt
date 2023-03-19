@@ -151,6 +151,7 @@ edition.hit_conditions = Hit Condition list
 edition.reactions = Reactions
 edition.pushback = Pushback
 edition.pushback_extra = Pushback extra
+edition.input_sequence = Input sequence
 
 edition.move.window_name = Move
 edition.move.category_2 = References

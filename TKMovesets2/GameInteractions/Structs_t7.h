@@ -33,7 +33,15 @@ namespace StructsT7
 
 	struct Cancel
 	{
-		uint64_t command;
+		union
+		{
+			int64_t command;
+			struct
+			{
+				int32_t input;
+				int32_t direction;
+			};
+		};
 		Requirement* requirements_addr;
 		CancelExtradata* extradata_addr;
 		uint32_t detection_start;
@@ -104,9 +112,15 @@ namespace StructsT7
 
 	struct Input
 	{
-		// todo: name properly 
-		int32_t _0x00_int;
-		int32_t _0x04_int;
+		union
+		{
+			int64_t command;
+			struct
+			{
+				int32_t input;
+				int32_t direction;
+			};
+		};
 	};
 
 	struct InputSequence
@@ -326,7 +340,15 @@ namespace StructsT7_gameAddr
 
 	struct Cancel
 	{
-		uint64_t command;
+		union
+		{
+			int64_t command;
+			struct
+			{
+				int32_t input;
+				int32_t direction;
+			};
+		};
 		gameAddr requirements_addr;
 		gameAddr extradata_addr;
 		uint32_t detection_start;

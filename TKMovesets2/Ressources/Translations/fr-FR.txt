@@ -148,6 +148,7 @@ edition.hit_conditions = Liste de Hit Condition
 edition.reactions = Réactions
 edition.pushback = Poussée
 edition.pushback_extra = Poussée: extra
+edition.input_sequence = Séquence de commande
 
 edition.move.window_name = Move
 edition.move.category_2 = Références
@@ -269,7 +270,7 @@ edition.reactions.downed_moveid = À terre
 edition.input_sequence.window_name = Séquence de commande
 edition.input_sequence.input_window_frames = Fenêtre de temps
 edition.input_sequence.input_amount = Nombre de commandes
-edition.input_sequence.input_addr = Commande ID
+edition.input_sequence.input_addr = ID de commande
 
 edition.form_list.item = Élément
 edition.form_list.end = FIN

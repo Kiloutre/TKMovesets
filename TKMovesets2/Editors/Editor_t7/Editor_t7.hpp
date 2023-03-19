@@ -126,6 +126,8 @@ public:
 	int32_t CreateNew(EditorWindowType_ type) override;
 	template<typename T> int32_t CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset);
 	//
+	int32_t CreateInputSequence();
+	//
 	int32_t CreateNewRequirements();
 	//
 	int32_t CreateNewMove();

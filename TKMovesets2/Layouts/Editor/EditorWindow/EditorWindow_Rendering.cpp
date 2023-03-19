@@ -100,6 +100,11 @@ void EditorWindow::RenderToolBar()
 			structType = EditorWindowType_PushbackExtradata;
 		}
 
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.input_sequence"))) {
+			structType = EditorWindowType_InputSequence;
+		}
+
 		if (structType != EditorWindowType_Invalid) {
 			int32_t structId = m_editor->CreateNew(structType);
 			if (structId != -1) {
