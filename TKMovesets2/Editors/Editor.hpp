@@ -51,16 +51,24 @@ enum EditorConstants_
 enum EditorWindowType_
 {
 	EditorWindowType_Move,
-	EditorWindowType_Extraproperty,
+
 	EditorWindowType_Voiceclip,
-	EditorWindowType_Cancel,
-	EditorWindowType_CancelExtradata,
-	EditorWindowType_GroupedCancel,
-	EditorWindowType_Requirement,
+
 	EditorWindowType_HitCondition,
 	EditorWindowType_Reactions,
 	EditorWindowType_Pushback,
 	EditorWindowType_PushbackExtradata,
+
+	EditorWindowType_Requirement,
+
+	EditorWindowType_Cancel,
+	EditorWindowType_GroupedCancel,
+	EditorWindowType_CancelExtradata,
+
+	EditorWindowType_InputSequence,
+	EditorWindowType_Input,
+
+	EditorWindowType_Extraproperty,
 	EditorWindowType_MoveBeginProperty,
 	EditorWindowType_MoveEndProperty,
 
@@ -97,7 +105,7 @@ struct EditorInput
 	// CContains the field name in short format, used for easy-to-read checks, better than having to type the full name
 	std::string name;
 	// Contains the field name, used to show the correct translation string
-	std::string field_fullname;
+	std::string displayName;
 	// Use to split various fields into various tree-like categories
 	uint8_t category = 0;
 	// Sets the allowed charset for the input
@@ -209,6 +217,8 @@ public:
 	std::map<EditorConstants_, int> constants;
 	// Contains every move, in a displayable format
 	std::vector<DisplayableMove*>* displayableMovelist = nullptr;
+	// Contains quick data that is made to be accessed outside of this class
+	EditorTable movesetTable;
 
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
@@ -216,8 +226,6 @@ public:
 	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	// Assigns the moveset pointer and useful ptrs to it
 	virtual void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) = 0;
-	// Returns useful informations contained within the moveset  actual header
-	virtual EditorTable GetMovesetTable() = 0;
 	// Return the movelist in a quickly displayable format
 	virtual void ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref = nullptr) = 0;
 	// Returns the given player current move id

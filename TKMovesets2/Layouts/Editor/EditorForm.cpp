@@ -57,6 +57,10 @@ namespace EditorFormUtils
 			return "start_other_extraproperty";
 		case EditorWindowType_MoveEndProperty:
 			return "end_other_extraproperty";
+		case EditorWindowType_Input:
+			return "input";
+		case EditorWindowType_InputSequence:
+			return "input_sequence";
 		}
 		return "UNKNOWN";
 	}
@@ -121,7 +125,7 @@ void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, i
 
 void EditorForm::RenderLabel(EditorInput* field)
 {
-	const char* fieldLabel = _(field->field_fullname.c_str());
+	const char* fieldLabel = _(field->displayName.c_str());
 	if (field->flags & EditorInput_Clickable && !field->errored) {
 		if (ImGui::Selectable(fieldLabel, true)) {
 			OnFieldLabelClick(field);

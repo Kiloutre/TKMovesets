@@ -101,7 +101,7 @@ void EditorFormList::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs
 
 void EditorFormList::RenderLabel(int listIdx, EditorInput* field)
 {
-	const char* fieldLabel = _(field->field_fullname.c_str());
+	const char* fieldLabel = _(field->displayName.c_str());
 	if (field->flags & EditorInput_Clickable && !field->errored) {
 		if (ImGui::Selectable(fieldLabel, true)) {
 			OnFieldLabelClick(listIdx, field);

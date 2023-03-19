@@ -21,6 +21,7 @@
 #include "EditorPushbackExtra.hpp"
 #include "EditorMoveStartProperty.hpp"
 #include "EditorMoveEndProperty.hpp"
+#include "EditorInputSequence.hpp"
 
 // -- Private methods -- //
 
@@ -66,6 +67,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		break;
 	case EditorWindowType_MoveEndProperty:
 		return new EditorMoveEndProperty(m_windowTitle, id, m_editor, this);
+		break;
+	case EditorWindowType_InputSequence:
+		return new EditorInputSequence(m_windowTitle, id, m_editor, this);
 		break;
 	}
 
@@ -120,7 +124,7 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 
 	if (filter == EditorMovelistFilter_PostIdle) {
 		// Get idle move ID, only list moves beyond it
-		size_t startingIndex = editorTable.aliases[1];
+		size_t startingIndex = editorTable->aliases[1];
 		for (; startingIndex < movelist.size(); ++startingIndex) {
 			m_filteredMovelist.push_back(movelist[startingIndex]);
 		}
@@ -170,11 +174,11 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 	const size_t movelistSize = movelist.size();
 	if (moveId >= movelistSize)
 	{
-		const size_t aliasesCount = editorTable.aliases.size();
+		const size_t aliasesCount = editorTable->aliases.size();
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
-		moveId = editorTable.aliases[moveId - (uint16_t)0x8000];
+		moveId = editorTable->aliases[moveId - (uint16_t)0x8000];
 	}
 
 	return moveId;
@@ -255,7 +259,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	m_editor->ReloadDisplayableMoveList(&movelist);
 	m_filteredMovelist = movelist;
 
-	editorTable = m_editor->GetMovesetTable();
+	editorTable = &m_editor->movesetTable;
 }
 
 void EditorWindow::ReloadMovelistFilter()

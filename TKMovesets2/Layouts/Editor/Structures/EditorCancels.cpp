@@ -6,9 +6,7 @@
 #include "EditorCancels.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-std::vector<std::string> directionBitLabels = {
+const std::vector<std::string> cg_directionBitLabels = {
 	"D/B",
 	"D",
 	"D/F",
@@ -19,6 +17,8 @@ std::vector<std::string> directionBitLabels = {
 	"U",
 	"U/F",
 };
+
+// -- Static helpers -- //
 
 static std::string GetCancelCommandStr(uint64_t command)
 {
@@ -44,7 +44,7 @@ static std::string GetCancelCommandStr(uint64_t command)
 				if (retVal.size() != 0) {
 					retVal += "|";
 				}
-				retVal += directionBitLabels[i - 1];
+				retVal += cg_directionBitLabels[i - 1];
 			}
 		}
 
@@ -76,12 +76,16 @@ static std::string GetCancelCommandStr(uint64_t command)
 	return retVal.size() == 0 ? retVal : "[ " + retVal + " ]";
 }
 
+// -- Public methods -- //
+
 EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
 {
 	windowType = EditorWindowType_Cancel;
 	m_baseWindow = baseWindow;
 	InitForm(windowTitleBase, t_id, editor);
 }
+
+// -- Private methods -- //
 
 void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
@@ -104,6 +108,12 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	else if (name == "requirements_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
 	}
+	else if (name == "command") {
+		// Command is only clickable
+		uint64_t command = (uint64_t)strtoll(item->identifierMaps["command"]->buffer, nullptr, 16);
+		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
+		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
+	}
 }
 
 void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
@@ -112,14 +122,14 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 	auto& item = m_items[listIdx];
 
 	if (name == "command" || name == "move_id") {
-		// More complex validation than what is shown in EditorT7 (multi-field validation)
+		// More complex validation than what is shown in the editors.cpp (cross-field validation)
 		EditorInput* commandField = item->identifierMaps["command"];
 		EditorInput* moveIdField = item->identifierMaps["move_id"];
 		uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
 			int groupId = atoi(moveIdField->buffer);
-			moveIdField->errored = groupId >= m_baseWindow->editorTable.groupCancelCount;
+			moveIdField->errored = groupId >= m_baseWindow->editorTable->groupCancelCount;
 		}
 		else {
 			int moveId = m_baseWindow->ValidateMoveId(moveIdField->buffer);
@@ -141,18 +151,28 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
 	if ((command & 0xFFFFFFFF) >= m_editor->constants[EditorConstants_InputSequenceCommandStart]) {
+		if (moveIdField->flags & EditorInput_Clickable) {
+			moveIdField->flags -= EditorInput_Clickable;
+		}
 		commandField->flags |= EditorInput_Clickable;
+		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
+		label = std::format("{}: {}", _("edition.input_sequence.window_name"), inputSequenceId);
 	}
 	else {
 		if (commandField->flags & EditorInput_Clickable) {
 			commandField->flags -= EditorInput_Clickable;
 		}
+		if ((moveIdField->flags & EditorInput_Clickable) == 0) {
+			moveIdField->flags |= EditorInput_Clickable;
+		}
 
 		int move_id = atoi(moveIdField->buffer);
 		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+			moveIdField->displayName = "edition.cancel.group_id";
 			label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
 		}
 		else {
+			moveIdField->displayName = "edition.cancel.move_id";
 			int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 			std::string commandStr = GetCancelCommandStr(command);
 			if (validated_move_id == -1) {

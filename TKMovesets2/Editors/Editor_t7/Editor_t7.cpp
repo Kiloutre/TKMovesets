@@ -17,7 +17,7 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	for (auto& [name, input] : inputMap) {
 		// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
 		input->name = name;
-		input->field_fullname = "edition." + baseIdentifier + "." + name;
+		input->displayName = "edition." + baseIdentifier + "." + name;
 	}
 }
 
@@ -91,6 +91,52 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 	pushback->displacement = atoi(inputs["displacement"]->buffer);
 	pushback->num_of_loops = atoi(inputs["num_of_loops"]->buffer);
 	pushback->extradata_addr = atoi(inputs["extradata_addr"]->buffer);
+
+}
+
+// ===== Input Sequence  ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	uint64_t offset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.inputSequence;
+	gAddr::InputSequence* sequence = (gAddr::InputSequence*)(m_movesetData + offset) + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("input_addr", 0, EditorInput_PTR, sequence->input_addr);
+	CREATE_FIELD("_0x4_int", 0, EditorInput_U32, sequence->_0x4_int);
+	CREATE_FIELD("input_amount", 0, EditorInput_U16, sequence->input_amount);
+	CREATE_FIELD("input_window_frames", 0, EditorInput_U16, sequence->input_window_frames);
+
+	WriteFieldFullname(inputMap, "input_sequence");
+	return inputMap;
+}
+
+bool EditorT7::ValidateInputSequenceField(std::string name, EditorInput* field)
+{
+	if (name == "input_addr")
+	{
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.inputCount;
+	}
+
+	return true;
+}
+
+void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	uint64_t offset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.inputSequence;
+	gAddr::InputSequence* sequence = (gAddr::InputSequence*)(m_movesetData + offset) + id;
+
+	sequence->input_window_frames = atoi(inputs["input_window_frames"]->buffer);
+	sequence->input_amount = atoi(inputs["input_amount"]->buffer);
+	sequence->_0x4_int = atoi(inputs["_0x4_int"]->buffer);
+	sequence->input_addr = atoi(inputs["input_addr"]->buffer);
 
 }
 
@@ -403,6 +449,13 @@ bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelExtradataCount;
 	}
+	else if (name == "command") {
+		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16) & 0xFFFFFFFF;
+		if (command >= constants[EditorConstants_InputSequenceCommandStart]) {
+			int listIdx = command - constants[EditorConstants_InputSequenceCommandStart];
+			return listIdx < (int)m_infos->table.inputCount;
+		}
+	}
 
 	return true;
 }
@@ -480,6 +533,13 @@ bool EditorT7::ValidateGroupedCancelField(std::string name, EditorInput* field)
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelExtradataCount;
+	}
+	else if (name == "command") {
+		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16) & 0xFFFFFFFF;
+		if (command >= constants[EditorConstants_InputSequenceCommandStart]) {
+			int listIdx = command - constants[EditorConstants_InputSequenceCommandStart];
+			return listIdx < (int)m_infos->table.inputCount;
+		}
 	}
 
 	return true;
@@ -980,6 +1040,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_MoveEndProperty:
 		SaveMoveEndProperty(id, inputs);
 		break;
+	case EditorWindowType_InputSequence:
+		SaveInputSequence(id, inputs);
+		break;
 	}
 }
 
@@ -1005,6 +1068,9 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		break;
 	case EditorWindowType_PushbackExtradata:
 		return GetPushbackExtraInputs(id, drawOrder);
+		break;
+	case EditorWindowType_InputSequence:
+		return GetInputSequenceInputs(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -1070,6 +1136,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 	case EditorWindowType_MoveEndProperty:
 		return ValidateOtherMoveProperty(fieldShortName, field);
 		break;
+	case EditorWindowType_InputSequence:
+		return ValidateInputSequenceField(fieldShortName, field);
+		break;
 	}
 
 	return true;
@@ -1105,6 +1174,8 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.move_start_properties.Set(movesetBlock, m_infos->table.moveBeginningProp, m_infos->table.moveBeginningPropCount);
 	m_iterators.move_end_properties.Set(movesetBlock, m_infos->table.moveEndingProp, m_infos->table.moveEndingPropCount);
 	m_iterators.projectiles.Set(movesetBlock, m_infos->table.projectile, m_infos->table.projectileCount);
+	m_iterators.input_sequences.Set(movesetBlock, m_infos->table.inputSequence, m_infos->table.inputSequenceCount);
+	m_iterators.inputs.Set(movesetBlock, m_infos->table.input, m_infos->table.inputCount);
 }
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
@@ -1164,14 +1235,9 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		m_animNameToOffsetMap[animName_str] = animOffset;
 		m_animOffsetToNameOffset[animOffset] = movePtr[i].anim_name_addr;
 	}
-}
 
-EditorTable EditorT7::GetMovesetTable()
-{
-	return EditorTable{
-		.aliases = m_aliases,
-		.groupCancelCount = m_infos->table.groupCancelCount
-	};
+	movesetTable.aliases = m_aliases;
+	movesetTable.groupCancelCount = m_infos->table.groupCancelCount;
 }
 
 void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)

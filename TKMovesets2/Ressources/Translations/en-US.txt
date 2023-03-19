@@ -209,6 +209,7 @@ edition.cancel.detection_start = Detection start
 edition.cancel.detection_end = Detection end
 edition.cancel.starting_frame = Starting frame
 edition.cancel.move_id = Move ID
+edition.cancel.group_id = Cancel group ID
 edition.cancel.cancel_option = Cancel option
 
 edition.grouped_cancel.window_name = Grouped Cancel list
@@ -268,6 +269,11 @@ edition.reactions.block_moveid = Blocking
 edition.reactions.crouch_block_moveid = Crouch blocking
 edition.reactions.wallslump_moveid = Wallslump
 edition.reactions.downed_moveid = Downed
+
+edition.input_sequence.window_name = Input sequence
+edition.input_sequence.input_window_frames = Timeframe
+edition.input_sequence.input_amount = Input amount
+edition.input_sequence.input_addr = Input ID
 
 edition.form_list.item = Item
 edition.form_list.end = END

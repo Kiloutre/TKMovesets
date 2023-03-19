@@ -24,6 +24,8 @@ struct StructIterators
 	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_start_properties;
 	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
 	StructIterator<StructsT7_gameAddr::Projectile> projectiles;
+	StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
+	StructIterator<Input> inputs;
 };
 
 class DLLCONTENT EditorT7 : public Editor
@@ -42,7 +44,6 @@ public:
 
 	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
 	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
-	EditorTable GetMovesetTable() override;
 	void ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref = nullptr) override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
 	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
@@ -110,6 +111,11 @@ public:
 	// Pushback extradata
 	std::map<std::string, EditorInput*> GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
+	// Input Sequence
+	std::map<std::string, EditorInput*> GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateInputSequenceField(std::string name, EditorInput* field);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player

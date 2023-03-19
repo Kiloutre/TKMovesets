@@ -6,7 +6,7 @@
 class EditorWindowBase {
 public:
 	// Stores important moveset informations such as aliases, etc...
-	EditorTable editorTable;
+	EditorTable* editorTable = nullptr;
 	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*> movelist;
 

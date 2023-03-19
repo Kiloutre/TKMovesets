@@ -205,6 +205,7 @@ edition.cancel.detection_start = Début de détection
 edition.cancel.detection_end = Fin de détection
 edition.cancel.starting_frame = Frame de commencement
 edition.cancel.move_id = ID de move
+edition.cancel.group_id = ID de cancel de groupe
 edition.cancel.cancel_option = Option de cancel
 
 edition.grouped_cancel.window_name = Liste de Cancel groupés
@@ -264,6 +265,11 @@ edition.reactions.block_moveid = Garde
 edition.reactions.crouch_block_moveid = Garde accroupi
 edition.reactions.wallslump_moveid = Bas du mur
 edition.reactions.downed_moveid = À terre
+
+edition.input_sequence.window_name = Séquence de commande
+edition.input_sequence.input_window_frames = Fenêtre de temps
+edition.input_sequence.input_amount = Nombre de commandes
+edition.input_sequence.input_addr = Commande ID
 
 edition.form_list.item = Élément
 edition.form_list.end = FIN

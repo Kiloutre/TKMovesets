@@ -174,6 +174,8 @@ int32_t EditorT7::CreateNewCancelList()
 
 int32_t EditorT7::CreateNewGroupedCancelList()
 {
+	movesetTable.groupCancelCount += 2;
+
 	Cancel newStruct{ 0 };
 	Cancel newStruct2{ 0 };
 
