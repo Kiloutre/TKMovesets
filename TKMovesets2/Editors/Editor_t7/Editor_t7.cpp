@@ -670,18 +670,18 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("distance", 0, EditorInput_U16, move->distance);
 
 	CREATE_FIELD("cancel_id", 2, EditorInput_PTR,  move->cancel_addr);
-	CREATE_FIELD("hit_condition_id", 2, EditorInput_PTR, move->hit_condition_addr);
-	CREATE_FIELD("extra_properties_id", 2, EditorInput_PTR, move->extra_move_property_addr);
-	CREATE_FIELD("beginning_extra_properties_id", 2, EditorInput_PTR, move->move_start_extraprop_addr);
-	CREATE_FIELD("ending_extra_properties_id", 2, EditorInput_PTR, move->move_end_extraprop_addr);
-	CREATE_FIELD("voiceclip_id", 2, EditorInput_PTR, move->voicelip_addr);
+	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, move->hit_condition_addr);
+	CREATE_FIELD("extra_move_property_addr", 2, EditorInput_PTR, move->extra_move_property_addr);
+	CREATE_FIELD("move_start_extraprop_addr", 2, EditorInput_PTR, move->move_start_extraprop_addr);
+	CREATE_FIELD("move_end_extraprop_addr", 2, EditorInput_PTR, move->move_end_extraprop_addr);
+	CREATE_FIELD("voicelip_addr", 2, EditorInput_PTR, move->voicelip_addr);
 
 	CREATE_FIELD("cancel_id_2", 3, EditorInput_PTR, move->_0x28_cancel_addr);
-	CREATE_FIELD("cancel_id_2_related", 3, EditorInput_U32, move->_0x30_int__0x28_related);
+	CREATE_FIELD("cancel_related_id_2", 3, EditorInput_U32, move->_0x30_int__0x28_related);
 	CREATE_FIELD("cancel_id_3", 3, EditorInput_PTR, move->_0x38_cancel_addr);
-	CREATE_FIELD("cancel_id_3_related", 3, EditorInput_U32, move->_0x40_int__0x38_related);
+	CREATE_FIELD("cancel_related_id_3", 3, EditorInput_U32, move->_0x40_int__0x38_related);
 	CREATE_FIELD("cancel_id_4", 3, EditorInput_PTR, move->_0x48_cancel_addr);
-	CREATE_FIELD("cancel_id_4_related", 3, EditorInput_U32, move->_0x50_int__0x48_related);
+	CREATE_FIELD("cancel_related_id_4", 3, EditorInput_U32, move->_0x50_int__0x48_related);
 
 	CREATE_FIELD("_0x34_int", 5, EditorInput_U32, move->_0x34_int);
 	CREATE_FIELD("_0x44_int", 5, EditorInput_U32, move->_0x44_int);
@@ -843,18 +843,18 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	move->distance = (uint16_t)atoi(inputs["distance"]->buffer);
 
 	move->cancel_addr = atoll(inputs["cancel_id"]->buffer);
-	move->hit_condition_addr = atoll(inputs["hit_condition_id"]->buffer);
-	move->extra_move_property_addr = atoll(inputs["extra_properties_id"]->buffer);
-	move->move_start_extraprop_addr = atoll(inputs["beginning_extra_properties_id"]->buffer);
-	move->move_end_extraprop_addr = atoll(inputs["ending_extra_properties_id"]->buffer);
-	move->voicelip_addr = atoll(inputs["voiceclip_id"]->buffer);
+	move->hit_condition_addr = atoll(inputs["hit_condition_addr"]->buffer);
+	move->extra_move_property_addr = atoll(inputs["extra_move_property_addr"]->buffer);
+	move->move_start_extraprop_addr = atoll(inputs["move_start_extraprop_addr"]->buffer);
+	move->move_end_extraprop_addr = atoll(inputs["move_end_extraprop_addr"]->buffer);
+	move->voicelip_addr = atoll(inputs["voicelip_addr"]->buffer);
 
 	move->_0x28_cancel_addr = atoll(inputs["cancel_id_2"]->buffer);
-	move->_0x30_int__0x28_related = atoi(inputs["cancel_id_2_related"]->buffer);
+	move->_0x30_int__0x28_related = atoi(inputs["cancel_related_id_2"]->buffer);
 	move->_0x38_cancel_addr = atoll(inputs["cancel_id_3"]->buffer);
-	move->_0x40_int__0x38_related = atoi(inputs["cancel_id_3_related"]->buffer);
+	move->_0x40_int__0x38_related = atoi(inputs["cancel_related_id_3"]->buffer);
 	move->_0x48_cancel_addr = atoll(inputs["cancel_id_4"]->buffer);
-	move->_0x50_int__0x48_related = atoi(inputs["cancel_id_4_related"]->buffer);
+	move->_0x50_int__0x48_related = atoi(inputs["cancel_related_id_4"]->buffer);
 
 	move->_0x34_int = atoi(inputs["_0x34_int"]->buffer);
 	move->_0x44_int = atoi(inputs["_0x44_int"]->buffer);
@@ -888,33 +888,32 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 		return m_animNameToOffsetMap.find(field->buffer) != m_animNameToOffsetMap.end();
 	}
 
-	else if (name == "cancel_id" || name == "cancel_id_2" ||
-		name == "cancel_id_3" || name == "cancel_id_4") {
+	else if (Helpers::startsWith(name, "cancel_id")) {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.cancelCount;
 	}
 
-	else if (name == "hit_condition_id") {
+	else if (name == "hit_condition_addr") {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.hitConditionCount;
 	}
 
-	else if (name == "extra_properties_id") {
+	else if (name == "extra_move_property_addr") {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.extraMovePropertyCount;
 	}
 
-	else if (name == "beginning_extra_properties_id") {
+	else if (name == "move_start_extraprop_addr") {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.moveBeginningPropCount;
 	}
 
-	else if (name == "ending_extra_properties_id") {
+	else if (name == "move_end_extraprop_addr") {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.moveEndingPropCount;
 	}
 
-	else if (name == "voiceclip_id") {
+	else if (name == "voiceclip_addr") {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.voiceclipCount;
 	}

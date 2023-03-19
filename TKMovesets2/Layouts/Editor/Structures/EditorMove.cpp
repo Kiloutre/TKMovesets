@@ -29,27 +29,27 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 		// Validation is only needed here for alias conversion
 		m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
 	}
-	else if (name == "voiceclip_id") {
+	else if (name == "voiceclip_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Voiceclip, id);
 		}
 	}
-	else if (name == "hit_condition_id") {
+	else if (name == "hit_condition_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_HitCondition, id);
 		}
 	}
-	else if (name == "extra_properties_id") {
+	else if (name == "extra_properties_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Extraproperty, id);
 		}
 	}
-	else if (name == "beginning_extra_properties_id") {
+	else if (name == "beginning_extra_properties_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_MoveBeginProperty, id);
 		}
 	}
-	else if (name == "ending_extra_properties_id") {
+	else if (name == "ending_extra_properties_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_MoveEndProperty, id);
 		}
