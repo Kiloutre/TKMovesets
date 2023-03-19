@@ -8,12 +8,32 @@
 
 using namespace StructsT7;
 
+struct StructIterators
+{
+	StructIterator<StructsT7_gameAddr::Move> moves;
+	StructIterator<Requirement> requirements;
+	StructIterator<StructsT7_gameAddr::HitCondition> hit_conditions;
+	StructIterator<StructsT7_gameAddr::Cancel> cancels;
+	StructIterator<StructsT7_gameAddr::Cancel> grouped_cancels;
+	StructIterator<StructsT7_gameAddr::Reactions> reactions;
+	StructIterator<StructsT7_gameAddr::Pushback> pushbacks;
+	StructIterator<PushbackExtradata> pushback_extras;
+	StructIterator<CancelExtradata> cancel_extras;
+	StructIterator<ExtraMoveProperty> extra_move_properties;
+	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_start_properties;
+	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
+	StructIterator<StructsT7_gameAddr::Projectile> projectiles;
+};
+
 class DLLCONTENT EditorT7 : public Editor
 {
 private:
 	// Stores the moveset table containing lists offsets & count, aliases too
 	MovesetInfo* m_infos = nullptr;
+	// Stores absolute pointers to the moveset table within the moveset
+	MovesetTable* m_absoluteTable = nullptr;
 	std::vector<uint16_t> m_aliases;
+	StructIterators m_iterators;
 
 public:
 	// Inherit constructor
@@ -116,18 +136,18 @@ public:
 	int32_t CreateNewPushbackExtra();
 
 	// -- List Creation / Deletion -- //
-	void ModifyListSize(EditorWindowType_ type, uint32_t listId, uint16_t oldSize, uint16_t newSize) override;
+	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
 	//
-	void ModifyRequirementListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
 	//
-	void ModifyCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
-	void ModifyGroupedCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyCancelListSize(int listId, int oldSize, int newSize);
+	void ModifyGroupedCancelListSize(int listId, int oldSize, int newSize);
 	//
-	void ModifyExtraPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
-	void ModifyStartPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
-	void ModifyEndPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyExtraPropertyListSize(int listId, int oldSize, int newSize);
+	void ModifyStartPropertyListSize(int listId, int oldSize, int newSize);
+	void ModifyEndPropertyListSize(int listId, int oldSize, int newSize);
 	//
-	void ModifyHitConditionListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+	void ModifyHitConditionListSize(int listId, int oldSize, int newSize);
 
 	template<typename T>
 	void ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
