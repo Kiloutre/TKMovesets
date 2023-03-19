@@ -273,7 +273,7 @@ void EditorForm::Render()
 
 			bool enabledBtn = unsavedChanges;
 			if (enabledBtn) {
-				ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(64, 161, 154, 255));
+				ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
 			}
 			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				Apply();

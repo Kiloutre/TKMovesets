@@ -221,7 +221,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 
 	const ImVec2 buttonSize(18, 18);
 	const float buttonWidth = 25;
-	float pos_x = ImGui::GetContentRegionAvail().x - buttonWidth * 4;
+	float pos_x = ImGui::GetContentRegionAvail().x + 15 - buttonWidth * 4;
 
 	if (pos_x <= 220) {
 		// If too little place, just don't draw controls (for now)
@@ -333,7 +333,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	if (listIndex + 1 != m_listSize || m_listSize == 1)
 	{
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
-		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(158, 47, 25, 255));
+		ImGui::PushStyleColor(ImGuiCol_Button, FORM_DELETE_BTN);
 		if (ImGui::Button("X", buttonSize))
 		{
 			// Delete this item
@@ -414,7 +414,9 @@ void EditorFormList::Render()
 				}
 
 				ImGui::PushID(listIndex);
-				if (!ImGui::TreeNode(this + listIndex, m_itemLabels[listIndex].c_str())) {
+				;
+
+				if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, m_itemLabels[listIndex].c_str(), va_list())) {
 					// Tree node hidden so no need to render anything
 					ImGui::PopID();
 					m_itemOpenStatus[listIndex] = EditorFormTreeview_Closed;
@@ -447,7 +449,7 @@ void EditorFormList::Render()
 
 			bool enabledBtn = unsavedChanges;
 			if (enabledBtn) {
-				ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(106, 120, 153, 255));
+				ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
 			}
 			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				Apply();
