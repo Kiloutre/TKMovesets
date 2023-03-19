@@ -270,6 +270,21 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex - 1);
 			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex - 1);
 			std::iter_swap(m_itemOpenStatus.begin() + listIndex, m_itemOpenStatus.begin() + listIndex - 1);
+
+			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
+			if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Opened) {
+				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceOpen;
+			} else if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Closed) {
+				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceClose;
+			}
+
+			if (m_itemOpenStatus[listIndex - 1] == EditorFormTreeview_Opened) {
+				m_itemOpenStatus[listIndex - 1] = EditorFormTreeview_ForceOpen;
+			}
+			else if (m_itemOpenStatus[listIndex - 1] == EditorFormTreeview_Closed) {
+				m_itemOpenStatus[listIndex - 1] = EditorFormTreeview_ForceClose;
+			}
+
 			BuildItemLabel(listIndex);
 			BuildItemLabel(listIndex - 1);
 			unsavedChanges = true;
@@ -286,6 +301,22 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex + 1);
 			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex + 1);
 			std::iter_swap(m_itemOpenStatus.begin() + listIndex, m_itemOpenStatus.begin() + listIndex + 1);
+
+			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
+			if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Opened) {
+				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceOpen;
+			}
+			else if (m_itemOpenStatus[listIndex] == EditorFormTreeview_Closed) {
+				m_itemOpenStatus[listIndex] = EditorFormTreeview_ForceClose;
+			}
+
+			if (m_itemOpenStatus[listIndex + 1] == EditorFormTreeview_Opened) {
+				m_itemOpenStatus[listIndex + 1] = EditorFormTreeview_ForceOpen;
+			}
+			else if (m_itemOpenStatus[listIndex + 1] == EditorFormTreeview_Closed) {
+				m_itemOpenStatus[listIndex + 1] = EditorFormTreeview_ForceClose;
+			}
+
 			BuildItemLabel(listIndex);
 			BuildItemLabel(listIndex + 1);
 			unsavedChanges = true;
@@ -370,18 +401,20 @@ void EditorFormList::Render()
 				}
 
 				// This allows us to force some treenode to open at certain times, without forcing them to be closed
-				if (m_itemOpenStatus[listIndex] != EditorFormTreeview_Default) {
+				auto openStatus = m_itemOpenStatus[listIndex];
+				if (openStatus == EditorFormTreeview_ForceOpen || openStatus == EditorFormTreeview_ForceClose) {
 					ImGui::SetNextItemOpen(m_itemOpenStatus[listIndex] == EditorFormTreeview_ForceOpen);
-					m_itemOpenStatus[listIndex] = EditorFormTreeview_Default;
 				}
 
 				ImGui::PushID(listIndex);
 				if (!ImGui::TreeNode(this + listIndex, m_itemLabels[listIndex].c_str())) {
 					// Tree node hidden so no need to render anything
 					ImGui::PopID();
+					m_itemOpenStatus[listIndex] = EditorFormTreeview_Closed;
 					continue;
 				}
 				ImGui::PopID();
+				m_itemOpenStatus[listIndex] = EditorFormTreeview_Opened;
 
 				// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 				for (uint8_t category : m_categories)

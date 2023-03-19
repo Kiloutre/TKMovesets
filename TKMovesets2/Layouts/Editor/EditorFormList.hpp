@@ -10,6 +10,8 @@
 enum EditorFormTreeview_
 {
 	EditorFormTreeview_Default,
+	EditorFormTreeview_Opened,
+	EditorFormTreeview_Closed,
 	EditorFormTreeview_ForceOpen,
 	EditorFormTreeview_ForceClose,
 };
