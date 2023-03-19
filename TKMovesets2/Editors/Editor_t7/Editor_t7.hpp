@@ -117,6 +117,7 @@ public:
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
 	int32_t CreateNew(EditorWindowType_ type) override;
+	template<typename T> int32_t CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset);
 	//
 	int32_t CreateNewRequirements();
 	//
@@ -137,6 +138,7 @@ public:
 
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
+	template<typename T> void ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
 	//
 	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
 	//
@@ -149,6 +151,4 @@ public:
 	//
 	void ModifyHitConditionListSize(int listId, int oldSize, int newSize);
 
-	template<typename T>
-	void ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
 };

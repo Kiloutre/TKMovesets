@@ -35,13 +35,13 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 		*tableListCount += listSizeDiff;
 		tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
 
-		uint64_t* countOffset = (uint64_t*)&m_infos->table;
+		uint64_t* listHeadPtr = (uint64_t*)&m_infos->table;
 		for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
 		{
-			if (*countOffset > tableListStart) {
-				*countOffset += structListSizeDiff;
+			if (*listHeadPtr > tableListStart) {
+				*listHeadPtr += structListSizeDiff;
 			}
-			countOffset += 2;
+			listHeadPtr += 2;
 		}
 	}
 	
@@ -61,9 +61,6 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 	// Shift offsets in the moveset table & in our header
 	m_header->offsets.animationBlock += structListSizeDiff;
 	m_header->offsets.motaBlock += structListSizeDiff;
-
-	// Update table list address after re-allocation
-
 }
 
 void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)

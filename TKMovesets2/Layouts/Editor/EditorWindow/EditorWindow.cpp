@@ -72,7 +72,7 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	return nullptr;
 }
 
-void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
+void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structId)
 {
 	// todo: template this function?
 	int availableOverwriteIndex = -1;
@@ -82,7 +82,7 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
 			continue;
 		}
 
-		if (structWin->id == moveId) {
+		if (structWin->id == structId) {
 			structWin->setFocus = true;
 			// Prevent duplicate move window creation
 			return;
@@ -95,7 +95,7 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId)
 	}
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-	EditorForm* newWin = AllocateFormWindow(windowType, moveId);
+	EditorForm* newWin = AllocateFormWindow(windowType, structId);
 	newWin->nextDockId = m_dockId;
 	newWin->lastDockId = m_dockId;
 	if (openNew || availableOverwriteIndex == -1) {

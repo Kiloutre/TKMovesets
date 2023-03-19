@@ -336,6 +336,7 @@ void EditorWindow::RenderMovelist()
 				ImGui::TextUnformatted(move->moveId_str.c_str());
 
 				ImGui::TableNextColumn();
+				ImGui::PushID(move->moveId);
 				if (ImGui::Selectable(move->name.c_str(), move->moveId == m_highlightedMoveId)) {
 					// If clicked on the move
 					m_highlightedMoveId = move->moveId;
@@ -343,6 +344,7 @@ void EditorWindow::RenderMovelist()
 					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
 					OpenFormWindow(EditorWindowType_Move, move->moveId);
 				}
+				ImGui::PopID();
 
 				if (move->aliasId != 0) {
 					ImGui::TableNextColumn();
