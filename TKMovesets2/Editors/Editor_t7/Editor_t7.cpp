@@ -1043,59 +1043,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 
 bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field)
 {
-	if (field->buffer[0] == '\0') {
-		// There are no fields that should be allowed to be empty
+	if (!ValidateFieldType(field)) {
 		return false;
-	}
-
-	auto flags = field->flags;
-
-	if (flags & EditorInput_H64) {
-		if (strlen(field->buffer) > 16) {
-			return false;
-		}
-	}
-	else if (flags & EditorInput_H32) {
-		if (strlen(field->buffer) > 8) {
-			return false;
-		}
-	}
-	else if (flags & EditorInput_H16) {
-		if (strlen(field->buffer) > 4) {
-			return false;
-		}
-	}
-	else if (flags & (EditorInput_U64 | EditorInput_S64)) {
-		if (strlen(field->buffer) > 19) {
-			return false;
-		}
-		if ((flags & EditorInput_U64) && atoll(field->buffer) < 0) {
-			return false;
-		}
-	}
-	else if (flags & EditorInput_U32) {
-		long long num = atoll(field->buffer);
-		if (num > UINT_MAX || num < 0) {
-			return false;
-		}
-	}
-	else if (flags & EditorInput_S32) {
-		long long num = atoll(field->buffer);
-		if (num > INT_MAX || num < INT_MIN) {
-			return false;
-		}
-	}
-	else if (flags & EditorInput_U16) {
-		int num = atoi(field->buffer);
-		if (num > USHRT_MAX || num < 0) {
-			return false;
-		}
-	}
-	else if (flags & EditorInput_S16) {
-		int num = atoi(field->buffer);
-		if (num > SHRT_MAX || num < SHRT_MIN) {
-			return false;
-		}
 	}
 
 	switch (fieldType)

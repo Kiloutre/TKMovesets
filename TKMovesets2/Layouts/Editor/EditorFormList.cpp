@@ -359,8 +359,11 @@ void EditorFormList::Render()
 			const int columnCount = EditorFormUtils::GetColumnCount();
 			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 			{
-				bool test = false;
-				RenderListControlButtons(listIndex);
+				if (id > 1) {
+					// Only non-starting lists may have access to list controls
+					RenderListControlButtons(listIndex);
+				}
+
 				ImGui::PushID(listIndex);
 				if (!ImGui::TreeNode(this + listIndex, m_itemLabels[listIndex].c_str())) {
 					// Tree node hidden so no need to render anything

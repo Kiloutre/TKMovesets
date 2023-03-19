@@ -5,18 +5,21 @@
 # include "Helpers.hpp"
 
 #define gAddr StructsT7_gameAddr
+#define offsetof(st, m) ((size_t)(&((decltype(st) *)0)->m))
 
-void EditorT7::ModifyRequirementListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
+template<typename T>
+void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(Requirement);
+	const int structSize = sizeof(T);
 	const int structListSize = structSize * newSize;
 	const int structListSizeDiff = structSize * listSizeDiff;
+	uint64_t tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
 
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;
 
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement + listId * structSize;
+	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + tableListStart + listId * structSize;
 
 	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
 	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
@@ -41,18 +44,28 @@ void EditorT7::ModifyRequirementListSize(uint32_t listId, uint16_t oldSize, uint
 	// Shift offsets in the moveset table & in our header
 	m_header->offsets.animationBlock += structListSizeDiff;
 	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.requirementCount += listSizeDiff;
+
+	// Update table list address after re-allocation and also update the count 
+	uint64_t* tableListCount = (uint64_t*)(((Byte*)&m_infos->table) + tableListOffset + 8);
+	tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
+	*tableListCount += listSizeDiff;
 
 	uint64_t* countOffset = (uint64_t*)&m_infos->table;
 	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
 	{
-		if (*countOffset > (uint64_t)m_infos->table.requirement) {
+		if (*countOffset > tableListStart) {
 			*countOffset += structListSizeDiff;
 		}
 		countOffset += 2;
 	}
+}
+
+void EditorT7::ModifyRequirementListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
+{
+	const int listSizeDiff = newSize - oldSize;
+	ModifyGenericListSize<Requirement>(listId, oldSize, newSize, offsetof(m_infos->table, requirement));
 	
-	// Correct every structure that use this structure
+	// Correct every structure that uses this list and needs shifting
 	{
 		// Cancels
 		uint64_t cancelListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
@@ -123,50 +136,9 @@ void EditorT7::ModifyRequirementListSize(uint32_t listId, uint16_t oldSize, uint
 void EditorT7::ModifyHitConditionListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(HitCondition);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	ModifyGenericListSize<HitCondition>(listId, oldSize, newSize, offsetof(m_infos->table, hitCondition));
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition + listId * structSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.hitConditionCount += listSizeDiff;
-
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
-	{
-		if (*countOffset > (uint64_t)m_infos->table.hitCondition) {
-			*countOffset += structListSizeDiff;
-		}
-		countOffset += 2;
-	}
-
-
+	// Correct every structure that uses this list and needs shifting
 	{
 		// Moves
 		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
@@ -198,59 +170,20 @@ void EditorT7::ModifyHitConditionListSize(uint32_t listId, uint16_t oldSize, uin
 void EditorT7::ModifyGroupedCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(Cancel);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	ModifyGenericListSize<Cancel>(listId, oldSize, newSize, offsetof(m_infos->table, groupCancel));
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel + listId * structSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.groupCancelCount += listSizeDiff;
-
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	// Correct every structure that uses this list and needs shifting
 	{
-		if (*countOffset > (uint64_t)m_infos->table.groupCancel) {
-			*countOffset += structListSizeDiff;
-		}
-		countOffset += 2;
-	}
+		uint64_t cancelListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+		gAddr::Cancel* cancelPtr = (gAddr::Cancel*)(m_movesetData + cancelListOffset);
 
-	// Correct cancel that use the list after the one we modified
-	uint64_t cancelListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
-	gAddr::Cancel* cancelPtr = (gAddr::Cancel*)(m_movesetData + cancelListOffset);
-
-	uint16_t cancelId = 0;
-	for (gAddr::Cancel* cancel = cancelPtr; cancelId < m_infos->table.cancelCount; ++cancelId, ++cancel)
-	{
-		if (cancel->command == constants[EditorConstants_GroupedCancelCommand]) {
-			if (cancel->move_id >= listId + oldSize || (listSizeDiff < 0 && cancel->move_id > listId)) {
-				cancel->move_id += listSizeDiff;
+		uint16_t cancelId = 0;
+		for (gAddr::Cancel* cancel = cancelPtr; cancelId < m_infos->table.cancelCount; ++cancelId, ++cancel)
+		{
+			if (cancel->command == constants[EditorConstants_GroupedCancelCommand]) {
+				if (cancel->move_id >= listId + oldSize || (listSizeDiff < 0 && cancel->move_id > listId)) {
+					cancel->move_id += listSizeDiff;
+				}
 			}
 		}
 	}
@@ -259,58 +192,19 @@ void EditorT7::ModifyGroupedCancelListSize(uint32_t listId, uint16_t oldSize, ui
 void EditorT7::ModifyCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(Cancel);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	ModifyGenericListSize<Cancel>(listId, oldSize, newSize, offsetof(m_infos->table, cancel));
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel + listId * structSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.cancelCount += listSizeDiff;
-
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	// Correct every structure that uses this list and needs shifting
 	{
-		if (*countOffset > (uint64_t)m_infos->table.cancel) {
-			*countOffset += structListSizeDiff;
-		}
-		countOffset += 2;
-	}
+		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 
-	// Correct moves that use cancel IDs after the one we modified
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-
-	uint16_t moveId = 0;
-	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
-	{
-		if (move->cancel_addr >= listId + oldSize || (listSizeDiff < 0 && move->cancel_addr > listId)) {
-			move->cancel_addr += listSizeDiff;
+		uint16_t moveId = 0;
+		for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
+		{
+			if (move->cancel_addr >= listId + oldSize || (listSizeDiff < 0 && move->cancel_addr > listId)) {
+				move->cancel_addr += listSizeDiff;
+			}
 		}
 	}
 }
@@ -318,59 +212,20 @@ void EditorT7::ModifyCancelListSize(uint32_t listId, uint16_t oldSize, uint16_t 
 void EditorT7::ModifyExtraPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(ExtraMoveProperty);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	ModifyGenericListSize<ExtraMoveProperty>(listId, oldSize, newSize, offsetof(m_infos->table, extraMoveProperty));
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty + listId * structSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.extraMovePropertyCount += listSizeDiff;
-
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	// Correct every structure that uses this list and needs shifting
 	{
-		if (*countOffset > (uint64_t)m_infos->table.extraMoveProperty) {
-			*countOffset += structListSizeDiff;
-		}
-		countOffset += 2;
-	}
+		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 
-	// Correct moves that use cancel IDs after the one we modified
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-
-	uint16_t moveId = 0;
-	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
-	{
-		if (move->extra_move_property_addr != MOVESET_ADDR_MISSING) {
-			if (move->extra_move_property_addr >= listId + oldSize || (listSizeDiff < 0 && move->extra_move_property_addr > listId)) {
-				move->extra_move_property_addr += listSizeDiff;
+		uint16_t moveId = 0;
+		for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
+		{
+			if (move->extra_move_property_addr != MOVESET_ADDR_MISSING) {
+				if (move->extra_move_property_addr >= listId + oldSize || (listSizeDiff < 0 && move->extra_move_property_addr > listId)) {
+					move->extra_move_property_addr += listSizeDiff;
+				}
 			}
 		}
 	}
@@ -379,59 +234,20 @@ void EditorT7::ModifyExtraPropertyListSize(uint32_t listId, uint16_t oldSize, ui
 void EditorT7::ModifyStartPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(OtherMoveProperty);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	ModifyGenericListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetof(m_infos->table, moveBeginningProp));
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp + listId * structSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.moveBeginningPropCount += listSizeDiff;
-
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	// Correct every structure that uses this list and needs shifting
 	{
-		if (*countOffset > (uint64_t)m_infos->table.moveBeginningProp) {
-			*countOffset += structListSizeDiff;
-		}
-		countOffset += 2;
-	}
+		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 
-	// Correct moves that use cancel IDs after the one we modified
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-
-	uint16_t moveId = 0;
-	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
-	{
-		if (move->move_start_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (move->move_start_extraprop_addr >= listId + oldSize || (listSizeDiff < 0 && move->move_start_extraprop_addr > listId)) {
-				move->move_start_extraprop_addr += listSizeDiff;
+		uint16_t moveId = 0;
+		for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
+		{
+			if (move->move_start_extraprop_addr != MOVESET_ADDR_MISSING) {
+				if (move->move_start_extraprop_addr >= listId + oldSize || (listSizeDiff < 0 && move->move_start_extraprop_addr > listId)) {
+					move->move_start_extraprop_addr += listSizeDiff;
+				}
 			}
 		}
 	}
@@ -440,59 +256,20 @@ void EditorT7::ModifyStartPropertyListSize(uint32_t listId, uint16_t oldSize, ui
 void EditorT7::ModifyEndPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(OtherMoveProperty);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	ModifyGenericListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetof(m_infos->table, moveEndingProp));
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp + listId * structSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_infos->table.moveEndingPropCount += listSizeDiff;
-
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
+	// Correct every structure that uses this list and needs shifting
 	{
-		if (*countOffset > (uint64_t)m_infos->table.moveEndingProp) {
-			*countOffset += structListSizeDiff;
-		}
-		countOffset += 2;
-	}
+		uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+		gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 
-	// Correct moves that use cancel IDs after the one we modified
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-
-	uint16_t moveId = 0;
-	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
-	{
-		if (move->move_end_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (move->move_end_extraprop_addr >= listId + oldSize || (listSizeDiff < 0 && move->move_end_extraprop_addr > listId)) {
-				move->move_end_extraprop_addr += listSizeDiff;
+		uint16_t moveId = 0;
+		for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
+		{
+			if (move->move_end_extraprop_addr != MOVESET_ADDR_MISSING) {
+				if (move->move_end_extraprop_addr >= listId + oldSize || (listSizeDiff < 0 && move->move_end_extraprop_addr > listId)) {
+					move->move_end_extraprop_addr += listSizeDiff;
+				}
 			}
 		}
 	}

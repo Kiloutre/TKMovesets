@@ -128,4 +128,7 @@ public:
 	void ModifyEndPropertyListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
 	//
 	void ModifyHitConditionListSize(uint32_t listId, uint16_t oldSize, uint16_t newSize);
+
+	template<typename T>
+	void ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
 };

@@ -198,6 +198,8 @@ protected:
 	// Stores a <offset, offset> animation map
 	std::map<gameAddr, gameAddr> m_animOffsetToNameOffset;
 
+	// Returns false if the field's input buffer is invalid for the field type
+	bool ValidateFieldType(EditorInput* field);
 public:
 	// Constants useful constant variables, to be set on a per-game basis
 	std::map<EditorConstants_, int> constants;
