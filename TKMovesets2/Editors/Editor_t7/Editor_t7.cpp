@@ -27,8 +27,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t pushbackExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
-	PushbackExtradata* pushbackExtra = (PushbackExtradata*)(m_movesetData + pushbackExtraOffset) + id;
+	auto pushbackExtra = m_iterators.pushback_extras[id];
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -42,8 +41,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id
 
 void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t pushbackExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
-	PushbackExtradata* pushbackExtra= (PushbackExtradata*)(m_movesetData + pushbackExtraOffset) + id;
+	auto pushbackExtra = m_iterators.pushback_extras[id];
 
 	pushbackExtra->horizontal_offset = atoi(inputs["horizontal_offset"]->buffer);
 }
@@ -54,8 +52,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t pushbackOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback;
-	gAddr::Pushback* pushback = (gAddr::Pushback*)(m_movesetData + pushbackOffset) + id;
+	auto pushback = m_iterators.pushbacks[id];
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -84,14 +81,12 @@ bool EditorT7::ValidatePushbackField(std::string name, EditorInput* field)
 
 void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t pushbackOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback;
-	gAddr::Pushback* pushback = (gAddr::Pushback*)(m_movesetData + pushbackOffset) + id;
+	auto pushback = m_iterators.pushbacks[id];
 
 	pushback->duration = atoi(inputs["duration"]->buffer);
 	pushback->displacement = atoi(inputs["displacement"]->buffer);
 	pushback->num_of_loops = atoi(inputs["num_of_loops"]->buffer);
 	pushback->extradata_addr = atoi(inputs["extradata_addr"]->buffer);
-
 }
 
 // ===== Input Sequence  ===== //
@@ -100,8 +95,7 @@ std::map<std::string, EditorInput*> EditorT7::GetInputSequenceInputs(uint16_t id
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t offset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.inputSequence;
-	gAddr::InputSequence* sequence = (gAddr::InputSequence*)(m_movesetData + offset) + id;
+	auto sequence = m_iterators.input_sequences[id];
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -130,14 +124,12 @@ bool EditorT7::ValidateInputSequenceField(std::string name, EditorInput* field)
 
 void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t offset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.inputSequence;
-	gAddr::InputSequence* sequence = (gAddr::InputSequence*)(m_movesetData + offset) + id;
+	auto sequence = m_iterators.input_sequences[id];
 
 	sequence->input_window_frames = atoi(inputs["input_window_frames"]->buffer);
 	sequence->input_amount = atoi(inputs["input_amount"]->buffer);
 	sequence->_0x4_int = atoi(inputs["_0x4_int"]->buffer);
 	sequence->input_addr = atoi(inputs["input_addr"]->buffer);
-
 }
 
 // ===== Reactions ===== //
@@ -146,8 +138,7 @@ std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, Ve
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t reactionsOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions;
-	gAddr::Reactions* reaction = (gAddr::Reactions*)(m_movesetData + reactionsOffset) + id;
+	auto reaction = m_iterators.reactions[id];
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -221,8 +212,7 @@ bool EditorT7::ValidateReactionsField(std::string name, EditorInput* field)
 
 void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t reactionsOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions;
-	gAddr::Reactions* reaction = (gAddr::Reactions*)(m_movesetData + reactionsOffset) + id;
+	auto reaction = m_iterators.reactions[id];
 
 	reaction->front_pushback = atoi(inputs["front_pushback"]->buffer);
 	reaction->backturned_pushback = atoi(inputs["backturned_pushback"]->buffer);
@@ -266,11 +256,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t hitConditionOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
-	gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(m_movesetData + hitConditionOffset) + id;
-
-	uint64_t requirementOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
-	Requirement* req = (Requirement*)(m_movesetData + requirementOffset);
+	auto hitCondition = m_iterators.hit_conditions.begin() + id;
+	auto req = m_iterators.requirements.begin();
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -300,8 +287,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 
 void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t hitConditionOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
-	gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(m_movesetData + hitConditionOffset) + id;
+	auto hitCondition = m_iterators.hit_conditions[id];
 
 	hitCondition->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
 	hitCondition->damage = (uint32_t)atoi(inputs["damage"]->buffer);
@@ -331,8 +317,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t requirementOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
-	Requirement* req = (Requirement*)(m_movesetData + requirementOffset) + id;
+	auto req = m_iterators.requirements.begin();
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -355,8 +340,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 
 void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t requirementOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
-	Requirement* req = (Requirement*)(m_movesetData + requirementOffset) + id;
+	auto req = m_iterators.requirements[id];
 
 	req->condition = (uint32_t)atoi(inputs["condition"]->buffer);
 	req->param = (uint32_t)atoi(inputs["param"]->buffer);
@@ -368,8 +352,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t cancelExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
-	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + cancelExtraOffset) + id;
+	auto cancelExtra = m_iterators.cancel_extras[id];
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -383,8 +366,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 
 void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t cancelExtraOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
-	CancelExtradata* cancelExtra = (CancelExtradata*)(m_movesetData + cancelExtraOffset) + id;
+	auto cancelExtra = m_iterators.cancel_extras[id];
 
 	cancelExtra->value = (uint32_t)strtol(inputs["value"]->buffer, nullptr, 16);
 }
@@ -395,8 +377,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
-	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
+	auto cancel= m_iterators.cancels.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -424,8 +405,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 
 void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
-	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
+	auto cancel = m_iterators.cancels[id];
 
 	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
 	cancel->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
@@ -466,8 +446,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
-	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
+	auto cancel = m_iterators.grouped_cancels.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -495,8 +474,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 
 void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t cancelOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
-	gAddr::Cancel* cancel = (gAddr::Cancel*)(m_movesetData + cancelOffset) + id;
+	auto cancel = m_iterators.grouped_cancels[id];
 
 	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
 	cancel->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
@@ -551,8 +529,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
-	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+	auto prop = m_iterators.move_start_properties.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -575,9 +552,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 
 void EditorT7::SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-
-	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
-	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+	auto prop = m_iterators.move_start_properties[id];
 
 	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
 	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
@@ -590,8 +565,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
-	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+	auto prop = m_iterators.move_end_properties.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -614,9 +588,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 
 void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-
-	uint64_t otherPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
-	gAddr::OtherMoveProperty* prop = (gAddr::OtherMoveProperty*)(m_movesetData + otherPropOffset) + id;
+	auto prop = m_iterators.move_end_properties[id];
 
 	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
 	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
@@ -638,8 +610,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	uint64_t extraPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + extraPropOffset) + id;
+	auto prop = m_iterators.extra_move_properties.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -662,8 +633,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t extraPropOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-	ExtraMoveProperty* prop = (ExtraMoveProperty*)(m_movesetData + extraPropOffset) + id;
+	auto prop = m_iterators.extra_move_properties[id];
 
 	prop->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
 	prop->id = (uint32_t)strtoll(inputs["id"]->buffer, nullptr, 16);
@@ -676,8 +646,7 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t voiceclipOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + voiceclipOffset) + id;
+	auto voiceclip = m_iterators.voiceclips[id];
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -692,8 +661,7 @@ std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, Ve
 
 void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t voiceclipOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	Voiceclip* voiceclip = (Voiceclip*)(m_movesetData + voiceclipOffset) + id;
+	auto voiceclip = m_iterators.voiceclips[id];
 
 	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
 }
@@ -704,8 +672,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 {
 	std::map<std::string, EditorInput*> inputMap;
 
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + id;
+	auto move = m_iterators.moves[id];
 
 	char* nameBlock = (char*)(m_movesetData + m_header->offsets.nameBlock);
 
@@ -882,8 +849,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 
 void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset) + id;
+	auto move = m_iterators.moves[id];
 
 	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
 		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
@@ -1176,6 +1142,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.projectiles.Set(movesetBlock, m_infos->table.projectile, m_infos->table.projectileCount);
 	m_iterators.input_sequences.Set(movesetBlock, m_infos->table.inputSequence, m_infos->table.inputSequenceCount);
 	m_iterators.inputs.Set(movesetBlock, m_infos->table.input, m_infos->table.inputCount);
+	m_iterators.voiceclips.Set(movesetBlock, m_infos->table.voiceclip, m_infos->table.voiceclipCount);
 }
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)

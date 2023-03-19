@@ -21,10 +21,13 @@ public:
 
 		Iterator(T* ptr) : m_ptr(ptr) {}
 
+		reference operator[](int n) const { return m_ptr[n]; }
 		reference operator*() const { return *m_ptr; }
 		pointer operator->() { return m_ptr; }
 		Iterator& operator++() { m_ptr++; return *this; }
-		Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
+		Iterator& operator+=(int n) { m_ptr += n; return *this; }
+		Iterator operator++(int) { Iterator tmp = *this; (*this) += 1; return tmp; }
+		Iterator operator+(int x) { return Iterator(&m_ptr[x]); }
 		friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; }
 		friend bool operator!= (const Iterator& a, const Iterator& b) { return a.m_ptr != b.m_ptr; }
 
@@ -34,6 +37,7 @@ public:
 
 	Iterator begin() { return Iterator(&m_ptr[0]); }
 	Iterator end() { return Iterator(&m_ptr[m_size]); }
+	T* operator[](int n) const { return &m_ptr[n]; }
 
 	StructIterator() { m_ptr = nullptr, m_size = 0; }
 	StructIterator(void* ptr, size_t size) { Set(ptr, size); }

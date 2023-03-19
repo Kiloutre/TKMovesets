@@ -26,6 +26,7 @@ struct StructIterators
 	StructIterator<StructsT7_gameAddr::Projectile> projectiles;
 	StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
 	StructIterator<Input> inputs;
+	StructIterator<Voiceclip> voiceclips;
 };
 
 class DLLCONTENT EditorT7 : public Editor
