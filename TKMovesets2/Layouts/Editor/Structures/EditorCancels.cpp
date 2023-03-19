@@ -8,6 +8,74 @@
 
 // -- Public methods -- //
 
+std::vector<std::string> directionBitLabels = {
+	"D/B",
+	"D",
+	"D/F",
+	"B",
+	"N",
+	"F",
+	"U/B",
+	"U",
+	"U/F",
+};
+
+static std::string GetCancelCommandStr(uint64_t command)
+{
+	int inputBits = command >> 32;
+	int directionBits = command & 0xFFFFFFFF;
+
+	if (command == 0x8000) {
+		return "AUTO";
+	}
+
+	if (directionBits >= 0x800d && directionBits <= 0x8FFF) {
+		// Input sequence
+		return std::string();
+	}
+
+	std::string retVal;
+
+	// Directions
+	{
+		for (int i = 1; i < 10; ++i)
+		{
+			if (directionBits & (1 << i)) {
+				if (retVal.size() != 0) {
+					retVal += "|";
+				}
+				retVal += directionBitLabels[i - 1];
+			}
+		}
+
+		if (directionBits >> 10) {
+			if (retVal.size() != 0) {
+				retVal += "|";
+			}
+			retVal += "???";
+		}
+	}
+
+	// Inputs
+	{
+		std::string inputs;
+		for (int i = 0; i < 4; ++i)
+		{
+			if (inputBits & (1 << (i))) {
+				inputs += "+" + std::to_string(i + 1);
+			}
+		}
+		if (inputBits & (1 << 4)) {
+			inputs += "+RA";
+		}
+		if (inputs.size() > 0) {
+			retVal += inputs.substr(retVal.size() == 0 ? 1 : 0);
+		}
+	}
+
+	return retVal.size() == 0 ? retVal : "[ " + retVal + " ]";
+}
+
 EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
 {
 	windowType = EditorWindowType_Cancel;
@@ -57,10 +125,10 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 		}
 	}
 
-	BuildItemLabel(listIdx);
+	BuildItemDetails(listIdx);
 }
 
-void EditorCancels::BuildItemLabel(int listIdx)
+void EditorCancels::BuildItemDetails(int listIdx)
 {
 	std::string label;
 
@@ -74,13 +142,14 @@ void EditorCancels::BuildItemLabel(int listIdx)
 	}
 	else {
 		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
+		std::string commandStr = GetCancelCommandStr(command);
 		if (validated_move_id == -1) {
-			label = std::format("{} ({}) ", _("edition.form_list.invalid"), move_id);
+			label = std::format("{} ({}) / {}", _("edition.form_list.invalid"), move_id, commandStr);
 		}
 		else
 		{
 			const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
-			label = std::format("{} / {}", move_id, moveName);
+			label = std::format("{} / {} / {}", move_id, moveName, commandStr);
 		}
 	}
 

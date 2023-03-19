@@ -29,25 +29,25 @@ namespace EditorUtils
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags)
 	{
 		if (flags & EditorMoveFlags_Generic) {
-			return IM_COL32(77, 131, 219, 50);
+			return MOVE_GENERIC;
 		}
 
 		if (flags & EditorMoveFlags_Custom) {
-			return IM_COL32(119, 175, 58, 50);
+			return MOVE_CUSTOM;
 		}
 
 		if (flags & EditorMoveFlags_Throw) {
-			return IM_COL32(119, 58, 199, 50);
+			return MOVE_THROW;
 		}
 		else if (flags & EditorMoveFlags_ThrowReaction) {
-			return IM_COL32(210, 100, 222, 50);
+			return MOVE_THROWREACTION;
 		}
 
 		if (flags & EditorMoveFlags_Attack) {
-			return IM_COL32(186, 54, 54, 50);
+			return MOVE_ATK;
 		}
 		else if (flags & EditorMoveFlags_OtherAttack) {
-			return IM_COL32(140, 0, 0, 50);
+			return MOVE_OTHERATK;
 		}
 
 		return 0;

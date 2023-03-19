@@ -196,7 +196,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 		}
 
 		m_itemOpenStatus.push_back(EditorFormTreeview_Default);
-		BuildItemLabel(listIndex);
+		BuildItemDetails(listIndex);
 	}
 
 	// Build category names
@@ -260,7 +260,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 
 			m_itemLabels.push_back("");
 			for (int i = listIndex; i < m_listSize; ++i) {
-				BuildItemLabel(i);
+				BuildItemDetails(i);
 			}
 			unsavedChanges = true;
 		}
@@ -291,8 +291,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_itemOpenStatus[listIndex - 1] = EditorFormTreeview_ForceClose;
 			}
 
-			BuildItemLabel(listIndex);
-			BuildItemLabel(listIndex - 1);
+			BuildItemDetails(listIndex);
+			BuildItemDetails(listIndex - 1);
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -323,8 +323,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_itemOpenStatus[listIndex + 1] = EditorFormTreeview_ForceClose;
 			}
 
-			BuildItemLabel(listIndex);
-			BuildItemLabel(listIndex + 1);
+			BuildItemDetails(listIndex);
+			BuildItemDetails(listIndex + 1);
 			unsavedChanges = true;
 		}
 		ImGui::SameLine();
@@ -353,7 +353,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				
 				// Rebuild labels
 				for (int i = listIndex; i < m_listSize; ++i) {
-					BuildItemLabel(i);
+					BuildItemDetails(i);
 				}
 			}
 		}
@@ -397,7 +397,6 @@ void EditorFormList::Render()
 			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 			{
 				{
-					// todo : maybe allow colors to be set in OnUpdate
 					ImVec2 drawStart = c_winPos + ImGui::GetCursorPos();
 					drawStart.y -= ImGui::GetScrollY() + 2;
 					drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), listIndex & 1 ? FORM_BG_1 : FORM_BG_2);
@@ -467,7 +466,7 @@ void EditorFormList::Render()
 	}
 }
 
-void EditorFormList::BuildItemLabel(int listIdx)
+void EditorFormList::BuildItemDetails(int listIdx)
 {
 	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
 

@@ -34,3 +34,10 @@
 # define FORM_DELETE_BTN         IM_COL32(158, 47, 25, 255)
 # define FORM_BG_1               IM_COL32(48, 60, 140, 50)
 # define FORM_BG_2               IM_COL32(104, 115, 189, 50)
+
+# define MOVE_GENERIC            IM_COL32(77, 131, 219, 50)
+# define MOVE_CUSTOM             IM_COL32(119, 175, 58, 50)
+# define MOVE_THROW              IM_COL32(119, 58, 199, 50)
+# define MOVE_THROWREACTION      IM_COL32(210, 100, 222, 50)
+# define MOVE_ATK                IM_COL32(186, 54, 54, 50)
+# define MOVE_OTHERATK           IM_COL32(140, 0, 0, 50)
