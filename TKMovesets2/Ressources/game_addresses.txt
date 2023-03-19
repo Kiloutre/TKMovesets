@@ -15,3 +15,4 @@ val:t7_camera_mota_offset = 0x14A0
 val:t7_currmove_timer     = 0x1D4
 val:t7_currmove_id        = 0x350
 val:t7_nextmove_addr      = 0xDA0
+val:t7_character_id_condition = 217
