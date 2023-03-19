@@ -88,7 +88,7 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 			return;
 		}
 
-		if (structWin->unsavedChanges == false && structWin->lastDockId == m_dockId) {
+		if (structWin->unsavedChanges == false && structWin->currentViewport == m_viewport) {
 			// Don't overwrite windows with unsaved changes OR that have been detached
 			availableOverwriteIndex = i;
 		}
@@ -97,7 +97,6 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorForm* newWin = AllocateFormWindow(windowType, structId);
 	newWin->nextDockId = m_dockId;
-	newWin->lastDockId = m_dockId;
 	if (openNew || availableOverwriteIndex == -1) {
 		m_structWindows.push_back(newWin);
 	}

@@ -223,13 +223,18 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	const float buttonWidth = 25;
 	float pos_x = ImGui::GetContentRegionAvail().x - buttonWidth * 4;
 
+	if (pos_x <= 220) {
+		// If too little place, just don't draw controls (for now)
+		return;
+	}
+
 	ImGui::PushID(this);
 	ImGui::PushID(listIndex);
 
 	// No point in having the + on every single item
 	if (listIndex + 1 != m_listSize || m_listSize == 1) {
 		ImGui::SetCursorPosX(pos_x);
-		if (ImGui::Button("+", ImVec2(20, 20))) {
+		if (ImGui::Button("+", buttonSize)) {
 			VectorSet<std::string> drawOrder;
 			auto fieldMap = m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0];
 
@@ -328,6 +333,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	if (listIndex + 1 != m_listSize || m_listSize == 1)
 	{
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
+		ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(158, 47, 25, 255));
 		if (ImGui::Button("X", buttonSize))
 		{
 			// Delete this item
@@ -350,6 +356,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				}
 			}
 		}
+		ImGui::PopStyleColor();
 		ImGui::SameLine();
 	}
 
@@ -389,7 +396,7 @@ void EditorFormList::Render()
 		}
 		else
 		{
-			lastDockId = ImGui::GetWindowDockID();
+			currentViewport = ImGui::GetWindowViewport();
 
 			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 			const int columnCount = EditorFormUtils::GetColumnCount();
@@ -440,7 +447,7 @@ void EditorFormList::Render()
 
 			bool enabledBtn = unsavedChanges;
 			if (enabledBtn) {
-				ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(64, 161, 154, 255));
+				ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(106, 120, 153, 255));
 			}
 			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				Apply();

@@ -249,7 +249,7 @@ void EditorForm::Render()
 		}
 		else
 		{
-			lastDockId = ImGui::GetWindowDockID();
+			currentViewport = ImGui::GetWindowViewport();
 
 			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 			const int columnCount = EditorFormUtils::GetColumnCount();

@@ -426,6 +426,7 @@ void EditorWindow::Render(int dockid)
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, windowFlags))
 	{
+		m_viewport = ImGui::GetWindowViewport();
 		RenderToolBar();
 
 		// We will render the statusbar afterward so we need to save FrameHeight of space

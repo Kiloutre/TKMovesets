@@ -75,8 +75,8 @@ public:
 	EditorWindowType_ windowType;
 	// The dock ID to set during the next render 
 	int nextDockId = -1;
-	// Stores the last dock id the window was rendered in. If isn't the main window's dock ID, this window can't be deleted.
-	ImGuiID lastDockId = 0;
+	// Stores the last viewport the windowwas rendered in. If isn't the main window's, this window won't be closed automatically.
+	ImGuiViewport* currentViewport = nullptr;
 
 	virtual void Render();
 };

@@ -77,6 +77,8 @@ private:
 	std::vector<EditorForm*> m_structWindows;
 	// The dock id that new windows might dock on
 	ImGuiID m_dockId;
+	// The viewport of the editor window. Used to know which subwindow is docked or not.
+	ImGuiViewport* m_viewport = nullptr;
 
 
 	// Render the top toolbar containing useful moveset editing tools
