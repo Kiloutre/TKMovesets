@@ -25,8 +25,8 @@ protected:
 	std::vector<std::map<int, std::vector<EditorInput*>>> m_fieldsCategoryMaps;
 	// The label of each list item
 	std::vector<std::string> m_itemLabels;
-	// Contains the size of the current list. Might change.
-	int m_listSize = 0;
+	// Contains the size of the current list. Value can change.
+	size_t m_listSize = 0;
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
 	int m_listSizeChange = 0;
 	// Determines what tree node should be open

@@ -5,6 +5,7 @@
 #include "constants.h"
 
 ImVec2 operator+(const ImVec2& c_self, const ImVec2& c_other);
+ImVec2 operator-(const ImVec2& c_self, const ImVec2& c_other);
 ImVec2 operator*(const ImVec2& c_self, float value);
 
 namespace ImGuiExtra

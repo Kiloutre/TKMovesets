@@ -65,6 +65,21 @@ namespace EditorFormUtils
 
 // -- Private methods -- //
 
+void EditorForm::RenderDiscardButtons()
+{
+	ImGui::TextUnformatted(_("edition.discard_changes"));
+
+	if (ImGui::Button(_("yes")))
+	{
+		unsavedChanges = false;
+		popen = false;
+	}
+
+	if (ImGui::Button(_("no"))) {
+		m_requestedClosure = false;
+	}
+}
+
 void EditorForm::Apply()
 {
 	if (!IsFormValid()) {
@@ -233,19 +248,8 @@ void EditorForm::Render()
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
-		if (m_requestedClosure)
-		{
-			ImGui::TextUnformatted(_("edition.discard_changes"));
-
-			if (ImGui::Button(_("yes")))
-			{
-				unsavedChanges = false;
-				popen = false;
-			}
-
-			if (ImGui::Button(_("no"))) {
-				m_requestedClosure = false;
-			}
+		if (m_requestedClosure) {
+			RenderDiscardButtons();
 		}
 		else
 		{

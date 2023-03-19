@@ -48,6 +48,8 @@ protected:
 	virtual void OnUpdate(int listIdx, EditorInput* field) {};
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(EditorInput* field) {};
+	// Renders buttons to ask if the changes should be discarded or not, if trying to leave without applying
+	void RenderDiscardButtons();
 	// Render inputs from the <category : input> map
 	void RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount);
 	// Render a single input field in the form

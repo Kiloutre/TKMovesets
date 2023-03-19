@@ -32,3 +32,5 @@
 
 # define FORM_SAVE_BTN           IM_COL32(19, 96, 18, 255)
 # define FORM_DELETE_BTN         IM_COL32(158, 47, 25, 255)
+# define FORM_BG_1               IM_COL32(48, 60, 140, 50)
+# define FORM_BG_2               IM_COL32(104, 115, 189, 50)

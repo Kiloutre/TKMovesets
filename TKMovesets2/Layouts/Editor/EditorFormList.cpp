@@ -236,10 +236,11 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		ImGui::SetCursorPosX(pos_x);
 		if (ImGui::Button("+", buttonSize)) {
 			VectorSet<std::string> drawOrder;
-			auto fieldMap = m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0];
 
-			m_fieldIdentifierMaps.insert(m_fieldIdentifierMaps.begin() + listIndex, fieldMap);
+			m_fieldIdentifierMaps.insert(m_fieldIdentifierMaps.begin() + listIndex, m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0]);
 			m_itemOpenStatus.insert(m_itemOpenStatus.begin() + listIndex, EditorFormTreeview_ForceOpen);
+
+			auto& fieldMap = m_fieldIdentifierMaps[listIndex];
 
 			for (uint8_t category : m_categories)
 			{
@@ -380,19 +381,8 @@ void EditorFormList::Render()
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
-		if (m_requestedClosure)
-		{
-			ImGui::TextUnformatted(_("edition.discard_changes"));
-
-			if (ImGui::Button(_("yes")))
-			{
-				unsavedChanges = false;
-				popen = false;
-			}
-
-			if (ImGui::Button(_("no"))) {
-				m_requestedClosure = false;
-			}
+		if (m_requestedClosure) {
+			RenderDiscardButtons();
 		}
 		else
 		{
@@ -400,8 +390,19 @@ void EditorFormList::Render()
 
 			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 			const int columnCount = EditorFormUtils::GetColumnCount();
+			const float drawWidth = ImGui::GetContentRegionAvail().x;
+			ImDrawList* drawlist = ImGui::GetWindowDrawList();
+			const ImVec2 c_winPos = ImGui::GetWindowPos();
+
 			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 			{
+				{
+					// todo : maybe allow colors to be set in OnUpdate
+					ImVec2 drawStart = c_winPos + ImGui::GetCursorPos();
+					drawStart.y -= ImGui::GetScrollY() + 2;
+					drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), listIndex & 1 ? FORM_BG_1 : FORM_BG_2);
+				}
+
 				if (id > 1) {
 					// Only non-starting lists may have access to list controls
 					RenderListControlButtons(listIndex);
@@ -414,8 +415,6 @@ void EditorFormList::Render()
 				}
 
 				ImGui::PushID(listIndex);
-				;
-
 				if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, m_itemLabels[listIndex].c_str(), va_list())) {
 					// Tree node hidden so no need to render anything
 					ImGui::PopID();
