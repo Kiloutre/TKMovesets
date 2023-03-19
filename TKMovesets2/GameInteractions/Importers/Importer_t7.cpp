@@ -124,105 +124,94 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 
 void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const TKMovesetHeader_offsets& blockOffsets)
 {
-	size_t i;
 	gameAddr blockOffset = gameMoveset + blockOffsets.movesetBlock;
 
-	i = 0;
-	for (gAddr::Move* move = (gAddr::Move*)(moveset + blockOffsets.movesetBlock + offsets->move); i < offsets->moveCount; ++i, ++move)
+	for (auto& move : StructIterator<gAddr::Move>(moveset, blockOffsets.movesetBlock + offsets->move, offsets->moveCount))
 	{
-		move->name_addr += gameMoveset + blockOffsets.nameBlock;
-		move->anim_name_addr += gameMoveset + blockOffsets.nameBlock;
-		move->anim_addr += gameMoveset + blockOffsets.animationBlock;
+		move.name_addr += gameMoveset + blockOffsets.nameBlock;
+		move.anim_name_addr += gameMoveset + blockOffsets.nameBlock;
+		move.anim_addr += gameMoveset + blockOffsets.animationBlock;
 
-		FROM_INDEX(move->cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move->_0x28_cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move->_0x38_cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move->_0x48_cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
-		FROM_INDEX(move->voicelip_addr, blockOffset + offsets->voiceclip, Voiceclip);
-		FROM_INDEX(move->extra_move_property_addr, blockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
-		FROM_INDEX(move->move_start_extraprop_addr, blockOffset + offsets->moveBeginningProp, OtherMoveProperty);
-		FROM_INDEX(move->move_end_extraprop_addr, blockOffset + offsets->moveEndingProp, OtherMoveProperty);
+		FROM_INDEX(move.cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move._0x28_cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move._0x38_cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move._0x48_cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(move.hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
+		FROM_INDEX(move.voicelip_addr, blockOffset + offsets->voiceclip, Voiceclip);
+		FROM_INDEX(move.extra_move_property_addr, blockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
+		FROM_INDEX(move.move_start_extraprop_addr, blockOffset + offsets->moveBeginningProp, OtherMoveProperty);
+		FROM_INDEX(move.move_end_extraprop_addr, blockOffset + offsets->moveEndingProp, OtherMoveProperty);
 	}
 
 	// Convert projectile ptrs
-	i = 0;
-	for (gAddr::Projectile* projectile = (gAddr::Projectile*)(moveset + blockOffsets.movesetBlock + offsets->projectile); i < offsets->projectileCount; ++i, ++projectile)
+	for (auto& projectile : StructIterator<gAddr::Projectile>(moveset, blockOffsets.movesetBlock + offsets->projectile, offsets->projectileCount))
 	{
-		// One projectile actually has both at 0 for some reason ? todo : check
-		FROM_INDEX(projectile->cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(projectile->hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
+		// One projectile actually has both at NULL for some reason ? todo : check
+		FROM_INDEX(projectile.cancel_addr, blockOffset + offsets->cancel, Cancel);
+		FROM_INDEX(projectile.hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
 	}
 
 	// Convert cancel ptrs
-	i = 0;
-	for (gAddr::Cancel* cancel = (gAddr::Cancel*)(moveset + blockOffsets.movesetBlock + offsets->cancel); i < offsets->cancelCount; ++i, ++cancel)
+	for (auto& cancel : StructIterator<gAddr::Cancel>(moveset, blockOffsets.movesetBlock + offsets->cancel, offsets->cancelCount))
 	{
-		FROM_INDEX(cancel->requirements_addr, blockOffset + offsets->requirement, Requirement);
-		FROM_INDEX(cancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
+		FROM_INDEX(cancel.requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(cancel.extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
 	}
-	i = 0;
 
-	for (gAddr::Cancel* groupCancel = (gAddr::Cancel*)(moveset + blockOffsets.movesetBlock + offsets->groupCancel); i < offsets->groupCancelCount; ++i, ++groupCancel)
+	// Convert groupe dcancel ptrs
+	for (auto& groupCancel : StructIterator<gAddr::Cancel>(moveset, blockOffsets.movesetBlock + offsets->groupCancel, offsets->groupCancelCount))
 	{
-		FROM_INDEX(groupCancel->requirements_addr, blockOffset + offsets->requirement, Requirement);
-		FROM_INDEX(groupCancel->extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
+		FROM_INDEX(groupCancel.requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(groupCancel.extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
 	}
 
 	// Convert reaction ptrs
-	i = 0;
-	for (gAddr::Reactions* reaction = (gAddr::Reactions*)(moveset + blockOffsets.movesetBlock + offsets->reactions); i < offsets->reactionsCount; ++i, ++reaction)
+	for (auto& reaction : StructIterator<gAddr::Reactions>(moveset, blockOffsets.movesetBlock + offsets->reactions, offsets->reactionsCount))
 	{
-		FROM_INDEX(reaction->front_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction->backturned_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction->left_side_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction->right_side_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction->front_counterhit_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction->downed_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction->block_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.front_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.backturned_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.left_side_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.right_side_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.front_counterhit_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.downed_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.block_pushback, blockOffset + offsets->pushback, Pushback);
 	}
 
 	// Convert input sequence ptrs
-	i = 0;
-	for (gAddr::InputSequence* inputSequence = (gAddr::InputSequence*)(moveset + blockOffsets.movesetBlock + offsets->inputSequence); i < offsets->inputSequenceCount; ++i, ++inputSequence)
+	for (auto& inputSequence : StructIterator<gAddr::InputSequence>(moveset, blockOffsets.movesetBlock + offsets->inputSequence, offsets->inputSequenceCount))
 	{
-		FROM_INDEX(inputSequence->input_addr, blockOffset + offsets->input, Input);
+		FROM_INDEX(inputSequence.input_addr, blockOffset + offsets->input, Input);
 	}
 
 	// Convert throws ptrs
-	i = 0;
-	for (gAddr::ThrowData* throws = (gAddr::ThrowData*)(moveset + blockOffsets.movesetBlock + offsets->throws); i < offsets->throwsCount; ++i, ++throws)
+	for (auto& throws : StructIterator<gAddr::ThrowData>(moveset, blockOffsets.movesetBlock + offsets->throws, offsets->throwsCount))
 	{
-		FROM_INDEX(throws->cameradata_addr, blockOffset + offsets->cameraData, CameraData);
+		FROM_INDEX(throws.cameradata_addr, blockOffset + offsets->cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs
-	i = 0;
-	for (gAddr::HitCondition* hitCondition = (gAddr::HitCondition*)(moveset + blockOffsets.movesetBlock + offsets->hitCondition); i < offsets->hitConditionCount; ++i, ++hitCondition)
+	for (auto& hitCondition : StructIterator<gAddr::HitCondition>(moveset, blockOffsets.movesetBlock + offsets->hitCondition, offsets->hitConditionCount))
 	{
-		FROM_INDEX(hitCondition->requirements_addr, blockOffset + offsets->requirement, Requirement);
-		FROM_INDEX(hitCondition->reactions_addr, blockOffset + offsets->reactions, Reactions);
+		FROM_INDEX(hitCondition.requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(hitCondition.reactions_addr, blockOffset + offsets->reactions, Reactions);
 	}
 
 	// Convert pushback ptrs
-	i = 0;
-	for (gAddr::Pushback* pushback = (gAddr::Pushback*)(moveset + blockOffsets.movesetBlock + offsets->pushback); i < offsets->pushbackCount; ++i, ++pushback)
+	for (auto& pushback : StructIterator<gAddr::Pushback>(moveset, blockOffsets.movesetBlock + offsets->pushback, offsets->pushbackCount))
 	{
-		FROM_INDEX(pushback->extradata_addr, blockOffset + offsets->pushbackExtradata, PushbackExtradata);
+		FROM_INDEX(pushback.extradata_addr, blockOffset + offsets->pushbackExtradata, PushbackExtradata);
 	}
 
 	// Convert move-start ptrs
-	i = 0;
-	for (gAddr::OtherMoveProperty* moveBeginProp = (gAddr::OtherMoveProperty*)(moveset + blockOffsets.movesetBlock + offsets->moveBeginningProp); i < offsets->moveBeginningPropCount; ++i, ++moveBeginProp)
+	for (auto& moveBeginProp : StructIterator<gAddr::OtherMoveProperty>(moveset, blockOffsets.movesetBlock + offsets->moveBeginningProp, offsets->moveBeginningPropCount))
 	{
-		FROM_INDEX(moveBeginProp->requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(moveBeginProp.requirements_addr, blockOffset + offsets->requirement, Requirement);
 	}
 
 	// Convert move-end prop ptrs
-	i = 0;
-	for (gAddr::OtherMoveProperty* moveEndProp = (gAddr::OtherMoveProperty*)(moveset + blockOffsets.movesetBlock + offsets->moveEndingProp); i < offsets->moveEndingPropCount; ++i, ++moveEndProp)
+	for (auto& moveEndProp : StructIterator<gAddr::OtherMoveProperty>(moveset, blockOffsets.movesetBlock + offsets->moveEndingProp, offsets->moveEndingPropCount))
 	{
-		FROM_INDEX(moveEndProp->requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(moveEndProp.requirements_addr, blockOffset + offsets->requirement, Requirement);
 	}
 }
 
