@@ -7,6 +7,13 @@
 #include "Editor.hpp"
 #include "EditorForm.hpp"
 
+enum EditorFormTreeview_
+{
+	EditorFormTreeview_Default,
+	EditorFormTreeview_ForceOpen,
+	EditorFormTreeview_ForceClose,
+};
+
 class EditorFormList : public EditorForm
 {
 protected:
@@ -20,6 +27,8 @@ protected:
 	int m_listSize = 0;
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
 	int m_listSizeChange = 0;
+	// Determines what tree node should be open
+	std::vector<EditorFormTreeview_> m_itemOpenStatus;
 
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};

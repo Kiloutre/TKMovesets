@@ -1133,7 +1133,6 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	
 	for (size_t i = 0; i < m_infos->table.moveCount; ++i)
 	{
-		//printf("%d/%d - %llx\n", i, m_infos->table.moveCount, movePtr[i].anim_name_addr);
 		const char* animName = namePtr + movePtr[i].anim_name_addr;
 		std::string animName_str(animName);
 		gameAddr animOffset = movePtr[i].anim_addr;

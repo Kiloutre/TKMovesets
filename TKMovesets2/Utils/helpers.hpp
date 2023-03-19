@@ -33,7 +33,7 @@ public:
 	};
 
 	Iterator begin() { return Iterator(&m_ptr[0]); }
-	Iterator end() { return Iterator(&m_ptr[m_size > 0 ? (m_size- 1) : 0]); }
+	Iterator end() { return Iterator(&m_ptr[m_size]); }
 
 	StructIterator() { m_ptr = nullptr, m_size = 0; }
 	StructIterator(void* ptr, size_t size) { Set(ptr, size); }

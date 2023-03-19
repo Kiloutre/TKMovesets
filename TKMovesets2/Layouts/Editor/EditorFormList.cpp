@@ -195,6 +195,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 			m_fieldsCategoryMaps[listIndex][category] = inputs;
 		}
 
+		m_itemOpenStatus.push_back(EditorFormTreeview_Default);
 		BuildItemLabel(listIndex);
 	}
 
@@ -233,6 +234,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			auto fieldMap = m_editor->GetFormFieldsList(windowType, 0, drawOrder)[0];
 
 			m_fieldIdentifierMaps.insert(m_fieldIdentifierMaps.begin() + listIndex, fieldMap);
+			m_itemOpenStatus.insert(m_itemOpenStatus.begin() + listIndex, EditorFormTreeview_ForceOpen);
 
 			for (uint8_t category : m_categories)
 			{
@@ -267,6 +269,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Move item UP
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex - 1);
 			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex - 1);
+			std::iter_swap(m_itemOpenStatus.begin() + listIndex, m_itemOpenStatus.begin() + listIndex - 1);
 			BuildItemLabel(listIndex);
 			BuildItemLabel(listIndex - 1);
 			unsavedChanges = true;
@@ -282,6 +285,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Move item DOWN
 			std::iter_swap(m_fieldIdentifierMaps.begin() + listIndex, m_fieldIdentifierMaps.begin() + listIndex + 1);
 			std::iter_swap(m_fieldsCategoryMaps.begin() + listIndex, m_fieldsCategoryMaps.begin() + listIndex + 1);
+			std::iter_swap(m_itemOpenStatus.begin() + listIndex, m_itemOpenStatus.begin() + listIndex + 1);
 			BuildItemLabel(listIndex);
 			BuildItemLabel(listIndex + 1);
 			unsavedChanges = true;
@@ -306,6 +310,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_fieldIdentifierMaps.erase(m_fieldIdentifierMaps.begin() + listIndex);
 				m_fieldsCategoryMaps.erase(m_fieldsCategoryMaps.begin() + listIndex);
 				m_itemLabels.erase(m_itemLabels.begin() + listIndex);
+				m_itemOpenStatus.erase(m_itemOpenStatus.begin() + listIndex);
 				unsavedChanges = true;
 				
 				// Rebuild labels
@@ -362,6 +367,12 @@ void EditorFormList::Render()
 				if (id > 1) {
 					// Only non-starting lists may have access to list controls
 					RenderListControlButtons(listIndex);
+				}
+
+				// This allows us to force some treenode to open at certain times, without forcing them to be closed
+				if (m_itemOpenStatus[listIndex] != EditorFormTreeview_Default) {
+					ImGui::SetNextItemOpen(m_itemOpenStatus[listIndex] == EditorFormTreeview_ForceOpen);
+					m_itemOpenStatus[listIndex] = EditorFormTreeview_Default;
 				}
 
 				ImGui::PushID(listIndex);
