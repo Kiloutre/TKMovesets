@@ -29,3 +29,36 @@ void EditorMoveEndProperty::OnResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("beginning_extra_properties_addr", sizeChange, id, id + oldSize);
 }
+
+void EditorMoveEndProperty::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+{
+	if (fieldName == "beginning_extra_properties_addr") {
+		// If a struct was created before this one, we must shfit our own ID
+		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			id += valueChange;
+			ApplyWindowName();
+		}
+	}
+	else if (fieldName == "requirements_addr")
+	{
+		int listIdx = 0;
+		for (auto& item : m_items)
+		{
+			EditorInput* field = item->identifierMaps[fieldName];
+
+			if (field->errored) {
+				continue;
+			}
+
+			int value = atoi(field->buffer);
+			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+				// Same shifting logic as in ListCreations
+				sprintf(field->buffer, "%d", value + valueChange);
+				BuildItemDetails(listIdx);
+			}
+
+			++listIdx;
+		}
+	}
+}

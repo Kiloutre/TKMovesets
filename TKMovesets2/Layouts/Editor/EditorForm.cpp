@@ -196,6 +196,16 @@ bool EditorForm::IsFormValid()
 	return true;
 }
 
+void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
+{
+	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
+	m_windowTitle = std::format("{} {} - {}", windowName, id, m_windowTitleBase.c_str());
+
+	if (reapplyWindowProperties) {
+		m_winInfo.applyNextRender = true;
+	}
+}
+
 // -- Public methods -- //
 
 void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
@@ -210,16 +220,10 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
-	char name[32] = "";
 	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = m_fieldIdentifierMap[fieldName];
 
 		m_categories.insert(field->category);
-
-		// Moves are the only named fields so there is no reason to write any more complex code for now
-		if (fieldName == "move_name") {
-			strcpy_s(name, sizeof(name), field->buffer);
-		}
 	}
 
 	// Builds the <category : fields> map
@@ -236,14 +240,8 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
 	}
 
-	// Builds the window title. Currently, switching translations does not update this. Todo 
-	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
-	if (name[0] == '\0') {
-		m_windowTitle = std::format("{} {} - {}", windowName, id, windowTitleBase.c_str());
-	}
-	else {
-		m_windowTitle = std::format("{} {} {} - {}", windowName, id, name, windowTitleBase.c_str());
-	}
+	m_windowTitleBase = windowTitleBase;
+	ApplyWindowName(false);
 }
 
 void EditorForm::Render()
@@ -258,8 +256,17 @@ void EditorForm::Render()
 		nextDockId = -1;
 	}
 
+	if (m_winInfo.applyNextRender) {
+		m_winInfo.applyNextRender = false;
+		ImGui::SetNextWindowPos(m_winInfo.pos);
+		ImGui::SetNextWindowSize(m_winInfo.size);
+	}
+
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
+		m_winInfo.pos = ImGui::GetWindowPos();
+		m_winInfo.size = ImGui::GetWindowSize();
+
 		if (m_requestedClosure) {
 			RenderDiscardButtons();
 		}

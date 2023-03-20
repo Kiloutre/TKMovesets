@@ -41,7 +41,17 @@ protected:
 	bool m_requestedClosure = false;
 	// Contains the string identifiers to avoid having to compute them at every individual Render() call
 	std::map<int, std::string> m_categoryStringIdentifiers;
+	// Contains the base title of the main window that we will preprend our title to
+	std::string m_windowTitleBase;
+	// Contains wndow info to re-apply when renaming the window
+	struct WindowInfo
+	{
+		ImVec2 pos;
+		ImVec2 size;
+		bool applyNextRender = false;
+	} m_winInfo;
 
+	virtual void ApplyWindowName(bool reapplyWindowProperties = true);
 	// Called whenever the changes are successfully applied
 	virtual void OnApply() {};
 	// Called whenever a field changes (and is valid). listIdx is always 0 if not a list of structs.

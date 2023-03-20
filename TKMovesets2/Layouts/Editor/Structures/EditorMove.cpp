@@ -15,6 +15,19 @@ EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* edito
 	InitForm(windowTitleBase, t_id, editor);
 }
 
+void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
+{
+	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
+	const char* moveName = m_fieldIdentifierMap["move_name"]->buffer;
+	m_windowTitle = std::format("{} {} {} - {}", windowName, id, moveName, m_windowTitleBase.c_str());
+
+	if (reapplyWindowProperties) {
+		m_winInfo.pos = ImGui::GetWindowPos();
+		m_winInfo.size = ImGui::GetWindowSize();
+		m_winInfo.applyNextRender = true;
+	}
+}
+
 void EditorMove::OnFieldLabelClick(EditorInput* field)
 {
 	int id = atoi(field->buffer);
@@ -59,6 +72,7 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 void EditorMove::OnApply()
 {
 	m_baseWindow->ReloadMovelistFilter();
+	ApplyWindowName();
 }
 
 void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
@@ -69,7 +83,6 @@ void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int 
 			int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
-				// Might be a good idea to macro it
 				sprintf(m_fieldIdentifierMap[fieldName]->buffer, "%d", value + valueChange);
 			}
 		}

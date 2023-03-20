@@ -35,7 +35,15 @@ void EditorHitConditions::OnResize(int sizeChange, int oldSize)
 
 void EditorHitConditions::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "requirements_addr" || fieldName == "reactions_addr")
+	if (fieldName == "hit_condition_addr") {
+		// If a struct was created before this one, we must shfit our own ID
+		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			id += valueChange;
+			ApplyWindowName();
+		}
+	}
+	else if (fieldName == "requirements_addr" || fieldName == "reactions_addr")
 	{
 		int listIdx = 0;
 		for (auto& item : m_items)
@@ -49,7 +57,6 @@ void EditorHitConditions::RequestFieldUpdate(std::string fieldName, int valueCha
 			int value = atoi(field->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
-				// Might be a good idea to macro it
 				sprintf(field->buffer, "%d", value + valueChange);
 				BuildItemDetails(listIdx);
 			}

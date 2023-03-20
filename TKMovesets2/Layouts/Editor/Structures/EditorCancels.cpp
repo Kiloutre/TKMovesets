@@ -144,7 +144,14 @@ void EditorCancels::OnResize(int sizeChange, int oldSize)
 
 void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "grouped_cancel_id") {
+	if (fieldName == "cancel_addr") {
+		// If a struct was created before this one, we must shfit our own ID
+		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			id += valueChange;
+			ApplyWindowName();
+		}
+	} else if (fieldName == "grouped_cancel_id") {
 		int listIdx = 0;
 		for (auto& item : m_items)
 		{
@@ -160,7 +167,6 @@ void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, i
 				int group_id = atoi(moveIdField->buffer);
 				if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {
 					// Same shifting logic as in ListCreations
-					// Might be a good idea to macro it
 					sprintf(moveIdField->buffer, "%d", group_id + valueChange);
 					BuildItemDetails(listIdx);
 				}
