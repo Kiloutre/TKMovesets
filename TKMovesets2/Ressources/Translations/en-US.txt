@@ -185,6 +185,7 @@ edition.move.cancel_id_3 = Cancels ID (4)
 edition.move.cancel_related_id_3= Cancel ID 3: related
 edition.move.cancel_id_4 = Cancels ID (4)
 edition.move.cancel_related_id_4= Cancels ID 4: related
+edition.move._0xA8_short = Facing/Extras?
 
 edition.voiceclip.window_name = Voiceclip
 edition.voiceclip.id = ID
