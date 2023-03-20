@@ -6,76 +6,6 @@
 #include "EditorCancels.hpp"
 #include "Localization.hpp"
 
-const std::vector<std::string> cg_directionBitLabels = {
-	"D/B",
-	"D",
-	"D/F",
-	"B",
-	"N",
-	"F",
-	"U/B",
-	"U",
-	"U/F",
-};
-
-// -- Static helpers -- //
-
-static std::string GetCancelCommandStr(uint64_t command)
-{
-	int inputBits = command >> 32;
-	int directionBits = command & 0xFFFFFFFF;
-
-	if (command == 0x8000) {
-		return "AUTO";
-	}
-
-	if (directionBits >= 0x800d && directionBits <= 0x8FFF) {
-		// Input sequence
-		return std::string();
-	}
-
-	std::string retVal;
-
-	// Directions
-	{
-		for (int i = 1; i < 10; ++i)
-		{
-			if (directionBits & (1 << i)) {
-				if (retVal.size() != 0) {
-					retVal += "|";
-				}
-				retVal += cg_directionBitLabels[i - 1];
-			}
-		}
-
-		if (directionBits >> 10 || directionBits & 1) {
-			if (retVal.size() != 0) {
-				retVal += "|";
-			}
-			retVal += "???";
-		}
-	}
-
-	// Inputs
-	{
-		std::string inputs;
-		for (int i = 0; i < 4; ++i)
-		{
-			if (inputBits & (1 << (i))) {
-				inputs += "+" + std::to_string(i + 1);
-			}
-		}
-		if (inputBits & (1 << 4)) {
-			inputs += "+RA";
-		}
-		if (inputs.size() > 0) {
-			retVal += inputs.substr(retVal.size() == 0 ? 1 : 0);
-		}
-	}
-
-	return retVal.size() == 0 ? retVal : "[ " + retVal + " ]";
-}
-
 // -- Public methods -- //
 
 EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
@@ -150,7 +80,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	EditorInput* moveIdField = item->identifierMaps["move_id"];
 	uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
-	if ((command & 0xFFFFFFFF) >= m_editor->constants[EditorConstants_InputSequenceCommandStart]) {
+	if (m_editor->isCommandInputSequence(command)) {
 		commandField->flags |= EditorInput_Clickable;
 		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
 
@@ -184,7 +114,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 			item->color = 0;
 			moveIdField->displayName = "edition.cancel.move_id";
 			int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
-			std::string commandStr = GetCancelCommandStr(command);
+			std::string commandStr = m_editor->GetCommandStr(commandField->buffer);
 			if (validated_move_id == -1) {
 				label = std::format("{} ({}) / {}", _("edition.form_list.invalid"), move_id, commandStr);
 			}

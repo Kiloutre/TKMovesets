@@ -21,8 +21,6 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
-
-
 // ===== Pushback Extra ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder)

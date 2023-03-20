@@ -257,4 +257,9 @@ public:
 	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
 	// Modifies an existing list's size
 	virtual void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) = 0;
+
+	// -- Utils -- //
+	virtual std::string GetCommandStr(const char* direction, const char* button) = 0;
+	virtual std::string GetCommandStr(const char* commandBuf) = 0;
+	virtual bool isCommandInputSequence(uint64_t command) = 0;
 };

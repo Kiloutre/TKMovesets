@@ -134,6 +134,11 @@ public:
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
 
+	// -- Utils -- //
+	std::string GetCommandStr(const char* direction, const char* button) override;
+	std::string GetCommandStr(const char* commandBuf) override;
+	bool isCommandInputSequence(uint64_t command) override;
+
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
 	int32_t CreateNew(EditorWindowType_ type) override;
