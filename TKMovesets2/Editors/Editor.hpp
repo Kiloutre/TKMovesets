@@ -17,6 +17,9 @@
 # define FORM_INPUT_BUFSIZE (64)
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
+// Shifting logic for list resizing
+# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) ((id >= listOldEnd) || (valueChange < 0 && (id - valueChange) >= listOldEnd))
+
 // Vector with unique elements
 template < typename T >
 class VectorSet : public std::vector<T> {

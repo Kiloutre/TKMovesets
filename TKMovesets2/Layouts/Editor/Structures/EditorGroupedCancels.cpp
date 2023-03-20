@@ -111,5 +111,34 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 void EditorGroupedCancels::OnResize(int sizeChange, int oldSize)
 {
-	m_baseWindow->IssueFieldUpdate("grouped_cancel_addr", sizeChange, id, id + oldSize);
+	m_baseWindow->IssueFieldUpdate("grouped_cancel_id", sizeChange, id, id + oldSize);
+}
+
+void EditorGroupedCancels::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+{
+	if (fieldName == "input_sequence_id")
+	{
+		int listIdx = 0;
+		for (auto& item : m_items)
+		{
+			EditorInput* commandField = item->identifierMaps["command"];
+			uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
+
+			if (!m_editor->IsCommandInputSequence(command)) {
+				continue;
+			}
+
+			const int inputSequenceStart = m_editor->constants[EditorConstants_InputSequenceCommandStart];
+			int inputSequenceId = (command & 0xFFFFFFFF) - inputSequenceStart;
+
+			if (MUST_SHIFT_ID(inputSequenceId, valueChange, listStart, listEnd)) {
+				// Same shifting logic as in ListCreations
+				// Might be a good idea to macro it
+				sprintf(commandField->buffer, "%d", inputSequenceStart + inputSequenceId + valueChange);
+				BuildItemDetails(listIdx);
+			}
+
+			++listIdx;
+		}
+	}
 }

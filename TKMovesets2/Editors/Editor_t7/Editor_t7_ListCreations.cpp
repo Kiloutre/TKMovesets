@@ -70,7 +70,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Cancels
 	for (auto& cancel : m_iterators.cancels)
 	{
-		if (cancel.requirements_addr >= listId + oldSize || (listSizeDiff < 0 && cancel.requirements_addr > listId)) {
+		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
 			cancel.requirements_addr += listSizeDiff;
 		}
 	}
@@ -78,7 +78,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Grouped cancels
 	for (auto& cancel : m_iterators.grouped_cancels)
 	{
-		if (cancel.requirements_addr >= listId + oldSize || (listSizeDiff < 0 && cancel.requirements_addr > listId)) {
+		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
 			cancel.requirements_addr += listSizeDiff;
 		}
 	}
@@ -86,7 +86,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Hit conditions
 	for (auto& hitCondition : m_iterators.hit_conditions)
 	{
-		if (hitCondition.requirements_addr >= listId + oldSize || (listSizeDiff < 0 && hitCondition.requirements_addr > listId)) {
+		if (MUST_SHIFT_ID(hitCondition.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
 			hitCondition.requirements_addr += listSizeDiff;
 		}
 	}
@@ -94,7 +94,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Move begin prop
 	for (auto& otherProp : m_iterators.move_start_properties)
 	{
-		if (otherProp.requirements_addr >= listId + oldSize || (listSizeDiff < 0 && otherProp.requirements_addr > listId)) {
+		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
 			otherProp.requirements_addr += listSizeDiff;
 		}
 	}
@@ -102,7 +102,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Move end prop
 	for (auto& otherProp : m_iterators.move_end_properties)
 	{
-		if (otherProp.requirements_addr >= listId + oldSize || (listSizeDiff < 0 && otherProp.requirements_addr > listId)) {
+		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
 			otherProp.requirements_addr += listSizeDiff;
 		}
 	}
@@ -119,7 +119,7 @@ void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.hit_condition_addr != MOVESET_ADDR_MISSING) {
-			if (move.hit_condition_addr >= listId + oldSize || (listSizeDiff < 0 && move.hit_condition_addr > listId)) {
+			if (MUST_SHIFT_ID(move.hit_condition_addr, listSizeDiff, listId, listId + oldSize)) {
 				move.hit_condition_addr += listSizeDiff;
 			}
 		}
@@ -127,7 +127,7 @@ void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
 	// Projectiles
 	for (auto& projectile : m_iterators.projectiles)
 	{
-		if (projectile.hit_condition_addr >= listId + oldSize || (listSizeDiff < 0 && projectile.hit_condition_addr > listId)) {
+		if (MUST_SHIFT_ID(projectile.hit_condition_addr, listSizeDiff, listId, listId + oldSize)) {
 			projectile.hit_condition_addr += listSizeDiff;
 		}
 	}
@@ -143,10 +143,10 @@ void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
 	// Input sequences
 	for (auto& sequence : m_iterators.input_sequences)
 	{
-		if (sequence.input_addr >= listId + oldSize || (listSizeDiff < 0 && sequence.input_addr > listId)) {
+		if (MUST_SHIFT_ID(sequence.input_addr, listSizeDiff, listId, listId + oldSize)) {
 			sequence.input_addr += listSizeDiff;
 		}
-		else if (sequence.input_addr >= listId && sequence.input_addr <= listId + oldSize) {
+		else if (sequence.input_addr >= listId && sequence.input_addr <= (listId + oldSize)) {
 			sequence.input_amount += listSizeDiff;
 		}
 	}
@@ -164,7 +164,7 @@ void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (cancel.command == constants[EditorConstants_GroupedCancelCommand]) {
-			if (cancel.move_id >= listId + oldSize || (listSizeDiff < 0 && cancel.move_id > listId)) {
+			if (MUST_SHIFT_ID(cancel.move_id, listSizeDiff, listId, listId + oldSize)) {
 				cancel.move_id += listSizeDiff;
 			}
 		}
@@ -181,7 +181,7 @@ void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.cancel_addr != MOVESET_ADDR_MISSING) {
-			if (move.cancel_addr >= listId + oldSize || (listSizeDiff < 0 && move.cancel_addr > listId)) {
+			if (MUST_SHIFT_ID(move.cancel_addr, listSizeDiff, listId, listId + oldSize)) {
 				move.cancel_addr += listSizeDiff;
 			}
 		}
@@ -190,7 +190,7 @@ void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
 	// Projectiles
 	for (auto& projectile : m_iterators.projectiles)
 	{
-		if (projectile.cancel_addr >= listId + oldSize || (listSizeDiff < 0 && projectile.cancel_addr > listId)) {
+		if (MUST_SHIFT_ID(projectile.cancel_addr, listSizeDiff, listId, listId + oldSize)) {
 			projectile.cancel_addr += listSizeDiff;
 		}
 	}
@@ -206,7 +206,7 @@ void EditorT7::ModifyExtraPropertyListSize(int listId, int oldSize, int newSize)
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.extra_move_property_addr != MOVESET_ADDR_MISSING) {
-			if (move.extra_move_property_addr >= listId + oldSize || (listSizeDiff < 0 && move.extra_move_property_addr > listId)) {
+			if (MUST_SHIFT_ID(move.extra_move_property_addr, listSizeDiff, listId, listId + oldSize)) {
 				move.extra_move_property_addr += listSizeDiff;
 			}
 		}
@@ -223,7 +223,7 @@ void EditorT7::ModifyStartPropertyListSize(int listId, int oldSize, int newSize)
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_start_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (move.move_start_extraprop_addr >= listId + oldSize || (listSizeDiff < 0 && move.move_start_extraprop_addr > listId)) {
+			if (MUST_SHIFT_ID(move.move_start_extraprop_addr, listSizeDiff, listId, listId + oldSize)) {
 				move.move_start_extraprop_addr += listSizeDiff;
 			}
 		}
@@ -240,7 +240,7 @@ void EditorT7::ModifyEndPropertyListSize(int listId, int oldSize, int newSize)
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_end_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (move.move_end_extraprop_addr >= listId + oldSize || (listSizeDiff < 0 && move.move_end_extraprop_addr > listId)) {
+			if (MUST_SHIFT_ID(move.move_end_extraprop_addr, listSizeDiff, listId, listId + oldSize)) {
 				move.move_end_extraprop_addr += listSizeDiff;
 			}
 		}

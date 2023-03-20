@@ -67,7 +67,7 @@ void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int 
 		fieldName == "beginning_extra_properties_addr" || fieldName == "ending_extra_properties_addr") {
 		if (!m_fieldIdentifierMap[fieldName]->errored) {
 			int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
-			if (value >= listEnd || (valueChange < 0 && value > listStart)) {
+			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
 				// Might be a good idea to macro it
 				sprintf(m_fieldIdentifierMap[fieldName]->buffer, "%d", value + valueChange);

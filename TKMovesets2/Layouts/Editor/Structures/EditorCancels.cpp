@@ -144,8 +144,7 @@ void EditorCancels::OnResize(int sizeChange, int oldSize)
 
 void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
 {
-	printf("%s\n", fieldName.c_str());
-	if (fieldName == "grouped_cancel_addr") {
+	if (fieldName == "grouped_cancel_id") {
 		int listIdx = 0;
 		for (auto& item : m_items)
 		{
@@ -159,12 +158,36 @@ void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, i
 
 			if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
 				int group_id = atoi(moveIdField->buffer);
-				if (group_id >= listEnd || (valueChange < 0 && group_id > listStart)) {
+				if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {
 					// Same shifting logic as in ListCreations
 					// Might be a good idea to macro it
 					sprintf(moveIdField->buffer, "%d", group_id + valueChange);
-					BuildItemDetails(listIdx)
+					BuildItemDetails(listIdx);
 				}
+			}
+
+			++listIdx;
+		}
+	}
+	else if (fieldName == "input_sequence_id")
+	{
+		int listIdx = 0;
+		for (auto& item : m_items)
+		{
+			EditorInput* commandField = item->identifierMaps["command"];
+			uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
+
+			if (!m_editor->IsCommandInputSequence(command)) {
+				continue;
+			}
+
+			const int inputSequenceStart = m_editor->constants[EditorConstants_InputSequenceCommandStart];
+			int inputSequenceId = (command & 0xFFFFFFFF) - inputSequenceStart;
+			if (MUST_SHIFT_ID(inputSequenceId, valueChange, listStart, listEnd)) {
+				// Same shifting logic as in ListCreations
+				// Might be a good idea to macro it
+				sprintf(commandField->buffer, "%d", inputSequenceStart + inputSequenceId + valueChange);
+				BuildItemDetails(listIdx);
 			}
 
 			++listIdx;
