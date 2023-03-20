@@ -116,6 +116,7 @@ std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, V
 	CREATE_FIELD("can_hitbox_connect", 0, EditorInput_U32, projectile->can_hitbox_connect);
 	CREATE_FIELD("gravity", 0, EditorInput_U32, projectile->gravity);
 	CREATE_FIELD("hit_level", 0, EditorInput_H32, projectile->hit_level);
+	CREATE_FIELD("voiceclip_on_hit", 0, EditorInput_H32, projectile->voiceclip_on_hit);
 
 	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, projectile->hit_condition_addr);
 	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR, projectile->cancel_addr);
@@ -132,7 +133,9 @@ std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, V
 	CREATE_FIELD("_0x3C_int_4", 3, EditorInput_U32, projectile->_0x3C_int[3]);
 	CREATE_FIELD("_0x3C_int_5", 3, EditorInput_U32, projectile->_0x3C_int[4]);
 	CREATE_FIELD("_0x3C_int_6", 3, EditorInput_U32, projectile->_0x3C_int[5]);
-	CREATE_FIELD("_0x70_int", 3, EditorInput_U32, projectile->_0x70_int);
+	CREATE_FIELD("_0x58_int", 3, EditorInput_U32, projectile->_0x58_int);
+	CREATE_FIELD("_0x5C_int", 3, EditorInput_U32, projectile->_0x5C_int);
+	CREATE_FIELD("_0x70_int", 3, EditorInput_U32, projectile->_0x58_int);
 	CREATE_FIELD("_0x74_int", 3, EditorInput_U32, projectile->_0x74_int);
 	CREATE_FIELD("_0x7C_int", 3, EditorInput_U32, projectile->_0x7C_int);
 	CREATE_FIELD("_0x80_int", 3, EditorInput_U32, projectile->_0x80_int);
@@ -181,7 +184,7 @@ void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& 
 	projectile->duration = atoi(inputs["duration"]->buffer);
 	projectile->no_collision = atoi(inputs["no_collision"]->buffer);
 	projectile->size = atoi(inputs["size"]->buffer);
-	projectile->hit_level = (uint32_t)strtol(inputs["value"]->buffer, nullptr, 16);
+	projectile->hit_level = (uint32_t)strtol(inputs["hit_level"]->buffer, nullptr, 16);
 	projectile->voiceclip_on_hit = atoi(inputs["voiceclip_on_hit"]->buffer);
 	projectile->can_hitbox_connect = atoi(inputs["can_hitbox_connect"]->buffer);
 	projectile->gravity = atoi(inputs["gravity"]->buffer);
