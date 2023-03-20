@@ -8,9 +8,10 @@
 
 // -- Public methods -- //
 
-EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_id, Editor* editor)
+EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
 {
 	windowType = EditorWindowType_Requirement;
+	m_baseWindow = baseWindow;
 	InitForm(windowTitleBase, t_id, editor);
 }
 
@@ -29,4 +30,30 @@ void EditorRequirements::RequestFieldUpdate(std::string fieldName, int valueChan
 			ApplyWindowName();
 		}
 	}
+}
+
+void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
+{
+	BuildItemDetails(listIdx);
+}
+
+void EditorRequirements::BuildItemDetails(int listIdx)
+{
+	std::string label;
+
+	auto& map = m_items[listIdx]->identifierMaps;
+
+	int id = atoi(map["condition"]->buffer);
+	int value = atoi(map["param"]->buffer);
+
+	const char* idLabel = m_baseWindow->labels->GetText(id);
+
+	if (idLabel == nullptr) {
+		label = std::format("{} = 0x{:x} / {}", id, value, value);
+	}
+	else {
+		label = std::format("{} = 0x{:x} / {}", idLabel, value, value);
+	}
+
+	m_items[listIdx]->itemLabel = label;
 }

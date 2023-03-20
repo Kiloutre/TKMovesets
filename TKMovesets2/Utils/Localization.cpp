@@ -24,7 +24,7 @@ namespace Localization
 		std::ifstream infile;
 		std::string line;
 
-		infile.open(std::format("{}/{}.txt", PROGRAM_LANG_FOLDER, c_langId));
+		infile.open(std::format("{}/{}.txt", INTERFACE_DATA_DIR, c_langId));
 		g_currentLangId = std::string(c_langId);
 		while (std::getline(infile, line))
 		{

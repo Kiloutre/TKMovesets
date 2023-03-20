@@ -61,11 +61,12 @@ set(BINARY_SOURCES
                     "Layouts/Submenus/Submenu_About.cpp"
 
                     # Helpers and such
-                    "Utils/imgui_extras.cpp"
                     "Utils/helpers.cpp"
-                    "Utils/Localization.cpp"
-                    "Utils/GameAddressesFile.cpp"
+                    "Utils/imgui_extras.cpp"
                     "Utils/ThreadedClass.cpp"
+                    "Utils/Localization.cpp"
+                    "Utils/EditorLabel.cpp"
+                    "Utils/GameAddressesFile.cpp"
 )
 
 set(IMPORTEXPORT_INCLUDE_FOLDERS
@@ -114,8 +115,8 @@ target_link_libraries(TKMovesets2 PRIVATE ExportImport)
 ## Ressources ##
 # Addresses file #
 configure_file("Ressources/game_addresses.txt" "game_addresses.txt" COPYONLY)
-# Translations #
-add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Ressources/Translations" "${CMAKE_CURRENT_BINARY_DIR}/Translations")
+# Interface data #
+add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Ressources/Interface" "${CMAKE_CURRENT_BINARY_DIR}/Interface")
 
 
 ## Extra dependencies ##

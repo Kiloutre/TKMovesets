@@ -171,7 +171,7 @@ edition.move.airborne_end = Aérien (fin)
 edition.move.ground_fall = "Ground fall"
 edition.move.distance = Distance
 edition.move.hit_condition_addr = ID de hit-conditions
-edition.move.extra_move_property_addr = ID de propriété
+edition.move.extra_properties_addr = ID de propriété
 edition.move.move_start_extraprop_addr = ID de propriété (pré)
 edition.move.move_end_extraprop_addr = ID de propriété (post)
 edition.move.voiceclip_addr = ID de voix
@@ -191,16 +191,17 @@ edition.extraproperty.window_name = Liste de propriété
 edition.extraproperty.starting_frame = Frame de début
 edition.extraproperty.id = ID
 edition.extraproperty.value = Value
+edition.extraproperty.instant = INSTANTANÉ
 
-edition.start_other_extraproperty.window_name = Liste de propriété de début
-edition.start_other_extraproperty.requirements_addr = ID de condition
-edition.start_other_extraproperty.extraprop = Propriété / Condition
-edition.start_other_extraproperty.value = Valeur
+edition.move_start_extraprop_addr.window_name = Liste de propriété de début
+edition.move_start_extraprop_addr.requirements_addr = ID de condition
+edition.move_start_extraprop_addr.extraprop = Propriété / Condition
+edition.move_start_extraprop_addr.value = Valeur
 
-edition.end_other_extraproperty.window_name = Liste de propriété de fin
-edition.end_other_extraproperty.requirements_addr = ID de condition
-edition.end_other_extraproperty.extraprop =  Propriété / Condition
-edition.end_other_extraproperty.value = Valeur
+edition.move_end_extraprop_addr.window_name = Liste de propriété de fin
+edition.move_end_extraprop_addr.requirements_addr = ID de condition
+edition.move_end_extraprop_addr.extraprop =  Propriété / Condition
+edition.move_end_extraprop_addr.value = Valeur
 
 edition.cancel.window_name = Liste de Cancel
 edition.cancel.command = Commande

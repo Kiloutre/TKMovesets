@@ -38,7 +38,7 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		return new EditorVoiceclip(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_Extraproperty:
-		return new EditorExtraproperties(m_windowTitle, id, m_editor);
+		return new EditorExtraproperties(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Cancel:
 		return new EditorCancels(m_windowTitle, id, m_editor, this);
@@ -50,7 +50,7 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		return new EditorCancelExtra(m_windowTitle, id, m_editor);
 		break;
 	case EditorWindowType_Requirement:
-		return new EditorRequirements(m_windowTitle, id, m_editor);
+		return new EditorRequirements(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_HitCondition:
 		return new EditorHitConditions(m_windowTitle, id, m_editor, this);
@@ -224,6 +224,7 @@ EditorWindow::~EditorWindow()
 	free(moveset);
 
 	delete m_editor;
+	delete labels;
 }
 
 EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
@@ -232,6 +233,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	importerHelper.StartThread();
 
 	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, importerHelper.process, importerHelper.game);
+	labels = new EditorLabel(movesetInfo->gameId);
 
 	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
 

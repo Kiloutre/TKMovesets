@@ -11,7 +11,8 @@
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LANG    "en-US"
-# define PROGRAM_LANG_FOLDER     "Translations"
+
+# define INTERFACE_DATA_DIR      "Interface"
 
 # define MOVESET_EXTRACTED_NAME_PREFIX   "Tkm:"
 # define MOVESET_CUSTOM_MOVE_NAME_PREFIX "tkm_"

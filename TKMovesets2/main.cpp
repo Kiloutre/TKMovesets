@@ -41,10 +41,10 @@ static bool LoadLocaleTranslation()
 		}
 	}
 
-	const uint64_t filenameMaxSize = LOCALE_NAME_MAX_LENGTH + 5 + sizeof(PROGRAM_LANG_FOLDER);
+	const uint64_t filenameMaxSize = LOCALE_NAME_MAX_LENGTH + 5 + sizeof(INTERFACE_DATA_DIR);
 	char filename[filenameMaxSize];
 
-	strcpy_s(filename, filenameMaxSize, PROGRAM_LANG_FOLDER);
+	strcpy_s(filename, filenameMaxSize, INTERFACE_DATA_DIR);
 	strcat_s(filename, filenameMaxSize, "/");
 	strcat_s(filename, filenameMaxSize, name);
 	strcat_s(filename, filenameMaxSize, ".txt");

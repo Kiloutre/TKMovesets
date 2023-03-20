@@ -53,16 +53,17 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 		}
 	}
 	else if (name == "extra_properties_addr") {
+		printf("o");
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Extraproperty, id);
 		}
 	}
-	else if (name == "beginning_extra_properties_addr") {
+	else if (name == "move_start_extraprop_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_MoveBeginProperty, id);
 		}
 	}
-	else if (name == "ending_extra_properties_addr") {
+	else if (name == "move_end_extraprop_addr") {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_MoveEndProperty, id);
 		}
@@ -78,7 +79,7 @@ void EditorMove::OnApply()
 void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
 {
 	if (fieldName == "hit_condition_addr" || fieldName == "extra_properties_addr" || fieldName == "cancel_addr" ||
-		fieldName == "beginning_extra_properties_addr" || fieldName == "ending_extra_properties_addr") {
+		fieldName == "move_start_extraprop_addr" || fieldName == "move_end_extraprop_addr") {
 		if (!m_fieldIdentifierMap[fieldName]->errored) {
 			int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {

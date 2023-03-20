@@ -487,7 +487,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	auto req = m_iterators.requirements.begin();
+	auto req = m_iterators.requirements.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -876,7 +876,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 
 	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR,  move->cancel_addr);
 	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, move->hit_condition_addr);
-	CREATE_FIELD("extra_move_property_addr", 2, EditorInput_PTR, move->extra_move_property_addr);
+	CREATE_FIELD("extra_properties_addr", 2, EditorInput_PTR, move->extra_move_property_addr);
 	CREATE_FIELD("move_start_extraprop_addr", 2, EditorInput_PTR, move->move_start_extraprop_addr);
 	CREATE_FIELD("move_end_extraprop_addr", 2, EditorInput_PTR, move->move_end_extraprop_addr);
 	CREATE_FIELD("voiceclip_addr", 2, EditorInput_PTR, move->voicelip_addr);
@@ -1048,7 +1048,7 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 
 	move->cancel_addr = atoll(inputs["cancel_addr"]->buffer);
 	move->hit_condition_addr = atoll(inputs["hit_condition_addr"]->buffer);
-	move->extra_move_property_addr = atoll(inputs["extra_move_property_addr"]->buffer);
+	move->extra_move_property_addr = atoll(inputs["extra_properties_addr"]->buffer);
 	move->move_start_extraprop_addr = atoll(inputs["move_start_extraprop_addr"]->buffer);
 	move->move_end_extraprop_addr = atoll(inputs["move_end_extraprop_addr"]->buffer);
 	move->voicelip_addr = atoll(inputs["voiceclip_addr"]->buffer);
@@ -1104,7 +1104,7 @@ bool EditorT7::ValidateMoveField( EditorInput* field)
 		return -1 <= listIdx && listIdx < (int)m_infos->table.hitConditionCount;
 	}
 
-	else if (name == "extra_move_property_addr") {
+	else if (name == "extra_properties_addr") {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.extraMovePropertyCount;
 	}

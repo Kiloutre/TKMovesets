@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Editor.hpp"
+#include "EditorLabel.hpp"
 
 // Base class used for methods that should be accessible in child windows
 class EditorWindowBase {
@@ -9,6 +10,8 @@ public:
 	EditorTable* editorTable = nullptr;
 	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*> movelist;
+	// Contains the labels to display in the editor
+	EditorLabel* labels = nullptr;
 
 	virtual void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId, int listSize = 0) = 0;
 	virtual int32_t ValidateMoveId(const char* buf) = 0;

@@ -58,9 +58,9 @@ namespace EditorFormUtils
 		case EditorWindowType_Extraproperty:
 			return "extraproperty";
 		case EditorWindowType_MoveBeginProperty:
-			return "start_other_extraproperty";
+			return "move_start_extraprop_addr";
 		case EditorWindowType_MoveEndProperty:
-			return "end_other_extraproperty";
+			return "move_end_extraprop_addr";
 
 		case EditorWindowType_Input:
 			return "input";

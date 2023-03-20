@@ -42,6 +42,8 @@ struct GameInfo
 	uint8_t characterCount;
 	// Determines what can be done with the game. See GameFlag enum for more details
 	GameFlag flags;
+	// Used to build path for label files
+	const char* dataString;
 	// Dynamic type allocator to store the game's extractor. Can be nullptr for no available extractor.
 	FactoryType_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.
