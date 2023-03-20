@@ -189,7 +189,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
-		ImGui::TableSetupColumn("##");
+		ImGui::TableSetupColumn(_("moveset.version"));
 		ImGui::TableSetupColumn(_("moveset.delete"), 0, 0.0f);
 		ImGui::TableHeadersRow();
 

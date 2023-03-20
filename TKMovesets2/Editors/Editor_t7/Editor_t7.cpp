@@ -182,7 +182,7 @@ void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& 
 	projectile->duration = atoi(inputs["duration"]->buffer);
 	projectile->no_collision = atoi(inputs["no_collision"]->buffer);
 	projectile->size = atoi(inputs["size"]->buffer);
-	projectile->hit_level = (uint32_t)strtol(inputs["hit_level"]->buffer, nullptr, 16);
+	projectile->hit_level = (uint32_t)strtoll(inputs["hit_level"]->buffer, nullptr, 16);
 	projectile->voiceclip_on_hit = atoi(inputs["voiceclip_on_hit"]->buffer);
 	projectile->can_hitbox_connect = atoi(inputs["can_hitbox_connect"]->buffer);
 	projectile->gravity = atoi(inputs["gravity"]->buffer);
@@ -294,8 +294,8 @@ void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& input
 {
 	auto input = m_iterators.inputs.begin() + id;
 
-	input->direction = (uint32_t)strtol(inputs["direction"]->buffer, nullptr, 16);
-	input->button = (uint32_t)strtol(inputs["button"]->buffer, nullptr, 16);
+	input->direction = (uint32_t)strtoll(inputs["direction"]->buffer, nullptr, 16);
+	input->button = (uint32_t)strtoll(inputs["button"]->buffer, nullptr, 16);
 }
 
 // ===== Reactions ===== //
@@ -538,7 +538,7 @@ void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>&
 {
 	auto cancelExtra = m_iterators.cancel_extras[id];
 
-	cancelExtra->value = (uint32_t)strtol(inputs["value"]->buffer, nullptr, 16);
+	cancelExtra->value = (uint32_t)strtoll(inputs["value"]->buffer, nullptr, 16);
 }
 
 // ===== Cancel ===== //
@@ -839,7 +839,7 @@ void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& i
 {
 	auto voiceclip = m_iterators.voiceclips[id];
 
-	voiceclip->id = (uint32_t)strtol(inputs["id"]->buffer, nullptr, 16);
+	voiceclip->id = (uint32_t)strtoll(inputs["id"]->buffer, nullptr, 16);
 }
 
 // ===== MOVES ===== //
@@ -1033,7 +1033,7 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
 	}
 	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
-	move->hitlevel = (uint32_t)strtol(inputs["hitlevel"]->buffer, nullptr, 16);
+	move->hitlevel = (uint32_t)strtoll(inputs["hitlevel"]->buffer, nullptr, 16);
 	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
 	move->moveId_val1 = (uint16_t)atoi(inputs["moveId_val1"]->buffer);
 	move->moveId_val2 = (uint16_t)atoi(inputs["moveId_val2"]->buffer);
@@ -1041,7 +1041,7 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	move->airborne_start = (uint32_t)atoi(inputs["airborne_start"]->buffer);
 	move->airborne_end = (uint32_t)atoi(inputs["airborne_end"]->buffer);
 	move->ground_fall = (uint32_t)atoi(inputs["ground_fall"]->buffer);
-	move->hitbox_location = (uint32_t)strtol(inputs["hitbox_location"]->buffer, nullptr, 16);
+	move->hitbox_location = (uint32_t)strtoll(inputs["hitbox_location"]->buffer, nullptr, 16);
 	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
 	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
 	move->distance = (uint16_t)atoi(inputs["distance"]->buffer);
@@ -1271,7 +1271,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		return GetInputListInputs(id, listSize, drawOrder);
 		break;
 	}
-	return std::vector<std::map<std::string, EditorInput*>>();
+	return GetFormFieldsList(type, id, drawOrder);
 }
 
 bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)

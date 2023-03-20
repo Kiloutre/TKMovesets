@@ -146,6 +146,9 @@ void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
 		if (sequence.input_addr >= listId + oldSize || (listSizeDiff < 0 && sequence.input_addr > listId)) {
 			sequence.input_addr += listSizeDiff;
 		}
+		else if (sequence.input_addr >= listId && sequence.input_addr <= listId + oldSize) {
+			sequence.input_amount += listSizeDiff;
+		}
 	}
 }
 
