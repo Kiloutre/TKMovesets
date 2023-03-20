@@ -15,6 +15,7 @@
 #include "MovesetStructs.h"
 
 # define FORM_INPUT_BUFSIZE (64)
+# define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
 // Vector with unique elements
 template < typename T >
@@ -259,7 +260,12 @@ public:
 	virtual void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) = 0;
 
 	// -- Utils -- //
+	// Returns a command string from two seperate direction & button fields
 	virtual std::string GetCommandStr(const char* direction, const char* button) = 0;
+	// Returns a command string from a command field
 	virtual std::string GetCommandStr(const char* commandBuf) = 0;
-	virtual bool isCommandInputSequence(uint64_t command) = 0;
+	// Returns true if the command is an input sequence
+	virtual bool IsCommandInputSequence(uint64_t command) = 0;
+	// Writes the input sequence to string, or writes to outSize if the sequence is over MAX_INPUT_SEQUENCE_SHORT_LEN inputs
+	virtual void GetInputSequenceString(int id, std::string& outStr, int& outSize) = 0;
 };

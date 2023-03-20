@@ -80,7 +80,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	EditorInput* moveIdField = item->identifierMaps["move_id"];
 	uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
-	if (m_editor->isCommandInputSequence(command)) {
+	if (m_editor->IsCommandInputSequence(command)) {
 		commandField->flags |= EditorInput_Clickable;
 		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
 
@@ -90,12 +90,20 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		int move_id = atoi(moveIdField->buffer);
 		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 
+		std::string inputs;
+		int inputAmount = 0;
+		m_editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
+
+		if (inputAmount > 0) {
+			inputs = std::format("{} {}", inputAmount, _("edition.inputs.inputs"));
+		}
+
 		if (m_baseWindow->ValidateMoveId(moveIdField->buffer) == -1) {
-			label = std::format("{} / {} / {}: {}", move_id, _("edition.form_list.invalid"), _("edition.input_sequence.window_name"), inputSequenceId);
+			label = std::format("{} / {} / {}: {}, [ {} ]", move_id, _("edition.form_list.invalid"), _("edition.input_sequence.window_name"), inputSequenceId, inputs);
 		}
 		else {
 			const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
-			label = std::format("{} / {} / {}: {}", move_id, moveName, _("edition.input_sequence.window_name"), inputSequenceId);
+			label = std::format("{} / {} / {}: {}, [ {} ]", move_id, moveName, _("edition.input_sequence.window_name"), inputSequenceId, inputs);
 		}
 	}
 	else {
@@ -116,12 +124,12 @@ void EditorCancels::BuildItemDetails(int listIdx)
 			int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 			std::string commandStr = m_editor->GetCommandStr(commandField->buffer);
 			if (validated_move_id == -1) {
-				label = std::format("{} ({}) / {}", _("edition.form_list.invalid"), move_id, commandStr);
+				label = std::format("{} ({}) / [ {} ]", _("edition.form_list.invalid"), move_id, commandStr);
 			}
 			else
 			{
 				const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
-				label = std::format("{} / {} / {}", move_id, moveName, commandStr);
+				label = std::format("{} / {} / [ {} ]", move_id, moveName, commandStr);
 			}
 		}
 	}

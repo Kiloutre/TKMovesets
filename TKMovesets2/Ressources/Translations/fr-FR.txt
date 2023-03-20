@@ -279,6 +279,7 @@ edition.input_sequence.input_addr = ID de commande
 edition.input.window_name = Commande
 edition.input.direction = Direction
 edition.input.button = Boutons
+edition.input.inputs = Commandes
 
 edition.projectile.window_name = Projectile
 edition.projectile.category_2 = Références

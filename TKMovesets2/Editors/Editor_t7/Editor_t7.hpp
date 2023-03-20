@@ -137,7 +137,8 @@ public:
 	// -- Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;
 	std::string GetCommandStr(const char* commandBuf) override;
-	bool isCommandInputSequence(uint64_t command) override;
+	bool IsCommandInputSequence(uint64_t command) override;
+	void GetInputSequenceString(int id, std::string& outStr, int& outSize) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list

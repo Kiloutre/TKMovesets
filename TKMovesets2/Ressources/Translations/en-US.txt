@@ -283,6 +283,7 @@ edition.input_sequence.input_addr = Input ID
 edition.input.window_name = Input
 edition.input.direction = Direction
 edition.input.button = Buttons
+edition.input.inputs = Inputs
 
 edition.projectile.window_name = Projectile
 edition.projectile.category_2 = References
