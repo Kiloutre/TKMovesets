@@ -52,7 +52,7 @@ public:
 	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
-	bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) override;
+	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
 	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 	
 	// Moves
@@ -60,7 +60,7 @@ public:
 	uint64_t CreateMoveName(const char* newName);
 	void SaveMoveName(const char* newName, gameAddr move_name_addr);
 	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateMoveField(std::string name, EditorInput* field);
+	bool ValidateMoveField(EditorInput* field);
 
 	// Voiceclips
 	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder);
@@ -73,7 +73,7 @@ public:
 	// Other properties (start)
 	std::vector<std::map<std::string, EditorInput*>> GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateOtherMoveProperty(std::string name, EditorInput* field);
+	bool ValidateOtherMoveProperty(EditorInput* field);
 
 	// Other properties (end)
 	std::vector<std::map<std::string, EditorInput*>> GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
@@ -82,12 +82,12 @@ public:
 	// Cancels
 	std::vector<std::map<std::string, EditorInput*>> GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateCancelField(std::string name, EditorInput* field);
+	bool ValidateCancelField(EditorInput* field);
 
 	// Grouped Cancels
 	std::vector<std::map<std::string, EditorInput*>> GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateGroupedCancelField(std::string name, EditorInput* field);
+	bool ValidateGroupedCancelField(EditorInput* field);
 
 	// Cancel extras
 	std::map<std::string, EditorInput*> GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);
@@ -100,17 +100,17 @@ public:
 	// Hit conditions
 	std::vector<std::map<std::string, EditorInput*>> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateHitConditionField(std::string name, EditorInput* field);
+	bool ValidateHitConditionField( EditorInput* field);
 	
 	// Reactions
 	std::map<std::string, EditorInput*> GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateReactionsField(std::string name, EditorInput* field);
+	bool ValidateReactionsField(EditorInput* field);
 
 	// Pushback
 	std::map<std::string, EditorInput*> GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SavePushback(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidatePushbackField(std::string name, EditorInput* field);
+	bool ValidatePushbackField(EditorInput* field);
 
 	// Pushback extradata
 	std::map<std::string, EditorInput*> GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
@@ -119,11 +119,16 @@ public:
 	// Input Sequence
 	std::map<std::string, EditorInput*> GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateInputSequenceField(std::string name, EditorInput* field);
+	bool ValidateInputSequenceField(EditorInput* field);
 
 	// Hit conditions
 	std::vector<std::map<std::string, EditorInput*>> GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
 	void SaveInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
+	// Projectiles
+	std::map<std::string, EditorInput*> GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateProjectileField(EditorInput* field);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player
@@ -154,6 +159,7 @@ public:
 	int32_t CreateNewPushback();
 	int32_t CreateNewPushbackExtra();
 	//
+	int32_t CreateNewProjectile();
 
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;

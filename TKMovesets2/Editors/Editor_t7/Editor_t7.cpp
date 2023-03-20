@@ -21,6 +21,8 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	}
 }
 
+
+
 // ===== Pushback Extra ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -67,8 +69,10 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 	return inputMap;
 }
 
-bool EditorT7::ValidatePushbackField(std::string name, EditorInput* field)
+bool EditorT7::ValidatePushbackField(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (name == "extradata_addr")
 	{
 		int listIdx = atoi(field->buffer);
@@ -87,6 +91,130 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 	pushback->displacement = atoi(inputs["displacement"]->buffer);
 	pushback->num_of_loops = atoi(inputs["num_of_loops"]->buffer);
 	pushback->extradata_addr = atoi(inputs["extradata_addr"]->buffer);
+}
+
+// ===== Projectile ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	auto projectile = m_iterators.projectiles[id];
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("vfx_id", 0, EditorInput_U32, projectile->vfx_id);
+	CREATE_FIELD("vfx_variation_id", 0, EditorInput_U32, projectile->vfx_variation_id);
+	CREATE_FIELD("delay", 0, EditorInput_U32, projectile->delay);
+	CREATE_FIELD("vertical_velocity", 0, EditorInput_U32, projectile->vertical_velocity);
+	CREATE_FIELD("horizontal_velocity", 0, EditorInput_U32, projectile->horizontal_velocity);
+	CREATE_FIELD("duration", 0, EditorInput_U32, projectile->duration);
+	CREATE_FIELD("no_collision", 0, EditorInput_U32, projectile->no_collision);
+	CREATE_FIELD("size", 0, EditorInput_U32, projectile->size);
+	CREATE_FIELD("can_hitbox_connect", 0, EditorInput_U32, projectile->can_hitbox_connect);
+	CREATE_FIELD("gravity", 0, EditorInput_U32, projectile->gravity);
+	CREATE_FIELD("hit_level", 0, EditorInput_H32, projectile->hit_level);
+
+	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, projectile->hit_condition_addr);
+	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR, projectile->cancel_addr);
+
+	CREATE_FIELD("_0x4_int", 3, EditorInput_U32, projectile->_0x4_int);
+	CREATE_FIELD("_0xC_int", 3, EditorInput_U32, projectile->_0xC_int);
+	CREATE_FIELD("_0x10_int", 3, EditorInput_U32, projectile->_0x10_int);
+	CREATE_FIELD("_0x14_int", 3, EditorInput_U32, projectile->_0x14_int);
+	CREATE_FIELD("_0x24_int", 3, EditorInput_U32, projectile->_0x24_int);
+	CREATE_FIELD("_0x34_int", 3, EditorInput_U32, projectile->_0x34_int);
+	CREATE_FIELD("_0x3C_int_1", 3, EditorInput_U32, projectile->_0x3C_int[0]);
+	CREATE_FIELD("_0x3C_int_2", 3, EditorInput_U32, projectile->_0x3C_int[1]);
+	CREATE_FIELD("_0x3C_int_3", 3, EditorInput_U32, projectile->_0x3C_int[2]);
+	CREATE_FIELD("_0x3C_int_4", 3, EditorInput_U32, projectile->_0x3C_int[3]);
+	CREATE_FIELD("_0x3C_int_5", 3, EditorInput_U32, projectile->_0x3C_int[4]);
+	CREATE_FIELD("_0x3C_int_6", 3, EditorInput_U32, projectile->_0x3C_int[5]);
+	CREATE_FIELD("_0x70_int", 3, EditorInput_U32, projectile->_0x70_int);
+	CREATE_FIELD("_0x74_int", 3, EditorInput_U32, projectile->_0x74_int);
+	CREATE_FIELD("_0x7C_int", 3, EditorInput_U32, projectile->_0x7C_int);
+	CREATE_FIELD("_0x80_int", 3, EditorInput_U32, projectile->_0x80_int);
+	CREATE_FIELD("_0x88_int_1", 3, EditorInput_U32, projectile->_0x88_int[0]);
+	CREATE_FIELD("_0x88_int_2", 3, EditorInput_U32, projectile->_0x88_int[1]);
+	CREATE_FIELD("_0x88_int_3", 3, EditorInput_U32, projectile->_0x88_int[2]);
+	CREATE_FIELD("_0x88_int_4", 3, EditorInput_U32, projectile->_0x88_int[3]);
+	CREATE_FIELD("_0x88_int_5", 3, EditorInput_U32, projectile->_0x88_int[4]);
+	CREATE_FIELD("_0x88_int_6", 3, EditorInput_U32, projectile->_0x88_int[5]);
+	CREATE_FIELD("_0x88_int_7", 3, EditorInput_U32, projectile->_0x88_int[6]);
+	CREATE_FIELD("_0x88_int_8", 3, EditorInput_U32, projectile->_0x88_int[7]);
+
+	WriteFieldFullname(inputMap, "projectile");
+	return inputMap;
+}
+
+bool EditorT7::ValidateProjectileField(EditorInput* field)
+{
+	std::string& name = field->name;
+
+	if (name == "hit_condition_addr")
+	{
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.hitConditionCount;
+	}
+	else if (name == "cancel_addr")
+	{
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelCount;
+	}
+
+	return true;
+}
+
+void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	auto projectile = m_iterators.projectiles[id];
+
+	projectile->vfx_id = atoi(inputs["vfx_id"]->buffer);
+	projectile->vfx_variation_id = atoi(inputs["vfx_variation_id"]->buffer);
+	projectile->delay = atoi(inputs["delay"]->buffer);
+	projectile->vertical_velocity = atoi(inputs["vertical_velocity"]->buffer);
+	projectile->horizontal_velocity = atoi(inputs["horizontal_velocity"]->buffer);
+	projectile->duration = atoi(inputs["duration"]->buffer);
+	projectile->no_collision = atoi(inputs["no_collision"]->buffer);
+	projectile->size = atoi(inputs["size"]->buffer);
+	projectile->hit_level = (uint32_t)strtol(inputs["value"]->buffer, nullptr, 16);
+	projectile->voiceclip_on_hit = atoi(inputs["voiceclip_on_hit"]->buffer);
+	projectile->can_hitbox_connect = atoi(inputs["can_hitbox_connect"]->buffer);
+	projectile->gravity = atoi(inputs["gravity"]->buffer);
+
+	projectile->hit_condition_addr = atoi(inputs["hit_condition_addr"]->buffer);
+	projectile->cancel_addr = atoi(inputs["cancel_addr"]->buffer);
+
+	projectile->_0x34_int = atoi(inputs["_0x34_int"]->buffer);
+	projectile->_0x4_int = atoi(inputs["_0x4_int"]->buffer);
+	projectile->_0xC_int = atoi(inputs["_0xC_int"]->buffer);
+	projectile->_0x10_int = atoi(inputs["_0x10_int"]->buffer);
+	projectile->_0x14_int = atoi(inputs["_0x14_int"]->buffer);
+	projectile->_0x24_int = atoi(inputs["_0x24_int"]->buffer);
+	projectile->_0x3C_int[0] = atoi(inputs["_0x3C_int_1"]->buffer);
+	projectile->_0x3C_int[1] = atoi(inputs["_0x3C_int_2"]->buffer);
+	projectile->_0x3C_int[2] = atoi(inputs["_0x3C_int_3"]->buffer);
+	projectile->_0x3C_int[3] = atoi(inputs["_0x3C_int_4"]->buffer);
+	projectile->_0x3C_int[4] = atoi(inputs["_0x3C_int_5"]->buffer);
+	projectile->_0x3C_int[5] = atoi(inputs["_0x3C_int_6"]->buffer);
+	projectile->_0x58_int = atoi(inputs["_0x58_int"]->buffer);
+	projectile->_0x5C_int = atoi(inputs["_0x5C_int"]->buffer);
+	projectile->_0x70_int = atoi(inputs["_0x70_int"]->buffer);
+	projectile->_0x74_int = atoi(inputs["_0x74_int"]->buffer);
+	projectile->_0x7C_int = atoi(inputs["_0x7C_int"]->buffer);
+	projectile->_0x80_int = atoi(inputs["_0x80_int"]->buffer);
+	projectile->_0x88_int[0] = atoi(inputs["_0x88_int_1"]->buffer);
+	projectile->_0x88_int[1] = atoi(inputs["_0x88_int_2"]->buffer);
+	projectile->_0x88_int[2] = atoi(inputs["_0x88_int_3"]->buffer);
+	projectile->_0x88_int[3] = atoi(inputs["_0x88_int_4"]->buffer);
+	projectile->_0x88_int[4] = atoi(inputs["_0x88_int_5"]->buffer);
+	projectile->_0x88_int[5] = atoi(inputs["_0x88_int_6"]->buffer);
+	projectile->_0x88_int[6] = atoi(inputs["_0x88_int_7"]->buffer);
+	projectile->_0x88_int[7] = atoi(inputs["_0x88_int_8"]->buffer);
 }
 
 // ===== Input Sequence  ===== //
@@ -110,8 +238,10 @@ std::map<std::string, EditorInput*> EditorT7::GetInputSequenceInputs(uint16_t id
 	return inputMap;
 }
 
-bool EditorT7::ValidateInputSequenceField(std::string name, EditorInput* field)
+bool EditorT7::ValidateInputSequenceField(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (name == "input_addr")
 	{
 		int listIdx = atoi(field->buffer);
@@ -218,8 +348,10 @@ std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, Ve
 	return inputMap;
 }
 
-bool EditorT7::ValidateReactionsField(std::string name, EditorInput* field)
+bool EditorT7::ValidateReactionsField(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (Helpers::endsWith(name, "_moveid"))
 	{
 		int moveId = atoi(field->buffer);
@@ -330,8 +462,10 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 	hitCondition->reactions_addr = (uint64_t)atoi(inputs["reactions_addr"]->buffer);
 }
 
-bool EditorT7::ValidateHitConditionField(std::string name, EditorInput* field)
+bool EditorT7::ValidateHitConditionField(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
@@ -452,8 +586,10 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 	cancel->cancel_option = (uint16_t)atoi(inputs["cancel_option"]->buffer);
 }
 
-bool EditorT7::ValidateCancelField(std::string name, EditorInput* field)
+bool EditorT7::ValidateCancelField(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	// move_id is not validated here but in the cancel class since it can serve as both a group cancel & move id
 	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
@@ -521,8 +657,10 @@ void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*
 	cancel->cancel_option = (uint16_t)atoi(inputs["cancel_option"]->buffer);
 }
 
-bool EditorT7::ValidateGroupedCancelField(std::string name, EditorInput* field)
+bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (name == "move_id") {
 		int moveId = atoi(field->buffer);
 		if (moveId >= m_infos->table.moveCount) {
@@ -630,8 +768,10 @@ void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInpu
 	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
 }
 
-bool EditorT7::ValidateOtherMoveProperty(std::string name, EditorInput* field)
+bool EditorT7::ValidateOtherMoveProperty(EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
 		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
@@ -945,8 +1085,10 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	ReloadDisplayableMoveList();
 }
 
-bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
+bool EditorT7::ValidateMoveField( EditorInput* field)
 {
+	std::string& name = field->name;
+
 	if (name == "anim_name") {
 		return m_animNameToOffsetMap.find(field->buffer) != m_animNameToOffsetMap.end();
 	}
@@ -1002,6 +1144,7 @@ bool EditorT7::ValidateMoveField(std::string name, EditorInput* field)
 
 void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
+	// Saving is one on an individual item basis, even for lists
 	switch (type)
 	{
 	case EditorWindowType_Move:
@@ -1049,6 +1192,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_Input:
 		SaveInput(id, inputs);
 		break;
+	case EditorWindowType_Projectile:
+		SaveProjectile(id, inputs);
+		break;
 	}
 }
 
@@ -1077,6 +1223,9 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		break;
 	case EditorWindowType_InputSequence:
 		return GetInputSequenceInputs(id, drawOrder);
+		break;
+	case EditorWindowType_Projectile:
+		return GetProjectileInputs(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -1114,7 +1263,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize)
 {
-	// Builds an input list for a specific window type (list of structs) and fill default values according to the given ID
+	// Specific to lists with unguessable sizes : we provide the size as an argument
 	switch (type)
 	{
 	case EditorWindowType_Input:
@@ -1124,7 +1273,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 	return std::vector<std::map<std::string, EditorInput*>>();
 }
 
-bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field)
+bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 {
 	if (!ValidateFieldType(field)) {
 		return false;
@@ -1133,29 +1282,32 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, std::string fieldShort
 	switch (fieldType)
 	{
 	case EditorWindowType_Move:
-		return ValidateMoveField(fieldShortName, field);
+		return ValidateMoveField(field);
 		break;
 	case EditorWindowType_Cancel:
-		return ValidateCancelField(fieldShortName, field);
+		return ValidateCancelField(field);
 		break;
 	case EditorWindowType_GroupedCancel:
-		return ValidateGroupedCancelField(fieldShortName, field);
+		return ValidateGroupedCancelField(field);
 		break;
 	case EditorWindowType_HitCondition:
-		return ValidateHitConditionField(fieldShortName, field);
+		return ValidateHitConditionField(field);
 		break;
 	case EditorWindowType_Reactions:
-		return ValidateReactionsField(fieldShortName, field);
+		return ValidateReactionsField(field);
 		break;
 	case EditorWindowType_Pushback:
-		return ValidatePushbackField(fieldShortName, field);
+		return ValidatePushbackField(field);
 		break;
 	case EditorWindowType_MoveBeginProperty:
 	case EditorWindowType_MoveEndProperty:
-		return ValidateOtherMoveProperty(fieldShortName, field);
+		return ValidateOtherMoveProperty(field);
 		break;
 	case EditorWindowType_InputSequence:
-		return ValidateInputSequenceField(fieldShortName, field);
+		return ValidateInputSequenceField(field);
+		break;
+	case EditorWindowType_Projectile:
+		return ValidateProjectileField(field);
 		break;
 	}
 

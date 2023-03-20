@@ -152,6 +152,8 @@ edition.reactions = Reactions
 edition.pushback = Pushback
 edition.pushback_extra = Pushback extra
 edition.input_sequence = Input sequence
+edition.inputs = Inputs
+edition.projectile = Projectile
 
 edition.move.window_name = Move
 edition.move.category_2 = References
@@ -280,6 +282,23 @@ edition.input_sequence.input_addr = Input ID
 edition.input.window_name = Input
 edition.input.direction = Direction
 edition.input.button = Buttons
+
+edition.projectile.window_name = Projectile
+edition.projectile.category_2 = References
+edition.projectile.category_3 = Unnamed
+edition.projectile.vfx_id = VFX ID
+edition.projectile.vfx_variation_id = VFX Variation ID
+edition.projectile.delay = Delay
+edition.projectile.vertical_velocity = Vertical velocity
+edition.projectile.horizontal_velocity = Horizontal velocity
+edition.projectile.duration = Duration
+edition.projectile.no_collision = No collision
+edition.projectile.size = Size
+edition.projectile.can_hitbox_connect = Can hitbox connect
+edition.projectile.gravity = Gravity
+edition.projectile.hit_level = Hit level
+edition.projectile.hit_condition_addr = Hit Conditions ID
+edition.projectile.cancel_addr = Cancels ID
 
 edition.form_list.item = Item
 edition.form_list.end = END

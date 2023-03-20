@@ -133,7 +133,7 @@ void EditorFormList::RenderInput(int listIdx, EditorInput* field)
 	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 	{
 		unsavedChanges = true;
-		field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
+		field->errored = m_editor->ValidateField(windowType, field) == false;
 		if (!field->errored) {
 			OnUpdate(listIdx, field);
 		}

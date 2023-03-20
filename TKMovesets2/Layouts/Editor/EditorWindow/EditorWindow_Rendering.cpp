@@ -53,6 +53,7 @@ void EditorWindow::RenderToolBar()
 	if (ImGui::BeginMenu(_("edition.create_new")))
 	{
 		EditorWindowType_ structType = EditorWindowType_Invalid;
+		int listSize = 0;
 
 		if (ImGui::MenuItem(_("edition.requirement"))) {
 			structType = EditorWindowType_Requirement;
@@ -99,10 +100,19 @@ void EditorWindow::RenderToolBar()
 		if (ImGui::MenuItem(_("edition.pushback_extra"))) {
 			structType = EditorWindowType_PushbackExtradata;
 		}
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.projectile"))) {
+			structType = EditorWindowType_Projectile;
+		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.input_sequence"))) {
 			structType = EditorWindowType_InputSequence;
+		}
+		if (ImGui::MenuItem(_("edition.inputs"))) {
+			// Input list sizes must be known ahead of time when opening a window
+			listSize = 2;
+			structType = EditorWindowType_Input;
 		}
 
 		if (structType != EditorWindowType_Invalid) {
@@ -110,7 +120,7 @@ void EditorWindow::RenderToolBar()
 			if (structId != -1) {
 				m_savedLastChange = false;
 				m_importNeeded = true;
-				OpenFormWindow(structType, structId);
+				OpenFormWindow(structType, structId, listSize);
 
 				// Custom pre-creation behaviour implementations
 				switch (structType)

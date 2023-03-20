@@ -149,6 +149,8 @@ edition.reactions = Réactions
 edition.pushback = Poussée
 edition.pushback_extra = Poussée: extra
 edition.input_sequence = Séquence de commande
+edition.inputs = Commande
+edition.projectile = Projectile
 
 edition.move.window_name = Move
 edition.move.category_2 = Références
@@ -276,6 +278,23 @@ edition.input_sequence.input_addr = ID de commande
 edition.input.window_name = Commande
 edition.input.direction = Direction
 edition.input.button = Boutons
+
+edition.projectile.window_name = Projectile
+edition.projectile.category_2 = Références
+edition.projectile.category_3 = Sans-noms
+edition.projectile.vfx_id = ID de VFX
+edition.projectile.vfx_variation_id = ID de variation VFX 
+edition.projectile.delay = Délai
+edition.projectile.vertical_velocity = Vélocité verticale
+edition.projectile.horizontal_velocity = Vélocité horizontale
+edition.projectile.duration = Durée
+edition.projectile.no_collision = Pas de collision
+edition.projectile.size = Taille
+edition.projectile.can_hitbox_connect = "Can hitbox connect"
+edition.projectile.gravity = Gravité
+edition.projectile.hit_level = Hauteur de coup
+edition.projectile.hit_condition_addr = ID de Hit Conditions
+edition.projectile.cancel_addr = ID de Cancels
 
 edition.form_list.item = Élément
 edition.form_list.end = FIN

@@ -31,20 +31,21 @@ namespace EditorFormUtils
 	{
 		switch (type)
 		{
+		case EditorWindowType_Requirement:
+			return "requirement";
+
 		case EditorWindowType_Move:
 			return "move";
 		case EditorWindowType_Voiceclip:
 			return "voiceclip";
-		case EditorWindowType_Extraproperty:
-			return "extraproperty";
+
 		case EditorWindowType_Cancel:
 			return "cancel";
 		case EditorWindowType_CancelExtradata:
 			return "cancel_extra";
-		case EditorWindowType_Requirement:
-			return "requirement";
 		case EditorWindowType_GroupedCancel:
 			return "grouped_cancel";
+
 		case EditorWindowType_HitCondition:
 			return "hit_condition";
 		case EditorWindowType_Reactions:
@@ -53,14 +54,21 @@ namespace EditorFormUtils
 			return "pushback";
 		case EditorWindowType_PushbackExtradata:
 			return "pushback_extradata";
+
+		case EditorWindowType_Extraproperty:
+			return "extraproperty";
 		case EditorWindowType_MoveBeginProperty:
 			return "start_other_extraproperty";
 		case EditorWindowType_MoveEndProperty:
 			return "end_other_extraproperty";
+
 		case EditorWindowType_Input:
 			return "input";
 		case EditorWindowType_InputSequence:
 			return "input_sequence";
+
+		case EditorWindowType_Projectile:
+			return "projectile";
 		}
 		return "UNKNOWN";
 	}
@@ -156,7 +164,7 @@ void EditorForm::RenderInput(EditorInput* field)
 	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
 	{
 		unsavedChanges = true;
-		field->errored = m_editor->ValidateField(windowType, field->name, field) == false;
+		field->errored = m_editor->ValidateField(windowType, field) == false;
 		if (!field->errored) {
 			OnUpdate(0, field);
 		}

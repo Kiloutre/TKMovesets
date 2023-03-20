@@ -186,6 +186,14 @@ void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
 			}
 		}
 	}
+
+	// Projectiles
+	for (auto& projectile : m_iterators.projectiles)
+	{
+		if (projectile.cancel_addr >= listId + oldSize || (listSizeDiff < 0 && projectile.cancel_addr > listId)) {
+			projectile.cancel_addr += listSizeDiff;
+		}
+	}
 }
 
 void EditorT7::ModifyExtraPropertyListSize(int listId, int oldSize, int newSize)

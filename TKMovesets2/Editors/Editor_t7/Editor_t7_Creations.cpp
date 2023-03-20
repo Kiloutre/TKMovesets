@@ -64,6 +64,14 @@ template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2
 	return newStructId;
 }
 
+int32_t EditorT7::CreateNewProjectile()
+{
+	Projectile newStruct{ 0 };
+
+	int32_t newStructId = CreateNewGeneric<Projectile>(&newStruct, nullptr, offsetof(m_infos->table, projectile));
+	return newStructId;
+}
+
 int32_t EditorT7::CreateInputSequence()
 {
 	InputSequence newStruct{ 0 };
@@ -75,8 +83,9 @@ int32_t EditorT7::CreateInputSequence()
 int32_t EditorT7::CreateInputList()
 {
 	Input newStruct{ 0 };
+	Input newStruct2{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<Input>(&newStruct, nullptr, offsetof(m_infos->table, input));
+	int32_t newStructId = CreateNewGeneric<Input>(&newStruct, &newStruct2, offsetof(m_infos->table, input));
 	return newStructId;
 }
 
@@ -346,6 +355,10 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 		break;
 	case EditorWindowType_Input:
 		return CreateInputList();
+		break;
+
+	case EditorWindowType_Projectile:
+		return CreateNewProjectile();
 		break;
 	}
 	return -1;

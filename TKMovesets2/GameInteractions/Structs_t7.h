@@ -141,7 +141,7 @@ namespace StructsT7
 		int32_t _0x14_int;
 		uint32_t delay; // Frames before both velocity components can be applied
 		uint32_t vertical_velocity;
-		uint32_t horizonal_velocity;
+		uint32_t horizontal_velocity;
 		int32_t _0x24_int; // 0: disable projectile
 		uint32_t duration;
 		uint32_t no_collision; // default: 0. Non-zero: no collision
@@ -423,7 +423,7 @@ namespace StructsT7_gameAddr
 		int32_t _0x14_int;
 		uint32_t delay; // Frames before both velocity components can be applied
 		uint32_t vertical_velocity;
-		uint32_t horizonal_velocity;
+		uint32_t horizontal_velocity;
 		int32_t _0x24_int; // 0: disable projectile
 		uint32_t duration;
 		uint32_t no_collision; // default: 0. Non-zero: no collision

@@ -23,6 +23,7 @@
 #include "EditorMoveEndProperty.hpp"
 #include "EditorInputSequence.hpp"
 #include "EditorInputStruct.hpp"
+#include "EditorProjectile.hpp"
 
 // -- Private methods -- //
 
@@ -74,6 +75,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		break;
 	case EditorWindowType_Input:
 		return new EditorInputStruct(m_windowTitle, id, m_editor, this, listSize);
+		break;
+	case EditorWindowType_Projectile:
+		return new EditorProjectile(m_windowTitle, id, m_editor, this);
 		break;
 	}
 

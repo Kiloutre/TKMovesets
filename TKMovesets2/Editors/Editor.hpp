@@ -246,7 +246,7 @@ public:
 	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
 	// Returns true if the given field is valid
-	virtual bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) = 0;
+	virtual bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) = 0;
 	// Save a single struct in the moveset
 	virtual void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
 

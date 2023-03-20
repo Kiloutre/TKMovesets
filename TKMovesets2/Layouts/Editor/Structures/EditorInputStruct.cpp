@@ -88,8 +88,14 @@ EditorInputStruct::EditorInputStruct(std::string windowTitleBase, uint32_t t_id,
 
 // -- Private methods-- //
 
+void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
+{
+	BuildItemDetails(listIdx);
+}
+
 void EditorInputStruct::BuildItemDetails(int listIdx)
 {
+	printf("BuildItemDetails\n");
 	auto& identifierMaps = m_items[listIdx]->identifierMaps;
 	
 	uint64_t command = strtoll(identifierMaps["direction"]->buffer, nullptr, 16);
