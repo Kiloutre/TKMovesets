@@ -268,10 +268,14 @@ edition.reactions.crouch_block_moveid = Garde accroupi
 edition.reactions.wallslump_moveid = Bas du mur
 edition.reactions.downed_moveid = À terre
 
-edition.input_sequence.window_name = Séquence de commande
+edition.input_sequence.window_name = Séquence de commandes
 edition.input_sequence.input_window_frames = Fenêtre de temps
 edition.input_sequence.input_amount = Nombre de commandes
 edition.input_sequence.input_addr = ID de commande
+
+edition.input.window_name = Commande
+edition.input.direction = Direction
+edition.input.button = Boutons
 
 edition.form_list.item = Élément
 edition.form_list.end = FIN

@@ -22,10 +22,11 @@
 #include "EditorMoveStartProperty.hpp"
 #include "EditorMoveEndProperty.hpp"
 #include "EditorInputSequence.hpp"
+#include "EditorInputStruct.hpp"
 
 // -- Private methods -- //
 
-EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint16_t id)
+EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize)
 {
 	switch (windowType)
 	{
@@ -71,12 +72,15 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_InputSequence:
 		return new EditorInputSequence(m_windowTitle, id, m_editor, this);
 		break;
+	case EditorWindowType_Input:
+		return new EditorInputStruct(m_windowTitle, id, m_editor, this, listSize);
+		break;
 	}
 
 	return nullptr;
 }
 
-void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structId)
+void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize)
 {
 	// todo: template this function?
 	int availableOverwriteIndex = -1;
@@ -99,7 +103,7 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 	}
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-	EditorForm* newWin = AllocateFormWindow(windowType, structId);
+	EditorForm* newWin = AllocateFormWindow(windowType, structId, listSize);
 	newWin->nextDockId = m_dockId;
 	if (openNew || availableOverwriteIndex == -1) {
 		m_structWindows.push_back(newWin);

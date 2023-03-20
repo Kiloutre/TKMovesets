@@ -244,6 +244,7 @@ public:
 	virtual std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns the fields to display to build a list of forms of a certain type (extraproperties, requirements, cancels, etc...)
 	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
 	// Returns true if the given field is valid
 	virtual bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) = 0;
 	// Save a single struct in the moveset

@@ -91,7 +91,7 @@ private:
 	void RenderMovelist();
 
 	// Factory instantiating the right class for the right identifier
-	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id);
+	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize = 0);
 
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorMovelistFilter_ filter);
@@ -117,7 +117,7 @@ public:
 	void Render(int dockid);
 
 	// Create a new window containing data about the given move. Can be called by subwidnows.
-	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId) override;
+	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId, int listSize = 0) override;
 	// Validates the move ID against the movelist size and alias list
 	int32_t ValidateMoveId(const char* buf) override;
 	// Reloads the movelist filter, used mostly when a move is renamed

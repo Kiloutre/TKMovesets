@@ -163,8 +163,16 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
 
 	VectorSet<std::string> drawOrder;
-	auto fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
-	m_listSize = fieldIdentifierMaps.size();
+
+	std::vector<std::map<std::string, EditorInput*>> fieldIdentifierMaps;
+	if (m_listSize == 0) {
+		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
+		m_listSize = fieldIdentifierMaps.size();
+	} else {
+		// Some struct lists may have fixed list sizes: in this case, we'll call a different function
+		// For now these two GetFormFields aren't swappable, if a list is not supposed to have a known size ahead of time, don't provide a size
+		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, m_listSize);
+	}
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories

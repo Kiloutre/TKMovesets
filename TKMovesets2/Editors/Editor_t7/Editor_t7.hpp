@@ -51,6 +51,7 @@ public:
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
 	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
 	bool ValidateField(EditorWindowType_ fieldType, std::string fieldShortName, EditorInput* field) override;
 	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 	
@@ -100,7 +101,7 @@ public:
 	std::vector<std::map<std::string, EditorInput*>> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateHitConditionField(std::string name, EditorInput* field);
-
+	
 	// Reactions
 	std::map<std::string, EditorInput*> GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs);
@@ -119,6 +120,10 @@ public:
 	std::map<std::string, EditorInput*> GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateInputSequenceField(std::string name, EditorInput* field);
+
+	// Hit conditions
+	std::vector<std::map<std::string, EditorInput*>> GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
+	void SaveInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player

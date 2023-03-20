@@ -20,7 +20,10 @@ void EditorInputSequence::OnFieldLabelClick(EditorInput* field)
 	int id = atoi(field->buffer);
 	std::string& name = field->name;
 
-	if (name == "input_window_frames") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Input, id);
+	if (name == "input_addr") {
+		auto& inputAmountField = m_fieldIdentifierMap["input_amount"];
+		if (!inputAmountField->errored) {
+			m_baseWindow->OpenFormWindow(EditorWindowType_Input, id, atoi(inputAmountField->buffer));
+		}
 	}
 }

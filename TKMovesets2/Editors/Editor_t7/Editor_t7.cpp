@@ -132,6 +132,41 @@ void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*
 	sequence->input_addr = atoi(inputs["input_addr"]->buffer);
 }
 
+// ===== Inputs ===== //
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+
+	auto input = m_iterators.inputs.begin() + id;
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
+
+		CREATE_FIELD("direction", 0, EditorInput_H32, input->direction);
+		CREATE_FIELD("button", 0, EditorInput_H32, input->button);
+
+		WriteFieldFullname(inputMap, "input");
+		inputListMap.push_back(inputMap);
+		input++;
+	} while (--listSize > 0);
+
+	return inputListMap;
+}
+
+void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	auto input = m_iterators.inputs.begin() + id;
+
+	input->direction = (uint32_t)strtol(inputs["direction"]->buffer, nullptr, 16);
+	input->button = (uint32_t)strtol(inputs["button"]->buffer, nullptr, 16);
+}
+
 // ===== Reactions ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -1011,6 +1046,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_InputSequence:
 		SaveInputSequence(id, inputs);
 		break;
+	case EditorWindowType_Input:
+		SaveInput(id, inputs);
+		break;
 	}
 }
 
@@ -1069,6 +1107,18 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		break;
 	case EditorWindowType_HitCondition:
 		return GetHitConditionListInputs(id, drawOrder);
+		break;
+	}
+	return std::vector<std::map<std::string, EditorInput*>>();
+}
+
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize)
+{
+	// Builds an input list for a specific window type (list of structs) and fill default values according to the given ID
+	switch (type)
+	{
+	case EditorWindowType_Input:
+		return GetInputListInputs(id, listSize, drawOrder);
 		break;
 	}
 	return std::vector<std::map<std::string, EditorInput*>>();

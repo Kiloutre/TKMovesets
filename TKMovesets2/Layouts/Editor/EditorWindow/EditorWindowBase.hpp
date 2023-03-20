@@ -10,7 +10,7 @@ public:
 	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*> movelist;
 
-	virtual void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId) = 0;
+	virtual void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId, int listSize = 0) = 0;
 	virtual int32_t ValidateMoveId(const char* buf) = 0;
 	virtual void ReloadMovelistFilter() = 0;
 };

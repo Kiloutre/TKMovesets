@@ -38,7 +38,7 @@ namespace StructsT7
 			int64_t command;
 			struct
 			{
-				int32_t input;
+				int32_t button;
 				int32_t direction;
 			};
 		};
@@ -117,7 +117,7 @@ namespace StructsT7
 			int64_t command;
 			struct
 			{
-				int32_t input;
+				int32_t button;
 				int32_t direction;
 			};
 		};

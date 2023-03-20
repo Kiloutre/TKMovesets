@@ -51,6 +51,7 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorMoveStartProperty.cpp"
                     "Layouts/Editor/Structures/EditorMoveEndProperty.cpp"
                     "Layouts/Editor/Structures/EditorInputSequence.cpp"
+                    "Layouts/Editor/Structures/EditorInputStruct.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"

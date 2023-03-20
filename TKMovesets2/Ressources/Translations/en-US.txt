@@ -277,6 +277,10 @@ edition.input_sequence.input_window_frames = Timeframe
 edition.input_sequence.input_amount = Input amount
 edition.input_sequence.input_addr = Input ID
 
+edition.input.window_name = Input
+edition.input.direction = Direction
+edition.input.button = Buttons
+
 edition.form_list.item = Item
 edition.form_list.end = END
 edition.form_list.invalid = INVALID
