@@ -135,6 +135,7 @@ public:
 	template<typename T> int32_t CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset);
 	//
 	int32_t CreateInputSequence();
+	int32_t CreateInputList();
 	//
 	int32_t CreateNewRequirements();
 	//
@@ -152,6 +153,7 @@ public:
 	int32_t CreateNewReactions();
 	int32_t CreateNewPushback();
 	int32_t CreateNewPushbackExtra();
+	//
 
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
@@ -167,5 +169,7 @@ public:
 	void ModifyEndPropertyListSize(int listId, int oldSize, int newSize);
 	//
 	void ModifyHitConditionListSize(int listId, int oldSize, int newSize);
+	//
+	void ModifyInputListSize(int listId, int oldSize, int newSize);
 
 };

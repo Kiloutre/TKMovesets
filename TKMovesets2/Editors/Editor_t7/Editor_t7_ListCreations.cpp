@@ -136,6 +136,22 @@ void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
 	}
 }
 
+void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
+{
+	const int listSizeDiff = newSize - oldSize;
+	ModifyGenericListSize<Input>(listId, oldSize, newSize, offsetof(m_infos->table, input));
+
+	// Correct every structure that uses this list and needs shifting
+
+	// Input sequences
+	for (auto& sequence : m_iterators.input_sequences)
+	{
+		if (sequence.input_addr >= listId + oldSize || (listSizeDiff < 0 && sequence.input_addr > listId)) {
+			sequence.input_addr += listSizeDiff;
+		}
+	}
+}
+
 void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
@@ -250,6 +266,10 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 
 	case EditorWindowType_HitCondition:
 		ModifyHitConditionListSize(listId, oldSize, newSize);
+		break;
+
+	case EditorWindowType_Input:
+		ModifyInputListSize(listId, oldSize, newSize);
 		break;
 	}
 }

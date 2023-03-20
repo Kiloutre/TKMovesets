@@ -72,6 +72,14 @@ int32_t EditorT7::CreateInputSequence()
 	return newStructId;
 }
 
+int32_t EditorT7::CreateInputList()
+{
+	Input newStruct{ 0 };
+
+	int32_t newStructId = CreateNewGeneric<Input>(&newStruct, nullptr, offsetof(m_infos->table, input));
+	return newStructId;
+}
+
 int32_t EditorT7::CreateNewPushbackExtra()
 {
 	PushbackExtradata newStruct{ 0 };
@@ -335,6 +343,9 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 
 	case EditorWindowType_InputSequence:
 		return CreateInputSequence();
+		break;
+	case EditorWindowType_Input:
+		return CreateInputList();
 		break;
 	}
 	return -1;
