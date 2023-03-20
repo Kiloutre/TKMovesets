@@ -10,6 +10,5 @@ private:
 	void OnApply() override;
 public:
 	EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow);
-	// All of our EditorForm derived classes are created with the new keyword, so we do have to commit suicide here
-	//~EditorMove() { printf("destructed move\n");  delete this; }
+	void RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd) override;
 };

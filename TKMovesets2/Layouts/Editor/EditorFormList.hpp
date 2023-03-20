@@ -37,6 +37,8 @@ protected:
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
 	int m_listSizeChange = 0;
 
+	// Called whenever the list is resized, used  to issue field updates to other windows
+	virtual void OnResize(int sizeChange, int oldSize) {};
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};
 	// Builds a string label that will be shown as the title of the item tree view
@@ -47,6 +49,7 @@ protected:
 	bool IsFormValid() override;
 	// Displays buttons to move, create or delete individual list items
 	void RenderListControlButtons(int listIdx);
+	
 
 	void RenderLabel(int listIdx, EditorInput* field);
 	void RenderInput(int listIdx, EditorInput* field);

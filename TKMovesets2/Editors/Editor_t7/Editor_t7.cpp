@@ -874,18 +874,18 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("last_active_frame", 0, EditorInput_U32, move->last_active_frame);
 	CREATE_FIELD("distance", 0, EditorInput_U16, move->distance);
 
-	CREATE_FIELD("cancel_id", 2, EditorInput_PTR,  move->cancel_addr);
+	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR,  move->cancel_addr);
 	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, move->hit_condition_addr);
 	CREATE_FIELD("extra_move_property_addr", 2, EditorInput_PTR, move->extra_move_property_addr);
 	CREATE_FIELD("move_start_extraprop_addr", 2, EditorInput_PTR, move->move_start_extraprop_addr);
 	CREATE_FIELD("move_end_extraprop_addr", 2, EditorInput_PTR, move->move_end_extraprop_addr);
 	CREATE_FIELD("voiceclip_addr", 2, EditorInput_PTR, move->voicelip_addr);
 
-	CREATE_FIELD("cancel_id_2", 3, EditorInput_PTR, move->_0x28_cancel_addr);
+	CREATE_FIELD("cancel_addr_2", 3, EditorInput_PTR, move->_0x28_cancel_addr);
 	CREATE_FIELD("cancel_related_id_2", 3, EditorInput_U32, move->_0x30_int__0x28_related);
-	CREATE_FIELD("cancel_id_3", 3, EditorInput_PTR, move->_0x38_cancel_addr);
+	CREATE_FIELD("cancel_addr_3", 3, EditorInput_PTR, move->_0x38_cancel_addr);
 	CREATE_FIELD("cancel_related_id_3", 3, EditorInput_U32, move->_0x40_int__0x38_related);
-	CREATE_FIELD("cancel_id_4", 3, EditorInput_PTR, move->_0x48_cancel_addr);
+	CREATE_FIELD("cancel_addr_4", 3, EditorInput_PTR, move->_0x48_cancel_addr);
 	CREATE_FIELD("cancel_related_id_4", 3, EditorInput_U32, move->_0x50_int__0x48_related);
 
 	CREATE_FIELD("_0x34_int", 5, EditorInput_U32, move->_0x34_int);
@@ -1046,18 +1046,18 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
 	move->distance = (uint16_t)atoi(inputs["distance"]->buffer);
 
-	move->cancel_addr = atoll(inputs["cancel_id"]->buffer);
+	move->cancel_addr = atoll(inputs["cancel_addr"]->buffer);
 	move->hit_condition_addr = atoll(inputs["hit_condition_addr"]->buffer);
 	move->extra_move_property_addr = atoll(inputs["extra_move_property_addr"]->buffer);
 	move->move_start_extraprop_addr = atoll(inputs["move_start_extraprop_addr"]->buffer);
 	move->move_end_extraprop_addr = atoll(inputs["move_end_extraprop_addr"]->buffer);
 	move->voicelip_addr = atoll(inputs["voiceclip_addr"]->buffer);
 
-	move->_0x28_cancel_addr = atoll(inputs["cancel_id_2"]->buffer);
+	move->_0x28_cancel_addr = atoll(inputs["cancel_addr_2"]->buffer);
 	move->_0x30_int__0x28_related = atoi(inputs["cancel_related_id_2"]->buffer);
-	move->_0x38_cancel_addr = atoll(inputs["cancel_id_3"]->buffer);
+	move->_0x38_cancel_addr = atoll(inputs["cancel_addr_3"]->buffer);
 	move->_0x40_int__0x38_related = atoi(inputs["cancel_related_id_3"]->buffer);
-	move->_0x48_cancel_addr = atoll(inputs["cancel_id_4"]->buffer);
+	move->_0x48_cancel_addr = atoll(inputs["cancel_addr_4"]->buffer);
 	move->_0x50_int__0x48_related = atoi(inputs["cancel_related_id_4"]->buffer);
 
 	move->_0x34_int = atoi(inputs["_0x34_int"]->buffer);
@@ -1094,7 +1094,7 @@ bool EditorT7::ValidateMoveField( EditorInput* field)
 		return m_animNameToOffsetMap.find(field->buffer) != m_animNameToOffsetMap.end();
 	}
 
-	else if (Helpers::startsWith(name, "cancel_id")) {
+	else if (Helpers::startsWith(name, "cancel_addr")) {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.cancelCount;
 	}

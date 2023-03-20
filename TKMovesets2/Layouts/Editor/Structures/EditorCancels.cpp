@@ -136,3 +136,38 @@ void EditorCancels::BuildItemDetails(int listIdx)
 
 	item->itemLabel = label;
 }
+
+void EditorCancels::OnResize(int sizeChange, int oldSize)
+{
+	m_baseWindow->IssueFieldUpdate("cancel_addr", sizeChange, id, id + oldSize);
+}
+
+void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+{
+	printf("%s\n", fieldName.c_str());
+	if (fieldName == "grouped_cancel_addr") {
+		int listIdx = 0;
+		for (auto& item : m_items)
+		{
+			EditorInput* commandField = item->identifierMaps["command"];
+			EditorInput* moveIdField = item->identifierMaps["move_id"];
+			uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
+
+			if (moveIdField->errored || commandField->errored) {
+				continue;
+			}
+
+			if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+				int group_id = atoi(moveIdField->buffer);
+				if (group_id >= listEnd || (valueChange < 0 && group_id > listStart)) {
+					// Same shifting logic as in ListCreations
+					// Might be a good idea to macro it
+					sprintf(moveIdField->buffer, "%d", group_id + valueChange);
+					BuildItemDetails(listIdx)
+				}
+			}
+
+			++listIdx;
+		}
+	}
+}

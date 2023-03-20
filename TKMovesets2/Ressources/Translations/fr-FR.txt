@@ -175,12 +175,12 @@ edition.move.extra_move_property_addr = ID de propriété
 edition.move.move_start_extraprop_addr = ID de propriété (pré)
 edition.move.move_end_extraprop_addr = ID de propriété (post)
 edition.move.voiceclip_addr = ID de voix
-edition.move.cancel_id = ID de cancel
-edition.move.cancel_id_2 = ID de cancel 2
+edition.move.cancel_addr = ID de cancel
+edition.move.cancel_addr_2 = ID de cancel 2
 edition.move.cancel_related_id_2 = ID de cancel 2 (lié)
-edition.move.cancel_id_3 = ID de cancel 3
+edition.move.cancel_addr_3 = ID de cancel 3
 edition.move.cancel_related_id_3 = ID de cancel 3 (lié)
-edition.move.cancel_id_4 = ID de cancel 4
+edition.move.cancel_addr_4 = ID de cancel 4
 edition.move.cancel_related_id_4 = ID de cancel 4 (lié)
 edition.move._0xA8_short = "Facing/Extras?"
 

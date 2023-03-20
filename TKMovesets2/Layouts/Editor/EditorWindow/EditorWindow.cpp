@@ -274,3 +274,13 @@ void EditorWindow::ReloadMovelistFilter()
 {
 	FilterMovelist(m_movelistFilter);
 }
+
+void EditorWindow::IssueFieldUpdate(std::string fieldShortName, int valueChange, int listStart, int listEnd)
+{
+	for (auto& window : m_structWindows)
+	{
+		if (window->popen) {
+			window->RequestFieldUpdate(fieldShortName, valueChange, listStart, listEnd);
+		}
+	}
+}

@@ -35,7 +35,11 @@ void EditorFormList::Apply()
 	if (m_listSizeChange != 0)
 	{
 		// If items were added/removed, reallocate entire moveset
-		m_editor->ModifyListSize(windowType, id, m_listSize - m_listSizeChange, m_listSize);
+		int oldSize = m_listSize - m_listSizeChange;
+		m_editor->ModifyListSize(windowType, id, oldSize, m_listSize);
+		if (m_listSize != 0) {
+			OnResize(m_listSizeChange, oldSize);
+		}
 		m_listSizeChange = 0;
 	}
 
