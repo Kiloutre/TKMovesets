@@ -17,7 +17,7 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 	for (auto& [name, input] : inputMap) {
 		// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
 		input->name = name;
-		input->displayName = "edition." + baseIdentifier + "." + name;
+		input->fullName = "edition." + baseIdentifier + "." + name;
 	}
 }
 

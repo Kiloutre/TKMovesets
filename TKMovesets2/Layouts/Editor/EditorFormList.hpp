@@ -25,6 +25,7 @@ struct FieldItem
 	std::string itemLabel;
 	// Determines what tree node should be open
 	EditorFormTreeview_ openStatus = EditorFormTreeview_Closed;
+	// Background color of the item
 	int color = 0;
 };
 

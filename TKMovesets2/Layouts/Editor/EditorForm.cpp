@@ -232,6 +232,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 		std::vector<EditorInput*> inputs;
 		for (std::string fieldName : drawOrder) {
 			EditorInput* field = m_fieldIdentifierMap[fieldName];
+			field->displayName = _(field->fullName.c_str());
 			if (field->category == category) {
 				inputs.push_back(field);
 			}

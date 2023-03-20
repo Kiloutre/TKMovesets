@@ -114,6 +114,8 @@ struct EditorInput
 	// CContains the field name in short format, used for easy-to-read checks, better than having to type the full name
 	std::string name;
 	// Contains the field name, used to show the correct translation string
+	std::string fullName;
+	// Contains the actual string that will be displayed in the form. Write on this freely.
 	std::string displayName;
 	// Use to split various fields into various tree-like categories
 	uint8_t category = 0;

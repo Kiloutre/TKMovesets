@@ -61,7 +61,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
 
 		item->color = MOVEID_INPUT_SEQUENCE;
-		commandField->displayName = "edition.cancel.sequence_id";
+		commandField->displayName = _("edition.cancel.sequence_id");
 
 		int move_id = atoi(moveIdField->buffer);
 		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
@@ -83,7 +83,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		}
 	}
 	else {
-		commandField->displayName = "edition.cancel.command";
+		commandField->displayName = _("edition.cancel.command");
 		if (commandField->flags & EditorInput_Clickable) {
 			commandField->flags -= EditorInput_Clickable;
 		}
@@ -93,7 +93,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 
 		item->color = 0;
-		moveIdField->displayName = "edition.cancel.move_id";
+		moveIdField->displayName = _("edition.cancel.move_id");
 		std::string commandStr = m_editor->GetCommandStr(commandField->buffer);
 
 		if (validated_move_id == -1) {
@@ -162,7 +162,6 @@ void EditorGroupedCancels::RequestFieldUpdate(std::string fieldName, int valueCh
 			int value = atoi(field->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
-				// Might be a good idea to macro it
 				sprintf(field->buffer, "%d", value + valueChange);
 				BuildItemDetails(listIdx);
 			}

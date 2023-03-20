@@ -5,6 +5,7 @@
 #include "imgui_extras.hpp"
 #include "EditorMove.hpp"
 #include "Localization.hpp"
+#include "Helpers.hpp"
 
 // -- Public methods -- //
 
@@ -13,6 +14,17 @@ EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* edito
 	windowType = EditorWindowType_Move;
 	m_baseWindow = baseWindow;
 	InitForm(windowTitleBase, t_id, editor);
+
+	// Build initial transition label
+	{
+		auto& field = m_fieldIdentifierMap["transition"];
+		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
+		if (moveId != -1)
+		{
+			const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
+			field->displayName = std::format("{} : {}", _(field->fullName.c_str()), moveName);
+		}
+	}
 }
 
 void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
@@ -33,7 +45,7 @@ void EditorMove::OnFieldLabelClick(EditorInput* field)
 	int id = atoi(field->buffer);
 	std::string& name = field->name;
 
-	if (name == "cancel_addr") {
+	if (Helpers::startsWith(name, "cancel_addr")) {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Cancel, id);
 		}
@@ -87,5 +99,15 @@ void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int 
 				sprintf(m_fieldIdentifierMap[fieldName]->buffer, "%d", value + valueChange);
 			}
 		}
+	}
+}
+
+void EditorMove::OnUpdate(int listIdx, EditorInput* field)
+{
+	if (field->name == "transition")
+	{
+		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
+		const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
+		field->displayName = std::format("{} : {}", _(field->fullName.c_str()), moveName);
 	}
 }
