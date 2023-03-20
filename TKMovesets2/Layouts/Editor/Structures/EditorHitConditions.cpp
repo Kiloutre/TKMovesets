@@ -27,3 +27,34 @@ void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 		m_baseWindow->OpenFormWindow(EditorWindowType_Reactions, id);
 	}
 }
+
+void EditorHitConditions::OnResize(int sizeChange, int oldSize)
+{
+	m_baseWindow->IssueFieldUpdate("hit_condition_addr", sizeChange, id, id + oldSize);
+}
+
+void EditorHitConditions::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+{
+	if (fieldName == "requirements_addr" || fieldName == "reactions_addr")
+	{
+		int listIdx = 0;
+		for (auto& item : m_items)
+		{
+			EditorInput* field = item->identifierMaps[fieldName];
+
+			if (field->errored) {
+				continue;
+			}
+
+			int value = atoi(field->buffer);
+			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+				// Same shifting logic as in ListCreations
+				// Might be a good idea to macro it
+				sprintf(field->buffer, "%d", value + valueChange);
+				BuildItemDetails(listIdx);
+			}
+
+			++listIdx;
+		}
+	}
+}

@@ -193,4 +193,26 @@ void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, i
 			++listIdx;
 		}
 	}
+	else if (fieldName == "requirements_addr")
+	{
+		int listIdx = 0;
+		for (auto& item : m_items)
+		{
+			EditorInput* field = item->identifierMaps["requirements_addr"];
+
+			if (field->errored) {
+				continue;
+			}
+
+			int value = atoi(field->buffer);
+			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+				// Same shifting logic as in ListCreations
+				// Might be a good idea to macro it
+				sprintf(field->buffer, "%d", value + valueChange);
+				BuildItemDetails(listIdx);
+			}
+
+			++listIdx;
+		}
+	}
 }

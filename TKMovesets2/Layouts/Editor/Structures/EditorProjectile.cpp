@@ -27,3 +27,22 @@ void EditorProjectile::OnFieldLabelClick(EditorInput* field)
 		m_baseWindow->OpenFormWindow(EditorWindowType_HitCondition, id);
 	}
 }
+
+void EditorProjectile::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+{
+	if (fieldName == "cancel_addr" || fieldName == "hit_condition_addr")
+{
+		EditorInput* field = m_fieldIdentifierMap[fieldName];
+
+		if (field->errored) {
+			return;
+		}
+
+		int value = atoi(field->buffer);
+		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			// Might be a good idea to macro it
+			sprintf(field->buffer, "%d", value + valueChange);
+		}
+	}
+}

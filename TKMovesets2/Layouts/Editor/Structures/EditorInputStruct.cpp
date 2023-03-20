@@ -29,3 +29,8 @@ void EditorInputStruct::BuildItemDetails(int listIdx)
 
 	m_items[listIdx]->itemLabel = m_editor->GetCommandStr(identifierMap["direction"]->buffer, identifierMap["button"]->buffer);
 }
+
+void EditorInputStruct::OnResize(int sizeChange, int oldSize)
+{
+	m_baseWindow->IssueFieldUpdate("inputs", sizeChange, id, id + oldSize);
+}

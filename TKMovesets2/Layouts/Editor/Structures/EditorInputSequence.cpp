@@ -27,3 +27,23 @@ void EditorInputSequence::OnFieldLabelClick(EditorInput* field)
 		}
 	}
 }
+
+void EditorInputSequence::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+{
+	if (fieldName == "inputs") {
+		if (m_fieldIdentifierMap["input_addr"]->errored) {
+			return;
+		}
+
+		int value = atoi(m_fieldIdentifierMap["input_addr"]->buffer);
+		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			// Might be a good idea to macro it
+			sprintf(m_fieldIdentifierMap["input_addr"]->buffer, "%d", value + valueChange);
+		}
+		else if (value >= listStart && value <= (listEnd)) {
+			value = atoi(m_fieldIdentifierMap["input_amount"]->buffer);
+			sprintf(m_fieldIdentifierMap["input_amount"]->buffer, "%d", value + valueChange);
+		}
+	}
+}
