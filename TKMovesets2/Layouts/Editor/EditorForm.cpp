@@ -327,6 +327,15 @@ void EditorForm::Render()
 			if (enabledBtn) {
 				ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
 			}
+
+			// Add spacing to ensure last item is always visible
+			const float frameHeight = ImGui::GetFrameHeightWithSpacing();
+			if (ImGui::GetCursorPosY() + frameHeight >= m_winInfo.size.y) {
+				ImGui::Dummy(ImVec2(1, frameHeight));
+			}
+
+			// Render Apply() button at the bottom, always
+			ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - frameHeight + ImGui::GetScrollY()));
 			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				Apply();
 			}

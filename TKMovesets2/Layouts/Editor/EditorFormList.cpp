@@ -283,9 +283,6 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 
 void EditorFormList::RenderInternal()
 {
-	m_winInfo.pos = ImGui::GetWindowPos();
-	m_winInfo.size = ImGui::GetWindowSize();
-
 	currentViewport = ImGui::GetWindowViewport();
 
 	// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
@@ -295,12 +292,10 @@ void EditorFormList::RenderInternal()
 	const float drawWidth = ImGui::GetContentRegionAvail().x;
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-	const ImVec2 c_winPos = ImGui::GetWindowPos();
-
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
 		{
-			ImVec2 drawStart = c_winPos + ImGui::GetCursorPos();
+			ImVec2 drawStart = m_winInfo.pos + ImGui::GetCursorPos();
 			drawStart.y -= ImGui::GetScrollY() + 2;
 			int color = m_items[listIndex]->color;
 			color = color == 0 ? (listIndex & 1 ? FORM_BG_1 : FORM_BG_2) : color;
