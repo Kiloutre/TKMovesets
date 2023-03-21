@@ -16,7 +16,7 @@ EditorReactions::EditorReactions(std::string windowTitleBase, uint32_t t_id, Edi
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorReactions::OnFieldLabelClick(EditorInput* field)
+void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;

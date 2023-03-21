@@ -113,12 +113,11 @@ int32_t EditorT7::CreateNewReactions()
 int32_t EditorT7::CreateNewHitConditions()
 {
 	gAddr::HitCondition newStruct{ 0 };
-	gAddr::HitCondition newStruct2{ 0 };
 
 	// This may potentially cause problems if the moveset's requirement 1 does not immediately end with a 881 requirement
-	newStruct2.requirements_addr = 1;
+	newStruct.requirements_addr = 1;
 
-	int32_t newStructId = CreateNewGeneric<gAddr::HitCondition>(&newStruct, &newStruct2, offsetof(m_infos->table, hitCondition));
+	int32_t newStructId = CreateNewGeneric<gAddr::HitCondition>(&newStruct, &newStruct, offsetof(m_infos->table, hitCondition));
 	return newStructId;
 }
 

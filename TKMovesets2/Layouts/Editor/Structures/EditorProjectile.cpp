@@ -15,7 +15,7 @@ EditorProjectile::EditorProjectile(std::string windowTitleBase, uint32_t t_id, E
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorProjectile::OnFieldLabelClick(EditorInput* field)
+void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;

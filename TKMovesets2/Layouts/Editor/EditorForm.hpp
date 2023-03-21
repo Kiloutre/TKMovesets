@@ -10,6 +10,9 @@
 
 namespace EditorFormUtils
 {
+	// Sets the field display text and calculate the text size for alignment
+	void SetFieldDisplayText(EditorInput* field, std::string newName);
+
 	// Helps calculate the amount of drawable columns for forms
 	int GetColumnCount();
 	
@@ -50,22 +53,27 @@ protected:
 		ImVec2 size;
 		bool applyNextRender = false;
 	} m_winInfo;
+	// Used for alignment calculations
+	float m_labelWidthHalf = 0.0f;
 
+	// Actual rendering function
+	virtual void RenderInternal();
+	// Sets the window name and reapplies its position and size because imgui ties window pos / size to their name
 	virtual void ApplyWindowName(bool reapplyWindowProperties = true);
 	// Called whenever the changes are successfully applied
 	virtual void OnApply() {};
 	// Called whenever a field changes (and is valid). listIdx is always 0 if not a list of structs.
 	virtual void OnUpdate(int listIdx, EditorInput* field) {};
 	// Called when clicking a field
-	virtual void OnFieldLabelClick(EditorInput* field) {};
+	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};
 	// Renders buttons to ask if the changes should be discarded or not, if trying to leave without applying
 	void RenderDiscardButtons();
 	// Render inputs from the <category : input> map
-	void RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount);
+	void RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount);
 	// Render a single input field in the form
-	void RenderInput(EditorInput* field);
+	void RenderInput(int listIdx, EditorInput* field);
 	// Render a single input label in the form
-	void RenderLabel(EditorInput* field);
+	void RenderLabel(int listIdx, EditorInput* field);
 	// Called when clicking the apply button, will check for field errors, set variables and then save the data
 	virtual void Apply();
 	// Returns false if any field has an error state
@@ -92,5 +100,5 @@ public:
 
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
 	virtual void RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd) {};
-	virtual void Render();
+	void Render();
 };

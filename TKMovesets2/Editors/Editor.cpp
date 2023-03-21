@@ -26,6 +26,17 @@ typedef unsigned int ImU32;
 
 namespace EditorUtils
 {
+	void SetInputfieldColor(EditorInput* field)
+	{
+		if (field->flags & EditorInput_Hex) {
+			field->color = FORM_INPUT_HEX;
+		}
+
+		else if (field->flags & EditorInput_PTR) {
+			field->color = FORM_INPUT_REF;
+		}
+	}
+
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags)
 	{
 		if (flags & EditorMoveFlags_Generic) {
@@ -55,7 +66,7 @@ namespace EditorUtils
 
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags)
 	{
-		if (flags & (EditorInput_H64 | EditorInput_H32 | EditorInput_H16)) {
+		if (flags & EditorInput_Hex) {
 			return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
 		}
 		return ImGuiInputTextFlags_CharsDecimal;
@@ -78,7 +89,21 @@ namespace EditorUtils
 		if (flags & (EditorInput_U32 | EditorInput_U16)) {
 			return "%u";
 		}
+		if (flags & (EditorInput_Float)) {
+			return "%f";
+		}
 		return "%d";
+	}
+
+	uint64_t GetFieldValue(EditorInput* field)
+	{
+		const char* buffer = field->buffer;
+		auto& flags = field->flags;
+
+		if (flags & (EditorInput_H64 | EditorInput_H32 | EditorInput_H16)) {
+			return strtoll(buffer, nullptr, 16);
+		}
+		return strtoll(buffer, nullptr, 10);
 	}
 }
 

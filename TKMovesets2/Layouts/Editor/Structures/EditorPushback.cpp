@@ -15,7 +15,7 @@ EditorPushback::EditorPushback(std::string windowTitleBase, uint32_t t_id, Edito
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorPushback::OnFieldLabelClick(EditorInput* field)
+void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;

@@ -6,7 +6,7 @@
 class EditorMove : public EditorForm
 {
 private:
-	void OnFieldLabelClick(EditorInput* field) override;
+	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 	void OnApply() override;
 	void ApplyWindowName(bool reapplyWindowProperties = true) override;
 	void OnUpdate(int listIdx, EditorInput* field) override;

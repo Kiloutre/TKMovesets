@@ -22,7 +22,7 @@ EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* edito
 		if (moveId != -1)
 		{
 			const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
-			field->displayName = std::format("{} : {}", _(field->fullName.c_str()), moveName);
+			EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 		}
 	}
 }
@@ -40,7 +40,7 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 	}
 }
 
-void EditorMove::OnFieldLabelClick(EditorInput* field)
+void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;
@@ -108,6 +108,6 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 	{
 		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
 		const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
-		field->displayName = std::format("{} : {}", _(field->fullName.c_str()), moveName);
+		EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 	}
 }

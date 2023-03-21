@@ -101,12 +101,12 @@ enum EditorInputFlag_
 	EditorInput_H16       = (1 << 9),
 	EditorInput_S16       = (1 << 10),
 
+	EditorInput_Float     = (1 << 11),
 
 	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
 
-	/*
-	EditorInput_float,
-	*/
+	// Used internally for conditions
+	EditorInput_Hex       = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16),
 };
 
 struct EditorInput
@@ -127,6 +127,10 @@ struct EditorInput
 	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
 	// Contains true if the buffer contains invalid data
 	bool errored = false;
+	// Sets the BG color of the input
+	int color = 0;
+	// Contains half of the text size, used for alignment
+	float textSizeHalf = 0;
 };
 
 // Pre-calculate these flags in order to color-code, sort and filter the movelist
@@ -189,12 +193,16 @@ struct EditorTable
 
 namespace EditorUtils
 {
+	// Used for color coding input fields
+	void SetInputfieldColor(EditorInput* field);
 	// Used for color-coding the movelist
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
 	// Returns a format depending on the input type
 	const char* GetFieldFormat(EditorInputFlag flags);
 	// Returns an imgui Input() charset depending on the input type
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags);
+	// Returns an field value, parsing it as a hex or regular int depending on the type
+	uint64_t GetFieldValue(EditorInput* field);
 }
 
 class DLLCONTENT Editor

@@ -9,7 +9,7 @@ using namespace EditorUtils;
 #define gAddr StructsT7_gameAddr
 #define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
 #define CREATE_STRING_FIELD(a, c, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String }, SET_DEFAULT_VAL(a, "%s", g)
-#define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g)
+#define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g), SetInputfieldColor(inputMap[a])
 
 static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier)
 {
@@ -43,7 +43,7 @@ void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto pushbackExtra = m_iterators.pushback_extras[id];
 
-	pushbackExtra->horizontal_offset = atoi(inputs["horizontal_offset"]->buffer);
+	pushbackExtra->horizontal_offset = GetFieldValue(inputs["horizontal_offset"]);
 }
 
 // ===== Pushback ===== //
@@ -85,10 +85,10 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 {
 	auto pushback = m_iterators.pushbacks[id];
 
-	pushback->duration = atoi(inputs["duration"]->buffer);
-	pushback->displacement = atoi(inputs["displacement"]->buffer);
-	pushback->num_of_loops = atoi(inputs["num_of_loops"]->buffer);
-	pushback->extradata_addr = atoi(inputs["extradata_addr"]->buffer);
+	pushback->duration = GetFieldValue(inputs["duration"]);
+	pushback->displacement = GetFieldValue(inputs["displacement"]);
+	pushback->num_of_loops = GetFieldValue(inputs["num_of_loops"]);
+	pushback->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
 }
 
 // ===== Projectile ===== //
@@ -174,48 +174,48 @@ void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& 
 {
 	auto projectile = m_iterators.projectiles[id];
 
-	projectile->vfx_id = atoi(inputs["vfx_id"]->buffer);
-	projectile->vfx_variation_id = atoi(inputs["vfx_variation_id"]->buffer);
-	projectile->delay = atoi(inputs["delay"]->buffer);
-	projectile->vertical_velocity = atoi(inputs["vertical_velocity"]->buffer);
-	projectile->horizontal_velocity = atoi(inputs["horizontal_velocity"]->buffer);
-	projectile->duration = atoi(inputs["duration"]->buffer);
-	projectile->no_collision = atoi(inputs["no_collision"]->buffer);
-	projectile->size = atoi(inputs["size"]->buffer);
-	projectile->hit_level = (uint32_t)strtoll(inputs["hit_level"]->buffer, nullptr, 16);
-	projectile->voiceclip_on_hit = atoi(inputs["voiceclip_on_hit"]->buffer);
-	projectile->can_hitbox_connect = atoi(inputs["can_hitbox_connect"]->buffer);
-	projectile->gravity = atoi(inputs["gravity"]->buffer);
+	projectile->vfx_id = GetFieldValue(inputs["vfx_id"]);
+	projectile->vfx_variation_id = GetFieldValue(inputs["vfx_variation_id"]);
+	projectile->delay = GetFieldValue(inputs["delay"]);
+	projectile->vertical_velocity = GetFieldValue(inputs["vertical_velocity"]);
+	projectile->horizontal_velocity = GetFieldValue(inputs["horizontal_velocity"]);
+	projectile->duration = GetFieldValue(inputs["duration"]);
+	projectile->no_collision = GetFieldValue(inputs["no_collision"]);
+	projectile->size = GetFieldValue(inputs["size"]);
+	projectile->hit_level = GetFieldValue(inputs["hit_level"]);
+	projectile->voiceclip_on_hit = GetFieldValue(inputs["voiceclip_on_hit"]);
+	projectile->can_hitbox_connect = GetFieldValue(inputs["can_hitbox_connect"]);
+	projectile->gravity = GetFieldValue(inputs["gravity"]);
 
-	projectile->hit_condition_addr = atoi(inputs["hit_condition_addr"]->buffer);
-	projectile->cancel_addr = atoi(inputs["cancel_addr"]->buffer);
+	projectile->hit_condition_addr = GetFieldValue(inputs["hit_condition_addr"]);
+	projectile->cancel_addr = GetFieldValue(inputs["cancel_addr"]);
 
-	projectile->_0x34_int = atoi(inputs["_0x34_int"]->buffer);
-	projectile->_0x4_int = atoi(inputs["_0x4_int"]->buffer);
-	projectile->_0xC_int = atoi(inputs["_0xC_int"]->buffer);
-	projectile->_0x10_int = atoi(inputs["_0x10_int"]->buffer);
-	projectile->_0x14_int = atoi(inputs["_0x14_int"]->buffer);
-	projectile->_0x24_int = atoi(inputs["_0x24_int"]->buffer);
-	projectile->_0x3C_int[0] = atoi(inputs["_0x3C_int_1"]->buffer);
-	projectile->_0x3C_int[1] = atoi(inputs["_0x3C_int_2"]->buffer);
-	projectile->_0x3C_int[2] = atoi(inputs["_0x3C_int_3"]->buffer);
-	projectile->_0x3C_int[3] = atoi(inputs["_0x3C_int_4"]->buffer);
-	projectile->_0x3C_int[4] = atoi(inputs["_0x3C_int_5"]->buffer);
-	projectile->_0x3C_int[5] = atoi(inputs["_0x3C_int_6"]->buffer);
-	projectile->_0x58_int = atoi(inputs["_0x58_int"]->buffer);
-	projectile->_0x5C_int = atoi(inputs["_0x5C_int"]->buffer);
-	projectile->_0x70_int = atoi(inputs["_0x70_int"]->buffer);
-	projectile->_0x74_int = atoi(inputs["_0x74_int"]->buffer);
-	projectile->_0x7C_int = atoi(inputs["_0x7C_int"]->buffer);
-	projectile->_0x80_int = atoi(inputs["_0x80_int"]->buffer);
-	projectile->_0x88_int[0] = atoi(inputs["_0x88_int_1"]->buffer);
-	projectile->_0x88_int[1] = atoi(inputs["_0x88_int_2"]->buffer);
-	projectile->_0x88_int[2] = atoi(inputs["_0x88_int_3"]->buffer);
-	projectile->_0x88_int[3] = atoi(inputs["_0x88_int_4"]->buffer);
-	projectile->_0x88_int[4] = atoi(inputs["_0x88_int_5"]->buffer);
-	projectile->_0x88_int[5] = atoi(inputs["_0x88_int_6"]->buffer);
-	projectile->_0x88_int[6] = atoi(inputs["_0x88_int_7"]->buffer);
-	projectile->_0x88_int[7] = atoi(inputs["_0x88_int_8"]->buffer);
+	projectile->_0x34_int = GetFieldValue(inputs["_0x34_int"]);
+	projectile->_0x4_int = GetFieldValue(inputs["_0x4_int"]);
+	projectile->_0xC_int = GetFieldValue(inputs["_0xC_int"]);
+	projectile->_0x10_int = GetFieldValue(inputs["_0x10_int"]);
+	projectile->_0x14_int = GetFieldValue(inputs["_0x14_int"]);
+	projectile->_0x24_int = GetFieldValue(inputs["_0x24_int"]);
+	projectile->_0x3C_int[0] = GetFieldValue(inputs["_0x3C_int_1"]);
+	projectile->_0x3C_int[1] = GetFieldValue(inputs["_0x3C_int_2"]);
+	projectile->_0x3C_int[2] = GetFieldValue(inputs["_0x3C_int_3"]);
+	projectile->_0x3C_int[3] = GetFieldValue(inputs["_0x3C_int_4"]);
+	projectile->_0x3C_int[4] = GetFieldValue(inputs["_0x3C_int_5"]);
+	projectile->_0x3C_int[5] = GetFieldValue(inputs["_0x3C_int_6"]);
+	projectile->_0x58_int = GetFieldValue(inputs["_0x58_int"]);
+	projectile->_0x5C_int = GetFieldValue(inputs["_0x5C_int"]);
+	projectile->_0x70_int = GetFieldValue(inputs["_0x70_int"]);
+	projectile->_0x74_int = GetFieldValue(inputs["_0x74_int"]);
+	projectile->_0x7C_int = GetFieldValue(inputs["_0x7C_int"]);
+	projectile->_0x80_int = GetFieldValue(inputs["_0x80_int"]);
+	projectile->_0x88_int[0] = GetFieldValue(inputs["_0x88_int_1"]);
+	projectile->_0x88_int[1] = GetFieldValue(inputs["_0x88_int_2"]);
+	projectile->_0x88_int[2] = GetFieldValue(inputs["_0x88_int_3"]);
+	projectile->_0x88_int[3] = GetFieldValue(inputs["_0x88_int_4"]);
+	projectile->_0x88_int[4] = GetFieldValue(inputs["_0x88_int_5"]);
+	projectile->_0x88_int[5] = GetFieldValue(inputs["_0x88_int_6"]);
+	projectile->_0x88_int[6] = GetFieldValue(inputs["_0x88_int_7"]);
+	projectile->_0x88_int[7] = GetFieldValue(inputs["_0x88_int_8"]);
 }
 
 // ===== Input Sequence  ===== //
@@ -257,10 +257,10 @@ void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto sequence = m_iterators.input_sequences[id];
 
-	sequence->input_window_frames = atoi(inputs["input_window_frames"]->buffer);
-	sequence->input_amount = atoi(inputs["input_amount"]->buffer);
-	sequence->_0x4_int = atoi(inputs["_0x4_int"]->buffer);
-	sequence->input_addr = atoi(inputs["input_addr"]->buffer);
+	sequence->input_window_frames = GetFieldValue(inputs["input_window_frames"]);
+	sequence->input_amount = GetFieldValue(inputs["input_amount"]);
+	sequence->_0x4_int = GetFieldValue(inputs["_0x4_int"]);
+	sequence->input_addr = GetFieldValue(inputs["input_addr"]);
 }
 
 // ===== Inputs ===== //
@@ -294,8 +294,8 @@ void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& input
 {
 	auto input = m_iterators.inputs.begin() + id;
 
-	input->direction = (uint32_t)strtoll(inputs["direction"]->buffer, nullptr, 16);
-	input->button = (uint32_t)strtoll(inputs["button"]->buffer, nullptr, 16);
+	input->direction = GetFieldValue(inputs["direction"]);
+	input->button = GetFieldValue(inputs["button"]);
 }
 
 // ===== Reactions ===== //
@@ -382,40 +382,40 @@ void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& i
 {
 	auto reaction = m_iterators.reactions[id];
 
-	reaction->front_pushback = atoi(inputs["front_pushback"]->buffer);
-	reaction->backturned_pushback = atoi(inputs["backturned_pushback"]->buffer);
-	reaction->left_side_pushback = atoi(inputs["left_side_pushback"]->buffer);
-	reaction->right_side_pushback = atoi(inputs["right_side_pushback"]->buffer);
-	reaction->front_counterhit_pushback = atoi(inputs["front_counterhit_pushback"]->buffer);
-	reaction->downed_pushback = atoi(inputs["downed_pushback"]->buffer);
-	reaction->block_pushback = atoi(inputs["block_pushback"]->buffer);
+	reaction->front_pushback = GetFieldValue(inputs["front_pushback"]);
+	reaction->backturned_pushback = GetFieldValue(inputs["backturned_pushback"]);
+	reaction->left_side_pushback = GetFieldValue(inputs["left_side_pushback"]);
+	reaction->right_side_pushback = GetFieldValue(inputs["right_side_pushback"]);
+	reaction->front_counterhit_pushback = GetFieldValue(inputs["front_counterhit_pushback"]);
+	reaction->downed_pushback = GetFieldValue(inputs["downed_pushback"]);
+	reaction->block_pushback = GetFieldValue(inputs["block_pushback"]);
 
-	reaction->front_direction = atoi(inputs["front_direction"]->buffer);
-	reaction->back_direction = atoi(inputs["back_direction"]->buffer);
-	reaction->left_side_direction = atoi(inputs["left_side_direction"]->buffer);
-	reaction->right_side_direction = atoi(inputs["right_side_direction"]->buffer);
-	reaction->front_counterhit_direction = atoi(inputs["front_counterhit_direction"]->buffer);
-	reaction->downed_direction = atoi(inputs["downed_direction"]->buffer);
+	reaction->front_direction = GetFieldValue(inputs["front_direction"]);
+	reaction->back_direction = GetFieldValue(inputs["back_direction"]);
+	reaction->left_side_direction = GetFieldValue(inputs["left_side_direction"]);
+	reaction->right_side_direction = GetFieldValue(inputs["right_side_direction"]);
+	reaction->front_counterhit_direction = GetFieldValue(inputs["front_counterhit_direction"]);
+	reaction->downed_direction = GetFieldValue(inputs["downed_direction"]);
 
-	reaction->default_moveid = atoi(inputs["default_moveid"]->buffer);
-	reaction->standing_moveid = atoi(inputs["standing_moveid"]->buffer);
-	reaction->crouch_moveid = atoi(inputs["crouch_moveid"]->buffer);
-	reaction->counterhit_moveid = atoi(inputs["counterhit_moveid"]->buffer);
-	reaction->crouch_counterhit_moveid = atoi(inputs["crouch_counterhit_moveid"]->buffer);
-	reaction->left_side_moveid = atoi(inputs["left_side_moveid"]->buffer);
-	reaction->crouch_left_side_moveid = atoi(inputs["crouch_left_side_moveid"]->buffer);
-	reaction->right_side_moveid = atoi(inputs["right_side_moveid"]->buffer);
-	reaction->crouch_right_side_moveid = atoi(inputs["crouch_right_side_moveid"]->buffer);
-	reaction->backturned_moveid = atoi(inputs["backturned_moveid"]->buffer);
-	reaction->crouch_backturned_moveid = atoi(inputs["crouch_backturned_moveid"]->buffer);
-	reaction->block_moveid = atoi(inputs["block_moveid"]->buffer);
-	reaction->crouch_block_moveid = atoi(inputs["crouch_block_moveid"]->buffer);
-	reaction->wallslump_moveid = atoi(inputs["wallslump_moveid"]->buffer);
-	reaction->downed_moveid = atoi(inputs["downed_moveid"]->buffer);
+	reaction->default_moveid = GetFieldValue(inputs["default_moveid"]);
+	reaction->standing_moveid = GetFieldValue(inputs["standing_moveid"]);
+	reaction->crouch_moveid = GetFieldValue(inputs["crouch_moveid"]);
+	reaction->counterhit_moveid = GetFieldValue(inputs["counterhit_moveid"]);
+	reaction->crouch_counterhit_moveid = GetFieldValue(inputs["crouch_counterhit_moveid"]);
+	reaction->left_side_moveid = GetFieldValue(inputs["left_side_moveid"]);
+	reaction->crouch_left_side_moveid = GetFieldValue(inputs["crouch_left_side_moveid"]);
+	reaction->right_side_moveid = GetFieldValue(inputs["right_side_moveid"]);
+	reaction->crouch_right_side_moveid = GetFieldValue(inputs["crouch_right_side_moveid"]);
+	reaction->backturned_moveid = GetFieldValue(inputs["backturned_moveid"]);
+	reaction->crouch_backturned_moveid = GetFieldValue(inputs["crouch_backturned_moveid"]);
+	reaction->block_moveid = GetFieldValue(inputs["block_moveid"]);
+	reaction->crouch_block_moveid = GetFieldValue(inputs["crouch_block_moveid"]);
+	reaction->wallslump_moveid = GetFieldValue(inputs["wallslump_moveid"]);
+	reaction->downed_moveid = GetFieldValue(inputs["downed_moveid"]);
 
-	reaction->vertical_pushback = atoi(inputs["vertical_pushback"]->buffer);
-	reaction->_0x44_int = atoi(inputs["_0x44_int"]->buffer);
-	reaction->_0x48_int = atoi(inputs["_0x48_int"]->buffer);
+	reaction->vertical_pushback = GetFieldValue(inputs["vertical_pushback"]);
+	reaction->_0x44_int = GetFieldValue(inputs["_0x44_int"]);
+	reaction->_0x48_int = GetFieldValue(inputs["_0x48_int"]);
 }
 
 // ===== Hit conditions ===== //
@@ -457,10 +457,10 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 {
 	auto hitCondition = m_iterators.hit_conditions[id];
 
-	hitCondition->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
-	hitCondition->damage = (uint32_t)atoi(inputs["damage"]->buffer);
-	hitCondition->_0xC_int = (uint32_t)atoi(inputs["_0xC_int"]->buffer);
-	hitCondition->reactions_addr = (uint64_t)atoi(inputs["reactions_addr"]->buffer);
+	hitCondition->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
+	hitCondition->damage = GetFieldValue(inputs["damage"]);
+	hitCondition->_0xC_int = GetFieldValue(inputs["_0xC_int"]);
+	hitCondition->reactions_addr = GetFieldValue(inputs["reactions_addr"]);
 }
 
 bool EditorT7::ValidateHitConditionField(EditorInput* field)
@@ -512,8 +512,8 @@ void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>&
 {
 	auto req = m_iterators.requirements[id];
 
-	req->condition = (uint32_t)atoi(inputs["condition"]->buffer);
-	req->param = (uint32_t)atoi(inputs["param"]->buffer);
+	req->condition = GetFieldValue(inputs["condition"]);
+	req->param = GetFieldValue(inputs["param"]);
 }
 
 // ===== Cancel Extradata ===== //
@@ -538,7 +538,7 @@ void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>&
 {
 	auto cancelExtra = m_iterators.cancel_extras[id];
 
-	cancelExtra->value = (uint32_t)strtoll(inputs["value"]->buffer, nullptr, 16);
+	cancelExtra->value = GetFieldValue(inputs["value"]);
 }
 
 // ===== Cancel ===== //
@@ -577,14 +577,14 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 {
 	auto cancel = m_iterators.cancels[id];
 
-	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
-	cancel->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
-	cancel->extradata_addr = (uint64_t)atoi(inputs["extradata_addr"]->buffer);
-	cancel->detection_start = (uint32_t)atoi(inputs["detection_start"]->buffer);
-	cancel->detection_end = (uint32_t)atoi(inputs["detection_end"]->buffer);
-	cancel->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
-	cancel->move_id = (uint16_t)atoi(inputs["move_id"]->buffer);
-	cancel->cancel_option = (uint16_t)atoi(inputs["cancel_option"]->buffer);
+	cancel->command = GetFieldValue(inputs["command"]);
+	cancel->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
+	cancel->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
+	cancel->detection_start = GetFieldValue(inputs["detection_start"]);
+	cancel->detection_end = GetFieldValue(inputs["detection_end"]);
+	cancel->starting_frame = GetFieldValue(inputs["starting_frame"]);
+	cancel->move_id = GetFieldValue(inputs["move_id"]);
+	cancel->cancel_option = GetFieldValue(inputs["cancel_option"]);
 }
 
 bool EditorT7::ValidateCancelField(EditorInput* field)
@@ -648,14 +648,14 @@ void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto cancel = m_iterators.grouped_cancels[id];
 
-	cancel->command = (uint64_t)strtoll(inputs["command"]->buffer, nullptr, 16);
-	cancel->requirements_addr = (uint64_t)atoi(inputs["requirements_addr"]->buffer);
-	cancel->extradata_addr = (uint64_t)atoi(inputs["extradata_addr"]->buffer);
-	cancel->detection_start = (uint32_t)atoi(inputs["detection_start"]->buffer);
-	cancel->detection_end = (uint32_t)atoi(inputs["detection_end"]->buffer);
-	cancel->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
-	cancel->move_id = (uint16_t)atoi(inputs["move_id"]->buffer);
-	cancel->cancel_option = (uint16_t)atoi(inputs["cancel_option"]->buffer);
+	cancel->command = GetFieldValue(inputs["command"]);
+	cancel->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
+	cancel->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
+	cancel->detection_start = GetFieldValue(inputs["detection_start"]);
+	cancel->detection_end = GetFieldValue(inputs["detection_end"]);
+	cancel->starting_frame = GetFieldValue(inputs["starting_frame"]);
+	cancel->move_id = GetFieldValue(inputs["move_id"]);
+	cancel->cancel_option = GetFieldValue(inputs["cancel_option"]);
 }
 
 bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
@@ -728,9 +728,9 @@ void EditorT7::SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorIn
 {
 	auto prop = m_iterators.move_start_properties[id];
 
-	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
-	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
-	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
+	prop->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
+	prop->extraprop = GetFieldValue(inputs["extraprop"]);
+	prop->value = GetFieldValue(inputs["value"]);
 }
 
 // ===== Other move properties (end) ===== //
@@ -764,9 +764,9 @@ void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInpu
 {
 	auto prop = m_iterators.move_end_properties[id];
 
-	prop->requirements_addr = atoi(inputs["requirements_addr"]->buffer);
-	prop->extraprop = (uint32_t)strtoll(inputs["extraprop"]->buffer, nullptr, 16);
-	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
+	prop->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
+	prop->extraprop = GetFieldValue(inputs["extraprop"]);
+	prop->value = GetFieldValue(inputs["value"]);
 }
 
 bool EditorT7::ValidateOtherMoveProperty(EditorInput* field)
@@ -811,9 +811,9 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto prop = m_iterators.extra_move_properties[id];
 
-	prop->starting_frame = (uint32_t)atoi(inputs["starting_frame"]->buffer);
-	prop->id = (uint32_t)strtoll(inputs["id"]->buffer, nullptr, 16);
-	prop->value = (uint32_t)atoi(inputs["value"]->buffer);
+	prop->starting_frame = GetFieldValue(inputs["starting_frame"]);
+	prop->id = GetFieldValue(inputs["id"]);
+	prop->value = GetFieldValue(inputs["value"]);
 }
 
 // ===== Voiceclips ===== //
@@ -839,7 +839,7 @@ void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& i
 {
 	auto voiceclip = m_iterators.voiceclips[id];
 
-	voiceclip->id = (uint32_t)strtoll(inputs["id"]->buffer, nullptr, 16);
+	voiceclip->id = GetFieldValue(inputs["id"]);
 }
 
 // ===== MOVES ===== //
@@ -1032,42 +1032,42 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
 		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
 	}
-	move->vuln = (uint32_t)atoi(inputs["vulnerability"]->buffer);
-	move->hitlevel = (uint32_t)strtoll(inputs["hitlevel"]->buffer, nullptr, 16);
-	move->transition = (uint16_t)atoi(inputs["transition"]->buffer);
-	move->moveId_val1 = (uint16_t)atoi(inputs["moveId_val1"]->buffer);
-	move->moveId_val2 = (uint16_t)atoi(inputs["moveId_val2"]->buffer);
-	move->anim_len = (uint32_t)atoi(inputs["anim_len"]->buffer);
-	move->airborne_start = (uint32_t)atoi(inputs["airborne_start"]->buffer);
-	move->airborne_end = (uint32_t)atoi(inputs["airborne_end"]->buffer);
-	move->ground_fall = (uint32_t)atoi(inputs["ground_fall"]->buffer);
-	move->hitbox_location = (uint32_t)strtoll(inputs["hitbox_location"]->buffer, nullptr, 16);
-	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
-	move->last_active_frame = (uint32_t)atoi(inputs["last_active_frame"]->buffer);
-	move->distance = (uint16_t)atoi(inputs["distance"]->buffer);
+	move->vuln = GetFieldValue(inputs["vulnerability"]);
+	move->hitlevel = GetFieldValue(inputs["hitlevel"]);
+	move->transition = GetFieldValue(inputs["transition"]);
+	move->moveId_val1 = GetFieldValue(inputs["moveId_val1"]);
+	move->moveId_val2 = GetFieldValue(inputs["moveId_val2"]);
+	move->anim_len = GetFieldValue(inputs["anim_len"]);
+	move->airborne_start = GetFieldValue(inputs["airborne_start"]);
+	move->airborne_end = GetFieldValue(inputs["airborne_end"]);
+	move->ground_fall = GetFieldValue(inputs["ground_fall"]);
+	move->hitbox_location = GetFieldValue(inputs["hitbox_location"]);
+	move->last_active_frame = GetFieldValue(inputs["last_active_frame"]);
+	move->last_active_frame = GetFieldValue(inputs["last_active_frame"]);
+	move->distance = GetFieldValue(inputs["distance"]);
 
-	move->cancel_addr = atoll(inputs["cancel_addr"]->buffer);
-	move->hit_condition_addr = atoll(inputs["hit_condition_addr"]->buffer);
-	move->extra_move_property_addr = atoll(inputs["extra_properties_addr"]->buffer);
-	move->move_start_extraprop_addr = atoll(inputs["move_start_extraprop_addr"]->buffer);
-	move->move_end_extraprop_addr = atoll(inputs["move_end_extraprop_addr"]->buffer);
-	move->voicelip_addr = atoll(inputs["voiceclip_addr"]->buffer);
+	move->cancel_addr = GetFieldValue(inputs["cancel_addr"]);
+	move->hit_condition_addr = GetFieldValue(inputs["hit_condition_addr"]);
+	move->extra_move_property_addr = GetFieldValue(inputs["extra_properties_addr"]);
+	move->move_start_extraprop_addr = GetFieldValue(inputs["move_start_extraprop_addr"]);
+	move->move_end_extraprop_addr = GetFieldValue(inputs["move_end_extraprop_addr"]);
+	move->voicelip_addr = GetFieldValue(inputs["voiceclip_addr"]);
 
-	move->_0x28_cancel_addr = atoll(inputs["cancel_addr_2"]->buffer);
-	move->_0x30_int__0x28_related = atoi(inputs["cancel_related_id_2"]->buffer);
-	move->_0x38_cancel_addr = atoll(inputs["cancel_addr_3"]->buffer);
-	move->_0x40_int__0x38_related = atoi(inputs["cancel_related_id_3"]->buffer);
-	move->_0x48_cancel_addr = atoll(inputs["cancel_addr_4"]->buffer);
-	move->_0x50_int__0x48_related = atoi(inputs["cancel_related_id_4"]->buffer);
+	move->_0x28_cancel_addr = GetFieldValue(inputs["cancel_addr_2"]);
+	move->_0x30_int__0x28_related = GetFieldValue(inputs["cancel_related_id_2"]);
+	move->_0x38_cancel_addr = GetFieldValue(inputs["cancel_addr_3"]);
+	move->_0x40_int__0x38_related = GetFieldValue(inputs["cancel_related_id_3"]);
+	move->_0x48_cancel_addr = GetFieldValue(inputs["cancel_addr_4"]);
+	move->_0x50_int__0x48_related = GetFieldValue(inputs["cancel_related_id_4"]);
 
-	move->_0x34_int = atoi(inputs["_0x34_int"]->buffer);
-	move->_0x44_int = atoi(inputs["_0x44_int"]->buffer);
-	move->_0x56_short = atoi(inputs["_0x56_short"]->buffer);
-	move->_0x5C_short = atoi(inputs["_0x5C_short"]->buffer);
-	move->_0x5E_short = atoi(inputs["_0x5E_short"]->buffer);
-	move->_0x98_int = atoi(inputs["_0x98_int"]->buffer);
-	move->_0xA8_short = atoi(inputs["_0xA8_short"]->buffer);
-	move->_0xAC_short = atoi(inputs["_0xAC_short"]->buffer);
+	move->_0x34_int = GetFieldValue(inputs["_0x34_int"]);
+	move->_0x44_int = GetFieldValue(inputs["_0x44_int"]);
+	move->_0x56_short = GetFieldValue(inputs["_0x56_short"]);
+	move->_0x5C_short = GetFieldValue(inputs["_0x5C_short"]);
+	move->_0x5E_short = GetFieldValue(inputs["_0x5E_short"]);
+	move->_0x98_int = GetFieldValue(inputs["_0x98_int"]);
+	move->_0xA8_short = GetFieldValue(inputs["_0xA8_short"]);
+	move->_0xAC_short = GetFieldValue(inputs["_0xAC_short"]);
 
 	// Save move name at the end because it may implay reallocation and invalidation of existing pointers
 	char* newName = inputs["move_name"]->buffer;

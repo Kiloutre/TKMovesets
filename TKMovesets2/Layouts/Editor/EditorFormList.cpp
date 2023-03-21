@@ -77,146 +77,11 @@ bool EditorFormList::IsFormValid()
 	return true;
 }
 
-
-void EditorFormList::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount)
+void EditorFormList::BuildItemDetails(int listIdx)
 {
-	for (size_t i = 0; i < inputs.size(); ++i)
-	{
-		EditorInput* field = inputs[i];
+	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
 
-		if (field->category != category) {
-			continue;
-		}
-		//Render label
-		if (i % columnCount == 0) {
-			ImGui::TableNextRow();
-		}
-		ImGui::TableNextColumn();
-		RenderLabel(listIdx, field);
-
-		// Render input field
-		if (columnCount == 1) {
-			ImGui::TableNextRow();
-		}
-		ImGui::TableNextColumn();
-		RenderInput(listIdx, field);
-	}
-}
-
-void EditorFormList::RenderLabel(int listIdx, EditorInput* field)
-{
-	const char* fieldLabel = _(field->displayName.c_str());
-	if (field->flags & EditorInput_Clickable && !field->errored) {
-		if (ImGui::Selectable(fieldLabel, true)) {
-			OnFieldLabelClick(listIdx, field);
-		}
-	}
-	else {
-		ImGui::TextUnformatted(fieldLabel);
-	}
-
-	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-		// todo: maybe use this for a full-on description
-		ImGui::BeginTooltip();
-		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(fieldLabel);
-		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
-	}
-}
-
-void EditorFormList::RenderInput(int listIdx, EditorInput* field)
-{
-	bool erroredBg = field->errored;
-	if (erroredBg) {
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
-	}
-
-	ImGui::PushID(field);
-	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
-	{
-		unsavedChanges = true;
-		field->errored = m_editor->ValidateField(windowType, field) == false;
-		if (!field->errored) {
-			OnUpdate(listIdx, field);
-		}
-	}
-	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
-	{
-		// Have to manually implement copying
-		if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
-			ImGui::SetClipboardText(field->buffer);
-		}
-	}
-	ImGui::PopID();
-	ImGui::PopItemWidth();
-
-	if (erroredBg) {
-		ImGui::PopStyleColor();
-	}
-}
-
-// -- Public methods -- //
-
-void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
-{
-	id = t_id;
-	m_editor = editor;
-
-	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
-
-	VectorSet<std::string> drawOrder;
-
-	std::vector<std::map<std::string, EditorInput*>> fieldIdentifierMaps;
-	if (m_listSize == 0) {
-		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
-		m_listSize = fieldIdentifierMaps.size();
-	} else {
-		// Some struct lists may have fixed list sizes: in this case, we'll call a different function
-		// For now these two GetFormFields aren't swappable, if a list is not supposed to have a known size ahead of time, don't provide a size
-		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, m_listSize);
-	}
-
-	// Tries to find a name to show in the window title
-	// Also figure out the categories
-	for (const std::string& fieldName : drawOrder) {
-		EditorInput* field = fieldIdentifierMaps[0][fieldName];
-		m_categories.insert(field->category);
-	}
-
-	// Builds the <category : fields> maps & the item labels
-	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
-	{
-		m_items.push_back(new FieldItem);
-		auto& item = m_items[listIndex];
-
-		item->identifierMaps = fieldIdentifierMaps[listIndex];
-
-		for (uint8_t category : m_categories)
-		{
-			std::vector<EditorInput*> inputs;
-			for (const std::string& fieldName : drawOrder) {
-				EditorInput* field = fieldIdentifierMaps[listIndex][fieldName];
-				field->displayName = _(field->fullName.c_str());
-				if (field->category == category) {
-					inputs.push_back(field);
-				}
-			}
-			item->categoryMaps[category] = inputs;
-		}
-
-		BuildItemDetails(listIndex);
-	}
-
-	// Build category names
-	for (uint8_t category : m_categories) {
-		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
-	}
-
-	m_windowTitleBase = windowTitleBase;
-	ApplyWindowName(false);
-
+	m_items[listIdx]->itemLabel = label;
 }
 
 void EditorFormList::RenderListControlButtons(int listIndex)
@@ -267,7 +132,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		}
 		ImGui::SameLine();
 	}
-	
+
 	// Don't allow first item and ending item to shift up
 	if (listIndex != 0 && listIndex + 1 != m_listSize) {
 		ImGui::SetCursorPosX(pos_x + buttonWidth);
@@ -279,7 +144,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
 			if (m_items[listIndex]->openStatus == EditorFormTreeview_Opened) {
 				m_items[listIndex]->openStatus = EditorFormTreeview_ForceOpen;
-			} else if (m_items[listIndex]->openStatus == EditorFormTreeview_Closed) {
+			}
+			else if (m_items[listIndex]->openStatus == EditorFormTreeview_Closed) {
 				m_items[listIndex]->openStatus = EditorFormTreeview_ForceClose;
 			}
 
@@ -353,121 +219,136 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	ImGui::SetCursorPos(cursor);
 }
 
-void EditorFormList::Render()
+// -- Public methods -- //
+
+void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	if (setFocus) {
-		ImGui::SetNextWindowFocus();
-		setFocus = false;
+	id = t_id;
+	m_editor = editor;
+
+	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
+
+	VectorSet<std::string> drawOrder;
+
+	std::vector<std::map<std::string, EditorInput*>> fieldIdentifierMaps;
+	if (m_listSize == 0) {
+		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
+		m_listSize = fieldIdentifierMaps.size();
+	} else {
+		// Some struct lists may have fixed list sizes: in this case, we'll call a different function
+		// For now these two GetFormFields aren't swappable, if a list is not supposed to have a known size ahead of time, don't provide a size
+		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, m_listSize);
 	}
 
-	if (nextDockId != -1) {
-		ImGui::SetNextWindowDockID(nextDockId);
-		nextDockId = -1;
+	// Tries to find a name to show in the window title
+	// Also figure out the categories
+	for (const std::string& fieldName : drawOrder) {
+		EditorInput* field = fieldIdentifierMaps[0][fieldName];
+		m_categories.insert(field->category);
 	}
 
-	if (m_winInfo.applyNextRender) {
-		m_winInfo.applyNextRender = false;
-		ImGui::SetNextWindowPos(m_winInfo.pos);
-		ImGui::SetNextWindowSize(m_winInfo.size);
-	}
-
-	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
+	// Builds the <category : fields> maps & the item labels
+	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
-		if (m_requestedClosure) {
-			RenderDiscardButtons();
-		}
-		else
+		m_items.push_back(new FieldItem);
+		auto& item = m_items[listIndex];
+
+		item->identifierMaps = fieldIdentifierMaps[listIndex];
+
+		for (uint8_t category : m_categories)
 		{
-			m_winInfo.pos = ImGui::GetWindowPos();
-			m_winInfo.size = ImGui::GetWindowSize();
-
-			currentViewport = ImGui::GetWindowViewport();
-
-			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
-			const int columnCount = EditorFormUtils::GetColumnCount();
-			const float drawWidth = ImGui::GetContentRegionAvail().x;
-			ImDrawList* drawlist = ImGui::GetWindowDrawList();
-			const ImVec2 c_winPos = ImGui::GetWindowPos();
-
-			for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
-			{
-				{
-					ImVec2 drawStart = c_winPos + ImGui::GetCursorPos();
-					drawStart.y -= ImGui::GetScrollY() + 2;
-					int color = m_items[listIndex]->color;
-					color = color == 0 ? (listIndex & 1 ? FORM_BG_1 : FORM_BG_2) : color;
-					drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), color);
+			std::vector<EditorInput*> inputs;
+			for (const std::string& fieldName : drawOrder) {
+				EditorInput* field = fieldIdentifierMaps[listIndex][fieldName];
+				EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
+				if (field->category == category) {
+					inputs.push_back(field);
 				}
-
-				if (id > 1) {
-					// Only non-starting lists may have access to list controls
-					RenderListControlButtons(listIndex);
-				}
-
-				auto& item = m_items[listIndex];
-
-				// This allows us to force some treenode to open at certain times, without forcing them to be closed
-				auto openStatus = item->openStatus;
-				if (openStatus == EditorFormTreeview_ForceOpen || openStatus == EditorFormTreeview_ForceClose) {
-					ImGui::SetNextItemOpen(openStatus == EditorFormTreeview_ForceOpen);
-				}
-
-				ImGui::PushID(listIndex);
-				if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, item->itemLabel.c_str(), va_list())) {
-					// Tree node hidden so no need to render anything
-					ImGui::PopID();
-					item->openStatus = EditorFormTreeview_Closed;
-					continue;
-				}
-				ImGui::PopID();
-				item->openStatus = EditorFormTreeview_Opened;
-
-				// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
-				for (uint8_t category : m_categories)
-				{
-					const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
-					if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
-						// Only show titles for category > 0, and if tree is not open: no need to render anything
-						continue;
-					}
-
-					// Render each field name / field input in columns
-					if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
-					{
-						std::vector<EditorInput*>& inputs = item->categoryMaps[category];
-						RenderInputs(listIndex, inputs, category, columnCount);
-						ImGui::EndTable();
-					}
-
-				}
-
-				ImGui::TreePop();
 			}
-
-			bool enabledBtn = unsavedChanges;
-			if (enabledBtn) {
-				ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
-			}
-			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
-				Apply();
-			}
-			if (enabledBtn) {
-				ImGui::PopStyleColor();
-			}
+			item->categoryMaps[category] = inputs;
 		}
+
+		BuildItemDetails(listIndex);
 	}
 
-	ImGui::End();
-
-	if (!popen && unsavedChanges) {
-		m_requestedClosure = true;
-		popen = true;
+	// Build category names
+	for (uint8_t category : m_categories) {
+		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
 	}
+
+	m_windowTitleBase = windowTitleBase;
+	ApplyWindowName(false);
+
 }
 
-void EditorFormList::BuildItemDetails(int listIdx)
+void EditorFormList::RenderInternal()
 {
-	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
+	m_winInfo.pos = ImGui::GetWindowPos();
+	m_winInfo.size = ImGui::GetWindowSize();
 
-	m_items[listIdx]->itemLabel = label;
+	currentViewport = ImGui::GetWindowViewport();
+
+	// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
+	const int columnCount = EditorFormUtils::GetColumnCount();
+	m_labelWidthHalf = m_winInfo.size.x / columnCount / 2;
+
+	const float drawWidth = ImGui::GetContentRegionAvail().x;
+	ImDrawList* drawlist = ImGui::GetWindowDrawList();
+
+	const ImVec2 c_winPos = ImGui::GetWindowPos();
+
+	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
+	{
+		{
+			ImVec2 drawStart = c_winPos + ImGui::GetCursorPos();
+			drawStart.y -= ImGui::GetScrollY() + 2;
+			int color = m_items[listIndex]->color;
+			color = color == 0 ? (listIndex & 1 ? FORM_BG_1 : FORM_BG_2) : color;
+			drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), color);
+		}
+
+		if (id > 1) {
+			// Only non-starting lists may have access to list controls
+			RenderListControlButtons(listIndex);
+		}
+
+		auto& item = m_items[listIndex];
+
+		// This allows us to force some treenode to open at certain times, without forcing them to be closed
+		auto openStatus = item->openStatus;
+		if (openStatus == EditorFormTreeview_ForceOpen || openStatus == EditorFormTreeview_ForceClose) {
+			ImGui::SetNextItemOpen(openStatus == EditorFormTreeview_ForceOpen);
+		}
+
+		ImGui::PushID(listIndex);
+		if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, item->itemLabel.c_str(), va_list())) {
+			// Tree node hidden so no need to render anything
+			ImGui::PopID();
+			item->openStatus = EditorFormTreeview_Closed;
+			continue;
+		}
+		ImGui::PopID();
+		item->openStatus = EditorFormTreeview_Opened;
+
+		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
+		for (uint8_t category : m_categories)
+		{
+			const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
+			if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
+				// Only show titles for category > 0, and if tree is not open: no need to render anything
+				continue;
+			}
+
+			// Render each field name / field input in columns
+			if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+			{
+				std::vector<EditorInput*>& inputs = item->categoryMaps[category];
+				RenderInputs(listIndex, inputs, category, columnCount);
+				ImGui::EndTable();
+			}
+
+		}
+
+		ImGui::TreePop();
+	}
 }

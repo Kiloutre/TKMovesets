@@ -10,6 +10,12 @@
 
 namespace EditorFormUtils
 {
+	void SetFieldDisplayText(EditorInput* field, std::string newName)
+	{
+		field->displayName = newName;
+		field->textSizeHalf = ImGui::CalcTextSize(newName.c_str()).x / 2;
+	}
+
 	int GetColumnCount()
 	{
 		float windowWidth = ImGui::GetWindowWidth();
@@ -106,7 +112,7 @@ void EditorForm::Apply()
 	OnApply();
 }
 
-void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, int columnCount)
+void EditorForm::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount)
 {
 	for (size_t i = 0; i < inputs.size(); ++i)
 	{
@@ -120,27 +126,35 @@ void EditorForm::RenderInputs(std::vector<EditorInput*>& inputs, int category, i
 			ImGui::TableNextRow();
 		}
 		ImGui::TableNextColumn();
-		RenderLabel(field);
+		RenderLabel(listIdx, field);
 
 		// Render input field
 		if (columnCount == 1) {
 			ImGui::TableNextRow();
 		}
 		ImGui::TableNextColumn();
-		RenderInput(field);
+		RenderInput(listIdx, field);
 	}
 }
 
-void EditorForm::RenderLabel(EditorInput* field)
+void EditorForm::RenderLabel(int listIdx, EditorInput* field)
 {
 	const char* fieldLabel = _(field->displayName.c_str());
+
 	if (field->flags & EditorInput_Clickable && !field->errored) {
+		ImGui::PushStyleColor(ImGuiCol_Header, FORM_LABEL_CLICKABLE);
+
 		if (ImGui::Selectable(fieldLabel, true)) {
-			OnFieldLabelClick(field);
+			OnFieldLabelClick(listIdx, field);
 		}
+		ImGui::PopStyleColor();
 	} else {
+		ImVec2 pos = ImGui::GetCursorPos();
+		ImGui::SetCursorPos(ImVec2(pos.x + m_labelWidthHalf - field->textSizeHalf, pos.y + 2));
 		ImGui::TextUnformatted(fieldLabel);
+		ImGui::SetCursorPos(pos);
 	}
+
 
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
 		// todo: maybe use this for a full-on description
@@ -150,13 +164,18 @@ void EditorForm::RenderLabel(EditorInput* field)
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}
+
 }
 
-void EditorForm::RenderInput(EditorInput* field)
+void EditorForm::RenderInput(int listIdx, EditorInput* field)
 {
-	bool erroredBg = field->errored;
-	if (erroredBg) {
+	bool appliedBg = field->errored;
+	if (appliedBg) {
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(186, 54, 54, 150));
+	}
+	else if (field->color != 0) {
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, field->color);
+		appliedBg = true;
 	}
 
 	ImGui::PushID(field);
@@ -179,7 +198,7 @@ void EditorForm::RenderInput(EditorInput* field)
 	ImGui::PopID();
 	ImGui::PopItemWidth();
 
-	if (erroredBg) {
+	if (appliedBg) {
 		ImGui::PopStyleColor();
 	}
 }
@@ -232,7 +251,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 		std::vector<EditorInput*> inputs;
 		for (std::string fieldName : drawOrder) {
 			EditorInput* field = m_fieldIdentifierMap[fieldName];
-			field->displayName = _(field->fullName.c_str());
+			EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
 			if (field->category == category) {
 				inputs.push_back(field);
 			}
@@ -243,6 +262,32 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 
 	m_windowTitleBase = windowTitleBase;
 	ApplyWindowName(false);
+}
+
+void EditorForm::RenderInternal()
+{
+	currentViewport = ImGui::GetWindowViewport();
+
+	// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
+	const int columnCount = EditorFormUtils::GetColumnCount();
+	m_labelWidthHalf = m_winInfo.size.x / columnCount / 2;
+	for (uint8_t category : m_categories)
+	{
+		const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
+		// todo: compute this std::format() once and not every frame
+		if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
+			// Only show titles for category > 0, and if tree is not open: no need to render anything
+			continue;
+		}
+
+		else if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
+		{
+			std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
+			RenderInputs(0, inputs, category, columnCount);
+			ImGui::EndTable();
+		}
+
+	}
 }
 
 void EditorForm::Render()
@@ -263,6 +308,9 @@ void EditorForm::Render()
 		ImGui::SetNextWindowSize(m_winInfo.size);
 	}
 
+	// Setup style
+	ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
 		m_winInfo.pos = ImGui::GetWindowPos();
@@ -273,27 +321,7 @@ void EditorForm::Render()
 		}
 		else
 		{
-			currentViewport = ImGui::GetWindowViewport();
-
-			// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
-			const int columnCount = EditorFormUtils::GetColumnCount();
-			for (uint8_t category : m_categories)
-			{
-				const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
-				// todo: compute this std::format() once and not every frame
-				if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
-					// Only show titles for category > 0, and if tree is not open: no need to render anything
-					continue;
-				}
-
-				else if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
-				{
-					std::vector<EditorInput*>& inputs = m_fieldsCategoryMap[category];
-					RenderInputs(inputs, category, columnCount);
-					ImGui::EndTable();
-				}
-
-			}
+			RenderInternal();
 
 			bool enabledBtn = unsavedChanges;
 			if (enabledBtn) {
@@ -309,6 +337,8 @@ void EditorForm::Render()
 	}
 
 	ImGui::End();
+
+	ImGui::PopStyleVar();
 
 	if (!popen && unsavedChanges) {
 

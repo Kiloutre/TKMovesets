@@ -15,7 +15,7 @@ EditorInputSequence::EditorInputSequence(std::string windowTitleBase, uint32_t t
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorInputSequence::OnFieldLabelClick(EditorInput* field)
+void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	std::string& name = field->name;
