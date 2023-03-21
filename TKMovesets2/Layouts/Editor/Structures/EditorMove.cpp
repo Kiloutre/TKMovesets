@@ -80,6 +80,10 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 			m_baseWindow->OpenFormWindow(EditorWindowType_MoveEndProperty, id);
 		}
 	}
+	else if (name == "anim_name")
+	{
+		OpenAnimationList();
+	}
 }
 
 void EditorMove::OnApply()
@@ -110,4 +114,29 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 		const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
 		EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 	}
+}
+
+void EditorMove::OpenAnimationList()
+{
+	m_animationListOpen = true;
+}
+
+void EditorMove::PostRender()
+{
+	ImGui::PushID(id);
+	if (m_animationListOpen) {
+		ImGui::OpenPopup("AnimListPopup");
+	}
+	if (ImGui::BeginPopupModal("AnimListPopup", &m_animationListOpen))
+	{
+		ImGui::TextUnformatted(std::format("id is {}", id).c_str());
+
+		if (ImGui::Button(_("close"))) {
+			ImGui::CloseCurrentPopup();
+			m_animationListOpen = false;
+		}
+		ImGui::EndPopup();
+	}
+
+	ImGui::PopID();
 }

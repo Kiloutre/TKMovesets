@@ -141,7 +141,7 @@ void EditorForm::RenderLabel(int listIdx, EditorInput* field)
 {
 	const char* fieldLabel = _(field->displayName.c_str());
 
-	if (field->flags & EditorInput_Clickable && !field->errored) {
+	if (field->flags & EditorInput_Interactable && (!field->errored || field->flags & EditorInput_ClickableAlways)) {
 		ImGui::PushStyleColor(ImGuiCol_Header, FORM_LABEL_CLICKABLE);
 
 		if (ImGui::Selectable(fieldLabel, true)) {
@@ -346,7 +346,6 @@ void EditorForm::Render()
 	}
 
 	ImGui::End();
-
 	ImGui::PopStyleVar();
 
 	if (!popen && unsavedChanges) {
@@ -354,4 +353,6 @@ void EditorForm::Render()
 		m_requestedClosure = true;
 		popen = true;
 	}
+
+	PostRender();
 }

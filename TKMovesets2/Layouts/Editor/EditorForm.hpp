@@ -56,6 +56,7 @@ protected:
 	// Used for alignment calculations
 	float m_labelWidthHalf = 0.0f;
 
+	virtual void PostRender() {};
 	// Actual rendering function
 	virtual void RenderInternal();
 	// Sets the window name and reapplies its position and size because imgui ties window pos / size to their name

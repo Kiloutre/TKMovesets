@@ -107,6 +107,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 		bool busy = extractorHelper.IsBusy();
 		bool canExtract = p->IsAttached() && !busy && extractorHelper.CanStart();
+		bool canExtractAll = canExtract;
 
 		// Extraction buttons, will be disabled if we can't extract
 		for (int playerId = 0; playerId < extractorHelper.GetCharacterCount(); ++playerId)
@@ -124,6 +125,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 				buttonText = std::format("{} ({}, {})", _("extraction.extract"), _(playerIdTranslationId), characterName);
 				if (strncmp(characterName, MOVESET_EXTRACTED_NAME_PREFIX, sizeof(MOVESET_EXTRACTED_NAME_PREFIX) - 1) == 0) {
 					canExtractThisMoveset = false;
+					canExtractAll = false;
 				}
 			}
 
@@ -133,7 +135,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			ImGui::SameLine();
 		}
 
-		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_all"), canExtract)) {
+		if (ImGuiExtra::RenderButtonEnabled(_("extraction.extract_all"), canExtractAll)) {
 			extractorHelper.QueueCharacterExtraction(-1, GetExtractionSettings());
 		}
 
