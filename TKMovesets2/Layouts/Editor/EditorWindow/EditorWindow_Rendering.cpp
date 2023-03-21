@@ -140,6 +140,11 @@ void EditorWindow::RenderToolBar()
 		ImGui::EndMenu();
 	}
 
+	ImGui::Separator();
+	if (ImGui::MenuItem(_("edition.extract_animations"))) {
+		m_editor->ExtractAnimations(m_loadedCharacter.name);
+	}
+
 	ImGui::EndMenuBar();
 }
 

@@ -1,5 +1,6 @@
 #include <map>
 #include <format>
+#include <fstream>
 
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
@@ -1521,4 +1522,57 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
+}
+
+// -- Anim extraction -- //
+
+void EditorT7::ExtractAnimations(const std::string& characterFilename)
+{
+	std::string outputFolder;
+
+	outputFolder = std::format(EDITOR_LIB_DIRECTORY "/{}", characterFilename.substr(0, characterFilename.find_last_of('.')).c_str());
+	CreateDirectory(EDITOR_LIB_DIRECTORY, nullptr);
+	CreateDirectory(outputFolder.c_str(), nullptr);
+
+	const Byte* baseAnimPtr = m_movesetData + m_header->offsets.animationBlock;
+	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+	const int animCount = m_animOffsetToNameOffset.size();
+	auto it = m_animOffsetToNameOffset.begin();
+	auto end = m_animOffsetToNameOffset.end();
+
+	for (int idx = 0; idx < animCount; ++idx)
+	{
+		const char* name = namePtr + it->second;
+		auto& offset = it->first;
+		uint64_t size;
+
+		std::advance(it, 1);
+		if (it == end) {
+			// For the very last animation, we get the size by looking at the start of the next block
+			// This is a bit flawed because of 8 bytes alignement, but what's a little 7 bytes at most, for one anim?
+			size = (m_header->offsets.motaBlock - m_header->offsets.animationBlock) - offset;
+		}
+		else {
+			size = it->first - offset;
+			if (size == 0) {
+				// Two animation names referring to the same anim offset. Loop until we find a different offset in order to get the proper size
+				auto it_copy = it;
+				while (it_copy != end && it_copy->first == offset) {
+					std::advance(it_copy, 1);
+				}
+				size = it_copy->first - offset;
+			}
+		}
+
+		std::string filename = std::format("{}/{}.bin", outputFolder, name);
+		// todo: check if anim exists already
+		std::ofstream file(filename.c_str(), std::ios::binary);
+
+		if (file.fail()) {
+			continue;
+		}
+
+		const char* anim = (char*)baseAnimPtr + offset;
+		file.write(anim, size);
+	}
 }

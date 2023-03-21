@@ -50,6 +50,7 @@ moveset.import = Importer
 moveset.edit = Modifier
 moveset.delete = Suppr.
 moveset.version = Version
+moveset.extract_anims = Extraire anim.
 
 ## Principal ##
 
@@ -135,6 +136,8 @@ edition.play_move_2p = Lancer (J2)
 edition.window_title = Édition
 edition.apply = Appliquer
 edition.window_controls_explanation = Cliquez sur un Move dans la liste des moves pour ouvrir sa fenêtre associée. Elle viendra écraser toute fenêtre précédemment ouverte, sauf si cette ancienne fenêtre contient du contenu non-sauvegardé OU si vous maintenez CTRL GAUCHE avant de cliquer. Les fenêtres ouvertes peuvent être déplacées où vous le souhaitez, peuvent être assemblées et il est possible de les positionner de diverses manières.
+edition.extract_animations = Extraire animations
+
 edition.create_new = Créer 
 edition.requirement = Liste de conditions
 edition.move = Move

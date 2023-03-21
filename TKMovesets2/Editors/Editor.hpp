@@ -267,6 +267,10 @@ public:
 	// -- Iteractions -- //
 	// Sets the current move of a player
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
+	// Saves all the moveset animations in our library
+	virtual void ExtractAnimations(const std::string& characterFilename) = 0;
+
+	// -- Creation -- //
 	// Create a new structure or structure list
 	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
 	// Modifies an existing list's size

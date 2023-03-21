@@ -60,8 +60,6 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.edit"), moveset->editable)) {
 					movesetToLoad = moveset;
-					ImGui::PopID();
-					break;
 				}
 				ImGui::PopID();
 			}

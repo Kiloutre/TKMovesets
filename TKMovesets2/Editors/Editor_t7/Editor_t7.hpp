@@ -133,6 +133,8 @@ public:
 	// -- Interactions -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
+	// Saves all the moveset animations in our library
+	void ExtractAnimations(const std::string& characterFilename) override;
 
 	// -- Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;
