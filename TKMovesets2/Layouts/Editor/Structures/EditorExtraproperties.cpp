@@ -15,7 +15,7 @@ EditorExtraproperties::EditorExtraproperties(std::string windowTitleBase, uint32
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorExtraproperties::OnResize(int sizeChange, int oldSize)
+void EditorExtraproperties::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("extra_properties_addr", sizeChange, id, id + oldSize);
 }

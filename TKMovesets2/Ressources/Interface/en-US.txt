@@ -192,6 +192,9 @@ edition.move._0xA8_short = Facing/Extras?
 
 edition.voiceclip.window_name = Voiceclip
 edition.voiceclip.id = ID
+edition.voiceclip.limb_swinging = Limb swinging SFX
+edition.voiceclip.hit = Hit SFX
+edition.voiceclip.end = END
 
 edition.extraproperty.window_name = Extra property list
 edition.extraproperty.starting_frame = Starting frame

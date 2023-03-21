@@ -28,7 +28,7 @@ void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorHitConditions::OnResize(int sizeChange, int oldSize)
+void EditorHitConditions::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("hit_condition_addr", sizeChange, id, id + oldSize);
 }

@@ -15,7 +15,7 @@ EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_i
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorRequirements::OnResize(int sizeChange, int oldSize)
+void EditorRequirements::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("requirements_addr", sizeChange, id, id + oldSize);
 }

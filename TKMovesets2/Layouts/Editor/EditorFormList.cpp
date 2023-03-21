@@ -38,7 +38,7 @@ void EditorFormList::Apply()
 		int oldSize = m_listSize - m_listSizeChange;
 		m_editor->ModifyListSize(windowType, id, oldSize, m_listSize);
 		if (m_listSize != 0) {
-			OnResize(m_listSizeChange, oldSize);
+			OnApplyResize(m_listSizeChange, oldSize);
 		}
 		m_listSizeChange = 0;
 	}
@@ -130,6 +130,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			++m_listSize;
 
 			unsavedChanges = true;
+			OnResize();
 		}
 		ImGui::SameLine();
 	}
@@ -158,6 +159,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			}
 
 			unsavedChanges = true;
+			OnReorder();
 		}
 		ImGui::SameLine();
 	}
@@ -186,6 +188,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			}
 
 			unsavedChanges = true;
+			OnReorder();
 		}
 		ImGui::SameLine();
 	}
@@ -209,6 +212,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_items.erase(m_items.begin() + listIndex);
 				unsavedChanges = true;
 			}
+			OnResize();
 		}
 		ImGui::PopStyleColor();
 		ImGui::SameLine();

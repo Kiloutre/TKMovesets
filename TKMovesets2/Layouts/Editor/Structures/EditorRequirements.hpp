@@ -6,7 +6,7 @@
 class EditorRequirements : public EditorFormList
 {
 private:
-	void OnResize(int sizeChange, int oldSize) override;
+	void OnApplyResize(int sizeChange, int oldSize) override;
 	void BuildItemDetails(int listIdx) override;
 	void OnUpdate(int listIdx, EditorInput* field) override;
 public:

@@ -25,7 +25,7 @@ void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorMoveStartProperty::OnResize(int sizeChange, int oldSize)
+void EditorMoveStartProperty::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("ending_extra_properties_addr", sizeChange, id, id + oldSize);
 }

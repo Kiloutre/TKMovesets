@@ -138,7 +138,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	item->itemLabel = label;
 }
 
-void EditorCancels::OnResize(int sizeChange, int oldSize)
+void EditorCancels::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("cancel_addr", sizeChange, id, id + oldSize);
 }

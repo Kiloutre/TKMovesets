@@ -109,7 +109,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 	item->itemLabel = label;
 }
 
-void EditorGroupedCancels::OnResize(int sizeChange, int oldSize)
+void EditorGroupedCancels::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate("grouped_cancel_id", sizeChange, id, id + oldSize);
 }

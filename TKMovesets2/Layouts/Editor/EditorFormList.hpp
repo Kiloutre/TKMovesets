@@ -38,8 +38,12 @@ protected:
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
 	int m_listSizeChange = 0;
 
-	// Called whenever the list is resized, used  to issue field updates to other windows
-	virtual void OnResize(int sizeChange, int oldSize) {};
+	// Called whenver the list is reordered, used to  update field labels when index is important
+	virtual void OnReorder() {};
+	// Called whenever the list is resized, used to update field labels when index is important
+	virtual void OnResize() {};
+	// Called whenever applying with a resized list, used  to issue field updates to other windows
+	virtual void OnApplyResize(int sizeChange, int oldSize) {};
 	// Builds a string label that will be shown as the title of the item tree view
 	virtual void BuildItemDetails(int listIdx);
 	// Save every list item individually
