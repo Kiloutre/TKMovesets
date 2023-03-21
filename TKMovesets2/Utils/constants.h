@@ -6,6 +6,10 @@
 #define DLLCONTENT __declspec(dllimport)
 #endif
 
+#ifndef BUILD_TYPE
+#define BUILD_TYPE Release
+#endif
+
 # define PROGRAM_TITLE           "TKMovesets - kilo"
 # define PROGRAM_VERSION         "0.1"
 # define PROGRAM_WIN_WIDTH       1280
