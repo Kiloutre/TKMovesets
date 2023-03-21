@@ -117,6 +117,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				std::vector<EditorInput*> inputs;
 				for (const std::string& fieldName : drawOrder) {
 					EditorInput* field = item->identifierMaps[fieldName];
+					EditorFormUtils::SetFieldDisplayText(field, field->fullName);
 					if (field->category == category) {
 						inputs.push_back(field);
 					}
