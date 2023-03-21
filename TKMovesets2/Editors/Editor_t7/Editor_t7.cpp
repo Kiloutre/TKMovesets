@@ -929,6 +929,13 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 		return 0;
 	}
 
+
+	// Shift offsets now that we know the extra allocated size. Need to do it before LoadMovesetPtr.
+	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+	m_header->offsets.movesetBlock += extraNameSize;
+	m_header->offsets.animationBlock += extraNameSize;
+	m_header->offsets.motaBlock += extraNameSize;
+
 	// Copy start //
 
 	memcpy(newMoveset, m_moveset, moveNameOffset);
@@ -942,12 +949,6 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 	// Assign new moveset
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
-	m_header->offsets.movesetBlock += extraNameSize;
-	m_header->offsets.animationBlock += extraNameSize;
-	m_header->offsets.motaBlock += extraNameSize;
 
 	return relativeMoveNameOffset;
 }
