@@ -32,6 +32,10 @@ namespace EditorUtils
 			field->color = FORM_INPUT_HEX;
 		}
 
+		else if (field->flags & EditorInput_Float) {
+			field->color = FORM_INPUT_FLOAT;
+		}
+
 		else if (field->flags & EditorInput_PTR) {
 			field->color = FORM_INPUT_REF;
 		}
@@ -102,6 +106,14 @@ namespace EditorUtils
 
 		if (flags & (EditorInput_H64 | EditorInput_H32 | EditorInput_H16)) {
 			return strtoll(buffer, nullptr, 16);
+		}
+		if (flags & EditorInput_Float) {
+			union fieldValue {
+				uint64_t uint64 = 0;
+				float floatingPoint;
+			} Test;
+			Test.floatingPoint = std::atof(buffer);
+			return Test.uint64;
 		}
 		return strtoll(buffer, nullptr, 10);
 	}
