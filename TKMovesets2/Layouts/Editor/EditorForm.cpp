@@ -332,10 +332,10 @@ void EditorForm::Render()
 			const float frameHeight = ImGui::GetFrameHeightWithSpacing();
 			if (ImGui::GetCursorPosY() + frameHeight >= m_winInfo.size.y) {
 				ImGui::Dummy(ImVec2(1, frameHeight));
+				// Render Apply() button at the bottom
+				ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - frameHeight + ImGui::GetScrollY()));
 			}
 
-			// Render Apply() button at the bottom, always
-			ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - frameHeight + ImGui::GetScrollY()));
 			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 				Apply();
 			}
