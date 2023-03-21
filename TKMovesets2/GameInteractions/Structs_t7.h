@@ -14,8 +14,8 @@ namespace StructsT7
 
 	struct Pushback
 	{
-		int16_t duration;
-		int16_t displacement;
+		uint16_t duration;
+		uint16_t displacement;
 		uint32_t num_of_loops;
 		PushbackExtradata* extradata_addr;
 	};
@@ -35,11 +35,11 @@ namespace StructsT7
 	{
 		union
 		{
-			int64_t command;
+			uint64_t command;
 			struct
 			{
-				int32_t direction;
-				int32_t button;
+				uint32_t direction;
+				uint32_t button;
 			};
 		};
 		Requirement* requirements_addr;
@@ -53,7 +53,7 @@ namespace StructsT7
 
 	struct Reactions
 	{
-		// 0 = 0 when writing (might be a ptr)
+		// 0 = 0 when writing 
 		Pushback* front_pushback;
 		Pushback* backturned_pushback;
 		Pushback* left_side_pushback;
@@ -114,11 +114,11 @@ namespace StructsT7
 	{
 		union
 		{
-			int64_t command;
+			uint64_t command;
 			struct
 			{
-				int32_t direction;
-				int32_t button;
+				uint32_t direction;
+				uint32_t button;
 			};
 		};
 	};
@@ -188,7 +188,7 @@ namespace StructsT7
 	struct OtherMoveProperty
 	{
 		Requirement* requirements_addr;
-		uint32_t extraprop; // 881 list end value
+		uint32_t extraprop; // 881 list end value & extraprop values
 		uint32_t value;
 	};
 
@@ -332,8 +332,8 @@ namespace StructsT7_gameAddr
 {
 	struct Pushback
 	{
-		int16_t duration;
-		int16_t displacement;
+		uint16_t duration;
+		uint16_t displacement;
 		uint32_t num_of_loops;
 		gameAddr extradata_addr;
 	};
@@ -455,13 +455,13 @@ namespace StructsT7_gameAddr
 	struct OtherMoveProperty
 	{
 		gameAddr requirements_addr;
-		uint32_t extraprop; // 881 list end
+		uint32_t extraprop; // 881 list end value & extraprop values
 		uint32_t value; // Often small values
 	};
 
 	struct Move
 	{
-		// 0 = 0 when writing (might be a ptr)
+		// 0 = 0 when writing
 		gameAddr name_addr;
 		gameAddr anim_name_addr;
 		gameAddr anim_addr;

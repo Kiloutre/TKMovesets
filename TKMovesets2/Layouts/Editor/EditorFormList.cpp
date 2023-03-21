@@ -321,7 +321,7 @@ void EditorFormList::RenderInternal()
 		}
 
 		ImGui::PushID(listIndex);
-		if (!ImGui::TreeNodeExV(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, item->itemLabel.c_str(), va_list())) {
+		if (!ImGui::TreeNodeEx(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, item->itemLabel.c_str())) {
 			// Tree node hidden so no need to render anything
 			ImGui::PopID();
 			item->openStatus = EditorFormTreeview_Closed;

@@ -67,8 +67,8 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("duration", 0, EditorInput_S16, pushback->duration);
-	CREATE_FIELD("displacement", 0, EditorInput_S16, pushback->displacement);
+	CREATE_FIELD("duration", 0, EditorInput_U16, pushback->duration);
+	CREATE_FIELD("displacement", 0, EditorInput_U16, pushback->displacement);
 	CREATE_FIELD("num_of_loops", 0, EditorInput_U32, pushback->num_of_loops);
 	CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, pushback->extradata_addr);
 

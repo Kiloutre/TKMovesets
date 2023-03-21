@@ -46,11 +46,11 @@ moveset.date = Date
 moveset.invalid = INVALIDE
 moveset.size = Taille
 moveset.size_mb = MO
+moveset.size_kb = KO
 moveset.import = Importer
 moveset.edit = Modifier
 moveset.delete = Suppr.
 moveset.version = Version
-moveset.extract_anims = Extraire anim.
 
 ## Principal ##
 
@@ -319,6 +319,12 @@ edition.pushback_extradata.horizontal_offset = Valeur horizontale
 edition.form_list.item = Élément
 edition.form_list.end = FIN
 edition.form_list.invalid = INVALIDE
+
+edition.animation_list.anim_name = Nom de l'animation
+edition.animation_list.duration = Durée (images)
+edition.animation_list.size = Taille
+edition.animation_list.import = Importer dans move
+edition.animation_list.search_animation = Rechercher le nom de l'animation à importer dans ce move...
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 

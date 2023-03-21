@@ -2,6 +2,7 @@
 
 #include "Editor.hpp"
 #include "EditorForm.hpp"
+#include "EditorMove_Animations.hpp"
 
 class EditorMove : public EditorForm
 {
@@ -10,6 +11,8 @@ private:
 	bool m_animationListOpen = false;
 	// If the move name was changed. Used to re-apply window name.
 	bool m_renamed = false;
+	// Window containing the animation list to choose from
+	EditorMove_Animations* m_animationList = nullptr;
 
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 	void OnApply() override;

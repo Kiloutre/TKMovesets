@@ -43,9 +43,10 @@ process.game_unexpected_exit = Game exited unexpectedly.
 moveset.origin = Origin
 moveset.target_character = Character
 moveset.date = Date
-moveset.invalid = INVALID
+moveset.invalid = INVALID7
 moveset.size = Size
 moveset.size_mb = MB
+moveset.size_kb = KB
 moveset.import = Import
 moveset.edit = Edit
 moveset.delete = Delete
@@ -322,6 +323,12 @@ edition.pushback_extradata.horizontal_offset = Horizontal offset
 edition.form_list.item = Item
 edition.form_list.end = END
 edition.form_list.invalid = INVALID
+
+adition.animation_list.anim_name = Animation name
+adition.animation_list.duration = Duration (frames)
+adition.animation_list.size = Size
+edition.animation_list.import = Import in move
+edition.animation_list.search_animation = Search animation name to import in current move...
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

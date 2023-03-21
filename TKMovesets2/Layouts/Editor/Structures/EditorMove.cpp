@@ -124,23 +124,21 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 void EditorMove::OpenAnimationList()
 {
 	m_animationListOpen = true;
+	m_animationList = new EditorMove_Animations;
 }
 
 void EditorMove::PostRender()
 {
 	ImGui::PushID(id);
+
 	if (m_animationListOpen) {
 		ImGui::OpenPopup("AnimListPopup");
-	}
-	if (ImGui::BeginPopupModal("AnimListPopup", &m_animationListOpen))
-	{
-		ImGui::TextUnformatted(std::format("id is {}", id).c_str());
 
-		if (ImGui::Button(_("close"))) {
-			ImGui::CloseCurrentPopup();
+		if (!m_animationList->Render()) {
 			m_animationListOpen = false;
+			delete m_animationList;
+			m_animationList = nullptr;
 		}
-		ImGui::EndPopup();
 	}
 
 	ImGui::PopID();

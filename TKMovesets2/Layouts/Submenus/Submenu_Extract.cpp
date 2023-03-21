@@ -209,11 +209,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			if (moveset->origin == "INVALID") {
 				// Badly formatted file. Display it, but mention it is invalid
 				ImGui::TextUnformatted(_("moveset.invalid"));
-				ImGui::TableNextColumn();
-				ImGui::TableNextColumn();
-				ImGui::TableNextColumn();
-				ImGui::TableNextColumn();
-				ImGui::TableNextColumn();
+				ImGui::TableSetColumnIndex(6);
 				ImGui::PushID(moveset->filename.c_str());
 				if (ImGui::Button("X")) {
 					extractorHelper.storage->DeleteMoveset(moveset->filename.c_str());

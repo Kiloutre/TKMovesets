@@ -9,6 +9,7 @@ set(INCLUDE_FOLDERS
                     "Layouts/Editor"
                     "Layouts/Editor/EditorWindow"
                     "Layouts/Editor/Structures"
+                    "Layouts/Editor/Structures/Subwindows"
                     "Game"
                     "GameInteractions"
                     "GameInteractions/Extractors"
@@ -53,6 +54,8 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorInputSequence.cpp"
                     "Layouts/Editor/Structures/EditorInputStruct.cpp"
                     "Layouts/Editor/Structures/EditorProjectile.cpp"
+                    # Layout: editor subwindows
+                    "Layouts/Editor/Structures/Subwindows/EditorMove_Animations.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
