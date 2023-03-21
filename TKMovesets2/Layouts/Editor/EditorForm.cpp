@@ -185,7 +185,7 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		unsavedChanges = true;
 		field->errored = m_editor->ValidateField(windowType, field) == false;
 		if (!field->errored) {
-			OnUpdate(0, field);
+			OnUpdate(listIdx, field);
 		}
 	}
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))

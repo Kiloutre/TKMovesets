@@ -45,16 +45,24 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	int startingFrame = atoi(map["starting_frame"]->buffer);
 	int id = strtoll(map["id"]->buffer, nullptr, 16);
-	int value = atoi(map["value"]->buffer);
+	uint64_t value = strtoll(map["value"]->buffer, nullptr, 10);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 
 	std::string startingFrameText = startingFrame == 32769 ? _("edition.extraproperty.instant") : std::to_string(startingFrame);
+	std::string valueText;
+
+	if (value > 15) {
+		valueText = std::format("0x{:x} / {} / {}f", value, value, *(float*)&value);
+	}
+	else {
+		valueText = std::to_string(value);
+	}
 
 	if (idLabel == nullptr) {
-		label = std::format("{}: 0x{:x} = 0x{:x} / {}", startingFrameText, id, value, value);
+		label = std::format("{}: 0x{:x} =  {}", startingFrameText, id, valueText);
 	} else {
-		label = std::format("{}: {} = 0x{:x} / {}", startingFrameText, idLabel, value, value);
+		label = std::format("{}: {} = {}", startingFrameText, idLabel, valueText);
 	}
 
 	m_items[listIdx]->itemLabel = label;

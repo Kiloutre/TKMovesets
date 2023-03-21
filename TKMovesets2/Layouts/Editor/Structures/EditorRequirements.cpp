@@ -44,15 +44,23 @@ void EditorRequirements::BuildItemDetails(int listIdx)
 	auto& map = m_items[listIdx]->identifierMaps;
 
 	int id = atoi(map["condition"]->buffer);
-	int value = atoi(map["param"]->buffer);
+	uint64_t value = strtoll(map["param"]->buffer, nullptr, 10);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
+	std::string valueText;
 
-	if (idLabel == nullptr) {
-		label = std::format("{} = 0x{:x} / {}", id, value, value);
+	if (value > 15) {
+		valueText = std::format("0x{:x} / {} / {}f", value, value, *(float*)&value);
 	}
 	else {
-		label = std::format("{} = 0x{:x} / {}", idLabel, value, value);
+		valueText = std::to_string(value);
+	}
+
+	if (idLabel == nullptr) {
+		label = std::format("{} = {}", id, valueText);
+	}
+	else {
+		label = std::format("{} = {}", idLabel, valueText);
 	}
 
 	m_items[listIdx]->itemLabel = label;
