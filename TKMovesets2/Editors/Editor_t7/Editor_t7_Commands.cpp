@@ -17,7 +17,7 @@ const std::vector<std::string> cg_directionBitLabels = {
 static std::string getCommandString(uint64_t command)
 {
 	int inputBits = command >> 32;
-	int directionBits = command & 0xFFFFFFFF;
+	int directionBits = command & 0xFFFFFFFF;;
 
 	if (command == 0x8000) {
 		return "AUTO";

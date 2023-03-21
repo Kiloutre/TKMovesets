@@ -201,6 +201,7 @@ edition.extraproperty.starting_frame = Starting frame
 edition.extraproperty.id = ID
 edition.extraproperty.value = Value
 edition.extraproperty.instant = INSTANT
+edition.extraproperty.every_frame = EVERY FRAME
 
 edition.move_start_extraprop_addr.window_name = Start property list
 edition.move_start_extraprop_addr.requirements_addr = Requirements ID
@@ -221,7 +222,7 @@ edition.cancel.detection_end = Detection end
 edition.cancel.starting_frame = Starting frame
 edition.cancel.move_id = Move ID
 edition.cancel.group_id = Cancel group ID
-edition.cancel.sequence_id = ID de sequence
+edition.cancel.sequence_id = Sequence ID
 edition.cancel.cancel_option = Cancel option
 
 edition.grouped_cancel.window_name = Grouped Cancel list
@@ -308,6 +309,15 @@ edition.projectile.gravity = Gravity
 edition.projectile.hit_level = Hit level
 edition.projectile.hit_condition_addr = Hit Conditions ID
 edition.projectile.cancel_addr = Cancels ID
+
+edition.pushback.window_name = Pushback
+edition.pushback.duration = Duration
+edition.pushback.num_of_loops = Num of loops
+edition.pushback.displacement = Displacmeent
+edition.pushback.extradata_addr = Extradata ID
+
+edition.pushback_extradata.window_name = Pushback Extradata
+edition.pushback_extradata.horizontal_offset = Horizontal offset
 
 edition.form_list.item = Item
 edition.form_list.end = END

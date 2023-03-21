@@ -14,7 +14,7 @@ namespace StructsT7
 
 	struct Pushback
 	{
-		uint16_t duration;
+		int16_t duration;
 		int16_t displacement;
 		uint32_t num_of_loops;
 		PushbackExtradata* extradata_addr;
@@ -38,8 +38,8 @@ namespace StructsT7
 			int64_t command;
 			struct
 			{
-				int32_t button;
 				int32_t direction;
+				int32_t button;
 			};
 		};
 		Requirement* requirements_addr;
@@ -117,8 +117,8 @@ namespace StructsT7
 			int64_t command;
 			struct
 			{
-				int32_t button;
 				int32_t direction;
+				int32_t button;
 			};
 		};
 	};
@@ -332,7 +332,7 @@ namespace StructsT7_gameAddr
 {
 	struct Pushback
 	{
-		uint16_t duration;
+		int16_t duration;
 		int16_t displacement;
 		uint32_t num_of_loops;
 		gameAddr extradata_addr;

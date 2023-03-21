@@ -37,6 +37,8 @@ protected:
 	size_t m_listSize = 0;
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
 	int m_listSizeChange = 0;
+	// Identifier that will be sent when we are being resized
+	std::string m_resizeEventKey;
 
 	// Called whenver the list is reordered, used to  update field labels when index is important
 	virtual void OnReorder() {};

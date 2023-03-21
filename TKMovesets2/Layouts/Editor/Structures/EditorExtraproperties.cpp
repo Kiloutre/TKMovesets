@@ -49,8 +49,26 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 
-	std::string startingFrameText = startingFrame == 32769 ? _("edition.extraproperty.instant") : std::to_string(startingFrame);
+	std::string startingFrameText;
 	std::string valueText;
+
+	if (startingFrame >= 32769) {
+		switch (startingFrame)
+		{
+		case 99999:
+			startingFrameText = _("edition.extraproperty.every_frame");
+			break;
+		case 32769:
+			startingFrameText = _("edition.extraproperty.instant");
+			break;
+		default:
+			startingFrameText = std::format("{} ({})", _("edition.extraproperty.instant"), startingFrame - 32769);
+			break;
+		}
+	}
+	else {
+		startingFrameText = std::to_string(startingFrame);
+	}
 
 	if (value > 15) {
 		valueText = std::format("0x{:x} / {} / {}f", value, value, *(float*)&value);

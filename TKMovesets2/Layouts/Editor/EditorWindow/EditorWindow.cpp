@@ -62,7 +62,7 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		return new EditorPushback(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_PushbackExtradata:
-		return new EditorPushbackExtra(m_windowTitle, id, m_editor);
+		return new EditorPushbackExtra(m_windowTitle, id, m_editor, this, listSize);
 		break;
 	case EditorWindowType_MoveBeginProperty:
 		return new EditorMoveStartProperty(m_windowTitle, id, m_editor, this);

@@ -24,20 +24,28 @@ static void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, st
 
 // ===== Pushback Extra ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	auto pushbackExtra = m_iterators.pushback_extras[id];
+	auto pushbackExtra = m_iterators.pushback_extras.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("horizontal_offset", 0, EditorInput_U16, pushbackExtra->horizontal_offset);
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
 
-	WriteFieldFullname(inputMap, "pushback_extradata");
-	return inputMap;
+		CREATE_FIELD("horizontal_offset", 0, EditorInput_U16, pushbackExtra->horizontal_offset);
+
+		WriteFieldFullname(inputMap, "pushback_extradata");
+		inputListMap.push_back(inputMap);
+		pushbackExtra++;
+	} while (--listSize > 0);
+
+	return inputListMap;
 }
 
 void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
@@ -59,7 +67,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("duration", 0, EditorInput_U16, pushback->displacement);
+	CREATE_FIELD("duration", 0, EditorInput_S16, pushback->displacement);
 	CREATE_FIELD("displacement", 0, EditorInput_S16, pushback->duration);
 	CREATE_FIELD("num_of_loops", 0, EditorInput_U32, pushback->num_of_loops);
 	CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, pushback->duration);
@@ -90,6 +98,11 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 	pushback->displacement = GetFieldValue(inputs["displacement"]);
 	pushback->num_of_loops = GetFieldValue(inputs["num_of_loops"]);
 	pushback->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
+	printf("SavePushback %d %d [%s]\n", id, pushback->duration, inputs["duration"]->buffer);
+	printf("SavePushback %d [%s]\n", pushback->displacement, inputs["displacement"]->buffer);
+	printf("SavePushback %d [%s]\n", pushback->num_of_loops, inputs["num_of_loops"]->buffer);
+	printf("SavePushback %d [%s]\n", pushback->extradata_addr, inputs["extradata_addr"]->buffer);
+
 }
 
 // ===== Projectile ===== //
@@ -1228,9 +1241,6 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 	case EditorWindowType_Pushback:
 		return GetPushbackInputs(id, drawOrder);
 		break;
-	case EditorWindowType_PushbackExtradata:
-		return GetPushbackExtraInputs(id, drawOrder);
-		break;
 	case EditorWindowType_InputSequence:
 		return GetInputSequenceInputs(id, drawOrder);
 		break;
@@ -1281,6 +1291,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 	{
 	case EditorWindowType_Input:
 		return GetInputListInputs(id, listSize, drawOrder);
+		break;
+	case EditorWindowType_PushbackExtradata:
+		return GetPushbackExtraListInputs(id, listSize, drawOrder);
 		break;
 	}
 	return GetFormFieldsList(type, id, drawOrder);

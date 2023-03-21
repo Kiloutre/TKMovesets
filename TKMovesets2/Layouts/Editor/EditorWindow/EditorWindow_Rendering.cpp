@@ -100,6 +100,8 @@ void EditorWindow::RenderToolBar()
 			structType = EditorWindowType_Pushback;
 		}
 		if (ImGui::MenuItem(_("edition.pushback_extra"))) {
+			// Input list sizes must be known ahead of time when opening a window
+			listSize = 1;
 			structType = EditorWindowType_PushbackExtradata;
 		}
 		ImGui::Separator();

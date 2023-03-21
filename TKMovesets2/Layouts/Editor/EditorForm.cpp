@@ -222,6 +222,7 @@ void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 
 	if (reapplyWindowProperties) {
 		m_winInfo.applyNextRender = true;
+		nextDockId = ImGui::GetWindowDockID();
 	}
 }
 

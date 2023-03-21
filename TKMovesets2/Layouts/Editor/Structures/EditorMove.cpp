@@ -34,8 +34,7 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 	m_windowTitle = std::format("{} {} {} - {}", windowName, id, moveName, m_windowTitleBase.c_str());
 
 	if (reapplyWindowProperties) {
-		m_winInfo.pos = ImGui::GetWindowPos();
-		m_winInfo.size = ImGui::GetWindowSize();
+		nextDockId = ImGui::GetWindowDockID();
 		m_winInfo.applyNextRender = true;
 	}
 }

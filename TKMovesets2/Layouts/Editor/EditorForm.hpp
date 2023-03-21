@@ -51,6 +51,7 @@ protected:
 	{
 		ImVec2 pos;
 		ImVec2 size;
+		ImGuiID dockId;
 		bool applyNextRender = false;
 	} m_winInfo;
 	// Used for alignment calculations

@@ -152,6 +152,25 @@ void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
 	}
 }
 
+void EditorT7::ModifyPushbackExtraListSize(int listId, int oldSize, int newSize)
+{
+	const int listSizeDiff = newSize - oldSize;
+	ModifyGenericListSize<PushbackExtradata>(listId, oldSize, newSize, offsetof(m_infos->table, pushbackExtradata));
+
+	// Correct every structure that uses this list and needs shifting
+
+	// Input sequences
+	for (auto& pushback : m_iterators.pushbacks)
+	{
+		if (MUST_SHIFT_ID(pushback.extradata_addr, listSizeDiff, listId, listId + oldSize)) {
+			pushback.extradata_addr += listSizeDiff;
+		}
+		else if (pushback.extradata_addr >= listId && pushback.extradata_addr <= (listId + oldSize)) {
+			pushback.num_of_loops += listSizeDiff;
+		}
+	}
+}
+
 void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
@@ -295,6 +314,10 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 
 	case EditorWindowType_Input:
 		ModifyInputListSize(listId, oldSize, newSize);
+		break;
+
+	case EditorWindowType_PushbackExtradata:
+		ModifyPushbackExtraListSize(listId, oldSize, newSize);
 		break;
 
 	case EditorWindowType_Voiceclip:

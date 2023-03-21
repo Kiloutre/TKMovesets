@@ -198,6 +198,7 @@ edition.extraproperty.starting_frame = Frame de début
 edition.extraproperty.id = ID
 edition.extraproperty.value = Value
 edition.extraproperty.instant = INSTANTANÉ
+edition.extraproperty.every_frame = CHAQUE FRAME
 
 edition.move_start_extraprop_addr.window_name = Liste de propriété de début
 edition.move_start_extraprop_addr.requirements_addr = ID de condition
@@ -305,6 +306,15 @@ edition.projectile.gravity = Gravité
 edition.projectile.hit_level = Hauteur de coup
 edition.projectile.hit_condition_addr = ID de Hit Conditions
 edition.projectile.cancel_addr = ID de Cancels
+
+edition.pushback.window_name = Poussé
+edition.pushback.duration = Durée
+edition.pushback.num_of_loops = Nombre de boucles
+edition.pushback.displacement = Déplacement
+edition.pushback.extradata_addr = Poussée Extra ID
+
+edition.pushback_extradata.window_name = Poussée Extra
+edition.pushback_extradata.horizontal_offset = Valeur horizontale
 
 edition.form_list.item = Élément
 edition.form_list.end = FIN

@@ -113,7 +113,7 @@ public:
 	bool ValidatePushbackField(EditorInput* field);
 
 	// Pushback extradata
-	std::map<std::string, EditorInput*> GetPushbackExtraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	std::vector<std::map<std::string, EditorInput*>> GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
 	void SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
 	// Input Sequence
@@ -121,7 +121,7 @@ public:
 	void SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateInputSequenceField(EditorInput* field);
 
-	// Hit conditions
+	// Input list
 	std::vector<std::map<std::string, EditorInput*>> GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
 	void SaveInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
@@ -183,6 +183,7 @@ public:
 	void ModifyEndPropertyListSize(int listId, int oldSize, int newSize);
 	//
 	void ModifyHitConditionListSize(int listId, int oldSize, int newSize);
+	void ModifyPushbackExtraListSize(int listId, int oldSize, int newSize);
 	//
 	void ModifyInputListSize(int listId, int oldSize, int newSize);
 	//
