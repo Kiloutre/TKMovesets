@@ -217,6 +217,7 @@ bool EditorForm::IsFormValid()
 
 void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 {
+	if (reapplyWindowProperties) return;
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
 	m_windowTitle = std::format("{} {} - {}", windowName, id, m_windowTitleBase.c_str());
 
@@ -305,7 +306,8 @@ void EditorForm::Render()
 
 	if (m_winInfo.applyNextRender) {
 		m_winInfo.applyNextRender = false;
-		ImGui::SetNextWindowPos(m_winInfo.pos);
+		// + (100, 100) because i haven't managed to get the window to do back where it was
+		ImGui::SetNextWindowPos(m_winInfo.pos + ImVec2(100, 100));
 		ImGui::SetNextWindowSize(m_winInfo.size);
 	}
 

@@ -62,7 +62,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 			startingFrameText = _("edition.extraproperty.instant");
 			break;
 		default:
-			startingFrameText = std::format("{} ({})", _("edition.extraproperty.instant"), startingFrame - 32769);
+			startingFrameText = std::format("{} (+{})", _("edition.extraproperty.instant"), startingFrame - 32769);
 			break;
 		}
 	}
