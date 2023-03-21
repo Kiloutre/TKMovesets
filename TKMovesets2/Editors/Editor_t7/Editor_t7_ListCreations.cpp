@@ -247,6 +247,23 @@ void EditorT7::ModifyEndPropertyListSize(int listId, int oldSize, int newSize)
 	}
 }
 
+void EditorT7::ModifyVoiceclipListSize(int listId, int oldSize, int newSize)
+{
+	const int listSizeDiff = newSize - oldSize;
+	ModifyGenericListSize<Voiceclip>(listId, oldSize, newSize, offsetof(m_infos->table, voiceclip));
+
+	// Correct every structure that uses this list and needs shifting
+
+	for (auto& move : m_iterators.moves)
+	{
+		if (move.voicelip_addr != MOVESET_ADDR_MISSING) {
+			if (MUST_SHIFT_ID(move.voicelip_addr, listSizeDiff, listId, listId + oldSize)) {
+				move.voicelip_addr += listSizeDiff;
+			}
+		}
+	}
+}
+
 void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize)
 {
 	switch (type)
@@ -278,6 +295,10 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 
 	case EditorWindowType_Input:
 		ModifyInputListSize(listId, oldSize, newSize);
+		break;
+
+	case EditorWindowType_Voiceclip:
+		ModifyVoiceclipListSize(listId, oldSize, newSize);
 		break;
 	}
 }

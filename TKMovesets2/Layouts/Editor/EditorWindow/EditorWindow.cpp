@@ -35,7 +35,7 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		return new EditorMove(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Voiceclip:
-		return new EditorVoiceclip(m_windowTitle, id, m_editor);
+		return new EditorVoiceclip(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Extraproperty:
 		return new EditorExtraproperties(m_windowTitle, id, m_editor, this);

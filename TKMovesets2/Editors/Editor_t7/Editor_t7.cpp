@@ -819,20 +819,27 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 
 // ===== Voiceclips ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<std::map<std::string, EditorInput*>> EditorT7::GetVoiceclipListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	auto voiceclip = m_iterators.voiceclips[id];
+	auto voiceclip = m_iterators.voiceclips.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
+	do
+	{
+		std::map<std::string, EditorInput*> inputMap;
 
-	WriteFieldFullname(inputMap, "voiceclip");
-	return inputMap;
+		CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
+
+		WriteFieldFullname(inputMap, "voiceclip");
+		inputListMap.push_back(inputMap);
+	} while ((voiceclip++)->id != (uint32_t)- 1);
+
+	return inputListMap;
 }
 
 
@@ -1212,9 +1219,6 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 	case EditorWindowType_Move:
 		return GetMoveInputs(id, drawOrder);
 		break;
-	case EditorWindowType_Voiceclip:
-		return GetVoiceclipInputs(id, drawOrder);
-		break;
 	case EditorWindowType_CancelExtradata:
 		return GetCancelExtraInput(id, drawOrder);
 		break;
@@ -1262,6 +1266,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		break;
 	case EditorWindowType_HitCondition:
 		return GetHitConditionListInputs(id, drawOrder);
+		break;
+	case EditorWindowType_Voiceclip:
+		return GetVoiceclipListInputs(id, drawOrder);
 		break;
 	}
 	return std::vector<std::map<std::string, EditorInput*>>();

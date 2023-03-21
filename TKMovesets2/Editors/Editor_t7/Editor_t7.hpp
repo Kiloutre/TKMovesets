@@ -62,8 +62,8 @@ public:
 	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateMoveField(EditorInput* field);
 
-	// Voiceclips
-	std::map<std::string, EditorInput*> GetVoiceclipInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	// Voiceclipss
+	std::vector<std::map<std::string, EditorInput*>> GetVoiceclipListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 
 	// Extra properties
@@ -153,7 +153,7 @@ public:
 	int32_t CreateNewRequirements();
 	//
 	int32_t CreateNewMove();
-	int32_t CreateNewVoiceclip();
+	int32_t CreateNewVoiceclipList();
 	int32_t CreateNewCancelList();
 	int32_t CreateNewGroupedCancelList();
 	int32_t CreateNewCancelExtra();
@@ -185,5 +185,7 @@ public:
 	void ModifyHitConditionListSize(int listId, int oldSize, int newSize);
 	//
 	void ModifyInputListSize(int listId, int oldSize, int newSize);
+	//
+	void ModifyVoiceclipListSize(int listId, int oldSize, int newSize);
 
 };

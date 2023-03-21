@@ -166,11 +166,14 @@ int32_t EditorT7::CreateNewRequirements()
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewVoiceclip()
+int32_t EditorT7::CreateNewVoiceclipList()
 {
 	Voiceclip newStruct{ 0 };
+	Voiceclip newStruct2{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<Voiceclip>(&newStruct, nullptr, offsetof(m_infos->table, voiceclip));
+	newStruct2.id = (uint32_t)-1;
+
+	int32_t newStructId = CreateNewGeneric<Voiceclip>(&newStruct, &newStruct2, offsetof(m_infos->table, voiceclip));
 	return newStructId;
 }
 
@@ -311,7 +314,7 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 		return CreateNewMove();
 		break;
 	case EditorWindowType_Voiceclip:
-		return CreateNewVoiceclip();
+		return CreateNewVoiceclipList();
 		break;
 	case EditorWindowType_Cancel:
 		return CreateNewCancelList();

@@ -95,7 +95,7 @@ void EditorMove::OnApply()
 void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
 {
 	if (fieldName == "hit_condition_addr" || fieldName == "extra_properties_addr" || fieldName == "cancel_addr" ||
-		fieldName == "move_start_extraprop_addr" || fieldName == "move_end_extraprop_addr") {
+		fieldName == "move_start_extraprop_addr" || fieldName == "move_end_extraprop_addr" || fieldName == "voiceclip_addr") {
 		if (!m_fieldIdentifierMap[fieldName]->errored) {
 			int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
