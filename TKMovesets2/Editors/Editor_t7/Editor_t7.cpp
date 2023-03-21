@@ -67,10 +67,10 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("duration", 0, EditorInput_S16, pushback->displacement);
-	CREATE_FIELD("displacement", 0, EditorInput_S16, pushback->duration);
+	CREATE_FIELD("duration", 0, EditorInput_S16, pushback->duration);
+	CREATE_FIELD("displacement", 0, EditorInput_S16, pushback->displacement);
 	CREATE_FIELD("num_of_loops", 0, EditorInput_U32, pushback->num_of_loops);
-	CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, pushback->duration);
+	CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, pushback->extradata_addr);
 
 	WriteFieldFullname(inputMap, "pushback");
 	return inputMap;
@@ -98,11 +98,6 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 	pushback->displacement = GetFieldValue(inputs["displacement"]);
 	pushback->num_of_loops = GetFieldValue(inputs["num_of_loops"]);
 	pushback->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
-	printf("SavePushback %d %d [%s]\n", id, pushback->duration, inputs["duration"]->buffer);
-	printf("SavePushback %d [%s]\n", pushback->displacement, inputs["displacement"]->buffer);
-	printf("SavePushback %d [%s]\n", pushback->num_of_loops, inputs["num_of_loops"]->buffer);
-	printf("SavePushback %d [%s]\n", pushback->extradata_addr, inputs["extradata_addr"]->buffer);
-
 }
 
 // ===== Projectile ===== //

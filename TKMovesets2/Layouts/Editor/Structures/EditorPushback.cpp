@@ -32,16 +32,17 @@ void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 void EditorPushback::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "inputs") {
-		if (m_fieldIdentifierMap["pushback_extra"]->errored) {
+	if (fieldName == "pushback_extra") {
+		auto& extradataIdField = m_fieldIdentifierMap["extradata_addr"];
+		if (extradataIdField->errored) {
 			return;
 		}
 
-		int value = atoi(m_fieldIdentifierMap["pushback_extra"]->buffer);
+		int value = atoi(extradataIdField->buffer);
 
 		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
-			sprintf(m_fieldIdentifierMap["pushback_extra"]->buffer, "%d", value + valueChange);
+			sprintf(extradataIdField->buffer, "%d", value + valueChange);
 		}
 		else if (value >= listStart && value <= (listEnd)) {
 			value = atoi(m_fieldIdentifierMap["num_of_loops"]->buffer);
