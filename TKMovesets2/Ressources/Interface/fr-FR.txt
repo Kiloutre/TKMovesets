@@ -137,6 +137,7 @@ edition.window_title = Édition
 edition.apply = Appliquer
 edition.window_controls_explanation = Cliquez sur un Move dans la liste des moves pour ouvrir sa fenêtre associée. Elle viendra écraser toute fenêtre précédemment ouverte, sauf si cette ancienne fenêtre contient du contenu non-sauvegardé OU si vous maintenez CTRL GAUCHE avant de cliquer. Les fenêtres ouvertes peuvent être déplacées où vous le souhaitez, peuvent être assemblées et il est possible de les positionner de diverses manières.
 edition.extract_animations = Extraire animations
+edition.extract_animations_finished = Extraction d'animation terminée !
 
 edition.create_new = Créer 
 edition.requirement = Liste de conditions

@@ -1545,7 +1545,29 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 
 // -- Anim extraction -- //
 
-void EditorT7::ExtractAnimations(const std::string& characterFilename)
+void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
+{
+	if (animationExtractionStatus & ExtractionStatus_Started) {
+		return;
+	}
+
+	animationExtractionStatus = ExtractionStatus_Started;
+
+	// Create moveset copy because the extraction run in another thread and i don't want the moveset being modified / reallocated while i access it
+	Byte* moveset = (Byte*)malloc(m_movesetSize);
+	if (moveset == nullptr) {
+		animationExtractionStatus = ExtractionStatus_Failed;
+		return;
+	}
+	memcpy((void*)moveset, m_moveset, m_movesetSize);
+
+	// Start in another thread to avoid the display thread hanging
+	const Byte* baseAnimPtr = m_movesetData + m_header->offsets.animationBlock;
+	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+	animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, baseAnimPtr, namePtr, std::string(characterFilename));
+}
+
+void EditorT7::ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const char* namePtr, const std::string& characterFilename)
 {
 	std::string outputFolder;
 
@@ -1553,8 +1575,6 @@ void EditorT7::ExtractAnimations(const std::string& characterFilename)
 	CreateDirectory(EDITOR_LIB_DIRECTORY, nullptr);
 	CreateDirectory(outputFolder.c_str(), nullptr);
 
-	const Byte* baseAnimPtr = m_movesetData + m_header->offsets.animationBlock;
-	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
 	const int animCount = m_animOffsetToNameOffset.size();
 	auto it = m_animOffsetToNameOffset.begin();
 	auto end = m_animOffsetToNameOffset.end();
@@ -1594,4 +1614,15 @@ void EditorT7::ExtractAnimations(const std::string& characterFilename)
 		const char* anim = (char*)baseAnimPtr + offset;
 		file.write(anim, size);
 	}
+
+	free(moveset);
+	animationExtractionStatus = ExtractionStatus_Finished;
+	// Not calling detach on the thread apparently doesn't exit it cleanly here and crashes on debug mode
+	animExtractionThread.detach();
+}
+
+
+void EditorT7::ImportAnimation(const std::string& filename, int moveid)
+{
+	//todo
 }

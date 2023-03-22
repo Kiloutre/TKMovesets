@@ -124,7 +124,7 @@ void EditorMove_Animations::LoadAnimationList()
 				.filepath = filename,
 				.duration = std::to_string(duration), // todo
 				.size_megabytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f)
-			});s
+			});
 		}
 
 		if (charAnims->files.size() == 0) {

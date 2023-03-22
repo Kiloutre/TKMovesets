@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <thread>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -34,6 +35,15 @@ public:
 
 		return std::pair<iterator, bool>(it, true);
 	}
+};
+
+// Animation extraction status
+enum ExtractionStatus_
+{
+	ExtractionStatus_NotStarted = (1 << 0),
+	ExtractionStatus_Started    = (1 << 1),
+	ExtractionStatus_Failed     = (1 << 2),
+	ExtractionStatus_Finished   = (1 << 3),
 };
 
 enum EditorConstants_
@@ -241,6 +251,10 @@ public:
 	std::vector<DisplayableMove*>* displayableMovelist = nullptr;
 	// Contains quick data that is made to be accessed outside of this class
 	EditorTable movesetTable;
+	// Status of the animation extraction
+	ExtractionStatus_ animationExtractionStatus = ExtractionStatus_NotStarted;
+	// Thread where the animations extraction will be running to avoid blocking the display thread
+	std::thread animExtractionThread;
 
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
@@ -271,7 +285,9 @@ public:
 	// Sets the current move of a player
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
 	// Saves all the moveset animations in our library
-	virtual void ExtractAnimations(const std::string& characterFilename) = 0;
+	virtual void OrderAnimationsExtraction(const std::string& characterFilename) = 0;
+	// Imports an animation into the moveset and applies it to a move
+	virtual void ImportAnimation(const std::string& filename, int moveid) = 0;
 
 	// -- Creation -- //
 	// Create a new structure or structure list
