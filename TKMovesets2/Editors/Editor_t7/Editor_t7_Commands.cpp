@@ -86,7 +86,7 @@ std::string EditorT7::GetCommandStr(const char* commandBuf)
 std::string EditorT7::GetCommandStr(const char* direction, const char* button)
 {
 	uint64_t command = strtoll(button, nullptr, 16);
-	command = (command << 32) | strtoll(button, nullptr, 16);
+	command = (command << 32) | strtoll(direction, nullptr, 16);
 
 	return getCommandString(command);
 }

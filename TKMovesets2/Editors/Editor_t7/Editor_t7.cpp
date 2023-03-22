@@ -1005,6 +1005,13 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	if (newMoveset == nullptr) {
 		return ;
 	}
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraBlockSize = movelistStartOffset - orig_movelistStartOffset;
+	m_header->offsets.movesetBlock += extraBlockSize;
+	m_header->offsets.animationBlock += extraBlockSize;
+	m_header->offsets.motaBlock += extraBlockSize;
+
 	memset(newMoveset, 0, newMovesetSize);
 
 	// Copy start //
@@ -1024,23 +1031,15 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 
-	// Shift offsets in the moveset table & in our header
-	const uint64_t extraBlockSize = movelistStartOffset - orig_movelistStartOffset;
-	m_header->offsets.movesetBlock += extraBlockSize;
-	m_header->offsets.animationBlock += extraBlockSize;
-	m_header->offsets.motaBlock += extraBlockSize;
-
 	// Shift moveset name addr offsets
 	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
-	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
-	gAddr::Move* move = (gAddr::Move*)(m_movesetData + movesetListOffset);
-	for (size_t i = 0; i < m_infos->table.moveCount; ++i)
+	for (auto& move : m_iterators.moves)
 	{
-		if (move[i].name_addr > move_name_addr) {
-			move[i].name_addr += extraNameSize;
+		if (move.name_addr > move_name_addr) {
+			move.name_addr += extraNameSize;
 		}
-		if (move[i].anim_name_addr > move_name_addr) {
-			move[i].anim_name_addr += extraNameSize;
+		if (move.anim_name_addr > move_name_addr) {
+			move.anim_name_addr += extraNameSize;
 		}
 	}
 }

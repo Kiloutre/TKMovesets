@@ -228,9 +228,13 @@ void EditorWindow::Save()
 	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
-	file.write((char*)moveset, movesetSize);
-	file.close();
-	m_savedLastChange = true;
+	if (!file.fail()) {
+		file.write((char*)moveset, movesetSize);
+		m_savedLastChange = true;
+	}
+	else {
+		// Showing failure would be nice. Even simply changing the Save button text would suffice.
+	}
 }
 
 
