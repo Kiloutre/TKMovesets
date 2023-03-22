@@ -42,7 +42,7 @@ void EditorProjectile::RequestFieldUpdate(std::string fieldName, int valueChange
 		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
 			// Might be a good idea to macro it
-			sprintf(field->buffer, "%d", value + valueChange);
+				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 	}
 }

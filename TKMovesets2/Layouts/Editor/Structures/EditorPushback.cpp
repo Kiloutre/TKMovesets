@@ -42,11 +42,12 @@ void EditorPushback::RequestFieldUpdate(std::string fieldName, int valueChange, 
 
 		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
-			sprintf(extradataIdField->buffer, "%d", value + valueChange);
+			sprintf_s(extradataIdField->buffer, extradataIdField->bufsize, "%d", value + valueChange);
 		}
 		else if (value >= listStart && value <= (listEnd)) {
-			value = atoi(m_fieldIdentifierMap["num_of_loops"]->buffer);
-			sprintf(m_fieldIdentifierMap["num_of_loops"]->buffer, "%d", value + valueChange);
+            auto& field = m_fieldIdentifierMap["num_of_loops"];
+			value = atoi(field->buffer);
+			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 	}
 }

@@ -38,11 +38,13 @@ void EditorInputSequence::RequestFieldUpdate(std::string fieldName, int valueCha
 		int value = atoi(m_fieldIdentifierMap["input_addr"]->buffer);
 		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
-			sprintf(m_fieldIdentifierMap["input_addr"]->buffer, "%d", value + valueChange);
+            auto& field = m_fieldIdentifierMap["input_addr"];
+			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 		else if (value >= listStart && value <= (listEnd)) {
-			value = atoi(m_fieldIdentifierMap["input_amount"]->buffer);
-			sprintf(m_fieldIdentifierMap["input_amount"]->buffer, "%d", value + valueChange);
+            auto& field = m_fieldIdentifierMap["input_addr"];
+			value = atoi(field->buffer);
+			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 	}
 }

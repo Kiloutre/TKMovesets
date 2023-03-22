@@ -54,7 +54,7 @@ void EditorMoveEndProperty::RequestFieldUpdate(std::string fieldName, int valueC
 			int value = atoi(field->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
-				sprintf(field->buffer, "%d", value + valueChange);
+				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 				BuildItemDetails(listIdx);
 			}
 

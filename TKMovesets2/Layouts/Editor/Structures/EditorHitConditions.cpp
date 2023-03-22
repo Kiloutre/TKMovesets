@@ -57,7 +57,7 @@ void EditorHitConditions::RequestFieldUpdate(std::string fieldName, int valueCha
 			int value = atoi(field->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
-				sprintf(field->buffer, "%d", value + valueChange);
+				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 				BuildItemDetails(listIdx);
 			}
 

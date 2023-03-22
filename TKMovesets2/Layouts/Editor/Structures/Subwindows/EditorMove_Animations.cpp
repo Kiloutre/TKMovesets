@@ -36,7 +36,7 @@ static int GetAnimationDuration(const char* filename)
 			duration = *(uint16_t*)&buf[4];
 			break;
 		case 0x64:
-			file.seekg(4 + boneCount * 2, std::ios::beg);
+			file.seekg(4 + (uint16_t)boneCount * 2, std::ios::beg);
 			if (!file.fail() && !file.bad()) {
 				file.read(buf, 2);
 				if (file.gcount() == 2) {

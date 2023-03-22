@@ -102,7 +102,8 @@ void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int 
 			int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
-				sprintf(m_fieldIdentifierMap[fieldName]->buffer, "%d", value + valueChange);
+                auto& field = m_fieldIdentifierMap[fieldName];
+				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 			}
 		}
 	}

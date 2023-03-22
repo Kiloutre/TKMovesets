@@ -168,7 +168,7 @@ void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, i
 				int group_id = atoi(moveIdField->buffer);
 				if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {
 					// Same shifting logic as in ListCreations
-					sprintf(moveIdField->buffer, "%d", group_id + valueChange);
+					sprintf_s(moveIdField->buffer, moveIdField->bufsize, "%d", group_id + valueChange);
 					BuildItemDetails(listIdx);
 				}
 			}
@@ -193,7 +193,7 @@ void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, i
 			if (MUST_SHIFT_ID(inputSequenceId, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
 				// Might be a good idea to macro it
-				sprintf(commandField->buffer, "%d", inputSequenceStart + inputSequenceId + valueChange);
+				sprintf_s(commandField->buffer, "%d", commandField->bufsize, inputSequenceStart + inputSequenceId + valueChange);
 				BuildItemDetails(listIdx);
 			}
 
@@ -215,7 +215,7 @@ void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, i
 			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 				// Same shifting logic as in ListCreations
 				// Might be a good idea to macro it
-				sprintf(field->buffer, "%d", value + valueChange);
+				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 				BuildItemDetails(listIdx);
 			}
 
