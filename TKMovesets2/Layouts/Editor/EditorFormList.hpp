@@ -39,13 +39,15 @@ protected:
 	int m_listSizeChange = 0;
 	// Identifier that will be sent when we are being resized
 	std::string m_resizeEventKey;
+	// String that is sent when issuing a resize notification to other windows
+	std::string m_identifier;
 
 	// Called whenver the list is reordered, used to  update field labels when index is important
 	virtual void OnReorder() {};
 	// Called whenever the list is resized, used to update field labels when index is important
 	virtual void OnResize() {};
 	// Called whenever applying with a resized list, used  to issue field updates to other windows
-	virtual void OnApplyResize(int sizeChange, int oldSize) {};
+	virtual void OnApplyResize(int sizeChange, int oldSize);
 	// Builds a string label that will be shown as the title of the item tree view
 	virtual void BuildItemDetails(int listIdx);
 	// Save every list item individually
@@ -54,7 +56,9 @@ protected:
 	bool IsFormValid() override;
 	// Displays buttons to move, create or delete individual list items
 	void RenderListControlButtons(int listIdx);
-	
+	// 
+	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) override;
+
 public:
 	//
 	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);

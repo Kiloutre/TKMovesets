@@ -30,9 +30,10 @@ void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorPushback::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+void EditorPushback::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "pushback_extra") {
+	if (winType & EditorWindowType_PushbackExtradata)
+	{
 		auto& extradataIdField = m_fieldIdentifierMap["extradata_addr"];
 		if (extradataIdField->errored) {
 			return;

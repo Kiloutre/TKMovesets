@@ -28,10 +28,12 @@ void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorProjectile::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+void EditorProjectile::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "cancel_addr" || fieldName == "hit_condition_addr")
+	
+	if (winType & (EditorWindowType_Cancel | EditorWindowType_HitCondition))
 {
+		std::string fieldName = (winType & EditorWindowType_Cancel) ? "cancel_addr" : "hit_condition_addr";
 		EditorInput* field = m_fieldIdentifierMap[fieldName];
 
 		if (field->errored) {

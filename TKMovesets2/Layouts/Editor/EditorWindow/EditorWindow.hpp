@@ -123,5 +123,5 @@ public:
 	// Reloads the movelist filter, used mostly when a move is renamed
 	void ReloadMovelistFilter() override;
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
-	void IssueFieldUpdate(std::string fieldShortName, int valueChange, int listStart=-1, int listEnd = -1) override;
+	void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart=-1, int listEnd = -1) override;
 };

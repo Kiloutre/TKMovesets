@@ -16,23 +16,6 @@ EditorPushbackExtra::EditorPushbackExtra(std::string windowTitleBase, uint32_t t
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorPushbackExtra::OnApplyResize(int sizeChange, int oldSize)
-{
-	m_baseWindow->IssueFieldUpdate("pushback_extra", sizeChange, id, id + oldSize);
-}
-
-void EditorPushbackExtra::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
-{
-	if (fieldName == "pushback_extra") {
-		// If a struct was created before this one, we must shift our own ID
-		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
-			// Same shifting logic as in ListCreations
-			id += valueChange;
-			ApplyWindowName();
-		}
-	}
-}
-
 void EditorPushbackExtra::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);

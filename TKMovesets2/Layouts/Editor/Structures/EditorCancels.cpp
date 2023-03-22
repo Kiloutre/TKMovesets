@@ -138,88 +138,67 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	item->itemLabel = label;
 }
 
-void EditorCancels::OnApplyResize(int sizeChange, int oldSize)
+void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-	m_baseWindow->IssueFieldUpdate("cancel_addr", sizeChange, id, id + oldSize);
-}
-
-void EditorCancels::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
-{
-	if (fieldName == "cancel_addr") {
+	switch (winType)
+	{
+	case EditorWindowType_Cancel:
 		// If a struct was created before this one, we must shfit our own ID
 		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
 			id += valueChange;
 			ApplyWindowName();
 		}
-	} else if (fieldName == "grouped_cancel_id") {
-		int listIdx = 0;
-		for (auto& item : m_items)
+		break;
+	case EditorWindowType_GroupedCancel:
 		{
-			EditorInput* commandField = item->identifierMaps["command"];
-			EditorInput* moveIdField = item->identifierMaps["move_id"];
-			uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
+			int listIdx = 0;
+			for (auto& item : m_items)
+			{
+				EditorInput* commandField = item->identifierMaps["command"];
+				EditorInput* moveIdField = item->identifierMaps["move_id"];
+				uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
-			if (moveIdField->errored || commandField->errored) {
-				continue;
+				if (moveIdField->errored || commandField->errored) {
+					continue;
+				}
+
+				if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+					int group_id = atoi(moveIdField->buffer);
+					if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {
+						// Same shifting logic as in ListCreations
+						sprintf_s(moveIdField->buffer, moveIdField->bufsize, "%d", group_id + valueChange);
+						BuildItemDetails(listIdx);
+					}
+				}
+
+				++listIdx;
 			}
 
-			if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
-				int group_id = atoi(moveIdField->buffer);
-				if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {
+		}
+		break;
+	case EditorWindowType_Requirement:
+		{
+			int listIdx = 0;
+			for (auto& item : m_items)
+			{
+				EditorInput* field = item->identifierMaps["requirements_addr"];
+
+				if (field->errored) {
+					continue;
+				}
+
+				int value = atoi(field->buffer);
+				if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
 					// Same shifting logic as in ListCreations
-					sprintf_s(moveIdField->buffer, moveIdField->bufsize, "%d", group_id + valueChange);
+					// Might be a good idea to macro it
+					sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 					BuildItemDetails(listIdx);
 				}
-			}
 
-			++listIdx;
+				++listIdx;
+			}
 		}
-	}
-	else if (fieldName == "input_sequence_id")
-	{
-		int listIdx = 0;
-		for (auto& item : m_items)
-		{
-			EditorInput* commandField = item->identifierMaps["command"];
-			uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
-
-			if (!m_editor->IsCommandInputSequence(command)) {
-				continue;
-			}
-
-			const int inputSequenceStart = m_editor->constants[EditorConstants_InputSequenceCommandStart];
-			int inputSequenceId = (command & 0xFFFFFFFF) - inputSequenceStart;
-			if (MUST_SHIFT_ID(inputSequenceId, valueChange, listStart, listEnd)) {
-				// Same shifting logic as in ListCreations
-				// Might be a good idea to macro it
-				sprintf_s(commandField->buffer, "%d", commandField->bufsize, inputSequenceStart + inputSequenceId + valueChange);
-				BuildItemDetails(listIdx);
-			}
-
-			++listIdx;
-		}
-	}
-	else if (fieldName == "requirements_addr")
-	{
-		int listIdx = 0;
-		for (auto& item : m_items)
-		{
-			EditorInput* field = item->identifierMaps["requirements_addr"];
-
-			if (field->errored) {
-				continue;
-			}
-
-			int value = atoi(field->buffer);
-			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
-				// Same shifting logic as in ListCreations
-				// Might be a good idea to macro it
-				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
-				BuildItemDetails(listIdx);
-			}
-
-			++listIdx;
-		}
+		break;
 	}
 }

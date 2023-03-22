@@ -239,7 +239,8 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	id = t_id;
 	m_editor = editor;
 
-	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
+	m_identifier = EditorFormUtils::GetWindowTypeName(windowType);
+	m_identifierPrefix = "edition." + m_identifier;
 
 	VectorSet<std::string> drawOrder;
 
@@ -355,5 +356,22 @@ void EditorFormList::RenderInternal()
 		}
 
 		ImGui::TreePop();
+	}
+}
+
+void EditorFormList::OnApplyResize(int sizeChange, int oldSize)
+{
+	m_baseWindow->IssueFieldUpdate(windowType, sizeChange, id, id + oldSize);
+}
+
+void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+{
+	if (winType == windowType){
+		// If a struct was created before this one, we must shfit our own ID
+		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			id += valueChange;
+			ApplyWindowName();
+		}
 	}
 }

@@ -15,23 +15,6 @@ EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_i
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorRequirements::OnApplyResize(int sizeChange, int oldSize)
-{
-	m_baseWindow->IssueFieldUpdate("requirements_addr", sizeChange, id, id + oldSize);
-}
-
-void EditorRequirements::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
-{
-	if (fieldName == "requirements_addr") {
-		// If a requirement was created before this one, we must shfit our own ID
-		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
-			// Same shifting logic as in ListCreations
-			id += valueChange;
-			ApplyWindowName();
-		}
-	}
-}
-
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);

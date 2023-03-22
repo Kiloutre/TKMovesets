@@ -28,9 +28,9 @@ void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorInputSequence::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+void EditorInputSequence::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "inputs") {
+	if (winType == EditorWindowType_Input) {
 		if (m_fieldIdentifierMap["input_addr"]->errored) {
 			return;
 		}

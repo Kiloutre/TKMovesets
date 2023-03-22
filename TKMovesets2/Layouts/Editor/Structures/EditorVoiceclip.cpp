@@ -15,11 +15,6 @@ EditorVoiceclip::EditorVoiceclip(std::string windowTitleBase, uint32_t t_id, Edi
 	InitForm(windowTitleBase, t_id, editor);
 }
 
-void EditorVoiceclip::OnApplyResize(int sizeChange, int oldSize)
-{
-	m_baseWindow->IssueFieldUpdate("voiceclip_addr", sizeChange, id, id + oldSize);
-}
-
 void EditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);

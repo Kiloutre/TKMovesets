@@ -101,6 +101,6 @@ public:
 	ImGuiViewport* currentViewport = nullptr;
 
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
-	virtual void RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd) {};
+	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) {};
 	void Render();
 };

@@ -7,7 +7,6 @@
 class EditorVoiceclip : public EditorFormList
 {
 private:
-	void OnApplyResize(int sizeChange, int oldSize) override;
 	void BuildItemDetails(int listIdx) override;
 	void OnUpdate(int listIdx, EditorInput* field) override;
 	void OnResize() override;

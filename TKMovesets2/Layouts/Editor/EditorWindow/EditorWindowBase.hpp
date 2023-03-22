@@ -16,5 +16,5 @@ public:
 	virtual void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId, int listSize = 0) = 0;
 	virtual int32_t ValidateMoveId(const char* buf) = 0;
 	virtual void ReloadMovelistFilter() = 0;
-	virtual void IssueFieldUpdate(std::string fieldShortName, int valueChange, int listStart = -1, int listEnd = -1) = 0;
+	virtual void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart = -1, int listEnd = -1) = 0;
 };

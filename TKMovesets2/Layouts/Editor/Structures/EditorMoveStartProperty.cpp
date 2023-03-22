@@ -25,27 +25,25 @@ void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorMoveStartProperty::OnApplyResize(int sizeChange, int oldSize)
-{
-	m_baseWindow->IssueFieldUpdate("ending_extra_properties_addr", sizeChange, id, id + oldSize);
-}
 
-void EditorMoveStartProperty::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+void EditorMoveStartProperty::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "ending_extra_properties_addr") {
+	switch (winType)
+	{
+	case EditorWindowType_MoveBeginProperty:
 		// If a struct was created before this one, we must shfit our own ID
 		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
 			id += valueChange;
 			ApplyWindowName();
 		}
-	}
-	else if (fieldName == "requirements_addr")
+		break;
+	case EditorWindowType_Requirement:
 	{
 		int listIdx = 0;
 		for (auto& item : m_items)
 		{
-			EditorInput* field = item->identifierMaps[fieldName];
+			EditorInput* field = item->identifierMaps["requirements_addr"];
 
 			if (field->errored) {
 				continue;
@@ -60,5 +58,7 @@ void EditorMoveStartProperty::RequestFieldUpdate(std::string fieldName, int valu
 
 			++listIdx;
 		}
+	}
+	break;
 	}
 }

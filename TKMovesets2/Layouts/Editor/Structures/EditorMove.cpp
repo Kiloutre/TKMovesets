@@ -94,17 +94,43 @@ void EditorMove::OnApply()
 	}
 }
 
-void EditorMove::RequestFieldUpdate(std::string fieldName, int valueChange, int listStart, int listEnd)
+void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-	if (fieldName == "hit_condition_addr" || fieldName == "extra_properties_addr" || fieldName == "cancel_addr" ||
-		fieldName == "move_start_extraprop_addr" || fieldName == "move_end_extraprop_addr" || fieldName == "voiceclip_addr") {
-		if (!m_fieldIdentifierMap[fieldName]->errored) {
-			int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
-			if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
-				// Same shifting logic as in ListCreations
-                auto& field = m_fieldIdentifierMap[fieldName];
-				sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
-			}
+
+	if ((winType & (EditorWindowType_HitCondition | EditorWindowType_Extraproperty | EditorWindowType_Cancel
+		| EditorWindowType_MoveBeginProperty | EditorWindowType_MoveEndProperty | EditorWindowType_Voiceclip)) == 0) {
+		return;
+}
+	std::string fieldName;
+
+	switch (winType)
+	{
+	case EditorWindowType_HitCondition:
+		fieldName = "hit_condition_addr";
+		break;
+	case EditorWindowType_Extraproperty:
+		fieldName = "extra_properties_addr";
+		break;
+	case EditorWindowType_Cancel:
+		fieldName = "cancel_addr";
+		break;
+	case EditorWindowType_MoveBeginProperty:
+		fieldName = "move_start_extraprop_addr";
+		break;
+	case EditorWindowType_MoveEndProperty:
+		fieldName = "move_end_extraprop_addr";
+		break;
+	case EditorWindowType_Voiceclip:
+		fieldName = "voiceclip_addr";
+		break;
+	}
+
+	if (!m_fieldIdentifierMap[fieldName]->errored) {
+		int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
+		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+            auto& field = m_fieldIdentifierMap[fieldName];
+			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 	}
 }
