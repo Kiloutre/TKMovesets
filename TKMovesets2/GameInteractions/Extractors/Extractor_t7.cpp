@@ -547,22 +547,22 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 		{
 			progress = 80;
 
-			std::vector<std::pair<Byte*, uint64_t>> blocks{
-				// Our own header data
-				std::pair<Byte*, uint64_t>{headerBlock, s_headerBlock},
+			std::vector<std::pair<Byte*, uint64_t>> fileBlocks{
+				// First block is always ignored in our CRC32 calculation because it is supposed to be our own header
+				{headerBlock, s_headerBlock},
 
-				// Actual moveset reproduction
-				std::pair<Byte*, uint64_t>{movesetInfoBlock, s_movesetInfoBlock},
-				std::pair<Byte*, uint64_t>{tableBlock, s_tableBlock },
-				std::pair<Byte*, uint64_t>{motasListBlock, s_motasListBlock},
-				std::pair<Byte*, uint64_t>{(Byte*)nameBlock, s_nameBlock},
-				std::pair<Byte*, uint64_t>{movesetBlock, s_movesetBlock},
-				std::pair<Byte*, uint64_t>{animationBlock, s_animationBlock},
-				std::pair<Byte*, uint64_t>{motaCustomBlock, s_motaCustomBlock},
+				// Actual moveset reproduction attempt. Accurate up to the animation block
+				{movesetInfoBlock, s_movesetInfoBlock},
+				{tableBlock, s_tableBlock },
+				{motasListBlock, s_motasListBlock},
+				{(Byte*)nameBlock, s_nameBlock},
+				{movesetBlock, s_movesetBlock},
+				{animationBlock, s_animationBlock},
+				{motaCustomBlock, s_motaCustomBlock},
 			};
 
-			customHeader.infos.crc32 = ExtractorUtils::CalculateCrc32(blocks);
-			ExtractorUtils::WriteFileData(file, blocks, progress, 95);
+			customHeader.infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
+			ExtractorUtils::WriteFileData(file, fileBlocks, progress, 95);
 
 			file.close();
 

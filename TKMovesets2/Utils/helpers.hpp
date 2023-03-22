@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 #include <iterator>
+#include <algorithm>
+#include <vector>
 
 #include "GameAddresses.h"
 
@@ -63,8 +65,12 @@ namespace Helpers
     // Make sure a file's cursor is divisble by 8
     void align8Bytes(std::ofstream& file);
 
+	// Calcualte a crc32 from a list of data blocks. Always skip the first one.
+	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks);
+
     // Gets the current date format in 'hour:minutes day/month/year'
     std::string currentDateTime(uint64_t date);
+
 
     // In a (moveset) list, can convert ptr members of every structure in the list into offsets
     void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount);

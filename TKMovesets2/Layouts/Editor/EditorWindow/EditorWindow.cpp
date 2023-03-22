@@ -204,6 +204,27 @@ void EditorWindow::Save()
 	const Byte* moveset = m_editor->GetMoveset(movesetSize);
 
 	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
+
+	Byte* movesetData = (Byte*)moveset + header->infos.header_size;
+	auto& offsets = header->offsets;
+
+	std::vector<std::pair<Byte*, uint64_t>> fileBlocks{
+		// First block is always ignored in our CRC32 calculation because it is supposed to be our own header
+		{nullptr, 0},
+
+		{movesetData + offsets.movesetInfoBlock, offsets.tableBlock - offsets.movesetInfoBlock },
+		{movesetData + offsets.tableBlock, offsets.motalistsBlock - offsets.tableBlock },
+		{movesetData + offsets.motalistsBlock, offsets.nameBlock - offsets.motalistsBlock },
+		{movesetData + offsets.nameBlock, offsets.movesetBlock - offsets.nameBlock },
+		{movesetData + offsets.movesetBlock, offsets.animationBlock - offsets.movesetBlock },
+		{movesetData + offsets.animationBlock, offsets.motaBlock - offsets.animationBlock },
+		{movesetData + offsets.motaBlock, movesetSize - header->infos.header_size - offsets.motaBlock },
+	};
+
+	// Because the editor might make corrections to the moveset right as it loads it,
+	// ... it is likely the CRC32 will be different from extraction (especially for the name block)
+
+	header->infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
 	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
