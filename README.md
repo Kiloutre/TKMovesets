@@ -1,9 +1,16 @@
+![Editor screenshot](https://dist.tekkenmods.com/dist-cache/1920/340/mods/2429/thumbnails/4abb6005b885731d-1282x721.jpg)
+
+Tekken mods page:
+https://tekkenmods.com/mod/2429/tkmovesets2
+
+
 # WIP
-This project is a work in progress, it is not meant to be used yet
+
+This project is a work in progress and is still lacking critical features.
 
 If you have any contribution to bring, feel free, there is room for improvement in many places
 
-# Todo lists:
+# (Developer) Todo lists:
 
 https://github.com/Kiloutre/TKMovesets/projects?query=is%3Aopen
 
