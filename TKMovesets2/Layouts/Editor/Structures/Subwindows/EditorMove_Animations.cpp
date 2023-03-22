@@ -7,6 +7,7 @@
 #include "EditorMove_Animations.hpp"
 #include "Localization.hpp"
 #include "Helpers.hpp"
+#include "imgui_extras.hpp"
 
 #include "constants.h"
 
@@ -75,7 +76,15 @@ void EditorMove_Animations::ApplySearchFilter()
 
 EditorMove_Animations::EditorMove_Animations()
 {
-	LoadAnimationList();
+	loadingThread = std::thread(&EditorMove_Animations::LoadAnimationList, this);
+}
+
+EditorMove_Animations::~EditorMove_Animations()
+{
+	if (!loadedList) {
+		m_destructionRequested = true;
+	}
+	loadingThread.join();
 }
 
 void EditorMove_Animations::LoadAnimationList()
@@ -93,10 +102,16 @@ void EditorMove_Animations::LoadAnimationList()
 
 		AnimationLibChar* charAnims = new AnimationLibChar;
 		charAnims->name = characterName;
+		int fileIdx = 0;
 
 		for (const auto& file : std::filesystem::directory_iterator(characterFolder))
 		{
-			if (!file.is_regular_file()) {
+			if (m_destructionRequested) {
+				break;
+			}
+
+			if (!file.
+				is_regular_file()) {
 				continue;
 			}
 
@@ -125,16 +140,24 @@ void EditorMove_Animations::LoadAnimationList()
 				.duration = std::to_string(duration), // todo
 				.size_megabytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f)
 			});
+
+			charAnims->filteredFiles.push_back(charAnims->files[fileIdx]);
+			if (fileIdx == 0) {
+				m_characters.push_back(charAnims);
+			}
+			++fileIdx;
 		}
 
-		if (charAnims->files.size() == 0) {
+		if (fileIdx == 0) {
 			delete charAnims;
 		}
-		else {
-			charAnims->filteredFiles = charAnims->files;
-			m_characters.push_back(charAnims);
+
+		if (m_destructionRequested) {
+			break;
 		}
 	}
+
+	loadedList = true;
 }
 
 bool EditorMove_Animations::Render()
@@ -157,6 +180,12 @@ bool EditorMove_Animations::Render()
 		}
 
 		ImGui::PopItemWidth();
+
+		if (!loadedList) {
+			ImGui::TextUnformatted(_("edition.animation_list.loading"));
+		} else if (m_characters.size() == 0) {
+			ImGuiExtra::RenderTextbox(_("edition.animation_list.no_anim"));
+		}
 
 		for (auto& character : m_characters) {
 			if (character->filteredFiles.size() == 0) {

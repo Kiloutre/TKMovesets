@@ -331,6 +331,8 @@ adition.animation_list.duration = Duration (frames)
 adition.animation_list.size = Size
 edition.animation_list.import = Import in move
 edition.animation_list.search_animation = Search animation name to import in current move...
+edition.animation_list.no_anim = No animation was found in the animation library. Open a character with the editor and click the 'Extract animations' button to add its animations to the library.
+edition.animation_list.loading = Loading animation list...
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

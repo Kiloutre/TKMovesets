@@ -1550,6 +1550,10 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 	if (animationExtractionStatus & ExtractionStatus_Started) {
 		return;
 	}
+	if (animationExtractionStatus & ExtractionStatus_Finished) {
+		// Join to cleanly destroy the previous
+		animExtractionThread.join();
+	}
 
 	animationExtractionStatus = ExtractionStatus_Started;
 
@@ -1617,8 +1621,6 @@ void EditorT7::ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const c
 
 	free(moveset);
 	animationExtractionStatus = ExtractionStatus_Finished;
-	// Not calling detach on the thread apparently doesn't exit it cleanly here and crashes on debug mode
-	animExtractionThread.detach();
 }
 
 
