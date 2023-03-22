@@ -40,10 +40,10 @@ public:
 // Animation extraction status
 enum ExtractionStatus_
 {
-	ExtractionStatus_NotStarted = (1 << 0),
-	ExtractionStatus_Started    = (1 << 1),
-	ExtractionStatus_Failed     = (1 << 2),
-	ExtractionStatus_Finished   = (1 << 3),
+	ExtractionStatus_NotStarted,
+	ExtractionStatus_Started,
+	ExtractionStatus_Failed,
+	ExtractionStatus_Finished,
 };
 
 enum EditorConstants_

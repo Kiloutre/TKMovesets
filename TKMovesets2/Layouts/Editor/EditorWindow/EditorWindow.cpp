@@ -242,16 +242,18 @@ void EditorWindow::Save()
 
 EditorWindow::~EditorWindow()
 {
+	if (m_editor->animationExtractionStatus != ExtractionStatus_NotStarted) {
+		// Join the thread if it was ever created. Could be ongoing or finished, we still need to join it.
+		printf("join\n");
+		m_editor->animExtractionThread.join();
+	}
+
 	importerHelper.StopThreadAndCleanup();
 
 	uint64_t movesetSize;
 	Byte* moveset = (Byte*)m_editor->GetMoveset(movesetSize);
 	free(moveset);
 
-	if ((m_editor->animationExtractionStatus & ExtractionStatus_NotStarted) == 0) {
-		// Join the thread if it was ever created. Could be ongoing or finished, we still need to join it.
-		m_editor->animExtractionThread.join();
-	}
 	delete m_editor;
 	delete labels;
 }

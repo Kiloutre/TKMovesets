@@ -16,7 +16,7 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;
 
-	const uint64_t listOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock + tableListStart + listId * structSize;
+	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movesetBlock + tableListStart + listId * structSize;
 
 	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
 	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);

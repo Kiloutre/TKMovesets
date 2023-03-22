@@ -136,7 +136,7 @@ public:
 	// Starts a thread that extracts the moveset's animations
 	void OrderAnimationsExtraction(const std::string& characterFilename) override;
 	// Saves all the moveset animations in our library
-	void ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const char* namePtr, const std::string& characterFilename);
+	void ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeader_offsets offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset);
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
 	std::string ImportAnimation(const char* filepath, int moveid) override;
 

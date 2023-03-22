@@ -928,7 +928,7 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 	Byte* newMoveset = nullptr;
 
 	// Find position where to insert new name
-	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	uint64_t moveNameOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
 	const uint64_t orig_moveNameEndOffset = moveNameOffset;
 	while (*(m_moveset + (moveNameOffset - 2)) == 0)
 	{
@@ -937,7 +937,7 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 		moveNameOffset--;
 	}
 
-	const uint64_t relativeMoveNameOffset = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
+	const uint64_t relativeMoveNameOffset = moveNameOffset - m_header->offsets.nameBlock - m_header->infos.header_size;
 	const uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
@@ -979,12 +979,12 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	Byte* newMoveset = nullptr;
 
 	// Find position where to insert new name
-	const uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.nameBlock + move_name_addr;
+	const uint64_t moveNameOffset = m_header->infos.header_size + m_header->offsets.nameBlock + move_name_addr;
 	const uint64_t moveNameEndOffset = moveNameOffset + moveNameSize;
 	const uint64_t orig_moveNameEndOffset = moveNameOffset + strlen((char*)m_moveset + moveNameOffset) + 1;
 
 	// Find the very last move name ending offset
-	uint64_t lastNameEndOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	uint64_t lastNameEndOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
 	while (*(m_moveset + (lastNameEndOffset - 2)) == 0)
 	{
 		// Because the block after the nameBlock needs to be aligned, we also have to find the last offset and see
@@ -993,7 +993,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	}
 	// Shift by the new size difference
 	const uint64_t orig_moveNameSize = strlen((char*)m_moveset + moveNameOffset) + 1;
-	const uint64_t orig_movelistStartOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	const uint64_t orig_movelistStartOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
 	lastNameEndOffset += moveNameSize - orig_moveNameSize;
 
 	// Align the end of the name block to 8 bytes to get the start of the movelist block
@@ -1560,7 +1560,8 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 
 	animationExtractionStatus = ExtractionStatus_Started;
 
-	// Create moveset copy because the extraction run in another thread and i don't want the moveset being modified / reallocated while i access it
+	// Create moveset and various other variable copies
+	// The extraction run in another thread and i don't want the moveset being modified / reallocated while i access it, so i work on a copy instead.
 	Byte* moveset = (Byte*)malloc(m_movesetSize);
 	if (moveset == nullptr) {
 		animationExtractionStatus = ExtractionStatus_Failed;
@@ -1568,23 +1569,29 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 	}
 	memcpy((void*)moveset, m_moveset, m_movesetSize);
 
+	// These can also be modified during the extraction or worse, deallocated
+	TKMovesetHeader_offsets offsets = m_header->offsets;
+	auto& animOffsetToNameOffset = m_animOffsetToNameOffset;
+
 	// Start in another thread to avoid the display thread hanging
-	const Byte* baseAnimPtr = m_movesetData + m_header->offsets.animationBlock;
-	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
-	animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, baseAnimPtr, namePtr, std::string(characterFilename));
+	animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, characterFilename, offsets, animOffsetToNameOffset);
 }
 
-void EditorT7::ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const char* namePtr, const std::string& characterFilename)
+void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeader_offsets offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset)
 {
 	std::string outputFolder;
 
-	outputFolder = std::format(EDITOR_LIB_DIRECTORY "/{}", characterFilename.substr(0, characterFilename.find_last_of('.')).c_str());
+	outputFolder = std::format(EDITOR_LIB_DIRECTORY "/{}", characterFilename.c_str());
 	CreateDirectory(EDITOR_LIB_DIRECTORY, nullptr);
 	CreateDirectory(outputFolder.c_str(), nullptr);
 
-	const int animCount = m_animOffsetToNameOffset.size();
-	auto it = m_animOffsetToNameOffset.begin();
-	auto end = m_animOffsetToNameOffset.end();
+	Byte* movesetData = moveset + ((TKMovesetHeader_infos*)moveset)->header_size;
+	const Byte* baseAnimPtr = movesetData + offsets.animationBlock;
+	char const* namePtr = (char const*)(movesetData + offsets.nameBlock);
+
+	const int animCount = animOffsetToNameOffset.size();
+	auto it = animOffsetToNameOffset.begin();
+	auto end = animOffsetToNameOffset.end();
 
 	for (int idx = 0; idx < animCount; ++idx)
 	{
@@ -1596,7 +1603,7 @@ void EditorT7::ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const c
 		if (it == end) {
 			// For the very last animation, we get the size by looking at the start of the next block
 			// This is a bit flawed because of 8 bytes alignement, but what's a little 7 bytes at most, for one anim?
-			size = (m_header->offsets.motaBlock - m_header->offsets.animationBlock) - offset;
+			size = (offsets.motaBlock - offsets.animationBlock) - offset;
 		}
 		else {
 			size = it->first - offset;
@@ -1663,7 +1670,7 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 	Byte* newMoveset = nullptr;
 
 	// Find position where to insert new name
-	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	uint64_t moveNameOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
 	const uint64_t orig_nameBlockEnd = moveNameOffset;
 	while (*(m_moveset + (moveNameOffset - 2)) == 0)
 	{
@@ -1673,7 +1680,7 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 	}
 
 	const uint64_t nameBlockEnd = Helpers::align8Bytes(moveNameOffset + animNameSize);
-	const uint64_t orig_animBlockEnd = sizeof(TKMovesetHeader) + m_header->offsets.motaBlock;
+	const uint64_t orig_animBlockEnd = m_header->infos.header_size + m_header->offsets.motaBlock;
 	const uint64_t newAnimOffset = nameBlockEnd + m_header->offsets.motaBlock - m_header->offsets.movesetBlock;
 	const uint64_t animBlockEnd = Helpers::align8Bytes(newAnimOffset + animSize);
 	const uint64_t movesetAndAnimBlockSize = m_header->offsets.motaBlock - m_header->offsets.movesetBlock;
@@ -1693,8 +1700,8 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 	m_header->offsets.animationBlock += extraNameSize;
 	m_header->offsets.motaBlock += extraNameSize + extraAnimSize;
 
-	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
-	const uint64_t relativeAnim = newAnimOffset - m_header->offsets.animationBlock - sizeof(TKMovesetHeader);
+	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - m_header->infos.header_size;
+	const uint64_t relativeAnim = newAnimOffset - m_header->offsets.animationBlock - m_header->infos.header_size;
 
 	// Copy start //
 	memcpy(newMoveset, m_moveset, moveNameOffset);

@@ -13,7 +13,7 @@ template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2
 	const int amount = struct_2 == nullptr ? 1 : 2;
 	const uint64_t extraSize = sizeof(T) * amount;
 
-	const uint64_t newStructOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock
+	const uint64_t newStructOffset = m_header->infos.header_size + m_header->offsets.movesetBlock
 									+ tableListStart + (newStructId * sizeof(T));
 
 	uint64_t newMovesetSize = m_movesetSize + sizeof(T) * amount;
@@ -221,7 +221,7 @@ int32_t EditorT7::CreateNewMove()
 	Byte* newMoveset = nullptr;
 
 	// Find position where to insert new name
-	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	uint64_t moveNameOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
 	const uint64_t orig_nameBlockEnd = moveNameOffset;
 	while (*(m_moveset + (moveNameOffset - 2)) == 0)
 	{
@@ -235,7 +235,7 @@ int32_t EditorT7::CreateNewMove()
 	const uint64_t orig_movelistEnd = orig_nameBlockEnd + (uint64_t)m_infos->table.move + moveId * structSize;
 	const uint64_t movelistSize = (uint64_t)m_infos->table.move + moveId * structSize;
 
-	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
+	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - m_header->infos.header_size;
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
 	newMovesetSize = newMove + structSize + (m_movesetSize - orig_movelistEnd);
