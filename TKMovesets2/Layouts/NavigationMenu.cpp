@@ -9,16 +9,16 @@
 const NavMenuBtn cg_moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},
 	{NAV__MENU_IMPORT, "navmenu.import"},
-	{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
+	//{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
 };
 
 const NavMenuBtn cg_tools_btns[] = {
 	{NAV__MENU_EDITION, "navmenu.moveset_edit"},
-	{NAV__MENU_CAMERA, "navmenu.camera"},
+	//{NAV__MENU_CAMERA, "navmenu.camera"},
 };
 
 const NavMenuBtn cg_other_btns[] = {
-	{NAV__MENU_DOCUMENTATION, "navmenu.documentation"},
+	//{NAV__MENU_DOCUMENTATION, "navmenu.documentation"},
 	{NAV__MENU_ABOUT, "navmenu.about"},
 };
 
