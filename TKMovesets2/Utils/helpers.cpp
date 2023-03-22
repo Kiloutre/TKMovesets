@@ -13,7 +13,7 @@ namespace Helpers
 	uint64_t align8Bytes(uint64_t value)
 	{
 		// If any of the first 3 bits are set, is not divisble by 8
-		return (value & 0x7) == 0 ? value : value + (8 - value % 8);
+		return (value & 0x7) == 0 ? value : value + (8 - value & 7);
 	}
 
 	void align8Bytes(std::ofstream& file)

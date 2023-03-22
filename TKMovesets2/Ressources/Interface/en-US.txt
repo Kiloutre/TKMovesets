@@ -325,6 +325,7 @@ edition.pushback_extradata.horizontal_offset = Horizontal offset
 edition.form_list.item = Item
 edition.form_list.end = END
 edition.form_list.invalid = INVALID
+edition.form_list.controls_disabled_explanation =  Only lists with an starting ID above 1 may have access to list controls
 
 adition.animation_list.anim_name = Animation name
 adition.animation_list.duration = Duration (frames)

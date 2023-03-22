@@ -97,6 +97,14 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		return;
 	}
 
+	if (id <= 1 && listIndex == 0) {
+		ImGui::SetCursorPosX(pos_x);
+		ImGuiExtra::HelpMarker(_("edition.form_list.controls_disabled_explanation"));
+		ImGui::SetCursorPos(cursor);
+		// Only non-starting lists may have access to list controls
+		return;
+	}
+
 	ImGui::PushID(this);
 	ImGui::PushID(listIndex);
 
@@ -307,10 +315,7 @@ void EditorFormList::RenderInternal()
 			drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), color);
 		}
 
-		if (id > 1) {
-			// Only non-starting lists may have access to list controls
-			RenderListControlButtons(listIndex);
-		}
+		RenderListControlButtons(listIndex);
 
 		auto& item = m_items[listIndex];
 

@@ -320,6 +320,7 @@ edition.pushback_extradata.horizontal_offset = Valeur horizontale
 edition.form_list.item = Élément
 edition.form_list.end = FIN
 edition.form_list.invalid = INVALIDE
+edition.form_list.controls_disabled_explanation = Seule les listes dont l'ID de début dépasse 1 ont accès aux boutons de contrôle
 
 edition.animation_list.anim_name = Nom de l'animation
 edition.animation_list.duration = Durée (images)
