@@ -76,7 +76,7 @@ void EditorMove_Animations::ApplySearchFilter()
 
 EditorMove_Animations::EditorMove_Animations()
 {
-	loadingThread = std::thread(&EditorMove_Animations::LoadAnimationList, this);
+	m_loadingThread = std::thread(&EditorMove_Animations::LoadAnimationList, this);
 }
 
 EditorMove_Animations::~EditorMove_Animations()
@@ -84,7 +84,7 @@ EditorMove_Animations::~EditorMove_Animations()
 	if (!loadedList) {
 		m_destructionRequested = true;
 	}
-	loadingThread.join();
+	m_loadingThread.join();
 }
 
 void EditorMove_Animations::LoadAnimationList()
@@ -209,8 +209,7 @@ bool EditorMove_Animations::Render()
 
 			if (ImGui::TreeNode(character->name.c_str()))
 			{
-				if (ImGui::BeginTable("##", 4, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
-					| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImGui::GetContentRegionAvail()))
+				if (ImGui::BeginTable("##", 4, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 				{
 					ImGui::TableSetupColumn(_("edition.animation_list.anim_name"));
 					ImGui::TableSetupColumn(_("edition.animation_list.duration"));
@@ -234,10 +233,12 @@ bool EditorMove_Animations::Render()
 						ImGui::TextUnformatted(_("moveset.size_kb"));
 
 						ImGui::TableNextColumn();
-						if (ImGui::Button(_("edition.animation_list.import")))
-						{
-							// import
+						ImGui::PushID(file->filepath.c_str());
+						if (ImGui::Button(_("edition.animation_list.import"))) {
+							animationToImport = file->filepath.c_str();
+							// Value will be caught by parent window
 						}
+						ImGui::PopID();
 
 					}
 					ImGui::EndTable();

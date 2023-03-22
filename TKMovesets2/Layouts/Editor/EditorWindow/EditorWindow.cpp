@@ -223,8 +223,8 @@ EditorWindow::~EditorWindow()
 	Byte* moveset = (Byte*)m_editor->GetMoveset(movesetSize);
 	free(moveset);
 
-	if (m_editor->animationExtractionStatus & ExtractionStatus_Started) {
-		// Don't delete the editor while an extraction is going on, this could cause a crash
+	if ((m_editor->animationExtractionStatus & ExtractionStatus_NotStarted) == 0) {
+		// Join the thread if it was ever created. Could be ongoing or finished, we still need to join it.
 		m_editor->animExtractionThread.join();
 	}
 	delete m_editor;

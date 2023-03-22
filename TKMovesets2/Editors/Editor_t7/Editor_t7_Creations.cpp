@@ -222,7 +222,7 @@ int32_t EditorT7::CreateNewMove()
 
 	// Find position where to insert new name
 	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
-	const uint64_t orig_moveNameEndOffset = moveNameOffset;
+	const uint64_t orig_nameBlockEnd = moveNameOffset;
 	while (*(m_moveset + (moveNameOffset - 2)) == 0)
 	{
 		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
@@ -230,59 +230,22 @@ int32_t EditorT7::CreateNewMove()
 		moveNameOffset--;
 	}
 
-	const uint64_t relativeMoveNameOffset = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
-	const uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
-	const uint64_t newMoveOffset = moveNameEndOffset + (uint64_t)m_infos->table.voiceclip;
-	const uint64_t origMovelistEndOffset = orig_moveNameEndOffset + (uint64_t)m_infos->table.move + moveId * structSize;
+	const uint64_t nameBlockEnd = Helpers::align8Bytes(moveNameOffset + moveNameSize);
+	const uint64_t newMove = nameBlockEnd + (uint64_t)m_infos->table.voiceclip;
+	const uint64_t orig_movelistEnd = orig_nameBlockEnd + (uint64_t)m_infos->table.move + moveId * structSize;
+	const uint64_t movelistSize = (uint64_t)m_infos->table.move + moveId * structSize;
+
+	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
 
 	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
-	newMovesetSize = newMoveOffset + structSize + (m_movesetSize - origMovelistEndOffset);
+	newMovesetSize = newMove + structSize + (m_movesetSize - orig_movelistEnd);
 	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
 		return -1;
 	}
 
-	// Copy start //
-	memcpy(newMoveset, m_moveset, moveNameOffset);
-
-	// Write our new name
-	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
-
-	// Copy all the data up to the new structure
-	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, (uint64_t)m_infos->table.move + moveId * structSize);
-	
-	/// Move ///
-
-	// Initialize our structure value
-	uint64_t animOffset = m_animOffsetToNameOffset.begin()->first;
-	uint64_t animNameOffset = m_animOffsetToNameOffset.begin()->second;
-
-	gAddr::Move move{ 0 };
-	move.name_addr = relativeMoveNameOffset;
-	move.anim_name_addr = animNameOffset;
-	move.anim_addr = animOffset;
-	move.cancel_addr = -1;
-	move._0x28_cancel_addr = -1;
-	move._0x38_cancel_addr = -1;
-	move._0x48_cancel_addr = -1;
-	move.hit_condition_addr = -1;
-	move.extra_move_property_addr = -1;
-	move.move_start_extraprop_addr = -1;
-	move.move_end_extraprop_addr = -1;
-	move.voicelip_addr = -1;
-
-	// Write our new structure
-	memcpy(newMoveset + newMoveOffset, &move, structSize);
-
-	// Copy all the data after new the new structure
-	memcpy(newMoveset + newMoveOffset + structSize, m_moveset + origMovelistEndOffset, m_movesetSize - origMovelistEndOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
 	// Shift offsets in the moveset table & in our header
-	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+	const uint64_t extraNameSize = nameBlockEnd - orig_nameBlockEnd;
 	const uint64_t extraMoveSize = structSize;
 	m_header->offsets.movesetBlock += extraNameSize;
 	m_header->offsets.animationBlock += extraNameSize + extraMoveSize;
@@ -298,6 +261,45 @@ int32_t EditorT7::CreateNewMove()
 		}
 		countOffset += 2;
 	}
+
+	// Copy start //
+	memcpy(newMoveset, m_moveset, moveNameOffset);
+
+	// Write our new name
+	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
+
+	// Copy all the data up to the new structure
+	memcpy(newMoveset + nameBlockEnd, m_moveset + orig_nameBlockEnd, movelistSize);
+	
+	/// Move ///
+
+	// Initialize our structure value
+	uint64_t animOffset = m_animOffsetToNameOffset.begin()->first;
+	uint64_t animNameOffset = m_animOffsetToNameOffset.begin()->second;
+
+	gAddr::Move move{ 0 };
+	move.name_addr = relativeName;
+	move.anim_name_addr = animNameOffset;
+	move.anim_addr = animOffset;
+	move.cancel_addr = -1;
+	move._0x28_cancel_addr = -1;
+	move._0x38_cancel_addr = -1;
+	move._0x48_cancel_addr = -1;
+	move.hit_condition_addr = -1;
+	move.extra_move_property_addr = -1;
+	move.move_start_extraprop_addr = -1;
+	move.move_end_extraprop_addr = -1;
+	move.voicelip_addr = -1;
+
+	// Write our new structure
+	memcpy(newMoveset + newMove, &move, structSize);
+
+	// Copy all the data after new the new structure
+	memcpy(newMoveset + newMove + structSize, m_moveset + orig_movelistEnd, m_movesetSize - orig_movelistEnd);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	return moveId;
 }

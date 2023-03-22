@@ -138,6 +138,7 @@ struct EditorInput
 	EditorInputFlag flags = 0;
 	// The string buffer containing the input text
 	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
+	unsigned int bufsize = FORM_INPUT_BUFSIZE;
 	// Contains true if the buffer contains invalid data
 	bool errored = false;
 	// Sets the BG color of the input
@@ -286,8 +287,8 @@ public:
 	virtual void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) = 0;
 	// Saves all the moveset animations in our library
 	virtual void OrderAnimationsExtraction(const std::string& characterFilename) = 0;
-	// Imports an animation into the moveset and applies it to a move
-	virtual void ImportAnimation(const std::string& filename, int moveid) = 0;
+	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
+	virtual std::string ImportAnimation(const char* filepath, int moveid) = 0;
 
 	// -- Creation -- //
 	// Create a new structure or structure list

@@ -1550,8 +1550,9 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 	if (animationExtractionStatus & ExtractionStatus_Started) {
 		return;
 	}
+
 	if (animationExtractionStatus & ExtractionStatus_Finished) {
-		// Join to cleanly destroy the previous
+		// Join to cleanly destroy the previous started thread
 		animExtractionThread.join();
 	}
 
@@ -1624,7 +1625,97 @@ void EditorT7::ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const c
 }
 
 
-void EditorT7::ImportAnimation(const std::string& filename, int moveid)
+std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 {
-	//todo
+	// Keep file name only
+	std::string animName_str = std::string(filepath);
+	animName_str = animName_str.substr(animName_str.find_last_of('/\\') + 1);
+	animName_str = animName_str.substr(0, animName_str.find_last_of('.'));
+
+	Byte* anim;
+	uint64_t animSize;
+	{
+		std::ifstream animFile(filepath, std::ios::binary);
+		animFile.seekg(0, std::ios::end);
+		animSize = animFile.tellg();
+		anim = new Byte[animSize];
+		animFile.seekg(0, std::ios::beg);
+		animFile.read((char*)anim, animSize);
+	}
+
+	// Ensure animation name is unique
+	if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
+		std::string animName_orig = animName_str;
+		animName_str += " (2)";
+		unsigned int num = 2;
+		while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
+			animName_str = std::format("{} {}", animName_orig.c_str(), ++num);
+		}
+	}
+
+	// Importation start
+	const char* animName = animName_str.c_str();
+	const size_t animNameSize = strlen(animName) + 1;
+
+	uint64_t newMovesetSize = 0;
+	Byte* newMoveset = nullptr;
+
+	// Find position where to insert new name
+	uint64_t moveNameOffset = sizeof(TKMovesetHeader) + m_header->offsets.movesetBlock;
+	const uint64_t orig_nameBlockEnd = moveNameOffset;
+	while (*(m_moveset + (moveNameOffset - 2)) == 0)
+	{
+		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
+		// We want to erase as many empty bytes for writing because of past alignment and then re-align to 8 bytes for the next bllock
+		moveNameOffset--;
+	}
+
+	const uint64_t nameBlockEnd = Helpers::align8Bytes(moveNameOffset + animNameSize);
+	const uint64_t orig_animBlockEnd = sizeof(TKMovesetHeader) + m_header->offsets.motaBlock;
+	const uint64_t newAnimOffset = nameBlockEnd + m_header->offsets.motaBlock - m_header->offsets.movesetBlock;
+	const uint64_t animBlockEnd = Helpers::align8Bytes(newAnimOffset + animSize);
+	const uint64_t movesetAndAnimBlockSize = m_header->offsets.motaBlock - m_header->offsets.movesetBlock;
+
+	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
+	newMovesetSize = m_movesetSize + (animBlockEnd - orig_animBlockEnd);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		// Return empty string to indicate error
+		return std::string();
+	}
+
+	// Shift offsets in the moveset table & in our header
+	const uint64_t extraNameSize = nameBlockEnd - orig_nameBlockEnd;
+	const uint64_t extraAnimSize = Helpers::align8Bytes(animSize);
+	m_header->offsets.movesetBlock += extraNameSize;
+	m_header->offsets.animationBlock += extraNameSize;
+	m_header->offsets.motaBlock += extraNameSize + extraAnimSize;
+
+	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - sizeof(TKMovesetHeader);
+	const uint64_t relativeAnim = newAnimOffset - m_header->offsets.animationBlock - sizeof(TKMovesetHeader);
+
+	// Copy start //
+	memcpy(newMoveset, m_moveset, moveNameOffset);
+
+	// Write our new name
+	memcpy(newMoveset + moveNameOffset, animName, animNameSize);
+
+	// Copy all the data up to the animation (from name block end, which is moveset block start, to anim block end, which is mota block start)
+	memcpy(newMoveset + nameBlockEnd, m_moveset + orig_nameBlockEnd, movesetAndAnimBlockSize);
+
+	// Write our animation
+	memcpy(newMoveset + newAnimOffset, anim, animSize);
+	delete anim;
+
+	// Copy all the data after the animation
+	memcpy(newMoveset + newAnimOffset + animSize, m_moveset + orig_animBlockEnd, m_movesetSize - orig_animBlockEnd);
+
+	// Assign new moveset
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
+
+	m_iterators.moves[moveid]->anim_name_addr = relativeName;
+	m_iterators.moves[moveid]->anim_addr = relativeAnim;
+
+	return animName_str;
 }

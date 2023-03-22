@@ -180,7 +180,7 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 
 	ImGui::PushID(field);
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-	if (ImGui::InputText("##", field->buffer, sizeof(field->buffer), field->imguiInputFlags))
+	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags))
 	{
 		unsavedChanges = true;
 		field->errored = m_editor->ValidateField(windowType, field) == false;

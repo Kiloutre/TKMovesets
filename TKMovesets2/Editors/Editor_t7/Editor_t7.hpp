@@ -137,8 +137,8 @@ public:
 	void OrderAnimationsExtraction(const std::string& characterFilename) override;
 	// Saves all the moveset animations in our library
 	void ExtractAnimations(Byte* moveset, const Byte* baseAnimPtr, const char* namePtr, const std::string& characterFilename);
-	// Imports an animation into the moveset and applies it to a move
-	void ImportAnimation(const std::string& filename, int moveid) override;
+	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
+	std::string ImportAnimation(const char* filepath, int moveid) override;
 
 	// -- Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;

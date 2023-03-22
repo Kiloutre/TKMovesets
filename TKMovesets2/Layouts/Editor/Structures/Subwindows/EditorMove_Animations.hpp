@@ -32,16 +32,18 @@ private:
 	std::string m_lowercaseBuffer;
 	// Set to true to exit the animation loading early
 	bool m_destructionRequested = false;
+	// Thread that will take care of the animation loading
+	std::thread m_loadingThread;
 
 	// Filters the animation list according to the search buffer
 	void ApplySearchFilter();
 public:
 	//  Whether the window/popup is opened
 	bool popen = true;
-	// Thread that will take care of the animation loading
-	std::thread loadingThread;
 	// True if the thread we created finished loading the list
 	bool loadedList = false;
+	// Stores the animation filename that needs to be imported
+	const char* animationToImport = nullptr;
 
 	EditorMove_Animations();
 	~EditorMove_Animations();

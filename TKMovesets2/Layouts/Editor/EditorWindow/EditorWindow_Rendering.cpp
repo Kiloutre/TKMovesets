@@ -65,7 +65,7 @@ void EditorWindow::RenderToolBar()
 		if (ImGui::MenuItem(_("edition.move"))) {
 			structType = EditorWindowType_Move;
 		}
-		if (ImGui::MenuItem(_("edition.voiceclip"))) {
+		if (ImGui::MenuItem(_("edition.voiceclips"))) {
 			structType = EditorWindowType_Voiceclip;
 		}
 		if (ImGui::MenuItem(_("edition.cancel_list"))) {

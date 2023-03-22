@@ -20,8 +20,8 @@ static movesetInfo* fetchMovesetInformations(std::string filename)
 	std::ifstream file;
 	file.open(filename, std::ios::binary);
 
-	if (!file.fail()) {
-
+	if (!file.fail())
+	{
 		TKMovesetHeader header{ 0 };
 		file.read((char*)&header, sizeof(TKMovesetHeader));
 

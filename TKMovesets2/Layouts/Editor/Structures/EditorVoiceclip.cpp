@@ -49,7 +49,7 @@ void EditorVoiceclip::BuildItemDetails(int listIdx)
 		switch (listIdx)
 		{
 		case 0:
-			label = ("edition.voiceclip.limb_swinging");
+			label = _("edition.voiceclip.limb_swinging");
 			break;
 		case 1:
 			label = _("edition.voiceclip.hit");

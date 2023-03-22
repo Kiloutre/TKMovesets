@@ -134,7 +134,30 @@ void EditorMove::PostRender()
 	if (m_animationListOpen) {
 		ImGui::OpenPopup("AnimListPopup");
 
-		if (!m_animationList->Render()) {
+		if (m_animationList->Render()) {
+			const char* animPath = m_animationList->animationToImport;
+			if (animPath != nullptr) {
+				// User clicked on "Import" button on an anim
+				std::string animName = m_editor->ImportAnimation(animPath, id);
+
+				// InmportAnimation() might return an empty name on error
+				if (!animName.empty()) {
+					// Update our own field
+					auto& animNameField = m_fieldIdentifierMap["anim_name"];
+					sprintf_s(animNameField->buffer, animNameField->bufsize, animName.c_str());
+					// Mark changes as applied to tell the editor window to highlight the 'Save' button.
+					// But don't update m_unsavedChanges because these changes do not require the use of the Apply() button
+					justAppliedChanges = true;
+
+					// Close the animation list now that it is not needed
+					m_animationListOpen = false;
+					delete m_animationList;
+					m_animationList = nullptr;
+				}
+
+			}
+		}
+		else {
 			m_animationListOpen = false;
 			delete m_animationList;
 			m_animationList = nullptr;
