@@ -151,6 +151,9 @@ void EditorMove_Animations::LoadAnimationList()
 		if (fileIdx == 0) {
 			delete charAnims;
 		}
+		else {
+			charAnims->name = std::format("{} - {}", charAnims->name, charAnims->files.size());
+		}
 
 		if (m_destructionRequested) {
 			break;
@@ -173,6 +176,10 @@ bool EditorMove_Animations::Render()
 		ImGui::SameLine();
 		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
+		bool isDisabled = !loadedList;
+		if (isDisabled) {
+			ImGui::BeginDisabled();
+		}
 		if (ImGui::InputTextWithHint("##", _("edition.animation_list.search_animation"), m_searchBuffer, sizeof(m_searchBuffer))) {
 			m_lowercaseBuffer = std::string(m_searchBuffer);
 			std::transform(m_lowercaseBuffer.begin(), m_lowercaseBuffer.end(), m_lowercaseBuffer.begin(), tolower);
@@ -181,13 +188,16 @@ bool EditorMove_Animations::Render()
 
 		ImGui::PopItemWidth();
 
-		if (!loadedList) {
+		if (isDisabled) {
+			ImGui::EndDisabled();
 			ImGui::TextUnformatted(_("edition.animation_list.loading"));
 		} else if (m_characters.size() == 0) {
 			ImGuiExtra::RenderTextbox(_("edition.animation_list.no_anim"));
 		}
 
-		for (auto& character : m_characters) {
+		for (int i = 0; i < m_characters.size(); ++i)
+		{
+			auto& character = m_characters[i];
 			if (character->filteredFiles.size() == 0) {
 				continue;
 			}
@@ -208,8 +218,9 @@ bool EditorMove_Animations::Render()
 					ImGui::TableSetupColumn("##");
 					ImGui::TableHeadersRow();
 
-					for (auto& file : character->filteredFiles)
+					for (int j = 0; j < character->filteredFiles.size(); ++j)
 					{
+						auto& file = character->filteredFiles[j];
 						ImGui::TableNextRow();
 						ImGui::TableNextColumn();
 						ImGui::TextUnformatted(file->name.c_str());
