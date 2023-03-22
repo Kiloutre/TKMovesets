@@ -219,7 +219,10 @@ gameAddr GameProcess::allocateMem(size_t amount)
 {
 	gameAddr allocatedBlock = (gameAddr)VirtualAllocEx(m_processHandle, nullptr, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	allocatedMemory.push_back(std::pair<gameAddr, uint64_t>(allocatedBlock, amount));
-	printf("Allocated to game memory from %llx to %llx\n", allocatedBlock, allocatedBlock + amount);
+
+#ifdef BUILD_TYPE_DEBUG
+	printf("Allocated to game memory from : %llx to %llx\n", allocatedBlock, allocatedBlock + amount);
+#endif
 	return allocatedBlock;
 }
 
@@ -228,8 +231,11 @@ void GameProcess::freeMem(gameAddr addr)
 	VirtualFreeEx(m_processHandle, (LPVOID)addr, 0, MEM_RELEASE);
 	for (std::pair<gameAddr, uint64_t>& block : allocatedMemory) {
 		if (block.first == addr) {
-			printf("Freed allocated block %llx (size %lld)\n", block.first, block.second);
 			allocatedMemory.erase(std::find(allocatedMemory.begin(), allocatedMemory.end(), block));
+
+#ifdef BUILD_TYPE_DEBUG
+			printf("Freed allocated block %llx (size was %lld)\n", block.first, block.second);
+#endif
 			return;
 		}
 	}

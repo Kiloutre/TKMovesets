@@ -6,7 +6,7 @@
 #define DLLCONTENT __declspec(dllimport)
 #endif
 
-#ifndef BUILD_TYPE
+#ifndef DEBUGBUILD_TYPE
 #define BUILD_TYPE Release
 #endif
 

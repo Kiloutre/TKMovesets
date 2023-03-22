@@ -107,15 +107,20 @@ set(IMPORTEXPORT_SOURCES
 add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES})
 target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS} ${IMPORTEXPORT_INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
-target_compile_definitions(ExportImport PUBLIC BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+target_compile_definitions(ExportImport PUBLIC BUILD_TYPE_DEBUG)
+endif()
 
 # Build program .exe
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
 add_executable (TKMovesets2 ${BINARY_SOURCES})
+target_compile_definitions(ExportImport PUBLIC BUILD_TYPE_DEBUG)
+else()
+add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES})
+endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)
-target_compile_definitions(ExportImport PUBLIC BUILD_TYPE="${CMAKE_BUILD_TYPE}")
-
 
 ## Ressources ##
 # Addresses file #

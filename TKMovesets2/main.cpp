@@ -103,7 +103,11 @@ static void DestroyMainClasses(MainWindow& program)
 
 // -- main -- //
 
+#ifdef BUILD_TYPE_DEBUG
 int main(int argc, wchar_t** argv, char** env)
+#else
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+#endif
 {
 
 	{
