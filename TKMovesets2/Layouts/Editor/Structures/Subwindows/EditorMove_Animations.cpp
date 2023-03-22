@@ -53,8 +53,9 @@ static int GetAnimationDuration(const char* filename)
 
 void EditorMove_Animations::ApplySearchFilter()
 {
-
-	for (auto& character : m_characters) {
+	for (unsigned int j = 0; j < m_characters.size(); ++j)
+	{
+		auto& character = m_characters[j];
 		if (strlen(m_searchBuffer) == 0) {
 			character->filteredFiles = character->files;
 		}
@@ -62,12 +63,17 @@ void EditorMove_Animations::ApplySearchFilter()
 			auto& filteredFiles = character->filteredFiles;
 			filteredFiles.clear();
 
-			for (auto& file : character->files)
+			for (unsigned int i = 0; i < character->files.size(); ++i)
 			{
+				auto& file = character->files[i];
 				if (strstr(file->lowercaseName.c_str(), m_lowercaseBuffer.c_str())) {
 					filteredFiles.push_back(file);
 					character->forceOpen = true;
 				}
+			}
+
+			if (!character->forceOpen) {
+				character->forceClose = true;
 			}
 		}
 	}
@@ -129,7 +135,7 @@ void EditorMove_Animations::LoadAnimationList()
 			int duration = GetAnimationDuration(filename.c_str());
 
 			if (duration == -1) {
-				// Probably an invalid file
+				// Probably an invalid file. todo : show, but prevent import?
 				continue;
 			}
 
@@ -137,7 +143,7 @@ void EditorMove_Animations::LoadAnimationList()
 				.name = name,
 				.lowercaseName = lowercaseName,
 				.filepath = filename,
-				.duration = std::to_string(duration), // todo
+				.duration = std::to_string(duration),
 				.size_megabytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f)
 			});
 
@@ -168,16 +174,23 @@ bool EditorMove_Animations::Render()
 	ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(9999, 9999));
 	if (ImGui::BeginPopupModal("AnimListPopup", &popen))
 	{
-		if (ImGui::Button(_("close"))) {
+		if (ImGui::Button(_("close_window"))) {
 			ImGui::CloseCurrentPopup();
 			popen = false;
 		}
 
 		ImGui::SameLine();
+		bool disabled = !loadedList;
+		if (ImGui::Button(_("edition.animation_list.clear_filter"))) {
+			m_searchBuffer[0] = '\0';
+			m_lowercaseBuffer = std::string();
+			ApplySearchFilter();
+		}
+
+		ImGui::SameLine();
 		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
-		bool isDisabled = !loadedList;
-		if (isDisabled) {
+		if (disabled) {
 			ImGui::BeginDisabled();
 		}
 		if (ImGui::InputTextWithHint("##", _("edition.animation_list.search_animation"), m_searchBuffer, sizeof(m_searchBuffer))) {
@@ -188,7 +201,7 @@ bool EditorMove_Animations::Render()
 
 		ImGui::PopItemWidth();
 
-		if (isDisabled) {
+		if (disabled) {
 			ImGui::EndDisabled();
 			ImGui::TextUnformatted(_("edition.animation_list.loading"));
 		} else if (m_characters.size() == 0) {
@@ -202,9 +215,10 @@ bool EditorMove_Animations::Render()
 				continue;
 			}
 
-			if (character->forceOpen) {
-				ImGui::SetNextItemOpen(true);
+			if (character->forceOpen || character->forceClose) {
+				ImGui::SetNextItemOpen(character->forceOpen ? true : false);
 				character->forceOpen = false;
+				character->forceClose = false;
 			}
 
 			if (ImGui::TreeNode(character->name.c_str()))

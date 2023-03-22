@@ -19,6 +19,7 @@ struct AnimationLibChar
 	std::vector<AnimationLibFile*> files;
 	std::vector<AnimationLibFile*> filteredFiles;
 	bool forceOpen = false;
+	bool forceClose = false;
 };
 
 

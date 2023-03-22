@@ -23,6 +23,7 @@ mota_09 = Camera 2
 mota_10 = Inconnu 1
 mota_11 = Inconnu 2
 close = Fermer
+close_window = Fermer fenêtre
 1p = Joueur 1
 2p = Joueur 2
 3p = Joueur 3
@@ -332,6 +333,7 @@ edition.animation_list.import = Importer dans move
 edition.animation_list.search_animation = Rechercher le nom de l'animation à importer dans ce move...
 edition.animation_list.no_anim = Aucune animation n'a encore été extraite dans la bibliothèque. Ouvrez un personnage avec l'éditeur et cliquez sur le bouton 'Extraire animations' pour l'ajouter à la bibliothèque.
 edition.animation_list.loading = Chargement de la liste d'animation...
+edition.animation_list.clear_filter = Effacer le filtre
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
