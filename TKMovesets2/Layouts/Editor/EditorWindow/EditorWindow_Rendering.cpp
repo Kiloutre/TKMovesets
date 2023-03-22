@@ -124,7 +124,7 @@ void EditorWindow::RenderToolBar()
 			int32_t structId = m_editor->CreateNew(structType);
 			if (structId != -1) {
 				m_savedLastChange = false;
-				m_importNeeded = true;
+				RequireImport();
 				OpenFormWindow(structType, structId, listSize);
 
 				// Custom pre-creation behaviour implementations
@@ -186,8 +186,8 @@ void EditorWindow::RenderStatusBar()
 				if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 					importerHelper.SetTargetProcess(game->processName, i);
 					m_loadedMoveset = 0;
-					m_liveEdition = false;
-					m_importNeeded = true;
+					m_editor->game_loadedMoveset = 0;
+					RequireImport();
 				}
 			}
 		}
@@ -234,7 +234,7 @@ void EditorWindow::RenderStatusBar()
 	
 	// Import button
 	ImGui::SameLine();
-	bool canImport = isAttached && m_importNeeded && !importerHelper.IsBusy() && m_canInteractWithGame;
+	bool canImport = isAttached && !importerHelper.IsBusy() && m_canInteractWithGame && (m_importNeeded || (m_liveEdition && m_editonImportNeeded));
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		importerHelper.lastLoadedMoveset = 0;
 
@@ -243,21 +243,23 @@ void EditorWindow::RenderStatusBar()
 
 		importerHelper.QueueCharacterImportation(moveset, movesetSize);
 		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
-		m_liveEdition = false;
+		m_editor->game_loadedMoveset = 0;
 		m_importNeeded = false;
+		m_editonImportNeeded = false;
 	}
 
 	// Live edition. Might not be implemented for every game.
 	if (m_liveEditable)
 	{
-		if (m_loadedMoveset == 0) {
+		bool disabled = m_loadedMoveset == 0;
+		if (disabled) {
 			ImGui::BeginDisabled();
 		}
 		ImGui::SameLine();
 		ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition);
 		ImGui::SameLine();
 		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"));
-		if (m_loadedMoveset == 0) {
+		if (disabled) {
 			ImGui::EndDisabled();
 		}
 	}
@@ -428,8 +430,7 @@ void EditorWindow::Render(int dockid)
 	if (m_loadedMoveset != 0) {
 		if (!m_canInteractWithGame || !MovesetStillLoaded())
 		{
-			m_liveEdition = false;
-			m_importNeeded = true;
+			RequireImport();
 			m_loadedMoveset = 0;
 		}
 	}
@@ -437,6 +438,7 @@ void EditorWindow::Render(int dockid)
 		// If the moveset was successfully imported, this will be filled with a nonzero value
 		m_loadedMoveset = importerHelper.lastLoadedMoveset;
 	}
+	m_editor->game_loadedMoveset = m_liveEdition ? m_loadedMoveset : 0;
 
 	// Layout start
 	ImGui::SetNextWindowSize(ImVec2(1280, 720), ImGuiCond_Once);

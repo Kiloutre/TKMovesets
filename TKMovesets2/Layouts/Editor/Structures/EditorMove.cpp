@@ -146,6 +146,10 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 	else if (field->name == "move_name") {
 		m_renamed = true;
 	}
+
+	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
+		m_baseWindow->RequireImport();
+	}
 }
 
 void EditorMove::OpenAnimationList()

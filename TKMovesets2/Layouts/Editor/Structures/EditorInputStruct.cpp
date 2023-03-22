@@ -21,6 +21,9 @@ EditorInputStruct::EditorInputStruct(std::string windowTitleBase, uint32_t t_id,
 void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
+	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
+        m_baseWindow->RequireImport();
+    }
 }
 
 void EditorInputStruct::BuildItemDetails(int listIdx)

@@ -68,6 +68,10 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 	}
 
 	BuildItemDetails(listIdx);
+
+	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
+        m_baseWindow->RequireImport();
+    }
 }
 
 void EditorCancels::BuildItemDetails(int listIdx)

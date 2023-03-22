@@ -258,6 +258,8 @@ public:
 	ExtractionStatus_ animationExtractionStatus = ExtractionStatus_NotStarted;
 	// Thread where the animations extraction will be running to avoid blocking the display thread
 	std::thread animExtractionThread;
+	// Stores the address of the loaded moveset in-game. Used for live edition.
+	gameAddr game_loadedMoveset = 0;
 
 	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 
@@ -307,4 +309,8 @@ public:
 	virtual bool IsCommandInputSequence(uint64_t command) = 0;
 	// Writes the input sequence to string, or writes to outSize if the sequence is over MAX_INPUT_SEQUENCE_SHORT_LEN inputs
 	virtual void GetInputSequenceString(int id, std::string& outStr, int& outSize) = 0;
+
+	// -- Live edition -- //
+	// Called whenever a field is edited. Returns false if a re-import is needed.
+	virtual bool Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field) { return false; };
 };

@@ -45,7 +45,7 @@ protected:
 	// Called whenver the list is reordered, used to  update field labels when index is important
 	virtual void OnReorder() {};
 	// Called whenever the list is resized, used to update field labels when index is important
-	virtual void OnResize() {};
+	virtual void OnResize();
 	// Called whenever applying with a resized list, used  to issue field updates to other windows
 	virtual void OnApplyResize(int sizeChange, int oldSize);
 	// Builds a string label that will be shown as the title of the item tree view
@@ -56,9 +56,11 @@ protected:
 	bool IsFormValid() override;
 	// Displays buttons to move, create or delete individual list items
 	void RenderListControlButtons(int listIdx);
-	// 
+	// Notify fields in other windows to be updated
 	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) override;
 
+	// Called whenever a field changes (and is valid).
+	virtual void OnUpdate(int listIdx, EditorInput* field) override;
 public:
 	//
 	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);

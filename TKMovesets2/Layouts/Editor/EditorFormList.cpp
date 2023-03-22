@@ -359,6 +359,11 @@ void EditorFormList::RenderInternal()
 	}
 }
 
+void EditorFormList::OnResize()
+{
+	m_baseWindow->RequireImport();
+}
+
 void EditorFormList::OnApplyResize(int sizeChange, int oldSize)
 {
 	m_baseWindow->IssueFieldUpdate(windowType, sizeChange, id, id + oldSize);
@@ -374,4 +379,11 @@ void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChan
 			ApplyWindowName();
 		}
 	}
+}
+
+void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
+{
+	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
+        m_baseWindow->RequireImport();
+    }
 }

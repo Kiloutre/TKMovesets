@@ -18,10 +18,14 @@ EditorVoiceclip::EditorVoiceclip(std::string windowTitleBase, uint32_t t_id, Edi
 void EditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
+	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
+        m_baseWindow->RequireImport();
+    }
 }
 
 void EditorVoiceclip::OnResize()
 {
+	m_baseWindow->RequireImport();
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
 		BuildItemDetails(listIdx);
 	}

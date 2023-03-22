@@ -49,11 +49,7 @@ private:
 	EditorInfos m_loadedCharacter = { "", "", 0, -1 };
 	// True if we need to enable the save button
 	bool m_savedLastChange = true;
-	// True if moveset changes are to be applied to the game instantly
-	bool m_liveEdition = false;
-	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
-	bool m_importNeeded = true;
-	// If the moveset can be live edited or not
+	// If the moveset can be live edited or not (need to actually code it)
 	bool m_liveEditable = true;
 	// Stores the address, in-game, of the moveset we loaded. 0 if none loaded.
 	gameAddr m_loadedMoveset = 0;
@@ -61,8 +57,6 @@ private:
 	char m_moveToPlayBuf[7]{ 0 };
 	// Store the move to play as a int32_t, or -1 if the move id is invalid (checks are made against the moveset data)
 	int32_t m_moveToPlay = -1;
-	// Access moveset data through this variable. Uses polymorphism.
-	Editor* m_editor = nullptr;
 	// Contains the movelist displayed at all times, may get sorted and/or filtered
 	std::vector<DisplayableMove*> m_filteredMovelist;
 	// Contains the current display filter of the displayed movelist
@@ -79,6 +73,10 @@ private:
 	ImGuiID m_dockId;
 	// The viewport of the editor window. Used to know which subwindow is docked or not.
 	ImGuiViewport* m_viewport = nullptr;
+	// True if moveset changes are to be applied to the game instantly
+	bool m_liveEdition = false;
+	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
+	bool m_importNeeded = true;
 
 
 	// Render the top toolbar containing useful moveset editing tools
