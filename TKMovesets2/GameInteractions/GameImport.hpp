@@ -19,8 +19,10 @@ private:
 	// List of errors, one extraction fail = 1 error
 	std::vector<ImportationErrcode_> m_errors;
 
-	// Callback called whenever the process is re-atached
+	// Callback called whenever the process is re-attached
 	void OnProcessAttach() override;
+	// Callback called whenever the process is detached
+	void OnProcessDetach() override;
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	void InstantiateFactory() override;
 	// Function ran in the parallel thread, used to latch on to process

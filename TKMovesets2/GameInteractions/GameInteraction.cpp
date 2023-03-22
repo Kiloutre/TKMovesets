@@ -41,6 +41,13 @@ void GameInteraction::Update()
 			}
 		}
 
+		if (lastStatus != process->status) {
+			if (lastStatus == GameProcessErrcode_PROC_ATTACHED) {
+				OnProcessDetach();
+			}
+			lastStatus = process->status;
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
 }

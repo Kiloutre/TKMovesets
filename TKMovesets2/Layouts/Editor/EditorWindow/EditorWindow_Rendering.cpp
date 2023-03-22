@@ -34,6 +34,7 @@ void EditorWindow::RenderToolBar()
 	ImGui::Separator();
 
 	// Current move 1P
+
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_1p"), m_loadedMoveset != 0)) {
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(0);
 		m_moveToPlay = m_moveToScrollTo;

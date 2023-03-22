@@ -23,6 +23,8 @@ protected:
 	virtual void RunningUpdate() = 0;
 	// Callback called when the process has latched on a process for the first time
 	virtual void OnProcessAttach() = 0;
+	// Callback called when the process has detached, on purpose or not (status change from ATTACHED to any other)
+	virtual void OnProcessDetach() {};
 	// Called before detaching from the process when executing SetTargetProces()
 	virtual void PreProcessDetach() {};
 
@@ -41,6 +43,7 @@ public:
 	GameData* game = nullptr;
 	// Progress of the current task, between 0 and 100
 	uint8_t progress = 0;
+	GameProcessErrcode_ lastStatus = GameProcessErrcode_PROC_NOT_ATTACHED;
 
 	// Returns the amount of characters we are able to interact with
 	virtual uint8_t GetCharacterCount() = 0;

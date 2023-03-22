@@ -23,6 +23,11 @@ void GameImport::OnProcessAttach()
 	m_plannedImportations.clear();
 }
 
+void GameImport::OnProcessDetach()
+{
+	// There is no way to know if the moveset is still valid after detaching: reset it
+	lastLoadedMoveset = 0;
+}
 
 void GameImport::InstantiateFactory()
 {
@@ -72,6 +77,7 @@ void GameImport::RunningUpdate()
 		}
 	}
 }
+
 // -- Public methods -- //
 
 ImportationErrcode_ GameImport::GetLastError()
