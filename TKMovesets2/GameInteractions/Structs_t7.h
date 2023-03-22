@@ -107,7 +107,12 @@ namespace StructsT7
 	{
 		uint32_t starting_frame;
 		uint32_t id;
-		uint32_t value;
+		union
+		{
+			uint32_t value_unsigned;
+			int32_t value_signed;
+			float value_float;
+		};
 	};
 
 	struct Input

@@ -34,6 +34,43 @@ void EditorExtraproperties::RequestFieldUpdate(std::string fieldName, int valueC
 
 void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 {
+	auto& name = field->name;
+	auto& fields = m_items[listIdx]->identifierMaps;
+	const int bufsize = field->bufsize;
+
+	if (name == "value_unsigned")
+	{
+		uint64_t value = EditorUtils::GetFieldValue(field);
+
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", *(int32_t*)&value);
+		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", (uint32_t)value);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", *(float*)&value);
+	}
+	else if (name == "value_signed")
+	{
+		uint64_t value = EditorUtils::GetFieldValue(field);
+
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
+		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", (uint32_t)value);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%f", *(float*)&value);
+	}
+	else if (name == "value_hex")
+	{
+		uint64_t value = EditorUtils::GetFieldValue(field);
+
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", *(int32_t*)&value);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", *(float*)&value);
+	}
+	else if (name == "value_float")
+	{
+		uint64_t value = EditorUtils::GetFieldValue(field);
+
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", *(int32_t*)&value);
+		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", *(uint32_t*)&value);
+	}
+
 	BuildItemDetails(listIdx);
 }
 
@@ -45,7 +82,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	int startingFrame = atoi(map["starting_frame"]->buffer);
 	int id = strtoll(map["id"]->buffer, nullptr, 16);
-	uint64_t value = strtoll(map["value"]->buffer, nullptr, 10);
+	uint64_t value = strtoll(map["value_unsigned"]->buffer, nullptr, 10);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 
@@ -53,9 +90,10 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	std::string valueText;
 
 	if (startingFrame >= 32769) {
+		// Starting frame can sometimes be at 0x4000 and above. todo : look into what this does
 		switch (startingFrame)
 		{
-		case 99999:
+		case 9999:
 			startingFrameText = _("edition.extraproperty.every_frame");
 			break;
 		case 32769:
@@ -71,7 +109,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	}
 
 	if (value > 15) {
-		valueText = std::format("0x{:x} / {} / {}f", value, value, *(float*)&value);
+		valueText = std::format("{} / {} / 0x{:x} / {:f}f", *(int32_t*)&value, value, value, *(float*)&value);
 	}
 	else {
 		valueText = std::to_string(value);

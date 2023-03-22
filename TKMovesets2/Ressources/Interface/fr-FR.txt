@@ -197,19 +197,22 @@ edition.voiceclip.end = FIN
 edition.extraproperty.window_name = Liste de propriété
 edition.extraproperty.starting_frame = Frame de début
 edition.extraproperty.id = ID
-edition.extraproperty.value = Value
 edition.extraproperty.instant = INSTANTANÉ
 edition.extraproperty.every_frame = CHAQUE FRAME
+edition.extraproperty.value_unsigned = Valeur (U32)
+edition.extraproperty.value_signed = Valeur (S32)
+edition.extraproperty.value_hex = Valeur (H32)
+edition.extraproperty.value_float = Valeur (Float)
 
-edition.move_start_extraprop_addr.window_name = Liste de propriété de début
-edition.move_start_extraprop_addr.requirements_addr = ID de condition
-edition.move_start_extraprop_addr.extraprop = Propriété / Condition
-edition.move_start_extraprop_addr.value = Valeur
+edition.move_start_extraprop.window_name = Liste de propriété de début
+edition.move_start_extraprop.requirements_addr = ID de condition
+edition.move_start_extraprop.extraprop = Propriété / Condition
+edition.move_start_extraprop.value = Valeur
 
-edition.move_end_extraprop_addr.window_name = Liste de propriété de fin
-edition.move_end_extraprop_addr.requirements_addr = ID de condition
-edition.move_end_extraprop_addr.extraprop =  Propriété / Condition
-edition.move_end_extraprop_addr.value = Valeur
+edition.move_end_extraprop.window_name = Liste de propriété de fin
+edition.move_end_extraprop.requirements_addr = ID de condition
+edition.move_end_extraprop.extraprop =  Propriété / Condition
+edition.move_end_extraprop.value = Valeur
 
 edition.cancel.window_name = Liste de Cancel
 edition.cancel.command = Commande

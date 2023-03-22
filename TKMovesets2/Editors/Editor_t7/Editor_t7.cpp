@@ -726,7 +726,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
 		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
-		WriteFieldFullname(inputMap, "move_start_property");
+		WriteFieldFullname(inputMap, "move_start_extraprop");
 		inputListMap.push_back(inputMap);
 	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
 
@@ -762,7 +762,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
 		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
 
-		WriteFieldFullname(inputMap, "move_end_property");
+		WriteFieldFullname(inputMap, "move_end_extraprop");
 		inputListMap.push_back(inputMap);
 	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
 
@@ -807,7 +807,10 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 		CREATE_FIELD("starting_frame", 0, EditorInput_U32, prop->starting_frame);
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
-		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
+		CREATE_FIELD("value_signed", 0, EditorInput_S32, prop->value_signed);
+		CREATE_FIELD("value_unsigned", 0, EditorInput_U32, prop->value_unsigned);
+		CREATE_FIELD("value_hex", 0, EditorInput_H32, prop->value_unsigned);
+		CREATE_FIELD("value_float", 0, EditorInput_Float, prop->value_float);
 
 		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
@@ -822,7 +825,7 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 
 	prop->starting_frame = GetFieldValue(inputs["starting_frame"]);
 	prop->id = GetFieldValue(inputs["id"]);
-	prop->value = GetFieldValue(inputs["value"]);
+	prop->value_unsigned = GetFieldValue(inputs["value_unsigned"]);
 }
 
 // ===== Voiceclips ===== //

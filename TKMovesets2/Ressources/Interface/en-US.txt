@@ -202,9 +202,12 @@ edition.voiceclip.end = END
 edition.extraproperty.window_name = Extra property list
 edition.extraproperty.starting_frame = Starting frame
 edition.extraproperty.id = ID
-edition.extraproperty.value = Value
 edition.extraproperty.instant = INSTANT
 edition.extraproperty.every_frame = EVERY FRAME
+edition.extraproperty.value_unsigned = Value (U32)
+edition.extraproperty.value_signed = Value (S32)
+edition.extraproperty.value_hex = Value (H32)
+edition.extraproperty.value_float = Value (Float)
 
 edition.move_start_extraprop_addr.window_name = Start property list
 edition.move_start_extraprop_addr.requirements_addr = Requirements ID

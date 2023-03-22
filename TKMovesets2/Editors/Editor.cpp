@@ -39,6 +39,10 @@ namespace EditorUtils
 		else if (field->flags & EditorInput_PTR) {
 			field->color = FORM_INPUT_REF;
 		}
+
+		else if (field->flags & EditorInput_Signed) {
+			field->color = FORM_INPUT_SIGNED;
+		}
 	}
 
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags)
@@ -71,7 +75,11 @@ namespace EditorUtils
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags)
 	{
 		if (flags & EditorInput_Hex) {
-			return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
+			//return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
+			return ImGuiInputTextFlags_CharsNoBlank;
+		}
+		if (flags & EditorInput_Float) {
+			return ImGuiInputTextFlags_CharsDecimal;
 		}
 		return ImGuiInputTextFlags_CharsDecimal;
 	}
@@ -79,10 +87,10 @@ namespace EditorUtils
 	const char* GetFieldFormat(EditorInputFlag flags)
 	{
 		if (flags & (EditorInput_H64)) {
-			return "%llX";
+			return "0x%llX";
 		}
 		if (flags & (EditorInput_H32 | EditorInput_H16)) {
-			return "%X";
+			return "0x%X";
 		}
 		if (flags & EditorInput_S64) {
 			return "%lld";
@@ -104,7 +112,7 @@ namespace EditorUtils
 		const char* buffer = field->buffer;
 		auto& flags = field->flags;
 
-		if (flags & (EditorInput_H64 | EditorInput_H32 | EditorInput_H16)) {
+		if (flags & (EditorInput_Hex)) {
 			return strtoll(buffer, nullptr, 16);
 		}
 		if (flags & EditorInput_Float) {
@@ -135,17 +143,17 @@ bool Editor::ValidateFieldType(EditorInput* field)
 	auto flags = field->flags;
 
 	if (flags & EditorInput_H64) {
-		if (strlen(field->buffer) > 16) {
+		if (strlen(field->buffer) > 16 + 2) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_H32) {
-		if (strlen(field->buffer) > 8) {
+		if (strlen(field->buffer) > 8 + 2) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_H16) {
-		if (strlen(field->buffer) > 4) {
+		if (strlen(field->buffer) > 4 + 2) {
 			return false;
 		}
 	}

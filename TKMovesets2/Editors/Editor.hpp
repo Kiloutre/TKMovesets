@@ -118,6 +118,8 @@ enum EditorInputFlag_
 	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
 
 	// Used internally for conditions
+	EditorInput_Unsigned     = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16),
+	EditorInput_Signed       = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16),
 	EditorInput_Hex          = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16),
 	EditorInput_Interactable = (EditorInput_Clickable | EditorInput_ClickableAlways),
 };
