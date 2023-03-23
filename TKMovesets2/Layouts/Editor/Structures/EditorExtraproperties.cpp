@@ -107,20 +107,48 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	m_items[listIdx]->itemLabel = label;
 
-
-	if (m_editor->IsPropertyThrowCameraRef(map["id"]->buffer))
+	bool isCameraRef = m_editor->IsPropertyThrowCameraRef(map["id"]->buffer);
+	bool isProjectileRef = m_editor->IsPropertyProjectileRef(map["id"]->buffer);
+	if (isCameraRef || isProjectileRef)
 	{
-		m_items[listIdx]->color = PROPID_THROW_CAM;
+		map["value_unsigned"]->flags |= EditorInput_Clickable;
+		if (isCameraRef) {
+			m_items[listIdx]->color = PROPID_THROW_CAM;
+			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
+		}
+		else if (isProjectileRef) {
+
+			m_items[listIdx]->color = PROPID_PROJECTILE;
+			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
+		}
+
 		map["value_signed"]->visible = false;
 		map["value_hex"]->visible = false;
 		map["value_float"]->visible = false;
-		EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
 	}
 	else {
+		if (map["value_unsigned"]->flags & EditorInput_Clickable) {
+			map["value_unsigned"]->flags -= EditorInput_Clickable;
+		}
 		m_items[listIdx]->color = 0;
 		map["value_signed"]->visible = true;
 		map["value_hex"]->visible = true;
 		map["value_float"]->visible = true;
 		EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _(map["value_unsigned"]->fullName.c_str()));
+	}
+}
+
+
+void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
+{
+	auto& map = m_items[listIdx]->identifierMaps;
+	int id = atoi(field->buffer);
+
+	bool isProjectileRef = m_editor->IsPropertyProjectileRef(map["id"]->buffer);
+	if (m_editor->IsPropertyThrowCameraRef(map["id"]->buffer)) {
+		m_baseWindow->OpenFormWindow(EditorWindowType_ThrowCamera, id);
+	}
+	else {
+		m_baseWindow->OpenFormWindow(EditorWindowType_Projectile, id);
 	}
 }

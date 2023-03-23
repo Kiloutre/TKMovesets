@@ -26,3 +26,11 @@ bool EditorT7::IsPropertyThrowCameraRef(const char* buffer)
 	}
 	return false;
 }
+bool EditorT7::IsPropertyProjectileRef(const char* buffer)
+{
+	uint32_t id = (uint32_t)strtol(buffer, nullptr, 16);
+	if (id == 0x820B) {
+		return true;
+	}
+	return false;
+}

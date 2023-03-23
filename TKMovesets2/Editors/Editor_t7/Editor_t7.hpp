@@ -149,6 +149,7 @@ public:
 	bool IsCommandGroupedCancelReference(const char* buffer) override;
 	int GetCommandInputSequenceID(const char* buffer) override;
 	bool IsPropertyThrowCameraRef(const char* buffer) override;
+	bool IsPropertyProjectileRef(const char* buffer) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
@@ -220,5 +221,9 @@ public:
 	//
 	void Live_OnInputSequenceEdit(int id, EditorInput* field);
 	void Live_OnInputEdit(int id, EditorInput* field);
+	//
+	void Live_OnReactionsEdit(int id, EditorInput* field);
+	//
+	void Live_OnProjectileEdit(int id, EditorInput* field);
 
 };

@@ -65,7 +65,7 @@ protected:
 	// Called whenever the changes are successfully applied
 	virtual void OnApply() {};
 	// Called whenever a field changes (and is valid). listIdx is always 0 if not a list of structs.
-	virtual void OnUpdate(int listIdx, EditorInput* field) {};
+	virtual void OnUpdate(int listIdx, EditorInput* field);
 	// Called when clicking a field
 	virtual void OnFieldLabelClick(int listIdx, EditorInput* field) {};
 	// Renders buttons to ask if the changes should be discarded or not, if trying to leave without applying

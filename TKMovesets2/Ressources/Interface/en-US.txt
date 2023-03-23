@@ -204,6 +204,7 @@ edition.extraproperty.window_name = Extra property list
 edition.extraproperty.starting_frame = Starting frame
 edition.extraproperty.id = ID
 edition.extraproperty.throw_camera_id = Throw camera ID
+edition.extraproperty.projectile_id = Projectile ID
 edition.extraproperty.instant = INSTANT
 edition.extraproperty.every_frame = EVERY FRAME
 edition.extraproperty.value_unsigned = Value (U32)
@@ -317,6 +318,7 @@ edition.projectile.gravity = Gravity
 edition.projectile.hit_level = Hit level
 edition.projectile.hit_condition_addr = Hit Conditions ID
 edition.projectile.cancel_addr = Cancels ID
+edition.projectile.voiceclip_on_hit = Voiceclip (HIT)
 
 edition.pushback.window_name = Pushback
 edition.pushback.duration = Duration

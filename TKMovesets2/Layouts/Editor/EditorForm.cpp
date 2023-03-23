@@ -378,3 +378,8 @@ void EditorForm::Render()
 
 	PostRender();
 }
+
+void EditorForm::OnUpdate(int listIdx, EditorInput* field)
+{
+	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+}

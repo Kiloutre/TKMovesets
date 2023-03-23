@@ -346,6 +346,127 @@ void EditorT7::Live_OnHitConditionPropEdit(int id, EditorInput* field)
 	}
 }
 
+void EditorT7::Live_OnReactionsEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	gameAddr reactions = blockStart + (uint64_t)m_infos->table.reactions + id * sizeof(Reactions);
+
+	//
+	if (name == "front_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, front_pushback), pushbackAddr);
+	}
+	else if (name == "backturned_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, backturned_pushback), pushbackAddr);
+	}
+	else if (name == "left_side_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, left_side_pushback), pushbackAddr);
+	}
+	else if (name == "right_side_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, right_side_pushback), pushbackAddr);
+	}
+	else if (name == "front_counterhit_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, front_counterhit_pushback), pushbackAddr);
+	}
+	else if (name == "downed_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, downed_pushback), pushbackAddr);
+	}
+	else if (name == "block_pushback") {
+		int id = atoi(field->buffer);
+		gameAddr pushbackAddr = blockStart + (uint64_t)m_infos->table.pushback + id * sizeof(Pushback);
+		m_process->writeInt64(reactions + offsetof(Reactions, block_pushback), pushbackAddr);
+	}
+	//
+	else if (name == "default_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, default_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "standing_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, standing_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "crouch_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, crouch_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "counterhit_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, counterhit_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "crouch_counterhit_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, crouch_counterhit_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "left_side_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, left_side_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "crouch_left_side_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, crouch_left_side_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "right_side_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, right_side_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "crouch_right_side_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, crouch_right_side_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "backturned_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, backturned_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "crouch_backturned_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, crouch_backturned_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "block_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, block_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "crouch_block_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, crouch_block_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "wallslump_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, wallslump_moveid), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "downed_moveid") {
+		m_process->writeInt16(reactions + offsetof(Reactions, downed_moveid), (uint16_t)atoi(field->buffer));
+	}
+	//
+	else if (name == "front_direction") {
+		m_process->writeInt16(reactions + offsetof(Reactions, front_direction), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "back_direction") {
+		m_process->writeInt16(reactions + offsetof(Reactions, back_direction), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "left_side_direction") {
+		m_process->writeInt16(reactions + offsetof(Reactions, left_side_direction), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "right_side_direction") {
+		m_process->writeInt16(reactions + offsetof(Reactions, right_side_direction), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "front_counterhit_direction") {
+		m_process->writeInt16(reactions + offsetof(Reactions, front_counterhit_direction), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "downed_direction") {
+		m_process->writeInt16(reactions + offsetof(Reactions, downed_direction), (uint16_t)atoi(field->buffer));
+	}
+
+	else if (name == "vertical_pushback") {
+		m_process->writeInt16(reactions + offsetof(Reactions, vertical_pushback), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "_0x44_int") {
+		m_process->writeInt32(reactions + offsetof(Reactions, _0x44_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x48_int") {
+		m_process->writeInt32(reactions + offsetof(Reactions, _0x48_int), (uint32_t)atoi(field->buffer));
+	}
+}
+
 void EditorT7::Live_OnPushbackEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
@@ -426,6 +547,142 @@ void EditorT7::Live_OnInputEdit(int id, EditorInput* field)
 
 }
 
+void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t projectile = blockStart + (uint64_t)m_infos->table.projectile + id * sizeof(Projectile);
+
+	if (name == "vfx_id") {
+		m_process->writeInt32(projectile + offsetof(Projectile, vfx_id), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "vfx_variation_id") {
+		m_process->writeInt32(projectile + offsetof(Projectile, vfx_variation_id), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "delay") {
+		m_process->writeInt32(projectile + offsetof(Projectile, delay), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "vertical_velocity") {
+		m_process->writeInt32(projectile + offsetof(Projectile, vertical_velocity), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "horizontal_velocity") {
+		m_process->writeInt32(projectile + offsetof(Projectile, horizontal_velocity), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "duration") {
+		m_process->writeInt32(projectile + offsetof(Projectile, duration), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "no_collision") {
+		m_process->writeInt32(projectile + offsetof(Projectile, no_collision), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "size") {
+		m_process->writeInt32(projectile + offsetof(Projectile, size), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "can_hitbox_connect") {
+		m_process->writeInt32(projectile + offsetof(Projectile, can_hitbox_connect), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "gravity") {
+		m_process->writeInt32(projectile + offsetof(Projectile, gravity), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "hit_level") {
+		m_process->writeInt32(projectile + offsetof(Projectile, hit_level), (uint32_t)strtoll(field->buffer, nullptr, 16));
+	}
+	else if (name == "voiceclip_on_hit") {
+		m_process->writeInt32(projectile + offsetof(Projectile, voiceclip_on_hit), (uint32_t)strtoll(field->buffer, nullptr, 16));
+	}
+
+	else if (name == "reactions_addr") {
+		int id = atoi(field->buffer);
+		uint64_t hitConditionAddr = blockStart + (uint64_t)m_infos->table.hitCondition + id * sizeof(HitCondition);
+		m_process->writeInt64(projectile + offsetof(Projectile, hit_condition_addr), hitConditionAddr);
+	}
+	else if (name == "reactions_addr") {
+		int id = atoi(field->buffer);
+		uint64_t cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
+		m_process->writeInt64(projectile + offsetof(Projectile, cancel_addr), cancelAddr);
+	}
+
+	else if (name == "_0x4_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x4_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0xC_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0xC_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x10_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x10_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x14_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x14_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x24_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x24_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x34_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x34_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x3C_int_1") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x3C_int[0]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x3C_int_2") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x3C_int[1]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x3C_int_3") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x3C_int[2]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x3C_int_4") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x3C_int[3]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x3C_int_5") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x3C_int[4]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x3C_int_6") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x3C_int[5]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x58_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x58_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x5C_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x5C_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x70_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x70_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x74_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x74_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x7C_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x7C_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x80_int") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x80_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_1") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[0]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_2") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[1]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_3") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[2]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_4") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[3]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_5") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[4]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_6") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[5]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_7") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[6]), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x88_int_8") {
+		m_process->writeInt32(projectile + offsetof(Projectile, _0x88_int[7]), (uint32_t)atoi(field->buffer));
+	}
+}
+
 void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field)
 {
 #ifdef BUILD_TYPE_DEBUG
@@ -471,6 +728,7 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 		Live_OnHitConditionPropEdit(id, field);
 		break;
 	case EditorWindowType_Reactions:
+		Live_OnReactionsEdit(id, field);
 		break;
 	case EditorWindowType_Pushback:
 		Live_OnPushbackEdit(id, field);
@@ -487,11 +745,12 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 		break;
 
 	case EditorWindowType_Projectile:
+		Live_OnProjectileEdit(id, field);
 		break;
 
 	case EditorWindowType_CameraData:
 		break;
-	case EditorWindowType_ThrowData:
+	case EditorWindowType_ThrowCamera:
 		break;
 	}
 

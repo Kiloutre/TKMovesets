@@ -142,7 +142,7 @@ std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, V
 	CREATE_FIELD("_0x3C_int_6", 3, EditorInput_U32, projectile->_0x3C_int[5]);
 	CREATE_FIELD("_0x58_int", 3, EditorInput_U32, projectile->_0x58_int);
 	CREATE_FIELD("_0x5C_int", 3, EditorInput_U32, projectile->_0x5C_int);
-	CREATE_FIELD("_0x70_int", 3, EditorInput_U32, projectile->_0x58_int);
+	CREATE_FIELD("_0x70_int", 3, EditorInput_U32, projectile->_0x70_int);
 	CREATE_FIELD("_0x74_int", 3, EditorInput_U32, projectile->_0x74_int);
 	CREATE_FIELD("_0x7C_int", 3, EditorInput_U32, projectile->_0x7C_int);
 	CREATE_FIELD("_0x80_int", 3, EditorInput_U32, projectile->_0x80_int);

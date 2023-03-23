@@ -89,7 +89,7 @@ enum EditorWindowType_
 	EditorWindowType_Projectile,
 
 	EditorWindowType_CameraData,
-	EditorWindowType_ThrowData,
+	EditorWindowType_ThrowCamera,
 
 
 	EditorWindowType_Invalid,
@@ -321,6 +321,8 @@ public:
 	virtual int GetCommandInputSequenceID(const char* buffer) = 0;
 	// Returns true if the property ID refers to a throw camera
 	virtual bool IsPropertyThrowCameraRef(const char* buffer) = 0;
+	// Returns true if the property ID refers to a projectile
+	virtual bool IsPropertyProjectileRef(const char* buffer) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
