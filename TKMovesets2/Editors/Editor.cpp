@@ -119,9 +119,9 @@ namespace EditorUtils
 			union fieldValue {
 				uint64_t uint64 = 0;
 				float floatingPoint;
-			} Test;
-			Test.floatingPoint = std::atof(buffer);
-			return Test.uint64;
+			} value;
+			value.floatingPoint = std::atof(buffer);
+			return value.uint64;
 		}
 		return (uint64_t)strtoll(buffer, nullptr, 10);
 	}
