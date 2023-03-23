@@ -148,6 +148,7 @@ public:
 	bool IsCommandInputSequence(const char* buffer) override;
 	bool IsCommandGroupedCancelReference(const char* buffer) override;
 	int GetCommandInputSequenceID(const char* buffer) override;
+	bool IsPropertyThrowCameraRef(const char* buffer) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list

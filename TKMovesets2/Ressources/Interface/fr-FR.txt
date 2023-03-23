@@ -198,6 +198,7 @@ edition.voiceclip.end = FIN
 edition.extraproperty.window_name = Liste de propriété
 edition.extraproperty.starting_frame = Frame de début
 edition.extraproperty.id = ID
+edition.extraproperty.throw_camera_id = ID de caméra de prise
 edition.extraproperty.instant = INSTANTANÉ
 edition.extraproperty.every_frame = CHAQUE FRAME
 edition.extraproperty.value_unsigned = Valeur (U32)

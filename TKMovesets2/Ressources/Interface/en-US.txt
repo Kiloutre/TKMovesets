@@ -203,6 +203,7 @@ edition.voiceclip.end = END
 edition.extraproperty.window_name = Extra property list
 edition.extraproperty.starting_frame = Starting frame
 edition.extraproperty.id = ID
+edition.extraproperty.throw_camera_id = Throw camera ID
 edition.extraproperty.instant = INSTANT
 edition.extraproperty.every_frame = EVERY FRAME
 edition.extraproperty.value_unsigned = Value (U32)

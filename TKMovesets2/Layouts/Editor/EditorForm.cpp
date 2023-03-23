@@ -114,15 +114,16 @@ void EditorForm::Apply()
 
 void EditorForm::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount)
 {
-	for (size_t i = 0; i < inputs.size(); ++i)
+	unsigned int colIdx = 0;
+	for (auto& field : inputs)
 	{
-		EditorInput* field = inputs[i];
-
-		if (field->category != category) {
+		if (!field->visible) {
+			// If not visible: don't render and don't increment colIdx
 			continue;
 		}
+
 		//Render label
-		if (i % columnCount == 0) {
+		if (colIdx % columnCount == 0) {
 			ImGui::TableNextRow();
 		}
 		ImGui::TableNextColumn();
@@ -134,6 +135,8 @@ void EditorForm::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, in
 		}
 		ImGui::TableNextColumn();
 		RenderInput(listIdx, field);
+
+		++colIdx;
 	}
 }
 
@@ -178,10 +181,19 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		appliedBg = true;
 	}
 
+	if (field->nextValue.size() != 0) {
+		// Have to implement pasting manually
+		strcpy_s(field->buffer, field->bufsize, field->nextValue.c_str());
+		// Put the focus back on the input as it should
+		ImGui::SetKeyboardFocusHere();
+	}
+
 	ImGui::PushID(field);
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags))
+	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags) ||
+		field->nextValue.size() != 0)
 	{
+		field->nextValue.clear();
 		unsavedChanges = true;
 		field->errored = m_editor->ValidateField(windowType, field) == false;
 		if (!field->errored) {
@@ -191,8 +203,15 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
 		// Have to manually implement copying
-		if (ImGui::IsKeyPressed(ImGuiKey_C, true)) {
+		if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
 			ImGui::SetClipboardText(field->buffer);
+		}
+		else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
+		{
+			field->nextValue = ImGui::GetClipboardText();
+			// Force focus on the next widget
+			// This is because ImGUI prevents from writing on a focused input's buffer
+			ImGui::SetKeyboardFocusHere();
 		}
 	}
 	ImGui::PopID();

@@ -141,12 +141,16 @@ struct EditorInput
 	// The string buffer containing the input text
 	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
 	unsigned int bufsize = FORM_INPUT_BUFSIZE;
-	// Contains true if the buffer contains invalid data
-	bool errored = false;
 	// Sets the BG color of the input
 	int color = 0;
 	// Contains half of the text size, used for alignment
 	float textSizeHalf = 0;
+	// If set to false, the field and its label will not render
+	bool visible = true;
+	// Contains true if the buffer contains invalid data
+	bool errored = false;
+	// Used to implement pasting from clipboard. Can't write into a focused field.
+	std::string nextValue;
 };
 
 // Pre-calculate these flags in order to color-code, sort and filter the movelist
@@ -314,6 +318,8 @@ public:
 	virtual bool IsCommandGroupedCancelReference(const char* buffer) = 0;
 	// Returns the ID of an input sequence from a (grouped)cancel's command buffer
 	virtual int GetCommandInputSequenceID(const char* buffer) = 0;
+	// Returns true if the property ID refers to a throw camera
+	virtual bool IsPropertyThrowCameraRef(const char* buffer) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

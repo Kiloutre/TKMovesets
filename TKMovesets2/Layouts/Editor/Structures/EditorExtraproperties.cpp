@@ -106,4 +106,15 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	}
 
 	m_items[listIdx]->itemLabel = label;
+
+
+	if (m_editor->IsPropertyThrowCameraRef(map["id"]->buffer))
+	{
+		m_items[listIdx]->color = PROPID_THROW_CAM;
+		EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
+	}
+	else {
+		m_items[listIdx]->color = 0;
+		EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _(map["value_unsigned"]->fullName.c_str()));
+	}
 }
