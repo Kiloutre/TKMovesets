@@ -240,3 +240,8 @@ void GameProcess::freeMem(gameAddr addr)
 		}
 	}
 }
+
+void GameProcess::createRemoteThread(gameAddr startAddress)
+{
+	CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, nullptr, 0, nullptr);
+}

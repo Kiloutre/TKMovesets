@@ -117,7 +117,6 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
 		}
 		else if (isProjectileRef) {
-
 			m_items[listIdx]->color = PROPID_PROJECTILE;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
 		}
@@ -137,7 +136,6 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 		EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _(map["value_unsigned"]->fullName.c_str()));
 	}
 }
-
 
 void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

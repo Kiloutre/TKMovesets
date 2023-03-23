@@ -97,4 +97,6 @@ public:
 	gameAddr allocateMem(size_t amount);
 	// Frees memory that we previously allocated. Address must be the exact same as when it was returned by allocateMem().
 	void freeMem(gameAddr addr);
+	// Create a thread in the remote process
+	void createRemoteThread(gameAddr startAddress);
 };

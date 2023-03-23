@@ -214,14 +214,14 @@ edition.extraproperty.value_signed = Value (S32)
 edition.extraproperty.value_hex = Value (H32)
 edition.extraproperty.value_float = Value (Float)
 
-edition.move_start_extraprop_addr.window_name = Start property list
-edition.move_start_extraprop_addr.requirements_addr = Requirements ID
-edition.move_start_extraprop_addr.extraprop = Property / Requirement
-edition.move_start_extraprop_addr.value = Value
+edition.move_start_extraprop.window_name = Start property list
+edition.move_start_extraprop.requirements_addr = Requirements ID
+edition.move_start_extraprop.extraprop = Property / Requirement
+edition.move_start_extraprop.value = Value
 
-edition.move_end_extraprop_addr.window_name = End property list
-edition.move_end_extraprop_addr.requirements_addr = Requirements ID
-edition.move_end_extraprop_addr.extraprop =  Property / Requirement
+edition.move_end_extraprop.window_name = End property list
+edition.move_end_extraprop.requirements_addr = Requirements ID
+edition.move_end_extraprop.extraprop =  Property / Requirement
 edition.move_end_extraprop_addr.value = Value
 
 edition.cancel.window_name = Cancel list
