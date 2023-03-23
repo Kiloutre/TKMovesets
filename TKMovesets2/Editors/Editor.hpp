@@ -300,15 +300,20 @@ public:
 	// Modifies an existing list's size
 	virtual void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) = 0;
 
-	// -- Utils -- //
+	// -- Command Utils -- //
 	// Returns a command string from two seperate direction & button fields
 	virtual std::string GetCommandStr(const char* direction, const char* button) = 0;
 	// Returns a command string from a command field
 	virtual std::string GetCommandStr(const char* commandBuf) = 0;
-	// Returns true if the command is an input sequence
-	virtual bool IsCommandInputSequence(uint64_t command) = 0;
 	// Writes the input sequence to string, or writes to outSize if the sequence is over MAX_INPUT_SEQUENCE_SHORT_LEN inputs
 	virtual void GetInputSequenceString(int id, std::string& outStr, int& outSize) = 0;
+	// -- Utils -- //
+	// Returns true if the command is an input sequence
+	virtual bool IsCommandInputSequence(const char* buffer) = 0;
+	// Determines if a command states that the cancel refers to a grouped cancel 
+	virtual bool IsCommandGroupedCancelReference(const char* buffer) = 0;
+	// Returns the ID of an input sequence from a (grouped)cancel's command buffer
+	virtual int GetCommandInputSequenceID(const char* buffer) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

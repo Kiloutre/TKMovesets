@@ -24,8 +24,7 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
-		uint64_t command = (uint64_t)strtoll(item->identifierMaps["command"]->buffer, nullptr, 16);
-		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+		if (m_editor->IsCommandGroupedCancelReference(item->identifierMaps["command"]->buffer)) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, id);
 		}
 		else {
@@ -39,9 +38,8 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
 	}
 	else if (name == "command") {
-		// Command is only clickable
-		uint64_t command = (uint64_t)strtoll(item->identifierMaps["command"]->buffer, nullptr, 16);
-		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
+		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
+		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMaps["command"]->buffer);
 		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
 	}
 }
@@ -55,13 +53,14 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 		// More complex validation than what is shown in the editors.cpp (cross-field validation)
 		EditorInput* commandField = item->identifierMaps["command"];
 		EditorInput* moveIdField = item->identifierMaps["move_id"];
-		uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
-		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+		if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
+		{
 			int groupId = atoi(moveIdField->buffer);
 			moveIdField->errored = groupId >= m_baseWindow->editorTable->groupCancelCount;
 		}
-		else {
+		else
+		{
 			int moveId = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 			moveIdField->errored = moveId == -1;
 		}
@@ -80,11 +79,11 @@ void EditorCancels::BuildItemDetails(int listIdx)
 
 	EditorInput* commandField = item->identifierMaps["command"];
 	EditorInput* moveIdField = item->identifierMaps["move_id"];
-	uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
-	if (m_editor->IsCommandInputSequence(command)) {
+	if (m_editor->IsCommandInputSequence(commandField->buffer))
+	{
 		commandField->flags |= EditorInput_Clickable;
-		int inputSequenceId = (command & 0xFFFFFFFF) - m_editor->constants[EditorConstants_InputSequenceCommandStart];
+		int inputSequenceId = m_editor->GetCommandInputSequenceID(commandField->buffer);
 
 		item->color = MOVEID_INPUT_SEQUENCE;
 		EditorFormUtils::SetFieldDisplayText(commandField, _("edition.cancel.sequence_id"));
@@ -116,12 +115,14 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		}
 
 		int move_id = atoi(moveIdField->buffer);
-		if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+		if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
+		{
 			EditorFormUtils::SetFieldDisplayText(moveIdField, _("edition.cancel.group_id"));
 			label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
 			item->color = MOVEID_GROUP_CANCEL;
 		}
-		else {
+		else
+		{
 			item->color = 0;
 			EditorFormUtils::SetFieldDisplayText(moveIdField, _("edition.cancel.move_id"));
 			int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
@@ -159,13 +160,13 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 			{
 				EditorInput* commandField = item->identifierMaps["command"];
 				EditorInput* moveIdField = item->identifierMaps["move_id"];
-				uint64_t command = (uint64_t)strtoll(commandField->buffer, nullptr, 16);
 
 				if (moveIdField->errored || commandField->errored) {
 					continue;
 				}
 
-				if (command == m_editor->constants[EditorConstants_GroupedCancelCommand]) {
+				if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
+				{
 					int group_id = atoi(moveIdField->buffer);
 					if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {
 						// Same shifting logic as in ListCreations

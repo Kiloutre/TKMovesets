@@ -140,11 +140,14 @@ public:
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
 	std::string ImportAnimation(const char* filepath, int moveid) override;
 
-	// -- Utils -- //
+	// -- Command Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;
 	std::string GetCommandStr(const char* commandBuf) override;
-	bool IsCommandInputSequence(uint64_t command) override;
 	void GetInputSequenceString(int id, std::string& outStr, int& outSize) override;
+	// -- Utils --//
+	bool IsCommandInputSequence(const char* buffer) override;
+	bool IsCommandGroupedCancelReference(const char* buffer) override;
+	int GetCommandInputSequenceID(const char* buffer) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
@@ -202,4 +205,5 @@ public:
 	void Live_OnGroupedCancelEdit(int id, EditorInput* field);
 	void Live_OnExtrapropertyEdit(int id, EditorInput* field);
 	void Live_OnRequirementEdit(int id, EditorInput* field);
+
 };

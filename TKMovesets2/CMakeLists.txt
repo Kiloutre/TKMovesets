@@ -94,6 +94,7 @@ set(IMPORTEXPORT_SOURCES
                     "Editors/Editor.cpp"
 
                     # Game-specific
+                    ## T7
                     "GameInteractions/Extractors/Extractor_t7.cpp"
                     "GameInteractions/Importers/Importer_t7.cpp"
                     "Editors/Editor_t7/Editor_t7.cpp"
@@ -101,6 +102,7 @@ set(IMPORTEXPORT_SOURCES
                     "Editors/Editor_t7/Editor_t7_Creations.cpp"
                     "Editors/Editor_t7/Editor_t7_ListCreations.cpp"
                     "Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
+                    "Editors/Editor_t7/Editor_t7_Utils.cpp"
 )
 
 ## Build ##

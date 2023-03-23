@@ -72,11 +72,6 @@ static std::string getCommandString(uint64_t command)
 
 // -- Public methods -- //
 
-bool EditorT7::IsCommandInputSequence(uint64_t command)
-{
-	return (command & 0xFFFFFFFF) >= constants[EditorConstants_InputSequenceCommandStart];
-}
-
 std::string EditorT7::GetCommandStr(const char* commandBuf)
 {
 	uint64_t command = strtoll(commandBuf, nullptr, 16);
