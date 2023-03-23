@@ -215,5 +215,10 @@ public:
 	void Live_OnRequirementEdit(int id, EditorInput* field);
 	//
 	void Live_OnHitConditionPropEdit(int id, EditorInput* field);
+	void Live_OnPushbackEdit(int id, EditorInput* field);
+	void Live_OnPushbackExtraEdit(int id, EditorInput* field);
+	//
+	void Live_OnInputSequenceEdit(int id, EditorInput* field);
+	void Live_OnInputEdit(int id, EditorInput* field);
 
 };
