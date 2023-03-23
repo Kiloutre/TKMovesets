@@ -75,6 +75,12 @@ namespace EditorFormUtils
 
 		case EditorWindowType_Projectile:
 			return "projectile";
+
+		case EditorWindowType_CameraData:
+			return "camera_data";
+
+		case EditorWindowType_ThrowCamera:
+			return "throw_camera";
 		}
 		return "UNKNOWN";
 	}

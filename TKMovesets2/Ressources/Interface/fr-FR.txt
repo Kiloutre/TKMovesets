@@ -125,7 +125,7 @@ edition.move_generic_id = Alias
 edition.moves_all = Tout
 edition.moves_attacks = Attaques
 edition.moves_generic = Génériques
-edition.moves_throws = Prises
+edition.moves_ThrowCameras = Prises
 edition.moves_custom = Crées
 edition.moves_char_specific = Personnage
 edition.move_id_hint = ID...
@@ -157,6 +157,8 @@ edition.pushback_extra = Poussée: extra
 edition.input_sequence = Séquence de commande
 edition.inputs = Commande
 edition.projectile = Projectile
+edition.throw_camera = Caméra de prise
+edition.camera_data = Donnée de caméra
 
 edition.move.window_name = Move
 edition.move.category_2 = Références
@@ -336,6 +338,17 @@ edition.animation_list.search_animation = Rechercher le nom de l'animation à im
 edition.animation_list.no_anim = Aucune animation n'a encore été extraite dans la bibliothèque. Ouvrez un personnage avec l'éditeur et cliquez sur le bouton 'Extraire animations' pour l'ajouter à la bibliothèque.
 edition.animation_list.loading = Chargement de la liste d'animation...
 edition.animation_list.clear_filter = Effacer le filtre
+
+edition.throw_camera.window_name = Camera de prise
+edition.throw_camera._0x0_int = _0x0_int
+edition.throw_camera.cameradata_addr = ID de donnée de caméra
+
+edition.camera_data.window_name = Donnée de caméra
+edition.camera_data._0x0_int = _0x0_int
+edition.camera_data._0x4_short = _0x4_short
+edition.camera_data.left_side_camera_data = Côté gauche
+edition.camera_data.right_side_camera_data = Côté droit
+edition.camera_data._0xA_short = _0xA_short
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 

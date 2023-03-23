@@ -136,7 +136,7 @@ void EditorT7::Live_OnCancelEdit(int id, EditorInput* field)
 
 	if (name == "command") {
 		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16);
-		m_process->writeInt64(cancel + offsetof(Cancel, command), command);
+		m_process->writeInt64(cancel + offsetof(Cancel, command), (uint64_t)strtoll(field->buffer, nullptr, 16));
 	}
 	else if (name == "requirements_addr") {
 		int id = atoi(field->buffer);
@@ -498,7 +498,7 @@ void EditorT7::Live_OnPushbackExtraEdit(int id, EditorInput* field)
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
-	uint64_t pushbackExtra = blockStart + (uint64_t)m_infos->table.pushbackExtradata + id * sizeof(PushbackExtradata);
+	gameAddr pushbackExtra = blockStart + (uint64_t)m_infos->table.pushbackExtradata + id * sizeof(PushbackExtradata);
 
 	if (name == "horizontal_offset") {
 		m_process->writeInt16(pushbackExtra + offsetof(PushbackExtradata, horizontal_offset), (uint16_t)atoi(field->buffer));
@@ -511,11 +511,11 @@ void EditorT7::Live_OnInputSequenceEdit(int id, EditorInput* field)
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
-	uint64_t inputSequence = blockStart + (uint64_t)m_infos->table.inputSequence + id * sizeof(InputSequence);
+	gameAddr inputSequence = blockStart + (uint64_t)m_infos->table.inputSequence + id * sizeof(InputSequence);
 
 	if (name == "reactions_addr") {
 		int id = atoi(field->buffer);
-		uint64_t inputAddr = blockStart + (uint64_t)m_infos->table.input + id * sizeof(Input);
+		gameAddr inputAddr = blockStart + (uint64_t)m_infos->table.input + id * sizeof(Input);
 		m_process->writeInt64(inputSequence + offsetof(InputSequence, input_addr), inputAddr);
 	}
 	else if (name == "input_window_frames") {
@@ -535,7 +535,7 @@ void EditorT7::Live_OnInputEdit(int id, EditorInput* field)
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
-	uint64_t input = blockStart + (uint64_t)m_infos->table.input + id * sizeof(Input);
+	gameAddr input = blockStart + (uint64_t)m_infos->table.input + id * sizeof(Input);
 
 	if (name == "button") {
 		m_process->writeInt32(input + offsetof(Input, button), (uint32_t)strtoll(field->buffer, nullptr, 16));
@@ -544,7 +544,50 @@ void EditorT7::Live_OnInputEdit(int id, EditorInput* field)
 	{
 		m_process->writeInt32(input + offsetof(Input, direction), (uint32_t)strtoll(field->buffer, nullptr, 16));
 	}
+}
 
+void EditorT7::Live_OnThrowCameraEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	gameAddr throwCamera = blockStart + (uint64_t)m_infos->table.throwCameras + id * sizeof(ThrowCamera);
+
+	if (name == "_0x0_llong") {
+		m_process->writeInt64(throwCamera + offsetof(ThrowCamera, _0x0_llong), (uint64_t)strtoll(field->buffer, nullptr, 10));
+	}
+	else if (name == "cameradata_addr")
+	{
+		int id = atoi(field->buffer);
+		gameAddr cameraDataAddr = blockStart + (uint64_t)m_infos->table.cameraData + id * sizeof(CameraData);
+		m_process->writeInt64(throwCamera + offsetof(ThrowCamera, cameradata_addr), cameraDataAddr);
+	}
+}
+
+void EditorT7::Live_OnCameraDataEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	gameAddr cameraData = blockStart + (uint64_t)m_infos->table.cameraData + id * sizeof(CameraData);
+
+	if (name == "_0x0_int") {
+		m_process->writeInt32(cameraData + offsetof(CameraData, _0x0_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x4_short") {
+		m_process->writeInt16(cameraData + offsetof(CameraData, _0x4_short), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "left_side_camera_data") {
+		m_process->writeInt16(cameraData + offsetof(CameraData, left_side_camera_data), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "right_side_camera_data") {
+		m_process->writeInt16(cameraData + offsetof(CameraData, right_side_camera_data), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "_0xA_short") {
+		m_process->writeInt16(cameraData + offsetof(CameraData, _0xA_short), (uint16_t)atoi(field->buffer));
+	}
 }
 
 void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
@@ -749,8 +792,10 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 		break;
 
 	case EditorWindowType_CameraData:
+		Live_OnCameraDataEdit(id, field);
 		break;
 	case EditorWindowType_ThrowCamera:
+		Live_OnThrowCameraEdit(id, field);
 		break;
 	}
 

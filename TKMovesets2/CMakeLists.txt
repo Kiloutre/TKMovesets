@@ -54,6 +54,8 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorInputSequence.cpp"
                     "Layouts/Editor/Structures/EditorInputStruct.cpp"
                     "Layouts/Editor/Structures/EditorProjectile.cpp"
+                    "Layouts/Editor/Structures/EditorThrowCamera.cpp"
+                    "Layouts/Editor/Structures/EditorCameraData.cpp"
                     # Layout: editor subwindows
                     "Layouts/Editor/Structures/Subwindows/EditorMove_Animations.cpp"
                     # Layout: submenus

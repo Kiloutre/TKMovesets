@@ -307,6 +307,82 @@ void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& input
 	input->button = GetFieldValue(inputs["button"]);
 }
 
+// ===== Throw cameras ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	auto throwCamera = m_iterators.throw_datas[id];
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("cameradata_addr", 0, EditorInput_PTR, throwCamera->cameradata_addr);
+	CREATE_FIELD("_0x0_llong", 0, EditorInput_U64, throwCamera->_0x0_llong);
+
+	WriteFieldFullname(inputMap, "throw_camera");
+	return inputMap;
+}
+
+bool EditorT7::ValidateThrowCameraField(EditorInput* field)
+{
+	std::string& name = field->name;
+
+	if (name == "cameradata_addr")
+	{
+		int listIdx = atoi(field->buffer);
+		// No negative allowed here
+		return 0 <= listIdx && listIdx < (int)m_infos->table.cameraDataCount;
+	}
+
+	return true;
+}
+
+void EditorT7::SaveThrowCamera(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	auto throwCamera = m_iterators.throw_datas[id];
+
+	throwCamera->_0x0_llong = GetFieldValue(inputs["_0x0_int"]);
+	throwCamera->cameradata_addr = GetFieldValue(inputs["cameradata_addr"]);
+}
+
+// ===== Camera data ===== //
+
+std::map<std::string, EditorInput*> EditorT7::GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::map<std::string, EditorInput*> inputMap;
+
+	auto cameraData = m_iterators.camera_datas[id];
+
+	// Set up fields. Draw order is same as declaration order because of macro.
+	// Default value is written from the last two arguments, also thanks to the macro
+	// (fieldName, category, EditorInputFlag, value)
+	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("_0x0_int", 0, EditorInput_U32, cameraData->_0x0_int);
+	CREATE_FIELD("_0x4_short", 0, EditorInput_U16, cameraData->_0x4_short);
+	CREATE_FIELD("left_side_camera_data", 0, EditorInput_U16, cameraData->left_side_camera_data);
+	CREATE_FIELD("right_side_camera_data", 0, EditorInput_U16, cameraData->right_side_camera_data);
+	CREATE_FIELD("_0xA_short", 0, EditorInput_U16, cameraData->_0xA_short);
+
+	WriteFieldFullname(inputMap, "camera_data");
+	return inputMap;
+}
+
+
+void EditorT7::SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+{
+	auto cameraData = m_iterators.camera_datas[id];
+
+	cameraData->_0x0_int = GetFieldValue(inputs["_0x0_int"]);
+	cameraData->_0x4_short = GetFieldValue(inputs["_0x4_short"]);
+	cameraData->left_side_camera_data = GetFieldValue(inputs["left_side_camera_data"]);
+	cameraData->right_side_camera_data = GetFieldValue(inputs["right_side_camera_data"]);
+	cameraData->_0xA_short = GetFieldValue(inputs["_0xA_short"]);
+}
+
+
 // ===== Reactions ===== //
 
 std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder)
@@ -696,9 +772,9 @@ bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
 		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelExtradataCount;
 	}
 	else if (name == "command") {
-		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16) & 0xFFFFFFFF;
-		if (command >= constants[EditorConstants_InputSequenceCommandStart]) {
-			int listIdx = command - constants[EditorConstants_InputSequenceCommandStart];
+		if (EditorT7::IsCommandInputSequence(field->buffer))
+		{
+			int listIdx = EditorT7::GetCommandInputSequenceID(field->buffer);
 			return listIdx < (int)m_infos->table.inputCount;
 		}
 	}
@@ -1218,6 +1294,12 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_Projectile:
 		SaveProjectile(id, inputs);
 		break;
+	case EditorWindowType_ThrowCamera:
+		SaveThrowCamera(id, inputs);
+		break;
+	case EditorWindowType_CameraData:
+		SaveCameraData(id, inputs);
+		break;
 	}
 }
 
@@ -1243,6 +1325,12 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		break;
 	case EditorWindowType_Projectile:
 		return GetProjectileInputs(id, drawOrder);
+		break;
+	case EditorWindowType_ThrowCamera:
+		return GetThrowCameraInputs(id, drawOrder);
+		break;
+	case EditorWindowType_CameraData:
+		return GetCameraDataInputs(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -1332,6 +1420,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 	case EditorWindowType_Projectile:
 		return ValidateProjectileField(field);
 		break;
+	case EditorWindowType_ThrowCamera:
+		return ValidateThrowCameraField(field);
+		break;
 	}
 
 	return true;
@@ -1370,7 +1461,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.input_sequences.Set(movesetBlock, m_infos->table.inputSequence, m_infos->table.inputSequenceCount);
 	m_iterators.inputs.Set(movesetBlock, m_infos->table.input, m_infos->table.inputCount);
 	m_iterators.voiceclips.Set(movesetBlock, m_infos->table.voiceclip, m_infos->table.voiceclipCount);
-	m_iterators.throw_datas.Set(movesetBlock, m_infos->table.throws, m_infos->table.throwsCount);
+	m_iterators.throw_datas.Set(movesetBlock, m_infos->table.throwCameras, m_infos->table.throwCamerasCount);
 	m_iterators.camera_datas.Set(movesetBlock, m_infos->table.cameraData, m_infos->table.cameraDataCount);
 
 	// Because we re-allocated, tell the live editor that the moveset is now invalid

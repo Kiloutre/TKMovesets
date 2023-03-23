@@ -128,7 +128,7 @@ edition.move_generic_id = Alias
 edition.moves_all = All
 edition.moves_attacks = Attacks
 edition.moves_generic = Generic
-edition.moves_throws = Throws
+edition.moves_ThrowCameras = throwCameras
 edition.moves_custom = Custom
 edition.moves_char_specific = Character
 edition.move_id_hint = Move ID...
@@ -161,6 +161,8 @@ edition.pushback_extra = Pushback extra
 edition.input_sequence = Input sequence
 edition.inputs = Inputs
 edition.projectile = Projectile
+edition.throw_camera = Throw camera
+edition.camera_data = Camera data
 
 edition.move.window_name = Move
 edition.move.category_2 = References
@@ -342,6 +344,17 @@ edition.animation_list.search_animation = Search animation name to import in cur
 edition.animation_list.no_anim = No animation was found in the animation library. Open a character with the editor and click the 'Extract animations' button to add its animations to the library.
 edition.animation_list.loading = Loading animation list...
 edition.animation_list.clear_filter = Clear filter
+
+edition.throw_camera.window_name = Throw Camera
+edition.throw_camera._0x0_int = _0x0_int
+edition.throw_camera.cameradata_addr = Camera data ID
+
+edition.camera_data.window_name = Camera data
+edition.camera_data._0x0_int = _0x0_int
+edition.camera_data._0x4_short = _0x4_short
+edition.camera_data.left_side_camera_data = Left side camera data
+edition.camera_data.right_side_camera_data = Right side camera data
+edition.camera_data._0xA_short = _0xA_short
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

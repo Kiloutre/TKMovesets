@@ -25,7 +25,7 @@ struct StructIterators
 	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
 	StructIterator<StructsT7_gameAddr::Projectile> projectiles;
 	StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
-	StructIterator<StructsT7_gameAddr::ThrowData> throw_datas;
+	StructIterator<StructsT7_gameAddr::ThrowCamera> throw_datas;
 	StructIterator<Input> inputs;
 	StructIterator<Voiceclip> voiceclips;
 	StructIterator<CameraData> camera_datas;
@@ -129,6 +129,15 @@ public:
 	std::map<std::string, EditorInput*> GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateProjectileField(EditorInput* field);
+
+	// Throw Camera
+	std::map<std::string, EditorInput*> GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveThrowCamera(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateThrowCameraField(EditorInput* field);
+
+	// Camera data
+	std::map<std::string, EditorInput*> GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player
@@ -150,6 +159,7 @@ public:
 	int GetCommandInputSequenceID(const char* buffer) override;
 	bool IsPropertyThrowCameraRef(const char* buffer) override;
 	bool IsPropertyProjectileRef(const char* buffer) override;
+	bool IsVoicelipValueEnd(const char* buffer) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
@@ -177,6 +187,9 @@ public:
 	int32_t CreateNewPushbackExtra();
 	//
 	int32_t CreateNewProjectile();
+	//
+	int32_t CreateNewThrowCamera();
+	int32_t CreateNewCameraData();
 
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
@@ -225,5 +238,8 @@ public:
 	void Live_OnReactionsEdit(int id, EditorInput* field);
 	//
 	void Live_OnProjectileEdit(int id, EditorInput* field);
+	//
+	void Live_OnThrowCameraEdit(int id, EditorInput* field);
+	void Live_OnCameraDataEdit(int id, EditorInput* field);
 
 };

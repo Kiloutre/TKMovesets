@@ -198,14 +198,28 @@ int32_t EditorT7::CreateNewCancelList()
 
 int32_t EditorT7::CreateNewGroupedCancelList()
 {
-	movesetTable.groupCancelCount += 2;
-
 	Cancel newStruct{ 0 };
 	Cancel newStruct2{ 0 };
 
 	newStruct2.command = constants[EditorConstants_GroupedCancelCommandEnd];
 
 	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetof(m_infos->table, groupCancel));
+	return newStructId;
+}
+
+int32_t EditorT7::CreateNewThrowCamera()
+{
+	ThrowCamera newStruct{ 0 };
+
+	int32_t newStructId = CreateNewGeneric<ThrowCamera>(&newStruct, nullptr, offsetof(m_infos->table, throwCameras));
+	return newStructId;
+}
+
+int32_t EditorT7::CreateNewCameraData()
+{
+	CameraData newStruct{ 0 };
+
+	int32_t newStructId = CreateNewGeneric<CameraData>(&newStruct, nullptr, offsetof(m_infos->table, cameraData));
 	return newStructId;
 }
 
@@ -360,6 +374,14 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 
 	case EditorWindowType_Projectile:
 		return CreateNewProjectile();
+		break;
+
+	case EditorWindowType_ThrowCamera:
+		return CreateNewThrowCamera();
+		break;
+
+	case EditorWindowType_CameraData:
+		return CreateNewCameraData();
 		break;
 	}
 	return -1;

@@ -66,7 +66,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	int startingFrame = atoi(map["starting_frame"]->buffer);
 	int id = (uint64_t)strtoll(map["id"]->buffer, nullptr, 16);
-	uint64_t value = (uint64_t)strtoll(map["value_unsigned"]->buffer, nullptr, 10);
+	int64_t value = (int64_t)strtoll(map["value_unsigned"]->buffer, nullptr, 10);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 
@@ -92,7 +92,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 		startingFrameText = std::to_string(startingFrame);
 	}
 
-	if (value > 15) {
+	if (value > 15 || value < 0) {
 		valueText = std::format("{} / {} / 0x{:x} / {:f}f", *(int32_t*)&value, value, value, *(float*)&value);
 	}
 	else {

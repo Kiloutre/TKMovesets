@@ -13,7 +13,7 @@ enum EditorMovelistFilter_
 	EditorMovelistFilter_All,
 	EditorMovelistFilter_Attacks,
 	EditorMovelistFilter_Generic,
-	EditorMovelistFilter_Throws,
+	EditorMovelistFilter_ThrowCameras,
 	EditorMovelistFilter_Custom,
 	EditorMovelistFilter_PostIdle,
 };
@@ -90,7 +90,7 @@ private:
 	// Render the list of moves
 	void RenderMovelist();
 
-	// Factory instantiating the right class for the right identifier
+	// Factory instantiating the right class for the right identifier.
 	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize = 0);
 
 	// Filters and sort the movelist according to the given argument

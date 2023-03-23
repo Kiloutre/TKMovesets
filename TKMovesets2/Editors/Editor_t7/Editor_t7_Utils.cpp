@@ -26,6 +26,7 @@ bool EditorT7::IsPropertyThrowCameraRef(const char* buffer)
 	}
 	return false;
 }
+
 bool EditorT7::IsPropertyProjectileRef(const char* buffer)
 {
 	uint32_t id = (uint32_t)strtol(buffer, nullptr, 16);
@@ -33,4 +34,9 @@ bool EditorT7::IsPropertyProjectileRef(const char* buffer)
 		return true;
 	}
 	return false;
+}
+
+bool EditorT7::IsVoicelipValueEnd(const char* buffer)
+{
+	return (uint32_t)strtoll(buffer, nullptr, 16) == 0xFFFFFFFF;
 }

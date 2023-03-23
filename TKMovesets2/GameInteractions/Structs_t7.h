@@ -170,16 +170,16 @@ namespace StructsT7
 
 	struct CameraData
 	{
-		int32_t _0x0_int;
-		int16_t _0x4_short;
-		int16_t left_side_camera_data;
-		int16_t right_side_camera_data;
-		int16_t _0xA_short;
+		uint32_t _0x0_int;
+		uint16_t _0x4_short;
+		uint16_t left_side_camera_data;
+		uint16_t right_side_camera_data;
+		uint16_t _0xA_short;
 	};
 
-	struct ThrowData
+	struct ThrowCamera
 	{
-		int64_t _0x0_int;
+		uint64_t _0x0_llong;
 		CameraData* cameradata_addr;
 	};
 
@@ -187,7 +187,6 @@ namespace StructsT7
 	{
 		uint32_t value;
 	};
-
 
 	// Struct for Extra Move Properties that play when a move starts or ends
 	struct OtherMoveProperty
@@ -296,8 +295,8 @@ namespace StructsT7
 		CameraData* cameraData;
 		uint64_t cameraDataCount;
 
-		ThrowData* throws;
-		uint64_t throwsCount;
+		ThrowCamera* throwCameras;
+		uint64_t throwCamerasCount;
 	};
 
 	struct MotaList
@@ -451,9 +450,9 @@ namespace StructsT7_gameAddr
 	};
 
 
-	struct ThrowData
+	struct ThrowCamera
 	{
-		int64_t _0x0_int;
+		uint64_t _0x0_llong;
 		gameAddr cameradata_addr;
 	};
 
@@ -563,8 +562,8 @@ namespace StructsT7_gameAddr
 		gameAddr cameraData;
 		uint64_t cameraDataCount;
 
-		gameAddr throws;
-		uint64_t throwsCount;
+		gameAddr throwCameras;
+		uint64_t throwCamerasCount;
 	};
 
 	struct MovesetInfo

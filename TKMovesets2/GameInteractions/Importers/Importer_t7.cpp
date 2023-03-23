@@ -96,7 +96,7 @@ void ImporterT7::ConvertMovesetTableOffsets(const TKMovesetHeader_offsets& offse
 	table->input += offset;
 	table->unknownParryRelated += offset;
 	table->cameraData += offset;
-	table->throws += offset;
+	table->throwCameras += offset;
 }
 
 void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const TKMovesetHeader& header)
@@ -183,10 +183,10 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 		FROM_INDEX(inputSequence.input_addr, blockOffset + offsets->input, Input);
 	}
 
-	// Convert throws ptrs
-	for (auto& throws : StructIterator<gAddr::ThrowData>(moveset, blockOffsets.movesetBlock + offsets->throws, offsets->throwsCount))
+	// Convert throwCameras ptrs
+	for (auto& throwCameras : StructIterator<gAddr::ThrowCamera>(moveset, blockOffsets.movesetBlock + offsets->throwCameras, offsets->throwCamerasCount))
 	{
-		FROM_INDEX(throws.cameradata_addr, blockOffset + offsets->cameraData, CameraData);
+		FROM_INDEX(throwCameras.cameradata_addr, blockOffset + offsets->cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs

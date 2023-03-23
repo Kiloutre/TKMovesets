@@ -24,6 +24,8 @@
 #include "EditorInputSequence.hpp"
 #include "EditorInputStruct.hpp"
 #include "EditorProjectile.hpp"
+#include "EditorThrowCamera.hpp"
+#include "EditorCameraData.hpp"
 
 // -- Private methods -- //
 
@@ -78,6 +80,12 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		break;
 	case EditorWindowType_Projectile:
 		return new EditorProjectile(m_windowTitle, id, m_editor, this);
+		break;
+	case EditorWindowType_ThrowCamera:
+		return new EditorThrowCamera(m_windowTitle, id, m_editor, this);
+		break;
+	case EditorWindowType_CameraData:
+		return new EditorCameraData(m_windowTitle, id, m_editor);
 		break;
 	}
 
@@ -149,7 +157,7 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 	case EditorMovelistFilter_Generic:
 		flags |= EditorMoveFlags_Generic;
 		break;
-	case EditorMovelistFilter_Throws:
+	case EditorMovelistFilter_ThrowCameras:
 		flags |= EditorMoveFlags_Throw | EditorMoveFlags_ThrowReaction;
 		break;
 	case EditorMovelistFilter_Custom:

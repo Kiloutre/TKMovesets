@@ -113,7 +113,7 @@ namespace EditorUtils
 		auto& flags = field->flags;
 
 		if (flags & (EditorInput_Hex)) {
-			return strtoll(buffer, nullptr, 16);
+			return (uint64_t)strtoll(buffer, nullptr, 16);
 		}
 		if (flags & EditorInput_Float) {
 			union fieldValue {
@@ -123,7 +123,7 @@ namespace EditorUtils
 			Test.floatingPoint = std::atof(buffer);
 			return Test.uint64;
 		}
-		return strtoll(buffer, nullptr, 10);
+		return (uint64_t)strtoll(buffer, nullptr, 10);
 	}
 }
 

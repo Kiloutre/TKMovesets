@@ -207,7 +207,7 @@ struct EditorTable
 	uint64_t inputCount;
 	uint64_t unknownParryRelatedCount;
 	uint64_t cameraDataCount;
-	uint64_t throwsCount;
+	uint64_t throwCamerasCount;
 	*/
 };
 
@@ -323,6 +323,8 @@ public:
 	virtual bool IsPropertyThrowCameraRef(const char* buffer) = 0;
 	// Returns true if the property ID refers to a projectile
 	virtual bool IsPropertyProjectileRef(const char* buffer) = 0;
+	// Returns true if the voiceclip value indicates the end of the voiceclip list
+	virtual bool IsVoicelipValueEnd(const char* buffer) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

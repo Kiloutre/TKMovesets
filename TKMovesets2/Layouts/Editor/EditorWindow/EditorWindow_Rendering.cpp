@@ -120,6 +120,14 @@ void EditorWindow::RenderToolBar()
 			structType = EditorWindowType_Input;
 		}
 
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.throw_camera"))) {
+			structType = EditorWindowType_ThrowCamera;
+		}
+		if (ImGui::MenuItem(_("edition.camera_data"))) {
+			structType = EditorWindowType_CameraData;
+		}
+
 		if (structType != EditorWindowType_Invalid) {
 			int32_t structId = m_editor->CreateNew(structType);
 			if (structId != -1) {
@@ -317,9 +325,9 @@ void EditorWindow::RenderMovelist()
 			}
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem(_("edition.moves_throws"))) {
-			if (m_movelistFilter != EditorMovelistFilter_Throws) {
-				FilterMovelist(EditorMovelistFilter_Throws);
+		if (ImGui::BeginTabItem(_("edition.moves_ThrowCameras"))) {
+			if (m_movelistFilter != EditorMovelistFilter_ThrowCameras) {
+				FilterMovelist(EditorMovelistFilter_ThrowCameras);
 			}
 			ImGui::EndTabItem();
 		}

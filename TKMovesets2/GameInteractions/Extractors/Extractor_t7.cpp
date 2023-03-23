@@ -80,10 +80,10 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 		TO_INDEX(inputSequence.input_addr, table.input, Input);
 	}
 
-	// Convert throws ptrs
-	for (auto& throws : StructIterator<gAddr::ThrowData>(movesetBlock, offsets->throws, table.throwsCount))
+	// Convert throwCameras ptrs
+	for (auto& throwCameras : StructIterator<gAddr::ThrowCamera>(movesetBlock, offsets->throwCameras, table.throwCamerasCount))
 	{
-		TO_INDEX(throws.cameradata_addr, table.cameraData, CameraData);
+		TO_INDEX(throwCameras.cameradata_addr, table.cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs
@@ -376,7 +376,7 @@ void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* t
 Byte* ExtractorT7::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const gAddr::MovesetTable& table)
 {
 	gameAddr blockStart = (gameAddr)table.reactions;
-	gameAddr blockEnd = (gameAddr)table.throws + (sizeof(ThrowData) * table.throwsCount);
+	gameAddr blockEnd = (gameAddr)table.throwCameras + (sizeof(ThrowCamera) * table.throwCamerasCount);
 	return allocateAndReadBlock(blockStart, blockEnd, size_out);
 }
 
