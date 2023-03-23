@@ -77,6 +77,8 @@ private:
 	bool m_liveEdition = false;
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
+	// Access moveset data through this variable. Uses polymorphism.
+	Editor* m_editor = nullptr;
 
 
 	// Render the top toolbar containing useful moveset editing tools

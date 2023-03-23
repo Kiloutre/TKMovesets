@@ -195,11 +195,11 @@ public:
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
-	bool Live_OnFieldEdit(EditorWindowType_ type, int id,EditorInput* field) override;
+	void Live_OnFieldEdit(EditorWindowType_ type, int id,EditorInput* field) override;
 	//
-	bool Live_OnMoveEdit(int id, EditorInput* field);
-	bool Live_OnCancelEdit(int id, EditorInput* field);
-	bool Live_OnGroupedCancelEdit(int id, EditorInput* field);
-	bool Live_OnExtrapropertyEdit(int id, EditorInput* field);
-	bool Live_OnRequirementEdit(int id, EditorInput* field);
+	void Live_OnMoveEdit(int id, EditorInput* field);
+	void Live_OnCancelEdit(int id, EditorInput* field);
+	void Live_OnGroupedCancelEdit(int id, EditorInput* field);
+	void Live_OnExtrapropertyEdit(int id, EditorInput* field);
+	void Live_OnRequirementEdit(int id, EditorInput* field);
 };

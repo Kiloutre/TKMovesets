@@ -43,7 +43,7 @@ protected:
 	std::string m_identifier;
 
 	// Called whenver the list is reordered, used to  update field labels when index is important
-	virtual void OnReorder() {};
+	virtual void OnReorder();
 	// Called whenever the list is resized, used to update field labels when index is important
 	virtual void OnResize();
 	// Called whenever applying with a resized list, used  to issue field updates to other windows

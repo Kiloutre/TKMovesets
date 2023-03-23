@@ -55,9 +55,7 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 	}
 
 	BuildItemDetails(listIdx);
-	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
-        m_baseWindow->RequireImport();
-    }
+	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
 }
 
 void EditorExtraproperties::BuildItemDetails(int listIdx)

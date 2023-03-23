@@ -361,7 +361,21 @@ void EditorFormList::RenderInternal()
 
 void EditorFormList::OnResize()
 {
-	m_baseWindow->RequireImport();
+	m_editor->live_loadedMoveset = 0;
+}
+
+void EditorFormList::OnReorder()
+{
+	if (m_editor->live_loadedMoveset == 0) {
+		return;
+	}
+
+	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
+		for (auto& [key, field] : m_items[listIdx]->identifierMaps)
+		{
+			m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+		}
+	}
 }
 
 void EditorFormList::OnApplyResize(int sizeChange, int oldSize)
@@ -383,7 +397,5 @@ void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChan
 
 void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
 {
-	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
-        m_baseWindow->RequireImport();
-    }
+	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
 }

@@ -16,9 +16,15 @@ ImVec2 operator*(const ImVec2& c_self, float value)
 
 namespace ImGuiExtra
 {
-	void HelpMarker(const char* desc)
+	void HelpMarker(const char* desc, bool greyed)
 	{
-		ImGui::TextDisabled("(?)");
+		if (greyed) {
+			ImGui::TextDisabled("(?)");
+		}
+		else {
+			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), "(?)");
+		}
+
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
 		{
 			ImGui::BeginTooltip();

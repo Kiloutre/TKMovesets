@@ -18,14 +18,12 @@ EditorVoiceclip::EditorVoiceclip(std::string windowTitleBase, uint32_t t_id, Edi
 void EditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
-	if (!m_editor->Live_OnFieldEdit(windowType, id + listIdx, field)) {
-        m_baseWindow->RequireImport();
-    }
+	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
 }
 
 void EditorVoiceclip::OnResize()
 {
-	m_baseWindow->RequireImport();
+	m_editor->live_loadedMoveset = 0;
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
 		BuildItemDetails(listIdx);
 	}
@@ -35,7 +33,14 @@ void EditorVoiceclip::OnReorder()
 {
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
 		BuildItemDetails(listIdx);
+        
+        if (m_editor->live_loadedMoveset != 0) {
+            for (auto& [key, field] : m_items[listIdx]->identifierMaps) {
+                m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+            }
+        }
 	}
+
 }
 
 void EditorVoiceclip::BuildItemDetails(int listIdx)

@@ -1372,6 +1372,9 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.voiceclips.Set(movesetBlock, m_infos->table.voiceclip, m_infos->table.voiceclipCount);
 	m_iterators.throw_datas.Set(movesetBlock, m_infos->table.throws, m_infos->table.throwsCount);
 	m_iterators.camera_datas.Set(movesetBlock, m_infos->table.cameraData, m_infos->table.cameraDataCount);
+
+	// Because we re-allocated, tell the live editor that the moveset is now invalid
+	live_loadedMoveset = 0;
 }
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
