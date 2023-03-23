@@ -1161,7 +1161,6 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	move->_0xA8_short = GetFieldValue(inputs["_0xA8_short"]);
 	move->_0xAC_short = GetFieldValue(inputs["_0xAC_short"]);
 
-
 	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
 		// Todo: if old animation is unused, delete it
 		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];

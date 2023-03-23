@@ -6,13 +6,19 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
 
-	if (name == "anim_name") {
+	if (name == "name") {
 		return ;
 	}
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
 	gameAddr move = (uint64_t)m_infos->table.move + blockStart + id * sizeof(Move);
 
+
+	if (name == "anim_name") {
+		uint64_t animBlockStart = live_loadedMoveset + m_header->offsets.animationBlock;
+		gameAddr animAddr = animBlockStart + m_animNameToOffsetMap[field->buffer];
+		m_process->writeInt64(move + offsetof(Move, anim_addr), animAddr);
+	}
 	if (name == "vulnerability") {
 		m_process->writeInt32(move + offsetof(Move, vuln), (uint32_t)atoi(field->buffer));
 	}
