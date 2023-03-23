@@ -13,13 +13,117 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
 	gameAddr move = (uint64_t)m_infos->table.move + blockStart + id * sizeof(Move);
 
-
-	if (name == "first_active_frame") {
-		m_process->writeInt32(move + offsetof(Move, first_active_frame), atoi(field->buffer));
+	if (name == "vulnerability") {
+		m_process->writeInt32(move + offsetof(Move, vuln), (uint32_t)atoi(field->buffer));
 	}
-	
-	// todo
+	else if (name == "hitlevel") {
+		m_process->writeInt32(move + offsetof(Move, hitlevel), (uint32_t)strtol(field->buffer, nullptr, 16));
+	}
+	else if (name == "transition") {
+		m_process->writeInt16(move + offsetof(Move, transition), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "moveId_val1") {
+		m_process->writeInt16(move + offsetof(Move, moveId_val1), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "moveId_val2") {
+		m_process->writeInt16(move + offsetof(Move, moveId_val2), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "anim_len") {
+		m_process->writeInt32(move + offsetof(Move, anim_len), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "airborne_start") {
+		m_process->writeInt32(move + offsetof(Move, airborne_start), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "airborne_end") {
+		m_process->writeInt32(move + offsetof(Move, airborne_end), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "ground_fall") {
+		m_process->writeInt32(move + offsetof(Move, ground_fall), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "hitbox_location") {
+		m_process->writeInt32(move + offsetof(Move, hitbox_location), (uint32_t)strtol(field->buffer, nullptr, 16));
+	}
+	else if (name == "first_active_frame") {
+		m_process->writeInt32(move + offsetof(Move, first_active_frame), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "last_active_frame") {
+		m_process->writeInt32(move + offsetof(Move, last_active_frame), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "distance") {
+		m_process->writeInt16(move + offsetof(Move, distance), (uint16_t)atoi(field->buffer));
+	}
 
+	else if (name == "cancel_addr") {
+		int id = atoi(field->buffer);
+		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
+		m_process->writeInt64(move + offsetof(Move, cancel_addr), cancelAddr);
+	}
+	else if (name == "hit_condition_addr") {
+		int id = atoi(field->buffer);
+		gameAddr hitConditionAddr = blockStart + (uint64_t)m_infos->table.hitCondition + id * sizeof(HitCondition);
+		m_process->writeInt64(move + offsetof(Move, hit_condition_addr), hitConditionAddr);
+	}
+	else if (name == "extra_properties_addr") {
+		int id = atoi(field->buffer);
+		gameAddr propAddr = blockStart + (uint64_t)m_infos->table.extraMoveProperty + id * sizeof(ExtraMoveProperty);
+		m_process->writeInt64(move + offsetof(Move, extra_move_property_addr), propAddr);
+	}
+	else if (name == "move_start_extraprop_addr") {
+		int id = atoi(field->buffer);
+		gameAddr propAddr = blockStart + (uint64_t)m_infos->table.moveBeginningProp + id * sizeof(OtherMoveProperty);
+		m_process->writeInt64(move + offsetof(Move, move_start_extraprop_addr), propAddr);
+	}
+	else if (name == "move_end_extraprop_addr") {
+		int id = atoi(field->buffer);
+		gameAddr propAddr = blockStart + (uint64_t)m_infos->table.moveEndingProp + id * sizeof(OtherMoveProperty);
+		m_process->writeInt64(move + offsetof(Move, move_end_extraprop_addr), propAddr);
+	}
+	else if (name == "voiceclip_addr") {
+		int id = atoi(field->buffer);
+		gameAddr voiceclipAddr = blockStart + (uint64_t)m_infos->table.voiceclip + id * sizeof(Voiceclip);
+		m_process->writeInt64(move + offsetof(Move, voicelip_addr), voiceclipAddr);
+	}
+
+	else if (name == "cancel_addr_2") {
+		int id = atoi(field->buffer);
+		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
+		m_process->writeInt64(move + offsetof(Move, _0x28_cancel_addr), cancelAddr);
+	}
+	else if (name == "cancel_addr_3") {
+		int id = atoi(field->buffer);
+		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
+		m_process->writeInt64(move + offsetof(Move, _0x38_cancel_addr), cancelAddr);
+	}
+	else if (name == "cancel_addr_4") {
+		int id = atoi(field->buffer);
+		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
+		m_process->writeInt64(move + offsetof(Move, _0x48_cancel_addr), cancelAddr);
+	}
+
+	else if (name == "_0x34_int") {
+		m_process->writeInt32(move + offsetof(Move, _0x34_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x44_int") {
+		m_process->writeInt32(move + offsetof(Move, _0x44_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0x56_short") {
+		m_process->writeInt16(move + offsetof(Move, _0x56_short), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "_0x5C_short") {
+		m_process->writeInt16(move + offsetof(Move, _0x5C_short), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "_0x5E_short") {
+		m_process->writeInt16(move + offsetof(Move, _0x5E_short), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "_0x98_int") {
+		m_process->writeInt32(move + offsetof(Move, _0x98_int), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0xA8_short") {
+		m_process->writeInt16(move + offsetof(Move, _0xA8_short), (uint16_t)atoi(field->buffer));
+	}
+	else if (name == "_0xAC_short") {
+		m_process->writeInt16(move + offsetof(Move, _0xAC_short), (uint16_t)atoi(field->buffer));
+	}
 }
 
 void EditorT7::Live_OnCancelEdit(int id, EditorInput* field)
