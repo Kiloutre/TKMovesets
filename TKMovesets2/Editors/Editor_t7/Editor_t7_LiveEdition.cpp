@@ -64,19 +64,87 @@ void EditorT7::Live_OnCancelEdit(int id, EditorInput* field)
 void EditorT7::Live_OnGroupedCancelEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t cancelAddr = blockStart + (uint64_t)m_infos->table.groupCancel + id * sizeof(Cancel);
+
+	if (name == "command") {
+		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16);
+		m_process->writeInt64(cancelAddr + offsetof(Cancel, command), command);
+	}
+	else if (name == "requirements_addr") {
+		int id = atoi(field->buffer);
+		uint64_t reqAddr = blockStart + (uint64_t)m_infos->table.requirement + id * sizeof(Requirement);
+		m_process->writeInt64(cancelAddr + offsetof(Cancel, requirements_addr), reqAddr);
+	}
+	else if (name == "extradata_addr") {
+		int id = atoi(field->buffer);
+		uint64_t extradataAddr = blockStart + (uint64_t)m_infos->table.cancelExtradata + id * sizeof(CancelExtradata);
+		m_process->writeInt64(cancelAddr + offsetof(Cancel, extradata_addr), extradataAddr);
+	}
+	else if (name == "detection_start") {
+		m_process->writeInt32(cancelAddr + offsetof(Cancel, detection_start), atoi(field->buffer));
+	}
+	else if (name == "detection_end") {
+		m_process->writeInt32(cancelAddr + offsetof(Cancel, detection_end), atoi(field->buffer));
+	}
+	else if (name == "starting_frame") {
+		m_process->writeInt32(cancelAddr + offsetof(Cancel, starting_frame), atoi(field->buffer));
+	}
+	else if (name == "move_id") {
+		m_process->writeInt16(cancelAddr + offsetof(Cancel, move_id), atoi(field->buffer));
+	}
+	else if (name == "cancel_option") {
+		m_process->writeInt16(cancelAddr + offsetof(Cancel, cancel_option), atoi(field->buffer));
+	}
 
 }
 
 void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
+	auto& buffer = field->buffer;
 
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t propStart = blockStart + (uint64_t)m_infos->table.extraMoveProperty + id * sizeof(ExtraMoveProperty);
+
+	if (name == "starting_frame") {
+		m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, starting_frame), atoi(field->buffer));
+	} else if (name == "id") {
+		m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, id), (uint32_t)strtoll(field->buffer, nullptr, 16));
+	}
+	else
+	{
+		if (name == "value_hex") {
+			m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, value_unsigned), (uint32_t)strtoll(field->buffer, nullptr, 16));
+		}
+		else if (name == "value_unsigned") {
+			m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, value_unsigned), (uint32_t)atoi(field->buffer));
+		}
+		else if (name == "value_signed") {
+			m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, value_unsigned), (int32_t)atoi(field->buffer));
+		}
+		else if (name == "value_float") {
+			m_process->writeFloat(propStart + offsetof(ExtraMoveProperty, value_unsigned), atof(field->buffer));
+		}
+	}
 }
 
 void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
+	auto& buffer = field->buffer;
 
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t reqStart = blockStart + (uint64_t)m_infos->table.requirementCount + id * sizeof(Requirement);
+
+	if (name == "condition") {
+		m_process->writeInt32(reqStart + offsetof(Requirement, condition), atoi(field->buffer));
+	}
+	else if (name == "param") {
+		m_process->writeInt32(reqStart + offsetof(Requirement, param), atoi(field->buffer));
+	}
 }
 
 

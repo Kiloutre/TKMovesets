@@ -92,7 +92,7 @@ void EditorForm::RenderDiscardButtons()
 		unsavedChanges = false;
 		popen = false;
 	}
-
+	ImGui::SameLine();
 	if (ImGui::Button(_("no"))) {
 		m_requestedClosure = false;
 	}
