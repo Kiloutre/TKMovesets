@@ -101,6 +101,32 @@ void EditorT7::Live_OnGroupedCancelEdit(int id, EditorInput* field)
 
 }
 
+void EditorT7::Live_OnVoiceclipEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t voiceclipAddr = blockStart + (uint64_t)m_infos->table.voiceclip + id * sizeof(Voiceclip);
+
+	if (name == "id") {
+		m_process->writeInt32(voiceclipAddr + offsetof(Voiceclip, id), (uint32_t)strtol(field->buffer, nullptr, 16));
+	}
+}
+
+void EditorT7::Live_OnCancelExtraEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t cancelExtraAddr = blockStart + (uint64_t)m_infos->table.cancelExtradata + id * sizeof(CancelExtradata);
+
+	if (name == "value") {
+		m_process->writeInt32(cancelExtraAddr + offsetof(CancelExtradata, value), (uint32_t)strtol(field->buffer, nullptr, 16));
+	}
+}
+
 void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
@@ -111,7 +137,8 @@ void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 
 	if (name == "starting_frame") {
 		m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, starting_frame), atoi(field->buffer));
-	} else if (name == "id") {
+	}
+	else if (name == "id") {
 		m_process->writeInt32(propStart + offsetof(ExtraMoveProperty, id), (uint32_t)strtoll(field->buffer, nullptr, 16));
 	}
 	else
@@ -131,6 +158,48 @@ void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 	}
 }
 
+void EditorT7::Live_OnMoveBeginPropEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t propStart = blockStart + (uint64_t)m_infos->table.moveBeginningProp + id * sizeof(OtherMoveProperty);
+
+	if (name == "requirements_addr") {
+		int id = atoi(field->buffer);
+		uint64_t reqAddr = blockStart + (uint64_t)m_infos->table.requirement + id * sizeof(Requirement);
+		m_process->writeInt64(propStart + offsetof(OtherMoveProperty, requirements_addr), reqAddr);
+	}
+	else if (name == "extraprop") {
+		m_process->writeInt32(propStart + offsetof(OtherMoveProperty, extraprop), (uint32_t)strtoll(field->buffer, nullptr, 16));
+	}
+	else if (name == "value") {
+		m_process->writeInt32(propStart + offsetof(OtherMoveProperty, value), (uint32_t)atoi(field->buffer));
+	}
+}
+
+void EditorT7::Live_OnMoveEndPropEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t propStart = blockStart + (uint64_t)m_infos->table.moveEndingProp + id * sizeof(OtherMoveProperty);
+
+	if (name == "requirements_addr") {
+		int id = atoi(field->buffer);
+		uint64_t reqAddr = blockStart + (uint64_t)m_infos->table.requirement + id * sizeof(Requirement);
+		m_process->writeInt64(propStart + offsetof(OtherMoveProperty, requirements_addr), reqAddr);
+	}
+	else if (name == "extraprop") {
+		m_process->writeInt32(propStart + offsetof(OtherMoveProperty, extraprop), (uint32_t)strtoll(field->buffer, nullptr, 16));
+	}
+	else if (name == "value") {
+		m_process->writeInt32(propStart + offsetof(OtherMoveProperty, value), (uint32_t)atoi(field->buffer));
+	}
+}
+
 void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 {
 	std::string& name = field->name;
@@ -147,6 +216,31 @@ void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 	}
 }
 
+void EditorT7::Live_OnHitConditionPropEdit(int id, EditorInput* field)
+{
+	std::string& name = field->name;
+	auto& buffer = field->buffer;
+
+	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t hcStart = blockStart + (uint64_t)m_infos->table.hitCondition + id * sizeof(HitCondition);
+
+	if (name == "requirements_addr") {
+		int id = atoi(field->buffer);
+		uint64_t reqAddr = blockStart + (uint64_t)m_infos->table.requirement + id * sizeof(Requirement);
+		m_process->writeInt64(hcStart + offsetof(HitCondition, requirements_addr), reqAddr);
+	}
+	else if (name == "reactions_addr") {
+		int id = atoi(field->buffer);
+		uint64_t reactAddr = blockStart + (uint64_t)m_infos->table.reactions + id * sizeof(Reactions);
+		m_process->writeInt64(hcStart + offsetof(HitCondition, reactions_addr), reactAddr);
+	}
+	else if (name == "damage") {
+		m_process->writeInt32(hcStart + offsetof(HitCondition, damage), (uint32_t)atoi(field->buffer));
+	}
+	else if (name == "_0xC_int") {
+		m_process->writeInt32(hcStart + offsetof(HitCondition, _0xC_int), (uint32_t)atoi(field->buffer));
+	}
+}
 
 void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field)
 {
@@ -162,8 +256,15 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 	case EditorWindowType_Move:
 		Live_OnMoveEdit(id, field);
 		break;
+	case EditorWindowType_Voiceclip:
+		Live_OnVoiceclipEdit(id, field);
+		break;
+
 	case EditorWindowType_Cancel:
 		Live_OnCancelEdit(id, field);
+		break;
+	case EditorWindowType_CancelExtradata:
+		Live_OnCancelExtraEdit(id, field);
 		break;
 	case EditorWindowType_GroupedCancel:
 		Live_OnGroupedCancelEdit(id, field);
@@ -171,8 +272,38 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 	case EditorWindowType_Extraproperty:
 		Live_OnExtrapropertyEdit(id, field);
 		break;
+	case EditorWindowType_MoveBeginProperty:
+		Live_OnMoveBeginPropEdit(id, field);
+		break;
+	case EditorWindowType_MoveEndProperty:
+		Live_OnMoveEndPropEdit(id, field);
+		break;
+
 	case EditorWindowType_Requirement:
 		Live_OnRequirementEdit(id, field);
+		break;
+
+	case EditorWindowType_HitCondition:
+		Live_OnHitConditionPropEdit(id, field);
+		break;
+	case EditorWindowType_Reactions:
+		break;
+	case EditorWindowType_Pushback:
+		break;
+	case EditorWindowType_PushbackExtradata:
+		break;
+
+	case EditorWindowType_InputSequence:
+		break;
+	case EditorWindowType_Input:
+		break;
+
+	case EditorWindowType_Projectile:
+		break;
+
+	case EditorWindowType_CameraData:
+		break;
+	case EditorWindowType_ThrowData:
 		break;
 	}
 

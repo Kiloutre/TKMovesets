@@ -202,9 +202,18 @@ public:
 	void Live_OnFieldEdit(EditorWindowType_ type, int id,EditorInput* field) override;
 	//
 	void Live_OnMoveEdit(int id, EditorInput* field);
+	void Live_OnVoiceclipEdit(int id, EditorInput* field);
+	//
 	void Live_OnCancelEdit(int id, EditorInput* field);
 	void Live_OnGroupedCancelEdit(int id, EditorInput* field);
+	void Live_OnCancelExtraEdit(int id, EditorInput* field);
+	//
 	void Live_OnExtrapropertyEdit(int id, EditorInput* field);
+	void Live_OnMoveBeginPropEdit(int id, EditorInput* field);
+	void Live_OnMoveEndPropEdit(int id, EditorInput* field);
+	//
 	void Live_OnRequirementEdit(int id, EditorInput* field);
+	//
+	void Live_OnHitConditionPropEdit(int id, EditorInput* field);
 
 };

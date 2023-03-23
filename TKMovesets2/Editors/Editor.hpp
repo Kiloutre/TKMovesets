@@ -100,6 +100,7 @@ enum EditorInputFlag_
 {
 	EditorInput_String          = (1 << 0),
 	EditorInput_Clickable       = (1 << 1),
+	// Clickable regardless of field validity
 	EditorInput_ClickableAlways = (1 << 2),
 
 	EditorInput_H64       = (1 << 3),
