@@ -231,6 +231,7 @@ void EditorWindow::Save()
 	if (!file.fail()) {
 		file.write((char*)moveset, movesetSize);
 		m_savedLastChange = true;
+		m_loadedCharacter.lastSavedDate = header->infos.date;
 	}
 	else {
 		// Showing failure would be nice. Even simply changing the Save button text would suffice.

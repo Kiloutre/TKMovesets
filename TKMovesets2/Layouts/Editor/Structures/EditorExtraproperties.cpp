@@ -65,8 +65,8 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	auto& map = m_items[listIdx]->identifierMaps;
 
 	int startingFrame = atoi(map["starting_frame"]->buffer);
-	int id = strtoll(map["id"]->buffer, nullptr, 16);
-	uint64_t value = strtoll(map["value_unsigned"]->buffer, nullptr, 10);
+	int id = (uint64_t)strtoll(map["id"]->buffer, nullptr, 16);
+	uint64_t value = (uint64_t)strtoll(map["value_unsigned"]->buffer, nullptr, 10);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 

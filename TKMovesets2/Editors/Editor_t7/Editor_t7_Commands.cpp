@@ -74,14 +74,14 @@ static std::string getCommandString(uint64_t command)
 
 std::string EditorT7::GetCommandStr(const char* commandBuf)
 {
-	uint64_t command = strtoll(commandBuf, nullptr, 16);
+	uint64_t command = (uint64_t)strtoll(commandBuf, nullptr, 16);
 	return getCommandString(command);
 }
 
 std::string EditorT7::GetCommandStr(const char* direction, const char* button)
 {
-	uint64_t command = strtoll(button, nullptr, 16);
-	command = (command << 32) | strtoll(direction, nullptr, 16);
+	uint64_t command = (uint64_t)strtoll(button, nullptr, 16);
+	command = (command << 32) | (uint32_t)strtoll(direction, nullptr, 16);
 
 	return getCommandString(command);
 }

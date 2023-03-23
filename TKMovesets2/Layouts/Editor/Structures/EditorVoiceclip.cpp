@@ -46,7 +46,7 @@ void EditorVoiceclip::OnReorder()
 void EditorVoiceclip::BuildItemDetails(int listIdx)
 {
 	const char* buffer = m_items[listIdx]->identifierMaps["id"]->buffer;
-	const bool isEnd = strtoll(buffer, nullptr, 16) == 0xFFFFFFFF;
+	const bool isEnd = (uint64_t)strtoll(buffer, nullptr, 16) == 0xFFFFFFFF;
 	std::string label;
 
 	if (!isEnd) {

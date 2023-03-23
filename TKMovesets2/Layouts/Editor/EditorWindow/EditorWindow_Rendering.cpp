@@ -250,19 +250,20 @@ void EditorWindow::RenderStatusBar()
 	// Live edition. Might not be implemented for every game.
 	if (m_liveEditable)
 	{
-		bool disabled = m_editor->live_loadedMoveset == 0;
+		bool disabled = m_loadedMoveset == 0;
 		if (disabled) {
 			ImGui::BeginDisabled();
 		}
 		ImGui::SameLine();
 		if (ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition) && !disabled) {
-			m_editor->live_loadedMoveset = m_loadedMoveset;
+			m_editor->live_loadedMoveset = m_liveEdition ? m_loadedMoveset : 0;
 		}
 		ImGui::SameLine();
 		if (disabled) {
 			ImGui::EndDisabled();
 		}
-		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"), m_liveEdition == false || !disabled);
+		// Highlight only if live edition is enabled & live_moveset is zero
+		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"), m_liveEdition == false || m_editor->live_loadedMoveset != 0);
 	}
 
 }
@@ -440,7 +441,9 @@ void EditorWindow::Render(int dockid)
 	else {
 		// If the moveset was successfully imported, this will be filled with a nonzero value
 		m_loadedMoveset = importerHelper.lastLoadedMoveset;
-		m_editor->live_loadedMoveset = m_loadedMoveset;
+		if (m_liveEdition) {
+			m_editor->live_loadedMoveset = m_loadedMoveset;
+		}
 	}
 
 	// Layout start
