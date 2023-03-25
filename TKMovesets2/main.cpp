@@ -59,6 +59,8 @@ static bool LoadLocaleTranslation()
 		}
 	}
 
+	WriteToLogFile(std::format("Searching for locale {}", name));
+
 	const uint64_t filenameMaxSize = LOCALE_NAME_MAX_LENGTH + 5 + sizeof(INTERFACE_DATA_DIR);
 	char filename[filenameMaxSize];
 
