@@ -209,6 +209,7 @@ edition.extraproperty.throw_camera_id = Throw camera ID
 edition.extraproperty.projectile_id = Projectile ID
 edition.extraproperty.instant = INSTANT
 edition.extraproperty.every_frame = EVERY FRAME
+edition.extraproperty.every_nth_frame = EVERY %d FRAMES
 edition.extraproperty.value_unsigned = Value (U32)
 edition.extraproperty.value_signed = Value (S32)
 edition.extraproperty.value_hex = Value (H32)

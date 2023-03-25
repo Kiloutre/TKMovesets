@@ -88,6 +88,15 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 			break;
 		}
 	}
+	else if (startingFrame >= 0x4000)
+	{
+		const char* format_str = _("edition.extraproperty.every_nth_frame");
+		const int bufsize = strlen(format_str) + 8;
+		char* buf = new char[bufsize];
+		sprintf_s(buf, bufsize, format_str, startingFrame - 0x4000);
+		startingFrameText = std::string(buf);
+		delete buf;
+	}
 	else {
 		startingFrameText = std::to_string(startingFrame);
 	}
