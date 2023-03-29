@@ -56,7 +56,7 @@ namespace Games
 	size_t GetExtractableGamesCount()
 	{
 		size_t count = 0;
-		for (size_t i = 0; i < sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo); ++i)
+		for (size_t i = 0; i < _countof(cg_gamesInfo); ++i)
 		{
 			if (cg_gamesInfo[i].extractor != nullptr) {
 				++count;
@@ -68,7 +68,7 @@ namespace Games
 	size_t GetImportableGamesCount()
 	{
 		size_t count = 0;
-		for (size_t i = 0; i < sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo); ++i)
+		for (size_t i = 0; i < _countof(cg_gamesInfo); ++i)
 		{
 			if (cg_gamesInfo[i].importer != nullptr) {
 				++count;

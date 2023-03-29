@@ -95,7 +95,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 		char* buf = new char[bufsize];
 		sprintf_s(buf, bufsize, format_str, startingFrame - 0x4000);
 		startingFrameText = std::string(buf);
-		delete buf;
+		delete[] buf;
 	}
 	else {
 		startingFrameText = std::to_string(startingFrame);
@@ -124,10 +124,13 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 		if (isCameraRef) {
 			m_items[listIdx]->color = PROPID_THROW_CAM;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
+			int id = atoi(map["value_unsigned"]->buffer);
+			map["value_unsigned"]->errored = id < 0 || id >= m_editor->movesetTable.throwCamerasCount;
 		}
 		else if (isProjectileRef) {
 			m_items[listIdx]->color = PROPID_PROJECTILE;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
+			map["value_unsigned"]->errored = id < 0 || id >= m_editor->movesetTable.projectileCount;
 		}
 
 		map["value_signed"]->visible = false;

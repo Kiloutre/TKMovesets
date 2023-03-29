@@ -20,6 +20,10 @@ ImportationErrcode_ Importer::Import(const char* filename, gameAddr playerAddres
 {
 	progress = 0;
 	// Read file data
+
+#ifdef BUILD_TYPE_DEBUG
+	printf("Loading file '%s'\n", filename);
+#endif
 	std::ifstream file(filename, std::ios::binary);
 
 	if (file.fail()) {

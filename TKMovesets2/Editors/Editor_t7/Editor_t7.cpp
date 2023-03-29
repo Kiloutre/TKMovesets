@@ -1465,6 +1465,11 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 
 	// Because we re-allocated, tell the live editor that the moveset is now invalid
 	live_loadedMoveset = 0;
+
+	movesetTable.groupCancelCount = m_infos->table.groupCancelCount;
+	movesetTable.inputSequenceCount = m_infos->table.inputSequenceCount;
+	movesetTable.throwCamerasCount = m_infos->table.throwCamerasCount;
+	movesetTable.projectileCount = m_infos->table.projectileCount;
 }
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
@@ -1526,7 +1531,6 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	}
 
 	movesetTable.aliases = m_aliases;
-	movesetTable.groupCancelCount = m_infos->table.groupCancelCount;
 }
 
 void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
@@ -1807,7 +1811,7 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 
 	// Write our animation
 	memcpy(newMoveset + newAnimOffset, anim, animSize);
-	delete anim;
+	delete[] anim;
 
 	// Copy all the data after the animation
 	memcpy(newMoveset + newAnimOffset + animSize, m_moveset + orig_animBlockEnd, m_movesetSize - orig_animBlockEnd);

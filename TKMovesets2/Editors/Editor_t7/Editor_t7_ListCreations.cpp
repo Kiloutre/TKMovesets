@@ -176,8 +176,6 @@ void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 	const int listSizeDiff = newSize - oldSize;
 	ModifyGenericListSize<Cancel>(listId, oldSize, newSize, offsetof(m_infos->table, groupCancel));
 
-	movesetTable.groupCancelCount += listSizeDiff;
-
 	// Correct every structure that uses this list and needs shifting
 
 	for (auto& cancel : m_iterators.cancels)

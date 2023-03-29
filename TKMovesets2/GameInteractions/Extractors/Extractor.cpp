@@ -194,8 +194,8 @@ namespace ExtractorUtils
 		}
 		printf("gucci\n");
 
-		delete inbuf;
-		delete outbuf;
+		delete[] inbuf;
+		delete[] outbuf;
 
 		lzma_end(&strm);
 		*/

@@ -85,6 +85,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		commandField->flags |= EditorInput_Clickable;
 		int inputSequenceId = m_editor->GetCommandInputSequenceID(commandField->buffer);
 
+
 		item->color = MOVEID_INPUT_SEQUENCE;
 		EditorFormUtils::SetFieldDisplayText(commandField, _("edition.cancel.sequence_id"));
 
@@ -92,11 +93,20 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		int validated_move_id = m_baseWindow->ValidateMoveId(moveIdField->buffer);
 
 		std::string inputs;
-		int inputAmount = 0;
-		m_editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
 
-		if (inputAmount > 0) {
-			inputs = std::format("{} {}", inputAmount, _("edition.inputs.inputs"));
+		if (inputSequenceId >= m_editor->movesetTable.inputSequenceCount)
+		{
+			commandField->errored = true;
+			inputs = _("edition.cancel.invalid_sequence_id");
+		}
+		else
+		{
+			int inputAmount = 0;
+			m_editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
+
+			if (inputAmount > 0) {
+				inputs = std::format("{} {}", inputAmount, _("edition.input.inputs"));
+			}
 		}
 
 		if (m_baseWindow->ValidateMoveId(moveIdField->buffer) == -1) {

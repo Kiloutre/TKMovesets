@@ -236,6 +236,7 @@ edition.cancel.move_id = Move ID
 edition.cancel.group_id = Cancel group ID
 edition.cancel.sequence_id = Sequence ID
 edition.cancel.cancel_option = Cancel option
+edition.cancel.invalid_sequence_id = Invalid ID
 
 edition.grouped_cancel.window_name = Grouped Cancel list
 edition.grouped_cancel.command = Command

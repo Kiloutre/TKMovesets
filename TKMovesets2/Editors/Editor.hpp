@@ -189,26 +189,9 @@ struct EditorTable
 {
 	std::vector<uint16_t> aliases;
 	uint64_t groupCancelCount = 0;
-	/*
-	uint64_t reactionsCount;
-	uint64_t requirementCount;
-	uint64_t hitConditionCount;
-	uint64_t projectileCount;
-	uint64_t pushbackCount;
-	uint64_t pushbackExtradataCount;
-	uint64_t cancelCount;
-	uint64_t cancelExtradataCount;
-	uint64_t extraMovePropertyCount;
-	uint64_t moveBeginningPropCount;
-	uint64_t moveEndingPropCount;
-	uint64_t moveCount;
-	uint64_t voiceclipCount;
-	uint64_t inputSequenceCount;
-	uint64_t inputCount;
-	uint64_t unknownParryRelatedCount;
-	uint64_t cameraDataCount;
-	uint64_t throwCamerasCount;
-	*/
+	uint64_t inputSequenceCount = 0;
+	uint64_t throwCamerasCount = 0;
+	uint64_t projectileCount = 0;
 };
 
 

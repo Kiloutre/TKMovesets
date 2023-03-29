@@ -3,6 +3,7 @@
 #include "NavigationMenu.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
+#include "helpers.hpp"
 
 // - Const layout definition - //
 
@@ -46,7 +47,7 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, int w
 NavigationMenu::NavigationMenu()
 {
 	const char* currentLangId = Localization::GetCurrLangId();
-	for (int i = 0; i < sizeof(cg_languages) / sizeof(*cg_languages); ++i)
+	for (int i = 0; i < _countof(cg_languages); ++i)
 	{
 		if (strcmp(cg_languages[i].langId, currentLangId) == 0) {
 			m_languageId = i;
@@ -58,19 +59,19 @@ NavigationMenu::NavigationMenu()
 void NavigationMenu::Render(int width)
 {
 	ImGui::SeparatorText(_("navmenu.category_moveset"));
-	RenderBtnList(cg_moveset_btns, sizeof(cg_moveset_btns) / sizeof(*cg_moveset_btns), width);
+	RenderBtnList(cg_moveset_btns, _countof(cg_moveset_btns), width);
 
 	ImGui::SeparatorText(_("navmenu.category_tools"));
-	RenderBtnList(cg_tools_btns, sizeof(cg_tools_btns) / sizeof(*cg_tools_btns), width);
+	RenderBtnList(cg_tools_btns, _countof(cg_tools_btns), width);
 
 	ImGui::SeparatorText(_("navmenu.category_other"));
-	RenderBtnList(cg_other_btns, sizeof(cg_other_btns) / sizeof(*cg_other_btns), width);
+	RenderBtnList(cg_other_btns, _countof(cg_other_btns), width);
 
 	// Language list
 	ImGui::PushItemWidth(width);
 	if (ImGui::BeginCombo("##", cg_languages[m_languageId].name))
 	{
-		for (int i = 0; i < sizeof(cg_languages) / sizeof(*cg_languages); ++i)
+		for (int i = 0; i < _countof(cg_languages); ++i)
 		{
 			ImGui::PushID(&i);
 			if (ImGui::Selectable(cg_languages[i].name, i == m_languageId))

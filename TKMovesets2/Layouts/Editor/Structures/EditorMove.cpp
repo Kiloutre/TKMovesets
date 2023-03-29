@@ -123,6 +123,9 @@ void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, 
 	case EditorWindowType_Voiceclip:
 		fieldName = "voiceclip_addr";
 		break;
+	default:
+		return;
+		break;
 	}
 
 	if (!m_fieldIdentifierMap[fieldName]->errored) {

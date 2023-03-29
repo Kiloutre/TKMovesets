@@ -47,7 +47,7 @@ static int GetAnimationDuration(const char* filename)
 			break;
 		}
 	}
-	delete buf;
+	delete[] buf;
 	return duration;
 }
 

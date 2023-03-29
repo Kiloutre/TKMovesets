@@ -13,10 +13,14 @@
 
 Submenu_Extract::Submenu_Extract()
 {
-	m_motaExport[2] = true; // Hands
-	m_motaExport[3] = true; // Hands
-	m_motaExport[8] = true; // Camera
-	m_motaExport[9] = true; // Camera
+	for (int i = 0; i < _countof(m_motaExport); ++i)
+	{
+		m_motaExport[i] = true; // Hands
+	}
+	//m_motaExport[2] = true; // Hands
+	//m_motaExport[3] = true; // Hands
+	//m_motaExport[8] = true; // Camera
+	//m_motaExport[9] = true; // Camera
 }
 
 ExtractSettings Submenu_Extract::GetExtractionSettings()
