@@ -338,6 +338,7 @@ void EditorForm::Render()
 
 	// Setup style
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5, 0));
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
@@ -357,16 +358,17 @@ void EditorForm::Render()
 			}
 
 			// Add spacing to ensure last item is always visible
-			const float frameHeight = ImGui::GetFrameHeightWithSpacing();
-			if (ImGui::GetCursorPosY() + frameHeight >= m_winInfo.size.y) {
-				ImGui::Dummy(ImVec2(1, frameHeight));
-				// Render Apply() button at the bottom
-				ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - frameHeight + ImGui::GetScrollY()));
+			const float buttonHeight = 25;// ImGui::GetFrameHeightWithSpacing();
+			if (ImGui::GetCursorPosY() + buttonHeight >= m_winInfo.size.y) {
+				ImGui::Dummy(ImVec2(1, buttonHeight));
+				// Render Apply() button at the bottom to create more scrollable space
+				ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - buttonHeight + ImGui::GetScrollY()));
 			}
 
-			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, buttonHeight))) {
 				Apply();
 			}
+
 			if (enabledBtn) {
 				ImGui::PopStyleColor();
 			}
@@ -374,6 +376,7 @@ void EditorForm::Render()
 	}
 
 	ImGui::End();
+	ImGui::PopStyleVar();
 	ImGui::PopStyleVar();
 
 	if (!popen && unsavedChanges) {
