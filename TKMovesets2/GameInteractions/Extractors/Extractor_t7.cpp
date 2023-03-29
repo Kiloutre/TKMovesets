@@ -516,7 +516,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 		errcode = ExtractionErrcode_AllocationErr;
 #ifdef BUILD_TYPE_DEBUG
 		printf("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\n",
-		movesetInfoBlock, nameBlock, movesetBlock, animationBlock, motaCustomBlock);
+		(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock);
 #endif
 	}
 	else {
