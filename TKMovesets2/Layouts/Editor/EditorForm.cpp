@@ -209,12 +209,19 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
 		// Have to manually implement copying
-		if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
+		if (ImGui::IsKeyPressed(ImGuiKey_C, false) || ImGui::IsKeyPressed(ImGuiKey_X, false)) {
 			ImGui::SetClipboardText(field->buffer);
 		}
 		else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
 		{
 			field->nextValue = ImGui::GetClipboardText();
+			// Force focus on the next widget
+			// This is because ImGUI prevents from writing on a focused input's buffer
+			ImGui::SetKeyboardFocusHere();
+		}
+		else if ((field->flags & EditorInput_DataChangeable) && ImGui::IsKeyPressed(ImGuiKey_B, false))
+		{
+			EditorUtils::ChangeFieldDataType(field);
 			// Force focus on the next widget
 			// This is because ImGUI prevents from writing on a focused input's buffer
 			ImGui::SetKeyboardFocusHere();

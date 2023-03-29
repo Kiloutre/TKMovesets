@@ -38,12 +38,12 @@ public:
 };
 
 // Animation extraction status
-enum ExtractionStatus_
+enum AnimExtractionStatus_
 {
-	ExtractionStatus_NotStarted,
-	ExtractionStatus_Started,
-	ExtractionStatus_Failed,
-	ExtractionStatus_Finished,
+	AnimExtractionStatus_NotStarted,
+	AnimExtractionStatus_Started,
+	AnimExtractionStatus_Failed,
+	AnimExtractionStatus_Finished,
 };
 
 enum EditorConstants_
@@ -115,6 +115,9 @@ enum EditorInputFlag_
 
 	EditorInput_Float     = (1 << 12),
 
+	// Used internally for fancy behaviour
+	EditorInput_DataChangeable = (1 << 13),
+
 	// Shortcuts
 	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
 
@@ -130,7 +133,7 @@ enum EditorInputFlag_
 
 struct EditorInput
 {
-	// CContains the field name in short format, used for easy-to-read checks, better than having to type the full name
+	// Contains the field name in short format, used for easy-to-read checks, better than having to type the full name
 	std::string name;
 	// Contains the field name, used to show the correct translation string
 	std::string fullName;
@@ -191,10 +194,6 @@ struct DisplayableMove
 struct EditorTable
 {
 	std::vector<uint16_t> aliases;
-	uint64_t groupCancelCount = 0;
-	uint64_t inputSequenceCount = 0;
-	uint64_t throwCamerasCount = 0;
-	uint64_t projectileCount = 0;
 };
 
 
@@ -212,6 +211,8 @@ namespace EditorUtils
 	uint64_t GetFieldValue(EditorInput* field);
 	// Sets a struct member value according to a field's buffer, parsing it correctly according to its type
 	void SetMemberValue(void* memberPtr, EditorInput* field);
+	// Changes between unsigned, signed, hex and float data type if the field allows it
+	void ChangeFieldDataType(EditorInput* field);
 }
 
 class DLLCONTENT Editor
@@ -250,7 +251,7 @@ public:
 	// Contains quick data that is made to be accessed outside of this class
 	EditorTable movesetTable;
 	// Status of the animation extraction
-	ExtractionStatus_ animationExtractionStatus = ExtractionStatus_NotStarted;
+	AnimExtractionStatus_ animationExtractionStatus = AnimExtractionStatus_NotStarted;
 	// Thread where the animations extraction will be running to avoid blocking the display thread
 	std::thread* animExtractionThread;
 	// Stores the address of the loaded moveset in-game. Will become 0 if it does not match the current moveset.
@@ -316,6 +317,8 @@ public:
 	virtual bool IsPropertyProjectileRef(const char* buffer) = 0;
 	// Returns true if the voiceclip value indicates the end of the voiceclip list
 	virtual bool IsVoicelipValueEnd(const char* buffer) = 0;
+	// Returns the amount of structure in the given structure list type (move, cancel etc)
+	virtual unsigned int GetStructureCount(EditorWindowType_ type) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

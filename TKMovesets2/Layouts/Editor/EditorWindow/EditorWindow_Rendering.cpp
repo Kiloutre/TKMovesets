@@ -153,8 +153,8 @@ void EditorWindow::RenderToolBar()
 
 	ImGui::Separator();
 
-	bool disableExtractButton = m_editor->animationExtractionStatus == ExtractionStatus_Started;
-	const char* label = m_editor->animationExtractionStatus == ExtractionStatus_Finished ? "edition.extract_animations_finished" : "edition.extract_animations";
+	bool disableExtractButton = m_editor->animationExtractionStatus == AnimExtractionStatus_Started;
+	const char* label = m_editor->animationExtractionStatus == AnimExtractionStatus_Finished ? "edition.extract_animations_finished" : "edition.extract_animations";
 	if (ImGui::MenuItem(_(label), nullptr, false, !disableExtractButton)) {
 		m_editor->OrderAnimationsExtraction(m_loadedCharacter.name);
 	}

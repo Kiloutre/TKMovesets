@@ -583,7 +583,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 		std::map<std::string, EditorInput*> inputMap;
 
 		CREATE_FIELD("condition", 0, EditorInput_U32, req->condition);
-		CREATE_FIELD("param", 0, EditorInput_U32, req->param);
+		CREATE_FIELD("param", 0, EditorInput_U32 | EditorInput_DataChangeable, req->param);
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
@@ -1467,11 +1467,6 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 
 	// Because we re-allocated, tell the live editor that the moveset is now invalid
 	live_loadedMoveset = 0;
-
-	movesetTable.groupCancelCount = m_infos->table.groupCancelCount;
-	movesetTable.inputSequenceCount = m_infos->table.inputSequenceCount;
-	movesetTable.throwCamerasCount = m_infos->table.throwCamerasCount;
-	movesetTable.projectileCount = m_infos->table.projectileCount;
 }
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
@@ -1651,22 +1646,22 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 
 void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 {
-	if (animationExtractionStatus & ExtractionStatus_Started) {
+	if (animationExtractionStatus & AnimExtractionStatus_Started) {
 		return;
 	}
 
-	if (animationExtractionStatus & ExtractionStatus_Finished) {
+	if (animationExtractionStatus & AnimExtractionStatus_Finished) {
 		// Join to cleanly destroy the previous started thread
 		animExtractionThread->join();
 	}
 
-	animationExtractionStatus = ExtractionStatus_Started;
+	animationExtractionStatus = AnimExtractionStatus_Started;
 
 	// Create moveset and various other variable copies
 	// The extraction run in another thread and i don't want the moveset being modified / reallocated while i access it, so i work on a copy instead.
 	Byte* moveset = (Byte*)malloc(m_movesetSize);
 	if (moveset == nullptr) {
-		animationExtractionStatus = ExtractionStatus_Failed;
+		animationExtractionStatus = AnimExtractionStatus_Failed;
 		return;
 	}
 	memcpy((void*)moveset, m_moveset, m_movesetSize);
@@ -1732,7 +1727,7 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 	}
 
 	free(moveset);
-	animationExtractionStatus = ExtractionStatus_Finished;
+	animationExtractionStatus = AnimExtractionStatus_Finished;
 }
 
 

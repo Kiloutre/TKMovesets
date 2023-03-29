@@ -200,7 +200,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		Localization::LoadFile(PROGRAM_DEFAULT_LANG);
 	}
 	WriteToLogFile(std::format("Locale loaded - {}", Localization::GetCurrLangId()));
-	
+
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program(window, c_glsl_version);

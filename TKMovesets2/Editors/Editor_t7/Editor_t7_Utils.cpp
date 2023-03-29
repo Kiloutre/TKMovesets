@@ -46,3 +46,74 @@ bool EditorT7::IsVoicelipValueEnd(const char* buffer)
 {
 	return (uint32_t)strtoll(buffer, nullptr, 16) == 0xFFFFFFFF;
 }
+
+unsigned int EditorT7::GetStructureCount(EditorWindowType_ type)
+{
+	switch (type)
+	{
+	case EditorWindowType_Move:
+		return (unsigned int)m_infos->table.moveCount;
+		break;
+
+	case EditorWindowType_Voiceclip:
+		return (unsigned int)m_infos->table.voiceclipCount;
+		break;
+
+	case EditorWindowType_HitCondition:
+		return (unsigned int)m_infos->table.hitConditionCount;
+		break;
+	case EditorWindowType_Reactions:
+		return (unsigned int)m_infos->table.reactionsCount;
+		break;
+	case EditorWindowType_Pushback:
+		return (unsigned int)m_infos->table.pushbackCount;
+		break;
+	case EditorWindowType_PushbackExtradata:
+		return (unsigned int)m_infos->table.pushbackExtradataCount;
+		break;
+
+	case EditorWindowType_Requirement:
+		return (unsigned int)m_infos->table.requirementCount;
+		break;
+
+	case EditorWindowType_Cancel:
+		return (unsigned int)m_infos->table.cancelCount;
+		break;
+	case EditorWindowType_GroupedCancel:
+		return (unsigned int)m_infos->table.groupCancelCount;
+		break;
+	case EditorWindowType_CancelExtradata:
+		return (unsigned int)m_infos->table.cancelExtradataCount;
+		break;
+
+	case EditorWindowType_InputSequence:
+		return (unsigned int)m_infos->table.inputSequenceCount;
+		break;
+	case EditorWindowType_Input:
+		return (unsigned int)m_infos->table.inputCount;
+		break;
+
+	case EditorWindowType_Extraproperty:
+		return (unsigned int)m_infos->table.extraMovePropertyCount;
+		break;
+	case EditorWindowType_MoveBeginProperty:
+		return (unsigned int)m_infos->table.moveBeginningPropCount;
+		break;
+	case EditorWindowType_MoveEndProperty:
+		return (unsigned int)m_infos->table.moveEndingPropCount;
+		break;
+
+	case EditorWindowType_Projectile:
+		return (unsigned int)m_infos->table.projectileCount;
+		break;
+
+	case EditorWindowType_CameraData:
+		return (unsigned int)m_infos->table.cameraDataCount;
+		break;
+	case EditorWindowType_ThrowCamera:
+		return (unsigned int)m_infos->table.throwCamerasCount;
+		break;
+	}
+	throw;
+	return 0;
+}

@@ -43,6 +43,10 @@ namespace EditorUtils
 		else if (field->flags & EditorInput_Signed) {
 			field->color = FORM_INPUT_SIGNED;	
 		}
+
+		else {
+			field->color = 0;
+		}
 	}
 
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags)
@@ -160,6 +164,69 @@ namespace EditorUtils
 			throw;
 		}
 	}
+
+	void ChangeFieldDataType(EditorInput* field)
+	{
+		auto& flags = field->flags;
+		uint64_t value = GetFieldValue(field);
+
+		if (flags & EditorInput_64b)
+		{
+			if (flags & EditorInput_U64) {
+				field->flags = (flags ^ EditorInput_U64) | EditorInput_S64;
+			}
+			else if (flags & EditorInput_S64) {
+				field->flags = (flags ^ EditorInput_S64) | EditorInput_H64;
+			}
+			else {
+				field->flags = (flags ^ EditorInput_H64) | EditorInput_U64;
+			}
+		}
+		else if (flags & EditorInput_32b)
+		{
+			if (flags & EditorInput_U32) {
+				field->flags = (flags ^ EditorInput_U32) | EditorInput_S32;
+			}
+			else if (flags & EditorInput_S32) {
+				field->flags = (flags ^ EditorInput_S32) | EditorInput_H32;
+			}
+			else {
+				field->flags = (flags ^ EditorInput_H32) | EditorInput_U32;
+			}
+			/*
+			else if (flags & EditorInput_H32) {
+				field->flags = (flags ^ EditorInput_H32) | EditorInput_Float;
+			}
+			else {
+				field->flags = (flags ^ EditorInput_Float) | EditorInput_U32;
+			}
+			*/
+		}
+		else if (flags & EditorInput_16b)
+		{
+			if (flags & EditorInput_U16) {
+				field->flags = (flags ^ EditorInput_U16) | EditorInput_S16;
+			}
+			else if (flags & EditorInput_S16) {
+				field->flags = (flags ^ EditorInput_S16) | EditorInput_H16;
+			}
+			else {
+				field->flags = (flags ^ EditorInput_H16) | EditorInput_U16;
+			}
+		}
+		else {
+			return;
+		}
+
+		const unsigned int bufSize = 20;
+		char* buf = new char[bufSize];
+		sprintf_s(buf, bufSize, GetFieldFormat(field->flags), value);
+
+		field->nextValue = std::string(buf);
+		delete[] buf;
+
+		SetInputfieldColor(field);
+	}
 }
 
 const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)
@@ -170,7 +237,8 @@ const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)
 
 bool Editor::ValidateFieldType(EditorInput* field)
 {
-	if (field->buffer[0] == '\0') {
+	auto& buffer = field->buffer;
+	if (buffer[0] == '\0') {
 		// There are no fields that should be allowed to be empty
 		return false;
 	}
@@ -178,48 +246,51 @@ bool Editor::ValidateFieldType(EditorInput* field)
 	auto flags = field->flags;
 
 	if (flags & EditorInput_H64) {
-		if (strlen(field->buffer) > 16 + 2) {
+		int len = (int)strlen(buffer);
+		if (len > 16 && (len > (16 + 2) || strncmp(buffer, "0x", 2) != 0)) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_H32) {
-		if (strlen(field->buffer) > 8 + 2) {
+		int len = (int)strlen(buffer);
+		if (len > 8 && (len > (8 + 2) || strncmp(buffer, "0x", 2) != 0)) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_H16) {
-		if (strlen(field->buffer) > 4 + 2) {
+		int len = (int)strlen(buffer);
+		if (len > 4 && (len > (4 + 2) || strncmp(buffer, "0x", 2) != 0)) {
 			return false;
 		}
 	}
 	else if (flags & (EditorInput_U64 | EditorInput_S64)) {
-		if (strlen(field->buffer) > 19) {
+		if (strlen(buffer) > 19) {
 			return false;
 		}
-		if ((flags & EditorInput_U64) && atoll(field->buffer) < 0) {
+		if ((flags & EditorInput_U64) && buffer[0] == '-') {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_U32) {
-		long long num = atoll(field->buffer);
+		long long num = atoll(buffer);
 		if (num > UINT_MAX || num < 0) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_S32) {
-		long long num = atoll(field->buffer);
+		long long num = atoll(buffer);
 		if (num > INT_MAX || num < INT_MIN) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_U16) {
-		int num = atoi(field->buffer);
+		int num = atoi(buffer);
 		if (num > USHRT_MAX || num < 0) {
 			return false;
 		}
 	}
 	else if (flags & EditorInput_S16) {
-		int num = atoi(field->buffer);
+		int num = atoi(buffer);
 		if (num > SHRT_MAX || num < SHRT_MIN) {
 			return false;
 		}

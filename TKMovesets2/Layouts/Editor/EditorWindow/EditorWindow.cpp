@@ -251,7 +251,7 @@ void EditorWindow::Save()
 
 EditorWindow::~EditorWindow()
 {
-	if (m_editor->animationExtractionStatus != ExtractionStatus_NotStarted) {
+	if (m_editor->animationExtractionStatus != AnimExtractionStatus_NotStarted) {
 		// Join the thread if it was ever created. Could be ongoing or finished, we still need to join it.
 		m_editor->animExtractionThread->join();
 	}

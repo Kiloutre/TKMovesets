@@ -64,7 +64,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 		std::string inputs;
 
-		if (inputSequenceId >= m_editor->movesetTable.inputSequenceCount)
+		if (inputSequenceId >= (int)m_editor->GetStructureCount(EditorWindowType_InputSequence))
 		{
 			commandField->errored = true;
 			inputs = _("edition.cancel.invalid_sequence_id");

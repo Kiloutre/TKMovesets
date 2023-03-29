@@ -125,13 +125,13 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 			m_items[listIdx]->color = PROPID_THROW_CAM;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
 			int throwId = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = throwId < 0 || throwId >= m_editor->movesetTable.throwCamerasCount;
+			map["value_unsigned"]->errored = throwId < 0 || throwId >= m_editor->GetStructureCount(EditorWindowType_ThrowCamera);
 		}
 		else if (isProjectileRef) {
 			m_items[listIdx]->color = PROPID_PROJECTILE;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
 			int projectileId = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= m_editor->movesetTable.projectileCount;
+			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= m_editor->GetStructureCount(EditorWindowType_Projectile);
 		}
 
 		map["value_signed"]->visible = false;

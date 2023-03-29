@@ -158,6 +158,7 @@ public:
 	bool IsPropertyThrowCameraRef(const char* buffer) override;
 	bool IsPropertyProjectileRef(const char* buffer) override;
 	bool IsVoicelipValueEnd(const char* buffer) override;
+	unsigned int GetStructureCount(EditorWindowType_ type) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
