@@ -71,7 +71,6 @@ namespace ExtractorUtils
 			}
 		} while (--lastArg_copy != 0);
 
-		printf("%lld\n", (uint64_t)animPtr_2 - (uint64_t)anim);
 		return (uint64_t)animPtr_2 - (uint64_t)anim;
 	}
 
