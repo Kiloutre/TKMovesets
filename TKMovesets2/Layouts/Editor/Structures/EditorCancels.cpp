@@ -19,23 +19,23 @@ EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor*
 
 void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
-	int id = atoi(field->buffer);
+	int referenceId = atoi(field->buffer);
 	std::string& name = field->name;
 	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
 		if (m_editor->IsCommandGroupedCancelReference(item->identifierMaps["command"]->buffer)) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, id);
+			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, referenceId);
 		}
 		else {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
 		}
 	}
 	else if (name == "extradata_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_CancelExtradata, id);
+		m_baseWindow->OpenFormWindow(EditorWindowType_CancelExtradata, referenceId);
 	}
 	else if (name == "requirements_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
+		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, referenceId);
 	}
 	else if (name == "command") {
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
@@ -68,7 +68,7 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 
 	BuildItemDetails(listIdx);
 
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
 void EditorCancels::BuildItemDetails(int listIdx)
@@ -157,9 +157,9 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 	{
 	case EditorWindowType_Cancel:
 		// If a struct was created before this one, we must shfit our own ID
-		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
-			id += valueChange;
+			structureId += valueChange;
 			ApplyWindowName();
 		}
 		break;

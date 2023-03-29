@@ -31,7 +31,7 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 {
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
 	const char* moveName = m_fieldIdentifierMap["move_name"]->buffer;
-	m_windowTitle = std::format("{} {} {} - {}", windowName, id, moveName, m_windowTitleBase.c_str());
+	m_windowTitle = std::format("{} {} {} - {}", windowName, structureId, moveName, m_windowTitleBase.c_str());
 
 	if (reapplyWindowProperties) {
 		nextDockId = ImGui::GetWindowDockID();
@@ -150,7 +150,7 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 		m_renamed = true;
 	}
 
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
 void EditorMove::OpenAnimationList()
@@ -161,7 +161,7 @@ void EditorMove::OpenAnimationList()
 
 void EditorMove::PostRender()
 {
-	ImGui::PushID(id);
+	ImGui::PushID(structureId);
 
 	if (m_animationListOpen) {
 		ImGui::OpenPopup("AnimListPopup");
@@ -170,7 +170,7 @@ void EditorMove::PostRender()
 			const char* animPath = m_animationList->animationToImport;
 			if (animPath != nullptr) {
 				// User clicked on "Import" button on an anim
-				std::string animName = m_editor->ImportAnimation(animPath, id);
+				std::string animName = m_editor->ImportAnimation(animPath, structureId);
 
 				// InmportAnimation() might return an empty name on error
 				if (!animName.empty()) {

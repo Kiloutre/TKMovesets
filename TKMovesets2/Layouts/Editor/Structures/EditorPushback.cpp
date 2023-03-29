@@ -19,7 +19,8 @@ void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	std::string& name = field->name;
 
-	if (name == "extradata_addr") {
+	if (name == "extradata_addr")
+	{
 		int id = atoi(field->buffer);
 		auto& amountField = m_fieldIdentifierMap["num_of_loops"];
 

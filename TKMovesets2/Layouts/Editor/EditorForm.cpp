@@ -110,7 +110,7 @@ void EditorForm::Apply()
 		return;
 	}
 
-	m_editor->SaveItem(windowType, id, m_fieldIdentifierMap);
+	m_editor->SaveItem(windowType, structureId, m_fieldIdentifierMap);
 	unsavedChanges = false;
 	justAppliedChanges = true;
 	m_requestedClosure = false;
@@ -244,7 +244,7 @@ void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 {
 	if (reapplyWindowProperties) return;
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
-	m_windowTitle = std::format("{} {} - {}", windowName, id, m_windowTitleBase.c_str());
+	m_windowTitle = std::format("{} {} - {}", windowName, structureId, m_windowTitleBase.c_str());
 
 	if (reapplyWindowProperties) {
 		m_winInfo.applyNextRender = true;
@@ -256,7 +256,7 @@ void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 
 void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	id = t_id;
+	structureId = t_id;
 	m_editor = editor;
 
 	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
@@ -387,5 +387,5 @@ void EditorForm::Render()
 
 void EditorForm::OnUpdate(int listIdx, EditorInput* field)
 {
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }

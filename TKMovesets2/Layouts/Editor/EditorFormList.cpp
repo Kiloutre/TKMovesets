@@ -36,7 +36,7 @@ void EditorFormList::Apply()
 	{
 		// If items were added/removed, reallocate entire moveset
 		int oldSize = m_listSize - m_listSizeChange;
-		m_editor->ModifyListSize(windowType, id, oldSize, m_listSize);
+		m_editor->ModifyListSize(windowType, structureId, oldSize, m_listSize);
 		if (m_listSize != 0) {
 			OnApplyResize(m_listSizeChange, oldSize);
 		}
@@ -56,7 +56,7 @@ void EditorFormList::Apply()
 	// Write into every individual item
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
 		
-		m_editor->SaveItem(windowType, id + listIndex, m_items[listIndex]->identifierMaps);
+		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMaps);
 	}
 
 	OnApply();
@@ -79,7 +79,7 @@ bool EditorFormList::IsFormValid()
 
 void EditorFormList::BuildItemDetails(int listIdx)
 {
-	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + id);
+	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + structureId);
 
 	m_items[listIdx]->itemLabel = label;
 }
@@ -97,7 +97,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		return;
 	}
 
-	if (id <= 1 && listIndex == 0) {
+	if (structureId <= 1 && listIndex == 0) {
 		ImGui::SetCursorPosX(pos_x);
 		ImGuiExtra::HelpMarker(_("edition.form_list.controls_disabled_explanation"));
 		ImGui::SetCursorPos(cursor);
@@ -236,7 +236,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {
-	id = t_id;
+	structureId = t_id;
 	m_editor = editor;
 
 	m_identifier = EditorFormUtils::GetWindowTypeName(windowType);
@@ -373,23 +373,23 @@ void EditorFormList::OnReorder()
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
 		for (auto& [key, field] : m_items[listIdx]->identifierMaps)
 		{
-			m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+			m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 		}
 	}
 }
 
 void EditorFormList::OnApplyResize(int sizeChange, int oldSize)
 {
-	m_baseWindow->IssueFieldUpdate(windowType, sizeChange, id, id + oldSize);
+	m_baseWindow->IssueFieldUpdate(windowType, sizeChange, structureId, structureId + oldSize);
 }
 
 void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
 	if (winType == windowType){
 		// If a struct was created before this one, we must shfit our own ID
-		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
-			id += valueChange;
+			structureId += valueChange;
 			ApplyWindowName();
 		}
 	}
@@ -397,5 +397,5 @@ void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChan
 
 void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
 {
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }

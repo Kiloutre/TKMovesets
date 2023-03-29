@@ -21,7 +21,7 @@ EditorInputStruct::EditorInputStruct(std::string windowTitleBase, uint32_t t_id,
 void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
 void EditorInputStruct::BuildItemDetails(int listIdx)

@@ -121,9 +121,9 @@ void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType_ winType, int val
 	{
 	case EditorWindowType_GroupedCancel:
 		// If a struct was created before this one, we must shfit our own ID
-		if (MUST_SHIFT_ID(id, valueChange, listStart, listEnd)) {
+		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
-			id += valueChange;
+			structureId += valueChange;
 			ApplyWindowName();
 		}
 		break;

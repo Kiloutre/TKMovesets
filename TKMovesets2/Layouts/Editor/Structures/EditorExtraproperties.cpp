@@ -55,7 +55,7 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 	}
 
 	BuildItemDetails(listIdx);
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
 void EditorExtraproperties::BuildItemDetails(int listIdx)
@@ -65,10 +65,10 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	auto& map = m_items[listIdx]->identifierMaps;
 
 	int startingFrame = atoi(map["starting_frame"]->buffer);
-	int id = (uint64_t)strtoll(map["id"]->buffer, nullptr, 16);
+	int propId = (uint64_t)strtoll(map["id"]->buffer, nullptr, 16);
 	int64_t value = (int64_t)strtoll(map["value_unsigned"]->buffer, nullptr, 10);
 
-	const char* idLabel = m_baseWindow->labels->GetText(id);
+	const char* idLabel = m_baseWindow->labels->GetText(propId);
 
 	std::string startingFrameText;
 	std::string valueText;
@@ -109,7 +109,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	}
 
 	if (idLabel == nullptr) {
-		label = std::format("{}: 0x{:x} =  {}", startingFrameText, id, valueText);
+		label = std::format("{}: 0x{:x} =  {}", startingFrameText, propId, valueText);
 	} else {
 		label = std::format("{}: {} = {}", startingFrameText, idLabel, valueText);
 	}
@@ -124,13 +124,14 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 		if (isCameraRef) {
 			m_items[listIdx]->color = PROPID_THROW_CAM;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
-			int id = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = id < 0 || id >= m_editor->movesetTable.throwCamerasCount;
+			int throwId = atoi(map["value_unsigned"]->buffer);
+			map["value_unsigned"]->errored = throwId < 0 || throwId >= m_editor->movesetTable.throwCamerasCount;
 		}
 		else if (isProjectileRef) {
 			m_items[listIdx]->color = PROPID_PROJECTILE;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
-			map["value_unsigned"]->errored = id < 0 || id >= m_editor->movesetTable.projectileCount;
+			int projectileId = atoi(map["value_unsigned"]->buffer);
+			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= m_editor->movesetTable.projectileCount;
 		}
 
 		map["value_signed"]->visible = false;

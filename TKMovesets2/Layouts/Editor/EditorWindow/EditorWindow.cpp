@@ -102,7 +102,7 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 			continue;
 		}
 
-		if (structWin->id == structId) {
+		if (structWin->structureId == structId) {
 			structWin->setFocus = true;
 			// Prevent duplicate move window creation
 			return;

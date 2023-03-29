@@ -92,7 +92,7 @@ public:
 	// If true, we must call SetNextWndowFocus() before creating our window
 	bool setFocus = false;
 	// Contains our ID or list starting ID for lists (they are contiguous)
-	uint32_t id = 0;
+	uint32_t structureId = 0;
 	// Type of the widnow, passed to editor functions
 	EditorWindowType_ windowType;
 	// The dock ID to set during the next render 

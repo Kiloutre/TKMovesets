@@ -18,7 +18,7 @@ EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_i
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
-	m_editor->Live_OnFieldEdit(windowType, id + listIdx, field);
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
 void EditorRequirements::BuildItemDetails(int listIdx)
