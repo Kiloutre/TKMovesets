@@ -85,6 +85,9 @@ protected:
 	virtual const char* GetGameIdentifierString() = 0;
 	// Returns the game name, used in moveset headers
 	virtual const char* GetGameOriginString() = 0;
+
+	// Returns the amount of bytes an animation contains
+	uint64_t GetAnimationSize(gameAddr anim);
 public:
 	// Stores the number of character we are expected to extract if asked to extract every char
 	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.

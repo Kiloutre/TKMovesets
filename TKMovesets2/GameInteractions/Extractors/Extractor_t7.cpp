@@ -348,29 +348,6 @@ Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 	return animationBlock;
 }
 
-uint64_t ExtractorT7::GetAnimationSize(gameAddr anim)
-{
-	uint16_t animType = m_process->readInt16(anim);
-	if ((animType & 0xFF) == 0) {
-		animType = SWAP_INT16(animType);
-	}
-
-	if (animType == 0xC8) {
-		return ExtractorUtils::getC8AnimSize(m_process, anim);
-	}
-	else if (animType == 0x64) {
-		return ExtractorUtils::get64AnimSize(m_process, anim);
-	}
-	// Invalid animation type
-#ifdef BUILD_TYPE_DEBUG
-	uint32_t firstBytes = m_process->readInt32(anim);
-	printf("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, firstBytes);
-#endif
-
-	throw;
-	return 0;
-}
-
 void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* table, gAddr::MovesetTable* offsets)
 {
 	// Fill table

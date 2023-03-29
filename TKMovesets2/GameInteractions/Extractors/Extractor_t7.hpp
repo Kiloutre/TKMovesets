@@ -38,8 +38,6 @@ private:
 
 	// Writes bounds of the block containing anim and move names
 	void GetNamesBlockBounds(const StructsT7_gameAddr::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
-	// Returns the amount of bytes an animation contains
-	uint64_t GetAnimationSize(gameAddr anim);
 	// Returns an allocated block containing mota block offsets followed by mota blocks
 	Byte* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, ExtractSettings settings);
 	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
