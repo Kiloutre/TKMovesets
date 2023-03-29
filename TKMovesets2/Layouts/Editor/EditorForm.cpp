@@ -350,28 +350,42 @@ void EditorForm::Render()
 		}
 		else
 		{
-			RenderInternal();
-
 			bool enabledBtn = unsavedChanges;
+			const float buttonHeight = 25;// ImGui::GetFrameHeightWithSpacing();
+
+			ImVec2 startPos = ImGui::GetCursorPos();
+
 			if (enabledBtn) {
 				ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
 			}
-
-			// Add spacing to ensure last item is always visible
-			const float buttonHeight = 25;// ImGui::GetFrameHeightWithSpacing();
-			if (ImGui::GetCursorPosY() + buttonHeight >= m_winInfo.size.y) {
-				ImGui::Dummy(ImVec2(1, buttonHeight));
-				// Render Apply() button at the bottom to create more scrollable space
-				ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - buttonHeight + ImGui::GetScrollY()));
-			}
-
+			ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - buttonHeight + ImGui::GetScrollY()));
 			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, buttonHeight))) {
 				Apply();
 			}
-
 			if (enabledBtn) {
 				ImGui::PopStyleColor();
 			}
+
+			ImGui::SetCursorPos(startPos);
+			RenderInternal();
+
+			// Yes, it's a bit off to render a button twice, but i didn't find any other reliable way to give priority to the button input
+			if (ImGui::GetCursorPosY() + buttonHeight >= m_winInfo.size.y)
+			{
+				if (enabledBtn) {
+					ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
+				}
+				ImGui::Dummy(ImVec2(1, buttonHeight));
+				// Render Apply() button at the bottom to create more scrollable space
+				ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - buttonHeight + ImGui::GetScrollY()));
+				if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, buttonHeight))) {
+					Apply();
+				}
+				if (enabledBtn) {
+					ImGui::PopStyleColor();
+				}
+			}
+
 		}
 	}
 

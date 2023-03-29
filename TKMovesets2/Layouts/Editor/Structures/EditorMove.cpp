@@ -64,7 +64,6 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 		}
 	}
 	else if (name == "extra_properties_addr") {
-		printf("o");
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Extraproperty, id);
 		}
