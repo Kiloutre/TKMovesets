@@ -15,11 +15,65 @@ namespace ExtractorUtils
 {
 	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim)
 	{
-		uint8_t bone_count = process->readInt8(anim + 2);
+		bool isSwapped = process->readInt8(anim + 0) == 0;
+
+		uint8_t bone_count = process->readInt8(anim + (isSwapped ? 3 : 2));
 		uint32_t header_size = bone_count * 0x4 + 0x8;
 		uint32_t frame_size = bone_count * 0x4 * 3;
+
 		uint32_t length = process->readInt32(anim + 4);
+		if (isSwapped) {
+			length = SWAP_INT32(length);
+		}
+
 		return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
+	}
+
+	uint64_t get64AnimSize(GameProcess* process, gameAddr anim)
+	{
+		bool isSwapped = process->readInt8(anim + 0) == 0;
+		return isSwapped ? get64AnimSize_BigEndian(process,anim) : get64AnimSize_LittleEndian(process, anim);
+	}
+
+	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim)
+	{
+		// todo
+		return 0;
+	}
+
+	uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
+	{
+		uint16_t boneCount = process->readInt16(anim + 2);
+
+		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+		gameAddr anim_postBoneDescriptorAddr = (gameAddr)(anim + postBoneDescriptor_offset);
+
+		uint16_t animLength = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr);
+		uint64_t __unknown__ = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr + 4);
+
+		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+		uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+		gameAddr animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+		int baseFrame = animLength - 1 - 1;
+		int keyframe = baseFrame / 16;
+		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * keyframe);
+
+		gameAddr animPtr_2 = animPtr + _v56_intPtr;
+		int lastArg_copy = boneCount;
+
+		do
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				Byte v58 = process->readInt8(animPtr_2);
+				int offsetStep = v58 / 4;
+				animPtr_2 += offsetStep;
+			}
+		} while (--lastArg_copy != 0);
+
+		return (uint64_t)animPtr_2 - (uint64_t)anim;
 	}
 
 	void WriteFileData(std::ofstream &file, std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t&progress, uint8_t progress_max)

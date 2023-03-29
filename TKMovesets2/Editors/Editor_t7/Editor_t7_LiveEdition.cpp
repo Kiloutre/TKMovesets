@@ -734,12 +734,14 @@ void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field)
 {
-#ifdef BUILD_TYPE_DEBUG
-	printf("Live_OnFieldEdit, type %d id %d, field name [%s], buffer [%s], loaded moveset %llx\n", type, id, field->name.c_str(), field->buffer, live_loadedMoveset);
-#endif
 	if (live_loadedMoveset == 0) {
 		return ;
 	}
+#ifdef BUILD_TYPE_DEBUG
+	else {
+		printf("Applying live edit: window type %d, item id %d, field name '%s', buffer [%s]\n", type, id, field->name.c_str(), field->buffer);
+	}
+#endif
 
 	switch (type)
 	{

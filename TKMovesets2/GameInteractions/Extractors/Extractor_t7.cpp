@@ -112,20 +112,6 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 	}
 }
 
-// Find the closest anim address in order to establish the current anim's end. A bit hacky, but does the job until we can understand how to get 0x64 anims sizes
-static int64_t getClosestBoundary(gameAddr animAddr, const std::vector<gameAddr>& boundaries)
-{
-	for (gameAddr comp : boundaries)
-	{
-		if (comp > animAddr) {
-			return comp;
-		}
-	}
-	printf("No boundary found for anim %llx, extracting only 1KB\n", animAddr);
-	// Arbitrary 1KB size for anims where we can't find a close enough boundary
-	return animAddr + 1000 + 1;
-}
-
 // -- Private methods - //
 
 void ExtractorT7::CopyMovesetInfoBlock(gameAddr movesetAddr, gAddr::MovesetInfo* movesetHeader)
@@ -145,34 +131,36 @@ void ExtractorT7::CopyMovesetInfoBlock(gameAddr movesetAddr, gAddr::MovesetInfo*
 	movesetHeader->fulldate_addr += namelength;
 }
 
-uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::vector<gameAddr>& boundaries, std::map<gameAddr, uint64_t>& offsetMap, ExtractSettings settings)
+uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::map<gameAddr, std::pair<gameAddr, uint64_t>>& offsetMap, ExtractSettings settings)
 {
 	uint64_t motaCustomBlockSize = 0;
 
-
-	// Normally you would go up to (i < 12), but i don't care about the last two and i do care about working with a reliable motaSize, so this is what i am doing
-	for (uint8_t i = 0; i < 10; ++i)
+	for (uint16_t motaId = 0; motaId < 12; ++motaId)
 	{
-		gameAddr motaAddr = ((uint64_t*)motas)[i];
-		gameAddr motaSize = ((uint64_t*)motas)[i + 2] - motaAddr;
+		gameAddr motaAddr = ((uint64_t*)motas)[motaId];
+		gameAddr motaSize;
 		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
 
+		if (motaId >= 10) {
+#ifdef BUILD_TYPE_DEBUG
+			printf("Ignoring MOTA %d (>= 10)\n", motaId);
+#endif
+			// Todo: change the way motaSize is obtained
+			continue;
+		}
 
 		if (offsetMap.find(motaAddr) != offsetMap.end()) {
 			// Already saved this one, not saving it again
 			continue;
 		}
 
-		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
-		// Use bitwise flags to store which one we want to store
-		if ((1 << i) & settings) {
-			offsetMap[motaAddr] = motaCustomBlockSize;
-			motaCustomBlockSize += motaSize;
-		}
-
 		char buf[0x10];
 		m_process->readBytes(motaAddr, buf, 0x10);
 		if (memcmp(buf, "MOTA", 4) != 0) {
+
+#ifdef BUILD_TYPE_DEBUG
+			printf("Malformed MOTA %d\n", motaId);
+#endif
 			// Malformed MOTA, don't save it
 			continue;
 		}
@@ -180,41 +168,87 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::v
 		bool isBigEndian = (buf[4] == 0);
 		uint32_t animCount = *(uint32_t*)(buf + 0xC);
 
-		if (isBigEndian) {
-			// Big endian ones are clearly different, haven't looked into understanding them
-			continue;
-		}
-
 		if (animCount == 0) {
-			// Some motas can be empty, don't save it. Or maybe we should? It might be purposeful.
+#ifdef BUILD_TYPE_DEBUG
+			printf("Empty MOTA %d - Not saving\n", motaId);
 			continue;
+#endif
 		}
 
-		// Read mota file's offset list, which is a list of 4 bytes offsets relative to the mota file start itself
-		uint32_t* animOffsetList = (uint32_t*)malloc(sizeof(uint32_t) * animCount);
-		if (animOffsetList != nullptr) {
-			m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
-			for (size_t motaAnimIdx = 0; motaAnimIdx < animCount; ++motaAnimIdx)
-			{
-				uint64_t animAddr = motaAddr + animOffsetList[motaAnimIdx];
-				if (std::find(boundaries.begin(), boundaries.end(), animAddr) == boundaries.end()) {
-					boundaries.push_back(animAddr);
-				}
-			}
-			free(animOffsetList);
+		if (isBigEndian) {
+			animCount = SWAP_INT32(animCount);
 		}
+
+		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
+		// Use bitwise flags to store which one we want to store
+		if (((1 << motaId) & settings) == 0) {
+#ifdef BUILD_TYPE_DEBUG
+			printf("Not saving mota %d : not set to be exported.\n", motaId);
+#endif
+			continue;
+		}
+		uint32_t lastAnimOffset = 0;
+		uint32_t* animOffsetList = (uint32_t*)calloc(animCount, sizeof(uint32_t));
+
+		if (animOffsetList == nullptr) {
+#ifdef BUILD_TYPE_DEBUG
+			printf("Error while allocating the animation offset list (size %u * 4) for mota %d\n", animCount, motaId);
+#endif
+			throw;
+		}
+
+		m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
+		for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
+		{
+			uint32_t animOffset = animOffsetList[animIdx];
+			if (isBigEndian) {
+				animOffset = SWAP_INT32(animOffset);
+			}
+			if (animOffset > lastAnimOffset) {
+				lastAnimOffset = animOffset;
+			}
+		}
+
+		free(animOffsetList);
+		 
+		uint64_t lastAnimSize = GetAnimationSize(motaAddr + lastAnimOffset);
+
+		if (lastAnimSize != 0) {
+			motaSize = lastAnimOffset + lastAnimSize;
+		}
+		else {
+#ifdef BUILD_TYPE_DEBUG
+			printf("Last anim of mota %d is size zero. Address of anim: %llx\n", motaId, motaAddr + lastAnimOffset);
+#endif
+			if (motaId >= 10) {
+#ifdef BUILD_TYPE_DEBUG
+				printf("NOT EXTRACTING ABOVE MOTA\n");
+#endif
+				continue;
+			}
+			motaSize = ((uint64_t*)motas)[motaId + 2] - motaAddr;
+		}
+
+		// Store new mota offset & size in keypair map
+		offsetMap[motaAddr] = std::pair<gameAddr, uint64_t>(motaCustomBlockSize, motaSize);
+		motaCustomBlockSize += motaSize;
+
+#ifdef BUILD_TYPE_DEBUG
+		printf("Saved mota %d, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
+#endif
 	}
 	return motaCustomBlockSize;
 }
 
-Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, std::vector<gameAddr>& boundaries, ExtractSettings settings)
+Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, ExtractSettings settings)
 {
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
-	std::map<gameAddr, gameAddr> offsetMap;
+	// Map of GAME_ADDR:<offset, size> motas
+	std::map<gameAddr, std::pair<gameAddr, uint64_t>> offsetMap;
 	uint64_t sizeToAllocate = 0;
 
-	size_out = CalculateMotaCustomBlockSize(motas, boundaries, offsetMap, settings);
+	size_out = CalculateMotaCustomBlockSize(motas, offsetMap, settings);
 
 	// Allocate 8 bytes minimum. Allocating 0 might cause problem, so this is safer.
 	Byte* customBlock = (Byte*)malloc(max(8, size_out));
@@ -229,16 +263,19 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	std::set<gameAddr> exportedMotas;
 	for (size_t i = 0; i <= 12; ++i)
 	{
-		if (i < 10 && offsetMap.find(motaAddr[i]) != offsetMap.end()) {
-			if (!exportedMotas.contains(motaAddr[i])) {
-				gameAddr motaSize = motaAddr[i + 2] - motaAddr[i];
-				m_process->readBytes(motaAddr[i], customBlock + offsetMap[motaAddr[i]], motaSize);
+		if (offsetMap.find(motaAddr[i]) != offsetMap.end())
+		{
+			auto& [motaOffset, motaSize] = offsetMap[motaAddr[i]];
+			if (!exportedMotas.contains(motaAddr[i]))
+			{
+				m_process->readBytes(motaAddr[i], customBlock + motaOffset, motaSize);
 				exportedMotas.insert(motaAddr[i]);
 			}
-			motaAddr[i] = offsetMap[motaAddr[i]];
+			motaAddr[i] = motaOffset;
 		}
 		else {
-			// Set to 0 for mota block we aren't exporting
+			// Set to misisng address for mota block we aren't exporting
+			// The importer will recognize this and fill it with a proper value
 			motaAddr[i] = MOVESET_ADDR_MISSING;
 		}
 	}
@@ -282,41 +319,32 @@ void ExtractorT7::GetNamesBlockBounds(const gAddr::Move* move, uint64_t moveCoun
 }
 
 
-Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets, std::vector<gameAddr> &boundaries)
+Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount, uint64_t &size_out, std::map<gameAddr, uint64_t>& offsets)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
 	Byte* animationBlock = nullptr;
 
-	std::vector<gameAddr> addrList;
-	// Get animation list and sort it
+	std::set<gameAddr> addrList;
+	// Get unique animation list
 	for (size_t i = 0; i < moveCount; ++i)
 	{
 		gameAddr anim_addr = movelist[i].anim_addr;
-
-		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
-			// Avoid adding duplicates
-			addrList.push_back(anim_addr);
-		}
-
-		// List built by mota first, we append to it too
-		if (std::find(boundaries.begin(), boundaries.end(), anim_addr) == boundaries.end()) {
-			// Avoid adding duplicates
-			boundaries.push_back(anim_addr);
-		}
+		addrList.insert(anim_addr);
 	}
-	// Sort boundaries list because we will iterate on it, trying to find the first item higher than what we're comparing with
-	std::sort(boundaries.begin(), boundaries.end());
 	
 	// Find anim sizes and establish offsets
-	size_t animCount = addrList.size();
-	for (size_t i = 0; i < animCount; ++i)
+	for (gameAddr animAddr : addrList)
 	{
-		gameAddr animAddr = addrList[i];
-		gameAddr maxAnimEnd = getClosestBoundary(animAddr, boundaries);
+		uint64_t animSize = GetAnimationSize(animAddr);
 
-		uint64_t animSize = GetAnimationSize(animAddr, maxAnimEnd - animAddr);
-
+		if (animSize == 0) {
+#ifdef BUILD_TYPE_DEBUG
+			printf("Animation address %llx does not have a valid size.\n", animAddr);
+#endif
+			throw;
+		}
+		
 		offsets[animAddr] = totalSize;
 		animSizes[animAddr] = animSize;
 		totalSize += animSize;
@@ -341,25 +369,27 @@ Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 	return animationBlock;
 }
 
-uint64_t ExtractorT7::GetAnimationSize(gameAddr anim, size_t maxSize)
+uint64_t ExtractorT7::GetAnimationSize(gameAddr anim)
 {
-	// Attempts to try to get an animation's size
-	unsigned char animType = m_process->readInt8(anim);
+	uint16_t animType = m_process->readInt16(anim);
+	if ((animType & 0xFF) == 0) {
+		animType = SWAP_INT16(animType);
+	}
 
 	if (animType == 0xC8) {
 		return ExtractorUtils::getC8AnimSize(m_process, anim);
 	}
-	else {
-		// We do not know how to figure out the size of a 0x64 anim yet
-
-		if (maxSize >= 100000) {
-			// Arbitrary 100kb max size of an animation. Not a good idea.
-			// todo : change this
-			return 100000;
-		}
-
-		return maxSize;
+	else if (animType == 0x64) {
+		return ExtractorUtils::get64AnimSize(m_process, anim);
 	}
+	// Invalid animation type
+#ifdef BUILD_TYPE_DEBUG
+	uint32_t firstBytes = m_process->readInt32(anim);
+	printf("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, firstBytes);
+#endif
+
+	throw;
+	return 0;
 }
 
 void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* table, gAddr::MovesetTable* offsets)
@@ -399,10 +429,10 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	return nameBlock;
 }
 
-Byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, std::vector<gameAddr>& boundaries, ExtractSettings settings)
+Byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
-	return AllocateMotaCustomBlock(motasList, size_out, boundaries, settings);
+	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
 
 void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress)
@@ -483,13 +513,12 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	progress = 20;
 
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
-	std::vector<gameAddr> animBoundaries;
-	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, animBoundaries, settings);
+	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, settings);
 	progress = 50;
 
 	// Extract animations and build a map for their old address -> their new offset in our blocks
 	std::map<gameAddr, uint64_t> animOffsets;
-	animationBlock = CopyAnimations(movelist, table.moveCount, s_animationBlock, animOffsets, animBoundaries);
+	animationBlock = CopyAnimations(movelist, table.moveCount, s_animationBlock, animOffsets);
 	progress = 65;
 
 	// Reads block containing names of moves and animations

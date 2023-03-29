@@ -50,8 +50,14 @@ namespace ExtractorUtils
 {
 	// Write a list of blocks, each aligned on a 8 bytes basis
 	void WriteFileData(std::ofstream& file, std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t& progress, uint8_t progress_max);
-	// Returns the size in bytes of a 0xC8 in 
+	// Returns the size in bytes of a 0xC8 animation 
 	uint64_t getC8AnimSize(GameProcess* process, gameAddr anim);
+	// Wrapper that calculates the size in bytes of a 0x64 animation (big or little endian)
+	uint64_t get64AnimSize(GameProcess* process, gameAddr anim);
+	// Returns the size in bytes of a 0x64 animation (little endian anim)
+	uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim);
+	// Returns the size in bytes of a 0x64 animation (big endian anim)
+	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
 	// Compress
 	void CompressFile(std::string dest_filename, std::string src_filename);
 };

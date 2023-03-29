@@ -41,7 +41,7 @@ namespace EditorUtils
 		}
 
 		else if (field->flags & EditorInput_Signed) {
-			field->color = FORM_INPUT_SIGNED;
+			field->color = FORM_INPUT_SIGNED;	
 		}
 	}
 
