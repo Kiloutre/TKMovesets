@@ -18,7 +18,7 @@ namespace Localization
 		// If you want fallback lines (like en_US by default when the current file is lacking an entry), set unloadPrevious to false.
 		// I generally don't like this idea though because i want lacking translations to be made clear visually.
 		if (unloadPrevious) {
-			g_translations.clear();
+			Clear();
 		}
 
 		std::ifstream infile;
@@ -83,5 +83,10 @@ namespace Localization
 			return g_translations[c_stringId].c_str();
 		}
 		return c_stringId;
+	}
+
+	void Clear()
+	{
+		g_translations.clear();
 	}
 }

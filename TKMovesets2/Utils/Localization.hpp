@@ -12,4 +12,7 @@ namespace Localization
 
 	// Returns the current lang id. To be used only in the main thread
 	const char* GetCurrLangId();
+
+	// Clear every translation form the dictionnary
+	void Clear();
 }

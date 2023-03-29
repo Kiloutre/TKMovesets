@@ -1,4 +1,10 @@
-﻿#include "glad/glad.h"
+﻿#ifdef BUILD_TYPE_DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <stdlib.h>
+#endif
+
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include <imgui_impl_glfw.h>
@@ -16,8 +22,6 @@
 #include "GameAddressesFile.hpp"
 
 #include "constants.h"
-
-using namespace std;
 
 // -- Static helpers -- //
 
@@ -137,7 +141,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// Make sure working dir is same as .exe
 		wchar_t currPath[MAX_PATH] = { 0 };
 		GetModuleFileNameW(nullptr, currPath, MAX_PATH);
-		wstring ws(currPath);
+		std::wstring ws(currPath);
 		ws.erase(ws.find_last_of(L"\\"));
 		std::filesystem::current_path(ws);
 
@@ -162,8 +166,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
 	// Setup window title and create window
-	std::string windowTitle = std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION);
-	GLFWwindow* window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle.c_str(), nullptr, nullptr);
+	GLFWwindow* window;
+	{
+		std::string windowTitle = std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION);
+		window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle.c_str(), nullptr, nullptr);
+	}
 	WriteToLogFile("GLFW window created");
 
 	if (window == nullptr) {
@@ -242,6 +249,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	Localization::Clear();
+
+#ifdef BUILD_TYPE_DEBUG
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	_CrtDumpMemoryLeaks();
+#endif
 
 	return 0;
 }
