@@ -445,7 +445,7 @@ bool EditorT7::ValidateReactionsField(EditorInput* field)
 			if (moveId < 0x8000) {
 				return false;
 			}
-			if (moveId >= (0x8000 + m_aliases.size())) {
+			if (moveId >= (0x8000 + m_aliases->size())) {
 				return false;
 			}
 		}
@@ -528,7 +528,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		WriteFieldFullname(inputMap, "hit_condition");
 		inputListMap.push_back(inputMap);
 
-		if (req[(unsigned int)hitCondition->requirements_addr].condition == constants[EditorConstants_RequirementEnd]) {
+		if (req[(unsigned int)hitCondition->requirements_addr].condition == constants->at(EditorConstants_RequirementEnd)) {
 			break;
 		}
 
@@ -587,7 +587,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
-	} while ((req++)->condition != constants[EditorConstants_RequirementEnd]);
+	} while ((req++)->condition != constants->at(EditorConstants_RequirementEnd));
 
 	return inputListMap;
 }
@@ -653,7 +653,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 
 		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != constants[EditorConstants_CancelCommandEnd]);
+	} while ((cancel++)->command != constants->at(EditorConstants_CancelCommandEnd));
 
 	return inputListMap;
 }
@@ -689,8 +689,8 @@ bool EditorT7::ValidateCancelField(EditorInput* field)
 	}
 	else if (name == "command") {
 		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16) & 0xFFFFFFFF;
-		if (command >= constants[EditorConstants_InputSequenceCommandStart]) {
-			int listIdx = (unsigned int)(command - constants[EditorConstants_InputSequenceCommandStart]);
+		if (command >= constants->at(EditorConstants_InputSequenceCommandStart)) {
+			int listIdx = (unsigned int)(command - constants->at(EditorConstants_InputSequenceCommandStart));
 			return listIdx < (int)m_infos->table.inputCount;
 		}
 	}
@@ -725,7 +725,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 
 		WriteFieldFullname(inputMap, "grouped_cancel");
 		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != constants[EditorConstants_GroupedCancelCommandEnd]);
+	} while ((cancel++)->command != constants->at(EditorConstants_GroupedCancelCommandEnd));
 
 	return inputListMap;
 }
@@ -754,7 +754,7 @@ bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
 			if (moveId < 0x8000) {
 				return false;
 			}
-			if (moveId >= (0x8000 + m_aliases.size())) {
+			if (moveId >= (0x8000 + m_aliases->size())) {
 				return false;
 			}
 		}
@@ -805,7 +805,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 
 		WriteFieldFullname(inputMap, "move_start_extraprop");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
+	} while ((prop++)->extraprop != constants->at(EditorConstants_RequirementEnd));
 
 	return inputListMap;
 }
@@ -841,7 +841,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 
 		WriteFieldFullname(inputMap, "move_end_extraprop");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
+	} while ((prop++)->extraprop != constants->at(EditorConstants_RequirementEnd));
 
 	return inputListMap;
 }
@@ -1162,9 +1162,9 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
 	SetMemberValue(&move->_0xAC_short, inputs["_0xAC_short"]);
 
-	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
+	if (m_animNameToOffsetMap->find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap->end()) {
 		// Todo: if old animation is unused, delete it
-		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
+		move->anim_addr = m_animNameToOffsetMap->at(inputs["anim_name"]->buffer);
 	}
 
 	// Save move name at the end because it may imply reallocation and invalidation of existing pointers
@@ -1189,7 +1189,7 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 	std::string& name = field->name;
 
 	if (name == "anim_name") {
-		return m_animNameToOffsetMap.find(field->buffer) != m_animNameToOffsetMap.end();
+		return m_animNameToOffsetMap->find(field->buffer) != m_animNameToOffsetMap->end();
 	}
 
 	else if (Helpers::startsWith(name, "cancel_addr")) {
@@ -1228,7 +1228,7 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 			if (moveId < 0x8000) {
 				return false;
 			}
-			if (moveId >= (0x8000 + m_aliases.size())) {
+			if (moveId >= (0x8000 + m_aliases->size())) {
 				return false;
 			}
 		}
@@ -1476,7 +1476,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 
 void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
-	constants = {
+	*constants = {
 		   {EditorConstants_RequirementEnd, 881},
 		   {EditorConstants_CancelCommandEnd, 0x8000},
 		   {EditorConstants_ExtraPropertyEnd, 32769}, // 0x8001
@@ -1490,7 +1490,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	// Get aliases as a vector
 	uint16_t* aliasesPtr = m_infos->aliases1;
 	for (uint16_t i = 0; i < 112 + 36; ++i) {
-		m_aliases.push_back(aliasesPtr[i]);
+		m_aliases->push_back(aliasesPtr[i]);
 	}
 
 	// Build anim name : offset list
@@ -1504,13 +1504,13 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		std::string animName_str(animName);
 		gameAddr animOffset = movePtr[i].anim_addr;
 
-		if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap[animName_str] != animOffset) {
+		if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end() && m_animNameToOffsetMap->at(animName_str) != animOffset) {
 			// Same animation name refers to a different offset. Create a unique animation name for it.
 			// Move names being similar is irrelevant, but i build an anim name <-> anim offset map, so i need uniqueness here.
 
 			animName_str += " (2)";
 			unsigned int num = 2;
-			while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
+			while (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
 				animName_str = std::format("{} {}", animName, ++num);
 			}
 
@@ -1529,11 +1529,11 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 			}
 		}
 
-		m_animNameToOffsetMap[animName_str] = animOffset;
-		m_animOffsetToNameOffset[animOffset] = movePtr[i].anim_name_addr;
+		(*m_animNameToOffsetMap)[animName_str] = animOffset;
+		(*m_animOffsetToNameOffset)[animOffset] = movePtr[i].anim_name_addr;
 	}
 
-	movesetTable.aliases = m_aliases;
+	movesetTable.aliases = *m_aliases;
 }
 
 void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
@@ -1549,7 +1549,7 @@ void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
 	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
 
 	uint16_t* aliases = m_infos->aliases1;
-	uint8_t aliasesCount = (uint8_t)m_aliases.size();
+	uint8_t aliasesCount = (uint8_t)m_aliases->size();
 
 	uint16_t moveId = 0;
 	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
@@ -1610,7 +1610,7 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"));
 	if (moveId >= 0x8000) {
-		moveId = m_aliases[moveId - (uint16_t)0x8000];
+		moveId = m_aliases->at(moveId - (uint16_t)0x8000);
 	}
 
 	return moveId;
@@ -1657,7 +1657,7 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 
 	if (animationExtractionStatus & ExtractionStatus_Finished) {
 		// Join to cleanly destroy the previous started thread
-		animExtractionThread.join();
+		animExtractionThread->join();
 	}
 
 	animationExtractionStatus = ExtractionStatus_Started;
@@ -1673,10 +1673,10 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 
 	// These can also be modified during the extraction or worse, deallocated
 	TKMovesetHeader_offsets offsets = m_header->offsets;
-	auto& animOffsetToNameOffset = m_animOffsetToNameOffset;
+	auto& animOffsetToNameOffset = *m_animOffsetToNameOffset;
 
 	// Start in another thread to avoid the display thread hanging
-	animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, characterFilename, offsets, animOffsetToNameOffset);
+	*animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, characterFilename, offsets, animOffsetToNameOffset);
 }
 
 void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeader_offsets offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset)
@@ -1755,11 +1755,11 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 	}
 
 	// Ensure animation name is unique
-	if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
+	if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
 		std::string animName_orig = animName_str;
 		animName_str += " (2)";
 		unsigned int num = 2;
-		while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
+		while (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
 			animName_str = std::format("{} {}", animName_orig.c_str(), ++num);
 		}
 	}

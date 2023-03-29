@@ -35,8 +35,8 @@ void EditorFormList::Apply()
 	if (m_listSizeChange != 0)
 	{
 		// If items were added/removed, reallocate entire moveset
-		int oldSize = m_listSize - m_listSizeChange;
-		m_editor->ModifyListSize(windowType, structureId, oldSize, m_listSize);
+		int oldSize = (int)(m_listSize - m_listSizeChange);
+		m_editor->ModifyListSize(windowType, structureId, oldSize, (int)m_listSize);
 		if (m_listSize != 0) {
 			OnApplyResize(m_listSizeChange, oldSize);
 		}
@@ -251,7 +251,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	} else {
 		// Some struct lists may have fixed list sizes: in this case, we'll call a different function
 		// For now these two GetFormFields aren't swappable, if a list is not supposed to have a known size ahead of time, don't provide a size
-		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, m_listSize);
+		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, (int)m_listSize);
 	}
 
 	// Tries to find a name to show in the window title
@@ -387,7 +387,7 @@ void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChan
 {
 	if (winType == windowType){
 		// If a struct was created before this one, we must shfit our own ID
-		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
+		if (MUST_SHIFT_ID((int)structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
 			structureId += valueChange;
 			ApplyWindowName();

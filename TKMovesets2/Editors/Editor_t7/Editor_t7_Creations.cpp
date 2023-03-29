@@ -125,7 +125,7 @@ int32_t EditorT7::CreateNewExtraProperties()
 	ExtraMoveProperty newStruct{ 0 };
 	ExtraMoveProperty newStruct2{ 0 };
 
-	newStruct2.starting_frame = constants[EditorConstants_ExtraPropertyEnd];
+	newStruct2.starting_frame = constants->at(EditorConstants_ExtraPropertyEnd);
 
 	int32_t newStructId = CreateNewGeneric<ExtraMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, extraMoveProperty));
 	return newStructId;
@@ -136,7 +136,7 @@ int32_t EditorT7::CreateNewMoveBeginProperties()
 	OtherMoveProperty newStruct{ 0 };
 	OtherMoveProperty newStruct2{ 0 };
 
-	newStruct2.extraprop = constants[EditorConstants_RequirementEnd];
+	newStruct2.extraprop = constants->at(EditorConstants_RequirementEnd);
 
 	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, moveBeginningProp));
 	return newStructId;
@@ -147,7 +147,7 @@ int32_t EditorT7::CreateNewMoveEndProperties()
 	OtherMoveProperty newStruct{ 0 };
 	OtherMoveProperty newStruct2{ 0 };
 
-	newStruct2.extraprop = constants[EditorConstants_RequirementEnd];
+	newStruct2.extraprop = constants->at(EditorConstants_RequirementEnd);
 
 	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, moveEndingProp));
 	return newStructId;
@@ -159,7 +159,7 @@ int32_t EditorT7::CreateNewRequirements()
 	Requirement newStruct{ 0 };
 	Requirement newStruct2{ 0 };
 
-	newStruct2.condition = constants[EditorConstants_RequirementEnd];
+	newStruct2.condition = constants->at(EditorConstants_RequirementEnd);
 
 	int32_t newStructId = CreateNewGeneric<Requirement>(&newStruct, &newStruct2, offsetofVar(m_infos->table, requirement));
 	return newStructId;
@@ -189,7 +189,7 @@ int32_t EditorT7::CreateNewCancelList()
 	Cancel newStruct{ 0 };
 	Cancel newStruct2{ 0 };
 
-	newStruct2.command = constants[EditorConstants_CancelCommandEnd];
+	newStruct2.command = constants->at(EditorConstants_CancelCommandEnd);
 
 	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetofVar(m_infos->table, cancel));
 	return newStructId;
@@ -200,7 +200,7 @@ int32_t EditorT7::CreateNewGroupedCancelList()
 	Cancel newStruct{ 0 };
 	Cancel newStruct2{ 0 };
 
-	newStruct2.command = constants[EditorConstants_GroupedCancelCommandEnd];
+	newStruct2.command = constants->at(EditorConstants_GroupedCancelCommandEnd);
 
 	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetofVar(m_infos->table, groupCancel));
 	return newStructId;
@@ -287,8 +287,8 @@ int32_t EditorT7::CreateNewMove()
 	/// Move ///
 
 	// Initialize our structure value
-	uint64_t animOffset = m_animOffsetToNameOffset.begin()->first;
-	uint64_t animNameOffset = m_animOffsetToNameOffset.begin()->second;
+	uint64_t animOffset = m_animOffsetToNameOffset->begin()->first;
+	uint64_t animNameOffset = m_animOffsetToNameOffset->begin()->second;
 
 	gAddr::Move move{ 0 };
 	move.name_addr = relativeName;

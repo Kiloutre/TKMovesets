@@ -65,7 +65,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	auto& map = m_items[listIdx]->identifierMaps;
 
 	int startingFrame = atoi(map["starting_frame"]->buffer);
-	int propId = (uint64_t)strtoll(map["id"]->buffer, nullptr, 16);
+	unsigned int propId = (unsigned int)strtoll(map["id"]->buffer, nullptr, 16);
 	int64_t value = (int64_t)strtoll(map["value_unsigned"]->buffer, nullptr, 10);
 
 	const char* idLabel = m_baseWindow->labels->GetText(propId);
@@ -91,7 +91,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	else if (startingFrame >= 0x4000)
 	{
 		const char* format_str = _("edition.extraproperty.every_nth_frame");
-		const int bufsize = strlen(format_str) + 8;
+		const int bufsize = (int)strlen(format_str) + 8;
 		char* buf = new char[bufsize];
 		sprintf_s(buf, bufsize, format_str, startingFrame - 0x4000);
 		startingFrameText = std::string(buf);

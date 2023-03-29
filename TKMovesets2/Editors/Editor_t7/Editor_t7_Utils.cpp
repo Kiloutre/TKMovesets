@@ -3,19 +3,25 @@
 bool EditorT7::IsCommandGroupedCancelReference(const char* buffer)
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return command == constants[EditorConstants_GroupedCancelCommand];
+	return command == constants->at(EditorConstants_GroupedCancelCommand);
 }
 
 int EditorT7::GetCommandInputSequenceID(const char* buffer)
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return (command & 0xFFFFFFFF) - constants[EditorConstants_InputSequenceCommandStart];
+	return (command & 0xFFFFFFFF) - constants->at(EditorConstants_InputSequenceCommandStart);
 }
 
 bool EditorT7::IsCommandInputSequence(const char* buffer)
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return (command & 0xFFFFFFFF) >= constants[EditorConstants_InputSequenceCommandStart];
+	const uint32_t sequenceId = (command & 0xFFFFFFFF);
+	const uint32_t inputSequenceStart = (int)constants->at(EditorConstants_InputSequenceCommandStart);
+	if (sequenceId >= inputSequenceStart && sequenceId < 0x9000) {
+		// Arbitrary 0x9000 number here. Todo: find actual limit
+		return true;
+	}
+	return false;
 }
 
 bool EditorT7::IsPropertyThrowCameraRef(const char* buffer)

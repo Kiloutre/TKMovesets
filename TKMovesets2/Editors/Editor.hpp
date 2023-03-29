@@ -19,7 +19,7 @@
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
 // Shifting logic for list resizing
-# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) ((id >= listOldEnd) || (valueChange < 0 && (id - valueChange) >= listOldEnd))
+# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) (((int)id >= listOldEnd) || (valueChange < 0 && ((int)id - valueChange) >= listOldEnd))
 
 // Vector with unique elements
 template < typename T >
@@ -223,6 +223,8 @@ protected:
 	GameData* m_game = nullptr;
 	// Contains our header data
 	TKMovesetHeader* m_header = nullptr;
+	// Store move ID aliases
+	std::vector<uint16_t>* m_aliases = nullptr;
 
 	// Contains the moveset, including our own header.
 	Byte* m_moveset = nullptr;
@@ -234,27 +236,28 @@ protected:
 	uint64_t m_movesetDataSize = 0;
 
 	// Stores a <name, offset> animation map
-	std::map<std::string, gameAddr> m_animNameToOffsetMap;
+	std::map<std::string, gameAddr>* m_animNameToOffsetMap = nullptr;
 	// Stores a <offset, offset> animation map
-	std::map<gameAddr, gameAddr> m_animOffsetToNameOffset;
+	std::map<gameAddr, gameAddr>* m_animOffsetToNameOffset = nullptr;
 
 	// Returns false if the field's input buffer is invalid for the field type
 	bool ValidateFieldType(EditorInput* field);
 public:
 	// Constants useful constant variables, to be set on a per-game basis
-	std::map<EditorConstants_, int> constants;
-	// Contains every move, in a displayable format
+	std::map<EditorConstants_, int>* constants;
+	// Contains every move, in a displayable format. Ptr to the editor movelist.
 	std::vector<DisplayableMove*>* displayableMovelist = nullptr;
 	// Contains quick data that is made to be accessed outside of this class
 	EditorTable movesetTable;
 	// Status of the animation extraction
 	ExtractionStatus_ animationExtractionStatus = ExtractionStatus_NotStarted;
 	// Thread where the animations extraction will be running to avoid blocking the display thread
-	std::thread animExtractionThread;
+	std::thread* animExtractionThread;
 	// Stores the address of the loaded moveset in-game. Will become 0 if it does not match the current moveset.
 	gameAddr live_loadedMoveset = 0;
 
-	Editor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
+	Editor(GameProcess* process, GameData* game);
+	~Editor();
 
 	// Loads important moveset data in our class, required to start functionning
 	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;

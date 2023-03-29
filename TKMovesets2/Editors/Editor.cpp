@@ -120,7 +120,7 @@ namespace EditorUtils
 				uint64_t uint64 = 0;
 				float floatingPoint;
 			} value;
-			value.floatingPoint = std::atof(buffer);
+			value.floatingPoint = (float)std::atof(buffer);
 			return value.uint64;
 		}
 		return (uint64_t)strtoll(buffer, nullptr, 10);
@@ -151,10 +151,10 @@ namespace EditorUtils
 			*(uint64_t*)memberPtr = value;
 		}
 		else if (flags & EditorInput_32b) {
-			*(uint32_t*)memberPtr = value;
+			*(uint32_t*)memberPtr = (uint32_t)value;
 		}
 		else if (flags & EditorInput_16b) {
-			*(uint16_t*)memberPtr = value;
+			*(uint16_t*)memberPtr = (uint16_t)value;
 		}
 		else {
 			throw;
@@ -226,4 +226,29 @@ bool Editor::ValidateFieldType(EditorInput* field)
 	}
 	
 	return true;
+}
+
+Editor::Editor(GameProcess* process, GameData* game)
+{
+	m_process = process;
+	m_game = game;
+
+	m_aliases = new std::vector<uint16_t>;
+
+	m_animNameToOffsetMap = new std::map<std::string, gameAddr>;
+	m_animOffsetToNameOffset = new std::map<gameAddr, gameAddr>;
+
+	constants = new std::map<EditorConstants_, int>();
+	animExtractionThread = new std::thread();
+}
+
+Editor::~Editor()
+{
+	delete m_aliases;
+
+	delete m_animNameToOffsetMap;
+	delete m_animOffsetToNameOffset;
+
+	delete constants;
+	delete animExtractionThread;
 }

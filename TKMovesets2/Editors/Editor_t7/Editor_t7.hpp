@@ -38,11 +38,9 @@ private:
 	MovesetInfo* m_infos = nullptr;
 	// Stores absolute pointers to the moveset table within the moveset
 	MovesetTable* m_absoluteTable = nullptr;
-	std::vector<uint16_t> m_aliases;
 	StructIterators m_iterators;
 
 public:
-	// Inherit constructor
 	using Editor::Editor;
 
 	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
