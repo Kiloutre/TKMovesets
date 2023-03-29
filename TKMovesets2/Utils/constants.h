@@ -21,8 +21,11 @@
 # define EDITOR_LIB_DIRECTORY            "./editor_library"
 # define MOVESET_FILENAME_EXTENSION      ".tkbin"
 # define MOVESET_TMPFILENAME_EXTENSION   "._tmp_tkbin"
-# define MOVESET_VERSION_STRING          "0.1"  // We might update extractors/importers without touching the main tool, so this is separated
-# define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /" // Accepted chars in header strings are alphanum + those specified here
+// We might update extractors/importers without touching the main tool, so this is separated
+# define MOVESET_VERSION_STRING          "0.2"  
+// Accepted chars in header strings are alphanum + those specified here
+// Anything else indicate a malformed header : a bad file
+# define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
 
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 

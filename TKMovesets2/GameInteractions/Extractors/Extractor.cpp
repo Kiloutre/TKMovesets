@@ -37,16 +37,18 @@ namespace ExtractorUtils
 
 	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim)
 	{
+		// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
 		uint64_t boneCount = process->readInt16(anim + 2);
-		boneCount = SWAP_INT16(boneCount) & 0xFFFF;
+		boneCount = SWAP_INT16(boneCount);
 
 		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
 		gameAddr anim_postBoneDescriptorAddr = (gameAddr)(anim + postBoneDescriptor_offset);
 
 		uint64_t animLength = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr);
 		uint64_t __unknown__ = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr + 4);
-		animLength = SWAP_INT16(animLength) & 0xFFFF;
-		__unknown__ = SWAP_INT16(__unknown__) & 0xFFFF;
+		animLength = SWAP_INT16(animLength);
+		__unknown__ = SWAP_INT16(__unknown__);
 
 		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
 		uint64_t aa4 = 6 * (__unknown__ + boneCount);
@@ -56,7 +58,7 @@ namespace ExtractorUtils
 		int baseFrame = animLength - 1 - 1;
 		int keyframe = baseFrame / 16;
 		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * keyframe);
-		_v56_intPtr = SWAP_INT32(_v56_intPtr) & 0xFFFFFFFF;
+		_v56_intPtr = SWAP_INT32(_v56_intPtr);
 
 		gameAddr animPtr_2 = animPtr + _v56_intPtr;
 		int lastArg_copy = boneCount;
@@ -76,6 +78,8 @@ namespace ExtractorUtils
 
 	uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
 	{
+		// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
 		uint64_t boneCount = process->readInt16(anim + 2);
 
 		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
