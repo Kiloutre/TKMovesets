@@ -37,18 +37,52 @@ namespace ExtractorUtils
 
 	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim)
 	{
-		// todo
-		return 0;
-	}
-
-	uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
-	{
-		uint16_t boneCount = process->readInt16(anim + 2);
+		uint64_t boneCount = process->readInt16(anim + 2);
+		boneCount = SWAP_INT16(boneCount) & 0xFFFF;
 
 		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
 		gameAddr anim_postBoneDescriptorAddr = (gameAddr)(anim + postBoneDescriptor_offset);
 
-		uint16_t animLength = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr);
+		uint64_t animLength = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr);
+		uint64_t __unknown__ = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr + 4);
+		animLength = SWAP_INT16(animLength) & 0xFFFF;
+		__unknown__ = SWAP_INT16(__unknown__) & 0xFFFF;
+
+		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+		uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+		gameAddr animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+		int baseFrame = animLength - 1 - 1;
+		int keyframe = baseFrame / 16;
+		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * keyframe);
+		_v56_intPtr = SWAP_INT32(_v56_intPtr) & 0xFFFFFFFF;
+
+		gameAddr animPtr_2 = animPtr + _v56_intPtr;
+		int lastArg_copy = boneCount;
+
+		do
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				Byte v58 = process->readInt8(animPtr_2);
+				int offsetStep = v58 / 4;
+				animPtr_2 += offsetStep;
+			}
+		} while (--lastArg_copy != 0);
+
+		printf("%lld\n", (uint64_t)animPtr_2 - (uint64_t)anim);
+		return (uint64_t)animPtr_2 - (uint64_t)anim;
+	}
+
+	uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
+	{
+		uint64_t boneCount = process->readInt16(anim + 2);
+
+		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+		gameAddr anim_postBoneDescriptorAddr = (gameAddr)(anim + postBoneDescriptor_offset);
+
+		uint64_t animLength = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr);
 		uint64_t __unknown__ = (uint16_t)process->readInt16(anim_postBoneDescriptorAddr + 4);
 
 		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);

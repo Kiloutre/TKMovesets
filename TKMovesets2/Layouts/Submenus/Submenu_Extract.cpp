@@ -81,7 +81,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	{
 		ImGui::TextUnformatted(_("extraction.mota_explanation"));
 
-		for (uint8_t motaId = 0; motaId < 10; ++motaId) {
+		for (uint8_t motaId = 0; motaId < 12; ++motaId) {
 			char buf[8] = {"mota_00"};
 			buf[5] += motaId / 10;
 			buf[6] += motaId % 10;

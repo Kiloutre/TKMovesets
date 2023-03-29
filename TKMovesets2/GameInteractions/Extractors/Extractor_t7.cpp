@@ -141,14 +141,6 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		gameAddr motaSize;
 		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
 
-		if (motaId >= 10) {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Ignoring MOTA %d (>= 10)\n", motaId);
-#endif
-			// Todo: change the way motaSize is obtained
-			continue;
-		}
-
 		if (offsetMap.find(motaAddr) != offsetMap.end()) {
 			// Already saved this one, not saving it again
 			continue;
@@ -167,13 +159,6 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 
 		bool isBigEndian = (buf[4] == 0);
 		uint32_t animCount = *(uint32_t*)(buf + 0xC);
-
-		if (animCount == 0) {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Empty MOTA %d - Not saving\n", motaId);
-			continue;
-#endif
-		}
 
 		if (isBigEndian) {
 			animCount = SWAP_INT32(animCount);
@@ -210,23 +195,17 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		}
 
 		free(animOffsetList);
-		 
-		uint64_t lastAnimSize = GetAnimationSize(motaAddr + lastAnimOffset);
 
-		if (lastAnimSize != 0) {
-			motaSize = lastAnimOffset + lastAnimSize;
+		 
+		if (lastAnimOffset == 0) {
+#ifdef BUILD_TYPE_DEBUG
+			printf("Empty MOTA %d - ", motaId);
+#endif
+			motaSize = 0x14;
 		}
 		else {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Last anim of mota %d is size zero. Address of anim: %llx\n", motaId, motaAddr + lastAnimOffset);
-#endif
-			if (motaId >= 10) {
-#ifdef BUILD_TYPE_DEBUG
-				printf("NOT EXTRACTING ABOVE MOTA\n");
-#endif
-				continue;
-			}
-			motaSize = ((uint64_t*)motas)[motaId + 2] - motaAddr;
+			uint64_t lastAnimSize = GetAnimationSize(motaAddr + lastAnimOffset);
+			motaSize = lastAnimOffset + lastAnimSize;
 		}
 
 		// Store new mota offset & size in keypair map
