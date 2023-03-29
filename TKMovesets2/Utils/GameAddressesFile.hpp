@@ -16,6 +16,8 @@ private:
 	std::vector<std::string> m_entries;
 	// Mutex used to avoid m_entries iterator crashing because of concurrent m_entries modification
 	std::mutex m_entries_mutex;
+	// Returned by GetAddress() if address is not found
+	std::vector<gameAddr> m_emptyPtrPath;
 public:
 	GameAddressesFile();
 

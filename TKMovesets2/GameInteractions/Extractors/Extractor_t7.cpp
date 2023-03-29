@@ -514,6 +514,10 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
 		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
 		errcode = ExtractionErrcode_AllocationErr;
+#ifdef BUILD_TYPE_DEBUG
+		printf("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\n",
+		movesetInfoBlock, nameBlock, movesetBlock, animationBlock, motaCustomBlock);
+#endif
 	}
 	else {
 		// Create the file*

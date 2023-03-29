@@ -130,5 +130,5 @@ const std::vector<gameAddr>& GameAddressesFile::GetAddress(const char* c_address
 	if (m_absolute_pointer_paths.find(c_addressId) != m_absolute_pointer_paths.end()) {
 		return m_absolute_pointer_paths[c_addressId];
 	}
-	return std::vector<gameAddr>();
+	return m_emptyPtrPath;
 }

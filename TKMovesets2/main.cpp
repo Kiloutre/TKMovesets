@@ -176,7 +176,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	glfwSwapInterval(1);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		throw("Unable to context to OpenGL");
+		printf("Unable to context to OpenGL");
+		return 8;
 	}
 	WriteToLogFile("GLL Loader done");
 

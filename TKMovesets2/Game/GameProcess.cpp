@@ -5,8 +5,6 @@
 
 #include "GameAddresses.h"
 
-#pragma warning( disable : C6001 )
-
 // -- Private methods  -- //
 
 GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, DWORD processExtraFlags)
@@ -226,11 +224,11 @@ gameAddr GameProcess::allocateMem(size_t amount)
 	return allocatedBlock;
 }
 
-void GameProcess::freeMem(gameAddr addr)
+void GameProcess::freeMem(gameAddr targetAddr)
 {
-	VirtualFreeEx(m_processHandle, (LPVOID)addr, 0, MEM_RELEASE);
+	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 	for (std::pair<gameAddr, uint64_t>& block : allocatedMemory) {
-		if (block.first == addr) {
+		if (block.first == (gameAddr)targetAddr) {
 			allocatedMemory.erase(std::find(allocatedMemory.begin(), allocatedMemory.end(), block));
 
 #ifdef BUILD_TYPE_DEBUG

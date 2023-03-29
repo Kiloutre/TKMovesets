@@ -55,9 +55,9 @@ namespace ExtractorUtils
 
 		gameAddr animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
 
-		int baseFrame = (int)(animLength - 1 - 1);
-		int keyframe = baseFrame / 16;
-		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * keyframe);
+		unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+		unsigned int keyframe = baseFrame / 16;
+		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * (uint64_t)keyframe);
 		_v56_intPtr = SWAP_INT32(_v56_intPtr);
 
 		gameAddr animPtr_2 = animPtr + _v56_intPtr;
@@ -93,9 +93,9 @@ namespace ExtractorUtils
 
 		gameAddr animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
 
-		int baseFrame = animLength - 1 - 1;
-		int keyframe = baseFrame / 16;
-		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * keyframe);
+		unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+		unsigned int keyframe = baseFrame / 16;
+		unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * (uint64_t)keyframe);
 
 		gameAddr animPtr_2 = animPtr + _v56_intPtr;
 		int lastArg_copy = (int)boneCount;
@@ -116,7 +116,7 @@ namespace ExtractorUtils
 	void WriteFileData(std::ofstream &file, std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t&progress, uint8_t progress_max)
 	{
 		uint8_t remainingProgress = progress_max - progress;
-		uint8_t step = (size_t)remainingProgress / blocks.size();
+		uint8_t step = (uint8_t)((size_t)remainingProgress / blocks.size());
 
 		for (const std::pair<Byte*, uint64_t>& block : blocks) {
 			char* blockData = (char*)block.first;
