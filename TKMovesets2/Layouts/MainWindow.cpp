@@ -1,6 +1,4 @@
-﻿#pragma warning( disable: 4244 )
-
-#include <ImGui.h>
+﻿#include <ImGui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
@@ -103,7 +101,7 @@ void MainWindow::Update()
 			ImGui::SetNextWindowPos(mainView->Pos);
 			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height));
 			ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
-			navMenu.Render(navMenuWidth - 10);
+			navMenu.Render((float)(navMenuWidth - 10));
 			ImGui::End();
 		}
 

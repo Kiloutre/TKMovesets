@@ -9,9 +9,6 @@
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
 
-# pragma warning( disable : C4334 )
-# pragma warning( disable : C6297 )
-
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
@@ -166,7 +163,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 
 		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
 		// Use bitwise flags to store which one we want to store
-		if (((1 << motaId) & settings) == 0) {
+		if ((((uint64_t)1 << motaId) & settings) == 0) {
 #ifdef BUILD_TYPE_DEBUG
 			printf("Not saving mota %d : not set to be exported.\n", motaId);
 #endif

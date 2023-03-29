@@ -2,14 +2,13 @@
 # include "Helpers.hpp"
 
 #define gAddr StructsT7_gameAddr
-#define offsetof(st, m) ((size_t)(&((decltype(st) *)0)->m))
 
 template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset)
 {
 	uint64_t tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
 	uint64_t tableListCount = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset + 8);
 
-	const uint16_t newStructId = tableListCount;
+	const uint16_t newStructId = (uint16_t)tableListCount;
 	const int amount = struct_2 == nullptr ? 1 : 2;
 	const uint64_t extraSize = sizeof(T) * amount;
 
@@ -65,7 +64,7 @@ int32_t EditorT7::CreateNewProjectile()
 {
 	Projectile newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<Projectile>(&newStruct, nullptr, offsetof(m_infos->table, projectile));
+	int32_t newStructId = CreateNewGeneric<Projectile>(&newStruct, nullptr, offsetofVar(m_infos->table, projectile));
 	return newStructId;
 }
 
@@ -73,7 +72,7 @@ int32_t EditorT7::CreateInputSequence()
 {
 	InputSequence newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<InputSequence>(&newStruct, nullptr, offsetof(m_infos->table, inputSequence));
+	int32_t newStructId = CreateNewGeneric<InputSequence>(&newStruct, nullptr, offsetofVar(m_infos->table, inputSequence));
 	return newStructId;
 }
 
@@ -82,7 +81,7 @@ int32_t EditorT7::CreateInputList()
 	Input newStruct{ 0 };
 	Input newStruct2{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<Input>(&newStruct, &newStruct2, offsetof(m_infos->table, input));
+	int32_t newStructId = CreateNewGeneric<Input>(&newStruct, &newStruct2, offsetofVar(m_infos->table, input));
 	return newStructId;
 }
 
@@ -90,7 +89,7 @@ int32_t EditorT7::CreateNewPushbackExtra()
 {
 	PushbackExtradata newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<PushbackExtradata>(&newStruct, nullptr, offsetof(m_infos->table, pushbackExtradata));
+	int32_t newStructId = CreateNewGeneric<PushbackExtradata>(&newStruct, nullptr, offsetofVar(m_infos->table, pushbackExtradata));
 	return newStructId;
 }
 
@@ -98,7 +97,7 @@ int32_t EditorT7::CreateNewPushback()
 {
 	Pushback newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<Pushback>(&newStruct, nullptr, offsetof(m_infos->table, pushback));
+	int32_t newStructId = CreateNewGeneric<Pushback>(&newStruct, nullptr, offsetofVar(m_infos->table, pushback));
 	return newStructId;
 }
 
@@ -106,7 +105,7 @@ int32_t EditorT7::CreateNewReactions()
 {
 	Reactions newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<Reactions>(&newStruct, nullptr, offsetof(m_infos->table, reactions));
+	int32_t newStructId = CreateNewGeneric<Reactions>(&newStruct, nullptr, offsetofVar(m_infos->table, reactions));
 	return newStructId;
 }
 
@@ -117,7 +116,7 @@ int32_t EditorT7::CreateNewHitConditions()
 	// This may potentially cause problems if the moveset's requirement 1 does not immediately end with a 881 requirement
 	newStruct.requirements_addr = 1;
 
-	int32_t newStructId = CreateNewGeneric<gAddr::HitCondition>(&newStruct, &newStruct, offsetof(m_infos->table, hitCondition));
+	int32_t newStructId = CreateNewGeneric<gAddr::HitCondition>(&newStruct, &newStruct, offsetofVar(m_infos->table, hitCondition));
 	return newStructId;
 }
 
@@ -128,7 +127,7 @@ int32_t EditorT7::CreateNewExtraProperties()
 
 	newStruct2.starting_frame = constants[EditorConstants_ExtraPropertyEnd];
 
-	int32_t newStructId = CreateNewGeneric<ExtraMoveProperty>(&newStruct, &newStruct2, offsetof(m_infos->table, extraMoveProperty));
+	int32_t newStructId = CreateNewGeneric<ExtraMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, extraMoveProperty));
 	return newStructId;
 }
 
@@ -139,7 +138,7 @@ int32_t EditorT7::CreateNewMoveBeginProperties()
 
 	newStruct2.extraprop = constants[EditorConstants_RequirementEnd];
 
-	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetof(m_infos->table, moveBeginningProp));
+	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, moveBeginningProp));
 	return newStructId;
 }
 
@@ -150,7 +149,7 @@ int32_t EditorT7::CreateNewMoveEndProperties()
 
 	newStruct2.extraprop = constants[EditorConstants_RequirementEnd];
 
-	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetof(m_infos->table, moveEndingProp));
+	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, moveEndingProp));
 	return newStructId;
 }
 
@@ -162,7 +161,7 @@ int32_t EditorT7::CreateNewRequirements()
 
 	newStruct2.condition = constants[EditorConstants_RequirementEnd];
 
-	int32_t newStructId = CreateNewGeneric<Requirement>(&newStruct, &newStruct2, offsetof(m_infos->table, requirement));
+	int32_t newStructId = CreateNewGeneric<Requirement>(&newStruct, &newStruct2, offsetofVar(m_infos->table, requirement));
 	return newStructId;
 }
 
@@ -173,7 +172,7 @@ int32_t EditorT7::CreateNewVoiceclipList()
 
 	newStruct2.id = (uint32_t)-1;
 
-	int32_t newStructId = CreateNewGeneric<Voiceclip>(&newStruct, &newStruct2, offsetof(m_infos->table, voiceclip));
+	int32_t newStructId = CreateNewGeneric<Voiceclip>(&newStruct, &newStruct2, offsetofVar(m_infos->table, voiceclip));
 	return newStructId;
 }
 
@@ -181,7 +180,7 @@ int32_t EditorT7::CreateNewCancelExtra()
 {
 	CancelExtradata newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<CancelExtradata>(&newStruct, nullptr, offsetof(m_infos->table, cancelExtradata));
+	int32_t newStructId = CreateNewGeneric<CancelExtradata>(&newStruct, nullptr, offsetofVar(m_infos->table, cancelExtradata));
 	return newStructId;
 }
 
@@ -192,7 +191,7 @@ int32_t EditorT7::CreateNewCancelList()
 
 	newStruct2.command = constants[EditorConstants_CancelCommandEnd];
 
-	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetof(m_infos->table, cancel));
+	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetofVar(m_infos->table, cancel));
 	return newStructId;
 }
 
@@ -203,7 +202,7 @@ int32_t EditorT7::CreateNewGroupedCancelList()
 
 	newStruct2.command = constants[EditorConstants_GroupedCancelCommandEnd];
 
-	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetof(m_infos->table, groupCancel));
+	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetofVar(m_infos->table, groupCancel));
 	return newStructId;
 }
 
@@ -211,7 +210,7 @@ int32_t EditorT7::CreateNewThrowCamera()
 {
 	ThrowCamera newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<ThrowCamera>(&newStruct, nullptr, offsetof(m_infos->table, throwCameras));
+	int32_t newStructId = CreateNewGeneric<ThrowCamera>(&newStruct, nullptr, offsetofVar(m_infos->table, throwCameras));
 	return newStructId;
 }
 
@@ -219,7 +218,7 @@ int32_t EditorT7::CreateNewCameraData()
 {
 	CameraData newStruct{ 0 };
 
-	int32_t newStructId = CreateNewGeneric<CameraData>(&newStruct, nullptr, offsetof(m_infos->table, cameraData));
+	int32_t newStructId = CreateNewGeneric<CameraData>(&newStruct, nullptr, offsetofVar(m_infos->table, cameraData));
 	return newStructId;
 }
 
@@ -229,7 +228,7 @@ int32_t EditorT7::CreateNewMove()
 	const size_t moveNameSize = strlen(moveName) + 1;
 	const size_t structSize = sizeof(Move);
 
-	const uint16_t moveId = m_infos->table.moveCount;
+	const uint16_t moveId = (uint16_t)m_infos->table.moveCount;
 
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;

@@ -27,8 +27,8 @@ static int GetAnimationDuration(const char* filename)
 
 	file.read(buf, 8);
 	if (file.gcount() == 8) {
-		byte animType = buf[0];
-		byte boneCount = buf[2];
+		Byte animType = buf[0];
+		Byte boneCount = buf[2];
 
 		switch (animType)
 		{
@@ -104,7 +104,7 @@ void EditorMove_Animations::LoadAnimationList()
 		}
 
 		std::string characterFolder = directory.path().string();
-		std::string characterName = characterFolder.substr(characterFolder.find_last_of('/\\') + 1);
+		std::string characterName = characterFolder.substr(characterFolder.find_last_of("/\\"));
 
 		AnimationLibChar* charAnims = new AnimationLibChar;
 		charAnims->name = characterName;
@@ -127,7 +127,7 @@ void EditorMove_Animations::LoadAnimationList()
 				continue;
 			}
 
-			std::string name = filename.substr(filename.find_last_of('/\\') + 1);
+			std::string name = filename.substr(filename.find_last_of("/\\") + 1);
 			name = name.substr(0, name.find_last_of('.'));
 			std::string lowercaseName = name;
 			std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);

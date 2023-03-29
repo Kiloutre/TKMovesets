@@ -125,6 +125,41 @@ namespace EditorUtils
 		}
 		return (uint64_t)strtoll(buffer, nullptr, 10);
 	}
+
+	void SetMemberValue(void* memberPtr, EditorInput* field)
+	{
+		const char* buffer = field->buffer;
+		auto& flags = field->flags;
+		uint64_t value = 0;
+
+		if (flags & EditorInput_Hex) {
+			value = (uint64_t)strtoll(buffer, nullptr, 16);
+		}
+		else if (flags & EditorInput_Float) {
+			union fieldValue {
+				uint32_t uint32 = 0;
+				float floatingPoint;
+			} bufferValue;
+			bufferValue.floatingPoint = (float)std::atof(buffer);
+			value = bufferValue.uint32;
+		}
+		else {
+			value = (uint64_t)strtoll(buffer, nullptr, 10);
+		}
+
+		if (flags & EditorInput_64b) {
+			*(uint64_t*)memberPtr = value;
+		}
+		else if (flags & EditorInput_32b) {
+			*(uint32_t*)memberPtr = value;
+		}
+		else if (flags & EditorInput_16b) {
+			*(uint16_t*)memberPtr = value;
+		}
+		else {
+			throw;
+		}
+	}
 }
 
 const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)

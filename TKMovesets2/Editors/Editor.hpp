@@ -123,6 +123,9 @@ enum EditorInputFlag_
 	EditorInput_Signed       = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16),
 	EditorInput_Hex          = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16),
 	EditorInput_Interactable = (EditorInput_Clickable | EditorInput_ClickableAlways),
+	EditorInput_64b          = (EditorInput_U64 | EditorInput_S64 | EditorInput_H64),
+	EditorInput_32b          = (EditorInput_U32 | EditorInput_S32 | EditorInput_H32 | EditorInput_Float),
+	EditorInput_16b          = (EditorInput_U16 | EditorInput_S16 | EditorInput_H16),
 };
 
 struct EditorInput
@@ -207,6 +210,8 @@ namespace EditorUtils
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags);
 	// Returns an field value, parsing it as a hex or regular int depending on the type
 	uint64_t GetFieldValue(EditorInput* field);
+	// Sets a struct member value according to a field's buffer, parsing it correctly according to its type
+	void SetMemberValue(void* memberPtr, EditorInput* field);
 }
 
 class DLLCONTENT Editor
@@ -224,7 +229,7 @@ protected:
 	// Contains the size of the moveset, including our own header
 	uint64_t m_movesetSize = 0;
 	// Contains the moveset, without our header
-	byte* m_movesetData = nullptr;
+	Byte* m_movesetData = nullptr;
 	// Contains the moveset size, without our header
 	uint64_t m_movesetDataSize = 0;
 

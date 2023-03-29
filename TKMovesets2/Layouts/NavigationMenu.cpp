@@ -30,13 +30,13 @@ const LangSelect cg_languages[] = {
 
 // -- Private methods -- //
 
-void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, int width)
+void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width)
 {
 	for (size_t i = 0; i < count; ++i)
 	{
 		ImGui::Spacing();
 		NavMenuBtn navBtn = c_btns[i];
-		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId != navBtn.id, ImVec2(width, 30))) {
+		if (ImGuiExtra::RenderButtonEnabled(_(navBtn.c_name), menuId != navBtn.id, ImVec2(width, 30.0f))) {
 			menuId = navBtn.id;
 		}
 	}
@@ -56,7 +56,7 @@ NavigationMenu::NavigationMenu()
 	}
 }
 
-void NavigationMenu::Render(int width)
+void NavigationMenu::Render(float width)
 {
 	ImGui::SeparatorText(_("navmenu.category_moveset"));
 	RenderBtnList(cg_moveset_btns, _countof(cg_moveset_btns), width);

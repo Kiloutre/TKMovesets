@@ -1,5 +1,7 @@
 #include "Editor_t7.hpp"
 
+#include "helpers.hpp"
+
 // Live edition callbacks that will only be called if live edition is enabled, the moveset is loaded in memory AND if the modified field is valid
 
 void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
@@ -263,7 +265,7 @@ void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 			m_process->writeInt32(prop + offsetof(ExtraMoveProperty, value_unsigned), (int32_t)atoi(field->buffer));
 		}
 		else if (name == "value_float") {
-			m_process->writeFloat(prop + offsetof(ExtraMoveProperty, value_unsigned), atof(field->buffer));
+			m_process->writeFloat(prop + offsetof(ExtraMoveProperty, value_unsigned), (float)atof(field->buffer));
 		}
 	}
 }

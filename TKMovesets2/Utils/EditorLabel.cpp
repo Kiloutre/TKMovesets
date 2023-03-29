@@ -71,7 +71,7 @@ void EditorLabel::LoadFile(const char* dataString, const char* name)
 			}
 		}
 
-		int key = strtoll(keyStr.c_str(), nullptr, 0);
+		int key = (int)strtoll(keyStr.c_str(), nullptr, 0);
 		m_labels[key] = value;
 	}
 }

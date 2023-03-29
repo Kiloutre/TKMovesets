@@ -108,7 +108,7 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 	uint16_t currentCharacterId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_chara_id_offset"));
 
 	Requirement* requirement = (Requirement*)(moveset + header.offsets.movesetBlock + offsets->requirement);
-	const int c_characterIdCondition = m_game->addrFile->GetSingleValue("val:t7_character_id_condition");
+	const int c_characterIdCondition = (int)m_game->addrFile->GetSingleValue("val:t7_character_id_condition");
 
 	for (size_t i = 0; i < offsets->requirementCount; ++i)
 	{

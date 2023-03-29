@@ -52,7 +52,7 @@ void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto pushbackExtra = m_iterators.pushback_extras[id];
 
-	pushbackExtra->horizontal_offset = GetFieldValue(inputs["horizontal_offset"]);
+	SetMemberValue(&pushbackExtra->horizontal_offset, inputs["horizontal_offset"]);
 }
 
 // ===== Pushback ===== //
@@ -94,10 +94,10 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 {
 	auto pushback = m_iterators.pushbacks[id];
 
-	pushback->duration = GetFieldValue(inputs["duration"]);
-	pushback->displacement = GetFieldValue(inputs["displacement"]);
-	pushback->num_of_loops = GetFieldValue(inputs["num_of_loops"]);
-	pushback->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
+	SetMemberValue(&pushback->duration, inputs["duration"]);
+	SetMemberValue(&pushback->displacement, inputs["displacement"]);
+	SetMemberValue(&pushback->num_of_loops, inputs["num_of_loops"]);
+	SetMemberValue(&pushback->extradata_addr, inputs["extradata_addr"]);
 }
 
 // ===== Projectile ===== //
@@ -183,48 +183,48 @@ void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& 
 {
 	auto projectile = m_iterators.projectiles[id];
 
-	projectile->vfx_id = GetFieldValue(inputs["vfx_id"]);
-	projectile->vfx_variation_id = GetFieldValue(inputs["vfx_variation_id"]);
-	projectile->delay = GetFieldValue(inputs["delay"]);
-	projectile->vertical_velocity = GetFieldValue(inputs["vertical_velocity"]);
-	projectile->horizontal_velocity = GetFieldValue(inputs["horizontal_velocity"]);
-	projectile->duration = GetFieldValue(inputs["duration"]);
-	projectile->no_collision = GetFieldValue(inputs["no_collision"]);
-	projectile->size = GetFieldValue(inputs["size"]);
-	projectile->hit_level = GetFieldValue(inputs["hit_level"]);
-	projectile->voiceclip_on_hit = GetFieldValue(inputs["voiceclip_on_hit"]);
-	projectile->can_hitbox_connect = GetFieldValue(inputs["can_hitbox_connect"]);
-	projectile->gravity = GetFieldValue(inputs["gravity"]);
+	SetMemberValue(&projectile->vfx_id, inputs["vfx_id"]);
+	SetMemberValue(&projectile->vfx_variation_id, inputs["vfx_variation_id"]);
+	SetMemberValue(&projectile->delay, inputs["delay"]);
+	SetMemberValue(&projectile->vertical_velocity, inputs["vertical_velocity"]);
+	SetMemberValue(&projectile->horizontal_velocity, inputs["horizontal_velocity"]);
+	SetMemberValue(&projectile->duration, inputs["duration"]);
+	SetMemberValue(&projectile->no_collision, inputs["no_collision"]);
+	SetMemberValue(&projectile->size, inputs["size"]);
+	SetMemberValue(&projectile->hit_level, inputs["hit_level"]);
+	SetMemberValue(&projectile->voiceclip_on_hit, inputs["voiceclip_on_hit"]);
+	SetMemberValue(&projectile->can_hitbox_connect, inputs["can_hitbox_connect"]);
+	SetMemberValue(&projectile->gravity, inputs["gravity"]);
 
-	projectile->hit_condition_addr = GetFieldValue(inputs["hit_condition_addr"]);
-	projectile->cancel_addr = GetFieldValue(inputs["cancel_addr"]);
+	SetMemberValue(&projectile->hit_condition_addr, inputs["hit_condition_addr"]);
+	SetMemberValue(&projectile->cancel_addr, inputs["cancel_addr"]);
 
-	projectile->_0x34_int = GetFieldValue(inputs["_0x34_int"]);
-	projectile->_0x4_int = GetFieldValue(inputs["_0x4_int"]);
-	projectile->_0xC_int = GetFieldValue(inputs["_0xC_int"]);
-	projectile->_0x10_int = GetFieldValue(inputs["_0x10_int"]);
-	projectile->_0x14_int = GetFieldValue(inputs["_0x14_int"]);
-	projectile->_0x24_int = GetFieldValue(inputs["_0x24_int"]);
-	projectile->_0x3C_int[0] = GetFieldValue(inputs["_0x3C_int_1"]);
-	projectile->_0x3C_int[1] = GetFieldValue(inputs["_0x3C_int_2"]);
-	projectile->_0x3C_int[2] = GetFieldValue(inputs["_0x3C_int_3"]);
-	projectile->_0x3C_int[3] = GetFieldValue(inputs["_0x3C_int_4"]);
-	projectile->_0x3C_int[4] = GetFieldValue(inputs["_0x3C_int_5"]);
-	projectile->_0x3C_int[5] = GetFieldValue(inputs["_0x3C_int_6"]);
-	projectile->_0x58_int = GetFieldValue(inputs["_0x58_int"]);
-	projectile->_0x5C_int = GetFieldValue(inputs["_0x5C_int"]);
-	projectile->_0x70_int = GetFieldValue(inputs["_0x70_int"]);
-	projectile->_0x74_int = GetFieldValue(inputs["_0x74_int"]);
-	projectile->_0x7C_int = GetFieldValue(inputs["_0x7C_int"]);
-	projectile->_0x80_int = GetFieldValue(inputs["_0x80_int"]);
-	projectile->_0x88_int[0] = GetFieldValue(inputs["_0x88_int_1"]);
-	projectile->_0x88_int[1] = GetFieldValue(inputs["_0x88_int_2"]);
-	projectile->_0x88_int[2] = GetFieldValue(inputs["_0x88_int_3"]);
-	projectile->_0x88_int[3] = GetFieldValue(inputs["_0x88_int_4"]);
-	projectile->_0x88_int[4] = GetFieldValue(inputs["_0x88_int_5"]);
-	projectile->_0x88_int[5] = GetFieldValue(inputs["_0x88_int_6"]);
-	projectile->_0x88_int[6] = GetFieldValue(inputs["_0x88_int_7"]);
-	projectile->_0x88_int[7] = GetFieldValue(inputs["_0x88_int_8"]);
+	SetMemberValue(&projectile->_0x34_int, inputs["_0x34_int"]);
+	SetMemberValue(&projectile->_0x4_int, inputs["_0x4_int"]);
+	SetMemberValue(&projectile->_0xC_int, inputs["_0xC_int"]);
+	SetMemberValue(&projectile->_0x10_int, inputs["_0x10_int"]);
+	SetMemberValue(&projectile->_0x14_int, inputs["_0x14_int"]);
+	SetMemberValue(&projectile->_0x24_int, inputs["_0x24_int"]);
+	SetMemberValue(&projectile->_0x3C_int[0], inputs["_0x3C_int_1"]);
+	SetMemberValue(&projectile->_0x3C_int[1], inputs["_0x3C_int_2"]);
+	SetMemberValue(&projectile->_0x3C_int[2], inputs["_0x3C_int_3"]);
+	SetMemberValue(&projectile->_0x3C_int[3], inputs["_0x3C_int_4"]);
+	SetMemberValue(&projectile->_0x3C_int[4], inputs["_0x3C_int_5"]);
+	SetMemberValue(&projectile->_0x3C_int[5], inputs["_0x3C_int_6"]);
+	SetMemberValue(&projectile->_0x58_int, inputs["_0x58_int"]);
+	SetMemberValue(&projectile->_0x5C_int, inputs["_0x5C_int"]);
+	SetMemberValue(&projectile->_0x70_int, inputs["_0x70_int"]);
+	SetMemberValue(&projectile->_0x74_int, inputs["_0x74_int"]);
+	SetMemberValue(&projectile->_0x7C_int, inputs["_0x7C_int"]);
+	SetMemberValue(&projectile->_0x80_int, inputs["_0x80_int"]);
+	SetMemberValue(&projectile->_0x88_int[0], inputs["_0x88_int_1"]);
+	SetMemberValue(&projectile->_0x88_int[1], inputs["_0x88_int_2"]);
+	SetMemberValue(&projectile->_0x88_int[2], inputs["_0x88_int_3"]);
+	SetMemberValue(&projectile->_0x88_int[3], inputs["_0x88_int_4"]);
+	SetMemberValue(&projectile->_0x88_int[4], inputs["_0x88_int_5"]);
+	SetMemberValue(&projectile->_0x88_int[5], inputs["_0x88_int_6"]);
+	SetMemberValue(&projectile->_0x88_int[6], inputs["_0x88_int_7"]);
+	SetMemberValue(&projectile->_0x88_int[7], inputs["_0x88_int_8"]);
 }
 
 // ===== Input Sequence  ===== //
@@ -266,10 +266,10 @@ void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto sequence = m_iterators.input_sequences[id];
 
-	sequence->input_window_frames = GetFieldValue(inputs["input_window_frames"]);
-	sequence->input_amount = GetFieldValue(inputs["input_amount"]);
-	sequence->_0x4_int = GetFieldValue(inputs["_0x4_int"]);
-	sequence->input_addr = GetFieldValue(inputs["input_addr"]);
+	SetMemberValue(&sequence->input_window_frames, inputs["input_window_frames"]);
+	SetMemberValue(&sequence->input_amount, inputs["input_amount"]);
+	SetMemberValue(&sequence->_0x4_int, inputs["_0x4_int"]);
+	SetMemberValue(&sequence->input_addr, inputs["input_addr"]);
 }
 
 // ===== Inputs ===== //
@@ -303,8 +303,8 @@ void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& input
 {
 	auto input = m_iterators.inputs.begin() + id;
 
-	input->direction = GetFieldValue(inputs["direction"]);
-	input->button = GetFieldValue(inputs["button"]);
+	SetMemberValue(&input->direction, inputs["direction"]);
+	SetMemberValue(&input->button, inputs["button"]);
 }
 
 // ===== Throw cameras ===== //
@@ -344,8 +344,8 @@ void EditorT7::SaveThrowCamera(uint16_t id, std::map<std::string, EditorInput*>&
 {
 	auto throwCamera = m_iterators.throw_datas[id];
 
-	throwCamera->_0x0_llong = GetFieldValue(inputs["_0x0_int"]);
-	throwCamera->cameradata_addr = GetFieldValue(inputs["cameradata_addr"]);
+	SetMemberValue(&throwCamera->_0x0_llong, inputs["_0x0_int"]);
+	SetMemberValue(&throwCamera->cameradata_addr, inputs["cameradata_addr"]);
 }
 
 // ===== Camera data ===== //
@@ -375,11 +375,11 @@ void EditorT7::SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& 
 {
 	auto cameraData = m_iterators.camera_datas[id];
 
-	cameraData->_0x0_int = GetFieldValue(inputs["_0x0_int"]);
-	cameraData->_0x4_short = GetFieldValue(inputs["_0x4_short"]);
-	cameraData->left_side_camera_data = GetFieldValue(inputs["left_side_camera_data"]);
-	cameraData->right_side_camera_data = GetFieldValue(inputs["right_side_camera_data"]);
-	cameraData->_0xA_short = GetFieldValue(inputs["_0xA_short"]);
+	SetMemberValue(&cameraData->_0x0_int, inputs["_0x0_int"]);
+	SetMemberValue(&cameraData->_0x4_short, inputs["_0x4_short"]);
+	SetMemberValue(&cameraData->left_side_camera_data, inputs["left_side_camera_data"]);
+	SetMemberValue(&cameraData->right_side_camera_data, inputs["right_side_camera_data"]);
+	SetMemberValue(&cameraData->_0xA_short, inputs["_0xA_short"]);
 }
 
 
@@ -467,40 +467,40 @@ void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& i
 {
 	auto reaction = m_iterators.reactions[id];
 
-	reaction->front_pushback = GetFieldValue(inputs["front_pushback"]);
-	reaction->backturned_pushback = GetFieldValue(inputs["backturned_pushback"]);
-	reaction->left_side_pushback = GetFieldValue(inputs["left_side_pushback"]);
-	reaction->right_side_pushback = GetFieldValue(inputs["right_side_pushback"]);
-	reaction->front_counterhit_pushback = GetFieldValue(inputs["front_counterhit_pushback"]);
-	reaction->downed_pushback = GetFieldValue(inputs["downed_pushback"]);
-	reaction->block_pushback = GetFieldValue(inputs["block_pushback"]);
+	SetMemberValue(&reaction->front_pushback, inputs["front_pushback"]);
+	SetMemberValue(&reaction->backturned_pushback, inputs["backturned_pushback"]);
+	SetMemberValue(&reaction->left_side_pushback, inputs["left_side_pushback"]);
+	SetMemberValue(&reaction->right_side_pushback, inputs["right_side_pushback"]);
+	SetMemberValue(&reaction->front_counterhit_pushback, inputs["front_counterhit_pushback"]);
+	SetMemberValue(&reaction->downed_pushback, inputs["downed_pushback"]);
+	SetMemberValue(&reaction->block_pushback, inputs["block_pushback"]);
 
-	reaction->front_direction = GetFieldValue(inputs["front_direction"]);
-	reaction->back_direction = GetFieldValue(inputs["back_direction"]);
-	reaction->left_side_direction = GetFieldValue(inputs["left_side_direction"]);
-	reaction->right_side_direction = GetFieldValue(inputs["right_side_direction"]);
-	reaction->front_counterhit_direction = GetFieldValue(inputs["front_counterhit_direction"]);
-	reaction->downed_direction = GetFieldValue(inputs["downed_direction"]);
+	SetMemberValue(&reaction->front_direction, inputs["front_direction"]);
+	SetMemberValue(&reaction->back_direction, inputs["back_direction"]);
+	SetMemberValue(&reaction->left_side_direction, inputs["left_side_direction"]);
+	SetMemberValue(&reaction->right_side_direction, inputs["right_side_direction"]);
+	SetMemberValue(&reaction->front_counterhit_direction, inputs["front_counterhit_direction"]);
+	SetMemberValue(&reaction->downed_direction, inputs["downed_direction"]);
 
-	reaction->default_moveid = GetFieldValue(inputs["default_moveid"]);
-	reaction->standing_moveid = GetFieldValue(inputs["standing_moveid"]);
-	reaction->crouch_moveid = GetFieldValue(inputs["crouch_moveid"]);
-	reaction->counterhit_moveid = GetFieldValue(inputs["counterhit_moveid"]);
-	reaction->crouch_counterhit_moveid = GetFieldValue(inputs["crouch_counterhit_moveid"]);
-	reaction->left_side_moveid = GetFieldValue(inputs["left_side_moveid"]);
-	reaction->crouch_left_side_moveid = GetFieldValue(inputs["crouch_left_side_moveid"]);
-	reaction->right_side_moveid = GetFieldValue(inputs["right_side_moveid"]);
-	reaction->crouch_right_side_moveid = GetFieldValue(inputs["crouch_right_side_moveid"]);
-	reaction->backturned_moveid = GetFieldValue(inputs["backturned_moveid"]);
-	reaction->crouch_backturned_moveid = GetFieldValue(inputs["crouch_backturned_moveid"]);
-	reaction->block_moveid = GetFieldValue(inputs["block_moveid"]);
-	reaction->crouch_block_moveid = GetFieldValue(inputs["crouch_block_moveid"]);
-	reaction->wallslump_moveid = GetFieldValue(inputs["wallslump_moveid"]);
-	reaction->downed_moveid = GetFieldValue(inputs["downed_moveid"]);
+	SetMemberValue(&reaction->default_moveid, inputs["default_moveid"]);
+	SetMemberValue(&reaction->standing_moveid, inputs["standing_moveid"]);
+	SetMemberValue(&reaction->crouch_moveid, inputs["crouch_moveid"]);
+	SetMemberValue(&reaction->counterhit_moveid, inputs["counterhit_moveid"]);
+	SetMemberValue(&reaction->crouch_counterhit_moveid, inputs["crouch_counterhit_moveid"]);
+	SetMemberValue(&reaction->left_side_moveid, inputs["left_side_moveid"]);
+	SetMemberValue(&reaction->crouch_left_side_moveid, inputs["crouch_left_side_moveid"]);
+	SetMemberValue(&reaction->right_side_moveid, inputs["right_side_moveid"]);
+	SetMemberValue(&reaction->crouch_right_side_moveid, inputs["crouch_right_side_moveid"]);
+	SetMemberValue(&reaction->backturned_moveid, inputs["backturned_moveid"]);
+	SetMemberValue(&reaction->crouch_backturned_moveid, inputs["crouch_backturned_moveid"]);
+	SetMemberValue(&reaction->block_moveid, inputs["block_moveid"]);
+	SetMemberValue(&reaction->crouch_block_moveid, inputs["crouch_block_moveid"]);
+	SetMemberValue(&reaction->wallslump_moveid, inputs["wallslump_moveid"]);
+	SetMemberValue(&reaction->downed_moveid, inputs["downed_moveid"]);
 
-	reaction->vertical_pushback = GetFieldValue(inputs["vertical_pushback"]);
-	reaction->_0x44_int = GetFieldValue(inputs["_0x44_int"]);
-	reaction->_0x48_int = GetFieldValue(inputs["_0x48_int"]);
+	SetMemberValue(&reaction->vertical_pushback, inputs["vertical_pushback"]);
+	SetMemberValue(&reaction->_0x44_int, inputs["_0x44_int"]);
+	SetMemberValue(&reaction->_0x48_int, inputs["_0x48_int"]);
 }
 
 // ===== Hit conditions ===== //
@@ -528,7 +528,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 		WriteFieldFullname(inputMap, "hit_condition");
 		inputListMap.push_back(inputMap);
 
-		if (req[hitCondition->requirements_addr].condition == constants[EditorConstants_RequirementEnd]) {
+		if (req[(unsigned int)hitCondition->requirements_addr].condition == constants[EditorConstants_RequirementEnd]) {
 			break;
 		}
 
@@ -542,10 +542,10 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 {
 	auto hitCondition = m_iterators.hit_conditions[id];
 
-	hitCondition->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
-	hitCondition->damage = GetFieldValue(inputs["damage"]);
-	hitCondition->_0xC_int = GetFieldValue(inputs["_0xC_int"]);
-	hitCondition->reactions_addr = GetFieldValue(inputs["reactions_addr"]);
+	SetMemberValue(&hitCondition->requirements_addr, inputs["requirements_addr"]);
+	SetMemberValue(&hitCondition->damage, inputs["damage"]);
+	SetMemberValue(&hitCondition->_0xC_int, inputs["_0xC_int"]);
+	SetMemberValue(&hitCondition->reactions_addr, inputs["reactions_addr"]);
 }
 
 bool EditorT7::ValidateHitConditionField(EditorInput* field)
@@ -597,8 +597,8 @@ void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>&
 {
 	auto req = m_iterators.requirements[id];
 
-	req->condition = GetFieldValue(inputs["condition"]);
-	req->param = GetFieldValue(inputs["param"]);
+	SetMemberValue(&req->condition, inputs["condition"]);
+	SetMemberValue(&req->param, inputs["param"]);
 }
 
 // ===== Cancel Extradata ===== //
@@ -623,7 +623,7 @@ void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>&
 {
 	auto cancelExtra = m_iterators.cancel_extras[id];
 
-	cancelExtra->value = GetFieldValue(inputs["value"]);
+	SetMemberValue(&cancelExtra->value, inputs["value"]);
 }
 
 // ===== Cancel ===== //
@@ -632,7 +632,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;
 
-	auto cancel= m_iterators.cancels.begin() + id;
+	auto cancel = m_iterators.cancels.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -654,7 +654,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
 	} while ((cancel++)->command != constants[EditorConstants_CancelCommandEnd]);
-	
+
 	return inputListMap;
 }
 
@@ -662,14 +662,14 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 {
 	auto cancel = m_iterators.cancels[id];
 
-	cancel->command = GetFieldValue(inputs["command"]);
-	cancel->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
-	cancel->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
-	cancel->detection_start = GetFieldValue(inputs["detection_start"]);
-	cancel->detection_end = GetFieldValue(inputs["detection_end"]);
-	cancel->starting_frame = GetFieldValue(inputs["starting_frame"]);
-	cancel->move_id = GetFieldValue(inputs["move_id"]);
-	cancel->cancel_option = GetFieldValue(inputs["cancel_option"]);
+	SetMemberValue(&cancel->command, inputs["command"]);
+	SetMemberValue(&cancel->requirements_addr, inputs["requirements_addr"]);
+	SetMemberValue(&cancel->extradata_addr, inputs["extradata_addr"]);
+	SetMemberValue(&cancel->detection_start, inputs["detection_start"]);
+	SetMemberValue(&cancel->detection_end, inputs["detection_end"]);
+	SetMemberValue(&cancel->starting_frame, inputs["starting_frame"]);
+	SetMemberValue(&cancel->move_id, inputs["move_id"]);
+	SetMemberValue(&cancel->cancel_option, inputs["cancel_option"]);
 }
 
 bool EditorT7::ValidateCancelField(EditorInput* field)
@@ -681,7 +681,8 @@ bool EditorT7::ValidateCancelField(EditorInput* field)
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.requirementCount;
-	} else if (name == "extradata_addr") {
+	}
+	else if (name == "extradata_addr") {
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
 		return 0 <= listIdx && listIdx < (int)m_infos->table.cancelExtradataCount;
@@ -689,7 +690,7 @@ bool EditorT7::ValidateCancelField(EditorInput* field)
 	else if (name == "command") {
 		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16) & 0xFFFFFFFF;
 		if (command >= constants[EditorConstants_InputSequenceCommandStart]) {
-			int listIdx = command - constants[EditorConstants_InputSequenceCommandStart];
+			int listIdx = (unsigned int)(command - constants[EditorConstants_InputSequenceCommandStart]);
 			return listIdx < (int)m_infos->table.inputCount;
 		}
 	}
@@ -733,14 +734,14 @@ void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto cancel = m_iterators.grouped_cancels[id];
 
-	cancel->command = GetFieldValue(inputs["command"]);
-	cancel->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
-	cancel->extradata_addr = GetFieldValue(inputs["extradata_addr"]);
-	cancel->detection_start = GetFieldValue(inputs["detection_start"]);
-	cancel->detection_end = GetFieldValue(inputs["detection_end"]);
-	cancel->starting_frame = GetFieldValue(inputs["starting_frame"]);
-	cancel->move_id = GetFieldValue(inputs["move_id"]);
-	cancel->cancel_option = GetFieldValue(inputs["cancel_option"]);
+	SetMemberValue(&cancel->command, inputs["command"]);
+	SetMemberValue(&cancel->requirements_addr, inputs["requirements_addr"]);
+	SetMemberValue(&cancel->extradata_addr, inputs["extradata_addr"]);
+	SetMemberValue(&cancel->detection_start, inputs["detection_start"]);
+	SetMemberValue(&cancel->detection_end, inputs["detection_end"]);
+	SetMemberValue(&cancel->starting_frame, inputs["starting_frame"]);
+	SetMemberValue(&cancel->move_id, inputs["move_id"]);
+	SetMemberValue(&cancel->cancel_option, inputs["cancel_option"]);
 }
 
 bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
@@ -813,9 +814,9 @@ void EditorT7::SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorIn
 {
 	auto prop = m_iterators.move_start_properties[id];
 
-	prop->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
-	prop->extraprop = GetFieldValue(inputs["extraprop"]);
-	prop->value = GetFieldValue(inputs["value"]);
+	SetMemberValue(&prop->requirements_addr, inputs["requirements_addr"]);
+	SetMemberValue(&prop->extraprop, inputs["extraprop"]);
+	SetMemberValue(&prop->value, inputs["value"]);
 }
 
 // ===== Other move properties (end) ===== //
@@ -849,9 +850,9 @@ void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInpu
 {
 	auto prop = m_iterators.move_end_properties[id];
 
-	prop->requirements_addr = GetFieldValue(inputs["requirements_addr"]);
-	prop->extraprop = GetFieldValue(inputs["extraprop"]);
-	prop->value = GetFieldValue(inputs["value"]);
+	SetMemberValue(&prop->requirements_addr, inputs["requirements_addr"]);
+	SetMemberValue(&prop->extraprop, inputs["extraprop"]);
+	SetMemberValue(&prop->value, inputs["value"]);
 }
 
 bool EditorT7::ValidateOtherMoveProperty(EditorInput* field)
@@ -890,7 +891,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->starting_frame != 0);
+	} while ((prop++)->id != 0);
 
 	return inputListMap;
 }
@@ -899,9 +900,9 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 {
 	auto prop = m_iterators.extra_move_properties[id];
 
-	prop->starting_frame = GetFieldValue(inputs["starting_frame"]);
-	prop->id = GetFieldValue(inputs["id"]);
-	prop->value_unsigned = GetFieldValue(inputs["value_unsigned"]);
+	SetMemberValue(&prop->starting_frame, inputs["starting_frame"]);
+	SetMemberValue(&prop->id, inputs["id"]);
+	SetMemberValue(&prop->value_unsigned, inputs["value_unsigned"]);
 }
 
 // ===== Voiceclips ===== //
@@ -924,7 +925,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetVoiceclipListInput
 
 		WriteFieldFullname(inputMap, "voiceclip");
 		inputListMap.push_back(inputMap);
-	} while ((voiceclip++)->id != (uint32_t)- 1);
+	} while ((voiceclip++)->id != (uint32_t)-1);
 
 	return inputListMap;
 }
@@ -934,7 +935,7 @@ void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& i
 {
 	auto voiceclip = m_iterators.voiceclips[id];
 
-	voiceclip->id = GetFieldValue(inputs["id"]);
+	SetMemberValue(&voiceclip->id, inputs["id"]);
 }
 
 // ===== MOVES ===== //
@@ -964,12 +965,12 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("airborne_start", 0, EditorInput_U32, move->airborne_start);
 	CREATE_FIELD("airborne_end", 0, EditorInput_U32, move->airborne_end);
 	CREATE_FIELD("ground_fall", 0, EditorInput_U32, move->ground_fall);
-	CREATE_FIELD("hitbox_location", 0 , EditorInput_H32, move->hitbox_location);
+	CREATE_FIELD("hitbox_location", 0, EditorInput_H32, move->hitbox_location);
 	CREATE_FIELD("first_active_frame", 0, EditorInput_U32, move->first_active_frame);
 	CREATE_FIELD("last_active_frame", 0, EditorInput_U32, move->last_active_frame);
 	CREATE_FIELD("distance", 0, EditorInput_U16, move->distance);
 
-	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR,  move->cancel_addr);
+	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR, move->cancel_addr);
 	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, move->hit_condition_addr);
 	CREATE_FIELD("extra_properties_addr", 2, EditorInput_PTR, move->extra_move_property_addr);
 	CREATE_FIELD("move_start_extraprop_addr", 2, EditorInput_PTR, move->move_start_extraprop_addr);
@@ -1079,7 +1080,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	newMovesetSize = movelistStartOffset + (m_movesetSize - orig_movelistStartOffset);
 	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
-		return ;
+		return;
 	}
 
 	// Shift offsets in the moveset table & in our header
@@ -1095,7 +1096,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	memcpy(newMoveset, m_moveset, moveNameOffset);
 
 	// Write our new name
-	strcpy((char*)newMoveset + moveNameOffset, moveName);
+	strcpy_s((char*)newMoveset + moveNameOffset, strlen(moveName) + 1, moveName);
 
 	// Copy all the data after new name until the end of the name block
 	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, orig_movelistStartOffset - orig_moveNameEndOffset);
@@ -1124,42 +1125,42 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 {
 	auto move = m_iterators.moves[id];
 
-	move->vuln = GetFieldValue(inputs["vulnerability"]);
-	move->hitlevel = GetFieldValue(inputs["hitlevel"]);
-	move->transition = GetFieldValue(inputs["transition"]);
-	move->moveId_val1 = GetFieldValue(inputs["moveId_val1"]);
-	move->moveId_val2 = GetFieldValue(inputs["moveId_val2"]);
-	move->anim_len = GetFieldValue(inputs["anim_len"]);
-	move->airborne_start = GetFieldValue(inputs["airborne_start"]);
-	move->airborne_end = GetFieldValue(inputs["airborne_end"]);
-	move->ground_fall = GetFieldValue(inputs["ground_fall"]);
-	move->hitbox_location = GetFieldValue(inputs["hitbox_location"]);
-	move->last_active_frame = GetFieldValue(inputs["last_active_frame"]);
-	move->last_active_frame = GetFieldValue(inputs["last_active_frame"]);
-	move->distance = GetFieldValue(inputs["distance"]);
+	SetMemberValue(&move->vuln, inputs["vulnerability"]);
+	SetMemberValue(&move->hitlevel, inputs["hitlevel"]);
+	SetMemberValue(&move->transition, inputs["transition"]);
+	SetMemberValue(&move->moveId_val1, inputs["moveId_val1"]);
+	SetMemberValue(&move->moveId_val2, inputs["moveId_val2"]);
+	SetMemberValue(&move->anim_len, inputs["anim_len"]);
+	SetMemberValue(&move->airborne_start, inputs["airborne_start"]);
+	SetMemberValue(&move->airborne_end, inputs["airborne_end"]);
+	SetMemberValue(&move->ground_fall, inputs["ground_fall"]);
+	SetMemberValue(&move->hitbox_location, inputs["hitbox_location"]);
+	SetMemberValue(&move->last_active_frame, inputs["last_active_frame"]);
+	SetMemberValue(&move->last_active_frame, inputs["last_active_frame"]);
+	SetMemberValue(&move->distance, inputs["distance"]);
 
-	move->cancel_addr = GetFieldValue(inputs["cancel_addr"]);
-	move->hit_condition_addr = GetFieldValue(inputs["hit_condition_addr"]);
-	move->extra_move_property_addr = GetFieldValue(inputs["extra_properties_addr"]);
-	move->move_start_extraprop_addr = GetFieldValue(inputs["move_start_extraprop_addr"]);
-	move->move_end_extraprop_addr = GetFieldValue(inputs["move_end_extraprop_addr"]);
-	move->voicelip_addr = GetFieldValue(inputs["voiceclip_addr"]);
+	SetMemberValue(&move->cancel_addr, inputs["cancel_addr"]);
+	SetMemberValue(&move->hit_condition_addr, inputs["hit_condition_addr"]);
+	SetMemberValue(&move->extra_move_property_addr, inputs["extra_properties_addr"]);
+	SetMemberValue(&move->move_start_extraprop_addr, inputs["move_start_extraprop_addr"]);
+	SetMemberValue(&move->move_end_extraprop_addr, inputs["move_end_extraprop_addr"]);
+	SetMemberValue(&move->voicelip_addr, inputs["voiceclip_addr"]);
 
-	move->_0x28_cancel_addr = GetFieldValue(inputs["cancel_addr_2"]);
-	move->_0x30_int__0x28_related = GetFieldValue(inputs["cancel_related_id_2"]);
-	move->_0x38_cancel_addr = GetFieldValue(inputs["cancel_addr_3"]);
-	move->_0x40_int__0x38_related = GetFieldValue(inputs["cancel_related_id_3"]);
-	move->_0x48_cancel_addr = GetFieldValue(inputs["cancel_addr_4"]);
-	move->_0x50_int__0x48_related = GetFieldValue(inputs["cancel_related_id_4"]);
+	SetMemberValue(&move->_0x28_cancel_addr, inputs["cancel_addr_2"]);
+	SetMemberValue(&move->_0x30_int__0x28_related, inputs["cancel_related_id_2"]);
+	SetMemberValue(&move->_0x38_cancel_addr, inputs["cancel_addr_3"]);
+	SetMemberValue(&move->_0x40_int__0x38_related, inputs["cancel_related_id_3"]);
+	SetMemberValue(&move->_0x48_cancel_addr, inputs["cancel_addr_4"]);
+	SetMemberValue(&move->_0x50_int__0x48_related, inputs["cancel_related_id_4"]);
 
-	move->_0x34_int = GetFieldValue(inputs["_0x34_int"]);
-	move->_0x44_int = GetFieldValue(inputs["_0x44_int"]);
-	move->_0x56_short = GetFieldValue(inputs["_0x56_short"]);
-	move->_0x5C_short = GetFieldValue(inputs["_0x5C_short"]);
-	move->_0x5E_short = GetFieldValue(inputs["_0x5E_short"]);
-	move->_0x98_int = GetFieldValue(inputs["_0x98_int"]);
-	move->_0xA8_short = GetFieldValue(inputs["_0xA8_short"]);
-	move->_0xAC_short = GetFieldValue(inputs["_0xAC_short"]);
+	SetMemberValue(&move->_0x34_int, inputs["_0x34_int"]);
+	SetMemberValue(&move->_0x44_int, inputs["_0x44_int"]);
+	SetMemberValue(&move->_0x56_short, inputs["_0x56_short"]);
+	SetMemberValue(&move->_0x5C_short, inputs["_0x5C_short"]);
+	SetMemberValue(&move->_0x5E_short, inputs["_0x5E_short"]);
+	SetMemberValue(&move->_0x98_int, inputs["_0x98_int"]);
+	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
+	SetMemberValue(&move->_0xAC_short, inputs["_0xAC_short"]);
 
 	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end()) {
 		// Todo: if old animation is unused, delete it
@@ -1176,14 +1177,14 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 		SaveMoveName(newName, move->name_addr);
 	}
 	else {
-		strcpy(namePtr + move->name_addr, newName);
+		strcpy_s(namePtr + move->name_addr, strlen(newName) + 1, newName);
 	}
 
 	// In case we updated the name, reload the movelist display
 	ReloadDisplayableMoveList();
 }
 
-bool EditorT7::ValidateMoveField( EditorInput* field)
+bool EditorT7::ValidateMoveField(EditorInput* field)
 {
 	std::string& name = field->name;
 
@@ -1230,7 +1231,8 @@ bool EditorT7::ValidateMoveField( EditorInput* field)
 			if (moveId >= (0x8000 + m_aliases.size())) {
 				return false;
 			}
-		}else if (moveId < 0) {
+		}
+		else if (moveId < 0) {
 			return false;
 		}
 	}
@@ -1495,7 +1497,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
-	
+
 	for (size_t i = 0; i < m_infos->table.moveCount; ++i)
 	{
 		const char* animName = namePtr + movePtr[i].anim_name_addr;
@@ -1520,7 +1522,8 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 				namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
 				movePtr[i].anim_name_addr = newNameOffset;
 				animName = namePtr + movePtr[i].anim_name_addr;
-			} else {
+			}
+			else {
 				// Could not generate new name
 				throw std::exception();
 			}
@@ -1567,14 +1570,16 @@ void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
 		if (move->hitlevel || move->hitbox_location || move->first_active_frame || move->last_active_frame) {
 			if (move->hitlevel && move->hitbox_location && move->first_active_frame && move->last_active_frame) {
 				flags |= EditorMoveFlags_Attack;
-			} else {
+			}
+			else {
 				flags |= EditorMoveFlags_OtherAttack;
 			}
 		}
 
 		if (Helpers::endsWith(moveName, "_y")) {
 			flags |= EditorMoveFlags_Throw;
-		} else if (Helpers::endsWith(moveName, "_n")) {
+		}
+		else if (Helpers::endsWith(moveName, "_n")) {
 			flags |= EditorMoveFlags_ThrowReaction;
 		}
 
@@ -1590,7 +1595,7 @@ void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
 			.moveId = moveId,
 			.aliasId = aliasId,
 			.flags = flags,
-		});
+			});
 	}
 }
 
@@ -1686,7 +1691,7 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 	const Byte* baseAnimPtr = movesetData + offsets.animationBlock;
 	char const* namePtr = (char const*)(movesetData + offsets.nameBlock);
 
-	const int animCount = animOffsetToNameOffset.size();
+	const size_t animCount = animOffsetToNameOffset.size();
 	auto it = animOffsetToNameOffset.begin();
 	auto end = animOffsetToNameOffset.end();
 
@@ -1735,7 +1740,7 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 {
 	// Keep file name only
 	std::string animName_str = std::string(filepath);
-	animName_str = animName_str.substr(animName_str.find_last_of('/\\') + 1);
+	animName_str = animName_str.substr(animName_str.find_last_of("/\\") + 1);
 	animName_str = animName_str.substr(0, animName_str.find_last_of('.'));
 
 	Byte* anim;

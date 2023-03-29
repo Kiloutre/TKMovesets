@@ -38,7 +38,7 @@ static std::string getCommandString(uint64_t command)
 				if (retVal.size() != 0) {
 					retVal += "|";
 				}
-				retVal += cg_directionBitLabels[i - 1];
+				retVal += cg_directionBitLabels[(size_t)i - 1];
 			}
 		}
 
@@ -93,7 +93,7 @@ void EditorT7::GetInputSequenceString(int id, std::string& outStr, int& outSize)
 	auto inputSequence = m_iterators.input_sequences[id];
 	int inputAmount = inputSequence->input_amount;
 
-	auto input = m_iterators.inputs.begin() + inputSequence->input_addr;
+	auto input = m_iterators.inputs.begin() + (unsigned int)inputSequence->input_addr;
 
 	if (inputAmount > MAX_INPUT_SEQUENCE_SHORT_LEN || inputAmount == 0) {
 		outSize = inputAmount;
