@@ -38,7 +38,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetPushbackExtraListI
 	{
 		std::map<std::string, EditorInput*> inputMap;
 
-		CREATE_FIELD("horizontal_offset", 0, EditorInput_U16, pushbackExtra->horizontal_offset);
+		CREATE_FIELD("horizontal_offset", 0, EditorInput_U16_Changeable, pushbackExtra->horizontal_offset);
 
 		WriteFieldFullname(inputMap, "pushback_extradata");
 		inputListMap.push_back(inputMap);
@@ -68,7 +68,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("duration", 0, EditorInput_U16, pushback->duration);
-	CREATE_FIELD("displacement", 0, EditorInput_U16, pushback->displacement);
+	CREATE_FIELD("displacement", 0, EditorInput_U16_Changeable, pushback->displacement);
 	CREATE_FIELD("num_of_loops", 0, EditorInput_U32, pushback->num_of_loops);
 	CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, pushback->extradata_addr);
 
@@ -128,32 +128,32 @@ std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, V
 	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, projectile->hit_condition_addr);
 	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR, projectile->cancel_addr);
 
-	CREATE_FIELD("_0x4_int", 3, EditorInput_U32, projectile->_0x4_int);
-	CREATE_FIELD("_0xC_int", 3, EditorInput_U32, projectile->_0xC_int);
-	CREATE_FIELD("_0x10_int", 3, EditorInput_U32, projectile->_0x10_int);
-	CREATE_FIELD("_0x14_int", 3, EditorInput_U32, projectile->_0x14_int);
-	CREATE_FIELD("_0x24_int", 3, EditorInput_U32, projectile->_0x24_int);
-	CREATE_FIELD("_0x34_int", 3, EditorInput_U32, projectile->_0x34_int);
-	CREATE_FIELD("_0x3C_int_1", 3, EditorInput_U32, projectile->_0x3C_int[0]);
-	CREATE_FIELD("_0x3C_int_2", 3, EditorInput_U32, projectile->_0x3C_int[1]);
-	CREATE_FIELD("_0x3C_int_3", 3, EditorInput_U32, projectile->_0x3C_int[2]);
-	CREATE_FIELD("_0x3C_int_4", 3, EditorInput_U32, projectile->_0x3C_int[3]);
-	CREATE_FIELD("_0x3C_int_5", 3, EditorInput_U32, projectile->_0x3C_int[4]);
-	CREATE_FIELD("_0x3C_int_6", 3, EditorInput_U32, projectile->_0x3C_int[5]);
-	CREATE_FIELD("_0x58_int", 3, EditorInput_U32, projectile->_0x58_int);
-	CREATE_FIELD("_0x5C_int", 3, EditorInput_U32, projectile->_0x5C_int);
-	CREATE_FIELD("_0x70_int", 3, EditorInput_U32, projectile->_0x70_int);
-	CREATE_FIELD("_0x74_int", 3, EditorInput_U32, projectile->_0x74_int);
-	CREATE_FIELD("_0x7C_int", 3, EditorInput_U32, projectile->_0x7C_int);
-	CREATE_FIELD("_0x80_int", 3, EditorInput_U32, projectile->_0x80_int);
-	CREATE_FIELD("_0x88_int_1", 3, EditorInput_U32, projectile->_0x88_int[0]);
-	CREATE_FIELD("_0x88_int_2", 3, EditorInput_U32, projectile->_0x88_int[1]);
-	CREATE_FIELD("_0x88_int_3", 3, EditorInput_U32, projectile->_0x88_int[2]);
-	CREATE_FIELD("_0x88_int_4", 3, EditorInput_U32, projectile->_0x88_int[3]);
-	CREATE_FIELD("_0x88_int_5", 3, EditorInput_U32, projectile->_0x88_int[4]);
-	CREATE_FIELD("_0x88_int_6", 3, EditorInput_U32, projectile->_0x88_int[5]);
-	CREATE_FIELD("_0x88_int_7", 3, EditorInput_U32, projectile->_0x88_int[6]);
-	CREATE_FIELD("_0x88_int_8", 3, EditorInput_U32, projectile->_0x88_int[7]);
+	CREATE_FIELD("_0x4_int", 3, EditorInput_U32_Changeable, projectile->_0x4_int);
+	CREATE_FIELD("_0xC_int", 3, EditorInput_U32_Changeable, projectile->_0xC_int);
+	CREATE_FIELD("_0x10_int", 3, EditorInput_U32_Changeable, projectile->_0x10_int);
+	CREATE_FIELD("_0x14_int", 3, EditorInput_U32_Changeable, projectile->_0x14_int);
+	CREATE_FIELD("_0x24_int", 3, EditorInput_U32_Changeable, projectile->_0x24_int);
+	CREATE_FIELD("_0x34_int", 3, EditorInput_U32_Changeable, projectile->_0x34_int);
+	CREATE_FIELD("_0x3C_int_1", 3, EditorInput_U32_Changeable, projectile->_0x3C_int[0]);
+	CREATE_FIELD("_0x3C_int_2", 3, EditorInput_U32_Changeable, projectile->_0x3C_int[1]);
+	CREATE_FIELD("_0x3C_int_3", 3, EditorInput_U32_Changeable, projectile->_0x3C_int[2]);
+	CREATE_FIELD("_0x3C_int_4", 3, EditorInput_U32_Changeable, projectile->_0x3C_int[3]);
+	CREATE_FIELD("_0x3C_int_5", 3, EditorInput_U32_Changeable, projectile->_0x3C_int[4]);
+	CREATE_FIELD("_0x3C_int_6", 3, EditorInput_U32_Changeable, projectile->_0x3C_int[5]);
+	CREATE_FIELD("_0x58_int", 3, EditorInput_U32_Changeable, projectile->_0x58_int);
+	CREATE_FIELD("_0x5C_int", 3, EditorInput_U32_Changeable, projectile->_0x5C_int);
+	CREATE_FIELD("_0x70_int", 3, EditorInput_U32_Changeable, projectile->_0x70_int);
+	CREATE_FIELD("_0x74_int", 3, EditorInput_U32_Changeable, projectile->_0x74_int);
+	CREATE_FIELD("_0x7C_int", 3, EditorInput_U32_Changeable, projectile->_0x7C_int);
+	CREATE_FIELD("_0x80_int", 3, EditorInput_U32_Changeable, projectile->_0x80_int);
+	CREATE_FIELD("_0x88_int_1", 3, EditorInput_U32_Changeable, projectile->_0x88_int[0]);
+	CREATE_FIELD("_0x88_int_2", 3, EditorInput_U32_Changeable, projectile->_0x88_int[1]);
+	CREATE_FIELD("_0x88_int_3", 3, EditorInput_U32_Changeable, projectile->_0x88_int[2]);
+	CREATE_FIELD("_0x88_int_4", 3, EditorInput_U32_Changeable, projectile->_0x88_int[3]);
+	CREATE_FIELD("_0x88_int_5", 3, EditorInput_U32_Changeable, projectile->_0x88_int[4]);
+	CREATE_FIELD("_0x88_int_6", 3, EditorInput_U32_Changeable, projectile->_0x88_int[5]);
+	CREATE_FIELD("_0x88_int_7", 3, EditorInput_U32_Changeable, projectile->_0x88_int[6]);
+	CREATE_FIELD("_0x88_int_8", 3, EditorInput_U32_Changeable, projectile->_0x88_int[7]);
 
 	WriteFieldFullname(inputMap, "projectile");
 	return inputMap;
@@ -320,7 +320,7 @@ std::map<std::string, EditorInput*> EditorT7::GetThrowCameraInputs(uint16_t id, 
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("cameradata_addr", 0, EditorInput_PTR, throwCamera->cameradata_addr);
-	CREATE_FIELD("_0x0_llong", 0, EditorInput_U64, throwCamera->_0x0_llong);
+	CREATE_FIELD("_0x0_llong", 0, EditorInput_U64_Changeable, throwCamera->_0x0_llong);
 
 	WriteFieldFullname(inputMap, "throw_camera");
 	return inputMap;
@@ -360,11 +360,11 @@ std::map<std::string, EditorInput*> EditorT7::GetCameraDataInputs(uint16_t id, V
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("_0x0_int", 0, EditorInput_U32, cameraData->_0x0_int);
-	CREATE_FIELD("_0x4_short", 0, EditorInput_U16, cameraData->_0x4_short);
-	CREATE_FIELD("left_side_camera_data", 0, EditorInput_U16, cameraData->left_side_camera_data);
-	CREATE_FIELD("right_side_camera_data", 0, EditorInput_U16, cameraData->right_side_camera_data);
-	CREATE_FIELD("_0xA_short", 0, EditorInput_U16, cameraData->_0xA_short);
+	CREATE_FIELD("_0x0_int", 0, EditorInput_U32_Changeable, cameraData->_0x0_int);
+	CREATE_FIELD("_0x4_short", 0, EditorInput_U16_Changeable, cameraData->_0x4_short);
+	CREATE_FIELD("left_side_camera_data", 0, EditorInput_U16_Changeable, cameraData->left_side_camera_data);
+	CREATE_FIELD("right_side_camera_data", 0, EditorInput_U16_Changeable, cameraData->right_side_camera_data);
+	CREATE_FIELD("_0xA_short", 0, EditorInput_U16_Changeable, cameraData->_0xA_short);
 
 	WriteFieldFullname(inputMap, "camera_data");
 	return inputMap;
@@ -419,16 +419,16 @@ std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, Ve
 	CREATE_FIELD("wallslump_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->wallslump_moveid);
 	CREATE_FIELD("downed_moveid", 3, EditorInput_U16 | EditorInput_Clickable, reaction->downed_moveid);
 
-	CREATE_FIELD("front_direction", 5, EditorInput_U16, reaction->front_direction);
-	CREATE_FIELD("back_direction", 5, EditorInput_U16, reaction->back_direction);
-	CREATE_FIELD("left_side_direction", 5, EditorInput_U16, reaction->left_side_direction);
-	CREATE_FIELD("right_side_direction", 5, EditorInput_U16, reaction->right_side_direction);
-	CREATE_FIELD("front_counterhit_direction", 5, EditorInput_U16, reaction->front_counterhit_direction);
-	CREATE_FIELD("downed_direction", 5, EditorInput_U16, reaction->downed_direction);
+	CREATE_FIELD("front_direction", 5, EditorInput_U16_Changeable, reaction->front_direction);
+	CREATE_FIELD("back_direction", 5, EditorInput_U16_Changeable, reaction->back_direction);
+	CREATE_FIELD("left_side_direction", 5, EditorInput_U16_Changeable, reaction->left_side_direction);
+	CREATE_FIELD("right_side_direction", 5, EditorInput_U16_Changeable, reaction->right_side_direction);
+	CREATE_FIELD("front_counterhit_direction", 5, EditorInput_U16_Changeable, reaction->front_counterhit_direction);
+	CREATE_FIELD("downed_direction", 5, EditorInput_U16_Changeable, reaction->downed_direction);
 
-	CREATE_FIELD("vertical_pushback", 7, EditorInput_U16, reaction->vertical_pushback);
-	CREATE_FIELD("_0x44_int", 7, EditorInput_U32, reaction->_0x44_int);
-	CREATE_FIELD("_0x48_int", 7, EditorInput_U32, reaction->_0x48_int);
+	CREATE_FIELD("vertical_pushback", 7, EditorInput_U16_Changeable, reaction->vertical_pushback);
+	CREATE_FIELD("_0x44_int", 7, EditorInput_U32_Changeable, reaction->_0x44_int);
+	CREATE_FIELD("_0x48_int", 7, EditorInput_U32_Changeable, reaction->_0x48_int);
 
 	WriteFieldFullname(inputMap, "reactions");
 	return inputMap;
@@ -522,7 +522,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, hitCondition->requirements_addr);
 		CREATE_FIELD("damage", 0, EditorInput_U32, hitCondition->damage);
-		CREATE_FIELD("_0xC_int", 0, EditorInput_U32, hitCondition->_0xC_int);
+		CREATE_FIELD("_0xC_int", 0, EditorInput_U32_Changeable, hitCondition->_0xC_int);
 		CREATE_FIELD("reactions_addr", 0, EditorInput_PTR, hitCondition->reactions_addr);
 
 		WriteFieldFullname(inputMap, "hit_condition");
@@ -582,8 +582,10 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 	{
 		std::map<std::string, EditorInput*> inputMap;
 
-		CREATE_FIELD("condition", 0, EditorInput_U32, req->condition);
-		CREATE_FIELD("param", 0, EditorInput_U32 | EditorInput_DataChangeable, req->param);
+		unsigned short conditionType =
+			(req->condition >= 0x8000 ? EditorInput_H32_Changeable : EditorInput_U32_Changeable);
+		CREATE_FIELD("condition", 0, conditionType, req->condition);
+		CREATE_FIELD("param", 0, EditorInput_U32_Changeable, req->param);
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
@@ -613,7 +615,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("value", 0, EditorInput_H32, cancelExtra->value);
+	CREATE_FIELD("value", 0, EditorInput_H32_Changeable, cancelExtra->value);
 
 	WriteFieldFullname(inputMap, "cancel_extra");
 	return inputMap;
@@ -649,7 +651,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 		CREATE_FIELD("detection_end", 0, EditorInput_U32, cancel->detection_end);
 		CREATE_FIELD("starting_frame", 0, EditorInput_U32, cancel->starting_frame);
 		CREATE_FIELD("move_id", 0, EditorInput_U16 | EditorInput_Clickable, cancel->move_id);
-		CREATE_FIELD("cancel_option", 0, EditorInput_U16, cancel->cancel_option);
+		CREATE_FIELD("cancel_option", 0, EditorInput_U16_Changeable, cancel->cancel_option);
 
 		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
@@ -721,7 +723,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 		CREATE_FIELD("detection_end", 0, EditorInput_U32, cancel->detection_end);
 		CREATE_FIELD("starting_frame", 0, EditorInput_U32, cancel->starting_frame);
 		CREATE_FIELD("move_id", 0, EditorInput_U16 | EditorInput_Clickable, cancel->move_id);
-		CREATE_FIELD("cancel_option", 0, EditorInput_U16, cancel->cancel_option);
+		CREATE_FIELD("cancel_option", 0, EditorInput_U16_Changeable, cancel->cancel_option);
 
 		WriteFieldFullname(inputMap, "grouped_cancel");
 		inputListMap.push_back(inputMap);
@@ -800,8 +802,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 		std::map<std::string, EditorInput*> inputMap;
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
-		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
-		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
+		CREATE_FIELD("extraprop", 0, EditorInput_H32_Changeable, prop->extraprop);
+		CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
 
 		WriteFieldFullname(inputMap, "move_start_extraprop");
 		inputListMap.push_back(inputMap);
@@ -836,8 +838,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 		std::map<std::string, EditorInput*> inputMap;
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
-		CREATE_FIELD("extraprop", 0, EditorInput_H32, prop->extraprop);
-		CREATE_FIELD("value", 0, EditorInput_U32, prop->value);
+		CREATE_FIELD("extraprop", 0, EditorInput_H32_Changeable, prop->extraprop);
+		CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
 
 		WriteFieldFullname(inputMap, "move_end_extraprop");
 		inputListMap.push_back(inputMap);
@@ -968,7 +970,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("hitbox_location", 0, EditorInput_H32, move->hitbox_location);
 	CREATE_FIELD("first_active_frame", 0, EditorInput_U32, move->first_active_frame);
 	CREATE_FIELD("last_active_frame", 0, EditorInput_U32, move->last_active_frame);
-	CREATE_FIELD("distance", 0, EditorInput_U16, move->distance);
+	CREATE_FIELD("distance", 0, EditorInput_U16_Changeable, move->distance);
 
 	CREATE_FIELD("cancel_addr", 2, EditorInput_PTR, move->cancel_addr);
 	CREATE_FIELD("hit_condition_addr", 2, EditorInput_PTR, move->hit_condition_addr);
@@ -984,14 +986,14 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	CREATE_FIELD("cancel_addr_4", 3, EditorInput_PTR, move->_0x48_cancel_addr);
 	CREATE_FIELD("cancel_related_id_4", 3, EditorInput_U32, move->_0x50_int__0x48_related);
 
-	CREATE_FIELD("_0x34_int", 5, EditorInput_U32, move->_0x34_int);
-	CREATE_FIELD("_0x44_int", 5, EditorInput_U32, move->_0x44_int);
-	CREATE_FIELD("_0x56_short", 5, EditorInput_U16, move->_0x56_short);
-	CREATE_FIELD("_0x5C_short", 5, EditorInput_U16, move->_0x5C_short);
-	CREATE_FIELD("_0x5E_short", 5, EditorInput_U16, move->_0x5E_short);
-	CREATE_FIELD("_0x98_int", 5, EditorInput_U32, move->_0x98_int);
-	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16, move->_0xA8_short);
-	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16, move->_0xAC_short);
+	CREATE_FIELD("_0x34_int", 5, EditorInput_U32_Changeable, move->_0x34_int);
+	CREATE_FIELD("_0x44_int", 5, EditorInput_U32_Changeable, move->_0x44_int);
+	CREATE_FIELD("_0x56_short", 5, EditorInput_U16_Changeable, move->_0x56_short);
+	CREATE_FIELD("_0x5C_short", 5, EditorInput_U16_Changeable, move->_0x5C_short);
+	CREATE_FIELD("_0x5E_short", 5, EditorInput_U16_Changeable, move->_0x5E_short);
+	CREATE_FIELD("_0x98_int", 5, EditorInput_H32_Changeable, move->_0x98_int);
+	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16_Changeable, move->_0xA8_short);
+	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16_Changeable, move->_0xAC_short);
 
 	WriteFieldFullname(inputMap, "move");
 	return inputMap;
@@ -1605,7 +1607,7 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"));
 	if (moveId >= 0x8000) {
-		moveId = m_aliases->at(moveId - (uint16_t)0x8000);
+		moveId = m_aliases->at((size_t)(moveId - (uint16_t)0x8000));
 	}
 
 	return moveId;
@@ -1621,6 +1623,7 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	{
 		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
 		// movesetOffset is the one offset we can't touch because it is the moveset the characte reverts to when transitioning to a generic anim
+		// Since we want P2 to be able to play those moves here without changing their moveset, we don't write on it
 		m_process->writeInt64(movesetOffset + 0x8, playerMoveset);
 		m_process->writeInt64(movesetOffset + 0x10, playerMoveset);
 		m_process->writeInt64(movesetOffset + 0x18, playerMoveset);

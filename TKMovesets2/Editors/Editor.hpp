@@ -121,6 +121,16 @@ enum EditorInputFlag_
 	// Shortcuts
 	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
 
+	EditorInput_H64_Changeable = EditorInput_H64 | EditorInput_DataChangeable,
+	EditorInput_U64_Changeable = EditorInput_U64 | EditorInput_DataChangeable,
+	EditorInput_S64_Changeable = EditorInput_S64 | EditorInput_DataChangeable,
+	EditorInput_U32_Changeable = EditorInput_U32 | EditorInput_DataChangeable,
+	EditorInput_H32_Changeable = EditorInput_H32 | EditorInput_DataChangeable,
+	EditorInput_S32_Changeable = EditorInput_S32 | EditorInput_DataChangeable,
+	EditorInput_U16_Changeable = EditorInput_U16 | EditorInput_DataChangeable,
+	EditorInput_H16_Changeable = EditorInput_H16 | EditorInput_DataChangeable,
+	EditorInput_S16_Changeable = EditorInput_S16 | EditorInput_DataChangeable,
+
 	// Used internally for conditions
 	EditorInput_Unsigned     = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16),
 	EditorInput_Signed       = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16),
@@ -211,7 +221,7 @@ namespace EditorUtils
 	uint64_t GetFieldValue(EditorInput* field);
 	// Sets a struct member value according to a field's buffer, parsing it correctly according to its type
 	void SetMemberValue(void* memberPtr, EditorInput* field);
-	// Changes between unsigned, signed, hex and float data type if the field allows it
+	// Changes between unsigned, signed AND hex data type if the field allows it
 	void ChangeFieldDataType(EditorInput* field);
 }
 

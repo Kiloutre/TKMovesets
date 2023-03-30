@@ -27,8 +27,8 @@ void EditorRequirements::BuildItemDetails(int listIdx)
 
 	auto& map = m_items[listIdx]->identifierMaps;
 
-	int id = atoi(map["condition"]->buffer);
-	int64_t value = (int64_t)strtoll(map["param"]->buffer, nullptr, 10);
+	int id = (int)EditorUtils::GetFieldValue(map["condition"]);
+	int64_t value = (int64_t)EditorUtils::GetFieldValue(map["param"]);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 	std::string valueText;
