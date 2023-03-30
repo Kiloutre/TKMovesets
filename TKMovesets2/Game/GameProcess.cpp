@@ -169,6 +169,34 @@ int64_t GameProcess::readInt64(gameAddr addr)
 	return value;
 }
 
+uint8_t GameProcess::readUInt8(gameAddr addr)
+{
+	uint8_t value{ (uint8_t)-1};
+	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
+	return value;
+}
+
+uint16_t GameProcess::readUInt16(gameAddr addr)
+{
+	uint16_t value{ (uint16_t)-1};
+	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
+	return value;
+}
+
+uint32_t GameProcess::readUInt32(gameAddr addr)
+{
+	uint32_t value{ (uint32_t)-1};
+	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+	return value;
+}
+
+uint64_t GameProcess::readUInt64(gameAddr addr)
+{
+	uint64_t value{ (uint64_t)- 1};
+	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
+	return value;
+}
+
 float GameProcess::readFloat(gameAddr addr)
 {
 	float value{ -1 };
@@ -198,6 +226,26 @@ void  GameProcess::writeInt32(gameAddr addr, int32_t value)
 }
 
 void  GameProcess::writeInt64(gameAddr addr, int64_t value)
+{
+	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 8, nullptr);
+}
+
+void GameProcess::writeUInt8(gameAddr addr, uint8_t value)
+{
+	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 1, nullptr);
+}
+
+void  GameProcess::writeUInt16(gameAddr addr, uint16_t value)
+{
+	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 2, nullptr);
+}
+
+void  GameProcess::writeUInt32(gameAddr addr, uint32_t value)
+{
+	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
+}
+
+void  GameProcess::writeUInt64(gameAddr addr, uint64_t value)
 {
 	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 8, nullptr);
 }

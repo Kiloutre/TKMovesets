@@ -17,6 +17,21 @@ EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_i
 
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {
+	auto& name = field->name;
+	auto& fields = m_items[listIdx]->identifierMaps;
+	const int bufsize = field->bufsize;
+
+	if (name == "param_unsigned")
+	{
+		uint64_t value = EditorUtils::GetFieldValue(field);
+		sprintf_s(fields["param_float"]->buffer, bufsize, "%f", *(float*)&value);
+	}
+	else if (name == "param_float")
+	{
+		uint64_t value = EditorUtils::GetFieldValue(field);
+		sprintf_s(fields["param_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
+	}
+
 	BuildItemDetails(listIdx);
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
@@ -28,7 +43,7 @@ void EditorRequirements::BuildItemDetails(int listIdx)
 	auto& map = m_items[listIdx]->identifierMaps;
 
 	int id = (int)EditorUtils::GetFieldValue(map["condition"]);
-	int64_t value = (int64_t)EditorUtils::GetFieldValue(map["param"]);
+	int64_t value = (int64_t)EditorUtils::GetFieldValue(map["param_unsigned"]);
 
 	const char* idLabel = m_baseWindow->labels->GetText(id);
 	std::string valueText;

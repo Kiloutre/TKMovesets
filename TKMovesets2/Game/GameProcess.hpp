@@ -66,28 +66,49 @@ public:
 	bool IsAttached();
 	// Checks if pid still used by process & attempts a read. Updates .status & returns false if it fails.
 	bool CheckRunning();
-	
-	// Reads a char (1b) from the game in little endian
+
+
+	// Reads an unsigned byte from the game in little endian
 	int8_t  readInt8(gameAddr addr);
-	// Reads a short (2b) from the game in little endian
+	// Reads a short (2B) from the game in little endian
 	int16_t readInt16(gameAddr addr);
-	// Reads an int (4b) from the game in little endian
+	// Reads an int (4B) from the game in little endian
 	int32_t readInt32(gameAddr addr);
-	// Reads an int (8b) from the game in little endian
+	// Reads an int (8B) from the game in little endian
 	int64_t readInt64(gameAddr addr);
+
+	// Reads a byte from the game in little endian
+	uint8_t  readUInt8(gameAddr addr);
+	// Reads a ushort (2B) from the game in little endian
+	uint16_t readUInt16(gameAddr addr);
+	// Reads an uint (4B) from the game in little endian
+	uint32_t readUInt32(gameAddr addr);
+	// Reads an uint (8B) from the game in little endian
+	uint64_t readUInt64(gameAddr addr);
+
 	// Reads a floating point number (4b) from the game in little endian
 	float   readFloat(gameAddr addr);
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
 	void    readBytes(gameAddr addr, void* buf, size_t readSize);
 
-	// Writes a char (1b) to the game
+	// Writes a byte to the game
 	void writeInt8(gameAddr addr, int8_t value);
-	// Writes a short (2b) to the game
+	// Writes a short (2B) to the game
 	void writeInt16(gameAddr addr, int16_t value);
-	// Writes an int (4b) to the game
+	// Writes an int (4B) to the game
 	void writeInt32(gameAddr addr, int32_t value);
-	// Writes a 8b to the game
+	// Writes an int (8B) to the game
 	void writeInt64(gameAddr addr, int64_t value);
+	// Writes a byte to the game
+
+	void writeUInt8(gameAddr addr, uint8_t value);
+	// Writes a short (2B) to the game
+	void writeUInt16(gameAddr addr, uint16_t value);
+	// Writes an int (4B) to the game
+	void writeUInt32(gameAddr addr, uint32_t value);
+	// Writes an int (8B) to the game
+	void writeUInt64(gameAddr addr, uint64_t value);
+
 	// Writes a floating point number (4b) to the game
 	void writeFloat(gameAddr addr, float value);
 	// Writes [bufSize] amounts of bytes to the game

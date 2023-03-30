@@ -253,7 +253,8 @@ edition.cancel_extra.value = Value
 
 edition.requirement.window_name = Requirement list
 edition.requirement.condition = Condition
-edition.requirement.param = Parameter
+edition.requirement.param_unsigned = Parameter
+edition.requirement.param_float = Parameter (Float)
 
 edition.hit_condition.window_name = Hit condition list
 edition.hit_condition.requirements_addr = Requirements ID

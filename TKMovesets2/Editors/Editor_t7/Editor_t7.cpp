@@ -584,8 +584,10 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 
 		unsigned short conditionType =
 			(req->condition >= 0x8000 ? EditorInput_H32_Changeable : EditorInput_U32_Changeable);
+
 		CREATE_FIELD("condition", 0, conditionType, req->condition);
-		CREATE_FIELD("param", 0, EditorInput_U32_Changeable, req->param);
+		CREATE_FIELD("param_unsigned", 0, EditorInput_U32_Changeable, req->param_unsigned);
+		CREATE_FIELD("param_float", 0, EditorInput_Float, req->param_float);
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
@@ -600,7 +602,7 @@ void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>&
 	auto req = m_iterators.requirements[id];
 
 	SetMemberValue(&req->condition, inputs["condition"]);
-	SetMemberValue(&req->param, inputs["param"]);
+	SetMemberValue(&req->param_unsigned, inputs["param_unsigned"]);
 }
 
 // ===== Cancel Extradata ===== //
@@ -884,7 +886,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 	{
 		std::map<std::string, EditorInput*> inputMap;
 
-		CREATE_FIELD("starting_frame", 0, EditorInput_U32, prop->starting_frame);
+		CREATE_FIELD("starting_frame", 0, EditorInput_U32_Changeable, prop->starting_frame);
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
 		CREATE_FIELD("value_signed", 0, EditorInput_S32, prop->value_signed);
 		CREATE_FIELD("value_unsigned", 0, EditorInput_U32, prop->value_unsigned);
@@ -1389,6 +1391,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 
 bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 {
+	printf("ValidateField - buffer is [%s]\n", field->buffer);
 	if (!ValidateFieldType(field)) {
 		return false;
 	}

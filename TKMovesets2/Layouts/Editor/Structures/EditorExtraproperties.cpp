@@ -23,35 +23,59 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 
 	if (name == "value_unsigned")
 	{
-		uint64_t value = EditorUtils::GetFieldValue(field);
+		union {
+			uint64_t value_uint64;
+			uint32_t value_uint32;
+			int32_t value_int32;
+			float value_float;
+		};
+		value_uint64 = EditorUtils::GetFieldValue(field);
 
-		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", *(int32_t*)&value);
-		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", (uint32_t)value);
-		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", *(float*)&value);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", value_int32);
+		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", value_float);
 	}
 	else if (name == "value_signed")
 	{
-		uint64_t value = EditorUtils::GetFieldValue(field);
+		union {
+			uint64_t value_uint64;
+			uint32_t value_uint32;
+			int32_t value_int32;
+			float value_float;
+		};
+		value_uint64 = EditorUtils::GetFieldValue(field);
 
-		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
-		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", (uint32_t)value);
-		sprintf_s(fields["value_signed"]->buffer, bufsize, "%f", *(float*)&value);
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%d", value_uint32);
+		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", value_float);
 	}
 	else if (name == "value_hex")
 	{
-		uint64_t value = EditorUtils::GetFieldValue(field);
+		union {
+			uint64_t value_uint64;
+			uint32_t value_uint32;
+			int32_t value_int32;
+			float value_float;
+		};
+		value_uint64 = EditorUtils::GetFieldValue(field);
 
-		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
-		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", *(int32_t*)&value);
-		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", *(float*)&value);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", value_int32);
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "0x%X", value_uint32);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", value_float);
 	}
 	else if (name == "value_float")
 	{
-		uint64_t value = EditorUtils::GetFieldValue(field);
+		union {
+			uint64_t value_uint64;
+			uint32_t value_uint32;
+			int32_t value_int32;
+			float value_float;
+		};
+		value_uint64 = EditorUtils::GetFieldValue(field);
 
-		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", *(uint32_t*)&value);
-		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", *(int32_t*)&value);
-		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", *(uint32_t*)&value);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "0x%X", value_int32);
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%d", value_uint32);
+		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
 	}
 
 	BuildItemDetails(listIdx);
@@ -64,9 +88,9 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	auto& map = m_items[listIdx]->identifierMaps;
 
-	int startingFrame = atoi(map["starting_frame"]->buffer);
-	unsigned int propId = (unsigned int)strtoll(map["id"]->buffer, nullptr, 16);
-	int64_t value = (int64_t)strtoll(map["value_unsigned"]->buffer, nullptr, 10);
+	unsigned int startingFrame = (unsigned int)EditorUtils::GetFieldValue(map["starting_frame"]);
+	unsigned int propId = (unsigned int)EditorUtils::GetFieldValue(map["id"]);
+	int64_t value = (int64_t)EditorUtils::GetFieldValue(map["value_signed"]);
 
 	const char* idLabel = m_baseWindow->labels->GetText(propId);
 

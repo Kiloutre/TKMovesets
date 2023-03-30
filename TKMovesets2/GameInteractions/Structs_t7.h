@@ -23,7 +23,12 @@ namespace StructsT7
 	struct Requirement
 	{
 		uint32_t condition;
-		uint32_t param;
+		union
+		{
+			uint32_t param_unsigned;
+			int32_t param_signed;
+			float param_float;
+		};
 	};
 
 	struct CancelExtradata

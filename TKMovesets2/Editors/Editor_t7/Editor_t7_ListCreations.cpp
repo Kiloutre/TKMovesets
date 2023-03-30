@@ -7,7 +7,7 @@ template<typename T>
 void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const int structSize = sizeof(T);
+	const uint64_t structSize = sizeof(T);
 	const int structListSize = structSize * newSize;
 	const int structListSizeDiff = structSize * listSizeDiff;
 	uint64_t tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
@@ -15,7 +15,7 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;
 
-	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movesetBlock + tableListStart + listId * structSize;
+	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movesetBlock + tableListStart + (uint64_t)listId * structSize;
 
 	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
 	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
@@ -145,7 +145,7 @@ void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
 		if (MUST_SHIFT_ID(sequence.input_addr, listSizeDiff, listId, listId + oldSize)) {
 			sequence.input_addr += listSizeDiff;
 		}
-		else if (sequence.input_addr >= listId && sequence.input_addr <= (listId + oldSize)) {
+		else if (sequence.input_addr >= listId && sequence.input_addr <= ((uint64_t)listId + oldSize)) {
 			sequence.input_amount += listSizeDiff;
 		}
 	}
@@ -164,7 +164,7 @@ void EditorT7::ModifyPushbackExtraListSize(int listId, int oldSize, int newSize)
 		if (MUST_SHIFT_ID(pushback.extradata_addr, listSizeDiff, listId, listId + oldSize)) {
 			pushback.extradata_addr += listSizeDiff;
 		}
-		else if (pushback.extradata_addr >= listId && pushback.extradata_addr <= (listId + oldSize)) {
+		else if (pushback.extradata_addr >= listId && pushback.extradata_addr <= ((uint64_t)listId + oldSize)) {
 			pushback.num_of_loops += listSizeDiff;
 		}
 	}
