@@ -82,7 +82,8 @@
 147,Standing on right side
 148,On ground (right side)
 149,On ground (left side)
-155,If Ki Charged
+155,If Player Ki Charged
+156,If Opponent Ki Charged
 157,Player is in rage
 176,Geese in Max-Mode
 182,Near Wall
@@ -101,8 +102,9 @@
 256,Bryan taunted
 273,prop 0x80c8 >= param
 274,prop 0x80cb >= param
-284,_ 
+284,Player flag >= param
 285,prop 0x810c >= param
+286,prop 0x80ed >= param
 308,Chloe Points <= param
 310,prop 0x80c8 <= param
 311,prop 0x80cb <= param
@@ -118,7 +120,8 @@
 351,Claudio Starburst
 352,Check value (prop 0x80a6)
 353,Check value (prop 0x80a9)
-359,_ 
+359,Check player flag
+360,Check value (prop 0x810c)
 361,Check value (prop 0x80ed)
 532,Player speed >= param
 533,Player speed <= param
