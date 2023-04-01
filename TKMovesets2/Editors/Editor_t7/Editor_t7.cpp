@@ -68,6 +68,14 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 
 // ===== Other ===== //
 
+void EditorT7::SetupIterators_DisplayableMovelist()
+{
+	MvlHead* head = (MvlHead*)(m_movesetData + m_header->offsets.movelistBlock);
+
+	m_iterators.mvl_displayables.Set(head, head->displayables_offset, head->displayables_count);
+	m_iterators.mvl_playables.Set(head, head->playables_offset, head->playables_count);
+}
+
 void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 {
 	m_moveset = t_moveset;
@@ -102,6 +110,10 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.throw_datas.Set(movesetBlock, m_infos->table.throwCameras, m_infos->table.throwCamerasCount);
 	m_iterators.camera_datas.Set(movesetBlock, m_infos->table.cameraData, m_infos->table.cameraDataCount);
 
+	if (hasDisplayableMovelist) {
+		SetupIterators_DisplayableMovelist();
+	}
+
 	// Because we re-allocated, tell the live editor that the old moveset in the game memory is now invalid
 	live_loadedMoveset = 0;
 }
@@ -128,6 +140,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	if ((m_header->offsets.movelistBlock + 8) <= m_movesetDataSize && \
 		strncmp((char*)m_movesetData + m_header->offsets.movelistBlock, "MVLT", 4) == 0) {
 		hasDisplayableMovelist = true;
+		SetupIterators_DisplayableMovelist();
 	}
 
 	// Build anim name : offset list

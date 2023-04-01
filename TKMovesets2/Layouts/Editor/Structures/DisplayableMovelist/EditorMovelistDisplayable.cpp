@@ -12,6 +12,7 @@ EditorMovelistDisplayable::EditorMovelistDisplayable(std::string windowTitleBase
 {
 	windowType = EditorWindowType_MovelistDisplayable;
 	m_baseWindow = baseWindow;
+	uniqueType = true;
 	InitForm(windowTitleBase, 0, editor);
 }
 
@@ -25,6 +26,21 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 
 void EditorMovelistDisplayable::BuildItemDetails(int listIdx)
 {
-	auto& identifierMap = m_items[listIdx]->identifierMaps;
+	auto& item = m_items[listIdx];
+	auto& identifierMap = item->identifierMaps;
 
+	item->itemLabel = std::format("{} - Type: {}", listIdx, identifierMap["type"]->buffer);
+}
+
+void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* field)
+{
+	int referenceId = atoi(field->buffer);
+	std::string& name = field->name;
+	auto& item = m_items[listIdx];
+
+	if (name == "playable_id") {
+		if (referenceId != -1) {
+			m_baseWindow->OpenFormWindow(EditorWindowType_MovelistPlayable, referenceId);
+		}
+	}
 }

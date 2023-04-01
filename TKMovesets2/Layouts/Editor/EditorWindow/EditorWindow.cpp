@@ -27,6 +27,7 @@
 #include "EditorThrowCamera.hpp"
 #include "EditorCameraData.hpp"
 #include "EditorMovelistDisplayable.hpp"
+#include "EditorMovelistPlayable.hpp"
 
 // -- Private methods -- //
 
@@ -100,6 +101,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_MovelistDisplayable:
 		return new EditorMovelistDisplayable(m_windowTitle, m_editor, this);
 		break;
+	case EditorWindowType_MovelistPlayable:
+		return new EditorMovelistPlayable(m_windowTitle, id, m_editor, this);
+		break;
 	}
 
 	return nullptr;
@@ -121,7 +125,8 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 			return;
 		}
 
-		if (structWin->unsavedChanges == false && structWin->currentViewport == m_viewport) {
+		if ((structWin->unsavedChanges == false && structWin->currentViewport == m_viewport)
+			|| structWin->uniqueType) {
 			// Don't overwrite windows with unsaved changes OR that have been detached
 			availableOverwriteIndex = i;
 		}
@@ -207,7 +212,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
-		moveId = editorTable->aliases[moveId - (uint16_t)0x8000];
+		moveId = editorTable->aliases[moveId - 0x8000];
 	}
 
 	return moveId;

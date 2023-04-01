@@ -1243,6 +1243,12 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_CameraData:
 		SaveCameraData(id, inputs);
 		break;
+	case EditorWindowType_MovelistDisplayable:
+		SaveMovelistDisplayable(id, inputs);
+		break;
+	case EditorWindowType_MovelistPlayable:
+		SaveMovelistPlayable(id, inputs);
+		break;
 	}
 }
 
@@ -1274,6 +1280,9 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		break;
 	case EditorWindowType_CameraData:
 		return GetCameraDataInputs(id, drawOrder);
+		break;
+	case EditorWindowType_MovelistPlayable:
+		return GetMovelistPlayableInputs(id, drawOrder);
 		break;
 	}
 	return std::map<std::string, EditorInput*>();
@@ -1310,7 +1319,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		break;
 
 	case EditorWindowType_MovelistDisplayable:
-		return GetMovelistDisplayablesInputs(id, drawOrder);
+		return GetMovelistDisplayablesInputs(0, drawOrder);
 		break;
 	}
 	return std::vector<std::map<std::string, EditorInput*>>();
@@ -1369,6 +1378,9 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 		break;
 	case EditorWindowType_ThrowCamera:
 		return ValidateThrowCameraField(field);
+		break;
+	case EditorWindowType_MovelistDisplayable:
+		return ValidateMovelistDisplayableField(field);
 		break;
 	}
 

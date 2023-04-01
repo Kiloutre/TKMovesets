@@ -365,12 +365,12 @@ namespace StructsT7
 	{
 		char mvlString[4];
 		int32_t _unk0x4;
-		int32_t displayableEntriesCount;
-		int32_t playableEntriesCount;
+		int32_t displayables_count;
+		int32_t playables_count;
 		int32_t _unk0x10;
 		uint32_t displayables_offset;
 		uint32_t playables_offset;
-		uint32_t _unk0x1c_offset;
+		uint32_t inputs_offset;
 		int32_t _unk0x20;
 		int32_t _unk0x24;
 		int32_t _unk0x28;
@@ -385,13 +385,15 @@ namespace StructsT7
 		MvlDisplayableType_Regular        = 0x10000,
 		MvlDisplayableType_ComboListStart = 0xA,
 		MvlDisplayableType_Unknown        = 0xD,
+
+		MvlDisplayableType_MAX            = INT_MAX
 	};
 
 	struct MvlDisplayable
 	{
 		int32_t translationOffsets[16];
 		uint32_t _unk0x40;
-		__int16 playableEntryId;
+		__int16 playable_id;
 		__int16 _unk0x46;
 		MvlDisplayableType_ type;
 		uint32_t _unk0x4c;
@@ -473,7 +475,7 @@ namespace StructsT7
 
 	struct MvlPlayable
 	{
-		int16_t _unk0x0;
+		uint16_t _unk0x0;
 		uint16_t distance;
 		uint16_t p2_rotation;
 		uint16_t _unk0x6;
@@ -481,7 +483,7 @@ namespace StructsT7
 		uint16_t p1_facing_related;
 		uint16_t _unk0xc;
 		uint16_t input_count;
-		int32_t inputSequenceOffset;
+		uint32_t input_sequence_offset;
 		uint16_t has_rage;
 		uint16_t _unk0x16;
 	};

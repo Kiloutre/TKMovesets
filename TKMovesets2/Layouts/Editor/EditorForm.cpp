@@ -81,6 +81,12 @@ namespace EditorFormUtils
 
 		case EditorWindowType_ThrowCamera:
 			return "throw_camera";
+
+		case EditorWindowType_MovelistDisplayable:
+			return "mvl_displayable";
+
+		case EditorWindowType_MovelistPlayable:
+			return "mvl_playable";
 		}
 		return "UNKNOWN";
 	}

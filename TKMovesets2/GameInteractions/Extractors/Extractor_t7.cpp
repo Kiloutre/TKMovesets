@@ -394,7 +394,10 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 		gameAddr blockStart = m_process->readInt64(managerAddr + offsetof(MvlManager, mvlHead));
 		m_process->readBytes(blockStart, &head, sizeof(head));
 
-		const uint64_t s_playableBlock = sizeof(MvlPlayable) * head.playableEntriesCount;
+		const uint64_t s_playableBlock = sizeof(MvlPlayable) * head.playables_count;
+		if (head.playables_count == 0) {
+			return (Byte*)calloc(1, size_out);
+		}
 		MvlPlayable* playables = (MvlPlayable*)malloc(s_playableBlock);
 		if (playables == nullptr) {
 			return (Byte*)calloc(1, size_out);
@@ -404,9 +407,9 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 		// Use the biggest input offset in order to get the end of the movelist
 		// Haven't found a better way but it doesn't crash
 		uint64_t biggestInpuOffset = 0;
-		for (size_t i = 0; i < head.playableEntriesCount; ++i)
+		for (size_t i = 0; i < head.playables_count; ++i)
 		{
-			uint64_t lastInputOffset = playables[i].inputSequenceOffset + sizeof(MvlInput) * playables[i].input_count;
+			uint64_t lastInputOffset = playables[i].input_sequence_offset + sizeof(MvlInput) * playables[i].input_count;
 			lastInputOffset += (i * sizeof(MvlPlayable));
 			if (lastInputOffset > biggestInpuOffset) {
 				biggestInpuOffset = lastInputOffset;

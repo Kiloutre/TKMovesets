@@ -59,6 +59,7 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorCameraData.cpp"
                     # Layout: editor window: displayable movelist
                     "Layouts/Editor/Structures/DisplayableMovelist/EditorMovelistDisplayable.cpp"
+                    "Layouts/Editor/Structures/DisplayableMovelist/EditorMovelistPlayable.cpp"
                     # Layout: editor subwindows
                     "Layouts/Editor/Structures/Subwindows/EditorMove_Animations.cpp"
                     # Layout: submenus

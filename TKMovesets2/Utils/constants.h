@@ -59,3 +59,7 @@
 # define FORM_INPUT_REF          IM_COL32(56, 82, 124, 255)
 # define FORM_INPUT_SIGNED       IM_COL32(16, 55, 112, 255)
 # define FORM_LABEL_CLICKABLE    FORM_INPUT_REF
+
+# define MVL_ENTRY               IM_COL32(191, 94, 113, 35)
+# define MVL_CATEGORY            IM_COL32(77, 131, 219, 50)
+# define MVL_COMBO               IM_COL32(77, 131, 219, 50)

@@ -55,7 +55,10 @@ public:
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
 	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
 	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
-	
+
+	// Extra iterators setup
+	void SetupIterators_DisplayableMovelist();
+
 	// Moves
 	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	uint64_t CreateMoveName(const char* newName);
@@ -142,6 +145,12 @@ public:
 
 	//  Movelist : Displayables
 	std::vector<std::map<std::string, EditorInput*>> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMovelistDisplayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateMovelistDisplayableField(EditorInput* field);
+
+	//  Movelist : Displayables
+	std::map<std::string, EditorInput*> GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player

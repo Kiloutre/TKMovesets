@@ -48,6 +48,7 @@ public:
 
 	Iterator begin() { return Iterator(&m_ptr[0]); }
 	Iterator end() { return Iterator(&m_ptr[m_size]); }
+	uint64_t size() { return m_size; }
 	T* operator[](int n) const { return &m_ptr[n]; }
 
 	StructIterator() { m_ptr = nullptr, m_size = 0; }
