@@ -399,6 +399,28 @@ namespace StructsT7
 		uint32_t _unk0x7c;
 	};
 
+	struct MvlPlayable
+	{
+		int16_t _unk0x0;
+		uint16_t distance;
+		uint16_t p2_rotation;
+		uint16_t _unk0x6;
+		uint16_t _unk0x8;
+		uint16_t p1_facing_related;
+		uint16_t _unk0xc;
+		uint16_t input_count;
+		int32_t inputSequenceOffset;
+		uint16_t has_rage;
+		uint16_t _unk0x16;
+	};
+
+	// Inputs played by bot in movelist display
+	struct MvlInput
+	{
+		byte directions;
+		byte buttons;
+		__int16 frame_duration;
+	};
 }
 
 // Contains most of the same structs as above, but with no ptr (gameAddr instead)
