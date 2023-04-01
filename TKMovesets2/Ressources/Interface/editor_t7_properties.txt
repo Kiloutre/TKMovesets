@@ -81,6 +81,9 @@
 0x80cb,Value Store (uses req 348)
 0x80cc,Add to 0x80cb
 0x80ce,Sub from 0x80cb
+0x80db,Set Wallcombo counter
+0x80dc,Add to wallcombo counter
+0x80dd,Sub from wallcombo counter
 0x80ed,Store Combo Route Value
 0x8106,Activate Player Flag
 0x8107,Add value to 0x8106
