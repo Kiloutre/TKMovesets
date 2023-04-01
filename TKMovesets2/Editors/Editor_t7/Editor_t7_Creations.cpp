@@ -56,6 +56,7 @@ template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2
 	// Shift offsets in the moveset table & in our header
 	m_header->offsets.animationBlock += extraSize;
 	m_header->offsets.motaBlock += extraSize;
+	m_header->offsets.movelistBlock += extraSize;
 
 	return newStructId;
 }
@@ -263,6 +264,7 @@ int32_t EditorT7::CreateNewMove()
 	m_header->offsets.movesetBlock += extraNameSize;
 	m_header->offsets.animationBlock += extraNameSize + extraMoveSize;
 	m_header->offsets.motaBlock += extraNameSize + extraMoveSize;
+	m_header->offsets.movelistBlock += extraNameSize + extraMoveSize;
 	m_infos->table.moveCount++;
 
 	// Increment moveset block offsets

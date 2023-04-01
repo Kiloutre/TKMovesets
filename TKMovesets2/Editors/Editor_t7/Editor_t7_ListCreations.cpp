@@ -57,6 +57,7 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 	// Shift offsets in the moveset table & in our header
 	m_header->offsets.animationBlock += structListSizeDiff;
 	m_header->offsets.motaBlock += structListSizeDiff;
+	m_header->offsets.movelistBlock += structListSizeDiff;
 }
 
 void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
