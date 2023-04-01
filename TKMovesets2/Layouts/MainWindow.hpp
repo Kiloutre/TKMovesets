@@ -39,6 +39,9 @@ public:
 	Submenu_Import importMenu;
 	// Edition submenu
 	Submenu_Edition editionMenu;
+	// Online submenu
+	Submenu_OnlinePlay onlineMenu;
+
 	// Edition windows
 	std::vector<EditorWindow*> editorWindows;
 

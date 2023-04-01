@@ -215,6 +215,27 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 	}
 }
 
+void ImporterT7::ImportMovelist(gameAddr gameMoveset, Byte* moveset, gameAddr playerAddress, const TKMovesetHeader& header)
+{
+	MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
+
+	if (strncmp(mvlHead->mvlString, "MVLT", 4) == 0)
+	{
+		gameAddr movelistAddr = gameMoveset + header.offsets.movelistBlock;
+		gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
+
+		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
+
+		if (playerId == 1) {
+			managerAddr += sizeof(MvlManager);
+		}
+
+		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlHead), movelistAddr);
+		m_process->writeInt64(managerAddr + offsetof(MvlManager, displayableEntriesCount), mvlHead->displayableEntriesCount);
+		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlDisplayableBlock), movelistAddr + mvlHead->displayables_offset);
+	}
+}
+
 // -- Public methods -- //
 
 void ImporterT7::CleanupUnusedMovesets()
@@ -359,6 +380,8 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	if (applyInstantly) {
 		ForcePlayerMove(playerAddress, gameMoveset, 32769);
 	}
+
+	ImportMovelist(gameMoveset, moveset, playerAddress, header);
 
 	// -- Cleanup -- //
 	// Destroy our local copy

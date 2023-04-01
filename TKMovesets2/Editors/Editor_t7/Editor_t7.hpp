@@ -159,6 +159,7 @@ public:
 	bool IsPropertyProjectileRef(const char* buffer) override;
 	bool IsVoicelipValueEnd(const char* buffer) override;
 	unsigned int GetStructureCount(EditorWindowType_ type) override;
+	unsigned int GetMotaAnimCount(int motaId) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list

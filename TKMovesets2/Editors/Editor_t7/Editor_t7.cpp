@@ -1391,7 +1391,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 
 bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 {
-	printf("ValidateField - buffer is [%s]\n", field->buffer);
 	if (!ValidateFieldType(field)) {
 		return false;
 	}

@@ -40,12 +40,13 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId)
 		size_t pathLen = ptrPath.size() - 1;
 		if (pathLen > 0)
 		{
+			addr = (gameAddr)m_process->readInt64(addr);
 			for (size_t i = 1; i < pathLen; ++i)
 			{
 				if (addr == (gameAddr)0) {
 					return GAME_ADDR_NULL;
 				}
-				addr = (gameAddr)m_process->readInt64(addr) + ptrPath[i];
+				addr = (gameAddr)m_process->readInt64(addr + ptrPath[i]);
 			}
 			addr += ptrPath[pathLen];
 		}
@@ -84,7 +85,7 @@ int64_t GameData::ReadInt64(const char* c_addressId)
 
 gameAddr GameData::ReadPtr(const char* c_addressId)
 {
-	return (gameAddr)ReadInt64(c_addressId);
+	return (gameAddr)ReadPtrPath(c_addressId);
 }
 
 float GameData::ReadFloat(const char* c_addressId)

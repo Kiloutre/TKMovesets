@@ -132,7 +132,8 @@ target_link_libraries(TKMovesets2 PRIVATE ExportImport)
 configure_file("Ressources/game_addresses.txt" "game_addresses.txt" COPYONLY)
 # Interface data #
 add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Ressources/Interface" "${CMAKE_CURRENT_BINARY_DIR}/Interface")
-
+# Debug
+add_definitions(/FI"${CMAKE_CURRENT_SOURCE_DIR}/Utils/debug.hpp")
 
 ## Extra dependencies ##
 # Link the other libraries that we use #

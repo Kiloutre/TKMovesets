@@ -17,6 +17,9 @@ Submenu_Extract::Submenu_Extract()
 	m_motaExport[3] = true; // Hands
 	m_motaExport[8] = true; // Camera
 	m_motaExport[9] = true; // Camera
+
+	m_overwriteSameFilename = false;
+	m_extractDisplayableMovelist = true;
 }
 
 ExtractSettings Submenu_Extract::GetExtractionSettings()
@@ -27,7 +30,11 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
 	}
 
-	for (uint8_t i = 0; i < 10; ++i) {
+	if (m_extractDisplayableMovelist) {
+		settings |= ExtractSettings_DisplayableMovelist;
+	}
+
+	for (uint8_t i = 0; i < _countof(m_motaExport); ++i) {
 		if (m_motaExport[i]) {
 			settings |= ((uint64_t)1 << i);
 		}
@@ -79,6 +86,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 	if (ImGui::BeginPopupModal("ExtractionSettingsPopup"))
 	{
+		ImGui::SeparatorText("MOTA");
 		ImGui::TextUnformatted(_("extraction.mota_explanation"));
 
 		for (uint8_t motaId = 0; motaId < 12; ++motaId) {
@@ -94,6 +102,11 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		}
 
 		ImGui::NewLine();
+
+		ImGui::SeparatorText(_("extraction.settings.other"));
+		ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
+
+		ImGui::Separator();
 		if (ImGui::Button(_("close"))) {
 			ImGui::CloseCurrentPopup();
 		}

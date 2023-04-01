@@ -47,6 +47,12 @@ bool EditorT7::IsVoicelipValueEnd(const char* buffer)
 	return (uint32_t)strtoll(buffer, nullptr, 16) == 0xFFFFFFFF;
 }
 
+unsigned int EditorT7::GetMotaAnimCount(int motaId)
+{
+	// todo
+	return 0;
+}
+
 unsigned int EditorT7::GetStructureCount(EditorWindowType_ type)
 {
 	switch (type)

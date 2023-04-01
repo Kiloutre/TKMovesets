@@ -14,6 +14,7 @@
 typedef uint64_t ExtractSettings; // 64 flags
 enum ExtractSettings_
 {
+	// These 12 must occupy the first 12 bits
 	ExtractSettings_MOTA_0_ANIM = (1 << 0),
 	ExtractSettings_MOTA_1_ANIM = (1 << 1),
 	ExtractSettings_MOTA_2_HAND = (1 << 2),
@@ -37,6 +38,7 @@ enum ExtractSettings_
 
 
 	ExtractSettings_OVERWRITE_SAME_FILENAME = (1 << 12),
+	ExtractSettings_DisplayableMovelist = (1 << 13),
 };
 
 enum ExtractionErrcode_

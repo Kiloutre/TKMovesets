@@ -273,10 +273,8 @@ uint64_t Extractor::GetAnimationSize(gameAddr anim)
 		return ExtractorUtils::get64AnimSize(m_process, anim);
 	}
 	// Invalid animation type
-#ifdef BUILD_TYPE_DEBUG
-	uint32_t firstBytes = m_process->readInt32(anim);
-	printf("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, firstBytes);
-#endif
+
+	DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, m_process->readInt32(anim));
 
 	throw;
 	return 0;

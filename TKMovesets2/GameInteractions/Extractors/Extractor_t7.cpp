@@ -134,7 +134,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 
 	for (uint16_t motaId = 0; motaId < 12; ++motaId)
 	{
-		gameAddr motaAddr = ((uint64_t*)motas)[motaId];
+		gameAddr motaAddr = (gameAddr)motas->motas[motaId];
 		gameAddr motaSize;
 		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
 
@@ -146,10 +146,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		char buf[0x10];
 		m_process->readBytes(motaAddr, buf, 0x10);
 		if (memcmp(buf, "MOTA", 4) != 0) {
-
-#ifdef BUILD_TYPE_DEBUG
-			printf("Malformed MOTA %d\n", motaId);
-#endif
+			DEBUG_LOG("Malformed MOTA %d\n", motaId);
 			// Malformed MOTA, don't save it
 			continue;
 		}
@@ -164,18 +161,14 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
 		// Use bitwise flags to store which one we want to store
 		if ((((uint64_t)1 << motaId) & settings) == 0) {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Not saving mota %d : not set to be exported.\n", motaId);
-#endif
+			DEBUG_LOG("Not saving mota %d : not set to be exported.\n", motaId);
 			continue;
 		}
 		uint32_t lastAnimOffset = 0;
 		uint32_t* animOffsetList = (uint32_t*)calloc(animCount, sizeof(uint32_t));
 
 		if (animOffsetList == nullptr) {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Error while allocating the animation offset list (size %u * 4) for mota %d\n", animCount, motaId);
-#endif
+			DEBUG_LOG("Error while allocating the animation offset list (size %u * 4) for mota %d\n", animCount, motaId);
 			throw;
 		}
 
@@ -195,9 +188,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 
 		 
 		if (lastAnimOffset == 0) {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Empty MOTA %d - ", motaId);
-#endif
+			DEBUG_LOG("Empty MOTA %d - ", motaId);
 			motaSize = 0x14;
 		}
 		else {
@@ -209,9 +200,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		offsetMap[motaAddr] = std::pair<gameAddr, uint64_t>(motaCustomBlockSize, motaSize);
 		motaCustomBlockSize += motaSize;
 
-#ifdef BUILD_TYPE_DEBUG
-		printf("Saved mota %d, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
-#endif
+		DEBUG_LOG("Saved mota %d, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
 	}
 	return motaCustomBlockSize;
 }
@@ -291,7 +280,7 @@ void ExtractorT7::GetNamesBlockBounds(const gAddr::Move* move, uint64_t moveCoun
 	}
 
 	start = smallest;
-	end = lastItemEnd + 1; // Add 1 for extracting the nullbyte too
+	end = lastItemEnd + 1; // Add 1 to extract the nullbyte too
 }
 
 
@@ -315,9 +304,7 @@ Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 		uint64_t animSize = GetAnimationSize(animAddr);
 
 		if (animSize == 0) {
-#ifdef BUILD_TYPE_DEBUG
-			printf("Animation address %llx does not have a valid size.\n", animAddr);
-#endif
+			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
 			throw;
 		}
 		
@@ -388,6 +375,32 @@ Byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, Mota
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
 
+Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings)
+{
+	if (settings & ExtractSettings_DisplayableMovelist)
+	{
+		gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
+
+		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
+
+		if (playerId == 1) {
+			managerAddr += sizeof(MvlManager);
+		}
+
+		gameAddr blockStart = m_process->readInt64(managerAddr + offsetof(MvlManager, mvlHead));
+		MvlHead head;
+
+		m_process->readBytes(blockStart, &head, sizeof(head));
+
+		gameAddr blockEnd = blockStart + (m_process->readInt32(blockStart + offsetof(MvlHead, _unk0x1c_offset)) * 2); // todo: change
+		return allocateAndReadBlock(blockStart, blockEnd, size_out);
+	}
+	else {
+		size_out = 8;
+		return (Byte*)calloc(1, size_out);
+	}
+}
+
 void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress)
 {
 	infos.flags = 0; // Currently unused
@@ -414,6 +427,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	Byte* movesetBlock;
 	Byte* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
 	Byte* motaCustomBlock; // This is also a custom block because not contiguously stored
+	Byte* movelistBlock;
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
@@ -424,6 +438,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	uint64_t s_movesetBlock;
 	uint64_t s_animationBlock;
 	uint64_t s_motaCustomBlock;
+	uint64_t s_movelistBlock;
 
 	// Will contain our own informations such as date, version, character id
 	TKMovesetHeader customHeader{ 0 };
@@ -465,6 +480,10 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	}
 	progress = 20;
 
+	// movelistBlock
+	movelistBlock = CopyDisplayableMovelist(movesetAddr, playerAddress, s_movelistBlock, settings);
+	progress = 35;
+
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
 	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, settings);
 	progress = 50;
@@ -498,7 +517,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// Calculate each offsets according to the previous block offset + its size
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
-	// This is bceause you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
+	// This is because you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
+	// 8 bytes alignment isn't strictly needed, but i've had problems in the past on misaligned structures so this is safer
 	customHeader.offsets.movesetInfoBlock = 0x0;
 	customHeader.offsets.tableBlock = Helpers::align8Bytes(customHeader.offsets.movesetInfoBlock + s_movesetInfoBlock);
 	customHeader.offsets.motalistsBlock = Helpers::align8Bytes(customHeader.offsets.tableBlock + s_tableBlock);
@@ -506,21 +526,20 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	customHeader.offsets.movesetBlock = Helpers::align8Bytes(customHeader.offsets.nameBlock + s_nameBlock);
 	customHeader.offsets.animationBlock = Helpers::align8Bytes(customHeader.offsets.movesetBlock + s_movesetBlock);
 	customHeader.offsets.motaBlock = Helpers::align8Bytes(customHeader.offsets.animationBlock + s_animationBlock);
+	customHeader.offsets.movelistBlock = Helpers::align8Bytes(customHeader.offsets.motaBlock + s_motaCustomBlock);
 
 	ExtractionErrcode_ errcode;
 
 	// -- Writing the file -- 
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
-		|| animationBlock == nullptr || motaCustomBlock == nullptr) {
+		|| animationBlock == nullptr || motaCustomBlock == nullptr || movelistBlock == nullptr) {
 		errcode = ExtractionErrcode_AllocationErr;
-#ifdef BUILD_TYPE_DEBUG
-		printf("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\n",
-		(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock);
-#endif
+		DEBUG_LOG("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\nmovelistBlock = %llx\n",
+		(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock, (uint64_t)s_movelistBlock);
 	}
 	else {
-		// Create the file*
+		// Create the file
 
 		std::string filepath;
 		std::string tmp_filepath;
@@ -545,6 +564,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				{movesetBlock, s_movesetBlock},
 				{animationBlock, s_animationBlock},
 				{motaCustomBlock, s_motaCustomBlock},
+				{movelistBlock, s_movelistBlock},
 			};
 
 			customHeader.infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
@@ -575,6 +595,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	free(movesetBlock);
 	free(animationBlock);
 	free(motaCustomBlock);
+	free(movelistBlock);
 
 	return errcode;
 }

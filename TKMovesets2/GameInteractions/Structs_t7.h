@@ -304,21 +304,37 @@ namespace StructsT7
 		uint64_t throwCamerasCount;
 	};
 
+	struct MotaHeader
+	{
+		char motaString[4];
+		__int16 motaSwapped;
+		__int16 unk0xA;
+		__int32 unk0xC;
+		int animCount;
+		char gap0x10[4];
+		unsigned int animOffsetLIst[1];
+	};
+
 	struct MotaList
 	{
-		void* mota_0; // Anims
-		void* mota_1; // Anims
-		void* mota_2; // Hand
-		void* mota_3; // Hand
-		void* mota_4; // Face
-		void* mota_5; // Face
-		void* mota_6; // Wings (probably more to it)
-		void* mota_7; // Wings (probablty more to it)
-		void* mota_8; // Camera
-		void* mota_9; // Camera
-		void* mota_10; // Unknown
-		void* mota_11; // Unknown
-		void* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+		union {
+			struct {
+					MotaHeader* mota_0; // Anims
+					MotaHeader* mota_1; // Anims
+					MotaHeader* mota_2; // Hand
+					MotaHeader* mota_3; // Hand
+					MotaHeader* mota_4; // Face
+					MotaHeader* mota_5; // Face
+					MotaHeader* mota_6; // Wings (probably more to it)
+					MotaHeader* mota_7; // Wings (probablty more to it)
+					MotaHeader* mota_8; // Camera
+					MotaHeader* mota_9; // Camera
+					MotaHeader* mota_10; // Unknown
+					MotaHeader* mota_11; // Unknown
+					MotaHeader* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+			};
+			MotaHeader* motas[13];
+		};
 	};
 
 	struct MovesetInfo
@@ -333,6 +349,56 @@ namespace StructsT7
 		MovesetTable table;
 		MotaList motas;
 	};
+
+	// Displayable movelist structure
+	struct MvlHead
+	{
+		char mvlString[4];
+		int32_t _unk0x4;
+		int32_t displayableEntriesCount;
+		int32_t playableEntriesCount;
+		int32_t _unk0x10;
+		uint32_t displayables_offset;
+		uint32_t playables_offset;
+		uint32_t _unk0x1c_offset;
+		int32_t _unk0x20;
+		int32_t _unk0x24;
+		int32_t _unk0x28;
+		int32_t _unk0x2c;
+		int32_t _unk0x30;
+	};
+
+	struct MvlManager
+	{
+		uint32_t playingType;
+		uint32_t _unk0x4;
+		void* player;
+		uint32_t displayableEntriesCount;
+		uint32_t _unk0x14;
+		void* mvlDisplayableBlock;
+		MvlHead* mvlHead;
+		uint32_t _unk0x28;
+		uint32_t _unk0x2c;
+		uint32_t selected_entry;
+		uint32_t _unk0x34;
+		uint32_t _unk0x38;
+		uint32_t _unk0x3c;
+		uint32_t _unk0x40;
+		uint32_t _unk0x44;
+		uint32_t _unk0x48;
+		uint32_t _unk0x4c;
+		uint32_t _unk0x50;
+		uint32_t _unk0x54;
+		uint32_t _unk0x58;
+		uint32_t _unk0x5c;
+		void* sequenceEnd;
+		void* sequenceStart;
+		int32_t frame;
+		int32_t currentInputFrame;
+		uint32_t _unk0x78;
+		uint32_t _unk0x7c;
+	};
+
 }
 
 // Contains most of the same structs as above, but with no ptr (gameAddr instead)
@@ -571,6 +637,28 @@ namespace StructsT7_gameAddr
 		uint64_t throwCamerasCount;
 	};
 
+	struct MotaList
+	{
+		union {
+			struct {
+				gameAddr mota_0; // Anims
+				gameAddr mota_1; // Anims
+				gameAddr mota_2; // Hand
+				gameAddr mota_3; // Hand
+				gameAddr mota_4; // Face
+				gameAddr mota_5; // Face
+				gameAddr mota_6; // Wings (probably more to it)
+				gameAddr mota_7; // Wings (probablty more to it)
+				gameAddr mota_8; // Camera
+				gameAddr mota_9; // Camera
+				gameAddr mota_10; // Unknown
+				gameAddr mota_11; // Unknown
+				gameAddr _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+			};
+			gameAddr motas[13];
+		};
+	};
+
 	struct MovesetInfo
 	{
 		char _0x0[8];
@@ -581,6 +669,6 @@ namespace StructsT7_gameAddr
 		uint16_t aliases1[112];
 		uint16_t aliases2[36];
 		MovesetTable table;
-		StructsT7::MotaList motas;
+		MotaList motas;
 	};
 };

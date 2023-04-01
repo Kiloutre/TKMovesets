@@ -11,5 +11,4 @@ endif()
 
 project ("TKMovesets2")
 
-# Incluez les sous-projets.
 add_subdirectory ("TKMovesets2")

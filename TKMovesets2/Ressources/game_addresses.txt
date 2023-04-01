@@ -9,9 +9,12 @@ val:t7_playerstruct_size  = 0x3670
 val:t7_motbin_offset      = 0x1520
 val:t7_chara_id_offset    = 0xD8
 val:t7_currmove           = 0x220
+val:t7_playerid_offset    = 0xD4
+## Extras for fancier exportation (optional)
+t7_movelist_manager_addr  = +0x34477e0, 0x40
 # Required for importation
 val:t7_camera_mota_offset = 0x14A0
-# Extras for fancier importation
+## Extras for fancier importation (optional)
 val:t7_currmove_timer     = 0x1D4
 val:t7_currmove_id        = 0x350
 val:t7_nextmove_addr      = 0xDA0

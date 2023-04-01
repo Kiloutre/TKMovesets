@@ -1,5 +1,5 @@
 # Ceci est un commentaire
-# clé = Text
+# clé = Texte
 # Chaque ligne représente une entrée différente
 # '\n' peut être utilisé pour insérer un retour à la ligne dans un paragraphe. Les espaces en début et fin des clés et textes sont supprimés.
 
@@ -90,6 +90,8 @@ extraction.error_file_creation = Il y a eu une erreur lors de la création du fi
 extraction.error_allocation = Il y a eu une erreur d'allocation lors de la copie des données du personnage
 extraction.mota_explanation = Animations additionnelles 
 extraction.settings = Paramètres
+extraction.settings.displayable_movelist = Liste des coups
+extraction.settings.other = Autre
 
 # Importation #
 importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.

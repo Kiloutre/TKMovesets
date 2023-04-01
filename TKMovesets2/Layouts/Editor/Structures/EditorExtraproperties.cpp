@@ -90,7 +90,13 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	unsigned int startingFrame = (unsigned int)EditorUtils::GetFieldValue(map["starting_frame"]);
 	unsigned int propId = (unsigned int)EditorUtils::GetFieldValue(map["id"]);
-	int64_t value = (int64_t)EditorUtils::GetFieldValue(map["value_signed"]);
+	union {
+		uint64_t value_uint64;
+		uint32_t value_uint32;
+		int32_t value_int32;
+		float value_float;
+	};
+	value_uint64 = EditorUtils::GetFieldValue(map["value_signed"]);
 
 	const char* idLabel = m_baseWindow->labels->GetText(propId);
 
@@ -125,11 +131,11 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 		startingFrameText = std::to_string(startingFrame);
 	}
 
-	if (value > 15 || value < 0) {
-		valueText = std::format("{} / {} / 0x{:x} / {:f}f", *(int32_t*)&value, value, value, *(float*)&value);
+	if (value_int32 > 15 || value_int32 < 0) {
+		valueText = std::format("{} / {} / 0x{:x} / {:f}f", value_int32, value_uint32, value_uint32, value_float);
 	}
 	else {
-		valueText = std::to_string(value);
+		valueText = std::to_string(value_int32);
 	}
 
 	if (idLabel == nullptr) {

@@ -10,7 +10,7 @@
 const NavMenuBtn cg_moveset_btns[] = {
 	{NAV__MENU_EXTRACT, "navmenu.extraction"},
 	{NAV__MENU_IMPORT, "navmenu.import"},
-	//{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
+	{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
 };
 
 const NavMenuBtn cg_tools_btns[] = {

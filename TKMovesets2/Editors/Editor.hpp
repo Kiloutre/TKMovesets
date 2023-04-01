@@ -329,6 +329,8 @@ public:
 	virtual bool IsVoicelipValueEnd(const char* buffer) = 0;
 	// Returns the amount of structure in the given structure list type (move, cancel etc)
 	virtual unsigned int GetStructureCount(EditorWindowType_ type) = 0;
+	// Returns the amount of MOTA animations inside of a specific MOTA
+	virtual unsigned int GetMotaAnimCount(int motaId) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

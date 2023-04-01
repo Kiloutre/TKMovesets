@@ -896,11 +896,7 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 	if (live_loadedMoveset == 0) {
 		return;
 	}
-#ifdef BUILD_TYPE_DEBUG
-	else {
-		printf("Applying live edit: window type %d, item id %d, field name '%s', buffer [%s]\n", type, id, field->name.c_str(), field->buffer);
-	}
-#endif
+	DEBUG_LOG("Applying live edit: window type %d, item id %d, field name '%s', buffer [%s]\n", type, id, field->name.c_str(), field->buffer);
 
 	switch (type)
 	{

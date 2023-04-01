@@ -165,7 +165,8 @@ void EditorMove::PostRender()
 	if (m_animationListOpen) {
 		ImGui::OpenPopup("AnimListPopup");
 
-		if (m_animationList->Render()) {
+		if (m_animationList->Render())
+		{
 			const char* animPath = m_animationList->animationToImport;
 			if (animPath != nullptr) {
 				// User clicked on "Import" button on an anim
@@ -188,7 +189,8 @@ void EditorMove::PostRender()
 
 			}
 		}
-		else {
+		else
+		{
 			m_animationListOpen = false;
 			delete m_animationList;
 			m_animationList = nullptr;

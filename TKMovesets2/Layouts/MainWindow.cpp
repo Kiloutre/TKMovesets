@@ -121,6 +121,7 @@ void MainWindow::Update()
 				importMenu.Render(importer);
 				break;
 			case NAV__MENU_ONLINE_PLAY:
+				onlineMenu.Render();
 				break;
 			case NAV__MENU_CAMERA:
 				break;

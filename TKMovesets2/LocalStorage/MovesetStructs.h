@@ -48,10 +48,12 @@ struct TKMovesetHeader_offsets
 	uint64_t nameBlock;
 	// Stores an offset to the block containing stucture lists
 	uint64_t movesetBlock;
-	// Store an offset to the block containing every regular animation used in the moveset
-	uint64_t animationBlock; // Custom block
-	// Store an offset to the block containing the multiple mota files for those that are extracted
-	uint64_t motaBlock; // Custom block
+	// Store an offset to the block containing every regular animation used in the moveset. (customly-built)
+	uint64_t animationBlock;
+	// Store an offset to the block containing the multiple mota files for those that are extracted . (customly-built)
+	uint64_t motaBlock;
+	// Stores the .mvl file in order to show the custom movelist in training mode
+	uint64_t movelistBlock;
 };
 
 
