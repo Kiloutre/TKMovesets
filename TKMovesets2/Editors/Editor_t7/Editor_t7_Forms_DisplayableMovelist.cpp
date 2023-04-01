@@ -79,8 +79,8 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	CREATE_FIELD("_unk0x8", 0, EditorInput_U16_Changeable, playable->_unk0x8);
 	CREATE_FIELD("p1_facing_related", 0, EditorInput_U16_Changeable, playable->p1_facing_related);
 	CREATE_FIELD("_unk0xc", 0, EditorInput_U16_Changeable, playable->_unk0xc);
-	CREATE_FIELD("input_count", 0, EditorInput_U16, playable->input_count);
 	CREATE_FIELD("input_sequence_id", 0, EditorInput_U16 | EditorInput_Interactable, input_sequence_id);
+	CREATE_FIELD("input_count", 0, EditorInput_U16, playable->input_count);
 	CREATE_FIELD("has_rage", 0, EditorInput_U16_Changeable, playable->has_rage);
 	CREATE_FIELD("_unk0x16", 0, EditorInput_U16_Changeable, playable->_unk0x16);
 

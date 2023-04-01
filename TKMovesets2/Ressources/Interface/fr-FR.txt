@@ -357,6 +357,17 @@ edition.camera_data.left_side_camera_data = Côté gauche
 edition.camera_data.right_side_camera_data = Côté droit
 edition.camera_data._0xA_short = _0xA_short
 
+edition.mvl_displayable.window_name = Liste de coups: Entrée
+edition.mvl_displayable.type = Type
+edition.mvl_displayable.playable_id = ID de Jouable
+
+edition.mvl_playable.window_name = Liste de coups: Jouable
+edition.mvl_playable.distance = Distance
+edition.mvl_playable.p2_rotation = J2 Rotation
+edition.mvl_playable.input_count = Sequence de commande ID
+edition.mvl_playable.input_sequence_id = Nombre de commandes
+edition.mvl_playable.has_rage = Rage
+
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

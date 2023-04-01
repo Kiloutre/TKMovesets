@@ -363,6 +363,17 @@ edition.camera_data.left_side_camera_data = Left side camera data
 edition.camera_data.right_side_camera_data = Right side camera data
 edition.camera_data._0xA_short = _0xA_short
 
+edition.mvl_displayable.window_name = Movelist: Displayable
+edition.mvl_displayable.type = Type
+edition.mvl_displayable.playable_id = Playable ID
+
+edition.mvl_playable.window_name = Movelist: Playable
+edition.mvl_playable.distance = Distance
+edition.mvl_playable.p2_rotation = P2 Rotation
+edition.mvl_playable.input_count = Input sequence ID
+edition.mvl_playable.input_sequence_id = Input count
+edition.mvl_playable.has_rage = Has Rage
+
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?
