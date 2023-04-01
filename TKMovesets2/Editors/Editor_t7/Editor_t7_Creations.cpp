@@ -54,9 +54,13 @@ template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += extraSize;
-	m_header->offsets.motaBlock += extraSize;
-	m_header->offsets.movelistBlock += extraSize;
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= newStructOffset) {
+			m_header->offsets.blocks[i] += extraSize;
+			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraSize);
+		}
+	}
 
 	return newStructId;
 }
@@ -261,10 +265,20 @@ int32_t EditorT7::CreateNewMove()
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraNameSize = nameBlockEnd - orig_nameBlockEnd;
 	const uint64_t extraMoveSize = structSize;
-	m_header->offsets.movesetBlock += extraNameSize;
-	m_header->offsets.animationBlock += extraNameSize + extraMoveSize;
-	m_header->offsets.motaBlock += extraNameSize + extraMoveSize;
-	m_header->offsets.movelistBlock += extraNameSize + extraMoveSize;
+
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		uint64_t blockOffset = (m_header->infos.header_size + m_header->offsets.blocks[i]);
+		if (blockOffset >= orig_movelistEnd) {
+			m_header->offsets.blocks[i] += extraNameSize + extraMoveSize;
+			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize + extraMoveSize);
+		}
+		else if (blockOffset >= orig_nameBlockEnd) {
+			m_header->offsets.blocks[i] += extraNameSize;
+			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize);
+		}
+	}
+
 	m_infos->table.moveCount++;
 
 	// Increment moveset block offsets

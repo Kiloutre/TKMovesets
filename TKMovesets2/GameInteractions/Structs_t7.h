@@ -350,7 +350,17 @@ namespace StructsT7
 		MotaList motas;
 	};
 
-	// Displayable movelist structure
+	// Displayable movelist structures
+
+	// Inputs played by bot in movelist display
+	struct MvlInput
+	{
+		byte directions;
+		byte buttons;
+		__int16 frame_duration;
+	};
+
+	// .mvl file
 	struct MvlHead
 	{
 		char mvlString[4];
@@ -368,6 +378,22 @@ namespace StructsT7
 		int32_t _unk0x30;
 	};
 
+	struct MvlPlayable
+	{
+		int16_t _unk0x0;
+		uint16_t distance;
+		uint16_t p2_rotation;
+		uint16_t _unk0x6;
+		uint16_t _unk0x8;
+		uint16_t p1_facing_related;
+		uint16_t _unk0xc;
+		uint16_t input_count;
+		int32_t inputSequenceOffset;
+		uint16_t has_rage;
+		uint16_t _unk0x16;
+	};
+
+	// Struct that manages the training mode movelist in memory
 	struct MvlManager
 	{
 		uint32_t playingType;
@@ -391,35 +417,12 @@ namespace StructsT7
 		uint32_t _unk0x54;
 		uint32_t _unk0x58;
 		uint32_t _unk0x5c;
-		void* sequenceEnd;
-		void* sequenceStart;
+		MvlInput* sequenceEnd;
+		MvlInput* sequenceStart;
 		int32_t frame;
 		int32_t currentInputFrame;
 		uint32_t _unk0x78;
 		uint32_t _unk0x7c;
-	};
-
-	struct MvlPlayable
-	{
-		int16_t _unk0x0;
-		uint16_t distance;
-		uint16_t p2_rotation;
-		uint16_t _unk0x6;
-		uint16_t _unk0x8;
-		uint16_t p1_facing_related;
-		uint16_t _unk0xc;
-		uint16_t input_count;
-		int32_t inputSequenceOffset;
-		uint16_t has_rage;
-		uint16_t _unk0x16;
-	};
-
-	// Inputs played by bot in movelist display
-	struct MvlInput
-	{
-		byte directions;
-		byte buttons;
-		__int16 frame_duration;
 	};
 }
 

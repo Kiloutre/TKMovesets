@@ -223,14 +223,16 @@ void EditorWindow::Save()
 		{movesetData + offsets.movesetInfoBlock, offsets.tableBlock - offsets.movesetInfoBlock },
 		{movesetData + offsets.tableBlock, offsets.motalistsBlock - offsets.tableBlock },
 		{movesetData + offsets.motalistsBlock, offsets.nameBlock - offsets.motalistsBlock },
-		{movesetData + offsets.nameBlock, offsets.movesetBlock - offsets.nameBlock },
+		//{movesetData + offsets.nameBlock, offsets.movesetBlock - offsets.nameBlock }, Don't include name block because it isn't important
 		{movesetData + offsets.movesetBlock, offsets.animationBlock - offsets.movesetBlock },
 		{movesetData + offsets.animationBlock, offsets.motaBlock - offsets.animationBlock },
-		{movesetData + offsets.motaBlock, movesetSize - header->infos.header_size - offsets.motaBlock },
+		{movesetData + offsets.motaBlock, offsets.movelistBlock - offsets.motaBlock },
+		//{movesetData + offsets.movelistBlock, movesetSize - header->infos.header_size - offsets.movelistBlock }, Don't include displayable movelist block because it isn't important
 	};
 
 	// Because the editor might make corrections to the moveset right as it loads it,
-	// ... it is likely the CRC32 will be different from extraction (especially for the name block)
+	// ... it is likely the CRC32 will be different from extraction
+	// That isn't that big of a problem
 
 	header->infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
 	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();

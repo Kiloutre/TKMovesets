@@ -17,6 +17,9 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 
 	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movesetBlock + tableListStart + (uint64_t)listId * structSize;
 
+	uint64_t postListOffset = listOffset + structSize * newSize;
+	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
+
 	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
 	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
 	newMovesetSize = m_movesetSize + structListSizeDiff;
@@ -40,24 +43,26 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 			listHeadPtr += 2;
 		}
 	}
-	
+
+	// Shift offsets in the moveset table & in our header
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_postListOffset) {
+			m_header->offsets.blocks[i] += structListSizeDiff;
+			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, structListSizeDiff);
+		}
+	}
 
 	// Copy all the data up to the structure list 
 	memcpy(newMoveset, m_moveset, listOffset);
 
 	// Copy all the data after the structure list
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
 	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
 
 	// Assign new moveset
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 
-	// Shift offsets in the moveset table & in our header
-	m_header->offsets.animationBlock += structListSizeDiff;
-	m_header->offsets.motaBlock += structListSizeDiff;
-	m_header->offsets.movelistBlock += structListSizeDiff;
 }
 
 void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)

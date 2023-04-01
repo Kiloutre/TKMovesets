@@ -35,21 +35,25 @@ void EditorWindow::RenderToolBar()
 
 	// Current move 1P
 
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_1p"), m_loadedMoveset != 0)) {
-		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(0);
-		m_moveToPlay = m_moveToScrollTo;
-		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
-		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
-		m_highlightedMoveId = m_moveToScrollTo;
+	{
+		int32_t moveToSet = -1;
+		if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_1p"), m_loadedMoveset != 0)) {
+			moveToSet = (int16_t)m_editor->GetCurrentMoveID(0);
+		}
+		// Current move 2P
+		if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_2p"), m_loadedMoveset != 0)) {
+			moveToSet = (int16_t)m_editor->GetCurrentMoveID(1);
+		}
+
+		if (moveToSet != -1)
+		{
+			m_moveToPlay = moveToSet;
+			sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", moveToSet);
+			OpenFormWindow(EditorWindowType_Move, moveToSet);
+			m_highlightedMoveId = moveToSet;
+		}
 	}
-	// Current move 2P
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current_2p"), m_loadedMoveset != 0)) {
-		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(1);
-		m_moveToPlay = m_moveToScrollTo;
-		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
-		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
-		m_highlightedMoveId = m_moveToScrollTo;
-	}
+
 
 	ImGui::Separator();
 	

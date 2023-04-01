@@ -1028,12 +1028,16 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 		return 0;
 	}
 
-
 	// Shift offsets now that we know the extra allocated size. Need to do it before LoadMovesetPtr.
 	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
-	m_header->offsets.movesetBlock += extraNameSize;
-	m_header->offsets.animationBlock += extraNameSize;
-	m_header->offsets.motaBlock += extraNameSize;
+
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_moveNameEndOffset) {
+			m_header->offsets.blocks[i] += extraNameSize;
+			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize);
+		}
+	}
 
 	// Copy start //
 
@@ -1089,9 +1093,13 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraBlockSize = movelistStartOffset - orig_movelistStartOffset;
-	m_header->offsets.movesetBlock += extraBlockSize;
-	m_header->offsets.animationBlock += extraBlockSize;
-	m_header->offsets.motaBlock += extraBlockSize;
+
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_movelistStartOffset) {
+			m_header->offsets.blocks[i] += extraBlockSize;
+		}
+	}
 
 	memset(newMoveset, 0, newMovesetSize);
 
@@ -1798,9 +1806,17 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraNameSize = nameBlockEnd - orig_nameBlockEnd;
 	const uint64_t extraAnimSize = Helpers::align8Bytes(animSize);
-	m_header->offsets.movesetBlock += extraNameSize;
-	m_header->offsets.animationBlock += extraNameSize;
-	m_header->offsets.motaBlock += extraNameSize + extraAnimSize;
+
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		uint64_t blockOffset = (m_header->infos.header_size + m_header->offsets.blocks[i]);
+		if (blockOffset >= orig_animBlockEnd) {
+			m_header->offsets.blocks[i] += extraNameSize + extraAnimSize;
+		}
+		else if (blockOffset >= orig_nameBlockEnd) {
+			m_header->offsets.blocks[i] += extraNameSize;
+		}
+	}
 
 	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - m_header->infos.header_size;
 	const uint64_t relativeAnim = newAnimOffset - m_header->offsets.animationBlock - m_header->infos.header_size;

@@ -407,7 +407,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 		for (size_t i = 0; i < head.playableEntriesCount; ++i)
 		{
 			uint32_t lastInputOffset = playables[i].inputSequenceOffset + sizeof(MvlInput) * playables[i].input_count;
-			lastInputOffset += (i * sizeof(MvlPlayable));
+			lastInputOffset += (i * (uint32_t)sizeof(MvlPlayable));
 			if (lastInputOffset > biggestInpuOffset) {
 				biggestInpuOffset = lastInputOffset;
 			}

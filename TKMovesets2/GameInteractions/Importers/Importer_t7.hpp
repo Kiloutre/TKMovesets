@@ -29,7 +29,7 @@ private:
 	// Fixes move that rely on correct character IDs to work
 	void ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* offsets, const TKMovesetHeader& header);
 	// Import the displayable movelist
-	void ImportMovelist(gameAddr gameMoveset, Byte* moveset, gameAddr playerAddress, const TKMovesetHeader& header);
+	void ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
 public:
 	using Importer::Importer; // Inherit constructor too
 	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;

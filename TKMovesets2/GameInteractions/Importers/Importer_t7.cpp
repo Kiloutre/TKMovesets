@@ -215,13 +215,10 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 	}
 }
 
-void ImporterT7::ImportMovelist(gameAddr gameMoveset, Byte* moveset, gameAddr playerAddress, const TKMovesetHeader& header)
+void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress)
 {
-	MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
-
 	if (strncmp(mvlHead->mvlString, "MVLT", 4) == 0)
 	{
-		gameAddr movelistAddr = gameMoveset + header.offsets.movelistBlock;
 		gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
 
 		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
@@ -230,9 +227,9 @@ void ImporterT7::ImportMovelist(gameAddr gameMoveset, Byte* moveset, gameAddr pl
 			managerAddr += sizeof(MvlManager);
 		}
 
-		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlHead), movelistAddr);
+		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlHead), game_mlvHead);
 		m_process->writeInt64(managerAddr + offsetof(MvlManager, displayableEntriesCount), mvlHead->displayableEntriesCount);
-		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlDisplayableBlock), movelistAddr + mvlHead->displayables_offset);
+		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlDisplayableBlock), game_mlvHead + mvlHead->displayables_offset);
 	}
 }
 
@@ -263,9 +260,11 @@ void ImporterT7::CleanupUnusedMovesets()
 		bool isUsed = false;
 
 		// Call CanImport() because it's a quick way to see if players are loaded. If they're not, we can free memory worry-free.
-		if (CanImport()) {
+		if (CanImport())
+		{
 			// Check movesets of both players
-			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid) {
+			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid)
+			{
 				gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
 
 				// Maybe overkill to check every offset, but drastically reduces the chance of a crash, and isn't that slow
@@ -381,7 +380,11 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 		ForcePlayerMove(playerAddress, gameMoveset, 32769);
 	}
 
-	ImportMovelist(gameMoveset, moveset, playerAddress, header);
+	if (header.offsets.movelistBlock + 4 < s_moveset) {
+		MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
+		gameAddr game_mvlHead = (gameAddr)gameMoveset + header.offsets.movelistBlock;
+		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
+	}
 
 	// -- Cleanup -- //
 	// Destroy our local copy
