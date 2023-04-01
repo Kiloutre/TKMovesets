@@ -386,7 +386,7 @@ void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
-	gameAddr requirement = blockStart + (uint64_t)m_infos->table.requirementCount + id * sizeof(Requirement);
+	gameAddr requirement = blockStart + (uint64_t)m_infos->table.requirement + id * sizeof(Requirement);
 	union {
 		uint64_t value_u64;
 		int64_t value_s64;
