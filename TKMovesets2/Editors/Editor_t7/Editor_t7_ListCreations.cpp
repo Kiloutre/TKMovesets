@@ -49,7 +49,7 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 	{
 		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_postListOffset) {
 			m_header->offsets.blocks[i] += structListSizeDiff;
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, structListSizeDiff);
+			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
 		}
 	}
 

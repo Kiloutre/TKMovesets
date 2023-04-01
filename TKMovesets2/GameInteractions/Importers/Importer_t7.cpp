@@ -380,7 +380,8 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 		ForcePlayerMove(playerAddress, gameMoveset, 32769);
 	}
 
-	if (header.offsets.movelistBlock + 4 < s_moveset) {
+	if ((header.infos.header_size + header.offsets.movelistBlock + 4) < s_moveset)
+	{
 		MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
 		gameAddr game_mvlHead = (gameAddr)gameMoveset + header.offsets.movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);

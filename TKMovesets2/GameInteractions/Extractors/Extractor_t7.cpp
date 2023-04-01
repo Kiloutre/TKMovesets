@@ -403,11 +403,11 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 
 		// Use the biggest input offset in order to get the end of the movelist
 		// Haven't found a better way but it doesn't crash
-		uint32_t biggestInpuOffset = 0;
+		uint64_t biggestInpuOffset = 0;
 		for (size_t i = 0; i < head.playableEntriesCount; ++i)
 		{
-			uint32_t lastInputOffset = playables[i].inputSequenceOffset + sizeof(MvlInput) * playables[i].input_count;
-			lastInputOffset += (i * (uint32_t)sizeof(MvlPlayable));
+			uint64_t lastInputOffset = playables[i].inputSequenceOffset + sizeof(MvlInput) * playables[i].input_count;
+			lastInputOffset += (i * sizeof(MvlPlayable));
 			if (lastInputOffset > biggestInpuOffset) {
 				biggestInpuOffset = lastInputOffset;
 			}
@@ -554,7 +554,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	// -- Writing the file -- 
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
-		|| animationBlock == nullptr || motaCustomBlock == nullptr || movelistBlock == nullptr) {
+		|| animationBlock == nullptr || motaCustomBlock == nullptr || movelistBlock == nullptr)
+	{
 		errcode = ExtractionErrcode_AllocationErr;
 		DEBUG_LOG("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\nmovelistBlock = %llx\n",
 		(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock, (uint64_t)s_movelistBlock);

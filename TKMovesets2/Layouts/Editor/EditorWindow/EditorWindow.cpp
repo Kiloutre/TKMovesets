@@ -26,6 +26,7 @@
 #include "EditorProjectile.hpp"
 #include "EditorThrowCamera.hpp"
 #include "EditorCameraData.hpp"
+#include "EditorMovelistDisplayable.hpp"
 
 // -- Private methods -- //
 
@@ -39,9 +40,11 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_Voiceclip:
 		return new EditorVoiceclip(m_windowTitle, id, m_editor, this);
 		break;
+
 	case EditorWindowType_Extraproperty:
 		return new EditorExtraproperties(m_windowTitle, id, m_editor, this);
 		break;
+
 	case EditorWindowType_Cancel:
 		return new EditorCancels(m_windowTitle, id, m_editor, this);
 		break;
@@ -51,9 +54,11 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_CancelExtradata:
 		return new EditorCancelExtra(m_windowTitle, id, m_editor);
 		break;
+
 	case EditorWindowType_Requirement:
 		return new EditorRequirements(m_windowTitle, id, m_editor, this);
 		break;
+
 	case EditorWindowType_HitCondition:
 		return new EditorHitConditions(m_windowTitle, id, m_editor, this);
 		break;
@@ -66,26 +71,34 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 	case EditorWindowType_PushbackExtradata:
 		return new EditorPushbackExtra(m_windowTitle, id, m_editor, this, listSize);
 		break;
+
 	case EditorWindowType_MoveBeginProperty:
 		return new EditorMoveStartProperty(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_MoveEndProperty:
 		return new EditorMoveEndProperty(m_windowTitle, id, m_editor, this);
 		break;
+
 	case EditorWindowType_InputSequence:
 		return new EditorInputSequence(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_Input:
 		return new EditorInputStruct(m_windowTitle, id, m_editor, this, listSize);
 		break;
+
 	case EditorWindowType_Projectile:
 		return new EditorProjectile(m_windowTitle, id, m_editor, this);
 		break;
+
 	case EditorWindowType_ThrowCamera:
 		return new EditorThrowCamera(m_windowTitle, id, m_editor, this);
 		break;
 	case EditorWindowType_CameraData:
 		return new EditorCameraData(m_windowTitle, id, m_editor);
+		break;
+
+	case EditorWindowType_MovelistDisplayable:
+		return new EditorMovelistDisplayable(m_windowTitle, m_editor, this);
 		break;
 	}
 

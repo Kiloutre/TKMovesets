@@ -92,6 +92,10 @@ enum EditorWindowType_
 	EditorWindowType_ThrowCamera,
 
 
+	EditorWindowType_MovelistDisplayable,
+	EditorWindowType_MovelistPlayable,
+
+
 	EditorWindowType_Invalid,
 };
 
@@ -266,6 +270,8 @@ public:
 	std::thread* animExtractionThread;
 	// Stores the address of the loaded moveset in-game. Will become 0 if it does not match the current moveset.
 	gameAddr live_loadedMoveset = 0;
+	// If moveset posses movelist data
+	bool hasDisplayableMovelist = false;
 
 	Editor(GameProcess* process, GameData* game);
 	~Editor();

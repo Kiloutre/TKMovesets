@@ -40,6 +40,10 @@ namespace Helpers
 			uint64_t blockSize = blocks[i].second;
 
 			crc32 = Helpers::crc32_update(table, crc32, blockData, blockSize);
+#ifdef BUILD_TYPE_DEBUG
+			uint32_t single_crc32 = Helpers::crc32_update(table, 0, blockData, blockSize);
+			DEBUG_LOG("(CRC32 = %x) - Block %llx (size %llx)\n", single_crc32, (uint64_t)blockData, blockSize);
+#endif
 		}
 		return crc32;
 	}

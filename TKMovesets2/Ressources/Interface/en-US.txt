@@ -166,6 +166,8 @@ edition.projectile = Projectile
 edition.throw_camera = Throw camera
 edition.camera_data = Camera data
 
+edition.open_movelist = Open movelist
+
 edition.move.window_name = Move
 edition.move.category_2 = References
 edition.move.category_3 = Extras

@@ -1033,7 +1033,8 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 
 	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
 	{
-		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_moveNameEndOffset) {
+		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_moveNameEndOffset)
+		{
 			m_header->offsets.blocks[i] += extraNameSize;
 			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize);
 		}
@@ -1451,8 +1452,8 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	// Start getting pointers toward useful data structures
 	// Also get the actual game-moveset (past our header) pointer
 	m_header = (TKMovesetHeader*)t_moveset;
-	m_movesetData = t_moveset + m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
-	m_movesetDataSize = m_movesetSize - m_header->infos.header_size + m_header->offsets.movesetInfoBlock;
+	m_movesetData = t_moveset + m_header->infos.header_size;
+	m_movesetDataSize = m_movesetSize - m_header->infos.header_size;
 	m_infos = (MovesetInfo*)m_movesetData;
 
 	// Update our useful iterators
@@ -1500,6 +1501,11 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		m_aliases->push_back(aliasesPtr[i]);
 	}
 
+	if ((m_header->offsets.movelistBlock + 8) <= m_movesetDataSize && \
+		strncmp((char*)m_movesetData + m_header->offsets.movelistBlock, "MVLT", 4) == 0) {
+		hasDisplayableMovelist = true;
+	}
+
 	// Build anim name : offset list
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
@@ -1513,12 +1519,12 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 
 		if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end() && m_animNameToOffsetMap->at(animName_str) != animOffset) {
 			// Same animation name refers to a different offset. Create a unique animation name for it.
-			// Move names being similar is irrelevant, but i build an anim name <-> anim offset map, so i need uniqueness here.
+			// Move names being similar is irrelevant, but i build an anim name -> anim offset map, so i need identical names to point toward the same anim.
 
 			animName_str += " (2)";
 			unsigned int num = 2;
 			while (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
-				animName_str = std::format("{} {}", animName, ++num);
+				animName_str = std::format("{} ({})", animName, ++num);
 			}
 
 			uint64_t newNameOffset = CreateMoveName(animName_str.c_str());

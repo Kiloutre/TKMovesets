@@ -7,20 +7,6 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "EditorWindow.hpp"
-// Structures
-#include "EditorMove.hpp"
-#include "EditorVoiceclip.hpp"
-#include "EditorExtraproperties.hpp"
-#include "EditorCancels.hpp"
-#include "EditorCancelExtra.hpp"
-#include "EditorGroupedCancels.hpp"
-#include "EditorRequirements.hpp"
-#include "EditorHitConditions.hpp"
-#include "EditorReactions.hpp"
-#include "EditorPushback.hpp"
-#include "EditorPushbackExtra.hpp"
-#include "EditorMoveStartProperty.hpp"
-#include "EditorMoveEndProperty.hpp"
 
 // -- Private methods -- //
 
@@ -161,6 +147,11 @@ void EditorWindow::RenderToolBar()
 	const char* label = m_editor->animationExtractionStatus == AnimExtractionStatus_Finished ? "edition.extract_animations_finished" : "edition.extract_animations";
 	if (ImGui::MenuItem(_(label), nullptr, false, !disableExtractButton)) {
 		m_editor->OrderAnimationsExtraction(m_loadedCharacter.name);
+	}
+
+	ImGui::Separator();
+	if (ImGui::MenuItem(_("edition.open_movelist"), nullptr, false, m_editor->hasDisplayableMovelist)) {
+		OpenFormWindow(EditorWindowType_MovelistDisplayable, 0);
 	}
 
 	ImGui::EndMenuBar();

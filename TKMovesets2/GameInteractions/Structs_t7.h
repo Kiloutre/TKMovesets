@@ -378,6 +378,99 @@ namespace StructsT7
 		int32_t _unk0x30;
 	};
 
+	enum MvlDisplayableType_
+	{
+		MvlDisplayableType_Disabled       = 0x2,
+		MvlDisplayableType_Category       = 0x8,
+		MvlDisplayableType_Regular        = 0x10000,
+		MvlDisplayableType_ComboListStart = 0xA,
+		MvlDisplayableType_Unknown        = 0xD,
+	};
+
+	struct MvlDisplayable
+	{
+		int32_t translationOffsets[16];
+		uint32_t _unk0x40;
+		__int16 playableEntryId;
+		__int16 _unk0x46;
+		MvlDisplayableType_ type;
+		uint32_t _unk0x4c;
+		uint32_t _unk0x50;
+		uint32_t _unk0x54;
+		uint32_t _unk0x58;
+		uint32_t _unk0x5c;
+		uint32_t _unk0x60;
+		uint32_t _unk0x64;
+		uint32_t _unk0x68;
+		uint32_t _unk0x6c;
+		uint32_t _unk0x70;
+		uint32_t _unk0x74;
+		uint32_t _unk0x78;
+		uint32_t _unk0x7c;
+		uint32_t _unk0x80;
+		uint32_t _unk0x84;
+		uint32_t _unk0x88;
+		uint32_t _unk0x8c;
+		uint32_t _unk0x90;
+		uint32_t _unk0x94;
+		uint32_t _unk0x98;
+		uint32_t _unk0x9c;
+		uint32_t _unk0xa0;
+		uint32_t _unk0xa4;
+		uint32_t _unk0xa8;
+		uint32_t _unk0xac;
+		uint32_t _unk0xb0;
+		uint32_t _unk0xb4;
+		uint32_t _unk0xb8;
+		uint32_t _unk0xbc;
+		uint32_t _unk0xc0;
+		uint32_t _unk0xc4;
+		uint32_t _unk0xc8;
+		uint32_t _unk0xcc;
+		uint32_t _unk0xd0;
+		uint32_t _unk0xd4;
+		uint32_t _unk0xd8;
+		uint32_t _unk0xdc;
+		uint32_t _unk0xe0;
+		uint32_t _unk0xe4;
+		uint32_t _unk0xe8;
+		uint32_t _unk0xec;
+		uint32_t _unk0xf0;
+		uint32_t _unk0xf4;
+		uint32_t _unk0xf8;
+		uint32_t _unk0xfc;
+		uint32_t _unk0x100;
+		uint32_t _unk0x104;
+		uint32_t _unk0x108;
+		uint32_t _unk0x10c;
+		uint32_t _unk0x110;
+		uint32_t _unk0x114;
+		uint32_t _unk0x118;
+		uint32_t _unk0x11c;
+		uint32_t _unk0x120;
+		uint32_t _unk0x124;
+		uint32_t _unk0x128;
+		uint32_t _unk0x12c;
+		uint32_t _unk0x130;
+		uint32_t _unk0x134;
+		uint32_t _unk0x138;
+		uint32_t _unk0x13c;
+		uint32_t _unk0x140;
+		uint32_t _unk0x144;
+		uint32_t _unk0x148;
+		uint32_t _unk0x14c;
+		uint32_t _unk0x150;
+		uint32_t _unk0x154;
+		uint32_t _unk0x158;
+		uint32_t _unk0x15c;
+		uint32_t _unk0x160;
+		uint32_t _unk0x164;
+		uint32_t _unk0x168;
+		uint32_t _unk0x16c;
+		uint32_t _unk0x170;
+	};
+
+
 	struct MvlPlayable
 	{
 		int16_t _unk0x0;

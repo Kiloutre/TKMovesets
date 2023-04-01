@@ -10,6 +10,7 @@ set(INCLUDE_FOLDERS
                     "Layouts/Editor/EditorWindow"
                     "Layouts/Editor/Structures"
                     "Layouts/Editor/Structures/Subwindows"
+                    "Layouts/Editor/Structures/DisplayableMovelist"
                     "Game"
                     "GameInteractions"
                     "GameInteractions/Extractors"
@@ -56,6 +57,8 @@ set(BINARY_SOURCES
                     "Layouts/Editor/Structures/EditorProjectile.cpp"
                     "Layouts/Editor/Structures/EditorThrowCamera.cpp"
                     "Layouts/Editor/Structures/EditorCameraData.cpp"
+                    # Layout: editor window: displayable movelist
+                    "Layouts/Editor/Structures/DisplayableMovelist/EditorMovelistDisplayable.cpp"
                     # Layout: editor subwindows
                     "Layouts/Editor/Structures/Subwindows/EditorMove_Animations.cpp"
                     # Layout: submenus

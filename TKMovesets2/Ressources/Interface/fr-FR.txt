@@ -162,6 +162,8 @@ edition.projectile = Projectile
 edition.throw_camera = Caméra de prise
 edition.camera_data = Donnée de caméra
 
+edition.open_movelist = Liste des coups
+
 edition.move.window_name = Move
 edition.move.category_2 = Références
 edition.move.category_3 = Extras
