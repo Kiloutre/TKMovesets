@@ -227,6 +227,16 @@ namespace EditorUtils
 
 		SetInputfieldColor(field);
 	}
+
+	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier)
+	{
+		// Finishing touch
+		for (auto& [name, input] : inputMap) {
+			// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
+			input->name = name;
+			input->fullName = "edition." + baseIdentifier + "." + name;
+		}
+	}
 }
 
 const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)

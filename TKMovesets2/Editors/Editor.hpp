@@ -227,6 +227,8 @@ namespace EditorUtils
 	void SetMemberValue(void* memberPtr, EditorInput* field);
 	// Changes between unsigned, signed AND hex data type if the field allows it
 	void ChangeFieldDataType(EditorInput* field);
+	// Writes the fullname to every field in a field map
+	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier);
 }
 
 class DLLCONTENT Editor

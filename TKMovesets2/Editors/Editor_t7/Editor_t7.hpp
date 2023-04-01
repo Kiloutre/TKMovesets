@@ -29,6 +29,9 @@ struct StructIterators
 	StructIterator<Input> inputs;
 	StructIterator<Voiceclip> voiceclips;
 	StructIterator<CameraData> camera_datas;
+
+	StructIterator<MvlDisplayable> mvl_displayables;
+	StructIterator<MvlPlayable> mvl_playables;
 };
 
 class DLLCONTENT EditorT7 : public Editor
@@ -136,6 +139,9 @@ public:
 	// Camera data
 	std::map<std::string, EditorInput*> GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
+	//  Movelist : Displayables
+	std::vector<std::map<std::string, EditorInput*>> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player
