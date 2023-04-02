@@ -88,7 +88,7 @@ namespace EditorUtils
 		return ImGuiInputTextFlags_CharsDecimal;
 	}
 
-	const char* GetFieldFormat(EditorInputFlag flags)
+	constexpr const char* GetFieldFormat(EditorInputFlag flags)
 	{
 		if (flags & (EditorInput_H64)) {
 			return "0x%llX";
@@ -107,6 +107,9 @@ namespace EditorUtils
 		}
 		if (flags & (EditorInput_Float)) {
 			return "%f";
+		}
+		if (flags & (EditorInput_String)) {
+			return "%s";
 		}
 		return "%d";
 	}
@@ -196,14 +199,6 @@ namespace EditorUtils
 			else {
 				field->flags = (flags ^ EditorInput_H32) | EditorInput_U32;
 			}
-			/*
-			else if (flags & EditorInput_H32) {
-				field->flags = (flags ^ EditorInput_H32) | EditorInput_Float;
-			}
-			else {
-				field->flags = (flags ^ EditorInput_Float) | EditorInput_U32;
-			}
-			*/
 		}
 		else if (flags & EditorInput_16b)
 		{
@@ -252,6 +247,7 @@ namespace EditorUtils
 			input->fullName = "edition." + baseIdentifier + "." + name;
 		}
 	}
+
 }
 
 const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)

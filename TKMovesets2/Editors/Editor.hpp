@@ -15,7 +15,9 @@
 #include "GameAddresses.h"
 #include "MovesetStructs.h"
 
-# define FORM_INPUT_BUFSIZE (256)
+# define FORM_BUFSIZE (32) // Regular fields
+# define FORM_STRING_BUFSIZE (64) // String fields
+# define FORM_INPUT_MAX_BUFSIZE (256) // Some very long fields like displayable movelist use this
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
 // Shifting logic for list resizing
@@ -168,8 +170,8 @@ struct EditorInput
 	// Our own flags, required for our overflow checks
 	EditorInputFlag flags = 0;
 	// The string buffer containing the input text
-	char buffer[FORM_INPUT_BUFSIZE] = "INVALID";
-	unsigned int bufsize = FORM_INPUT_BUFSIZE;
+	char *buffer = nullptr;
+	unsigned int bufsize = 0;
 	// Sets the BG color of the input
 	int color = 0;
 	// Contains half of the text size, used for alignment
@@ -226,7 +228,7 @@ namespace EditorUtils
 	// Used for color-coding the movelist
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
 	// Returns a format depending on the input type
-	const char* GetFieldFormat(EditorInputFlag flags);
+	constexpr const char* GetFieldFormat(EditorInputFlag flags);
 	// Returns an imgui Input() charset depending on the input type
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags);
 	// Returns an field value, parsing it as a hex or regular int depending on the type

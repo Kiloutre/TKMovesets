@@ -425,6 +425,7 @@ EditorForm::~EditorForm()
 {
 	for (auto& [key, fieldPtr] : m_fieldIdentifierMap)
 	{
+		delete[] fieldPtr->buffer;
 		delete fieldPtr;
 	}
 

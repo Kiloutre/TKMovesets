@@ -119,6 +119,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			auto fieldList = m_editor->GetFormFieldsList(windowType, 0, drawOrder, 1);
 			for (int i = 1; i < fieldList.size(); ++i) {
 				for (auto& [key, fieldPtr] : fieldList[i]) {
+					delete[] fieldPtr->buffer;
 					delete fieldPtr;
 				}
 			}
@@ -222,6 +223,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			if (listIndex < m_listSize) {
 				// Shift following items up
 				for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMaps) {
+					delete[] fieldPtr->buffer;
 					delete fieldPtr;
 				}
 				delete m_items[listIndex];
@@ -415,6 +417,7 @@ EditorFormList::~EditorFormList()
 {
 	for (auto& item : m_items) {
 		for (auto& [key, fieldPtr] : item->identifierMaps) {
+			delete[] fieldPtr->buffer;
 			delete fieldPtr;
 		}
 		delete item;

@@ -1,10 +1,38 @@
 #include "Editor_t7.hpp"
 
+#include <type_traits>
 using namespace EditorUtils;
 
-#define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
-#define CREATE_STRING_FIELD(a, c, d, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String | d }, SET_DEFAULT_VAL(a, "%s", g)
-#define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g), SetInputfieldColor(inputMap[a])
+#define CREATE_FIELD(k, c, f, v) CreateField<decltype(v)>(k, drawOrder, inputMap, c, f, v)
+
+template <typename T>
+void CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
+{
+	drawOrder.push_back(fieldName);
+
+	if (bufsize == 0)
+	{
+		if constexpr (std::is_same_v< std::remove_cv_t<T>, char*>) {
+			bufsize = FORM_STRING_BUFSIZE;
+			flags |= EditorInput_String;
+		}
+		else {
+			bufsize = FORM_BUFSIZE;
+		}
+	}
+
+	EditorInput* newField = new EditorInput{
+		.category = category,
+		.imguiInputFlags = GetFieldCharset(flags),
+		.flags = flags,
+		.buffer = new char[bufsize],
+		.bufsize = bufsize,
+	};
+
+	inputMap[fieldName] = newField;
+	SetInputfieldColor(newField);
+	sprintf_s(newField->buffer, newField->bufsize, GetFieldFormat(flags), value);
+}
 
 // ===== Pushback Extra ===== //
 
@@ -942,8 +970,8 @@ std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorS
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_STRING_FIELD("move_name", 0, 0, nameBlock + move->name_addr);
-	CREATE_STRING_FIELD("anim_name", 0, EditorInput_ClickableAlways, nameBlock + move->anim_name_addr);
+	CREATE_FIELD("move_name", 0, 0, nameBlock + move->name_addr);
+	CREATE_FIELD("anim_name", 0, EditorInput_ClickableAlways, nameBlock + move->anim_name_addr);
 	CREATE_FIELD("vulnerability", 0, EditorInput_U32, move->vuln);
 	CREATE_FIELD("hitlevel", 0, EditorInput_H32, move->hitlevel);
 	CREATE_FIELD("transition", 0, EditorInput_U16 | EditorInput_Clickable, move->transition);

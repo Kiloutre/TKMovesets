@@ -4,9 +4,38 @@
 
 using namespace EditorUtils;
 
-#define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
-#define CREATE_STRING_FIELD(a, c, d, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String | d }, SET_DEFAULT_VAL(a, "%s", g)
-#define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g), SetInputfieldColor(inputMap[a])
+#define CREATE_STRING_FIELD(k, c, f, v, s) CreateField<decltype(v)>(k, drawOrder, inputMap, c, EditorInput_String | f, v, s)
+#define CREATE_FIELD(k, c, f, v) CreateField<decltype(v)>(k, drawOrder, inputMap, c, f, v)
+
+template <typename T>
+void CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
+{
+	drawOrder.push_back(fieldName);
+
+	if (bufsize == 0)
+	{
+		if constexpr (std::is_same_v< std::remove_cv_t<T>, char*>) {
+			bufsize = FORM_STRING_BUFSIZE;
+			flags |= EditorInput_String;
+		}
+		else {
+			bufsize = FORM_BUFSIZE;
+		}
+	}
+
+	EditorInput* newField = new EditorInput{
+		.category = category,
+		.imguiInputFlags = GetFieldCharset(flags),
+		.flags = flags,
+		.buffer = new char[bufsize],
+		.bufsize = bufsize,
+	};
+
+	inputMap[fieldName] = newField;
+	SetInputfieldColor(newField);
+	sprintf_s(newField->buffer, newField->bufsize, GetFieldFormat(flags), value);
+}
+
 
 // Utils
 
@@ -16,7 +45,7 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 
 	std::string convertedString;
 
-	size_t maxLen = min(strlen(entryString), FORM_INPUT_BUFSIZE - 1);
+	size_t maxLen = min(strlen(entryString), FORM_INPUT_MAX_BUFSIZE - 1);
 	for (int i = 0; i < maxLen;)
 	{
 		if ((unsigned char)entryString[i] == 0xE3 && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
@@ -140,12 +169,10 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 		++i;
 	}
 
-	/*
-	if (convertedString.size() >= FORM_INPUT_BUFSIZE) {
+	if (convertedString.size() >= FORM_INPUT_MAX_BUFSIZE) {
 		// todo: bigger bufsizes
-		convertedString.erase(FORM_INPUT_BUFSIZE - 1);
+		convertedString.erase(FORM_INPUT_MAX_BUFSIZE - 1);
 	}
-	*/
 	return convertedString;
 }
 // -- Inputs -- //
@@ -209,13 +236,13 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 			std::string key = "title_translation_" + std::to_string(i);
 			std::string value = GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
 
-			CREATE_STRING_FIELD(key, 0, 3, value.c_str());
+			CREATE_STRING_FIELD(key, 1, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			std::string key = "translation_" + std::to_string(i);
 			std::string value = GetMovelistDisplayableText(displayable.translation_offsets[i]);
 
-			CREATE_STRING_FIELD(key, 0, 3, value.c_str());
+			CREATE_STRING_FIELD(key, 1, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 
 
