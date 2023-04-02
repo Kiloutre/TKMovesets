@@ -25,7 +25,7 @@ void EditorT7::ModifyGenericMovesetListSize(int listId, int oldSize, int newSize
 	newMovesetSize = m_movesetSize + structListSizeDiff;
 	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
-		return;
+		throw;
 	}
 
 	// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date

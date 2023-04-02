@@ -23,7 +23,7 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	newMovesetSize = m_movesetSize + structListSizeDiff;
 	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
-		return;
+		throw;
 	}
 
 	// Shift offsets in the mvl head right away so that iterators can work later on
