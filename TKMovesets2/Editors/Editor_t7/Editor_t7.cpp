@@ -70,13 +70,11 @@ uint64_t EditorT7::CreateMoveName(const char* moveName)
 
 void EditorT7::SetupIterators_DisplayableMovelist()
 {
-	MvlHead* head = (MvlHead*)(m_movesetData + m_header->offsets.movelistBlock);
-
-	m_iterators.mvl_displayables.Set(head, head->displayables_offset, head->displayables_count);
-	m_iterators.mvl_playables.Set(head, head->playables_offset, head->playables_count);
+	m_iterators.mvl_displayables.Set(m_mvlHead, m_mvlHead->displayables_offset, m_mvlHead->displayables_count);
+	m_iterators.mvl_playables.Set(m_mvlHead, m_mvlHead->playables_offset, m_mvlHead->playables_count);
 
 	int mvl_inputs_count = 0;
-	m_iterators.mvl_inputs.Set(head, head->inputs_offset, mvl_inputs_count);
+	m_iterators.mvl_inputs.Set(m_mvlHead, m_mvlHead->inputs_offset, mvl_inputs_count);
 }
 
 void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
@@ -114,6 +112,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	m_iterators.camera_datas.Set(movesetBlock, m_infos->table.cameraData, m_infos->table.cameraDataCount);
 
 	if (hasDisplayableMovelist) {
+		m_mvlHead = (MvlHead*)(m_movesetData + m_header->offsets.movelistBlock);
 		SetupIterators_DisplayableMovelist();
 	}
 
@@ -142,6 +141,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 
 	if ((m_header->offsets.movelistBlock + 8) <= m_movesetDataSize && \
 		strncmp((char*)m_movesetData + m_header->offsets.movelistBlock, "MVLT", 4) == 0) {
+		m_mvlHead = (MvlHead*)(m_movesetData + m_header->offsets.movelistBlock);
 		hasDisplayableMovelist = true;
 		SetupIterators_DisplayableMovelist();
 	}

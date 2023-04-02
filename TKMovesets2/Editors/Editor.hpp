@@ -241,7 +241,7 @@ class DLLCONTENT Editor
 protected:
 	// Access the game's data through here. Use for live edition and live data querying only, not import
 	GameProcess* m_process = nullptr;
-	// Access the game's data through here. Use for live edition and live data querying only, not import
+	//
 	GameData* m_game = nullptr;
 	// Contains our header data
 	TKMovesetHeader* m_header = nullptr;
@@ -327,6 +327,14 @@ public:
 	virtual std::string GetCommandStr(const char* commandBuf) = 0;
 	// Writes the input sequence to string, or writes to outSize if the sequence is over MAX_INPUT_SEQUENCE_SHORT_LEN inputs
 	virtual void GetInputSequenceString(int id, std::string& outStr, int& outSize) = 0;
+	// Returns a command string 
+	virtual std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) = 0;
+	// Returns the color of a MvlDisplayable field according to its type
+	virtual int GetDisplayableMovelistEntryColor(EditorInput* field) = 0;
+	// Returns true if a displayable entry in the movelist is a combo
+	virtual bool IsMovelistDisplayableEntryCombo(EditorInput* field) = 0;
+	// Returns true if a displayable entry in the movelist is a category (don't increment index)
+	virtual	bool IsMovelistDisplayableEntryCategory(EditorInput* field) = 0;
 	// -- Utils -- //
 	// Returns true if the command is an input sequence
 	virtual bool IsCommandInputSequence(const char* buffer) = 0;

@@ -14,22 +14,42 @@ EditorMovelistDisplayable::EditorMovelistDisplayable(std::string windowTitleBase
 	m_baseWindow = baseWindow;
 	uniqueType = true;
 	InitForm(windowTitleBase, 0, editor);
+	// Trigger update to build all the item details
+	OnUpdate(0, nullptr);
 }
 
 // -- Private methods-- //
 
 void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 {
-	BuildItemDetails(listIdx);
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
-}
 
-void EditorMovelistDisplayable::BuildItemDetails(int listIdx)
-{
-	auto& item = m_items[listIdx];
-	auto& identifierMap = item->identifierMaps;
+	int visibleIndex = 1;
+	bool comboStarted = false;
+	for (int i = 0; i < m_listSize; ++i)
+	{
+		auto& item = m_items[i];
+		auto& typeField = item->identifierMaps["type"];
+		uint64_t typeVal = EditorUtils::GetFieldValue(typeField);
 
-	item->itemLabel = std::format("{} - Type: {}", listIdx, identifierMap["type"]->buffer);
+		item->color = m_editor->GetDisplayableMovelistEntryColor(typeField);
+		bool isPlayable = ((int64_t)EditorUtils::GetFieldValue(item->identifierMaps["playable_id"])) >= 0;
+		std::string playableStr = isPlayable ? _("edition.mvl_displayable.playable") : "";
+
+		if (m_editor->IsMovelistDisplayableEntryCategory(typeField)) {
+			item->itemLabel = std::format("---------- {}", playableStr);
+		}
+		else {
+			item->itemLabel = std::format("{} - Type: 0x{:x} {}", visibleIndex, typeVal, playableStr);
+			if (!comboStarted && m_editor->IsMovelistDisplayableEntryCombo(typeField)) {
+				visibleIndex = 1;
+				comboStarted = true;
+			}
+			else {
+				++visibleIndex;
+			}
+		}
+	}
 }
 
 void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* field)

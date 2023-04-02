@@ -25,9 +25,32 @@ void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 			auto& inputCount = m_fieldIdentifierMap["input_count"];
 			if (!inputCount->errored)
 			{
-				int listSize = EditorUtils::GetFieldValue(inputCount);
+				int listSize = (int)EditorUtils::GetFieldValue(inputCount);
 				m_baseWindow->OpenFormWindow(EditorWindowType_MovelistInput, referenceId, listSize);
 			}
+		}
+	}
+}
+
+void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+{
+	if (winType & EditorWindowType_MovelistInput)
+	{
+		auto& sequenceIdField = m_fieldIdentifierMap["input_sequence_id"];
+		if (sequenceIdField->errored) {
+			return;
+		}
+
+		int value = atoi(sequenceIdField->buffer);
+
+		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+			// Same shifting logic as in ListCreations
+			sprintf_s(sequenceIdField->buffer, sequenceIdField->bufsize, "%d", value + valueChange);
+		}
+		else if (value >= listStart && value <= (listEnd)) {
+			auto& field = m_fieldIdentifierMap["input_count"];
+			value = atoi(field->buffer);
+			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 	}
 }

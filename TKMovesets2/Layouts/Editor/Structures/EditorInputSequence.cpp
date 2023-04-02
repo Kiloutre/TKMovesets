@@ -43,7 +43,7 @@ void EditorInputSequence::RequestFieldUpdate(EditorWindowType_ winType, int valu
 			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
 		else if (value >= listStart && value <= (listEnd)) {
-            auto& field = m_fieldIdentifierMap["input_addr"];
+            auto& field = m_fieldIdentifierMap["input_amount"];
 			value = atoi(field->buffer);
 			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}

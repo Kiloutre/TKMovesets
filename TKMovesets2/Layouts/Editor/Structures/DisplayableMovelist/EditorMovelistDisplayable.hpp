@@ -7,7 +7,7 @@ class EditorMovelistDisplayable : public EditorFormList
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
-	void BuildItemDetails(int listIdx) override;
+	void BuildItemDetails(int listIdx) override {};
 	void OnUpdate(int listIdx, EditorInput* field) override;
 public:
 	EditorMovelistDisplayable(std::string windowTitleBase, Editor* editor, EditorWindowBase* baseWindow);

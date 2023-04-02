@@ -362,7 +362,8 @@ namespace StructsT7
 			};
 			uint16_t command;
 		};
-		uint16_t frame_duration;
+		uint8_t frame_duration;
+		uint8_t _unkn_0x2;
 	};
 
 	// .mvl file

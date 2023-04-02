@@ -29,5 +29,9 @@ void EditorMovelistInput::BuildItemDetails(int listIdx)
 	auto& item = m_items[listIdx];
 	auto& identifierMap = item->identifierMaps;
 
-	//item->itemLabel = std::format("{} - Type: {}", listIdx, identifierMap["type"]->buffer);
+	const auto& durationField = identifierMap["frame_duration"];
+
+	std::string commandLabel = m_editor->GetDisplayableMovelistInputStr(identifierMap["directions"]->buffer, identifierMap["buttons"]->buffer);
+	const char* frameLabel = EditorUtils::GetFieldValue(durationField) > 1 ? "edition.mvl_input.frames" : "edition.mvl_input.frame";
+	item->itemLabel = std::format("{} {} : {}", durationField->buffer, _(frameLabel), commandLabel);
 }

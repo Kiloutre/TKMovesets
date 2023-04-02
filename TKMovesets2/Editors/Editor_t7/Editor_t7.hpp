@@ -42,7 +42,10 @@ private:
 	MovesetInfo* m_infos = nullptr;
 	// Stores absolute pointers to the moveset table within the moveset
 	MovesetTable* m_absoluteTable = nullptr;
+	// Contains iterators for the various structure lists
 	StructIterators m_iterators;
+	// Contains a ptr to the head of the displayable movelist
+	MvlHead* m_mvlHead = nullptr;
 
 public:
 	using Editor::Editor;
@@ -171,6 +174,10 @@ public:
 	std::string GetCommandStr(const char* direction, const char* button) override;
 	std::string GetCommandStr(const char* commandBuf) override;
 	void GetInputSequenceString(int id, std::string& outStr, int& outSize) override;
+	std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) override;
+	int GetDisplayableMovelistEntryColor(EditorInput* field) override;
+	bool IsMovelistDisplayableEntryCombo(EditorInput* field) override;
+	bool IsMovelistDisplayableEntryCategory(EditorInput* field) override;
 	// -- Utils --//
 	bool IsCommandInputSequence(const char* buffer) override;
 	bool IsCommandGroupedCancelReference(const char* buffer) override;
@@ -213,7 +220,8 @@ public:
 
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
-	template<typename T> void ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
+	template<typename T> void ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
+	template<typename T> void ModifyGenericMovelistListSize(int listId, int oldSize, int newSize, uint32_t listStart_offset);
 	//
 	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
 	//
@@ -230,6 +238,9 @@ public:
 	void ModifyInputListSize(int listId, int oldSize, int newSize);
 	//
 	void ModifyVoiceclipListSize(int listId, int oldSize, int newSize);
+	// Movelist
+	void ModifyMovelistInputSize(int listId, int oldSize, int newSize);
+	void ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize);
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

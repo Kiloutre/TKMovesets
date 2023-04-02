@@ -4,7 +4,7 @@
 #define gAddr StructsT7_gameAddr
 
 template<typename T>
-void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_t tableListOffset)
+void EditorT7::ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset)
 {
 	const int listSizeDiff = newSize - oldSize;
 	const uint64_t structSize = sizeof(T);
@@ -67,8 +67,8 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<Requirement>(listId, oldSize, newSize, offsetofVar(m_infos->table, requirement));
-	
+	ModifyGenericMovesetListSize<Requirement>(listId, oldSize, newSize, offsetofVar(m_infos->table, requirement));
+
 	// Correct every structure that uses this list and needs shifting
 
 	// Cancels
@@ -115,7 +115,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<HitCondition>(listId, oldSize, newSize, offsetofVar(m_infos->table, hitCondition));
+	ModifyGenericMovesetListSize<HitCondition>(listId, oldSize, newSize, offsetofVar(m_infos->table, hitCondition));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -140,7 +140,7 @@ void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<Input>(listId, oldSize, newSize, offsetofVar(m_infos->table, input));
+	ModifyGenericMovesetListSize<Input>(listId, oldSize, newSize, offsetofVar(m_infos->table, input));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -159,7 +159,7 @@ void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyPushbackExtraListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<PushbackExtradata>(listId, oldSize, newSize, offsetofVar(m_infos->table, pushbackExtradata));
+	ModifyGenericMovesetListSize<PushbackExtradata>(listId, oldSize, newSize, offsetofVar(m_infos->table, pushbackExtradata));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -178,7 +178,7 @@ void EditorT7::ModifyPushbackExtraListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<Cancel>(listId, oldSize, newSize, offsetofVar(m_infos->table, groupCancel));
+	ModifyGenericMovesetListSize<Cancel>(listId, oldSize, newSize, offsetofVar(m_infos->table, groupCancel));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -195,7 +195,7 @@ void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<Cancel>(listId, oldSize, newSize, offsetofVar(m_infos->table, cancel));
+	ModifyGenericMovesetListSize<Cancel>(listId, oldSize, newSize, offsetofVar(m_infos->table, cancel));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -220,7 +220,7 @@ void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyExtraPropertyListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<ExtraMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, extraMoveProperty));
+	ModifyGenericMovesetListSize<ExtraMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, extraMoveProperty));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -237,7 +237,7 @@ void EditorT7::ModifyExtraPropertyListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyStartPropertyListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, moveBeginningProp));
+	ModifyGenericMovesetListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, moveBeginningProp));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -254,7 +254,7 @@ void EditorT7::ModifyStartPropertyListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyEndPropertyListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, moveEndingProp));
+	ModifyGenericMovesetListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, moveEndingProp));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -271,7 +271,7 @@ void EditorT7::ModifyEndPropertyListSize(int listId, int oldSize, int newSize)
 void EditorT7::ModifyVoiceclipListSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericListSize<Voiceclip>(listId, oldSize, newSize, offsetofVar(m_infos->table, voiceclip));
+	ModifyGenericMovesetListSize<Voiceclip>(listId, oldSize, newSize, offsetofVar(m_infos->table, voiceclip));
 
 	// Correct every structure that uses this list and needs shifting
 
@@ -324,6 +324,13 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 
 	case EditorWindowType_Voiceclip:
 		ModifyVoiceclipListSize(listId, oldSize, newSize);
+		break;
+
+	case EditorWindowType_MovelistDisplayable:
+		ModifyMovelistDisplayableSize(listId, oldSize, newSize);
+		break;
+	case EditorWindowType_MovelistInput:
+		ModifyMovelistInputSize(listId, oldSize, newSize);
 		break;
 	}
 }
