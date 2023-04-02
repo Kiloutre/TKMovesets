@@ -91,13 +91,12 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	const float buttonWidth = 25;
 	float pos_x = ImGui::GetContentRegionAvail().x + 15 - buttonWidth * 4;
 
-	if (pos_x <= 220 || uniqueType) {
-		// uniqueType because movelist displayables is uniqueType and we don't handle list controls for it yet
+	if (pos_x <= 220) {
 		// If too little place, just don't draw controls (for now)
 		return;
 	}
 
-	if (structureId <= 1 && listIndex == 0) {
+	if (structureId <= 1 && listIndex == 0 && !uniqueType) {
 		ImGui::SetCursorPosX(pos_x);
 		ImGuiExtra::HelpMarker(_("edition.form_list.controls_disabled_explanation"));
 		ImGui::SetCursorPos(cursor);

@@ -377,7 +377,7 @@ namespace StructsT7
 		uint32_t displayables_offset;
 		uint32_t playables_offset;
 		uint32_t inputs_offset;
-		char translation_strings[0];
+		char translation_strings[1];
 	};
 
 	typedef uint32_t MvlDisplayableType;

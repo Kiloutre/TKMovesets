@@ -52,42 +52,23 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 
 void EditorT7::ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize)
 {
-	// todo
-	// this is a lot more complex than it seems because we don't know which item in the list moved
-	/*
 	ModifyGenericMovelistListSize<MvlDisplayable>(listId, oldSize, newSize, m_mvlHead->displayables_offset);
 
-	// Shift translation string offsets that are relative to displayable struct addresses
-	const int listSizeDiff = (newSize - oldSize) * sizeof(MvlDisplayable);
-	for (int i = 0; i < m_iterators.mvl_displayables.size(); ++i)
-	{
-		auto displayable = m_iterators.mvl_displayables[i];
-
-		for (int i = 0; i < _countof(displayable.translationOffsets); ++i) {
-			// todo: check if there is a need to shift
-			displayable.translationOffsets[i] -= listSizeDiff;
-		}
-	}
-	*/
+	// No correction to do for once since no one refers to the displayable lists by anythign else than its head
 }
 
 void EditorT7::ModifyMovelistInputSize(int listId, int oldSize, int newSize)
 {
+	const int listSizeDiff = newSize - oldSize;
 	ModifyGenericMovelistListSize<MvlInput>(listId, oldSize, newSize, m_mvlHead->inputs_offset);
-
-	// Shift input offsets that are relative to playable struct addresses
-	const int32_t listSizeDiff = (newSize - oldSize) * sizeof(MvlInput);
-	const uint32_t absoluteListAddr = m_mvlHead->inputs_offset + (listId * sizeof(MvlInput));
-	int playableIdx = 0;
+	//;
 	for (auto& playable : m_iterators.mvl_playables)
 	{
-		uint32_t absolutePlayableAddr = m_mvlHead->playables_offset + (playableIdx++ * sizeof(MvlPlayable));
-		uint32_t playable_inputAbsoluteOffset = (absolutePlayableAddr + playable.input_sequence_offset);
-		if (playable_inputAbsoluteOffset > absoluteListAddr) {
+		if (MUST_SHIFT_ID(playable.input_sequence_offset, listSizeDiff, listId, listId + oldSize)) {
 			playable.input_sequence_offset += listSizeDiff;
 		}
-		else if (playable_inputAbsoluteOffset == absoluteListAddr) {
-			playable.input_count += (newSize - oldSize);
+		else if ((int)playable.input_sequence_offset >= listId && playable.input_sequence_offset <= ((uint64_t)listId + oldSize)) {
+			playable.input_sequence_offset += listSizeDiff;
 		}
 	}
 }

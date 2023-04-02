@@ -400,12 +400,12 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 		}
 		MvlPlayable* playables = (MvlPlayable*)malloc(s_playableBlock);
 		if (playables == nullptr) {
-			return (Byte*)calloc(1, size_out);
+			return nullptr;
 		}
 		m_process->readBytes(blockStart + head.playables_offset, playables, s_playableBlock);
 
 		// Use the biggest input offset in order to get the end of the movelist
-		// Haven't found a better way but it doesn't crash
+		// Haven't found a better way but it doesn't crash so there probably is nothing after the inputs
 		uint64_t biggestInpuOffset = 0;
 		for (size_t i = 0; i < head.playables_count; ++i)
 		{
@@ -419,17 +419,35 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 		free(playables);
 		gameAddr blockEnd = blockStart + biggestInpuOffset + head.playables_offset;
 		Byte* mvlBlock = allocateAndReadBlock(blockStart, blockEnd, size_out);
+		if (mvlBlock == nullptr) {
+			return nullptr;
+		}
 
 		// Correct translation strings offsets
-		MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlBlock + head.displayables_offset);
-		for (size_t i = 0; i < head.displayables_count; ++i)
 		{
-			int32_t absoluteDisplayableOffset = head.displayables_offset + (i * sizeof(MvlDisplayable));
-			for (int j = 0; j < _countof(displayable->translationOffsets); ++j) {
-				int32_t correctedOffset = absoluteDisplayableOffset + displayable->translationOffsets[j];
-				displayable->translationOffsets[j] = correctedOffset;
+			MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlBlock + head.displayables_offset);
+			for (size_t i = 0; i < head.displayables_count; ++i)
+			{
+				int32_t absoluteDisplayableOffset = head.displayables_offset + (i * sizeof(MvlDisplayable));
+				for (int j = 0; j < _countof(displayable->translationOffsets); ++j) {
+					int32_t correctedOffset = absoluteDisplayableOffset + displayable->translationOffsets[j];
+					displayable->translationOffsets[j] = correctedOffset;
+				}
+				++displayable;
 			}
-			++displayable;
+		}
+
+		{
+			MvlPlayable* playable = (MvlPlayable*)((uint64_t)mvlBlock + head.playables_offset);
+			uint32_t input_sequence_start = head.inputs_offset;
+			for (size_t i = 0; i < head.playables_count; ++i)
+			{
+				uint32_t playable_addr = head.playables_offset + sizeof(MvlPlayable) * i;
+				uint32_t input_sequence_addr = playable_addr + playable->input_sequence_offset;
+				uint32_t input_sequence_id = (input_sequence_addr - input_sequence_start) / sizeof(MvlInput);
+				playable->input_sequence_offset = input_sequence_id;
+				++playable;
+			}
 		}
 
 		return mvlBlock;

@@ -11,17 +11,28 @@
 
 //
 
-static void ConvertMovelistOffsets(MvlHead* mvlHead)
+static void ConvertDisplayableMovelistOffsets(MvlHead* mvlHead)
 {
 	MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlHead + mvlHead->displayables_offset);
 	for (size_t i = 0; i < mvlHead->displayables_count; ++i)
 	{
-		int32_t absoluteDisplayableOffset = mvlHead->displayables_offset + (i * sizeof(MvlDisplayable));
+		int32_t absoluteDisplayableOffset = mvlHead->displayables_offset + (int32_t)(i * sizeof(MvlDisplayable));
 		for (int j = 0; j < _countof(displayable->translationOffsets); ++j) {
 			int32_t correctedOffset = displayable->translationOffsets[j] - absoluteDisplayableOffset;
 			displayable->translationOffsets[j] = correctedOffset;
 		}
 		++displayable;
+	}
+
+	MvlPlayable* playable = (MvlPlayable*)((uint64_t)mvlHead + mvlHead->playables_offset);
+	for (size_t i = 0; i < mvlHead->playables_count; ++i)
+	{
+		uint32_t playable_addr = mvlHead->playables_offset + sizeof(MvlPlayable) * i;
+		uint32_t input_sequence_id = playable->input_sequence_offset;
+		uint32_t input_sequence_addr = input_sequence_id * sizeof(MvlInput) + mvlHead->inputs_offset;
+
+		playable->input_sequence_offset = input_sequence_addr - playable_addr;
+		++playable;
 	}
 }
 
@@ -381,7 +392,7 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
-		ConvertMovelistOffsets(mvlHead);
+		ConvertDisplayableMovelistOffsets(mvlHead);
 	}
 
 	// -- Allocation & Conversion finished -- //

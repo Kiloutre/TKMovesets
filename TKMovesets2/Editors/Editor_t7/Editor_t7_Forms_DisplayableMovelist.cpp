@@ -191,11 +191,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
 
 		// debug
-		/*
 		for (int i = 0; i < _countof(displayable.translationOffsets); ++i) {
-			CREATE_FIELD("playable_id" + std::to_string(i) , 0, EditorInput_S32, displayable.translationOffsets[i]);
+			CREATE_FIELD("translation_" + std::to_string(i) , 0, EditorInput_H32, displayable.translationOffsets[i]);
 		}
-		*/
 
 		WriteFieldFullname(inputMap, "mvl_displayable");
 		inputListMap.push_back(inputMap);
@@ -210,6 +208,11 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 
 	SetMemberValue(&displayable->type, inputs["type"]);
 	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
+
+	// debug
+	for (int i = 0; i < _countof(displayable->translationOffsets); ++i) {
+		SetMemberValue(&displayable->translationOffsets[i], inputs["translation_" + std::to_string(i)]);
+	}
 }
 
 bool EditorT7::ValidateMovelistDisplayableField(EditorInput* field)
@@ -238,11 +241,6 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 
-	uint32_t playable_addr = m_mvlHead->playables_offset + sizeof(MvlPlayable) * id;
-	uint32_t input_sequence_start = m_mvlHead->inputs_offset;
-	uint32_t input_sequence_addr = playable_addr + playable->input_sequence_offset;
-	uint32_t input_sequence_id = (input_sequence_addr - input_sequence_start) / sizeof(MvlInput);
-
 	CREATE_FIELD("_unk0x0", 0, EditorInput_U16_Changeable, playable->_unk0x0);
 	CREATE_FIELD("distance", 0, EditorInput_U16, playable->distance);
 	CREATE_FIELD("p2_rotation", 0, EditorInput_U16_Changeable, playable->p2_rotation);
@@ -250,7 +248,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	CREATE_FIELD("_unk0x8", 0, EditorInput_U16_Changeable, playable->_unk0x8);
 	CREATE_FIELD("p1_facing_related", 0, EditorInput_U16_Changeable, playable->p1_facing_related);
 	CREATE_FIELD("_unk0xc", 0, EditorInput_U16_Changeable, playable->_unk0xc);
-	CREATE_FIELD("input_sequence_id", 0, EditorInput_U16 | EditorInput_Interactable, input_sequence_id);
+	CREATE_FIELD("input_sequence_id", 0, EditorInput_U16 | EditorInput_Interactable, playable->input_sequence_offset);
 	CREATE_FIELD("input_count", 0, EditorInput_U16, playable->input_count);
 	CREATE_FIELD("has_rage", 0, EditorInput_U16_Changeable, playable->has_rage);
 	CREATE_FIELD("_unk0x16", 0, EditorInput_U16_Changeable, playable->_unk0x16);
@@ -276,7 +274,7 @@ void EditorT7::SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInp
 	SetMemberValue(&playable->p1_facing_related, inputs["p1_facing_related"]);
 	SetMemberValue(&playable->_unk0xc, inputs["_unk0xc"]);
 	SetMemberValue(&playable->input_count, inputs["input_count"]);
-	playable->input_sequence_offset = input_sequence_offset;
+	SetMemberValue(&playable->input_sequence_offset, inputs["input_sequence_id"]);
 	SetMemberValue(&playable->has_rage, inputs["has_rage"]);
 	SetMemberValue(&playable->_unk0x16, inputs["_unk0x16"]);
 }
