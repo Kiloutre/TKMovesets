@@ -195,6 +195,9 @@ void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
 		displayableMovelist = ref;
 	}
 
+	for (auto& move : *displayableMovelist) {
+		delete move;
+	}
 	displayableMovelist->clear();
 
 	uint64_t movesetListOffset = m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
@@ -248,7 +251,7 @@ void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
 			.moveId = moveId,
 			.aliasId = aliasId,
 			.flags = flags,
-			});
+		});
 	}
 }
 

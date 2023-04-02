@@ -91,6 +91,12 @@ EditorMove_Animations::~EditorMove_Animations()
 		m_destructionRequested = true;
 	}
 	m_loadingThread.join();
+	for (auto& charAnims : m_characters) {
+		for (auto& file : charAnims->files) {
+			delete file;
+		}
+		delete charAnims;
+	}
 }
 
 void EditorMove_Animations::LoadAnimationList()

@@ -215,6 +215,9 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Reducing list size will make things invisible on the next render anyway
 			if (listIndex < m_listSize) {
 				// Shift following items up
+				for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMaps) {
+					delete fieldPtr;
+				}
 				delete m_items[listIndex];
 				m_items.erase(m_items.begin() + listIndex);
 				unsavedChanges = true;
