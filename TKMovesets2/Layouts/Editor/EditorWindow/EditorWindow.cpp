@@ -28,6 +28,7 @@
 #include "EditorCameraData.hpp"
 #include "EditorMovelistDisplayable.hpp"
 #include "EditorMovelistPlayable.hpp"
+#include "EditorMovelistInput.hpp"
 
 // -- Private methods -- //
 
@@ -103,6 +104,9 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 		break;
 	case EditorWindowType_MovelistPlayable:
 		return new EditorMovelistPlayable(m_windowTitle, id, m_editor, this);
+		break;
+	case EditorWindowType_MovelistInput:
+		return new EditorMovelistInput(m_windowTitle, id, m_editor, this, listSize);
 		break;
 	}
 

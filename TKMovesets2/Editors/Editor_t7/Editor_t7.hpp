@@ -32,6 +32,7 @@ struct StructIterators
 
 	StructIterator<MvlDisplayable> mvl_displayables;
 	StructIterator<MvlPlayable> mvl_playables;
+	StructIterator<MvlInput> mvl_inputs;
 };
 
 class DLLCONTENT EditorT7 : public Editor
@@ -148,9 +149,13 @@ public:
 	void SaveMovelistDisplayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	bool ValidateMovelistDisplayableField(EditorInput* field);
 
-	//  Movelist : Displayables
+	//  Movelist : Playables
 	std::map<std::string, EditorInput*> GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+
+	// Movelist: Inputs
+	std::vector<std::map<std::string, EditorInput*>> GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
+	void SaveMovelistInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
 	
 	// -- Interactions -- //
 	// Sets the current move of a player

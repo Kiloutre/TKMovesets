@@ -1249,6 +1249,9 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	case EditorWindowType_MovelistPlayable:
 		SaveMovelistPlayable(id, inputs);
 		break;
+	case EditorWindowType_MovelistInput:
+		SaveMovelistInput(id, inputs);
+		break;
 	}
 }
 
@@ -1335,6 +1338,10 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		break;
 	case EditorWindowType_PushbackExtradata:
 		return GetPushbackExtraListInputs(id, listSize, drawOrder);
+		break;
+
+	case EditorWindowType_MovelistInput:
+		return GetMovelistInputListInputs(id, listSize, drawOrder);
 		break;
 	}
 	return GetFormFieldsList(type, id, drawOrder);

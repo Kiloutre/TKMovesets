@@ -15,7 +15,7 @@
 // -- Static helpers --
 
 // Reads a movest in order to fetch its header informations such as character name, version, etc. Can return null if errors are encountered.
-static movesetInfo* fetchMovesetInformations(std::string filename)
+static movesetInfo* fetchMovesetInformations(const std::string& filename)
 {
 	std::ifstream file;
 	file.open(filename, std::ios::binary);

@@ -84,9 +84,10 @@ namespace EditorFormUtils
 
 		case EditorWindowType_MovelistDisplayable:
 			return "mvl_displayable";
-
 		case EditorWindowType_MovelistPlayable:
 			return "mvl_playable";
+		case EditorWindowType_MovelistInput:
+			return "mvl_input";
 		}
 		return "UNKNOWN";
 	}
@@ -289,7 +290,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* ed
 	for (uint8_t category : m_categories)
 	{
 		std::vector<EditorInput*> inputs;
-		for (std::string fieldName : drawOrder) {
+		for (const auto& fieldName : drawOrder) {
 			EditorInput* field = m_fieldIdentifierMap[fieldName];
 			EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
 			if (field->category == category) {

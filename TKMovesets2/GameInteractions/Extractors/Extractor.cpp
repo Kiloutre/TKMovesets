@@ -113,7 +113,7 @@ namespace ExtractorUtils
 		return (uint64_t)animPtr_2 - (uint64_t)anim;
 	}
 
-	void WriteFileData(std::ofstream &file, std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t&progress, uint8_t progress_max)
+	void WriteFileData(std::ofstream &file, const std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t&progress, uint8_t progress_max)
 	{
 		uint8_t remainingProgress = progress_max - progress;
 		uint8_t step = (uint8_t)((size_t)remainingProgress / blocks.size());
@@ -129,7 +129,7 @@ namespace ExtractorUtils
 		}
 	}
 
-	void CompressFile(std::string dest_filename, std::string src_filename)
+	void CompressFile(const std::string& dest_filename, const std::string& src_filename)
 	{
 		std::rename(src_filename.c_str(), dest_filename.c_str());
 		// Todo: find a fast compression algorithm, or do it on the background while leaving the uncompressed file available until the compression is done

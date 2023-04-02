@@ -74,6 +74,9 @@ void EditorT7::SetupIterators_DisplayableMovelist()
 
 	m_iterators.mvl_displayables.Set(head, head->displayables_offset, head->displayables_count);
 	m_iterators.mvl_playables.Set(head, head->playables_offset, head->playables_count);
+
+	int mvl_inputs_count = 0;
+	m_iterators.mvl_inputs.Set(head, head->inputs_offset, mvl_inputs_count);
 }
 
 void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)

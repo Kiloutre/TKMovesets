@@ -355,9 +355,14 @@ namespace StructsT7
 	// Inputs played by bot in movelist display
 	struct MvlInput
 	{
-		byte directions;
-		byte buttons;
-		__int16 frame_duration;
+		union {
+			struct {
+				Byte directions;
+				Byte buttons;
+			};
+			uint16_t command;
+		};
+		uint16_t frame_duration;
 	};
 
 	// .mvl file

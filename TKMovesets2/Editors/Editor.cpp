@@ -93,7 +93,7 @@ namespace EditorUtils
 		if (flags & (EditorInput_H64)) {
 			return "0x%llX";
 		}
-		if (flags & (EditorInput_H32 | EditorInput_H16)) {
+		if (flags & (EditorInput_H32 | EditorInput_H16 | EditorInput_H8)) {
 			return "0x%X";
 		}
 		if (flags & EditorInput_S64) {
@@ -102,7 +102,7 @@ namespace EditorUtils
 		if (flags & EditorInput_U64) {
 			return "%llu";
 		}
-		if (flags & (EditorInput_U32 | EditorInput_U16)) {
+		if (flags & (EditorInput_U32 | EditorInput_U16 | EditorInput_U8)) {
 			return "%u";
 		}
 		if (flags & (EditorInput_Float)) {
@@ -155,10 +155,13 @@ namespace EditorUtils
 			*(uint64_t*)memberPtr = value;
 		}
 		else if (flags & EditorInput_32b) {
-			*(uint32_t*)memberPtr = (uint32_t)value;
+			*(uint32_t*)memberPtr = *(uint32_t*)&value;
 		}
 		else if (flags & EditorInput_16b) {
-			*(uint16_t*)memberPtr = (uint16_t)value;
+			*(uint16_t*)memberPtr = *(uint16_t*)&value;
+		}
+		else if (flags & EditorInput_8b) {
+			*(uint8_t*)memberPtr = *(uint8_t*)&value;
 		}
 		else {
 			throw;
@@ -214,6 +217,18 @@ namespace EditorUtils
 				field->flags = (flags ^ EditorInput_H16) | EditorInput_U16;
 			}
 		}
+		else if (flags & EditorInput_8b)
+		{
+			if (flags & EditorInput_U8) {
+				field->flags = (flags ^ EditorInput_U8) | EditorInput_S8;
+			}
+			else if (flags & EditorInput_S8) {
+				field->flags = (flags ^ EditorInput_S8) | EditorInput_H8;
+			}
+			else {
+				field->flags = (flags ^ EditorInput_H8) | EditorInput_U8;
+			}
+		}
 		else {
 			return;
 		}
@@ -228,7 +243,7 @@ namespace EditorUtils
 		SetInputfieldColor(field);
 	}
 
-	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier)
+	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, const std::string& baseIdentifier)
 	{
 		// Finishing touch
 		for (auto& [name, input] : inputMap) {

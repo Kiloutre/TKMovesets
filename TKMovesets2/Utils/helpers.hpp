@@ -87,13 +87,13 @@ namespace Helpers
     void convertPtrsToOffsets(void* listAddr, std::map<gameAddr, uint64_t> m, uint64_t struct_size, uint64_t amount);
 
     // Returns true if a string ends with [suffix]
-    bool endsWith(std::string str, std::string suffix);
+    bool endsWith(const std::string& str, const std::string& suffix);
     // Returns true if a string starts with [prefix]
-    bool startsWith(std::string str, std::string prefix);
+    bool startsWith(const std::string& str, const std::string& prefix);
     //bool endsWith(std::u32string str, std::u32string suffix);
 
     // Converts filename into displayable name. U32 for UTF8
-    std::string getMovesetNameFromFilename(std::string filename);
+    std::string getMovesetNameFromFilename(const std::string& filename);
 
     // Returns true if one of the header strings is not properly formatted indicating a bad moveset file
     bool isHeaderStringMalformated(const char* string, size_t size);

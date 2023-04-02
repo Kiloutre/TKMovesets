@@ -368,6 +368,11 @@ edition.mvl_playable.input_count = Sequence de commande ID
 edition.mvl_playable.input_sequence_id = Nombre de commandes
 edition.mvl_playable.has_rage = Rage
 
+edition.mvl_input.window_name = Liste de coups: Commande
+edition.mvl_input.directions = Directions
+edition.mvl_input.buttons = Boutons
+edition.mvl_input.frame_duration = Durée
+
 edition.suggest_new_name = 
 edition.non_trivial_detected = 
 edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?

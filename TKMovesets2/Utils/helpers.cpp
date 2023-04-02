@@ -89,7 +89,7 @@ namespace Helpers
 		}
 	}
 
-	bool endsWith(std::string str, std::string suffix)
+	bool endsWith(const std::string& str, const std::string& suffix)
 	{
 		if (str.length() < suffix.length())
 			return false;
@@ -106,7 +106,7 @@ namespace Helpers
 		return true;
 	}
 
-	bool startsWith(std::string str, std::string prefix)
+	bool startsWith(const std::string& str, const std::string& prefix)
 	{
 		if (str.length() < prefix.length())
 			return false;
@@ -121,7 +121,7 @@ namespace Helpers
 		return true;
 	}
 
-	std::string getMovesetNameFromFilename(std::string filename)
+	std::string getMovesetNameFromFilename(const std::string& filename)
 	{
 		size_t lastSlash = filename.find_last_of("/\\");
 		if (lastSlash == std::string::npos) {

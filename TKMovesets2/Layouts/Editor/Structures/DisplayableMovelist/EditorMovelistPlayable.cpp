@@ -14,3 +14,20 @@ EditorMovelistPlayable::EditorMovelistPlayable(std::string windowTitleBase, uint
 	m_baseWindow = baseWindow;
 	InitForm(windowTitleBase, t_id, editor);
 }
+
+void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
+{
+	int referenceId = atoi(field->buffer);
+	std::string& name = field->name;
+
+	if (name == "input_sequence_id") {
+		if (referenceId != -1) {
+			auto& inputCount = m_fieldIdentifierMap["input_count"];
+			if (!inputCount->errored)
+			{
+				int listSize = EditorUtils::GetFieldValue(inputCount);
+				m_baseWindow->OpenFormWindow(EditorWindowType_MovelistInput, referenceId, listSize);
+			}
+		}
+	}
+}

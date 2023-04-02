@@ -94,12 +94,13 @@ enum EditorWindowType_
 
 	EditorWindowType_MovelistDisplayable,
 	EditorWindowType_MovelistPlayable,
+	EditorWindowType_MovelistInput,
 
 
 	EditorWindowType_Invalid,
 };
 
-typedef uint16_t EditorInputFlag;
+typedef uint32_t EditorInputFlag;
 enum EditorInputFlag_
 {
 	EditorInput_String          = (1 << 0),
@@ -110,17 +111,20 @@ enum EditorInputFlag_
 	EditorInput_H64       = (1 << 3),
 	EditorInput_U64       = (1 << 4),
 	EditorInput_S64       = (1 << 5),
-	EditorInput_U32       = (1 << 6),
-	EditorInput_H32       = (1 << 7),
+	EditorInput_H32       = (1 << 6),
+	EditorInput_U32       = (1 << 7),
 	EditorInput_S32       = (1 << 8),
-	EditorInput_U16       = (1 << 9),
-	EditorInput_H16       = (1 << 10),
+	EditorInput_H16       = (1 << 9),
+	EditorInput_U16       = (1 << 10),
 	EditorInput_S16       = (1 << 11),
+	EditorInput_H8        = (1 << 12),
+	EditorInput_S8        = (1 << 13),
+	EditorInput_U8        = (1 << 14),
 
-	EditorInput_Float     = (1 << 12),
+	EditorInput_Float     = (1 << 15),
 
 	// Used internally for fancy behaviour
-	EditorInput_DataChangeable = (1 << 13),
+	EditorInput_DataChangeable = (1 << 16),
 
 	// Shortcuts
 	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
@@ -136,13 +140,14 @@ enum EditorInputFlag_
 	EditorInput_S16_Changeable = EditorInput_S16 | EditorInput_DataChangeable,
 
 	// Used internally for conditions
-	EditorInput_Unsigned     = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16),
-	EditorInput_Signed       = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16),
-	EditorInput_Hex          = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16),
+	EditorInput_Unsigned     = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16 | EditorInput_U8),
+	EditorInput_Signed       = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16 | EditorInput_S8),
+	EditorInput_Hex          = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16 | EditorInput_H8),
 	EditorInput_Interactable = (EditorInput_Clickable | EditorInput_ClickableAlways),
 	EditorInput_64b          = (EditorInput_U64 | EditorInput_S64 | EditorInput_H64),
 	EditorInput_32b          = (EditorInput_U32 | EditorInput_S32 | EditorInput_H32 | EditorInput_Float),
 	EditorInput_16b          = (EditorInput_U16 | EditorInput_S16 | EditorInput_H16),
+	EditorInput_8b           = (EditorInput_U8 | EditorInput_S8 | EditorInput_H8),
 };
 
 struct EditorInput
@@ -228,7 +233,7 @@ namespace EditorUtils
 	// Changes between unsigned, signed AND hex data type if the field allows it
 	void ChangeFieldDataType(EditorInput* field);
 	// Writes the fullname to every field in a field map
-	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, std::string baseIdentifier);
+	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, const std::string& baseIdentifier);
 }
 
 class DLLCONTENT Editor

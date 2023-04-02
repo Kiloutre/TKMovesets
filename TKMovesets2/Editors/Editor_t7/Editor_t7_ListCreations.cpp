@@ -62,7 +62,6 @@ void EditorT7::ModifyGenericListSize(int listId, int oldSize, int newSize, size_
 	// Assign new moveset
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
-
 }
 
 void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)

@@ -36,7 +36,6 @@ void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* fiel
 {
 	int referenceId = atoi(field->buffer);
 	std::string& name = field->name;
-	auto& item = m_items[listIdx];
 
 	if (name == "playable_id") {
 		if (referenceId != -1) {

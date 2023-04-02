@@ -6,7 +6,7 @@
 
 #include "GameAddressesFile.hpp"
 
-static std::vector<gameAddr> parsePtrPathString(std::string path)
+static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 {
 	std::vector<gameAddr> ptrPath = std::vector<gameAddr>();
 

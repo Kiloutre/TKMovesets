@@ -25,7 +25,7 @@
 
 // -- Static helpers -- //
 
-static void WriteToLogFile(std::string content, bool append=true)
+static void WriteToLogFile(const std::string& content, bool append=true)
 {
 	std::ofstream file;
 

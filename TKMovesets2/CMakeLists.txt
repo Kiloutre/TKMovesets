@@ -60,6 +60,7 @@ set(BINARY_SOURCES
                     # Layout: editor window: displayable movelist
                     "Layouts/Editor/Structures/DisplayableMovelist/EditorMovelistDisplayable.cpp"
                     "Layouts/Editor/Structures/DisplayableMovelist/EditorMovelistPlayable.cpp"
+                    "Layouts/Editor/Structures/DisplayableMovelist/EditorMovelistInput.cpp"
                     # Layout: editor subwindows
                     "Layouts/Editor/Structures/Subwindows/EditorMove_Animations.cpp"
                     # Layout: submenus
