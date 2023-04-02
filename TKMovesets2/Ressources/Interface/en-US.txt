@@ -367,6 +367,7 @@ edition.mvl_displayable.window_name = Movelist: Displayable
 edition.mvl_displayable.type = Type
 edition.mvl_displayable.playable_id = Playable ID
 edition.mvl_displayable.playable = (Playable)
+edition.mvl_displayable.not_playable = (Not playable)
 
 edition.mvl_playable.window_name = Movelist: Playable
 edition.mvl_playable.distance = Distance

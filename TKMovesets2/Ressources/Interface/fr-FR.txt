@@ -361,6 +361,7 @@ edition.mvl_displayable.window_name = Liste de coups: Entrée
 edition.mvl_displayable.type = Type
 edition.mvl_displayable.playable_id = ID de Jouable
 edition.mvl_displayable.playable = (Jouable)
+edition.mvl_displayable.not_playable = (Non-Jouable)
 
 edition.mvl_playable.window_name = Liste de coups: Jouable
 edition.mvl_playable.distance = Distance

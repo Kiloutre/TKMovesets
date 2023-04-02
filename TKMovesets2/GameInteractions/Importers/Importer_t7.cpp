@@ -9,6 +9,22 @@
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
 
+//
+
+static void ConvertMovelistOffsets(MvlHead* mvlHead)
+{
+	MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlHead + mvlHead->displayables_offset);
+	for (size_t i = 0; i < mvlHead->displayables_count; ++i)
+	{
+		int32_t absoluteDisplayableOffset = mvlHead->displayables_offset + (i * sizeof(MvlDisplayable));
+		for (int j = 0; j < _countof(displayable->translationOffsets); ++j) {
+			int32_t correctedOffset = displayable->translationOffsets[j] - absoluteDisplayableOffset;
+			displayable->translationOffsets[j] = correctedOffset;
+		}
+		++displayable;
+	}
+}
+
 // -- Private methods -- //
 
 void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset, size_t moveId)
@@ -217,20 +233,17 @@ void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, cons
 
 void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress)
 {
-	if (strncmp(mvlHead->mvlString, "MVLT", 4) == 0)
-	{
-		gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
+	gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
 
-		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
+	int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
 
-		if (playerId == 1) {
-			managerAddr += sizeof(MvlManager);
-		}
-
-		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlHead), game_mlvHead);
-		m_process->writeInt64(managerAddr + offsetof(MvlManager, displayableEntriesCount), mvlHead->displayables_count);
-		m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlDisplayableBlock), game_mlvHead + mvlHead->displayables_offset);
+	if (playerId == 1) {
+		managerAddr += sizeof(MvlManager);
 	}
+
+	m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlHead), game_mlvHead);
+	m_process->writeInt64(managerAddr + offsetof(MvlManager, displayableEntriesCount), mvlHead->displayables_count);
+	m_process->writeInt64(managerAddr + offsetof(MvlManager, mvlDisplayableBlock), game_mlvHead + mvlHead->displayables_offset);
 }
 
 // -- Public methods -- //
@@ -363,11 +376,26 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	ConvertMotaListOffsets(header.offsets, moveset, gameMoveset, playerAddress);
 	progress = 90;
 
+	MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
+	bool hasDisplayableMovelist = ((header.infos.header_size + header.offsets.movelistBlock + 4) < s_moveset) &&
+		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
+
+	if (hasDisplayableMovelist) {
+		ConvertMovelistOffsets(mvlHead);
+	}
+
 	// -- Allocation & Conversion finished -- //
+
+	if (hasDisplayableMovelist)
+	{
+		gameAddr game_mvlHead = (gameAddr)gameMoveset + header.offsets.movelistBlock;
+		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
+	}
 
 	// Finally write our moveset to the game's memory
 	m_process->writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
+	DEBUG_LOG("-- Imported moveset --\n");
 
 	// Then write our moveset address to the current player
 	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"), gameMoveset);
@@ -378,13 +406,6 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 
 	if (applyInstantly) {
 		ForcePlayerMove(playerAddress, gameMoveset, 32769);
-	}
-
-	if ((header.infos.header_size + header.offsets.movelistBlock + 4) < s_moveset)
-	{
-		MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
-		gameAddr game_mvlHead = (gameAddr)gameMoveset + header.offsets.movelistBlock;
-		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
 	}
 
 	// -- Cleanup -- //

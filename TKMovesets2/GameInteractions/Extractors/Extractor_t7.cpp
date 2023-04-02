@@ -418,7 +418,21 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 
 		free(playables);
 		gameAddr blockEnd = blockStart + biggestInpuOffset + head.playables_offset;
-		return allocateAndReadBlock(blockStart, blockEnd, size_out);
+		Byte* mvlBlock = allocateAndReadBlock(blockStart, blockEnd, size_out);
+
+		// Correct translation strings offsets
+		MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlBlock + head.displayables_offset);
+		for (size_t i = 0; i < head.displayables_count; ++i)
+		{
+			int32_t absoluteDisplayableOffset = head.displayables_offset + (i * sizeof(MvlDisplayable));
+			for (int j = 0; j < _countof(displayable->translationOffsets); ++j) {
+				int32_t correctedOffset = absoluteDisplayableOffset + displayable->translationOffsets[j];
+				displayable->translationOffsets[j] = correctedOffset;
+			}
+			++displayable;
+		}
+
+		return mvlBlock;
 	}
 	else {
 		return (Byte*)calloc(1, size_out);

@@ -61,5 +61,5 @@
 # define FORM_LABEL_CLICKABLE    FORM_INPUT_REF
 
 # define MVL_CATEGORY            IM_COL32(77, 131, 219, 50)
-# define MVL_COMBO               IM_COL32(77, 131, 219, 50)
-# define MVL_DISABLED            IM_COL32(42, 148, 82, 255)
+# define MVL_COMBO               IM_COL32(140, 177, 237, 50)
+# define MVL_DISABLED            IM_COL32(33, 21, 51, 150)

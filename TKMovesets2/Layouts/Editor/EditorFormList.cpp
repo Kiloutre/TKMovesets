@@ -55,7 +55,6 @@ void EditorFormList::Apply()
 
 	// Write into every individual item
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
-		
 		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMaps);
 	}
 
@@ -92,7 +91,8 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	const float buttonWidth = 25;
 	float pos_x = ImGui::GetContentRegionAvail().x + 15 - buttonWidth * 4;
 
-	if (pos_x <= 220) {
+	if (pos_x <= 220 || uniqueType) {
+		// uniqueType because movelist displayables is uniqueType and we don't handle list controls for it yet
 		// If too little place, just don't draw controls (for now)
 		return;
 	}

@@ -52,19 +52,23 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 
 void EditorT7::ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize)
 {
+	// todo
+	// this is a lot more complex than it seems because we don't know which item in the list moved
+	/*
 	ModifyGenericMovelistListSize<MvlDisplayable>(listId, oldSize, newSize, m_mvlHead->displayables_offset);
 
 	// Shift translation string offsets that are relative to displayable struct addresses
 	const int listSizeDiff = (newSize - oldSize) * sizeof(MvlDisplayable);
-	for (auto it = m_iterators.mvl_displayables.begin() + (listId + newSize); it != m_iterators.mvl_displayables.end(); ++it)
+	for (int i = 0; i < m_iterators.mvl_displayables.size(); ++i)
 	{
-		auto& displayable = *it;
+		auto displayable = m_iterators.mvl_displayables[i];
 
 		for (int i = 0; i < _countof(displayable.translationOffsets); ++i) {
 			// todo: check if there is a need to shift
 			displayable.translationOffsets[i] -= listSizeDiff;
 		}
 	}
+	*/
 }
 
 void EditorT7::ModifyMovelistInputSize(int listId, int oldSize, int newSize)

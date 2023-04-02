@@ -6,6 +6,133 @@ using namespace EditorUtils;
 #define CREATE_STRING_FIELD(a, c, d, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = 0, .flags = EditorInput_String | d }, SET_DEFAULT_VAL(a, "%s", g)
 #define CREATE_FIELD(a, c, e, g) drawOrder.push_back(a), inputMap[a] = new EditorInput { .category = c, .imguiInputFlags = GetFieldCharset(e), .flags = e }, SET_DEFAULT_VAL(a, GetFieldFormat(e), g), SetInputfieldColor(inputMap[a])
 
+// Utils
+
+std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
+{
+	const char* entryString = &m_mvlHead->translation_strings[offset];
+
+	std::string convertedString;
+
+	size_t maxLen = strlen(entryString);
+	for (int i = 0; entryString[i];)
+	{
+		if (entryString[i] == 0xEE && (i + 2 < maxLen) && entryString[i + 1] == 0x80)
+		{
+			switch (entryString[i + 2])
+			{
+			case 0x80:
+				convertedString += "{DB}";
+				break;
+			case 0x81:
+				convertedString += "{D}";
+				break;
+			case 0x82:
+				convertedString += "{DF}";
+				break;
+			case 0x83:
+				convertedString += "{B}";
+				break;
+			case 0x84:
+				convertedString += "{F}";
+				break;
+			case 0x85:
+				convertedString += "{UB}";
+				break;
+			case 0x86:
+				convertedString += "{U}";
+				break;
+			case 0x87:
+				convertedString += "{UF}";
+				break;
+
+			case 0x88:
+				convertedString += "{!DB}";
+				break;
+			case 0x89:
+				convertedString += "{!D}";
+				break;
+			case 0x8A:
+				convertedString += "{!DF}";
+				break;
+			case 0x8B:
+				convertedString += "{!B}";
+				break;
+			case 0x8C:
+				convertedString += "{!F}";
+				break;
+			case 0x8D:
+				convertedString += "{!UB}";
+				break;
+			case 0x8E:
+				convertedString += "{!U}";
+				break;
+			case 0x8F:
+				convertedString += "{!UF}";
+				break;
+
+			case 0x90:
+				convertedString += "{[}";
+				break;
+			case 0x91:
+				convertedString += "{]}";
+				break;
+
+			case 0x95:
+				convertedString += "{1}";
+				break;
+			case 0x96:
+				convertedString += "{2}";
+				break;
+			case 0x97:
+				convertedString += "{12}";
+				break;
+			case 0x98:
+				convertedString += "{3}";
+				break;
+			case 0x99:
+				convertedString += "{34}";
+				break;
+			case 0x9A:
+				convertedString += "{23}";
+				break;
+			case 0x9B:
+				convertedString += "{123}";
+				break;
+			case 0x9C:
+				convertedString += "{4}";
+				break;
+			case 0x9D:
+				convertedString += "{14}";
+				break;
+			case 0x9E:
+				convertedString += "{24}";
+				break;
+			case 0x9F:
+				convertedString += "{124}";
+				break;
+			case 0xA0:
+				convertedString += "{34}";
+				break;
+			case 0xA1:
+				convertedString += "{134}";
+				break;
+			case 0xA2:
+				convertedString += "{234}";
+				break;
+			case 0xA3:
+				convertedString += "{1234}";
+				break;
+			}
+			i += 3;
+			continue;
+		}
+		convertedString += entryString[i];
+		++i;
+	}
+
+	return convertedString;
+}
 // -- Inputs -- //
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
@@ -63,9 +190,12 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
 
+		// debug
+		/*
 		for (int i = 0; i < _countof(displayable.translationOffsets); ++i) {
 			CREATE_FIELD("playable_id" + std::to_string(i) , 0, EditorInput_S32, displayable.translationOffsets[i]);
 		}
+		*/
 
 		WriteFieldFullname(inputMap, "mvl_displayable");
 		inputListMap.push_back(inputMap);
@@ -121,7 +251,6 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	CREATE_FIELD("p1_facing_related", 0, EditorInput_U16_Changeable, playable->p1_facing_related);
 	CREATE_FIELD("_unk0xc", 0, EditorInput_U16_Changeable, playable->_unk0xc);
 	CREATE_FIELD("input_sequence_id", 0, EditorInput_U16 | EditorInput_Interactable, input_sequence_id);
-	CREATE_FIELD("input_sequence_offset", 0, EditorInput_H16, playable->input_sequence_offset);
 	CREATE_FIELD("input_count", 0, EditorInput_U16, playable->input_count);
 	CREATE_FIELD("has_rage", 0, EditorInput_U16_Changeable, playable->has_rage);
 	CREATE_FIELD("_unk0x16", 0, EditorInput_U16_Changeable, playable->_unk0x16);
@@ -198,7 +327,7 @@ std::string EditorT7::GetDisplayableMovelistInputStr(const char* directions, con
 
 int EditorT7::GetDisplayableMovelistEntryColor(EditorInput* field)
 {
-	uint32_t type = (uint32_t)GetFieldValue(field);
+	MvlDisplayableType type = (uint32_t)GetFieldValue(field);
 
 	switch (type & 0xFFFF)
 	{
@@ -224,12 +353,12 @@ int EditorT7::GetDisplayableMovelistEntryColor(EditorInput* field)
 
 bool EditorT7::IsMovelistDisplayableEntryCategory(EditorInput* field)
 {
-	uint32_t type = (uint32_t)GetFieldValue(field);
+	MvlDisplayableType type = (uint32_t)GetFieldValue(field);
 	return type == 8;
 }
 
 bool EditorT7::IsMovelistDisplayableEntryCombo(EditorInput* field)
 {
-	uint32_t type = (uint32_t)GetFieldValue(field);
+	MvlDisplayableType type = (uint32_t)GetFieldValue(field);
 	return type == 10;
 }

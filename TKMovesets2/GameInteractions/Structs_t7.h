@@ -377,13 +377,10 @@ namespace StructsT7
 		uint32_t displayables_offset;
 		uint32_t playables_offset;
 		uint32_t inputs_offset;
-		int32_t _unk0x20;
-		int32_t _unk0x24;
-		int32_t _unk0x28;
-		int32_t _unk0x2c;
-		int32_t _unk0x30;
+		char translation_strings[0];
 	};
 
+	typedef uint32_t MvlDisplayableType;
 	enum MvlDisplayableType_
 	{
 		MvlDisplayableType_Disabled       = 0x2,
@@ -391,8 +388,6 @@ namespace StructsT7
 		MvlDisplayableType_Regular        = 0x10000,
 		MvlDisplayableType_ComboListStart = 0xA,
 		MvlDisplayableType_Unknown        = 0xD,
-
-		MvlDisplayableType_MAX            = INT_MAX
 	};
 
 	struct MvlDisplayable
@@ -401,7 +396,7 @@ namespace StructsT7
 		uint32_t _unk0x40;
 		__int16 playable_id;
 		__int16 _unk0x46;
-		MvlDisplayableType_ type;
+		MvlDisplayableType type;
 		uint32_t _unk0x4c;
 		uint32_t _unk0x50;
 		uint32_t _unk0x54;
