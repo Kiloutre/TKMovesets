@@ -72,7 +72,7 @@ namespace Helpers
 		}
 	}
 
-	void convertPtrsToOffsets(void* listAddr, std::map<gameAddr, uint64_t> m, uint64_t struct_size, uint64_t amount)
+	void convertPtrsToOffsets(void* listAddr, const std::map<gameAddr, uint64_t>& m, uint64_t struct_size, uint64_t amount)
 	{
 		uint64_t listCursor = (uint64_t)listAddr;
 		while (amount-- > 0)
@@ -80,7 +80,7 @@ namespace Helpers
 			uint64_t* structMember = (gameAddr*)listCursor;
 			gameAddr addr = (gameAddr)*structMember;
 			if (m.find(addr) != m.end()) {
-				*structMember = m[addr];
+				*structMember = m.at(addr);
 			}
 			else {
 				*structMember -= (uint64_t)-1;

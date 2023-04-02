@@ -121,7 +121,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	CREATE_FIELD("has_rage", 0, EditorInput_U16_Changeable, playable->has_rage);
 	CREATE_FIELD("_unk0x16", 0, EditorInput_U16_Changeable, playable->_unk0x16);
 
-	WriteFieldFullname(inputMap, "mvl_playable");
+	WriteFieldFullname(inputMap, "mvl_playablei");
 	return inputMap;
 }
 
