@@ -62,7 +62,7 @@ protected:
 	// Called whenever a field changes (and is valid).
 	virtual void OnUpdate(int listIdx, EditorInput* field) override;
 public:
-	//
+	virtual ~EditorFormList() override;
 	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
 	void RenderInternal() override;
 };

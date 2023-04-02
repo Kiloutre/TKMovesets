@@ -101,6 +101,7 @@ public:
 	ImGuiViewport* currentViewport = nullptr;
 	// Set to true in a derived constructor to prevent the creation of multiple windows of the derived class
 	bool uniqueType = false;
+	virtual ~EditorForm();
 
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
 	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) {};

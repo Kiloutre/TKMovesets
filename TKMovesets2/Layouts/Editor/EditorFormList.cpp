@@ -244,6 +244,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	VectorSet<std::string> drawOrder;
 
 	std::vector<std::map<std::string, EditorInput*>> fieldIdentifierMaps;
+
 	if (m_listSize == 0) {
 		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
 		m_listSize = fieldIdentifierMaps.size();
@@ -255,6 +256,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
+
 	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = fieldIdentifierMaps[0][fieldName];
 		m_categories.insert(field->category);
@@ -285,6 +287,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	}
 
 	// Build category names
+
 	for (uint8_t category : m_categories) {
 		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
 	}
@@ -397,4 +400,17 @@ void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChan
 void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
 {
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+}
+
+EditorFormList::~EditorFormList()
+{
+	for (auto& item : m_items) {
+		for (auto& [key, fieldPtr] : item->identifierMaps) {
+			delete fieldPtr;
+		}
+		delete item;
+	}
+
+	m_items.clear();
+	m_items.shrink_to_fit();
 }

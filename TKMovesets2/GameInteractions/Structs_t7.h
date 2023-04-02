@@ -392,7 +392,13 @@ namespace StructsT7
 
 	struct MvlDisplayable
 	{
-		int32_t translationOffsets[16];
+		union {
+			struct {
+				int32_t title_translation_offsets[4];
+				int32_t translation_offsets[12];
+			};
+			int32_t all_translation_offsets[16];
+		};
 		uint32_t _unk0x40;
 		uint16_t playable_id;
 		uint16_t _unk0x46;

@@ -15,7 +15,7 @@
 #include "GameAddresses.h"
 #include "MovesetStructs.h"
 
-# define FORM_INPUT_BUFSIZE (64)
+# define FORM_INPUT_BUFSIZE (256)
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
 // Shifting logic for list resizing

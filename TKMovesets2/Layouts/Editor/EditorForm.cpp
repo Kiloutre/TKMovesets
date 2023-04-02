@@ -420,3 +420,16 @@ void EditorForm::OnUpdate(int listIdx, EditorInput* field)
 {
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
+
+EditorForm::~EditorForm()
+{
+	for (auto& [key, fieldPtr] : m_fieldIdentifierMap)
+	{
+		delete fieldPtr;
+	}
+
+	m_fieldIdentifierMap.clear();
+	m_fieldsCategoryMap.clear();
+	m_categories.clear();
+	m_categoryStringIdentifiers.clear();
+}

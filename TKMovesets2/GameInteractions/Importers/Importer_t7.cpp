@@ -17,9 +17,9 @@ static void ConvertDisplayableMovelistOffsets(MvlHead* mvlHead)
 	for (size_t i = 0; i < mvlHead->displayables_count; ++i)
 	{
 		int32_t absoluteDisplayableOffset = mvlHead->displayables_offset + (int32_t)(i * sizeof(MvlDisplayable));
-		for (int j = 0; j < _countof(displayable->translationOffsets); ++j) {
-			int32_t correctedOffset = displayable->translationOffsets[j] - absoluteDisplayableOffset;
-			displayable->translationOffsets[j] = correctedOffset;
+		for (int j = 0; j < _countof(displayable->all_translation_offsets); ++j) {
+			int32_t correctedOffset = displayable->all_translation_offsets[j] - absoluteDisplayableOffset;
+			displayable->all_translation_offsets[j] = correctedOffset;
 		}
 		++displayable;
 	}

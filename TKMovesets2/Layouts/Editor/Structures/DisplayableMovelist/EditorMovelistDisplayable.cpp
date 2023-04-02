@@ -30,20 +30,19 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 	{
 		auto& item = m_items[i];
 		auto& typeField = item->identifierMaps["type"];
-		uint64_t typeVal = EditorUtils::GetFieldValue(typeField);
 
 		item->color = m_editor->GetDisplayableMovelistEntryColor(typeField);
 		bool isPlayable = ((int64_t)EditorUtils::GetFieldValue(item->identifierMaps["playable_id"])) >= 0;
 
 		if (m_editor->IsMovelistDisplayableEntryCategory(typeField)) {
-			item->itemLabel = std::format("----------");
+			item->itemLabel = std::format("- {} -", item->identifierMaps["title_translation_1"]->buffer);
 		}
 		else {
 			if (!isPlayable) {
 				item->color = MVL_DISABLED;
 			}
 
-			item->itemLabel = std::format("{} - Type: 0x{:x}", visibleIndex, typeVal);
+			item->itemLabel = std::format("{} - {}", visibleIndex, item->identifierMaps["title_translation_1"]->buffer);
 			if (!comboStarted && m_editor->IsMovelistDisplayableEntryCombo(typeField)) {
 				visibleIndex = 1;
 				comboStarted = true;

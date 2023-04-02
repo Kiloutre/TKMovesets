@@ -139,15 +139,14 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorForm* newWin = AllocateFormWindow(windowType, structId, listSize);
 	newWin->nextDockId = m_dockId;
-	if (openNew || availableOverwriteIndex == -1) {
-		m_structWindows.push_back(newWin);
-	}
-	else {
+
+	if (!openNew && availableOverwriteIndex != -1) {
 		// Can't delete here because OpenFormWindow can be called by EditorForm classes
 		// Close the window and let deletion occur during next rendering
 		m_structWindows[availableOverwriteIndex]->popen = false;
-		m_structWindows[availableOverwriteIndex] = newWin;
 	}
+
+	m_structWindows.push_back(newWin);
 }
 
 void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)

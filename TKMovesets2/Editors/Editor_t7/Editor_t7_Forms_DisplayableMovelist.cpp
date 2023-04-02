@@ -12,16 +12,30 @@ using namespace EditorUtils;
 
 std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 {
-	const char* entryString = &m_mvlHead->translation_strings[offset];
+	const char* entryString = (char*)m_mvlHead + offset;
 
 	std::string convertedString;
 
-	size_t maxLen = strlen(entryString);
-	for (int i = 0; entryString[i];)
+	size_t maxLen = min(strlen(entryString), FORM_INPUT_BUFSIZE - 1);
+	for (int i = 0; i < maxLen;)
 	{
-		if (entryString[i] == 0xEE && (i + 2 < maxLen) && entryString[i + 1] == 0x80)
+		if ((unsigned char)entryString[i] == 0xE3 && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
 		{
-			switch (entryString[i + 2])
+			if ((unsigned char)entryString[i + 2] == 0x90) {
+				convertedString += "{[}";
+				i += 3;
+				continue;
+			}
+			else if ((unsigned char)entryString[i + 2] == 0x91) {
+				convertedString += "{]}";
+				i += 3;
+				continue;
+			}
+			// Might be korean/japanese characters
+		}
+		else if ((unsigned char)entryString[i] == 0xEE && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
+		{
+			switch ((unsigned char)entryString[i + 2])
 			{
 			case 0x80:
 				convertedString += "{DB}";
@@ -71,13 +85,6 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 				break;
 			case 0x8F:
 				convertedString += "{!UF}";
-				break;
-
-			case 0x90:
-				convertedString += "{[}";
-				break;
-			case 0x91:
-				convertedString += "{]}";
 				break;
 
 			case 0x95:
@@ -133,6 +140,12 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 		++i;
 	}
 
+	/*
+	if (convertedString.size() >= FORM_INPUT_BUFSIZE) {
+		// todo: bigger bufsizes
+		convertedString.erase(FORM_INPUT_BUFSIZE - 1);
+	}
+	*/
 	return convertedString;
 }
 // -- Inputs -- //
@@ -192,9 +205,17 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
 
-		// debug
-		for (int i = 0; i < _countof(displayable.translationOffsets); ++i) {
-			CREATE_FIELD("translation_" + std::to_string(i) , 1, EditorInput_H32, displayable.translationOffsets[i]);
+		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
+			std::string key = "title_translation_" + std::to_string(i);
+			std::string value = GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
+
+			CREATE_STRING_FIELD(key, 0, 3, value.c_str());
+		}
+		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
+			std::string key = "translation_" + std::to_string(i);
+			std::string value = GetMovelistDisplayableText(displayable.translation_offsets[i]);
+
+			CREATE_STRING_FIELD(key, 0, 3, value.c_str());
 		}
 
 
@@ -222,10 +243,6 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
 
 
-	// debug
-	for (int i = 0; i < _countof(displayable->translationOffsets); ++i) {
-		SetMemberValue(&displayable->translationOffsets[i], inputs["translation_" + std::to_string(i)]);
-	}
 
 	SetMemberValue(&displayable->_unk0x40, inputs["_unk0x40"]);
 	SetMemberValue(&displayable->_unk0x46, inputs["_unk0x46"]);

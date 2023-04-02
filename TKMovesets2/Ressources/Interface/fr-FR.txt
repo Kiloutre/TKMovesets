@@ -362,6 +362,14 @@ edition.mvl_displayable.type = Type
 edition.mvl_displayable.playable_id = ID de Jouable
 edition.mvl_displayable.playable = (Jouable)
 edition.mvl_displayable.not_playable = (Non-Jouable)
+edition.mvl_displayable.title_translation_1 = Title (English)
+edition.mvl_displayable.title_translation_3 = Title (Other)
+edition.mvl_displayable.translation_1 = English
+edition.mvl_displayable.translation_2 = Portuguese
+edition.mvl_displayable.translation_3 = Spanish
+edition.mvl_displayable.translation_4 = French
+edition.mvl_displayable.translation_5 = Italian
+edition.mvl_displayable.translation_6 = German
 
 edition.mvl_playable.window_name = Liste de coups: Jouable
 edition.mvl_playable.distance = Distance
