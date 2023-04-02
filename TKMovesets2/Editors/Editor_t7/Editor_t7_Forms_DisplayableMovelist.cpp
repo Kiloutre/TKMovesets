@@ -7,36 +7,6 @@ using namespace EditorUtils;
 #define CREATE_STRING_FIELD(k, c, f, v, s) CreateField<decltype(v)>(k, drawOrder, inputMap, c, EditorInput_String | f, v, s)
 #define CREATE_FIELD(k, c, f, v) CreateField<decltype(v)>(k, drawOrder, inputMap, c, f, v)
 
-template <typename T>
-void CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
-{
-	drawOrder.push_back(fieldName);
-
-	if (bufsize == 0)
-	{
-		if constexpr (std::is_same_v< std::remove_cv_t<T>, char*>) {
-			bufsize = FORM_STRING_BUFSIZE;
-			flags |= EditorInput_String;
-		}
-		else {
-			bufsize = FORM_BUFSIZE;
-		}
-	}
-
-	EditorInput* newField = new EditorInput{
-		.category = category,
-		.imguiInputFlags = GetFieldCharset(flags),
-		.flags = flags,
-		.buffer = new char[bufsize],
-		.bufsize = bufsize,
-	};
-
-	inputMap[fieldName] = newField;
-	SetInputfieldColor(newField);
-	sprintf_s(newField->buffer, newField->bufsize, GetFieldFormat(flags), value);
-}
-
-
 // Utils
 
 std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
@@ -236,7 +206,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 			std::string key = "title_translation_" + std::to_string(i);
 			std::string value = GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
 
-			CREATE_STRING_FIELD(key, 1, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
+			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			std::string key = "translation_" + std::to_string(i);
@@ -246,13 +216,13 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		}
 
 
-		CREATE_FIELD("_unk0x40", 3, EditorInput_H32_Changeable, displayable._unk0x40);
-		CREATE_FIELD("_unk0x46", 3, EditorInput_H16_Changeable, displayable._unk0x46);
+		CREATE_FIELD("_unk0x40", 1, EditorInput_H32_Changeable, displayable._unk0x40);
+		CREATE_FIELD("_unk0x46", 1, EditorInput_H16_Changeable, displayable._unk0x46);
 
 		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4) {
 			int value = *(int*)((char*)&displayable + ofst);
 			std::string key = std::format("unk_{:x}", ofst);
-			CREATE_FIELD(key, 3, EditorInput_H32_Changeable, value);
+			CREATE_FIELD(key, 1, EditorInput_H32_Changeable, value);
 		}
 
 		WriteFieldFullname(inputMap, "mvl_displayable");

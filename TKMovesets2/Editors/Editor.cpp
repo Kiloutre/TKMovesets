@@ -247,7 +247,6 @@ namespace EditorUtils
 			input->fullName = "edition." + baseIdentifier + "." + name;
 		}
 	}
-
 }
 
 const Byte* Editor::GetMoveset(uint64_t& movesetSize_out)

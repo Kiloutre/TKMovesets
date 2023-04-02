@@ -239,6 +239,35 @@ namespace EditorUtils
 	void ChangeFieldDataType(EditorInput* field);
 	// Writes the fullname to every field in a field map
 	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, const std::string& baseIdentifier);
+
+	template <typename T>
+	void CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
+	{
+		drawOrder.push_back(fieldName);
+
+		if (bufsize == 0)
+		{
+			if constexpr (std::is_same_v< std::remove_cv_t<T>, char*>) {
+				bufsize = FORM_STRING_BUFSIZE;
+				flags |= EditorInput_String;
+			}
+			else {
+				bufsize = FORM_BUFSIZE;
+			}
+		}
+
+		EditorInput* newField = new EditorInput{
+			.category = category,
+			.imguiInputFlags = EditorUtils::GetFieldCharset(flags),
+			.flags = flags,
+			.buffer = new char[bufsize],
+			.bufsize = bufsize,
+		};
+
+		inputMap[fieldName] = newField;
+		EditorUtils::SetInputfieldColor(newField);
+		sprintf_s(newField->buffer, newField->bufsize, EditorUtils::GetFieldFormat(flags), value);
+	}
 }
 
 class DLLCONTENT Editor

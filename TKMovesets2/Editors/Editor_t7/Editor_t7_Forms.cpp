@@ -5,35 +5,6 @@ using namespace EditorUtils;
 
 #define CREATE_FIELD(k, c, f, v) CreateField<decltype(v)>(k, drawOrder, inputMap, c, f, v)
 
-template <typename T>
-void CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
-{
-	drawOrder.push_back(fieldName);
-
-	if (bufsize == 0)
-	{
-		if constexpr (std::is_same_v< std::remove_cv_t<T>, char*>) {
-			bufsize = FORM_STRING_BUFSIZE;
-			flags |= EditorInput_String;
-		}
-		else {
-			bufsize = FORM_BUFSIZE;
-		}
-	}
-
-	EditorInput* newField = new EditorInput{
-		.category = category,
-		.imguiInputFlags = GetFieldCharset(flags),
-		.flags = flags,
-		.buffer = new char[bufsize],
-		.bufsize = bufsize,
-	};
-
-	inputMap[fieldName] = newField;
-	SetInputfieldColor(newField);
-	sprintf_s(newField->buffer, newField->bufsize, GetFieldFormat(flags), value);
-}
-
 // ===== Pushback Extra ===== //
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
