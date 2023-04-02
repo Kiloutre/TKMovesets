@@ -394,8 +394,8 @@ namespace StructsT7
 	{
 		int32_t translationOffsets[16];
 		uint32_t _unk0x40;
-		__int16 playable_id;
-		__int16 _unk0x46;
+		uint16_t playable_id;
+		uint16_t _unk0x46;
 		MvlDisplayableType type;
 		uint32_t _unk0x4c;
 		uint32_t _unk0x50;

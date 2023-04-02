@@ -138,6 +138,9 @@ enum EditorInputFlag_
 	EditorInput_U16_Changeable = EditorInput_U16 | EditorInput_DataChangeable,
 	EditorInput_H16_Changeable = EditorInput_H16 | EditorInput_DataChangeable,
 	EditorInput_S16_Changeable = EditorInput_S16 | EditorInput_DataChangeable,
+	EditorInput_U8_Changeable = EditorInput_U8 | EditorInput_DataChangeable,
+	EditorInput_H8_Changeable = EditorInput_H8 | EditorInput_DataChangeable,
+	EditorInput_S8_Changeable = EditorInput_S8 | EditorInput_DataChangeable,
 
 	// Used internally for conditions
 	EditorInput_Unsigned     = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16 | EditorInput_U8),

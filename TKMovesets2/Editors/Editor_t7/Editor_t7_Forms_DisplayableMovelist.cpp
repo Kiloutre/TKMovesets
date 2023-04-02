@@ -1,5 +1,7 @@
 #include "Editor_t7.hpp"
 
+#include <format>
+
 using namespace EditorUtils;
 
 #define SET_DEFAULT_VAL(fieldName, format, value) sprintf_s(inputMap[fieldName]->buffer, FORM_INPUT_BUFSIZE, format, value)
@@ -192,7 +194,17 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 
 		// debug
 		for (int i = 0; i < _countof(displayable.translationOffsets); ++i) {
-			CREATE_FIELD("translation_" + std::to_string(i) , 0, EditorInput_H32, displayable.translationOffsets[i]);
+			CREATE_FIELD("translation_" + std::to_string(i) , 1, EditorInput_H32, displayable.translationOffsets[i]);
+		}
+
+
+		CREATE_FIELD("_unk0x40", 3, EditorInput_H32_Changeable, displayable._unk0x40);
+		CREATE_FIELD("_unk0x46", 3, EditorInput_H16_Changeable, displayable._unk0x46);
+
+		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4) {
+			int value = *(int*)((char*)&displayable + ofst);
+			std::string key = std::format("unk_{:x}", ofst);
+			CREATE_FIELD(key, 3, EditorInput_H32_Changeable, value);
 		}
 
 		WriteFieldFullname(inputMap, "mvl_displayable");
@@ -209,9 +221,19 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 	SetMemberValue(&displayable->type, inputs["type"]);
 	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
 
+
 	// debug
 	for (int i = 0; i < _countof(displayable->translationOffsets); ++i) {
 		SetMemberValue(&displayable->translationOffsets[i], inputs["translation_" + std::to_string(i)]);
+	}
+
+	SetMemberValue(&displayable->_unk0x40, inputs["_unk0x40"]);
+	SetMemberValue(&displayable->_unk0x46, inputs["_unk0x46"]);
+
+	for (int ofst = 0x4C; ofst <= 0x170; ofst += 4) {
+		int* valuePtr = (int*)((char*)displayable + ofst);
+		std::string key = std::format("unk_{:x}", ofst);
+		SetMemberValue(valuePtr, inputs[key]);
 	}
 }
 

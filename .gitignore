@@ -15,6 +15,7 @@ _deps
 .vscode
 to_ignore
 vcpkg_installed
+enc_temp_folder
 
 ##### Windows
 # Windows thumbnail cache files

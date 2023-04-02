@@ -131,7 +131,11 @@ namespace ExtractorUtils
 
 	void CompressFile(const std::string& dest_filename, const std::string& src_filename)
 	{
-		std::rename(src_filename.c_str(), dest_filename.c_str());
+		std::remove(dest_filename.c_str());
+		if (std::rename(src_filename.c_str(), dest_filename.c_str()) != 0) {
+			// todo
+		}
+
 		// Todo: find a fast compression algorithm, or do it on the background while leaving the uncompressed file available until the compression is done
 		// Decompression speed is also really important.
 

@@ -27,14 +27,14 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	}
 
 	// Shift offsets in the mvl head right away so that iterators can work later on
-	if (m_mvlHead->displayables_offset >= orig_postListOffset) {
-		m_mvlHead->displayables_offset += structListSizeDiff;
+	uint64_t orig_relative_postLisOffset = orig_postListOffset - (m_header->infos.header_size + m_header->offsets.movelistBlock);
 
-		if (m_mvlHead->playables_offset >= orig_postListOffset) {
+	if (m_mvlHead->inputs_offset >= orig_relative_postLisOffset) {
+		m_mvlHead->inputs_offset += structListSizeDiff;
+		if (m_mvlHead->playables_offset >= orig_relative_postLisOffset) {
 			m_mvlHead->playables_offset += structListSizeDiff;
-
-			if (m_mvlHead->inputs_offset >= orig_postListOffset) {
-				m_mvlHead->inputs_offset += structListSizeDiff;
+			if (m_mvlHead->displayables_offset >= orig_relative_postLisOffset) {
+				m_mvlHead->displayables_offset += structListSizeDiff;
 			}
 		}
 	}
@@ -52,8 +52,10 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 
 void EditorT7::ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize)
 {
+	const int listSizeDiff = newSize - oldSize;
 	ModifyGenericMovelistListSize<MvlDisplayable>(listId, oldSize, newSize, m_mvlHead->displayables_offset);
 
+	m_mvlHead->displayables_count += listSizeDiff;
 	// No correction to do for once since no one refers to the displayable lists by anythign else than its head
 }
 
@@ -61,14 +63,14 @@ void EditorT7::ModifyMovelistInputSize(int listId, int oldSize, int newSize)
 {
 	const int listSizeDiff = newSize - oldSize;
 	ModifyGenericMovelistListSize<MvlInput>(listId, oldSize, newSize, m_mvlHead->inputs_offset);
-	//;
+
 	for (auto& playable : m_iterators.mvl_playables)
 	{
 		if (MUST_SHIFT_ID(playable.input_sequence_offset, listSizeDiff, listId, listId + oldSize)) {
 			playable.input_sequence_offset += listSizeDiff;
 		}
 		else if ((int)playable.input_sequence_offset >= listId && playable.input_sequence_offset <= ((uint64_t)listId + oldSize)) {
-			playable.input_sequence_offset += listSizeDiff;
+			playable.input_count += listSizeDiff;
 		}
 	}
 }
