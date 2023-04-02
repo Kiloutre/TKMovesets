@@ -38,6 +38,8 @@ public:
 	// Contains the list of movesets found in the extraction directory
 	std::vector<movesetInfo*> extractedMovesets;
 
+	~LocalStorage();
+
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Reads movesets from their configured extraction dir. Accessible under .extractedMovesets

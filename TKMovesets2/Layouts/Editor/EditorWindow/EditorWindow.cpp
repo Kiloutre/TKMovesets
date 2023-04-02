@@ -280,6 +280,14 @@ EditorWindow::~EditorWindow()
 	}
 
 	importerHelper.StopThreadAndCleanup();
+	
+	for (auto& move : movelist) {
+		delete move;
+	}
+
+	for (auto& win : m_structWindows) {
+		delete win;
+	}
 
 	uint64_t movesetSize;
 	Byte* moveset = (Byte*)m_editor->GetMoveset(movesetSize);

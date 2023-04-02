@@ -164,3 +164,8 @@ void LocalStorage::DeleteMoveset(const char* filename)
 {
 	remove(filename);
 }
+
+LocalStorage::~LocalStorage()
+{
+	CleanupUnusedMovesetInfos();
+}
