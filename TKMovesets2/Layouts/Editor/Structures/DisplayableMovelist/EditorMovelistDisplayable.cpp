@@ -51,14 +51,13 @@ void EditorMovelistDisplayable::BuidAllLabels()
 				playableField->flags |= EditorInput_Interactable;
 			}
 
-			item->itemLabel = std::format("{} - {}", visibleIndex, item->identifierMaps["title_translation_1"]->buffer);
 			if (!comboStarted && m_editor->IsMovelistDisplayableEntryCombo(typeField)) {
 				visibleIndex = 1;
 				comboStarted = true;
 			}
-			else {
-				++visibleIndex;
-			}
+
+			item->itemLabel = std::format("{} - {}", visibleIndex, item->identifierMaps["title_translation_1"]->buffer);
+			++visibleIndex;
 		}
 	}
 }

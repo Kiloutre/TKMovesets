@@ -18,9 +18,6 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	uint64_t postListOffset = listOffset + structSize * newSize;
 	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
 
-	printf("postListOffset %llx\n", postListOffset);
-	printf("orig_postListOffset %llx\n", orig_postListOffset);
-
 	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
 	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
 	newMovesetSize = m_movesetSize + structListSizeDiff;
@@ -68,23 +65,21 @@ void EditorT7::ModifyMovelistDisplayableTextSize(int listId, int oldSize, int ne
 	const int listSizeDiff = newSize - oldSize;
 	ModifyGenericMovelistListSize<char>(listId, oldSize, newSize, 0);
 
-	/*
 	int32_t offset = listId;
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
 		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
 			if (displayable.title_translation_offsets[i] > listId) {
-				displayable.title_translation_offsets[i] += offset;
+				displayable.title_translation_offsets[i] += listSizeDiff;
 			}
 		}
 
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			if (displayable.translation_offsets[i] > listId) {
-				displayable.translation_offsets[i] += offset;
+				displayable.translation_offsets[i] += listSizeDiff;
 			}
 		}
 	}
-	*/
 }
 
 void EditorT7::ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize)

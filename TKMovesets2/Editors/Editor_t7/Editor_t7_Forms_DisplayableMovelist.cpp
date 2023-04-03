@@ -140,19 +140,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 	return inputListMap;
 }
 
-
-// debug / todo: remove
-void PrintTest(char* ttt) {
-	for (int p = 0; ttt[p]; ++p) {
-		if (isprint((unsigned char)ttt[p])) {
-			printf("%c", ttt[p]);
-		}
-		else {
-			printf("\\%02X", (unsigned char)ttt[p]);
-		}
-	}
-}
-
 void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 	auto displayable = m_iterators.mvl_displayables[id];
@@ -170,12 +157,9 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		SetMemberValue(valuePtr, inputs[key]);
 	}
 
-	//debug
-
-	/*
 	for (int i = 0; i < _countof(displayable->title_translation_offsets); ++i) {
 		std::string key = "title_translation_" + std::to_string(i);
-		
+
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
 
 		char* currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
@@ -184,18 +168,15 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 
 
 		if (newLen != currentLen) {
-			printf("%d - [%s] %llu vs %llu [%s](%s)\n", i, currentString, currentLen, newLen, convertedBuffer.c_str(), inputs[key]->buffer);
 			// Reallocation
-			//ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
+			ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
 			currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
 		}
-		
 
-		//strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
+		strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
 	}
-	*/
 
 	for (int i = 0; i < _countof(displayable->translation_offsets); ++i) {
 		std::string key = "translation_" + std::to_string(i);
@@ -208,21 +189,14 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 
 
 		if (newLen != currentLen) {
-			printf("%d - [", i);
-			PrintTest(currentString);
-			printf("] %llu vs %llu[", currentLen, newLen );
-			PrintTest((char*)convertedBuffer.c_str());
-			printf("](%s)\n", inputs[key]->buffer);
-
 			// Reallocation
-			//ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
+			ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
 			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
 		}
 
-
-		//strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
+		strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
 	}
 }
 
