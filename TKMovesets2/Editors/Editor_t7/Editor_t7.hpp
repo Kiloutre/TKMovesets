@@ -249,6 +249,7 @@ public:
 	// Movelist
 	void ModifyMovelistInputSize(int listId, int oldSize, int newSize);
 	void ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize);
+	void ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize);
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

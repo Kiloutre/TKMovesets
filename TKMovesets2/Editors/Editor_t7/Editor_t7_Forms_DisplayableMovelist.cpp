@@ -35,12 +35,13 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 		else if ((unsigned char)entryString[i] == 0xEE && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
 		{
 			auto entry = EditorT7Utils::mvlDisplay_characterConversion.find((unsigned char)entryString[i + 2]);
+
 			if (entry != EditorT7Utils::mvlDisplay_characterConversion.end()) {
 				convertedString += entry->second;
+				i += 3;
+				continue;
 			}
 
-			i += 3;
-			continue;
 		}
 		convertedString += entryString[i];
 		++i;
@@ -139,13 +140,25 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 	return inputListMap;
 }
 
+
+// debug / todo: remove
+void PrintTest(char* ttt) {
+	for (int p = 0; ttt[p]; ++p) {
+		if (isprint((unsigned char)ttt[p])) {
+			printf("%c", ttt[p]);
+		}
+		else {
+			printf("\\%02X", (unsigned char)ttt[p]);
+		}
+	}
+}
+
 void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, EditorInput*>& inputs)
 {
 	auto displayable = m_iterators.mvl_displayables[id];
 
 	SetMemberValue(&displayable->type, inputs["type"]);
 	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
-
 
 	SetMemberValue(&displayable->_unk0x40, inputs["_unk0x40"]);
 	SetMemberValue(&displayable->_unk0x46, inputs["_unk0x46"]);
@@ -155,6 +168,61 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		int* valuePtr = (int*)((char*)displayable + ofst);
 		std::string key = std::format("unk_{:x}", ofst);
 		SetMemberValue(valuePtr, inputs[key]);
+	}
+
+	//debug
+
+	/*
+	for (int i = 0; i < _countof(displayable->title_translation_offsets); ++i) {
+		std::string key = "title_translation_" + std::to_string(i);
+		
+		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
+
+		char* currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
+		size_t currentLen = strlen(currentString);
+		size_t newLen = convertedBuffer.size();
+
+
+		if (newLen != currentLen) {
+			printf("%d - [%s] %llu vs %llu [%s](%s)\n", i, currentString, currentLen, newLen, convertedBuffer.c_str(), inputs[key]->buffer);
+			// Reallocation
+			//ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
+
+			displayable = m_iterators.mvl_displayables[id];
+			currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
+		}
+		
+
+		//strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
+	}
+	*/
+
+	for (int i = 0; i < _countof(displayable->translation_offsets); ++i) {
+		std::string key = "translation_" + std::to_string(i);
+
+		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
+
+		char* currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
+		size_t currentLen = strlen(currentString);
+		size_t newLen = convertedBuffer.size();
+
+
+		if (newLen != currentLen) {
+			printf("%d - [", i);
+			PrintTest(currentString);
+			printf("] %llu vs %llu[", currentLen, newLen );
+			PrintTest((char*)convertedBuffer.c_str());
+			printf("](%s)\n", inputs[key]->buffer);
+
+			// Reallocation
+			//ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
+
+			displayable = m_iterators.mvl_displayables[id];
+			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
+		}
+
+
+		//strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
 	}
 }
 

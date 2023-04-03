@@ -20,20 +20,20 @@ namespace EditorT7Utils
 		{ 0x83, "{B}" },
 		{ 0x84, "{F}" },
 		{ 0x85, "{UB}" },
-		{ 0x86, "{UB}" },
-		{ 0x87, "{UB}" },
+		{ 0x86, "{U}" },
+		{ 0x87, "{UF}" },
 
 		{ 0x88, "{!DB}" },
 		{ 0x89, "{!D}" },
 		{ 0x8A, "{!DF}" },
-		{ 0x88, "{!8}" },
+		{ 0x8B, "{!B}" },
 		{ 0x8C, "{!F}" },
 		{ 0x8D, "{!UB}" },
 		{ 0x8E, "{!U}" },
 		{ 0x8F, "{!UF}" },
 
-		{ 0x85, "{1}" },
-		{ 0x86, "{2}" },
+		{ 0x95, "{1}" },
+		{ 0x96, "{2}" },
 		{ 0x97, "{12}" },
 		{ 0x98, "{3}" },
 		{ 0x99, "{34}" },
@@ -47,6 +47,8 @@ namespace EditorT7Utils
 		{ 0xA1, "{134}" },
 		{ 0xA2, "{234}" },
 		{ 0xA3, "{1234}" },
+
+		{ 0xB4, "{N}" },
 	};
 
 	std::string ConvertMovelistDisplayableTextToGameText(const char* str)
