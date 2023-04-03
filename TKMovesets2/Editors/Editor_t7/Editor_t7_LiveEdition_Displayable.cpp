@@ -1,5 +1,6 @@
-#include "Editor_t7.hpp"
+#include <format>
 
+#include "Editor_t7.hpp"
 #include "helpers.hpp"
 
 // Live edition callbacks that will only be called if live edition is enabled, the moveset is loaded in memory AND if the modified field is valid
@@ -22,24 +23,60 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 	};
 	value_u64 = EditorUtils::GetFieldValue(field);
 
-	// todo
-	/*
-	if (name == "_0x0_int") {
-		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, _0x0_int), value_s32);
+	if (name == "_unk0x40") {
+		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, _unk0x40), value_s32);
 	}
-	else if (name == "_0x4_short") {
-		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, _0x4_short), value_s16);
+	else if (name == "playable_id") {
+		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, playable_id), value_s16);
 	}
-	else if (name == "left_side_camera_data") {
-		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, left_side_camera_data), value_s16);
+	else if (name == "_unk0x46") {
+		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, _unk0x46), value_s16);
 	}
-	else if (name == "right_side_camera_data") {
-		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, right_side_camera_data), value_s16);
+	else if (name == "type") {
+		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, type), value_s32);
 	}
-	else if (name == "_0xA_short") {
-		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, _0xA_short), value_s16);
+	else if (Helpers::startsWith(name, "unk_"))
+	{
+		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
+		{
+			std::string key = std::format("unk_{:x}", ofst);
+			if (name == key) {
+				m_process->writeInt32(structAddr + ofst, value_s32);
+			}
+		}
 	}
-	*/
+	else if (Helpers::startsWith(name, "title_translation_"))
+	{
+		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(buffer);
+		int translationId = atoi((char*)name.c_str() + sizeof("title_translation_") - 1);
+
+		int32_t translationOffset = m_iterators.mvl_displayables[id]->translation_offsets[translationId];
+		const char* currentString = (char*)m_mvlHead + translationOffset;
+		size_t oldLen = strlen(currentString);
+		size_t newLen = convertedBuffer.size();
+
+		if (newLen <= oldLen) {
+			gameAddr stringAddr = blockStart + translationOffset;
+			m_process->writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
+		}
+		// Bigger length requires re-allocation: no live edition possible
+	}
+	else if (Helpers::startsWith(name, "translation_"))
+	{
+		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(buffer);
+		int translationId = atoi((char*)name.c_str() + sizeof("translation_") - 1);
+
+		int32_t translationOffset = m_iterators.mvl_displayables[id]->translation_offsets[translationId];
+		const char* currentString = (char*)m_mvlHead + translationOffset;
+		size_t oldLen = strlen(currentString);
+		size_t newLen = convertedBuffer.size();
+		
+		if (newLen <= oldLen) {
+			gameAddr stringAddr = blockStart + translationOffset;
+			m_process->writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
+		}
+		// Bigger length requires re-allocation: no live edition possible
+	}
 }
 
 void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)

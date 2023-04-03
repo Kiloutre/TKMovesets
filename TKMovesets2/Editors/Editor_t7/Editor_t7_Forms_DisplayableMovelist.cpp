@@ -34,104 +34,11 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 		}
 		else if ((unsigned char)entryString[i] == 0xEE && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
 		{
-			switch ((unsigned char)entryString[i + 2])
-			{
-			case 0x80:
-				convertedString += "{DB}";
-				break;
-			case 0x81:
-				convertedString += "{D}";
-				break;
-			case 0x82:
-				convertedString += "{DF}";
-				break;
-			case 0x83:
-				convertedString += "{B}";
-				break;
-			case 0x84:
-				convertedString += "{F}";
-				break;
-			case 0x85:
-				convertedString += "{UB}";
-				break;
-			case 0x86:
-				convertedString += "{U}";
-				break;
-			case 0x87:
-				convertedString += "{UF}";
-				break;
-
-			case 0x88:
-				convertedString += "{!DB}";
-				break;
-			case 0x89:
-				convertedString += "{!D}";
-				break;
-			case 0x8A:
-				convertedString += "{!DF}";
-				break;
-			case 0x8B:
-				convertedString += "{!B}";
-				break;
-			case 0x8C:
-				convertedString += "{!F}";
-				break;
-			case 0x8D:
-				convertedString += "{!UB}";
-				break;
-			case 0x8E:
-				convertedString += "{!U}";
-				break;
-			case 0x8F:
-				convertedString += "{!UF}";
-				break;
-
-			case 0x95:
-				convertedString += "{1}";
-				break;
-			case 0x96:
-				convertedString += "{2}";
-				break;
-			case 0x97:
-				convertedString += "{12}";
-				break;
-			case 0x98:
-				convertedString += "{3}";
-				break;
-			case 0x99:
-				convertedString += "{34}";
-				break;
-			case 0x9A:
-				convertedString += "{23}";
-				break;
-			case 0x9B:
-				convertedString += "{123}";
-				break;
-			case 0x9C:
-				convertedString += "{4}";
-				break;
-			case 0x9D:
-				convertedString += "{14}";
-				break;
-			case 0x9E:
-				convertedString += "{24}";
-				break;
-			case 0x9F:
-				convertedString += "{124}";
-				break;
-			case 0xA0:
-				convertedString += "{34}";
-				break;
-			case 0xA1:
-				convertedString += "{134}";
-				break;
-			case 0xA2:
-				convertedString += "{234}";
-				break;
-			case 0xA3:
-				convertedString += "{1234}";
-				break;
+			auto entry = EditorT7Utils::mvlDisplay_characterConversion.find((unsigned char)entryString[i + 2]);
+			if (entry != EditorT7Utils::mvlDisplay_characterConversion.end()) {
+				convertedString += entry->second;
 			}
+
 			i += 3;
 			continue;
 		}
@@ -240,11 +147,11 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
 
 
-
 	SetMemberValue(&displayable->_unk0x40, inputs["_unk0x40"]);
 	SetMemberValue(&displayable->_unk0x46, inputs["_unk0x46"]);
 
-	for (int ofst = 0x4C; ofst <= 0x170; ofst += 4) {
+	for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
+	{
 		int* valuePtr = (int*)((char*)displayable + ofst);
 		std::string key = std::format("unk_{:x}", ofst);
 		SetMemberValue(valuePtr, inputs[key]);

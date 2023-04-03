@@ -15,15 +15,13 @@ EditorMovelistDisplayable::EditorMovelistDisplayable(std::string windowTitleBase
 	uniqueType = true;
 	InitForm(windowTitleBase, 0, editor);
 	// Trigger update to build all the item details
-	OnUpdate(0, nullptr);
+	BuidAllLabels();
 }
 
 // -- Private methods-- //
 
-void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
+void EditorMovelistDisplayable::BuidAllLabels()
 {
-	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
-
 	int visibleIndex = 1;
 	bool comboStarted = false;
 	for (int i = 0; i < m_listSize; ++i)
@@ -48,7 +46,8 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 				if (playableField->flags & EditorInput_Interactable) {
 					playableField->flags ^= EditorInput_Interactable;
 				}
-			} else if ((playableField->flags & EditorInput_Interactable) == 0) {
+			}
+			else if ((playableField->flags & EditorInput_Interactable) == 0) {
 				playableField->flags |= EditorInput_Interactable;
 			}
 
@@ -62,6 +61,12 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 			}
 		}
 	}
+}
+
+void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
+{
+	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+	BuidAllLabels();
 }
 
 void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* field)

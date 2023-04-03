@@ -9,6 +9,14 @@
 
 using namespace StructsT7;
 
+namespace EditorT7Utils
+{
+	const extern std::map<unsigned char, std::string> mvlDisplay_characterConversion;
+
+	// Converts editor displayable text ({1} -> {2}) to game text with 3 bytes icon characters
+	std::string ConvertMovelistDisplayableTextToGameText(const char* str);
+};
+
 struct StructIterators
 {
 	StructIterator<StructsT7_gameAddr::Move> moves;

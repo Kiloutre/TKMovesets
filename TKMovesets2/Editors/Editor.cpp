@@ -78,6 +78,9 @@ namespace EditorUtils
 
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags)
 	{
+		if (flags & EditorInput_String) {
+			return 0;
+		}
 		if (flags & EditorInput_Hex) {
 			//return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
 			return ImGuiInputTextFlags_CharsNoBlank;

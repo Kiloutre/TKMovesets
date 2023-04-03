@@ -9,6 +9,108 @@ using namespace EditorUtils;
 
 #define gAddr StructsT7_gameAddr
 
+// Utils
+
+namespace EditorT7Utils
+{
+	const std::map<unsigned char, std::string> mvlDisplay_characterConversion = {
+		{ 0x80, "{DB}" },
+		{ 0x81, "{D}" },
+		{ 0x82, "{DF}" },
+		{ 0x83, "{B}" },
+		{ 0x84, "{F}" },
+		{ 0x85, "{UB}" },
+		{ 0x86, "{UB}" },
+		{ 0x87, "{UB}" },
+
+		{ 0x88, "{!DB}" },
+		{ 0x89, "{!D}" },
+		{ 0x8A, "{!DF}" },
+		{ 0x88, "{!8}" },
+		{ 0x8C, "{!F}" },
+		{ 0x8D, "{!UB}" },
+		{ 0x8E, "{!U}" },
+		{ 0x8F, "{!UF}" },
+
+		{ 0x85, "{1}" },
+		{ 0x86, "{2}" },
+		{ 0x97, "{12}" },
+		{ 0x98, "{3}" },
+		{ 0x99, "{34}" },
+		{ 0x9A, "{23}" },
+		{ 0x9B, "{123}" },
+		{ 0x9C, "{4}" },
+		{ 0x9D, "{14}" },
+		{ 0x9E, "{24}" },
+		{ 0x9F, "{124}" },
+		{ 0xA0, "{34}" },
+		{ 0xA1, "{134}" },
+		{ 0xA2, "{234}" },
+		{ 0xA3, "{1234}" },
+	};
+
+	std::string ConvertMovelistDisplayableTextToGameText(const char* str)
+	{
+		std::string result;
+
+		size_t maxlen = strlen(str);
+		for (int i = 0; str[i]; ++i)
+		{
+			if (str[i] == '{')
+			{
+				int start = i;
+				while (str[i] && str[i] != '}') {
+					++i;
+				}
+
+				if (str[i] == '}') {
+					int keyLen = (i - start) + 1;
+					bool found = false;
+
+					if (keyLen == 3)
+					{
+						if (str[i - 1] == '[') {
+							result += "\xE3\x80\x90";
+							found = true;
+						}
+						else if (str[i - 1] == ']') {
+							result += "\xE3\x80\x91";
+							found = true;
+						}
+					}
+
+					if (!found)
+					{
+						for (auto& [key, value] : EditorT7Utils::mvlDisplay_characterConversion)
+						{
+							if (value.size() == keyLen && strncmp(value.c_str(), &str[start], keyLen) == 0)
+							{
+								unsigned char specialChar[4] = { 0xEE, 0x80, (unsigned char)key, 0 };
+								result += (char*)specialChar;
+								found = true;
+								break;
+							}
+						}
+					}
+
+					if (found) {
+						continue;
+					}
+
+					// If not found, come back and display the {XX} characters as regular text
+					i = start;
+				}
+			}
+
+			result += str[i];
+		}
+
+		return result;
+	}
+};
+
+// Fixup //
+
 uint64_t EditorT7::CreateMoveName(const char* moveName)
 {
 	const size_t moveNameSize = strlen(moveName) + 1;
