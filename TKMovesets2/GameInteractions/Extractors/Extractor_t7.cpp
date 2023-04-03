@@ -428,7 +428,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 			MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlBlock + head.displayables_offset);
 			for (size_t i = 0; i < head.displayables_count; ++i)
 			{
-				int32_t absoluteDisplayableOffset = head.displayables_offset + (i * sizeof(MvlDisplayable));
+				int32_t absoluteDisplayableOffset = head.displayables_offset + (int32_t)(i * sizeof(MvlDisplayable));
 				for (int j = 0; j < _countof(displayable->all_translation_offsets); ++j) {
 					int32_t correctedOffset = absoluteDisplayableOffset + displayable->all_translation_offsets[j];
 					displayable->all_translation_offsets[j] = correctedOffset;
@@ -442,7 +442,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 			uint32_t input_sequence_start = head.inputs_offset;
 			for (size_t i = 0; i < head.playables_count; ++i)
 			{
-				uint32_t playable_addr = head.playables_offset + sizeof(MvlPlayable) * i;
+				uint32_t playable_addr = head.playables_offset + (int32_t)(sizeof(MvlPlayable) * i);
 				uint32_t input_sequence_addr = playable_addr + playable->input_sequence_offset;
 				uint32_t input_sequence_id = (input_sequence_addr - input_sequence_start) / sizeof(MvlInput);
 				playable->input_sequence_offset = input_sequence_id;

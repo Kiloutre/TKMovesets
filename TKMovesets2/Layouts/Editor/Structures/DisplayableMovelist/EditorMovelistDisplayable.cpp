@@ -30,16 +30,26 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 	{
 		auto& item = m_items[i];
 		auto& typeField = item->identifierMaps["type"];
+		auto& playableField = item->identifierMaps["playable_id"];
 
 		item->color = m_editor->GetDisplayableMovelistEntryColor(typeField);
-		bool isPlayable = ((int64_t)EditorUtils::GetFieldValue(item->identifierMaps["playable_id"])) >= 0;
+		bool isPlayable = ((int64_t)EditorUtils::GetFieldValue(playableField)) >= 0;
 
 		if (m_editor->IsMovelistDisplayableEntryCategory(typeField)) {
-			item->itemLabel = std::format("- {} -", item->identifierMaps["title_translation_1"]->buffer);
+			item->itemLabel = std::format("- {} -", item->identifierMaps["translation_1"]->buffer);
+
+			if (playableField->flags & EditorInput_Interactable) {
+				playableField->flags ^= EditorInput_Interactable;
+			}
 		}
 		else {
 			if (!isPlayable) {
 				item->color = MVL_DISABLED;
+				if (playableField->flags & EditorInput_Interactable) {
+					playableField->flags ^= EditorInput_Interactable;
+				}
+			} else if ((playableField->flags & EditorInput_Interactable) == 0) {
+				playableField->flags |= EditorInput_Interactable;
 			}
 
 			item->itemLabel = std::format("{} - {}", visibleIndex, item->identifierMaps["title_translation_1"]->buffer);

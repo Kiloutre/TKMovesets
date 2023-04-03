@@ -394,13 +394,31 @@ namespace StructsT7
 	{
 		union {
 			struct {
+				int32_t title_translation_0;
+				int32_t title_translation_english;
+				int32_t title_translation_2;
+				int32_t title_translation_other;
+				int32_t translation_offsets_0;
+				int32_t translation_offsets_english;
+				int32_t translation_offsets_portuguese;
+				int32_t translation_offsets_spanish;
+				int32_t translation_offsets_french;
+				int32_t translation_offsets_italian;
+				int32_t translation_offsets_german;
+				int32_t translation_offsets_7;
+				int32_t translation_offsets_8;
+				int32_t translation_offsets_9;
+				int32_t translation_offsets_10;
+				int32_t translation_offsets_11;
+			};
+			struct {
 				int32_t title_translation_offsets[4];
 				int32_t translation_offsets[12];
 			};
 			int32_t all_translation_offsets[16];
 		};
 		uint32_t _unk0x40;
-		uint16_t playable_id;
+		int16_t playable_id;
 		uint16_t _unk0x46;
 		MvlDisplayableType type;
 		uint32_t _unk0x4c;

@@ -27,7 +27,7 @@ static void ConvertDisplayableMovelistOffsets(MvlHead* mvlHead)
 	MvlPlayable* playable = (MvlPlayable*)((uint64_t)mvlHead + mvlHead->playables_offset);
 	for (size_t i = 0; i < mvlHead->playables_count; ++i)
 	{
-		uint32_t playable_addr = mvlHead->playables_offset + sizeof(MvlPlayable) * i;
+		uint32_t playable_addr = mvlHead->playables_offset + (int32_t)(sizeof(MvlPlayable) * i);
 		uint32_t input_sequence_id = playable->input_sequence_offset;
 		uint32_t input_sequence_addr = input_sequence_id * sizeof(MvlInput) + mvlHead->inputs_offset;
 

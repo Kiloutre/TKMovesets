@@ -960,7 +960,17 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 	case EditorWindowType_ThrowCamera:
 		Live_OnThrowCameraEdit(id, field);
 		break;
-	}
 
+
+	case EditorWindowType_MovelistDisplayable:
+		Live_OnMovelistDisplayableEdit(id, field);
+		break;
+	case EditorWindowType_MovelistPlayable:
+		Live_OnMovelistPlayableEdit(id, field);
+		break;
+	case EditorWindowType_MovelistInput:
+		Live_OnMovelistInputEdit(id, field);
+		break;
+	}
 	return;
 }

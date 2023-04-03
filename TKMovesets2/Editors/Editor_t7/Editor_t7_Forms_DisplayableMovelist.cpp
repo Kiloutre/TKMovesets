@@ -212,7 +212,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 			std::string key = "translation_" + std::to_string(i);
 			std::string value = GetMovelistDisplayableText(displayable.translation_offsets[i]);
 
-			CREATE_STRING_FIELD(key, 1, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
+			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 
 

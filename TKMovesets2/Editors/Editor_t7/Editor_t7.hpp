@@ -272,6 +272,10 @@ public:
 	//
 	void Live_OnThrowCameraEdit(int id, EditorInput* field);
 	void Live_OnCameraDataEdit(int id, EditorInput* field);
+	//
+	void Live_OnMovelistDisplayableEdit(int id, EditorInput* field);
+	void Live_OnMovelistPlayableEdit(int id, EditorInput* field);
+	void Live_OnMovelistInputEdit(int id, EditorInput* field);
 
 	// Movelist text conversion
 	std::string GetMovelistDisplayableText(uint32_t offset);
