@@ -335,6 +335,7 @@ public:
 	// Returns the fields to display to build a list of forms of a certain type (extraproperties, requirements, cancels, etc...)
 	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
+	virtual std::map<std::string, EditorInput*> GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns true if the given field is valid
 	virtual bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) = 0;
 	// Save a single struct in the moveset
@@ -386,6 +387,8 @@ public:
 	virtual unsigned int GetStructureCount(EditorWindowType_ type) = 0;
 	// Returns the amount of MOTA animations inside of a specific MOTA
 	virtual unsigned int GetMotaAnimCount(int motaId) = 0;
+	// Returns a string computed based on a movelist displayable's icons value and more
+	virtual std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

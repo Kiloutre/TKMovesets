@@ -1346,6 +1346,31 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 	return GetFormFieldsList(type, id, drawOrder);
 }
 
+
+std::map<std::string, EditorInput*> EditorT7::GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+{
+	std::vector<std::map<std::string, EditorInput*>> list;
+
+	switch (type)
+	{
+	case EditorWindowType_MovelistDisplayable:
+		list = GetMovelistDisplayablesInputs(-1, drawOrder);
+		break;
+	default:
+		list = GetFormFieldsList(type, id, drawOrder, 1);
+		break;
+	}
+
+	for (int i = 1; i < list.size(); ++i) {
+		for (auto& [key, fieldPtr] : list[i]) {
+			delete fieldPtr->buffer;
+			delete fieldPtr;
+		}
+	}
+
+	return list[0];
+}
+
 bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 {
 	if (!ValidateFieldType(field)) {

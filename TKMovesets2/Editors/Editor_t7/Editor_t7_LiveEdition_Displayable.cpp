@@ -17,8 +17,9 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		int64_t value_s64;
 		uint32_t value_u32;
 		int32_t value_s32;
-		uint32_t value_u16;
-		int32_t value_s16;
+		uint16_t value_u16;
+		int16_t value_s16;
+		int8_t value_s8;
 		float value_float;
 	};
 	value_u64 = EditorUtils::GetFieldValue(field);
@@ -35,6 +36,21 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 	else if (name == "type") {
 		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, type), value_s32);
 	}
+	else if (name == "icons") {
+		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, icons), value_s32);
+	}
+	else if (name == "icons_2") {
+		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
+	}
+	else if (name == "combo_damage") {
+		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
+	}
+	else if (name == "combo_difficulty") {
+		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
+	}
+	else if (name == "_unk0x153") {
+		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, _unk0x153), value_s8);
+	}
 	else if (Helpers::startsWith(name, "unk_"))
 	{
 		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
@@ -42,6 +58,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 			std::string key = std::format("unk_{:x}", ofst);
 			if (name == key) {
 				m_process->writeInt32(structAddr + ofst, value_s32);
+				printf("write\n");
 			}
 		}
 	}
@@ -50,7 +67,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(buffer);
 		int translationId = atoi((char*)name.c_str() + sizeof("title_translation_") - 1);
 
-		int32_t translationOffset = m_iterators.mvl_displayables[id]->translation_offsets[translationId];
+		int32_t translationOffset = m_iterators.mvl_displayables[id]->title_translation_offsets[translationId];
 		const char* currentString = (char*)m_mvlHead + translationOffset;
 		size_t oldLen = strlen(currentString);
 		size_t newLen = convertedBuffer.size();
@@ -58,6 +75,9 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		if (newLen <= oldLen) {
 			gameAddr stringAddr = blockStart + translationOffset;
 			m_process->writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
+		}
+		else {
+			DEBUG_LOG("Not applying update");
 		}
 		// Bigger length requires re-allocation: no live edition possible
 	}
@@ -91,8 +111,8 @@ void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)
 		int64_t value_s64;
 		uint32_t value_u32;
 		int32_t value_s32;
-		uint32_t value_u16;
-		int32_t value_s16;
+		uint16_t value_u16;
+		int16_t value_s16;
 		float value_float;
 	};
 	value_u64 = EditorUtils::GetFieldValue(field);
@@ -148,8 +168,8 @@ void EditorT7::Live_OnMovelistInputEdit(int id, EditorInput* field)
 		int64_t value_s64;
 		uint32_t value_u32;
 		int32_t value_s32;
-		uint32_t value_u16;
-		int32_t value_s16;
+		uint16_t value_u16;
+		int16_t value_s16;
 		int8_t value_s8;
 		float value_float;
 	};

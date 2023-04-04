@@ -15,20 +15,23 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 
 	std::string convertedString;
 
-	size_t maxLen = min(strlen(entryString), FORM_INPUT_MAX_BUFSIZE - 1);
+	size_t maxLen = strlen(entryString);
 	for (int i = 0; i < maxLen;)
 	{
 		if ((unsigned char)entryString[i] == 0xE3 && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
 		{
-			if ((unsigned char)entryString[i + 2] == 0x90) {
+			switch ((unsigned char)entryString[i + 2])
+			{
+			case 0x90:
 				convertedString += "{[}";
 				i += 3;
 				continue;
-			}
-			else if ((unsigned char)entryString[i + 2] == 0x91) {
+				break;
+			case 0x91:
 				convertedString += "{]}";
 				i += 3;
 				continue;
+				break;
 			}
 			// Might be korean/japanese characters
 		}
@@ -43,16 +46,74 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 			}
 
 		}
+		else if ((unsigned char)entryString[i] == 0xEE && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x81)
+		{
+			switch ((unsigned char)entryString[i + 2])
+			{
+			case 0xA3:
+				convertedString += "{>}";
+				i += 3;
+				continue;
+				break;
+			case 0xA2:
+				convertedString += "{<}";
+				i += 3;
+				continue;
+				break;
+			}
+		}
+
 		convertedString += entryString[i];
 		++i;
 	}
 
 	if (convertedString.size() >= FORM_INPUT_MAX_BUFSIZE) {
-		// todo: bigger bufsizes
+		DEBUG_LOG("Movelist: cropping string. Size: %llu, offset: %x, string: [%s]\n", maxLen, offset, entryString);
 		convertedString.erase(FORM_INPUT_MAX_BUFSIZE - 1);
 	}
 	return convertedString;
 }
+
+std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap)
+{
+	std::string retVal;
+	uint32_t icons_1 = (uint32_t)GetFieldValue(fieldMap["icons"]);
+	uint8_t icons_2 = (uint8_t)GetFieldValue(fieldMap["icons_2"]);
+	uint8_t combo_damage = (uint8_t)GetFieldValue(fieldMap["combo_damage"]);
+	uint8_t combo_difficulty = (uint8_t)GetFieldValue(fieldMap["combo_difficulty"]);
+
+	if (icons_1 & 0x1000000) {
+		retVal += " HA";
+	}
+
+	if (icons_1 & 0xFF) {
+		retVal += " A";
+	}
+
+	if (icons_1 & 0x200) {
+		retVal += " !S";
+	}
+
+	if (icons_2 & 0xFF) {
+		retVal += " !WB";
+	}
+
+	if (combo_difficulty > 0)
+	{
+		retVal += " " + std::to_string(combo_damage) + " DMG ";
+		
+		const char difficultyBuffer[] = "***";
+		int index = (sizeof(difficultyBuffer) - 1) - combo_difficulty;
+		retVal += &difficultyBuffer[max(0, index)];
+	}
+
+
+	if (retVal.size() != 0) {
+		retVal = " -" + retVal;
+	}
+	return retVal;
+}
+
 // -- Inputs -- //
 
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
@@ -110,31 +171,61 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
 
+		
+		if (id == (uint16_t)-1) {
+			// Used for list creation
+			for (int i = 0; i < _countof(displayable.all_translation_offsets); ++i) {
+				// Set translation offsets to 0, will allocate new space for each when saving
+				displayable.all_translation_offsets[i] = 0;
+			}
+		}
+
 		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
 			std::string key = "title_translation_" + std::to_string(i);
-			std::string value = GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
+			std::string value = (id == (uint16_t)-1) ? " " : GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			std::string key = "translation_" + std::to_string(i);
-			std::string value = GetMovelistDisplayableText(displayable.translation_offsets[i]);
+			std::string value = (id == (uint16_t)-1) ? " " : GetMovelistDisplayableText(displayable.translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 
 
+		CREATE_FIELD("icons", 0, EditorInput_H32, displayable.icons);
+		CREATE_FIELD("icons_2", 0, EditorInput_H32, displayable.icons_2);
+		CREATE_FIELD("combo_difficulty", 0, EditorInput_U8, displayable.combo_difficulty);
+		CREATE_FIELD("combo_damage", 0, EditorInput_U8, displayable.combo_damage);
+
+
 		CREATE_FIELD("_unk0x40", 1, EditorInput_H32_Changeable, displayable._unk0x40);
 		CREATE_FIELD("_unk0x46", 1, EditorInput_H16_Changeable, displayable._unk0x46);
+		CREATE_FIELD("_unk0x153", 1, EditorInput_H8_Changeable, displayable._unk0x153);
 
-		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4) {
-			int value = *(int*)((char*)&displayable + ofst);
-			std::string key = std::format("unk_{:x}", ofst);
-			CREATE_FIELD(key, 1, EditorInput_H32_Changeable, value);
+		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
+		{
+			switch (ofst)
+			{
+				case 0x14C: //icons
+				case 0x150: //icons_2
+					break;
+				default:
+					int value = *(int*)((char*)&displayable + ofst);
+					std::string key = std::format("unk_{:x}", ofst);
+					CREATE_FIELD(key, 1, EditorInput_H32_Changeable, value);
+					break;
+			}
 		}
 
 		WriteFieldFullname(inputMap, "mvl_displayable");
 		inputListMap.push_back(inputMap);
+
+		if (id == -1) {
+			// When generating a single list item, id is -1
+			break;
+		}
 	}
 
 	return inputListMap;
@@ -146,57 +237,97 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 
 	SetMemberValue(&displayable->type, inputs["type"]);
 	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
+	SetMemberValue(&displayable->icons, inputs["icons"]);
+	SetMemberValue(&displayable->icons_2, inputs["icons_2"]);
+	SetMemberValue(&displayable->combo_difficulty, inputs["combo_difficulty"]);
+	SetMemberValue(&displayable->combo_damage, inputs["combo_damage"]);
 
 	SetMemberValue(&displayable->_unk0x40, inputs["_unk0x40"]);
 	SetMemberValue(&displayable->_unk0x46, inputs["_unk0x46"]);
+	SetMemberValue(&displayable->_unk0x153, inputs["_unk0x153"]);
 
 	for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
 	{
-		int* valuePtr = (int*)((char*)displayable + ofst);
-		std::string key = std::format("unk_{:x}", ofst);
-		SetMemberValue(valuePtr, inputs[key]);
+		switch (ofst)
+		{
+			case 0x14C: //icons
+			case 0x150: //icons_2? combo difficulty, damage
+				break;
+			default:
+				int* valuePtr = (int*)((char*)displayable + ofst);
+				std::string key = std::format("unk_{:x}", ofst);
+				SetMemberValue(valuePtr, inputs[key]);
+				break;
+		}
 	}
 
+	/*/
 	for (int i = 0; i < _countof(displayable->title_translation_offsets); ++i) {
 		std::string key = "title_translation_" + std::to_string(i);
 
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
 
-		char* currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
-		size_t currentLen = strlen(currentString);
+		size_t currentLen = 0;
+		uint32_t offset = displayable->title_translation_offsets[i];
+		char* currentString = (char*)m_mvlHead + offset;
+
+		if (offset == 0) {
+			printf("%d\n", id);
+			offset = m_mvlHead->displayables_offset;
+			currentString = (char*)m_mvlHead + offset;
+		}
+		else {
+			currentLen = strlen(currentString);
+		}
+
 		size_t newLen = convertedBuffer.size();
 
-
 		if (newLen != currentLen) {
+			printf("newLen %llu, currentLen %llu\n", newLen, currentLen);
 			// Reallocation
-			ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
+			ModifyMovelistDisplayableTextSize(offset, currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
-			currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
+			currentString = (char*)m_mvlHead + offset;
 		}
 
 		strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
 	}
+	*/
 
 	for (int i = 0; i < _countof(displayable->translation_offsets); ++i) {
 		std::string key = "translation_" + std::to_string(i);
 
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
 
-		char* currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
-		size_t currentLen = strlen(currentString);
-		size_t newLen = convertedBuffer.size();
+		bool allocateNewSpace = false;
+		int newLen = (int)convertedBuffer.size();
+		int currentLen = 0;
+		uint32_t offset = displayable->translation_offsets[i];
+		char* currentString = (char*)m_mvlHead + offset;
+
+		if (offset == 0) {
+			printf("%d\n", id);
+			offset = m_mvlHead->displayables_offset;
+			currentString = (char*)m_mvlHead + offset;
+			allocateNewSpace = true;
+			newLen += 1;
+		}
+		else {
+			currentLen = (int)strlen(currentString);
+		}
 
 
-		if (newLen != currentLen) {
+		if (newLen != currentLen || allocateNewSpace) {
 			// Reallocation
+			printf("ModifyMovelistDisplayableTextSize\n");
 			ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
 			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
 		}
 
-		strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
+		strcpy_s(currentString, (allocateNewSpace && newLen == 0) ? 1 : (newLen + 1), convertedBuffer.c_str());
 	}
 }
 

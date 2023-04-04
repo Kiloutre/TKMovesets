@@ -31,10 +31,13 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 
 	if (m_mvlHead->inputs_offset >= orig_relative_postLisOffset) {
 		m_mvlHead->inputs_offset += structListSizeDiff;
+		DEBUG_LOG("Shifted mvl_inputs block  0x%x\n", structListSizeDiff);
 		if (m_mvlHead->playables_offset >= orig_relative_postLisOffset) {
 			m_mvlHead->playables_offset += structListSizeDiff;
+			DEBUG_LOG("Shifted mvl_playable block  0x%x\n", structListSizeDiff);
 			if (m_mvlHead->displayables_offset >= orig_relative_postLisOffset) {
 				m_mvlHead->displayables_offset += structListSizeDiff;
+				DEBUG_LOG("Shifted mvl_displayable block  0x%x\n", structListSizeDiff);
 			}
 		}
 	}

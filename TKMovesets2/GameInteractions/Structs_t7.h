@@ -485,8 +485,11 @@ namespace StructsT7
 		uint32_t _unk0x140;
 		uint32_t _unk0x144;
 		uint32_t _unk0x148;
-		uint32_t _unk0x14c;
-		uint32_t _unk0x150;
+		uint32_t icons;
+		uint8_t icons_2;
+		uint8_t combo_damage;
+		uint8_t combo_difficulty;
+		uint8_t _unk0x153;
 		uint32_t _unk0x154;
 		uint32_t _unk0x158;
 		uint32_t _unk0x15c;

@@ -370,6 +370,10 @@ edition.mvl_displayable.translation_3 = Espagnol
 edition.mvl_displayable.translation_4 = Français
 edition.mvl_displayable.translation_5 = Italien
 edition.mvl_displayable.translation_6 = Allemand
+edition.mvl_displayable.icons = Icônes
+edition.mvl_displayable.icons_2 = Icônes 2
+edition.mvl_displayable.combo_difficulty = Difficulté
+edition.mvl_displayable.combo_damage = Dégâts
 
 edition.mvl_playable.window_name = Liste de coups: Jouable
 edition.mvl_playable.distance = Distance

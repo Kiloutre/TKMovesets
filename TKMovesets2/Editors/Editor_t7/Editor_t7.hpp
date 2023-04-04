@@ -65,6 +65,7 @@ public:
 	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
+	std::map<std::string, EditorInput*> GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
 	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 
@@ -195,6 +196,8 @@ public:
 	bool IsVoicelipValueEnd(const char* buffer) override;
 	unsigned int GetStructureCount(EditorWindowType_ type) override;
 	unsigned int GetMotaAnimCount(int motaId) override;
+	// Movelist
+	std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list

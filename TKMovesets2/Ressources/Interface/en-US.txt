@@ -376,6 +376,10 @@ edition.mvl_displayable.translation_3 = Spanish
 edition.mvl_displayable.translation_4 = French
 edition.mvl_displayable.translation_5 = Italian
 edition.mvl_displayable.translation_6 = German
+edition.mvl_displayable.icons = Icons
+edition.mvl_displayable.icons_2 = Icons 2
+edition.mvl_displayable.combo_difficulty = Difficulty
+edition.mvl_displayable.combo_damage = Damage
 
 edition.mvl_playable.window_name = Movelist: Playable
 edition.mvl_playable.distance = Distance

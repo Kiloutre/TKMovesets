@@ -71,13 +71,26 @@ namespace EditorT7Utils
 
 					if (keyLen == 3)
 					{
-						if (str[i - 1] == '[') {
+						char prevChar = str[i - 1];
+						found = true;
+
+						switch (prevChar)
+						{
+						case '[':
 							result += "\xE3\x80\x90";
-							found = true;
-						}
-						else if (str[i - 1] == ']') {
+							break;
+						case ']':
 							result += "\xE3\x80\x91";
-							found = true;
+							break;
+						case '>':
+							result += "\xEE\x81\xA3";
+							break;
+						case '<':
+							result += "\xEE\x81\xA2";
+							break;
+						default:
+							found = false;
+							break;
 						}
 					}
 

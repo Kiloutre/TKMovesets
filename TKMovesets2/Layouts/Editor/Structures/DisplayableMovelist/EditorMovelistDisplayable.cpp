@@ -27,14 +27,15 @@ void EditorMovelistDisplayable::BuidAllLabels()
 	for (int i = 0; i < m_listSize; ++i)
 	{
 		auto& item = m_items[i];
-		auto& typeField = item->identifierMaps["type"];
-		auto& playableField = item->identifierMaps["playable_id"];
+		auto& identifierMap = item->identifierMaps;
+		auto& typeField = identifierMap["type"];
+		auto& playableField = identifierMap["playable_id"];
 
 		item->color = m_editor->GetDisplayableMovelistEntryColor(typeField);
 		bool isPlayable = ((int64_t)EditorUtils::GetFieldValue(playableField)) >= 0;
 
 		if (m_editor->IsMovelistDisplayableEntryCategory(typeField)) {
-			item->itemLabel = std::format("- {} -", item->identifierMaps["translation_1"]->buffer);
+			item->itemLabel = std::format("- {} -", identifierMap["translation_1"]->buffer);
 
 			if (playableField->flags & EditorInput_Interactable) {
 				playableField->flags ^= EditorInput_Interactable;
@@ -56,7 +57,8 @@ void EditorMovelistDisplayable::BuidAllLabels()
 				comboStarted = true;
 			}
 
-			item->itemLabel = std::format("{} - {}", visibleIndex, item->identifierMaps["title_translation_1"]->buffer);
+			std::string extraLabel = m_editor->GetMovelistDisplayableLabel(identifierMap);
+			item->itemLabel = std::format("{} - {}{}", visibleIndex, identifierMap["title_translation_1"]->buffer, extraLabel.c_str());
 			++visibleIndex;
 		}
 	}
