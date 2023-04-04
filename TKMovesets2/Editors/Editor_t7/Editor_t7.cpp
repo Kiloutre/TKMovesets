@@ -88,6 +88,9 @@ namespace EditorT7Utils
 						case '<':
 							result += "\xEE\x81\xA2";
 							break;
+						case 'X':
+							result += "\xE2\x96\xA0";
+							break;
 						default:
 							found = false;
 							break;

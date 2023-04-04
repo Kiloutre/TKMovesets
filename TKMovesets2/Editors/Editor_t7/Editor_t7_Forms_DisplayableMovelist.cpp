@@ -62,6 +62,17 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 				break;
 			}
 		}
+		else if ((unsigned char)entryString[i] == 0xE2 && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x96)
+		{
+			switch ((unsigned char)entryString[i + 2])
+			{
+			case 0xA0:
+				convertedString += "{X}";
+				i += 3;
+				continue;
+				break;
+			}
+		}
 
 		convertedString += entryString[i];
 		++i;
@@ -82,16 +93,17 @@ std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorIn
 	uint8_t combo_damage = (uint8_t)GetFieldValue(fieldMap["combo_damage"]);
 	uint8_t combo_difficulty = (uint8_t)GetFieldValue(fieldMap["combo_difficulty"]);
 
-	if (icons_1 & 0x1000000) {
-		retVal += " HA";
-	}
 
 	if (icons_1 & 0xFF) {
 		retVal += " A";
 	}
 
-	if (icons_1 & 0x200) {
+	if (icons_1 & 0xFF00) {
 		retVal += " !S";
+	}
+
+	if (icons_1 & 0xFF000000) {
+		retVal += " HA";
 	}
 
 	if (icons_2 & 0xFF) {
@@ -106,7 +118,6 @@ std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorIn
 		int index = (sizeof(difficultyBuffer) - 1) - combo_difficulty;
 		retVal += &difficultyBuffer[max(0, index)];
 	}
-
 
 	if (retVal.size() != 0) {
 		retVal = " -" + retVal;
