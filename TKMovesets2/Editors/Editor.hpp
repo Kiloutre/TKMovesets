@@ -241,7 +241,7 @@ namespace EditorUtils
 	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, const std::string& baseIdentifier);
 
 	template <typename T>
-	void CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
+	EditorInput* CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
 	{
 		drawOrder.push_back(fieldName);
 
@@ -267,6 +267,8 @@ namespace EditorUtils
 		inputMap[fieldName] = newField;
 		EditorUtils::SetInputfieldColor(newField);
 		sprintf_s(newField->buffer, newField->bufsize, EditorUtils::GetFieldFormat(flags), value);
+
+		return newField;
 	}
 }
 

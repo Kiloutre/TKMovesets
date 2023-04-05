@@ -5,6 +5,7 @@
 
 template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, int oldSize, int newSize, uint32_t listStart_offset)
 {
+	//printf("ModifyGenericMovelistListSize %d %d %d\n", listId, oldSize, newSize);
 	const int listSizeDiff = newSize - oldSize;
 	const uint64_t structSize = sizeof(T);
 	const int structListSize = structSize * newSize;
@@ -13,13 +14,11 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;
 
-	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movelistBlock + listStart_offset + (uint64_t)listId * structSize;
+	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movelistBlock + listStart_offset + ((uint64_t)listId * structSize);
 
 	uint64_t postListOffset = listOffset + structSize * newSize;
 	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
 
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
 	newMovesetSize = m_movesetSize + structListSizeDiff;
 	newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
@@ -31,15 +30,15 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 
 	if (m_mvlHead->inputs_offset >= orig_relative_postLisOffset) {
 		m_mvlHead->inputs_offset += structListSizeDiff;
-		DEBUG_LOG("Shifted mvl_inputs block  0x%x\n", structListSizeDiff);
+		//DEBUG_LOG("Shifted mvl_inputs block  0x%x\n", structListSizeDiff);
 
 		if (m_mvlHead->playables_offset >= orig_relative_postLisOffset) {
 			m_mvlHead->playables_offset += structListSizeDiff;
-			DEBUG_LOG("Shifted mvl_playable block  0x%x\n", structListSizeDiff);
+			//DEBUG_LOG("Shifted mvl_playable block  0x%x\n", structListSizeDiff);
 
 			if (m_mvlHead->displayables_offset >= orig_relative_postLisOffset) {
 				m_mvlHead->displayables_offset += structListSizeDiff;
-				DEBUG_LOG("Shifted mvl_displayable block  0x%x\n", structListSizeDiff);
+				//DEBUG_LOG("Shifted mvl_displayable block  0x%x\n", structListSizeDiff);
 			}
 		}
 	}
@@ -49,15 +48,17 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	{
 		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_postListOffset) {
 			m_header->offsets.blocks[i] += structListSizeDiff;
-			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
+			//DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
 		}
 	}
 
 	// Copy all the data up to the structure list 
 	memcpy(newMoveset, m_moveset, listOffset);
+	//printf("Copy up to orig %llx\n", listOffset);
 
 	// Copy all the data after the structure list
 	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
+	//printf("Copy from orig %llx at %llx, size %llx\n", orig_postListOffset, postListOffset, m_movesetSize - orig_postListOffset);
 
 	// Assign new moveset
 	free(m_moveset);
@@ -73,14 +74,17 @@ void EditorT7::ModifyMovelistDisplayableTextSize(int listId, int oldSize, int ne
 	int32_t offset = listId;
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
+		/*
 		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
 			if (displayable.title_translation_offsets[i] > listId) {
 				displayable.title_translation_offsets[i] += listSizeDiff;
 			}
 		}
+		*/
 
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			if (displayable.translation_offsets[i] > listId) {
+				printf("%d. increase of %d (curr is %d)\n", i, listSizeDiff, displayable.translation_offsets[i]);
 				displayable.translation_offsets[i] += listSizeDiff;
 			}
 		}

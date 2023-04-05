@@ -15,7 +15,7 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 
 	std::string convertedString;
 
-	size_t maxLen = strlen(entryString);
+	int maxLen = (int)strlen(entryString);
 	for (int i = 0; i < maxLen;)
 	{
 		if ((unsigned char)entryString[i] == 0xE3 && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
@@ -79,7 +79,7 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 	}
 
 	if (convertedString.size() >= FORM_INPUT_MAX_BUFSIZE) {
-		DEBUG_LOG("Movelist: cropping string. Size: %llu, offset: %x, string: [%s]\n", maxLen, offset, entryString);
+		DEBUG_LOG("Movelist: cropping string. Size: %u, offset: %x, string: [%s]\n", maxLen, offset, entryString);
 		convertedString.erase(FORM_INPUT_MAX_BUFSIZE - 1);
 	}
 	return convertedString;
@@ -93,7 +93,7 @@ std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorIn
 	uint8_t combo_damage = (uint8_t)GetFieldValue(fieldMap["combo_damage"]);
 	uint8_t combo_difficulty = (uint8_t)GetFieldValue(fieldMap["combo_difficulty"]);
 
-
+	// Note that these 4 icons can't show at once, it's only 3 max. I still display 4 in the GUI for clarity.
 	if (icons_1 & 0xFF) {
 		retVal += " A";
 	}
@@ -175,9 +175,11 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 
+	int listIndex = 0;
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
 		std::map<std::string, EditorInput*> inputMap;
+		CREATE_FIELD("__id", 0, EditorInput_S32, id + listIndex);
 
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
@@ -196,12 +198,16 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 			std::string value = (id == (uint16_t)-1) ? " " : GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
+			// This hidden field will be used in order to know whether entry should be a new allocation or not
+			CREATE_FIELD(key + "_offset", 0, EditorInput_U32, (id == (uint16_t)-1) ? 0 : displayable.title_translation_offsets[i])->visible = false;
 		}
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			std::string key = "translation_" + std::to_string(i);
 			std::string value = (id == (uint16_t)-1) ? " " : GetMovelistDisplayableText(displayable.translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
+			// This hidden field will be used in order to know whether entry should be a new allocation or not
+			CREATE_FIELD(key + "_offset", 0, EditorInput_U32, (id == (uint16_t)-1) ? 0 : displayable.translation_offsets[i])->visible = false;
 		}
 
 
@@ -237,6 +243,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 			// When generating a single list item, id is -1
 			break;
 		}
+		++listIndex;
 	}
 
 	return inputListMap;
@@ -272,37 +279,49 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		}
 	}
 
-	/*/
+	/*
 	for (int i = 0; i < _countof(displayable->title_translation_offsets); ++i) {
 		std::string key = "title_translation_" + std::to_string(i);
 
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
 
-		size_t currentLen = 0;
+		bool allocateNewSpace = false;
+		int newLen = (int)convertedBuffer.size();
+		int currentLen = 0;
 		uint32_t offset = displayable->title_translation_offsets[i];
 		char* currentString = (char*)m_mvlHead + offset;
+		uint32_t copySize = (newLen + 1);
+
+		printf("\n -- Displayable %d - translation %d --\n ", id, i);
 
 		if (offset == 0) {
-			printf("%d\n", id);
-			offset = m_mvlHead->displayables_offset;
-			currentString = (char*)m_mvlHead + offset;
+			printf("EMPTY\n");
+			allocateNewSpace = true;
+			currentLen = -1;
+			displayable->title_translation_offsets[i] = m_mvlHead->displayables_offset;
 		}
 		else {
-			currentLen = strlen(currentString);
+			printf("[%s] to [%s]\n", currentString, convertedBuffer.c_str());
+			currentLen = (int)strlen(currentString);
 		}
 
-		size_t newLen = convertedBuffer.size();
 
-		if (newLen != currentLen) {
-			printf("newLen %llu, currentLen %llu\n", newLen, currentLen);
+		if (newLen != currentLen || allocateNewSpace) {
 			// Reallocation
-			ModifyMovelistDisplayableTextSize(offset, currentLen + 1, newLen + 1);
+			printf("-- ModifyMovelistDisplayableTextSize -- ofset %d, currLen %d, newLen %d\n", displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
+			printf("old addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
+			printf("old offset: %x\n", displayable->title_translation_offsets[i]);
+			if (i + 1 < (int)_countof(displayable->title_translation_offsets)) printf("old offset + 1: %x\n", displayable->title_translation_offsets[i + 1]);
+			ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
-			currentString = (char*)m_mvlHead + offset;
+			printf("new addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
+			if (i + 1 < (int)_countof(displayable->title_translation_offsets)) printf("new offset + 1: %x\n", displayable->title_translation_offsets[i + 1]);
+			currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
+			printf("new offset: %x - [%s]\n", displayable->title_translation_offsets[i], (char*)m_mvlHead + displayable->title_translation_offsets[i]);
 		}
 
-		strcpy_s(currentString, newLen + 1, convertedBuffer.c_str());
+		strcpy_s(currentString, copySize, convertedBuffer.c_str());
 	}
 	*/
 
@@ -314,36 +333,40 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		bool allocateNewSpace = false;
 		int newLen = (int)convertedBuffer.size();
 		int currentLen = 0;
-		uint32_t offset = displayable->translation_offsets[i];
+		uint32_t offset = GetFieldValue(inputs[key + "_offset"]);
 		char* currentString = (char*)m_mvlHead + offset;
+		uint32_t copySize = (newLen + 1);
+
+		//printf("\n -- Displayable %d - translation %d --\n ", id, i);
 
 		if (offset == 0) {
-			printf("Displayable %d - translation %d\n", id, i);
+			//printf("EMPTY\n");
 			allocateNewSpace = true;
 			currentLen = -1;
 			displayable->translation_offsets[i] = m_mvlHead->displayables_offset;
 		}
 		else {
+			//printf("[%s] to [%s]\n", currentString, convertedBuffer.c_str());
 			currentLen = (int)strlen(currentString);
 		}
 
 
 		if (newLen != currentLen || allocateNewSpace) {
 			// Reallocation
-			printf("\n-- ModifyMovelistDisplayableTextSize %d -- %d %d %d\n", i, displayable->translation_offsets[i], currentLen + 1, newLen + 1);
-			printf("old addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
-			printf("old offset: %x\n", displayable->translation_offsets[i]);
-			if (i + 1 < _countof(displayable->translation_offsets)) printf("old offset + 1: %x\n", displayable->translation_offsets[i + 1]);
+			//printf("-- ModifyMovelistDisplayableTextSize -- ofset %d, currLen %d, newLen %d\n", displayable->translation_offsets[i], currentLen + 1, newLen + 1);
+			//printf("old addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
+			//printf("old offset: %x\n", displayable->translation_offsets[i]);
+			//if (i + 1 < (int)_countof(displayable->translation_offsets)) printf("old offset + 1: %x\n", displayable->translation_offsets[i + 1]);
 			ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
-			printf("new addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
-			printf("new offset: %x\n", displayable->translation_offsets[i]);
-			if (i + 1 < _countof(displayable->translation_offsets)) printf("new offset + 1: %x\n", displayable->translation_offsets[i + 1]);
+			//printf("new addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
+			//if (i + 1 < (int)_countof(displayable->translation_offsets)) printf("new offset + 1: %x\n", displayable->translation_offsets[i + 1]);
 			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
+			//printf("new offset: %x - [%s]\n", displayable->translation_offsets[i], (char*)m_mvlHead + displayable->translation_offsets[i]);
 		}
 
-		uint32_t copySize = (allocateNewSpace && newLen == 0) ? 1 : (newLen + 1);
+		//printf("Copy string at %llx - %d bytes\n",  (uint64_t)currentString - (uint64_t)m_moveset, copySize);
 		strcpy_s(currentString, copySize, convertedBuffer.c_str());
 	}
 }
