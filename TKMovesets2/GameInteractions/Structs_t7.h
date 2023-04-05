@@ -503,7 +503,7 @@ namespace StructsT7
 
 	struct MvlPlayable
 	{
-		uint16_t _unk0x0;
+		uint16_t p2_action;
 		uint16_t distance;
 		uint16_t p2_rotation;
 		uint16_t _unk0x6;

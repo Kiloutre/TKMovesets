@@ -290,12 +290,18 @@ Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 	std::map<gameAddr, uint64_t> animSizes;
 	Byte* animationBlock = nullptr;
 
-	std::set<gameAddr> addrList;
+	// Vector to keep animation order identical regardless of how the game allocates them
+	std::vector<gameAddr> addrList;
+
 	// Get unique animation list
 	for (size_t i = 0; i < moveCount; ++i)
 	{
 		gameAddr anim_addr = movelist[i].anim_addr;
-		addrList.insert(anim_addr);
+
+		if (std::find(addrList.begin(), addrList.end(), anim_addr) == addrList.end()) {
+			// Don't extract same anim twice
+			addrList.push_back(anim_addr);
+		}
 	}
 	
 	// Find anim sizes and establish offsets

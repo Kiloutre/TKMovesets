@@ -169,9 +169,6 @@ namespace EditorUtils
 		else if (flags & EditorInput_8b) {
 			*(uint8_t*)memberPtr = *(uint8_t*)&value;
 		}
-		else {
-			throw;
-		}
 	}
 
 	void ChangeFieldDataType(EditorInput* field)

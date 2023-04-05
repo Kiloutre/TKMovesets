@@ -22,12 +22,12 @@ struct TKMovesetHeader_infos
 	uint32_t characterId;
 	// Small cost for ensuring future compatibility and less annoying cost
 	uint32_t header_size;
+	// Stores a hash of the moveset data (everything past our TKMovesetHeader_infos structure)
+	uint32_t crc32;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
 	MovesetFlags flags;
 	// Date of last modification
 	uint64_t date;
-	// Stores a hash of the moveset data (everything past our TKMovesetHeader_infos structure)
-	uint32_t crc32;
 	// Origin (Game name + author if you want)
 	char origin[32];
 	// Target character to play on

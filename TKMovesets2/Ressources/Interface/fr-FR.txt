@@ -374,6 +374,7 @@ edition.mvl_displayable.icons = Icônes
 edition.mvl_displayable.icons_2 = Icônes 2
 edition.mvl_displayable.combo_difficulty = Difficulté
 edition.mvl_displayable.combo_damage = Dégâts
+edition.mvl_displayable.p2_action = J2 action
 
 edition.mvl_playable.window_name = Liste de coups: Jouable
 edition.mvl_playable.distance = Distance

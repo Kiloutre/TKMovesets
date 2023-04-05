@@ -318,11 +318,10 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		char* currentString = (char*)m_mvlHead + offset;
 
 		if (offset == 0) {
-			printf("%d\n", id);
-			offset = m_mvlHead->displayables_offset;
-			currentString = (char*)m_mvlHead + offset;
+			printf("Displayable %d - translation %d\n", id, i);
 			allocateNewSpace = true;
-			newLen += 1;
+			currentLen = -1;
+			displayable->translation_offsets[i] = m_mvlHead->displayables_offset;
 		}
 		else {
 			currentLen = (int)strlen(currentString);
@@ -331,14 +330,21 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 
 		if (newLen != currentLen || allocateNewSpace) {
 			// Reallocation
-			printf("ModifyMovelistDisplayableTextSize\n");
+			printf("\n-- ModifyMovelistDisplayableTextSize %d -- %d %d %d\n", i, displayable->translation_offsets[i], currentLen + 1, newLen + 1);
+			printf("old addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
+			printf("old offset: %x\n", displayable->translation_offsets[i]);
+			if (i + 1 < _countof(displayable->translation_offsets)) printf("old offset + 1: %x\n", displayable->translation_offsets[i + 1]);
 			ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
+			printf("new addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
+			printf("new offset: %x\n", displayable->translation_offsets[i]);
+			if (i + 1 < _countof(displayable->translation_offsets)) printf("new offset + 1: %x\n", displayable->translation_offsets[i + 1]);
 			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
 		}
 
-		strcpy_s(currentString, (allocateNewSpace && newLen == 0) ? 1 : (newLen + 1), convertedBuffer.c_str());
+		uint32_t copySize = (allocateNewSpace && newLen == 0) ? 1 : (newLen + 1);
+		strcpy_s(currentString, copySize, convertedBuffer.c_str());
 	}
 }
 
@@ -368,8 +374,8 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 
-	CREATE_FIELD("_unk0x0", 0, EditorInput_U16_Changeable, playable->_unk0x0);
 	CREATE_FIELD("distance", 0, EditorInput_U16, playable->distance);
+	CREATE_FIELD("p2_action", 0, EditorInput_U16_Changeable, playable->p2_action);
 	CREATE_FIELD("p2_rotation", 0, EditorInput_U16_Changeable, playable->p2_rotation);
 	CREATE_FIELD("_unk0x6", 0, EditorInput_U16_Changeable, playable->_unk0x6);
 	CREATE_FIELD("_unk0x8", 0, EditorInput_U16_Changeable, playable->_unk0x8);
@@ -393,7 +399,7 @@ void EditorT7::SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInp
 	uint32_t input_sequence_addr = input_sequence_id * sizeof(MvlInput) + m_mvlHead->inputs_offset;
 	uint32_t input_sequence_offset = input_sequence_addr - playable_addr;
 
-	SetMemberValue(&playable->_unk0x0, inputs["_unk0x0"]);
+	SetMemberValue(&playable->p2_action, inputs["p2_action"]);
 	SetMemberValue(&playable->distance, inputs["distance"]);
 	SetMemberValue(&playable->p2_rotation, inputs["p2_rotation"]);
 	SetMemberValue(&playable->_unk0x6, inputs["_unk0x6"]);

@@ -48,8 +48,6 @@ class DLLCONTENT EditorT7 : public Editor
 private:
 	// Stores the moveset table containing lists offsets & count, aliases too
 	MovesetInfo* m_infos = nullptr;
-	// Stores absolute pointers to the moveset table within the moveset
-	MovesetTable* m_absoluteTable = nullptr;
 	// Contains iterators for the various structure lists
 	StructIterators m_iterators;
 	// Contains a ptr to the head of the displayable movelist

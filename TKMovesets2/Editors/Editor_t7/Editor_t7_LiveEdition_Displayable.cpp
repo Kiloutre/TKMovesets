@@ -117,8 +117,8 @@ void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)
 	};
 	value_u64 = EditorUtils::GetFieldValue(field);
 
-	if (name == "_unk0x0") {
-		m_process->writeInt32(structAddr + offsetof(MvlPlayable, _unk0x0), value_s16);
+	if (name == "p2_action") {
+		m_process->writeInt16(structAddr + offsetof(MvlPlayable, p2_action), value_s16);
 	}
 	else if (name == "distance") {
 		m_process->writeInt16(structAddr + offsetof(MvlPlayable, distance), value_s16);

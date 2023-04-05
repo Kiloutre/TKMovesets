@@ -439,6 +439,7 @@ void EditorWindow::Render(int dockid)
 			m_importNeeded = true;
 			m_loadedMoveset = 0;
 			m_editor->live_loadedMoveset = 0;
+			importerHelper.lastLoadedMoveset = 0;
 		}
 	}
 	else {
