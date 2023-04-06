@@ -235,10 +235,6 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 						m_mvlHead->displayables_offset += structSizeDiff;
 						DEBUG_LOG("MVLT: Shifted mvl_displayable block %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
 					}
-					else if (relativeOffset >= m_mvlHead->displayables_offset) {
-						//m_mvlHead->displayables_count += sizeDiff;
-						// todo
-					}
 				}
 			}
 		}
@@ -303,15 +299,18 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 
-	return 0;
+	return sizeDiff;
 }
 
 void EditorT7::ModifyMovelistDisplayableSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
+
 	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->displayables_offset;
 	int listSizeDiff = ModifyGenericMovelistListSize2<MvlDisplayable>(listStart, ids, deletedIds, listHead);
 
+	// Update count and iterator's count
 	m_mvlHead->displayables_count += listSizeDiff;
+	SetupIterators_DisplayableMovelist();
 }
 
 void EditorT7::ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
