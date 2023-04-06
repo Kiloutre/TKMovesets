@@ -27,6 +27,8 @@ struct FieldItem
 	EditorFormTreeview_ openStatus = EditorFormTreeview_Closed;
 	// Background color of the item
 	int color = 0;
+	// Absolute id of the item
+	int id = -1;
 };
 
 class EditorFormList : public EditorForm
@@ -41,6 +43,8 @@ protected:
 	std::string m_resizeEventKey;
 	// String that is sent when issuing a resize notification to other windows
 	std::string m_identifier;
+	// Absolute structure IDs of the deleted items sicne the last Apply()
+	std::set<int> m_deletedItemIds;
 
 	// Called whenver the list is reordered, used to  update field labels when index is important
 	virtual void OnReorder();

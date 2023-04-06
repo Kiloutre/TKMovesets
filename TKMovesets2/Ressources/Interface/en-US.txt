@@ -343,9 +343,9 @@ edition.form_list.end = END
 edition.form_list.invalid = INVALID
 edition.form_list.controls_disabled_explanation =  Only lists with an starting ID above 1 may have access to list controls
 
-adition.animation_list.anim_name = Animation name
-adition.animation_list.duration = Duration (frames)
-adition.animation_list.size = Size
+edition.animation_list.anim_name = Animation name
+edition.animation_list.duration = Duration (frames)
+edition.animation_list.size = Size
 edition.animation_list.import = Import in move
 edition.animation_list.search_animation = Search animation name to import in current move...
 edition.animation_list.no_anim = No animation was found in the animation library. Open a character with the editor and click the 'Extract animations' button to add its animations to the library.

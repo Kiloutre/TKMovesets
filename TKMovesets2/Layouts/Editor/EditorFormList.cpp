@@ -58,6 +58,7 @@ void EditorFormList::Apply()
 		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMaps);
 	}
 
+	//m_deletedItemIds.clear();
 	OnApply();
 }
 
@@ -211,6 +212,12 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			--m_listSizeChange;
 			--m_listSize;
 
+			/*
+			if (m_items[listIndex]->id != -1) {
+				m_deletedItemIds.insert(m_items[listIndex]->id);
+			}
+			*/
+
 			// Only delete if we're not at the list end, to avoid destructing the fields before using them
 			// Reducing list size will make things invisible on the next render anyway
 			if (listIndex < m_listSize) {
@@ -272,6 +279,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 		m_items.push_back(new FieldItem);
 		auto& item = m_items[listIndex];
 
+		//item->id = structureId + listIndex;
 		item->identifierMaps = fieldIdentifierMaps[listIndex];
 
 		for (uint8_t category : m_categories)

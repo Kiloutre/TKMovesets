@@ -179,7 +179,6 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
 		std::map<std::string, EditorInput*> inputMap;
-		CREATE_FIELD("__id", 0, EditorInput_S32, id + listIndex);
 
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
@@ -333,7 +332,7 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		bool allocateNewSpace = false;
 		int newLen = (int)convertedBuffer.size();
 		int currentLen = 0;
-		uint32_t offset = GetFieldValue(inputs[key + "_offset"]);
+		uint32_t offset = (uint32_t)GetFieldValue(inputs[key + "_offset"]);
 		char* currentString = (char*)m_mvlHead + offset;
 		uint32_t copySize = (newLen + 1);
 

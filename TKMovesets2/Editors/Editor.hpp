@@ -7,6 +7,7 @@
 #include <utility>
 #include <algorithm>
 #include <thread>
+#include <set>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -358,6 +359,7 @@ public:
 	virtual int32_t CreateNew(EditorWindowType_ type) = 0;
 	// Modifies an existing list's size
 	virtual void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) = 0;
+	virtual void ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) = 0;
 
 	// -- Command Utils -- //
 	// Returns a command string from two seperate direction & button fields
