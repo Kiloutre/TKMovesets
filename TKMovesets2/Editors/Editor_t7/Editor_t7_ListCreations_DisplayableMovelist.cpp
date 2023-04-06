@@ -3,9 +3,9 @@
 
 #define gAddr StructsT7_gameAddr
 
+// I end up using this only or strings, but it works pretty well
 template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, int oldSize, int newSize, uint32_t listStart_offset)
 {
-	//printf("ModifyGenericMovelistListSize %d %d %d\n", listId, oldSize, newSize);
 	const int listSizeDiff = newSize - oldSize;
 	const uint64_t structSize = sizeof(T);
 	const int structListSize = structSize * newSize;
@@ -30,15 +30,14 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 
 	if (m_mvlHead->inputs_offset >= orig_relative_postLisOffset) {
 		m_mvlHead->inputs_offset += structListSizeDiff;
-		//DEBUG_LOG("Shifted mvl_inputs block  0x%x\n", structListSizeDiff);
 
 		if (m_mvlHead->playables_offset >= orig_relative_postLisOffset) {
 			m_mvlHead->playables_offset += structListSizeDiff;
-			//DEBUG_LOG("Shifted mvl_playable block  0x%x\n", structListSizeDiff);
+			DEBUG_LOG("Shifted mvl_playable block  0x%x\n", structListSizeDiff);
 
 			if (m_mvlHead->displayables_offset >= orig_relative_postLisOffset) {
 				m_mvlHead->displayables_offset += structListSizeDiff;
-				//DEBUG_LOG("Shifted mvl_displayable block  0x%x\n", structListSizeDiff);
+				DEBUG_LOG("Shifted mvl_displayable block  0x%x\n", structListSizeDiff);
 			}
 		}
 	}
@@ -48,17 +47,15 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	{
 		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_postListOffset) {
 			m_header->offsets.blocks[i] += structListSizeDiff;
-			//DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
+			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
 		}
 	}
 
 	// Copy all the data up to the structure list 
 	memcpy(newMoveset, m_moveset, listOffset);
-	//printf("Copy up to orig %llx\n", listOffset);
 
 	// Copy all the data after the structure list
 	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-	//printf("Copy from orig %llx at %llx, size %llx\n", orig_postListOffset, postListOffset, m_movesetSize - orig_postListOffset);
 
 	// Assign new moveset
 	free(m_moveset);
@@ -74,44 +71,16 @@ void EditorT7::ModifyMovelistDisplayableTextSize(int listId, int oldSize, int ne
 	int32_t offset = listId;
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
-		/*
 		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
 			if (displayable.title_translation_offsets[i] > listId) {
 				displayable.title_translation_offsets[i] += listSizeDiff;
 			}
 		}
-		*/
 
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			if (displayable.translation_offsets[i] > listId) {
-				printf("%d. increase of %d (curr is %d)\n", i, listSizeDiff, displayable.translation_offsets[i]);
 				displayable.translation_offsets[i] += listSizeDiff;
 			}
-		}
-	}
-}
-
-void EditorT7::ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize)
-{
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovelistListSize<MvlDisplayable>(listId, oldSize, newSize, m_mvlHead->displayables_offset);
-
-	m_mvlHead->displayables_count += listSizeDiff;
-	// No correction to do for once since no one refers to the displayable lists by anythign else than its head
-}
-
-void EditorT7::ModifyMovelistInputSize(int listId, int oldSize, int newSize)
-{
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovelistListSize<MvlInput>(listId, oldSize, newSize, m_mvlHead->inputs_offset);
-
-	for (auto& playable : m_iterators.mvl_playables)
-	{
-		if (MUST_SHIFT_ID(playable.input_sequence_offset, listSizeDiff, listId, listId + oldSize)) {
-			playable.input_sequence_offset += listSizeDiff;
-		}
-		else if ((int)playable.input_sequence_offset >= listId && playable.input_sequence_offset <= ((uint64_t)listId + oldSize)) {
-			playable.input_count += listSizeDiff;
 		}
 	}
 }
@@ -119,7 +88,7 @@ void EditorT7::ModifyMovelistInputSize(int listId, int oldSize, int newSize)
 template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
 {
 	// Compute list old and new sizes
-	int newSize = ids.size();
+	int newSize = (int)ids.size();
 	int sizeDiff;
 	int oldSize;
 	{
@@ -130,7 +99,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 				newItemCount += 1;
 			}
 		}
-		oldSize = (ids.size() - newItemCount) + deletedIds.size();
+		oldSize = ((int)ids.size() - newItemCount) + (int)deletedIds.size();
 		sizeDiff = newSize - oldSize;
 	}
 
@@ -155,7 +124,6 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	// ------------------------------------------------
 	// Compute new moveset size
 	uint64_t newMovesetSize = new_followingBlockStart + (m_movesetSize - old_followingBlockStart);
-	printf("Old size: %llx, new size: %llx\n", m_movesetSize, newMovesetSize);
 
 	// Allocate new moveset
 	Byte* newMoveset = (Byte*)calloc(1, newMovesetSize);
@@ -167,7 +135,6 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	// Before we begin copying, there are a few values we want updated in the new moveset before it gets copied loaded up
 
 	// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date
-	/*
 	{
 		uint64_t movesetBlockStart = (m_header->infos.header_size + m_header->offsets.movesetBlock);
 		uint64_t movesetBlockEnd = movesetBlockStart + (m_header->offsets.animationBlock - m_header->offsets.movesetBlock);
@@ -178,15 +145,15 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 			for (size_t i = 0; i < tableEntryCount; ++i)
 			{
 				auto& currentEntry = m_infos->table.entries[i];
-				gameAddr absolute_entryStartAddr = movesetBlockStart + (uint64_t)currentEntry.offset;
+				gameAddr absolute_entryStartAddr = movesetBlockStart + (uint64_t)currentEntry.listAddr;
 			
 				// listPosition be equal to a list's start both with and and without belonging to the list
 				// Rule out the case where an empty structure list (count = 0) is resized into more
 				// This is overkill and not likely to happen since ModifyListSize() is never called for list creations but modification of existing ones
 				if (listPosition < absolute_entryStartAddr || \
-					(listPosition == absolute_entryStartAddr && currentEntry.count != 0)) {
-					*(uint64_t*)&currentEntry.offset += structSizeDiff;
-					DEBUG_LOG("Shifting movelist entry %d's offset\n", i);
+					(listPosition == absolute_entryStartAddr && currentEntry.listCount != 0)) {
+					*(uint64_t*)&currentEntry.listAddr += structSizeDiff;
+					DEBUG_LOG("Shifting movesetblock entry %lld's offset\n", i);
 				}
 				else {
 					bool isPartOfCurrentList = false;
@@ -196,23 +163,22 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 					}
 					else {
 						auto& nextEntry = m_infos->table.entries[i + 1];
-						gameAddr absolute_nextEntryStartAddr = movesetBlockStart + (uint64_t)nextEntry.offset;
+						gameAddr absolute_nextEntryStartAddr = movesetBlockStart + (uint64_t)nextEntry.listAddr;
 
 						if (listPosition < absolute_nextEntryStartAddr || \
-							(listPosition == absolute_nextEntryStartAddr && nextEntry.count != 0)) {
+							(listPosition == absolute_nextEntryStartAddr && nextEntry.listCount != 0)) {
 							isPartOfCurrentList = true;
 						}
 					}
 
 					if (isPartOfCurrentList) {
-						currentEntry.count += sizeDiff;
+						currentEntry.listCount += sizeDiff;
 						DEBUG_LOG("Adding movelist entry %llu count += %d\n", i, sizeDiff);
 					}
 				}
 			}
 		}
 	}
-	*/
 
 	// There are blocks to shift in the displayble movelist block
 	{
@@ -274,8 +240,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 					std::advance(it, 1);
 				}
 				else {
-					printf("--continue\n");
-					// Don't bother copying anything
+					// Don't bother copying anything. Calloc() implies that every byte of this struct will be at 0 anyway, so rely on that and do not change it.
 					continue;
 				}
 			}
@@ -286,12 +251,9 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 
 	// Copy everything after the list up to the next block
 	memcpy(newMoveset + new_listEndPosition, m_moveset + old_listEndPosition, old_followingBlockStart - old_listEndPosition);
-	printf("%llx - %llx = %llx\n", old_followingBlockStart, old_listEndPosition, old_followingBlockStart - old_listEndPosition);
-	printf("memcpy from %llx to %llx\n", new_listEndPosition, new_listEndPosition + (old_followingBlockStart - old_listEndPosition));
 
 	// If there is a block afterward and not just the moveset end, copy everything from that block to the moveset end
 	if (old_followingBlockStart != m_movesetSize) {
-		printf("memcpy %llx + %llx, %lld (%llx)\n", newMoveset, new_followingBlockStart, m_movesetSize - old_followingBlockStart);
 		memcpy(newMoveset + new_followingBlockStart, m_moveset + old_followingBlockStart, m_movesetSize - old_followingBlockStart);
 	}
 
@@ -302,7 +264,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	return sizeDiff;
 }
 
-void EditorT7::ModifyMovelistDisplayableSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
+void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 
 	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->displayables_offset;
@@ -313,12 +275,37 @@ void EditorT7::ModifyMovelistDisplayableSize2(unsigned int listStart, const std:
 	SetupIterators_DisplayableMovelist();
 }
 
+void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
+{
+
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->inputs_offset;
+	int listSizeDiff = ModifyGenericMovelistListSize2<MvlInput>(listStart, ids, deletedIds, listHead);
+
+	// No need to update count for input list cause we never store the count of the full thing, just like the game
+
+	int oldSize = (int)ids.size() + listSizeDiff;
+	for (auto& playable : m_iterators.mvl_playables)
+	{
+		// Todo: now that we know exactly whidh IDs is getting deleted, we can set the values properly
+		if (MUST_SHIFT_ID(playable.input_sequence_offset, listSizeDiff, listStart, listStart + oldSize)) {
+			playable.input_sequence_offset += listSizeDiff;
+		}
+		else if ((int)playable.input_sequence_offset >= listStart && playable.input_sequence_offset <= ((uint64_t)listStart + oldSize)) {
+			playable.input_count += listSizeDiff;
+		}
+	}
+}
+
 void EditorT7::ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	switch (type)
 	{
 	case EditorWindowType_MovelistDisplayable:
-		ModifyMovelistDisplayableSize2(listStart, ids, deletedIds);
+		ModifyMovelistDisplayableSize(listStart, ids, deletedIds);
+		break;
+
+	case EditorWindowType_MovelistInput:
+		ModifyMovelistInputSize(listStart, ids, deletedIds);
 		break;
 	}
 }

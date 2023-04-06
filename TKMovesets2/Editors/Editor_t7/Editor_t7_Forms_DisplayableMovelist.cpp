@@ -263,94 +263,67 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 		}
 	}
 
-	/*
 	for (int i = 0; i < _countof(displayable->title_translation_offsets); ++i) {
-		std::string key = "title_translation_" + std::to_string(i);
 
+		std::string key = "title_translation_" + std::to_string(i);
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
 
-		bool allocateNewSpace = false;
-		int newLen = (int)convertedBuffer.size();
 		int currentLen = 0;
-		uint32_t offset = displayable->title_translation_offsets[i];
-		char* currentString = (char*)m_mvlHead + offset;
+		int newLen = (int)convertedBuffer.size();
 		uint32_t copySize = (newLen + 1);
 
-		printf("\n -- Displayable %d - translation %d --\n ", id, i);
+		uint32_t offset = displayable->title_translation_offsets[i];
+		char* currentString = (char*)m_mvlHead + offset;
 
 		if (offset == 0) {
-			printf("EMPTY\n");
-			allocateNewSpace = true;
+			// This was a new field whose string has not yet been created
 			currentLen = -1;
 			displayable->title_translation_offsets[i] = m_mvlHead->displayables_offset;
 		}
 		else {
-			printf("[%s] to [%s]\n", currentString, convertedBuffer.c_str());
 			currentLen = (int)strlen(currentString);
 		}
 
-
-		if (newLen != currentLen || allocateNewSpace) {
+		if (newLen != currentLen) {
 			// Reallocation
-			printf("-- ModifyMovelistDisplayableTextSize -- ofset %d, currLen %d, newLen %d\n", displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
-			printf("old addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
-			printf("old offset: %x\n", displayable->title_translation_offsets[i]);
-			if (i + 1 < (int)_countof(displayable->title_translation_offsets)) printf("old offset + 1: %x\n", displayable->title_translation_offsets[i + 1]);
 			ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
-			printf("new addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
-			if (i + 1 < (int)_countof(displayable->title_translation_offsets)) printf("new offset + 1: %x\n", displayable->title_translation_offsets[i + 1]);
 			currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
-			printf("new offset: %x - [%s]\n", displayable->title_translation_offsets[i], (char*)m_mvlHead + displayable->title_translation_offsets[i]);
 		}
 
 		strcpy_s(currentString, copySize, convertedBuffer.c_str());
 	}
-	*/
 
 	for (int i = 0; i < _countof(displayable->translation_offsets); ++i) {
-		std::string key = "translation_" + std::to_string(i);
 
+		std::string key = "translation_" + std::to_string(i);
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
 
-		bool allocateNewSpace = false;
-		int newLen = (int)convertedBuffer.size();
 		int currentLen = 0;
-		uint32_t offset = (uint32_t)GetFieldValue(inputs[key + "_offset"]);
-		char* currentString = (char*)m_mvlHead + offset;
+		int newLen = (int)convertedBuffer.size();
 		uint32_t copySize = (newLen + 1);
 
-		//printf("\n -- Displayable %d - translation %d --\n ", id, i);
+		uint32_t offset = displayable->translation_offsets[i];
+		char* currentString = (char*)m_mvlHead + offset;
 
 		if (offset == 0) {
-			//printf("EMPTY\n");
-			allocateNewSpace = true;
+			// This was a new field whose string has not yet been created
 			currentLen = -1;
 			displayable->translation_offsets[i] = m_mvlHead->displayables_offset;
 		}
 		else {
-			//printf("[%s] to [%s]\n", currentString, convertedBuffer.c_str());
 			currentLen = (int)strlen(currentString);
 		}
 
-
-		if (newLen != currentLen || allocateNewSpace) {
+		if (newLen != currentLen) {
 			// Reallocation
-			//printf("-- ModifyMovelistDisplayableTextSize -- ofset %d, currLen %d, newLen %d\n", displayable->translation_offsets[i], currentLen + 1, newLen + 1);
-			//printf("old addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
-			//printf("old offset: %x\n", displayable->translation_offsets[i]);
-			//if (i + 1 < (int)_countof(displayable->translation_offsets)) printf("old offset + 1: %x\n", displayable->translation_offsets[i + 1]);
 			ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
 
 			displayable = m_iterators.mvl_displayables[id];
-			//printf("new addr: %llx\n", (uint64_t)displayable - (uint64_t)m_mvlHead);
-			//if (i + 1 < (int)_countof(displayable->translation_offsets)) printf("new offset + 1: %x\n", displayable->translation_offsets[i + 1]);
 			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
-			//printf("new offset: %x - [%s]\n", displayable->translation_offsets[i], (char*)m_mvlHead + displayable->translation_offsets[i]);
 		}
 
-		//printf("Copy string at %llx - %d bytes\n",  (uint64_t)currentString - (uint64_t)m_moveset, copySize);
 		strcpy_s(currentString, copySize, convertedBuffer.c_str());
 	}
 }

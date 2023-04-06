@@ -326,11 +326,5 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 		ModifyVoiceclipListSize(listId, oldSize, newSize);
 		break;
 
-	case EditorWindowType_MovelistDisplayable:
-		ModifyMovelistDisplayableSize(listId, oldSize, newSize);
-		break;
-	case EditorWindowType_MovelistInput:
-		ModifyMovelistInputSize(listId, oldSize, newSize);
-		break;
 	}
 }

@@ -230,10 +230,9 @@ public:
 	// -- List Creation / Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
 	void ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
-	void ModifyMovelistDisplayableSize2(unsigned int listSTart, const std::vector<int>& ids, const std::set<int>& deletedIds); // todo: move this
-	template<typename T> int ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset); // todo: move this
 	template<typename T> void ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
 	template<typename T> void ModifyGenericMovelistListSize(int listId, int oldSize, int newSize, uint32_t listStart_offset);
+	template<typename T> int ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset);
 	//
 	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
 	//
@@ -251,8 +250,8 @@ public:
 	//
 	void ModifyVoiceclipListSize(int listId, int oldSize, int newSize);
 	// Movelist
-	void ModifyMovelistInputSize(int listId, int oldSize, int newSize);
-	void ModifyMovelistDisplayableSize(int listId, int oldSize, int newSize);
+	void ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
+	void ModifyMovelistDisplayableSize(unsigned int listSTart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize);
 
 	// -- Live edition -- //

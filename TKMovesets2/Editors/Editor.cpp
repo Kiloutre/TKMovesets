@@ -263,6 +263,7 @@ bool Editor::ValidateFieldType(EditorInput* field)
 		return false;
 	}
 
+
 	auto flags = field->flags;
 
 	if (flags & EditorInput_H64) {
@@ -312,6 +313,18 @@ bool Editor::ValidateFieldType(EditorInput* field)
 	else if (flags & EditorInput_S16) {
 		int num = atoi(buffer);
 		if (num > SHRT_MAX || num < SHRT_MIN) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_U8) {
+		int num = atoi(buffer);
+		if (num > UCHAR_MAX || num < 0) {
+			return false;
+		}
+	}
+	else if (flags & EditorInput_S8) {
+		int num = atoi(buffer);
+		if (num > CHAR_MAX || num < CHAR_MIN) {
 			return false;
 		}
 	}

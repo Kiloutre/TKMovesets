@@ -246,62 +246,70 @@ namespace StructsT7
 
 	struct MovesetTable
 	{
-		Reactions* reactions;
-		uint64_t reactionsCount;
+		union {
+			struct {
+				Reactions* reactions;
+				uint64_t reactionsCount;
 
-		Requirement* requirement;
-		uint64_t requirementCount;
+				Requirement* requirement;
+				uint64_t requirementCount;
 
-		HitCondition* hitCondition;
-		uint64_t hitConditionCount;
+				HitCondition* hitCondition;
+				uint64_t hitConditionCount;
 
-		Projectile* projectile;
-		uint64_t projectileCount;
+				Projectile* projectile;
+				uint64_t projectileCount;
 
-		Pushback* pushback;
-		uint64_t pushbackCount;
+				Pushback* pushback;
+				uint64_t pushbackCount;
 
-		PushbackExtradata* pushbackExtradata;
-		uint64_t pushbackExtradataCount;
+				PushbackExtradata* pushbackExtradata;
+				uint64_t pushbackExtradataCount;
 
-		Cancel* cancel;
-		uint64_t cancelCount;
+				Cancel* cancel;
+				uint64_t cancelCount;
 
-		Cancel* groupCancel;
-		uint64_t groupCancelCount;
+				Cancel* groupCancel;
+				uint64_t groupCancelCount;
 
-		CancelExtradata* cancelExtradata;
-		uint64_t cancelExtradataCount;
+				CancelExtradata* cancelExtradata;
+				uint64_t cancelExtradataCount;
 
-		ExtraMoveProperty* extraMoveProperty;
-		uint64_t extraMovePropertyCount;
+				ExtraMoveProperty* extraMoveProperty;
+				uint64_t extraMovePropertyCount;
 
-		OtherMoveProperty* moveBeginningProp; // Extraprops that play when a move starts
-		uint64_t moveBeginningPropCount;
+				OtherMoveProperty* moveBeginningProp; // Extraprops that play when a move starts
+				uint64_t moveBeginningPropCount;
 
-		OtherMoveProperty* moveEndingProp; // Extraprops that play when a move ends
-		uint64_t moveEndingPropCount;
+				OtherMoveProperty* moveEndingProp; // Extraprops that play when a move ends
+				uint64_t moveEndingPropCount;
 
-		Move* move;
-		uint64_t moveCount;
+				Move* move;
+				uint64_t moveCount;
 
-		Voiceclip* voiceclip;
-		uint64_t voiceclipCount;
+				Voiceclip* voiceclip;
+				uint64_t voiceclipCount;
 
-		InputSequence* inputSequence;
-		uint64_t inputSequenceCount;
+				InputSequence* inputSequence;
+				uint64_t inputSequenceCount;
 
-		Input* input;
-		uint64_t inputCount;
+				Input* input;
+				uint64_t inputCount;
 
-		UnknownParryRelated* unknownParryRelated;
-		uint64_t unknownParryRelatedCount;
+				UnknownParryRelated* unknownParryRelated;
+				uint64_t unknownParryRelatedCount;
 
-		CameraData* cameraData;
-		uint64_t cameraDataCount;
+				CameraData* cameraData;
+				uint64_t cameraDataCount;
 
-		ThrowCamera* throwCameras;
-		uint64_t throwCamerasCount;
+				ThrowCamera* throwCameras;
+				uint64_t throwCamerasCount;
+			};
+			struct {
+				void* listAddr;
+				uint64_t listCount;
+			} entries[19];
+		};
 	};
 
 	struct MotaHeader
@@ -727,62 +735,70 @@ namespace StructsT7_gameAddr
 
 	struct MovesetTable
 	{
-		gameAddr reactions;
-		uint64_t reactionsCount;
+		union {
+			struct {
+				gameAddr reactions;
+				uint64_t reactionsCount;
 
-		gameAddr requirement;
-		uint64_t requirementCount;
+				gameAddr requirement;
+				uint64_t requirementCount;
 
-		gameAddr hitCondition;
-		uint64_t hitConditionCount;
+				gameAddr hitCondition;
+				uint64_t hitConditionCount;
 
-		gameAddr projectile;
-		uint64_t projectileCount;
+				gameAddr projectile;
+				uint64_t projectileCount;
 
-		gameAddr pushback;
-		uint64_t pushbackCount;
+				gameAddr pushback;
+				uint64_t pushbackCount;
 
-		gameAddr pushbackExtradata;
-		uint64_t pushbackExtradataCount;
+				gameAddr pushbackExtradata;
+				uint64_t pushbackExtradataCount;
 
-		gameAddr cancel;
-		uint64_t cancelCount;
+				gameAddr cancel;
+				uint64_t cancelCount;
 
-		gameAddr groupCancel;
-		uint64_t groupCancelCount;
+				gameAddr groupCancel;
+				uint64_t groupCancelCount;
 
-		gameAddr cancelExtradata;
-		uint64_t cancelExtradataCount;
+				gameAddr cancelExtradata;
+				uint64_t cancelExtradataCount;
 
-		gameAddr extraMoveProperty;
-		uint64_t extraMovePropertyCount;
+				gameAddr extraMoveProperty;
+				uint64_t extraMovePropertyCount;
 
-		gameAddr moveBeginningProp; // Extraprops that play when a move starts
-		uint64_t moveBeginningPropCount;
+				gameAddr moveBeginningProp; // Extraprops that play when a move starts
+				uint64_t moveBeginningPropCount;
 
-		gameAddr moveEndingProp; // Extraprops that play when a move ends
-		uint64_t moveEndingPropCount;
+				gameAddr moveEndingProp; // Extraprops that play when a move ends
+				uint64_t moveEndingPropCount;
 
-		gameAddr move;
-		uint64_t moveCount;
+				gameAddr move;
+				uint64_t moveCount;
 
-		gameAddr voiceclip;
-		uint64_t voiceclipCount;
+				gameAddr voiceclip;
+				uint64_t voiceclipCount;
 
-		gameAddr inputSequence;
-		uint64_t inputSequenceCount;
+				gameAddr inputSequence;
+				uint64_t inputSequenceCount;
 
-		gameAddr input;
-		uint64_t inputCount;
+				gameAddr input;
+				uint64_t inputCount;
 
-		gameAddr unknownParryRelated;
-		uint64_t unknownParryRelatedCount;
+				gameAddr unknownParryRelated;
+				uint64_t unknownParryRelatedCount;
 
-		gameAddr cameraData;
-		uint64_t cameraDataCount;
+				gameAddr cameraData;
+				uint64_t cameraDataCount;
 
-		gameAddr throwCameras;
-		uint64_t throwCamerasCount;
+				gameAddr throwCameras;
+				uint64_t throwCamerasCount;
+			};
+			struct {
+				gameAddr listAddr;
+				uint64_t listCount;
+			} entries[19];
+		};
 	};
 
 	struct MotaList

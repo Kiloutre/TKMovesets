@@ -224,6 +224,11 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 bool EditorWindow::MovesetStillLoaded()
 {
 	gameAddr movesetAddress = importerHelper.importer->GetMovesetAddress(importerHelper.currentPlayerId);
+#ifdef BUILD_TYPE_DEBUG
+	if (movesetAddress != m_loadedMoveset) {
+		printf("MovesetStillLoaded = false, current is %llx, old was %llx\n", movesetAddress, m_loadedMoveset);
+	}
+#endif
 	return movesetAddress == m_loadedMoveset;
 }
 

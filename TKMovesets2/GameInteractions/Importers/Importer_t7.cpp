@@ -276,16 +276,31 @@ void ImporterT7::CleanupUnusedMovesets()
 	};
 	*/
 
-	for (size_t i = 0; i + 2 < m_process->allocatedMemory.size();)
+	// Call CanImport() because it's a quick way to see if players are loaded. If they're not, we can free memory worry-free.
+	if (CanImport())
 	{
-		std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
-		gameAddr movesetAddress = block.first;
-		uint64_t movesetEnd = movesetAddress + block.second;
-		bool isUsed = false;
+		// Check mvl manager
+		MvlManager mvlManager[2];
+		m_process->readBytes(m_game->ReadPtr("t7_movelist_manager_addr"), mvlManager, sizeof(MvlManager) * 2);
 
-		// Call CanImport() because it's a quick way to see if players are loaded. If they're not, we can free memory worry-free.
-		if (CanImport())
+		for (size_t i = 0; i + 2 < m_process->allocatedMemory.size();)
 		{
+			std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
+			gameAddr movesetAddress = block.first;
+			uint64_t movesetEnd = movesetAddress + block.second;
+			bool isUsed = false;
+
+			for (int j = 0; j < 2; ++j) {
+				if (
+					(movesetAddress <= (gameAddr)mvlManager[j].mvlHead && (gameAddr)mvlManager[j].mvlHead <= movesetEnd)
+					|| (movesetAddress <= (gameAddr)mvlManager[j].sequenceEnd && (gameAddr)mvlManager[j].sequenceEnd <= movesetEnd)
+					|| (movesetAddress <= (gameAddr)mvlManager[j].sequenceStart && (gameAddr)mvlManager[j].sequenceStart <= movesetEnd)
+					) {
+					isUsed = true;
+					break;
+				}
+			}
+
 			// Check movesets of both players
 			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid)
 			{
@@ -299,22 +314,24 @@ void ImporterT7::CleanupUnusedMovesets()
 					uint64_t offsetValue = m_process->readInt64(pStart);
 					if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
 						isUsed = true;
+						break;
 					}
 					pStart += 8;
 				}
 
 			}
-		}
 
 		
-		if (isUsed) {
-			// Skip
-			++i;
-		}
-		else {
-			m_process->freeMem(movesetAddress);
-		}
+			if (isUsed) {
+				// Skip
+				++i;
+			}
+			else {
+				m_process->freeMem(movesetAddress);
+			}
 		
+		}
+
 	}
 }
 
