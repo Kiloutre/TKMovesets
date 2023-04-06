@@ -303,8 +303,6 @@ protected:
 public:
 	// Constants useful constant variables, to be set on a per-game basis
 	std::map<EditorConstants_, int>* constants;
-	// Contains every move, in a displayable format. Ptr to the editor movelist.
-	std::vector<DisplayableMove*>* displayableMovelist = nullptr;
 	// Contains quick data that is made to be accessed outside of this class
 	EditorTable movesetTable;
 	// Status of the animation extraction
@@ -315,6 +313,10 @@ public:
 	gameAddr live_loadedMoveset = 0;
 	// If moveset posses movelist data
 	bool hasDisplayableMovelist = false;
+	// Contains every move, in a displayable format. Not tied to training mode movelist.
+	std::vector<DisplayableMove*>* displayableMovelist;
+	// Set to true when updating displayableMovelist
+	bool mustReloadMovelist = false;
 
 	Editor(GameProcess* process, GameData* game);
 	~Editor();
@@ -324,7 +326,7 @@ public:
 	// Assigns the moveset pointer and useful ptrs to it
 	virtual void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	// Return the movelist in a quickly displayable format
-	virtual void ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref = nullptr) = 0;
+	virtual void ReloadDisplayableMoveList() = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
 	// Returns the moveset and its size

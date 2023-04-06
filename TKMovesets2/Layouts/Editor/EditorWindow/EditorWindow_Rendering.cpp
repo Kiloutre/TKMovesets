@@ -130,7 +130,6 @@ void EditorWindow::RenderToolBar()
 				{
 				case EditorWindowType_Move:
 					m_editor->ReloadDisplayableMoveList();
-					FilterMovelist(EditorMovelistFilter_All);
 					m_moveToScrollTo = structId;
 					m_highlightedMoveId = structId;
 					break;
@@ -429,6 +428,12 @@ void EditorWindow::RenderMovelist()
 
 void EditorWindow::Render(int dockid)
 {
+	// Many windows rely on movelist data : need to update it early on
+	if (m_editor->mustReloadMovelist) {
+		m_editor->mustReloadMovelist = false;
+		ReloadMovelistFilter();
+	}
+
 	// Check for important changes here
 	m_canInteractWithGame = importerHelper.CanStart();
 

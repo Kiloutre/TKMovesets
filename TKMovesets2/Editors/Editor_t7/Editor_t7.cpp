@@ -309,11 +309,9 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	movesetTable.aliases = *m_aliases;
 }
 
-void EditorT7::ReloadDisplayableMoveList(std::vector<DisplayableMove*>* ref)
+void EditorT7::ReloadDisplayableMoveList()
 {
-	if (ref != nullptr) {
-		displayableMovelist = ref;
-	}
+	mustReloadMovelist = true;
 
 	for (auto& move : *displayableMovelist) {
 		delete move;

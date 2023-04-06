@@ -9,7 +9,7 @@ public:
 	// Stores important moveset informations such as aliases, etc...
 	EditorTable* editorTable = nullptr;
 	// Contains the movelist displayed at all times
-	std::vector<DisplayableMove*> movelist;
+	std::vector<DisplayableMove*>* movelist = nullptr;
 	// Contains the labels to display in the editor
 	EditorLabel* labels = nullptr;
 

@@ -325,6 +325,7 @@ Editor::Editor(GameProcess* process, GameData* game)
 	m_game = game;
 
 	m_aliases = new std::vector<uint16_t>;
+	displayableMovelist = new std::vector<DisplayableMove*>;
 
 	m_animNameToOffsetMap = new std::map<std::string, gameAddr>;
 	m_animOffsetToNameOffset = new std::map<gameAddr, gameAddr>;
@@ -339,6 +340,8 @@ Editor::~Editor()
 
 	delete m_animNameToOffsetMap;
 	delete m_animOffsetToNameOffset;
+
+	delete displayableMovelist;
 
 	delete constants;
 	delete animExtractionThread;

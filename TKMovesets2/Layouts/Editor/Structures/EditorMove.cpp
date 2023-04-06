@@ -21,7 +21,7 @@ EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* edito
 		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
 		if (moveId != -1)
 		{
-			const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
+			const char* moveName = m_baseWindow->movelist->at(moveId)->name.c_str();
 			EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 		}
 	}
@@ -142,7 +142,7 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 	if (field->name == "transition")
 	{
 		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
-		const char* moveName = m_baseWindow->movelist[moveId]->name.c_str();
+		const char* moveName = m_baseWindow->movelist->at(moveId)->name.c_str();
 		EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 	}
 	else if (field->name == "move_name") {

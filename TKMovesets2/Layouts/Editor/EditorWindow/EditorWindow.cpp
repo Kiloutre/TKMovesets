@@ -155,15 +155,15 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 
 	m_movelistFilter = filter;
 	if (filter == EditorMovelistFilter_All) {
-		m_filteredMovelist = movelist;
+		m_filteredMovelist = *movelist;
 		return;
 	}
 
 	if (filter == EditorMovelistFilter_PostIdle) {
 		// Get idle move ID, only list moves beyond it
 		size_t startingIndex = editorTable->aliases[1];
-		for (; startingIndex < movelist.size(); ++startingIndex) {
-			m_filteredMovelist.push_back(movelist[startingIndex]);
+		for (; startingIndex < movelist->size(); ++startingIndex) {
+			m_filteredMovelist.push_back(movelist->at(startingIndex));
 		}
 		return;
 	}
@@ -186,7 +186,7 @@ void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
 		break;
 	}
 
-	for (DisplayableMove* move : movelist)
+	for (DisplayableMove* move : *movelist)
 	{
 		if (move->flags & flags) {
 			m_filteredMovelist.push_back(move);
@@ -208,7 +208,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 {
 	int32_t moveId = atoi(buf);
 
-	const size_t movelistSize = movelist.size();
+	const size_t movelistSize = movelist->size();
 	if (moveId >= movelistSize)
 	{
 		const size_t aliasesCount = editorTable->aliases.size();
@@ -281,7 +281,7 @@ EditorWindow::~EditorWindow()
 
 	importerHelper.StopThreadAndCleanup();
 	
-	for (auto& move : movelist) {
+	for (auto& move : *movelist) {
 		delete move;
 	}
 
@@ -336,8 +336,9 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
 
 	// Read what needs to be read and potentially displayed right away
-	m_editor->ReloadDisplayableMoveList(&movelist);
-	m_filteredMovelist = movelist;
+	m_editor->ReloadDisplayableMoveList();
+	movelist = m_editor->displayableMovelist;
+	ReloadMovelistFilter();
 
 	editorTable = &m_editor->movesetTable;
 }

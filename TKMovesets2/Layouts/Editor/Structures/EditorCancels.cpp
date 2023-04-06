@@ -113,7 +113,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 			label = std::format("{} / {} / {}: {}, [ {} ]", move_id, _("edition.form_list.invalid"), _("edition.input_sequence.window_name"), inputSequenceId, inputs);
 		}
 		else {
-			const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
+			const char* moveName = m_baseWindow->movelist->at(validated_move_id)->name.c_str();
 			label = std::format("{} / {} / {}: {}, [ {} ]", move_id, moveName, _("edition.input_sequence.window_name"), inputSequenceId, inputs);
 		}
 	}
@@ -142,7 +142,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 			}
 			else
 			{
-				const char* moveName = m_baseWindow->movelist[validated_move_id]->name.c_str();
+				const char* moveName = m_baseWindow->movelist->at(validated_move_id)->name.c_str();
 				label = std::format("{} / {} / [ {} ]", move_id, moveName, commandStr);
 			}
 		}
