@@ -175,7 +175,8 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 
-	int listIndex = 0;
+	bool isSingleItem = id == (uint16_t)-1;
+
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
 		std::map<std::string, EditorInput*> inputMap;
@@ -183,32 +184,18 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
 
-		
-		if (id == (uint16_t)-1) {
-			// Used for list creation
-			for (int i = 0; i < _countof(displayable.all_translation_offsets); ++i) {
-				// Set translation offsets to 0, will allocate new space for each when saving
-				displayable.all_translation_offsets[i] = 0;
-			}
-		}
-
 		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
 			std::string key = "title_translation_" + std::to_string(i);
-			std::string value = (id == (uint16_t)-1) ? " " : GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
+			std::string value = isSingleItem ? " " : GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
-			// This hidden field will be used in order to know whether entry should be a new allocation or not
-			CREATE_FIELD(key + "_offset", 0, EditorInput_U32, (id == (uint16_t)-1) ? 0 : displayable.title_translation_offsets[i])->visible = false;
 		}
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			std::string key = "translation_" + std::to_string(i);
-			std::string value = (id == (uint16_t)-1) ? " " : GetMovelistDisplayableText(displayable.translation_offsets[i]);
+			std::string value = isSingleItem ? " " : GetMovelistDisplayableText(displayable.translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
-			// This hidden field will be used in order to know whether entry should be a new allocation or not
-			CREATE_FIELD(key + "_offset", 0, EditorInput_U32, (id == (uint16_t)-1) ? 0 : displayable.translation_offsets[i])->visible = false;
 		}
-
 
 		CREATE_FIELD("icons", 0, EditorInput_H32, displayable.icons);
 		CREATE_FIELD("icons_2", 0, EditorInput_H32, displayable.icons_2);
@@ -238,11 +225,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		WriteFieldFullname(inputMap, "mvl_displayable");
 		inputListMap.push_back(inputMap);
 
-		if (id == -1) {
-			// When generating a single list item, id is -1
+		if (isSingleItem) {
 			break;
 		}
-		++listIndex;
 	}
 
 	return inputListMap;

@@ -155,6 +155,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	// ------------------------------------------------
 	// Compute new moveset size
 	uint64_t newMovesetSize = new_followingBlockStart + (m_movesetSize - old_followingBlockStart);
+	printf("Old size: %llx, new size: %llx\n", m_movesetSize, newMovesetSize);
 
 	// Allocate new moveset
 	Byte* newMoveset = (Byte*)calloc(1, newMovesetSize);
@@ -284,7 +285,6 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 			}
 
 			memcpy(newMoveset + writeOffset, m_moveset + readOffset, sizeof(T));
-			printf("Writting on %llx, from %llx - %llx\n", writeOffset, readOffset, *(uint64_t*)(newMoveset + writeOffset));
 		}
 	}
 
@@ -300,8 +300,8 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	}
 
 	// Free up old moveset from memory and assign the new one
-	//free(m_moveset);
-	//LoadMovesetPtr(newMoveset, newMovesetSize);
+	free(m_moveset);
+	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	return 0;
 }

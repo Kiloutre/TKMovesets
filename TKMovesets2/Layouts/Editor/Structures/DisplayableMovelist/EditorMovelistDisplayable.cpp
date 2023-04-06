@@ -35,7 +35,7 @@ void EditorMovelistDisplayable::Apply()
 		for (auto& item : m_items) {
 			itemIndexes.push_back(item->id);
 		}
-		//m_editor->ModifyListSize2(windowType, structureId, itemIndexes, m_deletedItemIds);
+		m_editor->ModifyListSize2(windowType, structureId, itemIndexes, m_deletedItemIds);
 		if (m_listSize != 0) {
 				OnApplyResize(m_listSizeChange, oldSize);
 		}
@@ -59,7 +59,7 @@ void EditorMovelistDisplayable::Apply()
 	}
 	*/
 
-	// After everything was save, re-set the IDs of the list items in case reordering/deletion/creation happened
+	// After everything was saved, re-set the IDs of the list items in case reordering/deletion/creation happened
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
 		m_items[listIndex]->id = structureId + listIndex;
 	}
@@ -114,7 +114,7 @@ void EditorMovelistDisplayable::BuidAllLabels()
 
 void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 {
-	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+	//m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 	BuidAllLabels();
 }
 
