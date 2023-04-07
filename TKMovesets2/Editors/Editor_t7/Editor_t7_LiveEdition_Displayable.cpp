@@ -58,7 +58,6 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 			std::string key = std::format("unk_{:x}", ofst);
 			if (name == key) {
 				m_process->writeInt32(structAddr + ofst, value_s32);
-				printf("write\n");
 			}
 		}
 	}

@@ -4,10 +4,10 @@
 #define gAddr StructsT7_gameAddr
 
 // I end up using this only or strings, but it works pretty well
-template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, int oldSize, int newSize, uint32_t listStart_offset)
+void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const uint64_t structSize = sizeof(T);
+	const uint64_t structSize = sizeof(char);
 	const int structListSize = structSize * newSize;
 	const int structListSizeDiff = structSize * listSizeDiff;
 
@@ -60,29 +60,6 @@ template<typename T> void EditorT7::ModifyGenericMovelistListSize(int listId, in
 	// Assign new moveset
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
-}
-
-void EditorT7::ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize)
-{
-	// Might as well use this generic method for strings since we don't care about alignment here
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovelistListSize<char>(listId, oldSize, newSize, 0);
-
-	int32_t offset = listId;
-	for (auto& displayable : m_iterators.mvl_displayables)
-	{
-		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
-			if (displayable.title_translation_offsets[i] > listId) {
-				displayable.title_translation_offsets[i] += listSizeDiff;
-			}
-		}
-
-		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
-			if (displayable.translation_offsets[i] > listId) {
-				displayable.translation_offsets[i] += listSizeDiff;
-			}
-		}
-	}
 }
 
 template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
@@ -264,8 +241,90 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	return sizeDiff;
 }
 
+void EditorT7::ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize)
+{
+	// Might as well use this generic method for strings since we don't care about alignment here
+	const int listSizeDiff = newSize - oldSize;
+	DisplayableMVLTranslationReallocate(listId, oldSize, newSize, 0);
+
+	int32_t offset = listId;
+	for (auto& displayable : m_iterators.mvl_displayables)
+	{
+		for (int i = 0; i < _countof(displayable.all_translation_offsets); ++i) {
+			if (displayable.all_translation_offsets[i] > listId) {
+				displayable.all_translation_offsets[i] += listSizeDiff;
+			}
+		}
+	}
+}
+
 void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
+	std::map<uint32_t, uint32_t> deletedTranslatons;
+
+	// Build the list of translation strings we will deallocate
+	for (auto id : deletedIds)
+	{
+		auto displayable = m_iterators.mvl_displayables[id];
+		for (size_t i = 0; i < _countof(displayable->all_translation_offsets); ++i) {
+			uint32_t addr = displayable->all_translation_offsets[i];
+			uint32_t addrEnd = 0;
+
+			if (deletedTranslatons.find(addr) != deletedTranslatons.end()) {
+				// Already in it somehow
+				// Ensure that the biggest size is saved
+				if (addrEnd < deletedTranslatons[addr]) {
+					continue;
+				}
+			}
+			deletedTranslatons[addr] = (uint32_t)strlen((char*)m_movesetData + m_header->offsets.movelistBlock + addr);
+		}
+	}
+
+	// Deallocate the later addresses first to avoid having to take into account shifting
+	for (auto iter = deletedTranslatons.rbegin(); iter != deletedTranslatons.rend(); ++iter)
+	{
+		uint32_t stringAddr_start = iter->first;
+		uint32_t stringAddr_size = iter->second;
+		uint32_t stringAddr_end = stringAddr_start + stringAddr_size;
+
+		// Have to painstainingly ensure the string isn't used anywhere else
+		bool stillUsed = false;
+		int idx = 0;
+		for (auto& displayable : m_iterators.mvl_displayables)
+		{
+			if (deletedIds.find(idx++) != deletedIds.end()) {
+				continue;
+			}
+
+			for (size_t i = 0; i < _countof(displayable.all_translation_offsets); ++i)
+			{
+				uint64_t currentStringAddr = displayable.all_translation_offsets[i];
+				if (stringAddr_start <= currentStringAddr && currentStringAddr <= stringAddr_end) {
+					stillUsed = true;
+					break;
+				}
+			}
+		}
+
+		if (!stillUsed) {
+			DisplayableMVLTranslationReallocate(stringAddr_start, stringAddr_size, 0, 0);
+
+			// Have to shift every reference now
+			int idx = 0;
+			for (auto& displayable : m_iterators.mvl_displayables)
+			{
+				if (deletedIds.find(idx++) != deletedIds.end()) {
+					continue;
+				}
+				for (int i = 0; i < _countof(displayable.all_translation_offsets); ++i) {
+					if (displayable.all_translation_offsets[i] >= stringAddr_start) {
+						displayable.all_translation_offsets[i] -= stringAddr_size;
+					}
+				}
+			}
+		}
+	}
 
 	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->displayables_offset;
 	int listSizeDiff = ModifyGenericMovelistListSize2<MvlDisplayable>(listStart, ids, deletedIds, listHead);
@@ -287,7 +346,7 @@ void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector
 	for (auto& playable : m_iterators.mvl_playables)
 	{
 		// Todo: now that we know exactly whidh IDs is getting deleted, we can set the values properly
-		if (MUST_SHIFT_ID(playable.input_sequence_offset, listSizeDiff, listStart, listStart + oldSize)) {
+		if (MUST_SHIFT_ID(playable.input_sequence_offset, listSizeDiff, (int)listStart, (int)listStart + oldSize)) {
 			playable.input_sequence_offset += listSizeDiff;
 		}
 		else if ((int)playable.input_sequence_offset >= listStart && playable.input_sequence_offset <= ((uint64_t)listStart + oldSize)) {

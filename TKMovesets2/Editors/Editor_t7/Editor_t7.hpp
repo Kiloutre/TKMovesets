@@ -231,8 +231,8 @@ public:
 	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
 	void ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
 	template<typename T> void ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
-	template<typename T> void ModifyGenericMovelistListSize(int listId, int oldSize, int newSize, uint32_t listStart_offset);
 	template<typename T> int ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset);
+	void DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset);
 	//
 	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
 	//

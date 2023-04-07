@@ -107,12 +107,10 @@ void EditorFormList::Apply2()
 	// Write into every individual item
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
 		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMaps);
-	}
-
-	// After everything was saved, re-set the IDs of the list items in case reordering/deletion/creation happened
-	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
+		// Re-set the IDs of the list items in case reordering/deletion/creation happened
 		m_items[listIndex]->id = structureId + listIndex;
 	}
+
 	m_deletedItemIds.clear();
 
 	OnApply();
