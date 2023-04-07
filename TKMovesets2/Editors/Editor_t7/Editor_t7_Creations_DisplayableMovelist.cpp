@@ -166,7 +166,7 @@ void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::
 	}
 
 	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->displayables_offset;
-	int listSizeDiff = ModifyGenericMovelistListSize2<MvlDisplayable>(listStart, ids, deletedIds, listHead);
+	int listSizeDiff = ModifyGenericMovelistListSize<MvlDisplayable>(listStart, ids, deletedIds, listHead);
 
 	// Update count and iterator's count
 	m_mvlHead->displayables_count += listSizeDiff;
@@ -175,11 +175,12 @@ void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::
 
 void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-
 	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->inputs_offset;
-	int listSizeDiff = ModifyGenericMovelistListSize2<MvlInput>(listStart, ids, deletedIds, listHead);
+	int listSizeDiff = ModifyGenericMovelistListSize<MvlInput>(listStart, ids, deletedIds, listHead);
 
-	// No need to update count for input list cause we never store the count of the full thing, just like the game
+	// No real need to update count for input list in term of structure data
+	// I do it anyway because this avoids me having
+	m_iterators.mvl_inputs.set_size(m_iterators.mvl_inputs.size() + listSizeDiff);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& playable : m_iterators.mvl_playables)
@@ -192,4 +193,34 @@ void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector
 			playable.input_count += listSizeDiff;
 		}
 	}
+}
+
+//
+
+uint32_t EditorT7::CreateNewMvlPlayable()
+{
+	uint32_t newStructId = m_mvlHead->playables_count;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->playables_offset;
+
+	ModifyGenericMovelistListSize<MvlPlayable>(newStructId, { -1 }, {}, listHead);
+	MvlPlayable* playable = m_iterators.mvl_playables[newStructId];
+	playable->distance = 1000;
+
+	m_mvlHead->playables_count++;
+	SetupIterators_DisplayableMovelist();
+	return newStructId;
+}
+
+uint32_t EditorT7::CreateNewMvlInputs()
+{
+	uint32_t newStructId = (uint32_t)m_iterators.mvl_inputs.size();
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movelistBlock + m_mvlHead->inputs_offset;
+
+	ModifyGenericMovelistListSize<MvlInput>(newStructId, { -1, -1 }, {}, listHead);
+	MvlInput* inputs = m_iterators.mvl_inputs[newStructId];
+	inputs[0].frame_duration = 5;
+	inputs[1].frame_duration = 5;
+
+	m_iterators.mvl_inputs.set_size(newStructId + 2);
+	return newStructId;
 }

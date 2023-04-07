@@ -194,6 +194,13 @@ void EditorT7::SetupIterators_DisplayableMovelist()
 	m_iterators.mvl_playables.Set(m_mvlHead, m_mvlHead->playables_offset, m_mvlHead->playables_count);
 
 	int mvl_inputs_count = 0;
+	for (auto& playable : m_iterators.mvl_playables)
+	{
+		int last_input_offset = playable.input_sequence_offset + playable.input_count;
+		if (last_input_offset > mvl_inputs_count) {
+			mvl_inputs_count = last_input_offset;
+		}
+	}
 	m_iterators.mvl_inputs.Set(m_mvlHead, m_mvlHead->inputs_offset, mvl_inputs_count);
 }
 

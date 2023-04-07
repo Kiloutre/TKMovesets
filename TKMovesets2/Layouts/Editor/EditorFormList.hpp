@@ -45,8 +45,6 @@ protected:
 	std::string m_identifier;
 	// Absolute structure IDs of the deleted items sicne the last Apply()
 	std::set<int> m_deletedItemIds;
-	// Set this to true to set the list resize function to be the 2nd one
-	bool m_usesNewerApplyFunction = false;
 
 	// Called whenver the list is reordered, used to  update field labels when index is important
 	virtual void OnReorder();
@@ -58,7 +56,6 @@ protected:
 	virtual void BuildItemDetails(int listIdx);
 	// Save every list item individually
 	virtual void Apply() override;
-	void Apply2();
 	// Returns false if any field has an error state
 	bool IsFormValid() override;
 	// Displays buttons to move, create or delete individual list items

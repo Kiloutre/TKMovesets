@@ -2,6 +2,7 @@
 #include <time.h>
 #include <cctype>
 #include <fstream>
+#include <chrono>
 
 #include "helpers.hpp"
 
@@ -25,7 +26,7 @@ namespace Helpers
 		}
 
 		// Invalid animation type
-		DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, *(uint32_t*)anim);
+		DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", (uint64_t)anim, *(uint32_t*)anim);
 		throw;
 	}
 
@@ -178,6 +179,11 @@ namespace Helpers
 			}
 		}
 		return std::string();
+	}
+
+	uint64_t getCurrentTimestamp()
+	{
+		return duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount)

@@ -49,6 +49,7 @@ public:
 	Iterator begin() { return Iterator(&m_ptr[0]); }
 	Iterator end() { return Iterator(&m_ptr[m_size]); }
 	uint64_t size() { return m_size; }
+	void set_size(uint64_t new_size) { m_size = new_size; }
 	T* operator[](int n) const { return &m_ptr[n]; }
 
 	StructIterator() { m_ptr = nullptr, m_size = 0; }
@@ -88,6 +89,8 @@ namespace Helpers
     // Gets the current date format in 'hour:minutes day/month/year'
     std::string currentDateTime(uint64_t date);
 
+	// Returns the current timestamp as a uint64
+	uint64_t getCurrentTimestamp();
 
     // In a (moveset) list, can convert ptr members of every structure in the list into offsets
     void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount);

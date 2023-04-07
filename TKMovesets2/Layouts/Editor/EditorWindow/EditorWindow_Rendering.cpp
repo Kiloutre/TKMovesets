@@ -91,7 +91,7 @@ void EditorWindow::RenderToolBar()
 			structType = EditorWindowType_Pushback;
 		}
 		if (ImGui::MenuItem(_("edition.pushback_extra"))) {
-			// Input list sizes must be known ahead of time when opening a window
+			// Pushback extra list sizes must be known ahead of time when opening a window
 			listSize = 1;
 			structType = EditorWindowType_PushbackExtradata;
 		}
@@ -118,24 +118,35 @@ void EditorWindow::RenderToolBar()
 			structType = EditorWindowType_CameraData;
 		}
 
-		if (structType != EditorWindowType_Invalid) {
-			int32_t structId = m_editor->CreateNew(structType);
-			if (structId != -1) {
-				m_savedLastChange = false;
-				m_importNeeded = true;
-				OpenFormWindow(structType, structId, listSize);
-
-				// Custom pre-creation behaviour implementations
-				switch (structType)
-				{
-				case EditorWindowType_Move:
-					m_editor->ReloadDisplayableMoveList();
-					m_moveToScrollTo = structId;
-					m_highlightedMoveId = structId;
-					break;
-				}
-			}
+		ImGui::Separator();
+		if (ImGui::MenuItem(_("edition.mvl_playable"))) {
+			structType = EditorWindowType_MovelistPlayable;
 		}
+		if (ImGui::MenuItem(_("edition.mvl_inputs"))) {
+			// MVL Input list sizes must be known ahead of time when opening a window
+			listSize = 2;
+			structType = EditorWindowType_MovelistInput;
+		}
+
+
+		if (structType != EditorWindowType_Invalid) {
+			uint32_t structId = m_editor->CreateNew(structType);
+
+            m_savedLastChange = false;
+            m_importNeeded = true;
+            OpenFormWindow(structType, structId, listSize);
+
+            // Custom pre-creation behaviour implementations
+            switch (structType)
+            {
+            case EditorWindowType_Move:
+                m_editor->ReloadDisplayableMoveList();
+				ReloadMovelistFilter();
+                m_moveToScrollTo = structId;
+                m_highlightedMoveId = structId;
+                break;
+            }
+    }
 
 		ImGui::EndMenu();
 	}

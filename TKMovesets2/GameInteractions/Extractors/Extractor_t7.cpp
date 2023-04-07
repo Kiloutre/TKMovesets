@@ -471,7 +471,7 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, 
 	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
 	strcpy_s(infos.origin, sizeof(infos.origin), GetGameOriginString());
 	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
-	infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();;
+	infos.date = Helpers::getCurrentTimestamp();
 	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(TKMovesetHeader));
 }
 

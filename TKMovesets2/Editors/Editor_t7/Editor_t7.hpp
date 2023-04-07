@@ -157,52 +157,53 @@ private:
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
-	template<typename T> int32_t CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset);
 	//
-	int32_t CreateInputSequence();
-	int32_t CreateInputList();
+	uint32_t CreateInputSequence();
+	uint32_t CreateInputList();
 	//
-	int32_t CreateNewRequirements();
+	uint32_t CreateNewRequirements();
 	//
-	int32_t CreateNewMove();
-	int32_t CreateNewVoiceclipList();
-	int32_t CreateNewCancelList();
-	int32_t CreateNewGroupedCancelList();
-	int32_t CreateNewCancelExtra();
+	uint32_t CreateNewMove();
+	uint32_t CreateNewVoiceclipList();
+	uint32_t CreateNewCancelList();
+	uint32_t CreateNewGroupedCancelList();
+	uint32_t CreateNewCancelExtra();
 	//
-	int32_t CreateNewExtraProperties();
-	int32_t CreateNewMoveBeginProperties();
-	int32_t CreateNewMoveEndProperties();
+	uint32_t CreateNewExtraProperties();
+	uint32_t CreateNewMoveBeginProperties();
+	uint32_t CreateNewMoveEndProperties();
 	//
-	int32_t CreateNewHitConditions();
-	int32_t CreateNewReactions();
-	int32_t CreateNewPushback();
-	int32_t CreateNewPushbackExtra();
+	uint32_t CreateNewHitConditions();
+	uint32_t CreateNewReactions();
+	uint32_t CreateNewPushback();
+	uint32_t CreateNewPushbackExtra();
 	//
-	int32_t CreateNewProjectile();
+	uint32_t CreateNewProjectile();
 	//
-	int32_t CreateNewThrowCamera();
-	int32_t CreateNewCameraData();
+	uint32_t CreateNewThrowCamera();
+	uint32_t CreateNewCameraData();
+	//
+	uint32_t CreateNewMvlPlayable();
+	uint32_t CreateNewMvlInputs();
 
 	// -- List Creation / Deletion -- //
-	template<typename T> void ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
 	void DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset);
 	//
-	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
+	void ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
 	void ModifyCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
-	void ModifyGroupedCancelListSize(int listId, int oldSize, int newSize);
+	void ModifyGroupedCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
-	void ModifyExtraPropertyListSize(int listId, int oldSize, int newSize);
-	void ModifyStartPropertyListSize(int listId, int oldSize, int newSize);
-	void ModifyEndPropertyListSize(int listId, int oldSize, int newSize);
+	void ModifyExtraPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
+	void ModifyStartPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
+	void ModifyEndPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
-	void ModifyHitConditionListSize(int listId, int oldSize, int newSize);
-	void ModifyPushbackExtraListSize(int listId, int oldSize, int newSize);
+	void ModifyHitConditionListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
+	void ModifyPushbackExtraListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
-	void ModifyInputListSize(int listId, int oldSize, int newSize);
+	void ModifyInputListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
-	void ModifyVoiceclipListSize(int listId, int oldSize, int newSize);
+	void ModifyVoiceclipListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	// Movelist
 	void ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
@@ -246,7 +247,7 @@ private:
 
 	// Templates
 
-	template<typename T> int ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
+	template<typename T> int ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
 	{
 		// Compute list old and new sizes
 		int newSize = (int)ids.size();
@@ -345,21 +346,21 @@ private:
 		// There are blocks to shift in the displayble movelist block
 		{
 			uint64_t movelistBlockStart = (m_header->infos.header_size + m_header->offsets.movelistBlock);
-			uint64_t movelistBlockEnd = m_movesetSize;
+			uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
 
 			if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd && strncmp(m_mvlHead->mvlString, "MVLT", 4) == 0)
 			{
 				uint64_t relativeOffset = listPosition - movelistBlockStart;
 
-				if (m_mvlHead->inputs_offset > relativeOffset) {
+				if ((m_mvlHead->inputs_offset > relativeOffset) || (listStart != 0 && m_mvlHead->inputs_offset == relativeOffset)) {
 					m_mvlHead->inputs_offset += structSizeDiff;
 					DEBUG_LOG("MVLT: Shifted mvl_inputs block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
 
-					if (m_mvlHead->playables_offset > relativeOffset) {
+					if ((m_mvlHead->playables_offset > relativeOffset) || (listStart != 0 && m_mvlHead->playables_offset == relativeOffset)) {
 						m_mvlHead->playables_offset += structSizeDiff;
 						DEBUG_LOG("MVTL: Shifted mvl_playable block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
 
-						if (m_mvlHead->displayables_offset > relativeOffset) {
+						if ((m_mvlHead->displayables_offset > relativeOffset) || (listStart != 0 && m_mvlHead->displayables_offset == relativeOffset)) {
 							m_mvlHead->displayables_offset += structSizeDiff;
 							DEBUG_LOG("MVLT: Shifted mvl_displayable block %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
 						}
@@ -470,11 +471,10 @@ public:
 	std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) override;
 
 	// -- Creation / Deletion -- //
-	int32_t CreateNew(EditorWindowType_ type) override;
+	uint32_t CreateNew(EditorWindowType_ type) override;
 
 	// -- List Creation / Deletion -- //
-	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
-	void ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
+	void ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.

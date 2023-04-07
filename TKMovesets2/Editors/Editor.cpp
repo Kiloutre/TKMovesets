@@ -354,6 +354,9 @@ Editor::~Editor()
 	delete m_animNameToOffsetMap;
 	delete m_animOffsetToNameOffset;
 
+	for (auto& move : *displayableMovelist) {
+		delete move;
+	}
 	delete displayableMovelist;
 
 	delete constants;

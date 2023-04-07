@@ -28,52 +28,6 @@ static int GetColumnCount()
 
 void EditorFormList::Apply()
 {
-	if (m_usesNewerApplyFunction) {
-		return Apply2();
-	}
-
-	if (!IsFormValid()) {
-		return;
-	}
-
-	if (m_listSizeChange != 0)
-	{
-		// If items were added/removed, reallocate entire moveset
-		int oldSize = (int)(m_listSize - m_listSizeChange);
-		m_editor->ModifyListSize(windowType, structureId, oldSize, (int)m_listSize);
-		if (m_listSize != 0) {
-			OnApplyResize(m_listSizeChange, oldSize);
-		}
-		m_listSizeChange = 0;
-	}
-
-	unsavedChanges = false;
-	justAppliedChanges = true;
-	m_requestedClosure = false;
-
-	if (m_listSize == 0) {
-		// List is now empty, no nede to kepe this open
-		popen = false;
-		return;
-	}
-
-	// Write into every individual item
-	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
-		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMaps);
-	}
-	// After everything was saved, re-set the IDs of the list items in case reordering/deletion/creation happened
-	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
-		m_items[listIndex]->id = structureId + listIndex;
-	}
-	m_deletedItemIds.clear();
-
-	OnApply();
-}
-
-// Apply that calls fancier list modification function
-// Every new list should use this 
-void EditorFormList::Apply2()
-{
 	if (!IsFormValid()) {
 		return;
 	}
@@ -87,7 +41,7 @@ void EditorFormList::Apply2()
 		for (auto& item : m_items) {
 			itemIndexes.push_back(item->id);
 		}
-		m_editor->ModifyListSize2(windowType, structureId, itemIndexes, m_deletedItemIds);
+		m_editor->ModifyListSize(windowType, structureId, itemIndexes, m_deletedItemIds);
 		if (m_listSize != 0) {
 			OnApplyResize(m_listSizeChange, oldSize);
 		}
@@ -260,7 +214,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	}
 
 	// Don't show delete button on last item
-	if (listIndex + 1 != m_listSize || m_listSize == 1)
+	if ((listIndex + 1 != m_listSize || m_listSize == 1) && (!uniqueType || m_listSize > 1))
 	{
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 3);
 		ImGui::PushStyleColor(ImGuiCol_Button, FORM_DELETE_BTN);

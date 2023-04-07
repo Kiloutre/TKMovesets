@@ -2,7 +2,9 @@
 #include <tlhelp32.h>
 
 #include "GameProcess.hpp"
+#include "Helpers.hpp"
 
+#include "constants.h"
 #include "GameAddresses.h"
 
 // -- Private methods  -- //
@@ -108,6 +110,7 @@ bool GameProcess::Attach(const char* processName, DWORD processExtraFlags)
 	}
 
 	allocatedMemory.clear();
+	m_toFree.clear();
 	status = AttachToNamedProcess(processName, processExtraFlags);
 	return status == GameProcessErrcode_PROC_ATTACHED;
 }
@@ -140,6 +143,23 @@ bool GameProcess::CheckRunning()
 	return true;
 }
 
+void GameProcess::FreeOldGameMemory(bool instant)
+{
+	uint64_t currentDate = Helpers::getCurrentTimestamp();
+	for (int i = 0; i < m_toFree.size();)
+	{
+		auto& [date, targetAddr] = m_toFree[i];
+		if (instant || ((currentDate - date) >= GAME_FREEING_DELAY_SEC))
+		{
+			VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
+			m_toFree.erase(m_toFree.begin() + i, m_toFree.begin() + i + 1);
+			DEBUG_LOG("Freeing game memory %llx after delay\n", targetAddr);
+		}
+		else {
+			++i;
+		}
+	}
+}
 
 int8_t GameProcess::readInt8(gameAddr addr)
 {
@@ -264,25 +284,31 @@ void  GameProcess::writeBytes(gameAddr addr, void* buf, size_t bufSize)
 gameAddr GameProcess::allocateMem(size_t amount)
 {
 	gameAddr allocatedBlock = (gameAddr)VirtualAllocEx(m_processHandle, nullptr, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	allocatedMemory.push_back(std::pair<gameAddr, uint64_t>(allocatedBlock, amount));
-
-	DEBUG_LOG("Allocated to game memory from : %llx to %llx\n", allocatedBlock, allocatedBlock + amount);
+	if (allocatedBlock != 0) {
+		allocatedMemory.push_back(std::pair<gameAddr, uint64_t>(allocatedBlock, amount));
+		DEBUG_LOG("Allocated to game memory from : %llx to %llx\n", allocatedBlock, allocatedBlock + amount);
+	}
+	else {
+		DEBUG_LOG("Allocation failure: attempt to allocate %lld (%llx) bytes\n", amount, amount);
+	}
 
 	return allocatedBlock;
 }
 
 void GameProcess::freeMem(gameAddr targetAddr)
 {
-	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 	for (std::pair<gameAddr, uint64_t>& block : allocatedMemory) {
 		if (block.first == (gameAddr)targetAddr) {
 			allocatedMemory.erase(std::find(allocatedMemory.begin(), allocatedMemory.end(), block));
-
-			DEBUG_LOG("Freed allocated block %llx (size was %lld)\n", block.first, block.second);
-
+			DEBUG_LOG("Queuing freeing of allocated block %llx (size is %lld)\n", block.first, block.second);
+			uint64_t currentDate = Helpers::getCurrentTimestamp();
+			m_toFree.push_back({ currentDate, targetAddr });
 			return;
 		}
 	}
+
+	DEBUG_LOG("Freeing of allocated block %llx (not size found)\n", targetAddr);
+	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 }
 
 void GameProcess::createRemoteThread(gameAddr startAddress)

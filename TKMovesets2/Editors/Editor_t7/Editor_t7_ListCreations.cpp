@@ -3,78 +3,15 @@
 
 #define gAddr StructsT7_gameAddr
 
-template<typename T>
-void EditorT7::ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset)
+void EditorT7::ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	const uint64_t structSize = sizeof(T);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
-	uint64_t tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	int listSizeDiff = ModifyGenericMovelistListSize<Requirement>(listStart, ids, deletedIds, listHead);
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	const uint64_t listOffset = m_header->infos.header_size + m_header->offsets.movesetBlock + tableListStart + (uint64_t)listId * structSize;
-
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
-
-	// todo: maybe align to 8 bytes in case the struct size is divisible by 4 and not 8. This is to keep following blocks 8 bytes aligned.
-	//newMovesetSize = m_movesetSize + Helpers::align8Bytes(structListSizeDiff);
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		throw;
-	}
-
-	// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date
-	{
-		uint64_t* tableListCount = (uint64_t*)(((Byte*)&m_infos->table) + tableListOffset + 8);
-		*tableListCount += listSizeDiff;
-		tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
-
-		uint64_t* listHeadPtr = (uint64_t*)&m_infos->table;
-		for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
-		{
-			if (*listHeadPtr > tableListStart) {
-				*listHeadPtr += structListSizeDiff;
-			}
-			listHeadPtr += 2;
-		}
-	}
-
-	// Shift offsets in the moveset table & in our header
-	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
-	{
-		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_postListOffset) {
-			m_header->offsets.blocks[i] += structListSizeDiff;
-			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
-		}
-	}
-
-	// Copy all the data up to the structure list 
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the structure list
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, m_movesetSize - orig_postListOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-}
-
-void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
-{
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<Requirement>(listId, oldSize, newSize, offsetofVar(m_infos->table, requirement));
-
-	// Correct every structure that uses this list and needs shifting
-
-	// Cancels
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& cancel : m_iterators.cancels)
 	{
-		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			cancel.requirements_addr += listSizeDiff;
 		}
 	}
@@ -82,7 +19,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Grouped cancels
 	for (auto& cancel : m_iterators.grouped_cancels)
 	{
-		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			cancel.requirements_addr += listSizeDiff;
 		}
 	}
@@ -90,7 +27,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Hit conditions
 	for (auto& hitCondition : m_iterators.hit_conditions)
 	{
-		if (MUST_SHIFT_ID(hitCondition.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(hitCondition.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			hitCondition.requirements_addr += listSizeDiff;
 		}
 	}
@@ -98,7 +35,7 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Move begin prop
 	for (auto& otherProp : m_iterators.move_start_properties)
 	{
-		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			otherProp.requirements_addr += listSizeDiff;
 		}
 	}
@@ -106,24 +43,22 @@ void EditorT7::ModifyRequirementListSize(int listId, int oldSize, int newSize)
 	// Move end prop
 	for (auto& otherProp : m_iterators.move_end_properties)
 	{
-		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			otherProp.requirements_addr += listSizeDiff;
 		}
 	}
 }
 
-void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyHitConditionListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<HitCondition>(listId, oldSize, newSize, offsetofVar(m_infos->table, hitCondition));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
+	int listSizeDiff = ModifyGenericMovelistListSize<HitCondition>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
-	// Moves
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.hit_condition_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.hit_condition_addr, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(move.hit_condition_addr, listSizeDiff, listStart, listStart + oldSize)) {
 				move.hit_condition_addr += listSizeDiff;
 			}
 		}
@@ -131,61 +66,58 @@ void EditorT7::ModifyHitConditionListSize(int listId, int oldSize, int newSize)
 	// Projectiles
 	for (auto& projectile : m_iterators.projectiles)
 	{
-		if (MUST_SHIFT_ID(projectile.hit_condition_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(projectile.hit_condition_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			projectile.hit_condition_addr += listSizeDiff;
 		}
 	}
 }
 
-void EditorT7::ModifyInputListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyInputListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<Input>(listId, oldSize, newSize, offsetofVar(m_infos->table, input));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.input;
+	int listSizeDiff = ModifyGenericMovelistListSize<Input>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	// Input sequences
 	for (auto& sequence : m_iterators.input_sequences)
 	{
-		if (MUST_SHIFT_ID(sequence.input_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(sequence.input_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			sequence.input_addr += listSizeDiff;
 		}
-		else if (sequence.input_addr >= listId && sequence.input_addr <= ((uint64_t)listId + oldSize)) {
+		else if (sequence.input_addr >= listStart && sequence.input_addr <= ((uint64_t)listStart + oldSize)) {
 			sequence.input_amount += listSizeDiff;
 		}
 	}
 }
 
-void EditorT7::ModifyPushbackExtraListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyPushbackExtraListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<PushbackExtradata>(listId, oldSize, newSize, offsetofVar(m_infos->table, pushbackExtradata));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
+	int listSizeDiff = ModifyGenericMovelistListSize<PushbackExtradata>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	// Input sequences
 	for (auto& pushback : m_iterators.pushbacks)
 	{
-		if (MUST_SHIFT_ID(pushback.extradata_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(pushback.extradata_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			pushback.extradata_addr += listSizeDiff;
 		}
-		else if (pushback.extradata_addr >= listId && pushback.extradata_addr <= ((uint64_t)listId + oldSize)) {
+		else if (pushback.extradata_addr >= listStart && pushback.extradata_addr <= ((uint64_t)listStart + oldSize)) {
 			pushback.num_of_loops += listSizeDiff;
 		}
 	}
 }
 
-void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<Cancel>(listId, oldSize, newSize, offsetofVar(m_infos->table, groupCancel));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
+	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (cancel.command == constants->at(EditorConstants_GroupedCancelCommand)) {
-			if (MUST_SHIFT_ID(cancel.move_id, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(cancel.move_id, listSizeDiff, listStart, listStart + oldSize)) {
 				cancel.move_id += listSizeDiff;
 			}
 		}
@@ -194,9 +126,8 @@ void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 
 void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-
 	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
-	int listSizeDiff = ModifyGenericMovelistListSize2<Cancel>(listStart, ids, deletedIds, listHead);
+	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
@@ -217,121 +148,106 @@ void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<in
 	}
 }
 
-void EditorT7::ModifyExtraPropertyListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyExtraPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<ExtraMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, extraMoveProperty));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	int listSizeDiff = ModifyGenericMovelistListSize<ExtraMoveProperty>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.extra_move_property_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.extra_move_property_addr, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(move.extra_move_property_addr, listSizeDiff, listStart, listStart + oldSize)) {
 				move.extra_move_property_addr += listSizeDiff;
 			}
 		}
 	}
 }
 
-void EditorT7::ModifyStartPropertyListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyStartPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, moveBeginningProp));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningPropCount;
+	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_start_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.move_start_extraprop_addr, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(move.move_start_extraprop_addr, listSizeDiff, listStart, listStart + oldSize)) {
 				move.move_start_extraprop_addr += listSizeDiff;
 			}
 		}
 	}
 }
 
-void EditorT7::ModifyEndPropertyListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyEndPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<OtherMoveProperty>(listId, oldSize, newSize, offsetofVar(m_infos->table, moveEndingProp));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
+	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_end_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.move_end_extraprop_addr, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(move.move_end_extraprop_addr, listSizeDiff, listStart, listStart + oldSize)) {
 				move.move_end_extraprop_addr += listSizeDiff;
 			}
 		}
 	}
 }
 
-void EditorT7::ModifyVoiceclipListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyVoiceclipListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<Voiceclip>(listId, oldSize, newSize, offsetofVar(m_infos->table, voiceclip));
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	int listSizeDiff = ModifyGenericMovelistListSize<Voiceclip>(listStart, ids, deletedIds, listHead);
 
-	// Correct every structure that uses this list and needs shifting
-
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.voicelip_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.voicelip_addr, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(move.voicelip_addr, listSizeDiff, listStart, listStart + oldSize)) {
 				move.voicelip_addr += listSizeDiff;
 			}
 		}
 	}
 }
 
-void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize)
+void EditorT7::ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	switch (type)
 	{
 	case EditorWindowType_Requirement:
-		ModifyRequirementListSize(listId, oldSize, newSize);
+		ModifyRequirementListSize(listStart, ids, deletedIds);
+		break;
+	case EditorWindowType_Extraproperty:
+		ModifyExtraPropertyListSize(listStart, ids, deletedIds);
 		break;
 
 	case EditorWindowType_GroupedCancel:
-		ModifyGroupedCancelListSize(listId, oldSize, newSize);
+		ModifyGroupedCancelListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_Extraproperty:
-		ModifyExtraPropertyListSize(listId, oldSize, newSize);
-		break;
 	case EditorWindowType_MoveBeginProperty:
-		ModifyStartPropertyListSize(listId, oldSize, newSize);
+		ModifyStartPropertyListSize(listStart, ids, deletedIds);
 		break;
 	case EditorWindowType_MoveEndProperty:
-		ModifyEndPropertyListSize(listId, oldSize, newSize);
+		ModifyEndPropertyListSize(listStart, ids, deletedIds);
 		break;
 
 	case EditorWindowType_HitCondition:
-		ModifyHitConditionListSize(listId, oldSize, newSize);
+		ModifyHitConditionListSize(listStart, ids, deletedIds);
 		break;
 
 	case EditorWindowType_Input:
-		ModifyInputListSize(listId, oldSize, newSize);
+		ModifyInputListSize(listStart, ids, deletedIds);
 		break;
 
 	case EditorWindowType_PushbackExtradata:
-		ModifyPushbackExtraListSize(listId, oldSize, newSize);
+		ModifyPushbackExtraListSize(listStart, ids, deletedIds);
 		break;
 
 	case EditorWindowType_Voiceclip:
-		ModifyVoiceclipListSize(listId, oldSize, newSize);
-		break;
-
-	}
-}
-
-void EditorT7::ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
-{
-	switch (type)
-	{
-	case EditorWindowType_MovelistInput:
-		ModifyMovelistInputSize(listStart, ids, deletedIds);
+		ModifyVoiceclipListSize(listStart, ids, deletedIds);
 		break;
 
 	case EditorWindowType_Cancel:
@@ -341,6 +257,9 @@ void EditorT7::ModifyListSize2(EditorWindowType_ type, unsigned int listStart, c
 
 	case EditorWindowType_MovelistDisplayable:
 		ModifyMovelistDisplayableSize(listStart, ids, deletedIds);
+		break;
+	case EditorWindowType_MovelistInput:
+		ModifyMovelistInputSize(listStart, ids, deletedIds);
 		break;
 	}
 }

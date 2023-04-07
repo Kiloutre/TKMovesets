@@ -33,6 +33,8 @@ private:
 	HANDLE m_processHandle = nullptr;
 	// Module addresses and sized of the current process
 	std::vector<std::pair<gameAddr, uint64_t>> m_moduleInfos;
+	// Contains a list of <timestamp, gameAddr>, freeing gameAddr once timestamp is older than 10 seconds
+	std::vector<std::pair<uint64_t, gameAddr>> m_toFree;
 
 	// Attach to .processName
 	GameProcessErrcode_ AttachToNamedProcess(const char* processName, DWORD processExtraFlags);
@@ -66,6 +68,8 @@ public:
 	bool IsAttached();
 	// Checks if pid still used by process & attempts a read. Updates .status & returns false if it fails.
 	bool CheckRunning();
+	// Frees previous allocated memory. Set to false (defult) if you want to only free memory older than 10 seconds.
+	void FreeOldGameMemory(bool instant = false);
 
 
 	// Reads an unsigned byte from the game in little endian

@@ -27,6 +27,7 @@
 // Anything else indicate a malformed header : a bad file
 # define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
 
+# define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 
 # define TEXTBOX_HORIZ_PADDING   15

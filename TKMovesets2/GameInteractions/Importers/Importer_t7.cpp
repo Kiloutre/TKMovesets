@@ -283,7 +283,7 @@ void ImporterT7::CleanupUnusedMovesets()
 		MvlManager mvlManager[2];
 		m_process->readBytes(m_game->ReadPtr("t7_movelist_manager_addr"), mvlManager, sizeof(MvlManager) * 2);
 
-		for (size_t i = 0; i + 2 < m_process->allocatedMemory.size();)
+		for (size_t i = 0; i + 1 < m_process->allocatedMemory.size();)
 		{
 			std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
 			gameAddr movesetAddress = block.first;

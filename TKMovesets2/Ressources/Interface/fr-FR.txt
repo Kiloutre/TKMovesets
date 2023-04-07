@@ -161,6 +161,8 @@ edition.inputs = Commande
 edition.projectile = Projectile
 edition.throw_camera = Caméra de prise
 edition.camera_data = Donnée de caméra
+edition.mvl_playable = Liste de coups: Jouable
+edition.mvl_inputs = Liste de coups: Commandes
 
 edition.open_movelist = Liste des coups
 
@@ -388,7 +390,7 @@ edition.mvl_input.directions = Directions
 edition.mvl_input.buttons = Boutons
 edition.mvl_input.frame_duration = Durée
 edition.mvl_input.frame = Image
-edition.mvl_input.frames = Images
+edition.mvl_input.frames = images
 
 edition.suggest_new_name = 
 edition.non_trivial_detected = 

@@ -165,6 +165,8 @@ edition.inputs = Inputs
 edition.projectile = Projectile
 edition.throw_camera = Throw camera
 edition.camera_data = Camera data
+edition.mvl_playable = Movelist: Playable
+edition.mvl_inputs = Movelist: Inputs
 
 edition.open_movelist = Open movelist
 
@@ -394,7 +396,7 @@ edition.mvl_input.directions = Directions
 edition.mvl_input.buttons = Buttons
 edition.mvl_input.frame_duration = Duration
 edition.mvl_input.frame = Frame
-edition.mvl_input.frames = Frames
+edition.mvl_input.frames = frames
 
 edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
 edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.

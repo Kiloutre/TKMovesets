@@ -14,8 +14,6 @@ EditorMovelistInput::EditorMovelistInput(std::string windowTitleBase, uint32_t t
 	m_baseWindow = baseWindow;
 	m_listSize = listSize;
 	InitForm(windowTitleBase, t_id, editor);
-
-	m_usesNewerApplyFunction = true;
 }
 
 // -- Private methods-- //

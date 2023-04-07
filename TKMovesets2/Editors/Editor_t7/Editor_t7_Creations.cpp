@@ -3,337 +3,210 @@
 
 #define gAddr StructsT7_gameAddr
 
-template<typename T> int32_t EditorT7::CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset)
+uint32_t EditorT7::CreateNewProjectile()
 {
-	uint64_t tableListStart = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset);
-	uint64_t tableListCount = *(uint64_t*)(((Byte*)&m_infos->table) + tableListOffset + 8);
+	uint32_t newStructId = (uint32_t)m_infos->table.projectileCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.projectile;
 
-	const uint16_t newStructId = (uint16_t)tableListCount;
-	const int amount = struct_2 == nullptr ? 1 : 2;
-	const uint64_t extraSize = sizeof(T) * amount;
-
-	const uint64_t newStructOffset = m_header->infos.header_size + m_header->offsets.movesetBlock
-									+ tableListStart + (newStructId * sizeof(T));
-
-	uint64_t newMovesetSize = m_movesetSize + sizeof(T) * amount;
-	Byte* newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return -1;
-	}
-
-	// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date
-	{
-		uint64_t* tableListCountPtr = (uint64_t*)(((Byte*)&m_infos->table) + tableListOffset + 8);
-		*tableListCountPtr += amount;
-
-		uint64_t* listHeadPtr = (uint64_t*)&m_infos->table;
-		for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
-		{
-			if (*listHeadPtr > tableListStart) {
-				*listHeadPtr += extraSize;
-			}
-			listHeadPtr += 2;
-		}
-	}
-
-	// Copy all the data up to the new structure 
-	memcpy(newMoveset, m_moveset, newStructOffset);
-
-	// Write our new structure
-	memcpy(newMoveset + newStructOffset, struct_1, sizeof(T));
-	if (struct_2 != nullptr) {
-		memcpy(newMoveset + newStructOffset + sizeof(T), struct_2, sizeof(T));
-	}
-
-	// Copy all the data after new the new structure
-	uint64_t newStructPostOffset = newStructOffset + extraSize;
-	memcpy(newMoveset + newStructPostOffset, m_moveset + newStructOffset, m_movesetSize - newStructOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift offsets in the moveset table & in our header
-	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
-	{
-		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= newStructOffset) {
-			m_header->offsets.blocks[i] += extraSize;
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraSize);
-		}
-	}
+	ModifyGenericMovelistListSize<Projectile>(newStructId, { -1 }, {}, listHead);
 
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewProjectile()
+uint32_t EditorT7::CreateInputSequence()
 {
-	Projectile newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.inputSequenceCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.inputSequence;
 
-	int32_t newStructId = CreateNewGeneric<Projectile>(&newStruct, nullptr, offsetofVar(m_infos->table, projectile));
+	ModifyGenericMovelistListSize<InputSequence>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateInputSequence()
+uint32_t EditorT7::CreateInputList()
 {
-	InputSequence newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.inputCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.input;
 
-	int32_t newStructId = CreateNewGeneric<InputSequence>(&newStruct, nullptr, offsetofVar(m_infos->table, inputSequence));
+	ModifyGenericMovelistListSize<Input>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateInputList()
+uint32_t EditorT7::CreateNewPushbackExtra()
 {
-	Input newStruct{ 0 };
-	Input newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.pushbackExtradataCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 
-	int32_t newStructId = CreateNewGeneric<Input>(&newStruct, &newStruct2, offsetofVar(m_infos->table, input));
+	ModifyGenericMovelistListSize<PushbackExtradata>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewPushbackExtra()
+uint32_t EditorT7::CreateNewPushback()
 {
-	PushbackExtradata newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.pushbackCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback;
 
-	int32_t newStructId = CreateNewGeneric<PushbackExtradata>(&newStruct, nullptr, offsetofVar(m_infos->table, pushbackExtradata));
+	ModifyGenericMovelistListSize<Pushback>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewPushback()
+uint32_t EditorT7::CreateNewReactions()
 {
-	Pushback newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.reactionsCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions;
 
-	int32_t newStructId = CreateNewGeneric<Pushback>(&newStruct, nullptr, offsetofVar(m_infos->table, pushback));
+	ModifyGenericMovelistListSize<Reactions>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewReactions()
+uint32_t EditorT7::CreateNewHitConditions()
 {
-	Reactions newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.hitConditionCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
 
-	int32_t newStructId = CreateNewGeneric<Reactions>(&newStruct, nullptr, offsetofVar(m_infos->table, reactions));
-	return newStructId;
-}
-
-int32_t EditorT7::CreateNewHitConditions()
-{
-	gAddr::HitCondition newStruct{ 0 };
-
+	ModifyGenericMovelistListSize<HitCondition>(newStructId, { -1 }, {}, listHead);
+	auto* newStruct = m_iterators.hit_conditions[newStructId];
 	// This may potentially cause problems if the moveset's requirement 1 does not immediately end with a 881 requirement
-	newStruct.requirements_addr = 1;
+	newStruct->requirements_addr = 1;
 
-	int32_t newStructId = CreateNewGeneric<gAddr::HitCondition>(&newStruct, &newStruct, offsetofVar(m_infos->table, hitCondition));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewExtraProperties()
+uint32_t EditorT7::CreateNewExtraProperties()
 {
-	ExtraMoveProperty newStruct{ 0 };
-	ExtraMoveProperty newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.extraMovePropertyCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 
-	newStruct2.starting_frame = constants->at(EditorConstants_ExtraPropertyEnd);
+	ModifyGenericMovelistListSize<ExtraMoveProperty>(newStructId, { -1, -1 }, {}, listHead);
+	auto* newStruct = m_iterators.extra_move_properties[newStructId];
+	newStruct[1].starting_frame = constants->at(EditorConstants_ExtraPropertyEnd);
 
-	int32_t newStructId = CreateNewGeneric<ExtraMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, extraMoveProperty));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewMoveBeginProperties()
+uint32_t EditorT7::CreateNewMoveBeginProperties()
 {
-	OtherMoveProperty newStruct{ 0 };
-	OtherMoveProperty newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.moveBeginningPropCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
 
-	newStruct2.extraprop = constants->at(EditorConstants_RequirementEnd);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
+	auto* newStruct = m_iterators.move_start_properties[newStructId];
+	newStruct->extraprop = constants->at(EditorConstants_RequirementEnd);
 
-	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, moveBeginningProp));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewMoveEndProperties()
+uint32_t EditorT7::CreateNewMoveEndProperties()
 {
-	OtherMoveProperty newStruct{ 0 };
-	OtherMoveProperty newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.moveEndingPropCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 
-	newStruct2.extraprop = constants->at(EditorConstants_RequirementEnd);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
+	auto* newStruct = m_iterators.move_end_properties[newStructId];
+	newStruct->extraprop = constants->at(EditorConstants_RequirementEnd);
 
-	int32_t newStructId = CreateNewGeneric<OtherMoveProperty>(&newStruct, &newStruct2, offsetofVar(m_infos->table, moveEndingProp));
 	return newStructId;
 }
 
-
-int32_t EditorT7::CreateNewRequirements()
+uint32_t EditorT7::CreateNewRequirements()
 {
-	Requirement newStruct{ 0 };
-	Requirement newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.requirementCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
 
-	newStruct2.condition = constants->at(EditorConstants_RequirementEnd);
+	ModifyGenericMovelistListSize<Requirement>(newStructId, { -1, -1 }, {}, listHead);
+	auto* newStruct = m_iterators.requirements[newStructId];
+	newStruct[1].condition = constants->at(EditorConstants_RequirementEnd);
 
-	int32_t newStructId = CreateNewGeneric<Requirement>(&newStruct, &newStruct2, offsetofVar(m_infos->table, requirement));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewVoiceclipList()
+uint32_t EditorT7::CreateNewVoiceclipList()
 {
-	Voiceclip newStruct{ 0 };
-	Voiceclip newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.voiceclipCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
 
-	newStruct2.id = (uint32_t)-1;
+	ModifyGenericMovelistListSize<Voiceclip>(newStructId, { -1 }, {}, listHead);
+	auto* newStruct = m_iterators.voiceclips[newStructId];
+	newStruct->id = (uint32_t)-1;
 
-	int32_t newStructId = CreateNewGeneric<Voiceclip>(&newStruct, &newStruct2, offsetofVar(m_infos->table, voiceclip));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewCancelExtra()
+uint32_t EditorT7::CreateNewCancelExtra()
 {
-	CancelExtradata newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.cancelExtradataCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
 
-	int32_t newStructId = CreateNewGeneric<CancelExtradata>(&newStruct, nullptr, offsetofVar(m_infos->table, cancelExtradata));
+	ModifyGenericMovelistListSize<CancelExtradata>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewCancelList()
+uint32_t EditorT7::CreateNewCancelList()
 {
-	Cancel newStruct{ 0 };
-	Cancel newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.cancelCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
 
-	newStruct2.command = constants->at(EditorConstants_CancelCommandEnd);
+	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
+	auto* newStruct = m_iterators.cancels[newStructId];
+	newStruct[1].command = constants->at(EditorConstants_CancelCommandEnd);
 
-	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetofVar(m_infos->table, cancel));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewGroupedCancelList()
+uint32_t EditorT7::CreateNewGroupedCancelList()
 {
-	Cancel newStruct{ 0 };
-	Cancel newStruct2{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.groupCancelCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
 
-	newStruct2.command = constants->at(EditorConstants_GroupedCancelCommandEnd);
+	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
+	auto* newStruct = m_iterators.grouped_cancels[newStructId];
+	newStruct[1].command = constants->at(EditorConstants_GroupedCancelCommandEnd);
 
-	int32_t newStructId = CreateNewGeneric<Cancel>(&newStruct, &newStruct2, offsetofVar(m_infos->table, groupCancel));
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewThrowCamera()
+uint32_t EditorT7::CreateNewThrowCamera()
 {
-	ThrowCamera newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.throwCamerasCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.throwCameras;
 
-	int32_t newStructId = CreateNewGeneric<ThrowCamera>(&newStruct, nullptr, offsetofVar(m_infos->table, throwCameras));
+	ModifyGenericMovelistListSize<ThrowCamera>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewCameraData()
+uint32_t EditorT7::CreateNewCameraData()
 {
-	CameraData newStruct{ 0 };
+	uint32_t newStructId = (uint32_t)m_infos->table.cameraDataCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cameraData;
 
-	int32_t newStructId = CreateNewGeneric<CameraData>(&newStruct, nullptr, offsetofVar(m_infos->table, cameraData));
+	ModifyGenericMovelistListSize<CameraData>(newStructId, { -1 }, {}, listHead);
+
 	return newStructId;
 }
 
-int32_t EditorT7::CreateNewMove()
+uint32_t EditorT7::CreateNewMove()
 {
-	const char* moveName = MOVESET_CUSTOM_MOVE_NAME_PREFIX;
-	const size_t moveNameSize = strlen(moveName) + 1;
-	const size_t structSize = sizeof(Move);
+	uint64_t nameOffset = CreateMoveName(MOVESET_CUSTOM_MOVE_NAME_PREFIX);
 
-	const uint16_t moveId = (uint16_t)m_infos->table.moveCount;
+	uint32_t newStructId = (uint32_t)m_infos->table.moveCount;
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
 
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
+	ModifyGenericMovelistListSize<Move>(newStructId, { -1 }, {}, listHead);
+	auto* baseStruct = m_iterators.moves[0];
+	auto* newStruct = m_iterators.moves[newStructId];
+	memcpy(newStruct, baseStruct, sizeof(Move));
+	newStruct->name_addr = nameOffset;
 
-	// Find position where to insert new name
-	uint64_t moveNameOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
-	const uint64_t orig_nameBlockEnd = moveNameOffset;
-	while (*(m_moveset + (moveNameOffset - 2)) == 0)
-	{
-		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
-		// We want to erase as many empty bytes because of past alignment and then re-align to 8 bytes
-		moveNameOffset--;
-	}
-
-	const uint64_t nameBlockEnd = Helpers::align8Bytes(moveNameOffset + moveNameSize);
-	const uint64_t newMove = nameBlockEnd + (uint64_t)m_infos->table.voiceclip;
-	const uint64_t orig_movelistEnd = orig_nameBlockEnd + (uint64_t)m_infos->table.move + moveId * structSize;
-	const uint64_t movelistSize = (uint64_t)m_infos->table.move + moveId * structSize;
-
-	const uint64_t relativeName = moveNameOffset - m_header->offsets.nameBlock - m_header->infos.header_size;
-
-	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
-	newMovesetSize = newMove + structSize + (m_movesetSize - orig_movelistEnd);
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return -1;
-	}
-
-	// Shift offsets in the moveset table & in our header
-	const uint64_t extraNameSize = nameBlockEnd - orig_nameBlockEnd;
-	const uint64_t extraMoveSize = structSize;
-
-	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
-	{
-		uint64_t blockOffset = (m_header->infos.header_size + m_header->offsets.blocks[i]);
-		if (blockOffset >= orig_movelistEnd) {
-			m_header->offsets.blocks[i] += extraNameSize + extraMoveSize;
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize + extraMoveSize);
-		}
-		else if (blockOffset >= orig_nameBlockEnd) {
-			m_header->offsets.blocks[i] += extraNameSize;
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize);
-		}
-	}
-
-	m_infos->table.moveCount++;
-
-	// Increment moveset block offsets
-	uint64_t* countOffset = (uint64_t*)&m_infos->table;
-	for (size_t i = 0; i < sizeof(MovesetTable) / 8 / 2; ++i)
-	{
-		if (*countOffset > (uint64_t)m_infos->table.move) {
-			*countOffset += extraMoveSize;
-		}
-		countOffset += 2;
-	}
-
-	// Copy start //
-	memcpy(newMoveset, m_moveset, moveNameOffset);
-
-	// Write our new name
-	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
-
-	// Copy all the data up to the new structure
-	memcpy(newMoveset + nameBlockEnd, m_moveset + orig_nameBlockEnd, movelistSize);
-	
-	/// Move ///
-
-	// Initialize our structure value
-	uint64_t animOffset = m_animOffsetToNameOffset->begin()->first;
-	uint64_t animNameOffset = m_animOffsetToNameOffset->begin()->second;
-
-	gAddr::Move move{ 0 };
-	move.name_addr = relativeName;
-	move.anim_name_addr = animNameOffset;
-	move.anim_addr = animOffset;
-	move.cancel_addr = -1;
-	move._0x28_cancel_addr = -1;
-	move._0x38_cancel_addr = -1;
-	move._0x48_cancel_addr = -1;
-	move.hit_condition_addr = -1;
-	move.extra_move_property_addr = -1;
-	move.move_start_extraprop_addr = -1;
-	move.move_end_extraprop_addr = -1;
-	move.voicelip_addr = -1;
-
-	// Write our new structure
-	memcpy(newMoveset + newMove, &move, structSize);
-
-	// Copy all the data after new the new structure
-	memcpy(newMoveset + newMove + structSize, m_moveset + orig_movelistEnd, m_movesetSize - orig_movelistEnd);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	return moveId;
+	return newStructId;
 }
 
-int32_t EditorT7::CreateNew(EditorWindowType_ type)
+uint32_t EditorT7::CreateNew(EditorWindowType_ type)
 {
 	switch (type)
 	{
@@ -397,6 +270,13 @@ int32_t EditorT7::CreateNew(EditorWindowType_ type)
 
 	case EditorWindowType_CameraData:
 		return CreateNewCameraData();
+		break;
+
+	case EditorWindowType_MovelistPlayable:
+		return CreateNewMvlPlayable();
+		break;
+	case EditorWindowType_MovelistInput:
+		return CreateNewMvlInputs();
 		break;
 	}
 	return -1;

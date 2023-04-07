@@ -16,8 +16,6 @@ EditorMovelistDisplayable::EditorMovelistDisplayable(std::string windowTitleBase
 	InitForm(windowTitleBase, 0, editor);
 	// Trigger update to build all the item details
 	BuidAllLabels();
-
-	m_usesNewerApplyFunction = true;
 }
 
 // -- Private methods-- //

@@ -261,7 +261,7 @@ void EditorWindow::Save()
 	// That isn't that big of a problem
 
 	header->infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
-	header->infos.date = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	header->infos.date = Helpers::getCurrentTimestamp();
 
 	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
 	if (!file.fail()) {
@@ -285,10 +285,6 @@ EditorWindow::~EditorWindow()
 	}
 
 	importerHelper.StopThreadAndCleanup();
-	
-	for (auto& move : *movelist) {
-		delete move;
-	}
 
 	for (auto& win : m_structWindows) {
 		delete win;
