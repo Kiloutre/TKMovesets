@@ -83,6 +83,7 @@ uint32_t EditorT7::CreateNewExtraProperties()
 
 	ModifyGenericMovelistListSize<ExtraMoveProperty>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.extra_move_properties[newStructId];
+	newStruct[0].starting_frame = constants->at(EditorConstants_ExtraProperty_Instant);
 	newStruct[1].starting_frame = constants->at(EditorConstants_ExtraPropertyEnd);
 
 	return newStructId;

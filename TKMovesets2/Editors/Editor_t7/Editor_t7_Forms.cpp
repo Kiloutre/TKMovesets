@@ -878,7 +878,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 
 		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->id != 0);
+	} while ((prop++)->starting_frame != constants->at(EditorConstants_ExtraPropertyEnd));
 
 	return inputListMap;
 }

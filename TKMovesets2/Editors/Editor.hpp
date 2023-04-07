@@ -59,6 +59,8 @@ enum EditorConstants_
 	EditorConstants_CancelCommandEnd,
 	// Marks the end of a grouped cancel list
 	EditorConstants_GroupedCancelCommandEnd,
+	// Marks an entry that applies instantly in the extra property list
+	EditorConstants_ExtraProperty_Instant,
 	// Marks the end of an extra property list
 	EditorConstants_ExtraPropertyEnd,
 	// Marks that the cancel command refers to an input sequence
@@ -303,7 +305,7 @@ protected:
 	bool ValidateFieldType(EditorInput* field);
 public:
 	// Constants useful constant variables, to be set on a per-game basis
-	std::map<EditorConstants_, int>* constants;
+	std::map<EditorConstants_, unsigned int >* constants;
 	// Contains quick data that is made to be accessed outside of this class
 	EditorTable movesetTable;
 	// Status of the animation extraction

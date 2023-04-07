@@ -343,7 +343,7 @@ Editor::Editor(GameProcess* process, GameData* game)
 	m_animNameToOffsetMap = new std::map<std::string, gameAddr>;
 	m_animOffsetToNameOffset = new std::map<gameAddr, gameAddr>;
 
-	constants = new std::map<EditorConstants_, int>();
+	constants = new std::map<EditorConstants_, unsigned int >();
 	animExtractionThread = new std::thread();
 }
 
