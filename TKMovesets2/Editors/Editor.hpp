@@ -22,7 +22,7 @@
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
 // Shifting logic for list resizing
-# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) (((int)id >= listOldEnd) || (valueChange < 0 && ((int)id - valueChange) >= listOldEnd))
+# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) (((int)id >= (int)listOldEnd) || (valueChange < 0 && ((int)id - valueChange) >= (int)listOldEnd))
 
 // Vector with unique elements
 template < typename T >

@@ -93,6 +93,10 @@ void EditorFormList::Apply2()
 		}
 		m_listSizeChange = 0;
 	}
+	else {
+		// Could optimize thing if needed here by calling a struct reordering function
+		// At it stands this isn't really needed and worth the effort at the current time
+	}
 
 	unsavedChanges = false;
 	justAppliedChanges = true;

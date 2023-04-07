@@ -192,17 +192,17 @@ void EditorT7::ModifyGroupedCancelListSize(int listId, int oldSize, int newSize)
 	}
 }
 
-void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	const int listSizeDiff = newSize - oldSize;
-	ModifyGenericMovesetListSize<Cancel>(listId, oldSize, newSize, offsetofVar(m_infos->table, cancel));
 
-	// Correct every structure that uses this list and needs shifting
+	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	int listSizeDiff = ModifyGenericMovelistListSize2<Cancel>(listStart, ids, deletedIds, listHead);
 
+	int oldSize = (int)ids.size() + listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.cancel_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.cancel_addr, listSizeDiff, listId, listId + oldSize)) {
+			if (MUST_SHIFT_ID(move.cancel_addr, listSizeDiff, listStart, listStart + oldSize)) {
 				move.cancel_addr += listSizeDiff;
 			}
 		}
@@ -211,7 +211,7 @@ void EditorT7::ModifyCancelListSize(int listId, int oldSize, int newSize)
 	// Projectiles
 	for (auto& projectile : m_iterators.projectiles)
 	{
-		if (MUST_SHIFT_ID(projectile.cancel_addr, listSizeDiff, listId, listId + oldSize)) {
+		if (MUST_SHIFT_ID(projectile.cancel_addr, listSizeDiff, listStart, listStart + oldSize)) {
 			projectile.cancel_addr += listSizeDiff;
 		}
 	}
@@ -293,9 +293,6 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 		ModifyRequirementListSize(listId, oldSize, newSize);
 		break;
 
-	case EditorWindowType_Cancel:
-		ModifyCancelListSize(listId, oldSize, newSize);
-		break;
 	case EditorWindowType_GroupedCancel:
 		ModifyGroupedCancelListSize(listId, oldSize, newSize);
 		break;
@@ -326,5 +323,24 @@ void EditorT7::ModifyListSize(EditorWindowType_ type, int listId, int oldSize, i
 		ModifyVoiceclipListSize(listId, oldSize, newSize);
 		break;
 
+	}
+}
+
+void EditorT7::ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
+{
+	switch (type)
+	{
+	case EditorWindowType_MovelistInput:
+		ModifyMovelistInputSize(listStart, ids, deletedIds);
+		break;
+
+	case EditorWindowType_Cancel:
+		ModifyCancelListSize(listStart, ids, deletedIds);
+		break;
+
+
+	case EditorWindowType_MovelistDisplayable:
+		ModifyMovelistDisplayableSize(listStart, ids, deletedIds);
+		break;
 	}
 }

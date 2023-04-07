@@ -13,6 +13,8 @@ EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor*
 	windowType = EditorWindowType_Cancel;
 	m_baseWindow = baseWindow;
 	InitForm(windowTitleBase, t_id, editor);
+
+	m_usesNewerApplyFunction = true;
 }
 
 // -- Private methods -- //

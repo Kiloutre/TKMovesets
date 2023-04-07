@@ -165,7 +165,7 @@ void EditorT7::SaveMovelistInput(uint16_t id, std::map<std::string, EditorInput*
 }
 
 // -- Displayables -- //
-
+	
 std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::vector<std::map<std::string, EditorInput*>> inputListMap;

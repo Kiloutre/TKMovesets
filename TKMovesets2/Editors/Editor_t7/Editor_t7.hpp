@@ -53,19 +53,7 @@ private:
 	// Contains a ptr to the head of the displayable movelist
 	MvlHead* m_mvlHead = nullptr;
 
-public:
-	using Editor::Editor;
 
-	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
-	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
-	void ReloadDisplayableMoveList() override;
-	uint16_t GetCurrentMoveID(uint8_t playerId) override;
-	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
-	std::map<std::string, EditorInput*> GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
-	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
 
 	// Extra iterators setup
 	void SetupIterators_DisplayableMovelist();
@@ -115,8 +103,8 @@ public:
 	// Hit conditions
 	std::vector<std::map<std::string, EditorInput*>> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	bool ValidateHitConditionField( EditorInput* field);
-	
+	bool ValidateHitConditionField(EditorInput* field);
+
 	// Reactions
 	std::map<std::string, EditorInput*> GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs);
@@ -166,40 +154,9 @@ public:
 	// Movelist: Inputs
 	std::vector<std::map<std::string, EditorInput*>> GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
 	void SaveMovelistInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
-	
-	// -- Interactions -- //
-	// Sets the current move of a player
-	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
-	// Starts a thread that extracts the moveset's animations
-	void OrderAnimationsExtraction(const std::string& characterFilename) override;
-	// Saves all the moveset animations in our library. Explicit copy of the parameters because this runs in another thread and the source data might be freed in parallel.
-	void ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeader_offsets offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset);
-	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
-	std::string ImportAnimation(const char* filepath, int moveid) override;
-
-	// -- Command Utils -- //
-	std::string GetCommandStr(const char* direction, const char* button) override;
-	std::string GetCommandStr(const char* commandBuf) override;
-	void GetInputSequenceString(int id, std::string& outStr, int& outSize) override;
-	std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) override;
-	int GetDisplayableMovelistEntryColor(EditorInput* field) override;
-	bool IsMovelistDisplayableEntryCombo(EditorInput* field) override;
-	bool IsMovelistDisplayableEntryCategory(EditorInput* field) override;
-	// -- Utils --//
-	bool IsCommandInputSequence(const char* buffer) override;
-	bool IsCommandGroupedCancelReference(const char* buffer) override;
-	int GetCommandInputSequenceID(const char* buffer) override;
-	bool IsPropertyThrowCameraRef(const char* buffer) override;
-	bool IsPropertyProjectileRef(const char* buffer) override;
-	bool IsVoicelipValueEnd(const char* buffer) override;
-	unsigned int GetStructureCount(EditorWindowType_ type) override;
-	unsigned int GetMotaAnimCount(int motaId) override;
-	// Movelist
-	std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) override;
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
-	int32_t CreateNew(EditorWindowType_ type) override;
 	template<typename T> int32_t CreateNewGeneric(T* struct_1, T* struct_2, size_t tableListOffset);
 	//
 	int32_t CreateInputSequence();
@@ -228,15 +185,12 @@ public:
 	int32_t CreateNewCameraData();
 
 	// -- List Creation / Deletion -- //
-	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
-	void ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
 	template<typename T> void ModifyGenericMovesetListSize(int listId, int oldSize, int newSize, size_t tableListOffset);
-	template<typename T> int ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset);
 	void DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset);
 	//
 	void ModifyRequirementListSize(int listId, int oldSize, int newSize);
 	//
-	void ModifyCancelListSize(int listId, int oldSize, int newSize);
+	void ModifyCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyGroupedCancelListSize(int listId, int oldSize, int newSize);
 	//
 	void ModifyExtraPropertyListSize(int listId, int oldSize, int newSize);
@@ -251,12 +205,10 @@ public:
 	void ModifyVoiceclipListSize(int listId, int oldSize, int newSize);
 	// Movelist
 	void ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
-	void ModifyMovelistDisplayableSize(unsigned int listSTart, const std::vector<int>& ids, const std::set<int>& deletedIds);
+	void ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize);
 
 	// -- Live edition -- //
-	// Called whenever a field is edited. Returns false if a re-import is needed.
-	void Live_OnFieldEdit(EditorWindowType_ type, int id,EditorInput* field) override;
 	//
 	void Live_OnMoveEdit(int id, EditorInput* field);
 	void Live_OnVoiceclipEdit(int id, EditorInput* field);
@@ -291,4 +243,240 @@ public:
 
 	// Movelist text conversion
 	std::string GetMovelistDisplayableText(uint32_t offset);
+
+	// Templates
+
+	template<typename T> int ModifyGenericMovelistListSize2(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
+	{
+		// Compute list old and new sizes
+		int newSize = (int)ids.size();
+		int sizeDiff;
+		int oldSize;
+		{
+			int newItemCount = 0;
+			for (auto& id : ids)
+			{
+				if (id == -1) {
+					newItemCount += 1;
+				}
+			}
+			oldSize = ((int)ids.size() - newItemCount) + (int)deletedIds.size();
+			sizeDiff = newSize - oldSize;
+		}
+
+		// Compute positions that will be used for copying
+		int structSizeDiff = sizeof(T) * sizeDiff;
+		uint64_t listPosition = listStart_offset + (sizeof(T) * listStart);
+		uint64_t new_listEndPosition = listPosition + sizeof(T) * newSize;
+		uint64_t old_listEndPosition = listPosition + sizeof(T) * oldSize;
+
+		// Compute following m_header->offsets block position. We do this because we want to make sure it always stays 8 bytes aligned
+		uint64_t new_followingBlockStart = m_movesetSize + structSizeDiff;
+		uint64_t old_followingBlockStart = m_movesetSize;
+		for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+		{
+			uint64_t absoluteBlockAddr = (m_header->infos.header_size + m_header->offsets.blocks[i]);
+			if (absoluteBlockAddr >= old_listEndPosition) {
+				old_followingBlockStart = absoluteBlockAddr;
+				new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart + structSizeDiff);
+				break;
+			}
+		}
+
+		// ------------------------------------------------
+		// Compute new moveset size
+		uint64_t newMovesetSize = new_followingBlockStart + (m_movesetSize - old_followingBlockStart);
+
+		// Allocate new moveset
+		Byte* newMoveset = (Byte*)calloc(1, newMovesetSize);
+		if (newMoveset == nullptr) {
+			return 0;
+		}
+
+		// ------------------------------------------------
+		// Before we begin copying, there are a few values we want updated in the new moveset before it gets copied loaded up
+
+		// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date
+		{
+			uint64_t movesetBlockStart = (m_header->infos.header_size + m_header->offsets.movesetBlock);
+			uint64_t movesetBlockEnd = movesetBlockStart + (m_header->offsets.animationBlock - m_header->offsets.movesetBlock);
+
+			if (movesetBlockStart < listPosition && listPosition < movesetBlockEnd)
+			{
+				unsigned int tableEntryCount = _countof(m_infos->table.entries);
+				for (size_t i = 0; i < tableEntryCount; ++i)
+				{
+					auto& currentEntry = m_infos->table.entries[i];
+					gameAddr absolute_entryStartAddr = movesetBlockStart + (uint64_t)currentEntry.listAddr;
+
+					// listPosition be equal to a list's start both with and and without belonging to the list
+					// Rule out the case where an empty structure list (count = 0) is resized into more
+					// This is overkill and not likely to happen since ModifyListSize() is never called for list creations but modification of existing ones
+					if (listPosition < absolute_entryStartAddr || \
+						(listPosition == absolute_entryStartAddr && currentEntry.listCount != 0)) {
+						*(uint64_t*)&currentEntry.listAddr += structSizeDiff;
+						DEBUG_LOG("Shifting movesetblock entry %lld's offset\n", i);
+					}
+					else {
+						bool isPartOfCurrentList = false;
+
+						if (i + 1 == tableEntryCount) {
+							isPartOfCurrentList = true;
+						}
+						else {
+							auto& nextEntry = m_infos->table.entries[i + 1];
+							gameAddr absolute_nextEntryStartAddr = movesetBlockStart + (uint64_t)nextEntry.listAddr;
+
+							if (listPosition < absolute_nextEntryStartAddr || \
+								(listPosition == absolute_nextEntryStartAddr && nextEntry.listCount != 0)) {
+								isPartOfCurrentList = true;
+							}
+						}
+
+						if (isPartOfCurrentList) {
+							currentEntry.listCount += sizeDiff;
+							DEBUG_LOG("Adding movelist entry %llu count += %d\n", i, sizeDiff);
+						}
+					}
+				}
+			}
+		}
+
+		// There are blocks to shift in the displayble movelist block
+		{
+			uint64_t movelistBlockStart = (m_header->infos.header_size + m_header->offsets.movelistBlock);
+			uint64_t movelistBlockEnd = m_movesetSize;
+
+			if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd && strncmp(m_mvlHead->mvlString, "MVLT", 4) == 0)
+			{
+				uint64_t relativeOffset = listPosition - movelistBlockStart;
+
+				if (m_mvlHead->inputs_offset > relativeOffset) {
+					m_mvlHead->inputs_offset += structSizeDiff;
+					DEBUG_LOG("MVLT: Shifted mvl_inputs block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
+
+					if (m_mvlHead->playables_offset > relativeOffset) {
+						m_mvlHead->playables_offset += structSizeDiff;
+						DEBUG_LOG("MVTL: Shifted mvl_playable block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
+
+						if (m_mvlHead->displayables_offset > relativeOffset) {
+							m_mvlHead->displayables_offset += structSizeDiff;
+							DEBUG_LOG("MVLT: Shifted mvl_displayable block %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
+						}
+					}
+				}
+			}
+		}
+
+		// Global moveset blocks must be shifted, better here than later
+		for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+		{
+			if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= listPosition) {
+				m_header->offsets.blocks[i] = Helpers::align8Bytes(m_header->offsets.blocks[i] + structSizeDiff);
+				DEBUG_LOG("Shifted moveset block %d by 0x%x (before alignment)\n", i, structSizeDiff);
+			}
+		}
+
+		// ------------------------------------------------
+		// Copy up to list start
+		memcpy(newMoveset, m_moveset, listPosition);
+
+		// Copy list items, one by one
+		// That way mere reordering + resize technically don't need SaveItem() to be re-applied
+		{
+			uint64_t writeOffset = listPosition - sizeof(T);
+			uint64_t readOffset;
+			auto it = deletedIds.begin();
+			for (auto id : ids)
+			{
+				writeOffset += sizeof(T);
+
+				if (id != -1) {
+					// Copy old structure data from its previous position (likely to not have changed but this handles reodering just fine)
+					readOffset = listPosition + (sizeof(T) * id);
+				}
+				else {
+					// Try to use existing data from deleted lists. This can be useful in rare cases like MvlDisplayables.
+					if (it != deletedIds.end()) {
+						readOffset = listPosition + (sizeof(T) * id);
+						std::advance(it, 1);
+					}
+					else {
+						// Don't bother copying anything. Calloc() implies that every byte of this struct will be at 0 anyway, so rely on that and do not change it.
+						continue;
+					}
+				}
+
+				memcpy(newMoveset + writeOffset, m_moveset + readOffset, sizeof(T));
+			}
+		}
+
+		// Copy everything after the list up to the next block
+		memcpy(newMoveset + new_listEndPosition, m_moveset + old_listEndPosition, old_followingBlockStart - old_listEndPosition);
+
+		// If there is a block afterward and not just the moveset end, copy everything from that block to the moveset end
+		if (old_followingBlockStart != m_movesetSize) {
+			memcpy(newMoveset + new_followingBlockStart, m_moveset + old_followingBlockStart, m_movesetSize - old_followingBlockStart);
+		}
+
+		// Free up old moveset from memory and assign the new one
+		free(m_moveset);
+		LoadMovesetPtr(newMoveset, newMovesetSize);
+
+		return sizeDiff;
+	};
+public:
+	using Editor::Editor;
+
+	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
+	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
+	void ReloadDisplayableMoveList() override;
+	uint16_t GetCurrentMoveID(uint8_t playerId) override;
+	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
+	std::map<std::string, EditorInput*> GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
+	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
+	
+	// -- Interactions -- //
+	// Sets the current move of a player
+	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
+	// Starts a thread that extracts the moveset's animations
+	void OrderAnimationsExtraction(const std::string& characterFilename) override;
+	// Saves all the moveset animations in our library. Explicit copy of the parameters because this runs in another thread and the source data might be freed in parallel.
+	void ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeader_offsets offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset);
+	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
+	std::string ImportAnimation(const char* filepath, int moveid) override;
+
+	// -- Command Utils -- //
+	std::string GetCommandStr(const char* direction, const char* button) override;
+	std::string GetCommandStr(const char* commandBuf) override;
+	void GetInputSequenceString(int id, std::string& outStr, int& outSize) override;
+	std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) override;
+	int GetDisplayableMovelistEntryColor(EditorInput* field) override;
+	bool IsMovelistDisplayableEntryCombo(EditorInput* field) override;
+	bool IsMovelistDisplayableEntryCategory(EditorInput* field) override;
+	// -- Utils --//
+	bool IsCommandInputSequence(const char* buffer) override;
+	bool IsCommandGroupedCancelReference(const char* buffer) override;
+	int GetCommandInputSequenceID(const char* buffer) override;
+	bool IsPropertyThrowCameraRef(const char* buffer) override;
+	bool IsPropertyProjectileRef(const char* buffer) override;
+	bool IsVoicelipValueEnd(const char* buffer) override;
+	unsigned int GetStructureCount(EditorWindowType_ type) override;
+	unsigned int GetMotaAnimCount(int motaId) override;
+	// Movelist
+	std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) override;
+
+	// -- Creation / Deletion -- //
+	int32_t CreateNew(EditorWindowType_ type) override;
+
+	// -- List Creation / Deletion -- //
+	void ModifyListSize(EditorWindowType_ type, int listId, int oldSize, int newSize) override;
+	void ModifyListSize2(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
+
+	// -- Live edition -- //
+	// Called whenever a field is edited. Returns false if a re-import is needed.
+	void Live_OnFieldEdit(EditorWindowType_ type, int id,EditorInput* field) override;
 };
