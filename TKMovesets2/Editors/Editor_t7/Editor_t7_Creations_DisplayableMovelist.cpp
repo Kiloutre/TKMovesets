@@ -19,32 +19,58 @@ void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int 
 	uint64_t postListOffset = listOffset + structSize * newSize;
 	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
 
-	newMovesetSize = m_movesetSize + structListSizeDiff;
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		throw;
-	}
-
 	// Compute following m_header->offsets block position. We do this because we want to make sure it always stays 8 bytes aligned
 	uint64_t new_followingBlockStart = m_movesetSize + structListSizeDiff;
 	uint64_t old_followingBlockStart = m_movesetSize;
 	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
 	{
 		uint64_t absoluteBlockAddr = (m_header->infos.header_size + m_header->offsets.blocks[i]);
-		if (absoluteBlockAddr >= listOffset) {
+		if (absoluteBlockAddr >= orig_postListOffset) {
 			old_followingBlockStart = absoluteBlockAddr;
 			new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart + structListSizeDiff);
 			break;
 		}
 	}
 
+	newMovesetSize = m_movesetSize + (new_followingBlockStart - old_followingBlockStart);
+	newMoveset = (Byte*)calloc(1, newMovesetSize);
+	if (newMoveset == nullptr) {
+		throw;
+	}
+
+	// Shift offsets in the mvl head right away so that iterators can work later on
+	uint64_t orig_relative_postLisOffset = orig_postListOffset - (m_header->infos.header_size + m_header->offsets.movelistBlock);
+
+	if (m_mvlHead->inputs_offset >= orig_relative_postLisOffset) {
+		m_mvlHead->inputs_offset += structListSizeDiff;
+
+		if (m_mvlHead->playables_offset >= orig_relative_postLisOffset) {
+			m_mvlHead->playables_offset += structListSizeDiff;
+			DEBUG_LOG("MVLT: Shifted mvl_inputs block by %d (0x%x) bytes\n", structListSizeDiff, structListSizeDiff);
+
+			if (m_mvlHead->displayables_offset >= orig_relative_postLisOffset) {
+				m_mvlHead->displayables_offset += structListSizeDiff;
+				DEBUG_LOG("MVLT: Shifted mvl_playables block by %d (0x%x) bytes\n", structListSizeDiff, structListSizeDiff);
+			}
+		}
+	}
+
+	// Shift moveset blocks offsets if necessary (at the time of this commit, it isn't)
+	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	{
+		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_postListOffset) {
+			m_header->offsets.blocks[i] = Helpers::align8Bytes(m_header->offsets.blocks[i] + structListSizeDiff);
+			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
+		}
+	}
+
 	// Copy all the data up to the structure list 
 	memcpy(newMoveset, m_moveset, listOffset);
 
-	// Copy all the data after the structure list up to the next block
+	// Copy all the data after the structure list
 	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, old_followingBlockStart - orig_postListOffset);
 
-	// If there are blocks afterward and not just the moveset end, copy everything from that block to the moveset end
+	// If there is a block afterward and not just the moveset end, copy everything from that block to the moveset end
 	if (old_followingBlockStart != m_movesetSize) {
 		memcpy(newMoveset + new_followingBlockStart, m_moveset + old_followingBlockStart, m_movesetSize - old_followingBlockStart);
 	}
@@ -180,8 +206,8 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize2(unsigned int l
 	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
 	{
 		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= listPosition) {
-			m_header->offsets.blocks[i] += structSizeDiff;
-			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structSizeDiff);
+			m_header->offsets.blocks[i] = Helpers::align8Bytes(m_header->offsets.blocks[i] + structSizeDiff);
+			DEBUG_LOG("Shifted moveset block %d by 0x%x (before alignment)\n", i, structSizeDiff);
 		}
 	}
 
