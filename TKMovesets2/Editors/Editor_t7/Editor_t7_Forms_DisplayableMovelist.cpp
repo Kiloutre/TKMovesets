@@ -392,6 +392,19 @@ void EditorT7::SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInp
 	SetMemberValue(&playable->_unk0x16, inputs["_unk0x16"]);
 }
 
+bool EditorT7::ValidateMovelistPlayableField(EditorInput* field)
+{
+	std::string& name = field->name;
+
+	if (name == "input_sequence_id")
+	{
+		int listIdx = atoi(field->buffer);
+		return 0 <= listIdx && listIdx < (int)m_iterators.mvl_inputs.size();
+	}
+
+	return true;
+}
+
 // Utils
 
 std::string EditorT7::GetDisplayableMovelistInputStr(const char* directions, const char* buttons)

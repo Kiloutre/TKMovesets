@@ -1410,9 +1410,14 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 	case EditorWindowType_ThrowCamera:
 		return ValidateThrowCameraField(field);
 		break;
+
 	case EditorWindowType_MovelistDisplayable:
 		return ValidateMovelistDisplayableField(field);
 		break;
+	case EditorWindowType_MovelistPlayable:
+		return ValidateMovelistPlayableField(field);
+		break;
+
 	}
 
 	return true;

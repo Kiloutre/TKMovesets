@@ -53,6 +53,11 @@ unsigned int EditorT7::GetMotaAnimCount(int motaId)
 	return 0;
 }
 
+unsigned int EditorT7::GetMovelistDisplayableInputCount()
+{
+	return (unsigned int)m_iterators.mvl_inputs.size();
+}
+
 unsigned int EditorT7::GetStructureCount(EditorWindowType_ type)
 {
 	switch (type)

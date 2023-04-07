@@ -54,7 +54,6 @@ private:
 	MvlHead* m_mvlHead = nullptr;
 
 
-
 	// Extra iterators setup
 	void SetupIterators_DisplayableMovelist();
 
@@ -150,6 +149,7 @@ private:
 	//  Movelist : Playables
 	std::map<std::string, EditorInput*> GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	void SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	bool ValidateMovelistPlayableField(EditorInput* field);
 
 	// Movelist: Inputs
 	std::vector<std::map<std::string, EditorInput*>> GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
@@ -469,6 +469,7 @@ public:
 	unsigned int GetMotaAnimCount(int motaId) override;
 	// Movelist
 	std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) override;
+	unsigned int GetMovelistDisplayableInputCount() override;
 
 	// -- Creation / Deletion -- //
 	uint32_t CreateNew(EditorWindowType_ type) override;

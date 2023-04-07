@@ -20,7 +20,8 @@ void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 	int referenceId = atoi(field->buffer);
 	std::string& name = field->name;
 
-	if (name == "input_sequence_id") {
+	if (name == "input_sequence_id")
+	{
 		if (referenceId != -1) {
 			auto& inputCount = m_fieldIdentifierMap["input_count"];
 			if (!inputCount->errored)
@@ -52,5 +53,16 @@ void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType_ winType, int v
 			value = atoi(field->buffer);
 			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
 		}
+	}
+}
+
+void EditorMovelistPlayable::OnUpdate(int listIdx, EditorInput* field)
+{
+	if (field->name == "input_sequence_id" || field->name == "input_count")
+	{
+		unsigned int list_end = (unsigned int)EditorUtils::GetFieldValue(m_fieldIdentifierMap["input_count"])
+								+ (unsigned int)EditorUtils::GetFieldValue(m_fieldIdentifierMap["input_sequence_id"]);
+		unsigned int inputCount = m_editor->GetMovelistDisplayableInputCount();
+		m_fieldIdentifierMap["input_count"]->errored = list_end > inputCount;
 	}
 }

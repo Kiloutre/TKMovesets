@@ -396,6 +396,8 @@ public:
 	virtual unsigned int GetMotaAnimCount(int motaId) = 0;
 	// Returns a string computed based on a movelist displayable's icons value and more
 	virtual std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) = 0;
+	// Returns the list of inputs in the displayable movelist
+	virtual unsigned int GetMovelistDisplayableInputCount() = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
