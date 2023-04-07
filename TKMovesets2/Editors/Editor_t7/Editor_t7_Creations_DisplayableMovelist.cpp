@@ -311,8 +311,8 @@ void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::
 					continue;
 				}
 				for (int i = 0; i < _countof(displayable.all_translation_offsets); ++i) {
-					if (displayable.all_translation_offsets[i] >= stringAddr_start) {
-						displayable.all_translation_offsets[i] -= stringAddr_size;
+					if (displayable.all_translation_offsets[i] >= (int32_t)stringAddr_start) {
+						displayable.all_translation_offsets[i] -= (int32_t)stringAddr_size;
 					}
 				}
 			}

@@ -401,6 +401,8 @@ namespace StructsT7
 	struct MvlDisplayable
 	{
 		union {
+			// Normally, these are uints in files and negative ints in memory, both in our software and in the actual game
+			// They are never really high though so we can just store them as ints all the times with no worries
 			struct {
 				int32_t title_translation_0;
 				int32_t title_translation_english;
