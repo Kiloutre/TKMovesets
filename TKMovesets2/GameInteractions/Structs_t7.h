@@ -404,11 +404,11 @@ namespace StructsT7
 			// Normally, these are uints in files and negative ints in memory, both in our software and in the actual game
 			// They are never really high though so we can just store them as ints all the times with no worries
 			struct {
-				int32_t title_translation_0;
+				int32_t title_translation_japanese;
 				int32_t title_translation_english;
-				int32_t title_translation_2;
+				int32_t title_translation_japanese_2;
 				int32_t title_translation_other;
-				int32_t translation_offsets_0;
+				int32_t translation_offsets_japanese;
 				int32_t translation_offsets_english;
 				int32_t translation_offsets_portuguese;
 				int32_t translation_offsets_spanish;
@@ -416,10 +416,10 @@ namespace StructsT7
 				int32_t translation_offsets_italian;
 				int32_t translation_offsets_german;
 				int32_t translation_offsets_7;
-				int32_t translation_offsets_8;
-				int32_t translation_offsets_9;
-				int32_t translation_offsets_10;
-				int32_t translation_offsets_11;
+				int32_t translation_offsets_cyrillic;
+				int32_t translation_offsets_arabic;
+				int32_t translation_offsets_chinese;
+				int32_t translation_offsets_korean;
 			};
 			struct {
 				int32_t title_translation_offsets[4];

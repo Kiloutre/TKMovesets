@@ -6,6 +6,7 @@
 
 #include "Games.hpp"
 #include "EditorLabel.hpp"
+#include "Helpers.hpp"
 
 #include "constants.h"
 
@@ -16,12 +17,10 @@ void EditorLabel::LoadFile(const char* dataString, const char* name)
 	std::string filename;
 	filename = std::format("{}/editor_{}_{}.txt", INTERFACE_DATA_DIR, dataString, name);
 
-	{
-		struct stat buffer;
-		if (stat(filename.c_str(), &buffer) != 0) {
-			return ;
-		}
-	}
+
+    if (!Helpers::fileExists(filename.c_str())) {
+        return;
+    }
 
 
 	std::ifstream infile;

@@ -8,6 +8,8 @@
 #include "GameProcess.hpp"
 // Submenus
 #include "Submenu_About.hpp"
+// Other
+#include "Helpers.hpp"
 #include "imgui_extras.hpp"
 
 // todo: fix inactive/collapsed tabs looking too similar to active ones
@@ -52,6 +54,20 @@ void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 	}
 }
 
+static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
+{
+	for (auto& name : filenames)
+	{
+		std::string full_filename = "C:/Windows/Fonts/" + std::string(name);
+		if (!Helpers::fileExists(full_filename.c_str())) {
+			continue;
+		}
+
+		DEBUG_LOG("Loaded font %s\n", full_filename.c_str());
+		io.Fonts->AddFontFromFileTTF(full_filename.c_str(), 15, config, glyphRange);
+	}
+}
+
 // -- Public methods -- //
 
 MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
@@ -70,10 +86,17 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
-	// Font import example
-	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesDefault());
-	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesJapanese());
-	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/micross.ttf", 20, NULL, io.Fonts->GetGlyphRangesKorean());
+	// Font import
+	ImFont* font = io.Fonts->AddFontDefault();
+	ImFontConfig config;
+	config.MergeMode = true;
+
+	// Attempt to load fonts for specific glyph ranges, loading the first foond that is found in the provided lists
+	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
+	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
+	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
+
+	io.Fonts->Build();
 }
 
 void MainWindow::NewFrame()
