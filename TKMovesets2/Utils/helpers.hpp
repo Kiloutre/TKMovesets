@@ -69,6 +69,13 @@ private:
 
 namespace Helpers
 {
+	// Returns the size of an animation in bytes
+	uint64_t GetAnimationSize(Byte* anim);
+	uint64_t get64AnimSize_LittleEndian(Byte* anim);
+	uint64_t get64AnimSize_BigEndian(Byte* anim);
+	uint64_t get64AnimSize(Byte* anim);
+	uint64_t getC8AnimSize(Byte* anim);
+
     // Make sure a value is divislbe by 8
     uint64_t align8Bytes(uint64_t value);
 

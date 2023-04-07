@@ -10,6 +10,125 @@
 
 namespace Helpers
 {
+	uint64_t GetAnimationSize(Byte* anim)
+	{
+		uint16_t animType = *(uint16_t*)anim;
+		if ((animType & 0xFF) == 0) {
+			animType = SWAP_INT16(animType);
+		}
+
+		if (animType == 0xC8) {
+			return getC8AnimSize(anim);
+		}
+		else if (animType == 0x64) {
+			return get64AnimSize(anim);
+		}
+
+		// Invalid animation type
+		DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, *(uint32_t*)anim);
+		throw;
+	}
+
+	uint64_t getC8AnimSize(Byte* anim)
+	{
+		bool isSwapped = *anim == 0;
+
+		uint8_t bone_count = anim[isSwapped ? 3 : 2];
+		uint32_t header_size = bone_count * 0x4 + 0x8;
+		uint32_t frame_size = bone_count * 0x4 * 3;
+
+		uint32_t length = *(uint32_t*)&anim[4];
+		if (isSwapped) {
+			length = SWAP_INT32(length);
+		}
+
+		return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
+	}
+
+	uint64_t get64AnimSize(Byte* anim)
+	{
+		bool isSwapped = *anim == 0;
+		return isSwapped ? get64AnimSize_BigEndian(anim) : get64AnimSize_LittleEndian(anim);
+	}
+
+	uint64_t get64AnimSize_BigEndian(Byte* anim)
+	{
+		// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
+		uint64_t boneCount = *(uint16_t*)&anim[2];
+		boneCount = SWAP_INT16(boneCount);
+
+		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+		Byte* anim_postBoneDescriptorAddr = (anim + postBoneDescriptor_offset);
+
+		uint64_t animLength = *(uint16_t*)&anim_postBoneDescriptorAddr[0];
+		uint64_t __unknown__ = *(uint16_t*)&anim_postBoneDescriptorAddr[4];
+		animLength = SWAP_INT16(animLength);
+		__unknown__ = SWAP_INT16(__unknown__);
+
+		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+		uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+		Byte* animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+		unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+		unsigned int keyframe = baseFrame / 16;
+		unsigned int _v56_intPtr = *(unsigned int*)&animPtr[4 * (uint64_t)keyframe];
+		_v56_intPtr = SWAP_INT32(_v56_intPtr);
+
+		Byte* animPtr_2 = animPtr + _v56_intPtr;
+		int lastArg_copy = (int)boneCount;
+
+		do
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				Byte v58 = *animPtr_2;
+				int offsetStep = v58 / 4;
+				animPtr_2 += offsetStep;
+			}
+		} while (--lastArg_copy != 0);
+
+		return (uint64_t)animPtr_2 - (uint64_t)anim;
+	}
+
+	uint64_t get64AnimSize_LittleEndian(Byte* anim)
+	{
+		// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
+		uint64_t boneCount = *(uint16_t*)&anim[2];
+
+		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+		Byte* anim_postBoneDescriptorAddr = (anim + postBoneDescriptor_offset);
+
+		uint64_t animLength = *(uint16_t*)&anim_postBoneDescriptorAddr[0];
+		uint64_t __unknown__ = *(uint16_t*)&anim_postBoneDescriptorAddr[4];
+
+		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+		uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+		Byte* animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+		unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+		unsigned int keyframe = baseFrame / 16;
+		unsigned int _v56_intPtr = *(unsigned int*)&animPtr[4 * (uint64_t)keyframe];
+
+		Byte* animPtr_2 = animPtr + _v56_intPtr;
+		int lastArg_copy = (int)boneCount;
+
+		do
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				Byte v58 = *animPtr_2;
+				int offsetStep = v58 / 4;
+				animPtr_2 += offsetStep;
+			}
+		} while (--lastArg_copy != 0);
+
+		return (uint64_t)animPtr_2 - (uint64_t)anim;
+	}
+
 	uint64_t align8Bytes(uint64_t value)
 	{
 		// If any of the first 3 bits are set, is not divisble by 8

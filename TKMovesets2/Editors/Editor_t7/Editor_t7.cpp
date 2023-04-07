@@ -527,6 +527,16 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 		anim = new Byte[animSize];
 		animFile.seekg(0, std::ios::beg);
 		animFile.read((char*)anim, animSize);
+
+		// Ensure old bad animations don't get completely carried over
+		uint64_t realAnimSize = Helpers::GetAnimationSize(anim);
+		if (realAnimSize <= animSize) {
+			animSize = animSize;
+		}
+		else {
+			// todo: Display a warning to the user
+			DEBUG_LOG("Error: Animation is missing bytes.");
+		}
 	}
 
 	// Ensure animation name is unique
