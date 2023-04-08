@@ -8,6 +8,30 @@
 
 // -- Public methods -- //
 
+static RenameErrcode_ RenameMoveset(std::string full_filename, const char* newName)
+{
+	if (strlen(newName) == 0) {
+		return RenameErrcode_EmptyName;
+	}
+
+	std::string new_full_filename = full_filename.substr(0, full_filename.find_last_of("/\\") + 1)
+									+ newName + MOVESET_FILENAME_EXTENSION;
+
+	if (std::string(newName).find_first_of("/\\<>:\"|?*") != -1) {
+		return RenameErrcode_InvalidName;
+	}
+
+	if (Helpers::fileExists(new_full_filename.c_str()) && full_filename != new_full_filename) {
+		return RenameErrcode_AlreadyExists;
+	}
+
+	if (std::rename(full_filename.c_str(), new_full_filename.c_str()) != 0) {
+		return RenameErrcode_RenameErr;
+	}
+
+	return RenameErrcode_NoErr;
+}
+
 movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 {
 	ImGuiExtra::RenderTextbox(_("edition.explanation"));
@@ -15,7 +39,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	movesetInfo* movesetToLoad = nullptr;
 
 	ImGui::SeparatorText(_("edition.select_moveset"));
-	if (ImGui::BeginTable("MovesetEditionList", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetEditionList", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(0, ImGui::GetContentRegionAvail().y)))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
@@ -23,6 +47,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.rename"));
 		ImGui::TableSetupColumn(_("moveset.edit"));
 		ImGui::TableHeadersRow();
 
@@ -55,9 +80,16 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
 				ImGui::TextUnformatted(sizeString.c_str());
 
-				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
+				ImGui::TableNextColumn();
+				if (ImGui::Button(_("moveset.rename"))) {
+					m_toRename = moveset->filename;
+					strcpy(m_newName, moveset->name.c_str());
+					m_popupOpen = true;
+					currentErr = RenameErrcode_NoErr;
+				}
 
+				ImGui::TableNextColumn();
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.edit"), moveset->editable)) {
 					movesetToLoad = moveset;
 				}
@@ -67,6 +99,50 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::PopID();
 
 		ImGui::EndTable();
+	}
+
+	if (m_popupOpen) {
+		ImGui::OpenPopup("EditionRenamePopup");
+		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
+	}
+
+	if (ImGui::BeginPopupModal("EditionRenamePopup", &m_popupOpen))
+	{
+		ImGui::InputText(_("edition.rename.new_moveset_name"), m_newName, sizeof(m_newName));
+
+		if (ImGui::Button(_("close"))) {
+			ImGui::CloseCurrentPopup();
+			m_popupOpen = false;
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button(_("save")))
+		{
+			currentErr = RenameMoveset(m_toRename, m_newName);
+			if (currentErr == RenameErrcode_NoErr)
+			{
+				ImGui::CloseCurrentPopup();
+				m_popupOpen = false;
+			}
+		}
+
+		switch (currentErr)
+		{
+		case RenameErrcode_EmptyName:
+			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.empty_name"));
+			break;
+		case RenameErrcode_AlreadyExists:
+			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.already_exists"));
+			break;
+		case RenameErrcode_RenameErr:
+			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.rename_err"));
+			break;
+		case RenameErrcode_InvalidName:
+			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.invalid_name"));
+			break;
+		}
+
+		ImGui::EndPopup();
 	}
 
 	return movesetToLoad;

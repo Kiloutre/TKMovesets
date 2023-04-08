@@ -48,6 +48,7 @@ moveset.invalid = INVALID7
 moveset.size = Size
 moveset.size_mb = MB
 moveset.size_kb = KB
+moveset.rename = Rename
 moveset.import = Import
 moveset.edit = Edit
 moveset.delete = Delete
@@ -115,6 +116,13 @@ importation.error_game_allocation = There was a game memory allocation error whi
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset (or none if you want) before the match's loading screen , the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running.
 online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
+
+# Movest Edition : rename #
+edition.rename.new_moveset_name = New moveset name
+edition.rename.empty_name = Name is empty
+edition.rename.already_exists = Name is already in use by another fail
+edition.rename.rename_err = Error while trying to rename. Are the characters valid?
+edition.rename.invalid_name = Name contains invalid characters. (/\|<>:"?*)
 
 # Moveset Edition #
 edition.explanation = You can hereedit extracted movesets. Refer to documentation for tutorials and helpful ressources.\nTurn on 'Live edition' for quickly modifying the custom moveset: Simple values changes will be instantly applied in memory with zero loading time.

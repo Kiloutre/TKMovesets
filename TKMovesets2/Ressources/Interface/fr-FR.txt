@@ -48,6 +48,7 @@ moveset.invalid = INVALIDE
 moveset.size = Taille
 moveset.size_mb = MO
 moveset.size_kb = KO
+moveset.rename = Renommer
 moveset.import = Importer
 moveset.edit = Modifier
 moveset.delete = Suppr.
@@ -114,6 +115,13 @@ importation.error_game_allocation = Il y a eu une erreur d'allocation dans le je
 online.explanation = Le jeu en ligne nécessite que les deux joueurs possèdent cet outil en train de tourner.\nVous devez chacun de vôtre côté selectionner un personnage à charger (ou aucun) avant le chargement du match, cet outil se chargera de synchroniser les personnages que vous avez modifié.\nLes moveset personnalisés ne seront pas chargés si vous ou l'adversaire n'avez pas cet outil de lancé.
 online.select_moveset = Sélectionner un personnage
 online.no_selected_moveset = Pas de personnage selectionné
+
+# Modifcation de moveset : Renommage #
+edition.rename.new_moveset_name = Nouveau nom
+edition.rename.empty_name = Nom est vide
+edition.rename.already_exists = Le nom est déjà utilisé par un autre fichier
+edition.rename.rename_err = Erreur lors du renommage
+edition.rename.invalid_name = Le nom contient des charactères invalide. (/\|<>:"?*)
 
 # Modifcation de moveset #
 edition.explanation = Vous pouvez ici modifier les personnage extraits. Consultez la documentation pour les information utiles et les tutoriels.\nActivez le mode 'Prévisualisation directe' pour rapidement modifier le personnage choisi : Les petits changement seront immédiatement appliqués dans le jeu, sans temps de chargement.
