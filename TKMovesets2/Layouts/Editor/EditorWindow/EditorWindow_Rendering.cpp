@@ -185,9 +185,9 @@ void EditorWindow::RenderStatusBar()
 	ImGui::SameLine();
 
 	// Game list
-	int8_t currentGameId = importerHelper.currentGameId;
+	int8_t currentGameId = m_importerHelper.currentGameId;
 	ImGui::PushItemWidth(100.0f);
-	ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
+	ImGui::PushID(&m_importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
 
 	if (ImGui::BeginCombo("##", (currentGameId == -1) ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
@@ -197,7 +197,7 @@ void EditorWindow::RenderStatusBar()
 			GameInfo* game = Games::GetGameInfo(i);
 			if (game->importer != nullptr) {
 				if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
-					importerHelper.SetTargetProcess(game->processName, i);
+					m_importerHelper.SetTargetProcess(game->processName, i);
 					m_loadedMoveset = 0;
 					m_importNeeded = true;
 					m_editor->live_loadedMoveset = 0;
@@ -211,7 +211,7 @@ void EditorWindow::RenderStatusBar()
 
 
 	// Process error
-	bool isAttached = importerHelper.process->IsAttached();
+	bool isAttached = m_importerHelper.process->IsAttached();
 	if (currentGameId != -1 && !isAttached)
 	{
 		// Short process error message
@@ -226,19 +226,19 @@ void EditorWindow::RenderStatusBar()
 	// Player list
 	{
 		ImGui::SameLine();
-		char buf[3] = { '1' + importerHelper.currentPlayerId, 'p', '\0' };
+		char buf[3] = { '1' + m_importerHelper.currentPlayerId, 'p', '\0' };
 		ImGui::PushItemWidth(100.0f);
 
-		uint8_t playerCount = min(2, importerHelper.GetCharacterCount());
+		uint8_t playerCount = min(2, m_importerHelper.GetCharacterCount());
 		if (ImGui::BeginCombo("##", _(buf)))
 		{
-			size_t currentPlayerId = importerHelper.currentPlayerId;
+			size_t currentPlayerId = m_importerHelper.currentPlayerId;
 			for (int8_t i = 0; i < playerCount; ++i)
 			{
 				buf[0] = '1' + i;
 				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
-					importerHelper.currentPlayerId = i;
-					importerHelper.lastLoadedMoveset = 0;
+					m_importerHelper.currentPlayerId = i;
+					m_importerHelper.lastLoadedMoveset = 0;
 				}
 			}
 			ImGui::EndCombo();
@@ -247,14 +247,14 @@ void EditorWindow::RenderStatusBar()
 	
 	// Import button
 	ImGui::SameLine();
-	bool canImport = isAttached && !importerHelper.IsBusy() && m_canInteractWithGame && m_importNeeded;
+	bool canImport = isAttached && !m_importerHelper.IsBusy() && m_canInteractWithGame && m_importNeeded;
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
-		importerHelper.lastLoadedMoveset = 0;
+		m_importerHelper.lastLoadedMoveset = 0;
 
 		uint64_t movesetSize;
 		const Byte* moveset = m_editor->GetMoveset(movesetSize);
 
-		importerHelper.QueueCharacterImportation(moveset, movesetSize);
+		m_importerHelper.QueueCharacterImportation(moveset, movesetSize);
 		m_editor->live_loadedMoveset = 0;
 		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
 		m_importNeeded = false;
@@ -419,7 +419,7 @@ void EditorWindow::RenderMovelist()
 
 	ImGui::SameLine();
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
-		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(importerHelper.currentPlayerId);
+		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(m_importerHelper.currentPlayerId);
 		m_moveToPlay = m_moveToScrollTo;
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
 		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
@@ -446,7 +446,7 @@ void EditorWindow::Render(int dockid)
 	}
 
 	// Check for important changes here
-	m_canInteractWithGame = importerHelper.CanStart();
+	m_canInteractWithGame = m_importerHelper.CanStart();
 
 	if (m_loadedMoveset != 0) {
 		if (!m_canInteractWithGame || !MovesetStillLoaded())
@@ -455,12 +455,12 @@ void EditorWindow::Render(int dockid)
 			m_importNeeded = true;
 			m_loadedMoveset = 0;
 			m_editor->live_loadedMoveset = 0;
-			importerHelper.lastLoadedMoveset = 0;
+			m_importerHelper.lastLoadedMoveset = 0;
 		}
 	}
 	else {
 		// If the moveset was successfully imported, this will be filled with a nonzero value
-		m_loadedMoveset = importerHelper.lastLoadedMoveset;
+		m_loadedMoveset = m_importerHelper.lastLoadedMoveset;
 		if (m_liveEdition) {
 			m_editor->live_loadedMoveset = m_loadedMoveset;
 		}

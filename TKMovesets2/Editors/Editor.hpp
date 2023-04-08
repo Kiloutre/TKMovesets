@@ -230,7 +230,7 @@ namespace EditorUtils
 	void WriteFieldFullname(InputMap& inputMap, const std::string& baseIdentifier);
 
 	template <typename T>
-	EditorInput* CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, InputMap& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
+	EditorInput* CreateField(const std::string& fieldName, VectorSet<std::string>& drawOrder, InputMap& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
 	{
 		drawOrder.push_back(fieldName);
 

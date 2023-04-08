@@ -223,7 +223,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 
 bool EditorWindow::MovesetStillLoaded()
 {
-	gameAddr movesetAddress = importerHelper.importer->GetMovesetAddress(importerHelper.currentPlayerId);
+	gameAddr movesetAddress = m_importerHelper.importer->GetMovesetAddress(m_importerHelper.currentPlayerId);
 #ifdef BUILD_TYPE_DEBUG
 	if (movesetAddress != m_loadedMoveset) {
 		DEBUG_LOG("MovesetStillLoaded = false, current is %llx, old was %llx\n", movesetAddress, m_loadedMoveset);
@@ -284,7 +284,7 @@ EditorWindow::~EditorWindow()
 		m_editor->animExtractionThread->join();
 	}
 
-	importerHelper.StopThreadAndCleanup();
+	m_importerHelper.StopThreadAndCleanup();
 
 	for (auto& win : m_structWindows) {
 		delete win;
@@ -300,10 +300,10 @@ EditorWindow::~EditorWindow()
 
 EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
 {
-	importerHelper.Init(addrFile, storage);
-	importerHelper.StartThread();
+	m_importerHelper.Init(addrFile, storage);
+	m_importerHelper.StartThread();
 
-	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, importerHelper.process, importerHelper.game);
+	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, m_importerHelper.process, m_importerHelper.game);
 	labels = new EditorLabel(movesetInfo->gameId);
 
 	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
@@ -342,6 +342,8 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 	ReloadMovelistFilter();
 
 	editorTable = &m_editor->movesetTable;
+
+	// todo: detect running game process, select it
 }
 
 void EditorWindow::ReloadMovelistFilter()

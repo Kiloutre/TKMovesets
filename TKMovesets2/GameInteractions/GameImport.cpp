@@ -139,5 +139,6 @@ uint8_t GameImport::GetCharacterCount()
 	if (importer != nullptr) {
 		return importer->characterCount;
 	}
-	return 2;
+	// Return 1 by default on purpose, easier to debug stuff that way
+	return 1;
 }

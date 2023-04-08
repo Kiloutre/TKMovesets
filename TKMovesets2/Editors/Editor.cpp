@@ -1,5 +1,7 @@
 #include "Editor.hpp"
 
+#include <format>
+
 typedef unsigned int ImU32;
 
 // Yes, i ripped this straight from ImGui, probably not a good idea but will do for now
@@ -243,7 +245,7 @@ namespace EditorUtils
 		// Finishing touch
 		for (auto& [name, input] : inputMap) {
 			// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
-			input->fullName = "edition." + baseIdentifier + "." + name;
+			input->fullName = std::format("edition.{}.{}", baseIdentifier.c_str(), name.c_str());
 		}
 	}
 }

@@ -310,7 +310,6 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	}
 
 	// Build category names
-
 	for (uint8_t category : m_categories) {
 		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
 	}

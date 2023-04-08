@@ -79,6 +79,8 @@ private:
 	bool m_importNeeded = true;
 	// Access moveset data through this variable. Uses polymorphism.
 	Editor* m_editor = nullptr;
+	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
+	GameImport m_importerHelper;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -102,8 +104,6 @@ private:
 public:
 	// Determines if the main window is open or not. If not, this tells the MainWindow parent class to free the ressources we have allocated
 	bool popen = true;
-	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
-	GameImport importerHelper;
 	// Stores the filename
 	std::string filename;
 	// True is we need to call SetNextWindowFocus() before rendering our own
