@@ -85,7 +85,7 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 	return convertedString;
 }
 
-std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap)
+std::string EditorT7::GetMovelistDisplayableLabel(InputMap& fieldMap)
 {
 	std::string retVal;
 	uint32_t icons_1 = (uint32_t)GetFieldValue(fieldMap["icons"]);
@@ -113,7 +113,7 @@ std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorIn
 	if (combo_difficulty > 0)
 	{
 		retVal += " " + std::to_string(combo_damage) + " DMG ";
-		
+
 		const char difficultyBuffer[] = "***";
 		int index = (sizeof(difficultyBuffer) - 1) - combo_difficulty;
 		retVal += &difficultyBuffer[max(0, index)];
@@ -127,9 +127,9 @@ std::string EditorT7::GetMovelistDisplayableLabel(std::map<std::string, EditorIn
 
 // -- Inputs -- //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto input = m_iterators.mvl_inputs.begin() + id;
 
@@ -139,7 +139,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistInputListI
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("directions", 0, EditorInput_H8, input->directions);
 		CREATE_FIELD("buttons", 0, EditorInput_H8, input->buttons);
@@ -154,7 +154,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistInputListI
 	return inputListMap;
 }
 
-void EditorT7::SaveMovelistInput(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMovelistInput(uint16_t id, InputMap& inputs)
 {
 	auto input = m_iterators.mvl_inputs.begin() + id;
 
@@ -165,10 +165,10 @@ void EditorT7::SaveMovelistInput(uint16_t id, std::map<std::string, EditorInput*
 }
 
 // -- Displayables -- //
-	
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+
+std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
@@ -179,7 +179,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
 		CREATE_FIELD("playable_id", 0, EditorInput_S16 | EditorInput_Interactable, displayable.playable_id);
@@ -211,14 +211,14 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 		{
 			switch (ofst)
 			{
-				case 0x14C: //icons
-				case 0x150: //icons_2
-					break;
-				default:
-					int value = *(int*)((char*)&displayable + ofst);
-					std::string key = std::format("unk_{:x}", ofst);
-					CREATE_FIELD(key, 1, EditorInput_H32_Changeable, value);
-					break;
+			case 0x14C: //icons
+			case 0x150: //icons_2
+				break;
+			default:
+				int value = *(int*)((char*)&displayable + ofst);
+				std::string key = std::format("unk_{:x}", ofst);
+				CREATE_FIELD(key, 1, EditorInput_H32_Changeable, value);
+				break;
 			}
 		}
 
@@ -233,7 +233,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMovelistDisplayabl
 	return inputListMap;
 }
 
-void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMovelistDisplayable(uint16_t id, InputMap& inputs)
 {
 	auto displayable = m_iterators.mvl_displayables[id];
 
@@ -252,14 +252,14 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 	{
 		switch (ofst)
 		{
-			case 0x14C: //icons
-			case 0x150: //icons_2? combo difficulty, damage
-				break;
-			default:
-				int* valuePtr = (int*)((char*)displayable + ofst);
-				std::string key = std::format("unk_{:x}", ofst);
-				SetMemberValue(valuePtr, inputs[key]);
-				break;
+		case 0x14C: //icons
+		case 0x150: //icons_2? combo difficulty, damage
+			break;
+		default:
+			int* valuePtr = (int*)((char*)displayable + ofst);
+			std::string key = std::format("unk_{:x}", ofst);
+			SetMemberValue(valuePtr, inputs[key]);
+			break;
 		}
 	}
 
@@ -330,7 +330,7 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, std::map<std::string, Editor
 
 bool EditorT7::ValidateMovelistDisplayableField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "playable_id")
 	{
@@ -343,9 +343,9 @@ bool EditorT7::ValidateMovelistDisplayableField(EditorInput* field)
 
 // -- Playables -- //
 
-std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto playable = m_iterators.mvl_playables[id];
 
@@ -370,7 +370,7 @@ std::map<std::string, EditorInput*> EditorT7::GetMovelistPlayableInputs(uint16_t
 	return inputMap;
 }
 
-void EditorT7::SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMovelistPlayable(uint16_t id, InputMap& inputs)
 {
 	auto playable = m_iterators.mvl_playables[id];
 
@@ -394,7 +394,7 @@ void EditorT7::SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInp
 
 bool EditorT7::ValidateMovelistPlayableField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "input_sequence_id")
 	{

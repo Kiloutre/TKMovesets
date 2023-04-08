@@ -6,7 +6,7 @@
 
 void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "name") {
 		return;
@@ -143,7 +143,7 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnCancelEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -189,7 +189,7 @@ void EditorT7::Live_OnCancelEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnGroupedCancelEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -235,7 +235,7 @@ void EditorT7::Live_OnGroupedCancelEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnVoiceclipEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -258,7 +258,7 @@ void EditorT7::Live_OnVoiceclipEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnCancelExtraEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -281,7 +281,7 @@ void EditorT7::Live_OnCancelExtraEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -322,7 +322,7 @@ void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnMoveBeginPropEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -352,7 +352,7 @@ void EditorT7::Live_OnMoveBeginPropEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnMoveEndPropEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -382,7 +382,7 @@ void EditorT7::Live_OnMoveEndPropEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -411,7 +411,7 @@ void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnHitConditionPropEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -445,7 +445,7 @@ void EditorT7::Live_OnHitConditionPropEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnReactionsEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -569,7 +569,7 @@ void EditorT7::Live_OnReactionsEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnPushbackEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -603,7 +603,7 @@ void EditorT7::Live_OnPushbackEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnPushbackExtraEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -626,7 +626,7 @@ void EditorT7::Live_OnPushbackExtraEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnInputSequenceEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -659,7 +659,7 @@ void EditorT7::Live_OnInputSequenceEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnInputEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -686,7 +686,7 @@ void EditorT7::Live_OnInputEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnThrowCameraEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -714,7 +714,7 @@ void EditorT7::Live_OnThrowCameraEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnCameraDataEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
@@ -749,7 +749,7 @@ void EditorT7::Live_OnCameraDataEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;

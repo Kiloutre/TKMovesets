@@ -18,7 +18,7 @@ EditorMovelistPlayable::EditorMovelistPlayable(std::string windowTitleBase, uint
 void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int referenceId = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "input_sequence_id")
 	{

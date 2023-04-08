@@ -35,7 +35,7 @@ void EditorVoiceclip::OnReorder()
 		BuildItemDetails(listIdx);
         
         if (m_editor->live_loadedMoveset != 0) {
-            for (auto& [key, field] : m_items[listIdx]->identifierMaps) {
+            for (auto& [key, field] : m_items[listIdx]->identifierMap) {
                 m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
             }
         }
@@ -45,7 +45,7 @@ void EditorVoiceclip::OnReorder()
 
 void EditorVoiceclip::BuildItemDetails(int listIdx)
 {
-	const char* buffer = m_items[listIdx]->identifierMaps["id"]->buffer;
+	const char* buffer = m_items[listIdx]->identifierMap["id"]->buffer;
 	const bool isEnd = m_editor->IsVoicelipValueEnd(buffer);
 	std::string label;
 

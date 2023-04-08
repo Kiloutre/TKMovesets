@@ -6,13 +6,14 @@
 #include <string>
 
 #include "ThreadedClass.hpp"
+#include "Helpers.hpp"
 
 // Moveset info, most of which is read straight from the file. Use for display.
 struct movesetInfo
 {
 	std::string filename;
 	std::string name;
-	std::string origin;
+	FasterStringComp origin;
 	std::string target_character;
 	std::string version_string;
 	uint64_t date;

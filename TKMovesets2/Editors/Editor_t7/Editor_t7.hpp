@@ -58,102 +58,102 @@ private:
 	void SetupIterators_DisplayableMovelist();
 
 	// Moves
-	std::map<std::string, EditorInput*> GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	InputMap GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	uint64_t CreateMoveName(const char* newName);
 	void SaveMoveName(const char* newName, gameAddr move_name_addr);
-	void SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	void SaveMove(uint16_t id, InputMap& inputs);
 	bool ValidateMoveField(EditorInput* field);
 
 	// Voiceclipss
-	std::vector<std::map<std::string, EditorInput*>> GetVoiceclipListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetVoiceclipListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveVoiceclip(uint16_t id, InputMap& inputs);
 
 	// Extra properties
-	std::vector<std::map<std::string, EditorInput*>> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveExtraproperty(uint16_t id, InputMap& inputs);
 
 	// Other properties (start)
-	std::vector<std::map<std::string, EditorInput*>> GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMoveStartProperty(uint16_t id, InputMap& inputs);
 	bool ValidateOtherMoveProperty(EditorInput* field);
 
 	// Other properties (end)
-	std::vector<std::map<std::string, EditorInput*>> GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMoveEndProperty(uint16_t id, InputMap& inputs);
 
 	// Cancels
-	std::vector<std::map<std::string, EditorInput*>> GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveCancel(uint16_t id, InputMap& inputs);
 	bool ValidateCancelField(EditorInput* field);
 
 	// Grouped Cancels
-	std::vector<std::map<std::string, EditorInput*>> GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveGroupedCancel(uint16_t id, InputMap& inputs);
 	bool ValidateGroupedCancelField(EditorInput* field);
 
 	// Cancel extras
-	std::map<std::string, EditorInput*> GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveCancelExtra(uint16_t id, InputMap& inputs);
 
 	// Requirements
-	std::vector<std::map<std::string, EditorInput*>> GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveRequirement(uint16_t id, InputMap& inputs);
 
 	// Hit conditions
-	std::vector<std::map<std::string, EditorInput*>> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveHitCondition(uint16_t id, InputMap& inputs);
 	bool ValidateHitConditionField(EditorInput* field);
 
 	// Reactions
-	std::map<std::string, EditorInput*> GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveReactions(uint16_t id, InputMap& inputs);
 	bool ValidateReactionsField(EditorInput* field);
 
 	// Pushback
-	std::map<std::string, EditorInput*> GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SavePushback(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SavePushback(uint16_t id, InputMap& inputs);
 	bool ValidatePushbackField(EditorInput* field);
 
 	// Pushback extradata
-	std::vector<std::map<std::string, EditorInput*>> GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
-	void SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
+	void SavePushbackExtra(uint16_t id, InputMap& inputs);
 
 	// Input Sequence
-	std::map<std::string, EditorInput*> GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveInputSequence(uint16_t id, InputMap& inputs);
 	bool ValidateInputSequenceField(EditorInput* field);
 
 	// Input list
-	std::vector<std::map<std::string, EditorInput*>> GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
-	void SaveInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
+	void SaveInput(uint16_t id, InputMap& inputs);
 
 	// Projectiles
-	std::map<std::string, EditorInput*> GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveProjectile(uint16_t id, InputMap& inputs);
 	bool ValidateProjectileField(EditorInput* field);
 
 	// Throw Camera
-	std::map<std::string, EditorInput*> GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveThrowCamera(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveThrowCamera(uint16_t id, InputMap& inputs);
 	bool ValidateThrowCameraField(EditorInput* field);
 
 	// Camera data
-	std::map<std::string, EditorInput*> GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveCameraData(uint16_t id, InputMap& inputs);
 
 	//  Movelist : Displayables
-	std::vector<std::map<std::string, EditorInput*>> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveMovelistDisplayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMovelistDisplayable(uint16_t id, InputMap& inputs);
 	bool ValidateMovelistDisplayableField(EditorInput* field);
 
 	//  Movelist : Playables
-	std::map<std::string, EditorInput*> GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder);
-	void SaveMovelistPlayable(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	InputMap GetMovelistPlayableInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	void SaveMovelistPlayable(uint16_t id, InputMap& inputs);
 	bool ValidateMovelistPlayableField(EditorInput* field);
 
 	// Movelist: Inputs
-	std::vector<std::map<std::string, EditorInput*>> GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
-	void SaveMovelistInput(uint16_t id, std::map<std::string, EditorInput*>& inputs);
+	std::vector<InputMap> GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
+	void SaveMovelistInput(uint16_t id, InputMap& inputs);
 
 	// -- Creation / Deletion -- //
 	// Create a new structure or structure list
@@ -433,13 +433,13 @@ public:
 	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
 	void ReloadDisplayableMoveList() override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
-	std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
-	std::map<std::string, EditorInput*> GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	InputMap GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
+	InputMap GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
-	void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) override;
-	
+	void SaveItem(EditorWindowType_ type, uint16_t id, InputMap& inputs) override;
+
 	// -- Interactions -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
@@ -468,7 +468,7 @@ public:
 	unsigned int GetStructureCount(EditorWindowType_ type) override;
 	unsigned int GetMotaAnimCount(int motaId) override;
 	// Movelist
-	std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) override;
+	std::string GetMovelistDisplayableLabel(InputMap& fieldMap) override;
 	unsigned int GetMovelistDisplayableInputCount() override;
 
 	// -- Creation / Deletion -- //
@@ -479,5 +479,5 @@ public:
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
-	void Live_OnFieldEdit(EditorWindowType_ type, int id,EditorInput* field) override;
+	void Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field) override;
 };

@@ -18,7 +18,7 @@ EditorInputSequence::EditorInputSequence(std::string windowTitleBase, uint32_t t
 void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "input_addr")
 	{

@@ -18,7 +18,7 @@ EditorProjectile::EditorProjectile(std::string windowTitleBase, uint32_t t_id, E
 void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "cancel_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Cancel, id);

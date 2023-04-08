@@ -64,7 +64,7 @@ void EditorFormList::Apply()
 
 	// Write into every individual item
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
-		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMaps);
+		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMap);
 		// Re-set the IDs of the list items in case reordering/deletion/creation happened
 		m_items[listIndex]->id = structureId + listIndex;
 	}
@@ -78,7 +78,7 @@ bool EditorFormList::IsFormValid()
 {
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
-		for (auto& [category, fields] : m_items[listIndex]->categoryMaps) {
+		for (auto& [category, fields] : m_items[listIndex]->categoryMap) {
 			for (auto& field : fields) {
 				if (field->errored) {
 					return false;
@@ -129,20 +129,20 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			m_items.insert(m_items.begin() + listIndex, new FieldItem);
 			auto& item = m_items[listIndex];
 
-			item->identifierMaps = m_editor->GetListSingleForm(windowType, 0, drawOrder);
+			item->identifierMap = m_editor->GetListSingleForm(windowType, 0, drawOrder);
 			item->openStatus = EditorFormTreeview_ForceOpen;
 
 			for (uint8_t category : m_categories)
 			{
 				std::vector<EditorInput*> inputs;
 				for (const std::string& fieldName : drawOrder) {
-					EditorInput* field = item->identifierMaps[fieldName];
+					EditorInput* field = item->identifierMap[fieldName];
 					EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
 					if (field->category == category) {
 						inputs.push_back(field);
 					}
 				}
-				item->categoryMaps[category] = inputs;
+				item->categoryMap[category] = inputs;
 			}
 			BuildItemDetails(listIndex);
 
@@ -233,7 +233,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			// Reducing list size will make things invisible on the next render anyway
 			if (listIndex < m_listSize) {
 				// Shift following items up
-				for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMaps) {
+				for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMap) {
 					delete[] fieldPtr->buffer;
 					delete fieldPtr;
 				}
@@ -265,7 +265,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 
 	VectorSet<std::string> drawOrder;
 
-	std::vector<std::map<std::string, EditorInput*>> fieldIdentifierMaps;
+	std::vector<InputMap> fieldIdentifierMaps;
 
 	if (m_listSize == 0) {
 		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
@@ -291,7 +291,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 		auto& item = m_items[listIndex];
 
 		item->id = structureId + listIndex;
-		item->identifierMaps = fieldIdentifierMaps[listIndex];
+		item->identifierMap = fieldIdentifierMaps[listIndex];
 
 		for (uint8_t category : m_categories)
 		{
@@ -303,7 +303,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 					inputs.push_back(field);
 				}
 			}
-			item->categoryMaps[category] = inputs;
+			item->categoryMap[category] = inputs;
 		}
 
 		BuildItemDetails(listIndex);
@@ -373,7 +373,7 @@ void EditorFormList::RenderInternal()
 			// Render each field name / field input in columns
 			if (ImGui::BeginTable(m_windowTitle.c_str(), columnCount))
 			{
-				std::vector<EditorInput*>& inputs = item->categoryMaps[category];
+				std::vector<EditorInput*>& inputs = item->categoryMap[category];
 				RenderInputs(listIndex, inputs, category, columnCount);
 				ImGui::EndTable();
 			}
@@ -396,7 +396,7 @@ void EditorFormList::OnReorder()
 	}
 
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
-		for (auto& [key, field] : m_items[listIdx]->identifierMaps)
+		for (auto& [key, field] : m_items[listIdx]->identifierMap)
 		{
 			m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 		}
@@ -428,7 +428,7 @@ void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
 EditorFormList::~EditorFormList()
 {
 	for (auto& item : m_items) {
-		for (auto& [key, fieldPtr] : item->identifierMaps) {
+		for (auto& [key, fieldPtr] : item->identifierMap) {
 			delete[] fieldPtr->buffer;
 			delete fieldPtr;
 		}

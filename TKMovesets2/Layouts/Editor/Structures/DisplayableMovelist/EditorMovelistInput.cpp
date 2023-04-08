@@ -27,7 +27,7 @@ void EditorMovelistInput::OnUpdate(int listIdx, EditorInput* field)
 void EditorMovelistInput::BuildItemDetails(int listIdx)
 {
 	auto& item = m_items[listIdx];
-	auto& identifierMap = item->identifierMaps;
+	auto& identifierMap = item->identifierMap;
 
 	const auto& durationField = identifierMap["frame_duration"];
 

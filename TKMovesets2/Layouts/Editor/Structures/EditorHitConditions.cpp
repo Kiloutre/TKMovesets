@@ -18,7 +18,7 @@ EditorHitConditions::EditorHitConditions(std::string windowTitleBase, uint32_t t
 void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "requirements_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
@@ -46,7 +46,7 @@ void EditorHitConditions::RequestFieldUpdate(EditorWindowType_ winType, int valu
 			int listIdx = 0;
 			for (auto& item : m_items)
 			{
-				EditorInput* field = item->identifierMaps["requirements_addr"];
+				EditorInput* field = item->identifierMap["requirements_addr"];
 
 				if (field->errored) {
 					continue;

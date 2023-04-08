@@ -7,9 +7,9 @@ using namespace EditorUtils;
 
 // ===== Pushback Extra ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetPushbackExtraListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto pushbackExtra = m_iterators.pushback_extras.begin() + id;
 
@@ -19,7 +19,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetPushbackExtraListI
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("horizontal_offset", 0, EditorInput_U16_Changeable, pushbackExtra->horizontal_offset);
 
@@ -31,7 +31,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetPushbackExtraListI
 	return inputListMap;
 }
 
-void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SavePushbackExtra(uint16_t id, InputMap& inputs)
 {
 	auto pushbackExtra = m_iterators.pushback_extras[id];
 
@@ -40,9 +40,9 @@ void EditorT7::SavePushbackExtra(uint16_t id, std::map<std::string, EditorInput*
 
 // ===== Pushback ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto pushback = m_iterators.pushbacks[id];
 
@@ -61,7 +61,7 @@ std::map<std::string, EditorInput*> EditorT7::GetPushbackInputs(uint16_t id, Vec
 
 bool EditorT7::ValidatePushbackField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "extradata_addr")
 	{
@@ -73,7 +73,7 @@ bool EditorT7::ValidatePushbackField(EditorInput* field)
 	return true;
 }
 
-void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SavePushback(uint16_t id, InputMap& inputs)
 {
 	auto pushback = m_iterators.pushbacks[id];
 
@@ -85,9 +85,9 @@ void EditorT7::SavePushback(uint16_t id, std::map<std::string, EditorInput*>& in
 
 // ===== Projectile ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetProjectileInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto projectile = m_iterators.projectiles[id];
 
@@ -144,7 +144,7 @@ std::map<std::string, EditorInput*> EditorT7::GetProjectileInputs(uint16_t id, V
 
 bool EditorT7::ValidateProjectileField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "hit_condition_addr")
 	{
@@ -162,7 +162,7 @@ bool EditorT7::ValidateProjectileField(EditorInput* field)
 	return true;
 }
 
-void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveProjectile(uint16_t id, InputMap& inputs)
 {
 	auto projectile = m_iterators.projectiles[id];
 
@@ -212,9 +212,9 @@ void EditorT7::SaveProjectile(uint16_t id, std::map<std::string, EditorInput*>& 
 
 // ===== Input Sequence  ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetInputSequenceInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto sequence = m_iterators.input_sequences[id];
 
@@ -233,7 +233,7 @@ std::map<std::string, EditorInput*> EditorT7::GetInputSequenceInputs(uint16_t id
 
 bool EditorT7::ValidateInputSequenceField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "input_addr")
 	{
@@ -245,7 +245,7 @@ bool EditorT7::ValidateInputSequenceField(EditorInput* field)
 	return true;
 }
 
-void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveInputSequence(uint16_t id, InputMap& inputs)
 {
 	auto sequence = m_iterators.input_sequences[id];
 
@@ -257,9 +257,9 @@ void EditorT7::SaveInputSequence(uint16_t id, std::map<std::string, EditorInput*
 
 // ===== Inputs ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto input = m_iterators.inputs.begin() + id;
 
@@ -269,7 +269,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetInputListInputs(ui
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("direction", 0, EditorInput_H32, input->direction);
 		CREATE_FIELD("button", 0, EditorInput_H32, input->button);
@@ -282,7 +282,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetInputListInputs(ui
 	return inputListMap;
 }
 
-void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveInput(uint16_t id, InputMap& inputs)
 {
 	auto input = m_iterators.inputs.begin() + id;
 
@@ -292,9 +292,9 @@ void EditorT7::SaveInput(uint16_t id, std::map<std::string, EditorInput*>& input
 
 // ===== Throw cameras ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto throwCamera = m_iterators.throw_datas[id];
 
@@ -311,7 +311,7 @@ std::map<std::string, EditorInput*> EditorT7::GetThrowCameraInputs(uint16_t id, 
 
 bool EditorT7::ValidateThrowCameraField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "cameradata_addr")
 	{
@@ -323,7 +323,7 @@ bool EditorT7::ValidateThrowCameraField(EditorInput* field)
 	return true;
 }
 
-void EditorT7::SaveThrowCamera(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveThrowCamera(uint16_t id, InputMap& inputs)
 {
 	auto throwCamera = m_iterators.throw_datas[id];
 
@@ -333,9 +333,9 @@ void EditorT7::SaveThrowCamera(uint16_t id, std::map<std::string, EditorInput*>&
 
 // ===== Camera data ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetCameraDataInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto cameraData = m_iterators.camera_datas[id];
 
@@ -354,7 +354,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCameraDataInputs(uint16_t id, V
 }
 
 
-void EditorT7::SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveCameraData(uint16_t id, InputMap& inputs)
 {
 	auto cameraData = m_iterators.camera_datas[id];
 
@@ -368,9 +368,9 @@ void EditorT7::SaveCameraData(uint16_t id, std::map<std::string, EditorInput*>& 
 
 // ===== Reactions ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto reaction = m_iterators.reactions[id];
 
@@ -419,9 +419,9 @@ std::map<std::string, EditorInput*> EditorT7::GetReactionsInputs(uint16_t id, Ve
 
 bool EditorT7::ValidateReactionsField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
-	if (Helpers::endsWith(name, "_moveid"))
+	if (name.endsWith("_moveid"))
 	{
 		int moveId = atoi(field->buffer);
 		if (moveId >= m_infos->table.moveCount) {
@@ -436,7 +436,7 @@ bool EditorT7::ValidateReactionsField(EditorInput* field)
 			return false;
 		}
 	}
-	else if (Helpers::endsWith(name, "_pushback"))
+	else if (name.endsWith("_pushback"))
 	{
 		int listIdx = atoi(field->buffer);
 		// No negative allowed here
@@ -446,7 +446,7 @@ bool EditorT7::ValidateReactionsField(EditorInput* field)
 	return true;
 }
 
-void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveReactions(uint16_t id, InputMap& inputs)
 {
 	auto reaction = m_iterators.reactions[id];
 
@@ -488,9 +488,9 @@ void EditorT7::SaveReactions(uint16_t id, std::map<std::string, EditorInput*>& i
 
 // ===== Hit conditions ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetHitConditionListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto hitCondition = m_iterators.hit_conditions.begin() + id;
 	auto req = m_iterators.requirements.begin();
@@ -501,7 +501,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, hitCondition->requirements_addr);
 		CREATE_FIELD("damage", 0, EditorInput_U32, hitCondition->damage);
@@ -521,7 +521,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetHitConditionListIn
 	return inputListMap;
 }
 
-void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveHitCondition(uint16_t id, InputMap& inputs)
 {
 	auto hitCondition = m_iterators.hit_conditions[id];
 
@@ -533,7 +533,7 @@ void EditorT7::SaveHitCondition(uint16_t id, std::map<std::string, EditorInput*>
 
 bool EditorT7::ValidateHitConditionField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
@@ -551,9 +551,9 @@ bool EditorT7::ValidateHitConditionField(EditorInput* field)
 
 // ===== Requirements  ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto req = m_iterators.requirements.begin() + id;
 
@@ -563,7 +563,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		unsigned short conditionType =
 			(req->condition >= 0x8000 ? EditorInput_H32_Changeable : EditorInput_U32_Changeable);
@@ -580,7 +580,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetRequirementListInp
 }
 
 
-void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveRequirement(uint16_t id, InputMap& inputs)
 {
 	auto req = m_iterators.requirements[id];
 
@@ -590,9 +590,9 @@ void EditorT7::SaveRequirement(uint16_t id, std::map<std::string, EditorInput*>&
 
 // ===== Cancel Extradata ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetCancelExtraInput(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto cancelExtra = m_iterators.cancel_extras[id];
 
@@ -606,7 +606,7 @@ std::map<std::string, EditorInput*> EditorT7::GetCancelExtraInput(uint16_t id, V
 	return inputMap;
 }
 
-void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveCancelExtra(uint16_t id, InputMap& inputs)
 {
 	auto cancelExtra = m_iterators.cancel_extras[id];
 
@@ -615,9 +615,9 @@ void EditorT7::SaveCancelExtra(uint16_t id, std::map<std::string, EditorInput*>&
 
 // ===== Cancel ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto cancel = m_iterators.cancels.begin() + id;
 
@@ -627,7 +627,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("command", 0, EditorInput_H64, cancel->command);
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, cancel->requirements_addr);
@@ -645,7 +645,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetCancelListInputs(u
 	return inputListMap;
 }
 
-void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveCancel(uint16_t id, InputMap& inputs)
 {
 	auto cancel = m_iterators.cancels[id];
 
@@ -661,7 +661,7 @@ void EditorT7::SaveCancel(uint16_t id, std::map<std::string, EditorInput*>& inpu
 
 bool EditorT7::ValidateCancelField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	// move_id is not validated here but in the cancel class since it can serve as both a group cancel & move id
 	if (name == "requirements_addr") {
@@ -687,9 +687,9 @@ bool EditorT7::ValidateCancelField(EditorInput* field)
 
 // ===== Grouped Cancel ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetGroupedCancelListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto cancel = m_iterators.grouped_cancels.begin() + id;
 
@@ -699,7 +699,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("command", 0, EditorInput_H64, cancel->command);
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, cancel->requirements_addr);
@@ -717,7 +717,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetGroupedCancelListI
 	return inputListMap;
 }
 
-void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveGroupedCancel(uint16_t id, InputMap& inputs)
 {
 	auto cancel = m_iterators.grouped_cancels[id];
 
@@ -733,7 +733,7 @@ void EditorT7::SaveGroupedCancel(uint16_t id, std::map<std::string, EditorInput*
 
 bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "move_id") {
 		int moveId = atoi(field->buffer);
@@ -772,9 +772,9 @@ bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
 
 // ===== Other move properties (start) ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetMoveStartPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto prop = m_iterators.move_start_properties.begin() + id;
 
@@ -784,7 +784,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
 		CREATE_FIELD("extraprop", 0, EditorInput_H32_Changeable, prop->extraprop);
@@ -797,7 +797,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveStartPropertyL
 	return inputListMap;
 }
 
-void EditorT7::SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMoveStartProperty(uint16_t id, InputMap& inputs)
 {
 	auto prop = m_iterators.move_start_properties[id];
 
@@ -808,9 +808,9 @@ void EditorT7::SaveMoveStartProperty(uint16_t id, std::map<std::string, EditorIn
 
 // ===== Other move properties (end) ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetMoveEndPropertyListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto prop = m_iterators.move_end_properties.begin() + id;
 
@@ -820,7 +820,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
 		CREATE_FIELD("extraprop", 0, EditorInput_H32_Changeable, prop->extraprop);
@@ -833,7 +833,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetMoveEndPropertyLis
 	return inputListMap;
 }
 
-void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMoveEndProperty(uint16_t id, InputMap& inputs)
 {
 	auto prop = m_iterators.move_end_properties[id];
 
@@ -844,7 +844,7 @@ void EditorT7::SaveMoveEndProperty(uint16_t id, std::map<std::string, EditorInpu
 
 bool EditorT7::ValidateOtherMoveProperty(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "requirements_addr") {
 		int listIdx = atoi(field->buffer);
@@ -855,9 +855,9 @@ bool EditorT7::ValidateOtherMoveProperty(EditorInput* field)
 
 // ===== ExtraProperties ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto prop = m_iterators.extra_move_properties.begin() + id;
 
@@ -867,7 +867,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("starting_frame", 0, EditorInput_U32_Changeable, prop->starting_frame);
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
@@ -883,7 +883,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetExtrapropListInput
 	return inputListMap;
 }
 
-void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveExtraproperty(uint16_t id, InputMap& inputs)
 {
 	auto prop = m_iterators.extra_move_properties[id];
 
@@ -894,9 +894,9 @@ void EditorT7::SaveExtraproperty(uint16_t id, std::map<std::string, EditorInput*
 
 // ===== Voiceclips ===== //
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetVoiceclipListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetVoiceclipListInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> inputListMap;
+	std::vector<InputMap> inputListMap;
 
 	auto voiceclip = m_iterators.voiceclips.begin() + id;
 
@@ -906,7 +906,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetVoiceclipListInput
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	do
 	{
-		std::map<std::string, EditorInput*> inputMap;
+		InputMap inputMap;
 
 		CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
 
@@ -918,7 +918,7 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetVoiceclipListInput
 }
 
 
-void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveVoiceclip(uint16_t id, InputMap& inputs)
 {
 	auto voiceclip = m_iterators.voiceclips[id];
 
@@ -927,9 +927,9 @@ void EditorT7::SaveVoiceclip(uint16_t id, std::map<std::string, EditorInput*>& i
 
 // ===== MOVES ===== //
 
-std::map<std::string, EditorInput*> EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::map<std::string, EditorInput*> inputMap;
+	InputMap inputMap;
 
 	auto move = m_iterators.moves[id];
 
@@ -1062,7 +1062,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	}
 }
 
-void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 {
 	auto move = m_iterators.moves[id];
 
@@ -1127,13 +1127,13 @@ void EditorT7::SaveMove(uint16_t id, std::map<std::string, EditorInput*>& inputs
 
 bool EditorT7::ValidateMoveField(EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "anim_name") {
 		return m_animNameToOffsetMap->find(field->buffer) != m_animNameToOffsetMap->end();
 	}
 
-	else if (Helpers::startsWith(name, "cancel_addr")) {
+	else if (name.startsWith("cancel_addr")) {
 		int listIdx = atoi(field->buffer);
 		return -1 <= listIdx && listIdx < (int)m_infos->table.cancelCount;
 	}
@@ -1183,7 +1183,7 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 
 // ===== Generic =====
 
-void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs)
+void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, InputMap& inputs)
 {
 	// Saving is one on an individual item basis, even for lists
 	switch (type)
@@ -1254,7 +1254,7 @@ void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::strin
 	}
 }
 
-std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	// Builds an input list for a specific window type (single struct) and fill default values according to the given ID
 	switch (type)
@@ -1287,10 +1287,10 @@ std::map<std::string, EditorInput*> EditorT7::GetFormFields(EditorWindowType_ ty
 		return GetMovelistPlayableInputs(id, drawOrder);
 		break;
 	}
-	return std::map<std::string, EditorInput*>();
+	return InputMap();
 }
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	// Builds an input list for a specific window type (list of structs) and fill default values according to the given ID
 	switch (type)
@@ -1324,10 +1324,10 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 		return GetMovelistDisplayablesInputs(0, drawOrder);
 		break;
 	}
-	return std::vector<std::map<std::string, EditorInput*>>();
+	return std::vector<InputMap>();
 }
 
-std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize)
+std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize)
 {
 	// Specific to lists with unguessable sizes : we provide the size as an argument
 	switch (type)
@@ -1347,9 +1347,9 @@ std::vector<std::map<std::string, EditorInput*>> EditorT7::GetFormFieldsList(Edi
 }
 
 
-std::map<std::string, EditorInput*> EditorT7::GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
 {
-	std::vector<std::map<std::string, EditorInput*>> list;
+	std::vector<InputMap> list;
 
 	switch (type)
 	{

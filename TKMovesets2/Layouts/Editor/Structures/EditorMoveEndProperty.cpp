@@ -18,7 +18,7 @@ EditorMoveEndProperty::EditorMoveEndProperty(std::string windowTitleBase, uint32
 void EditorMoveEndProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "requirements_addr") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
@@ -42,7 +42,7 @@ void EditorMoveEndProperty::RequestFieldUpdate(EditorWindowType_ winType, int va
 			int listIdx = 0;
 			for (auto& item : m_items)
 			{
-				EditorInput* field = item->identifierMaps["requirements_addr"];
+				EditorInput* field = item->identifierMap["requirements_addr"];
 
 				if (field->errored) {
 					continue;

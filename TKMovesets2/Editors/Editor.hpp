@@ -11,6 +11,7 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "Helpers.hpp"
 
 #include "constants.h"
 #include "GameAddresses.h"
@@ -108,31 +109,31 @@ enum EditorWindowType_
 typedef uint32_t EditorInputFlag;
 enum EditorInputFlag_
 {
-	EditorInput_String          = (1 << 0),
-	EditorInput_Clickable       = (1 << 1),
+	EditorInput_String = (1 << 0),
+	EditorInput_Clickable = (1 << 1),
 	// Clickable regardless of field validity
 	EditorInput_ClickableAlways = (1 << 2),
 
-	EditorInput_H64       = (1 << 3),
-	EditorInput_U64       = (1 << 4),
-	EditorInput_S64       = (1 << 5),
-	EditorInput_H32       = (1 << 6),
-	EditorInput_U32       = (1 << 7),
-	EditorInput_S32       = (1 << 8),
-	EditorInput_H16       = (1 << 9),
-	EditorInput_U16       = (1 << 10),
-	EditorInput_S16       = (1 << 11),
-	EditorInput_H8        = (1 << 12),
-	EditorInput_S8        = (1 << 13),
-	EditorInput_U8        = (1 << 14),
+	EditorInput_H64 = (1 << 3),
+	EditorInput_U64 = (1 << 4),
+	EditorInput_S64 = (1 << 5),
+	EditorInput_H32 = (1 << 6),
+	EditorInput_U32 = (1 << 7),
+	EditorInput_S32 = (1 << 8),
+	EditorInput_H16 = (1 << 9),
+	EditorInput_U16 = (1 << 10),
+	EditorInput_S16 = (1 << 11),
+	EditorInput_H8 = (1 << 12),
+	EditorInput_S8 = (1 << 13),
+	EditorInput_U8 = (1 << 14),
 
-	EditorInput_Float     = (1 << 15),
+	EditorInput_Float = (1 << 15),
 
 	// Used internally for fancy behaviour
 	EditorInput_DataChangeable = (1 << 16),
 
 	// Shortcuts
-	EditorInput_PTR       = (EditorInput_S64 | EditorInput_Clickable),
+	EditorInput_PTR = (EditorInput_S64 | EditorInput_Clickable),
 
 	EditorInput_H64_Changeable = EditorInput_H64 | EditorInput_DataChangeable,
 	EditorInput_U64_Changeable = EditorInput_U64 | EditorInput_DataChangeable,
@@ -148,20 +149,20 @@ enum EditorInputFlag_
 	EditorInput_S8_Changeable = EditorInput_S8 | EditorInput_DataChangeable,
 
 	// Used internally for conditions
-	EditorInput_Unsigned     = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16 | EditorInput_U8),
-	EditorInput_Signed       = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16 | EditorInput_S8),
-	EditorInput_Hex          = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16 | EditorInput_H8),
+	EditorInput_Unsigned = (EditorInput_U64 | EditorInput_U32 | EditorInput_U16 | EditorInput_U8),
+	EditorInput_Signed = (EditorInput_S64 | EditorInput_S32 | EditorInput_S16 | EditorInput_S8),
+	EditorInput_Hex = (EditorInput_H64 | EditorInput_H32 | EditorInput_H16 | EditorInput_H8),
 	EditorInput_Interactable = (EditorInput_Clickable | EditorInput_ClickableAlways),
-	EditorInput_64b          = (EditorInput_U64 | EditorInput_S64 | EditorInput_H64),
-	EditorInput_32b          = (EditorInput_U32 | EditorInput_S32 | EditorInput_H32 | EditorInput_Float),
-	EditorInput_16b          = (EditorInput_U16 | EditorInput_S16 | EditorInput_H16),
-	EditorInput_8b           = (EditorInput_U8 | EditorInput_S8 | EditorInput_H8),
+	EditorInput_64b = (EditorInput_U64 | EditorInput_S64 | EditorInput_H64),
+	EditorInput_32b = (EditorInput_U32 | EditorInput_S32 | EditorInput_H32 | EditorInput_Float),
+	EditorInput_16b = (EditorInput_U16 | EditorInput_S16 | EditorInput_H16),
+	EditorInput_8b = (EditorInput_U8 | EditorInput_S8 | EditorInput_H8),
 };
 
 struct EditorInput
 {
 	// Contains the field name in short format, used for easy-to-read checks, better than having to type the full name
-	std::string name;
+	FasterStringComp name;
 	// Contains the field name, used to show the correct translation string
 	std::string fullName;
 	// Contains the actual string that will be displayed in the form. Write on this freely.
@@ -173,7 +174,7 @@ struct EditorInput
 	// Our own flags, required for our overflow checks
 	EditorInputFlag flags = 0;
 	// The string buffer containing the input text
-	char *buffer = nullptr;
+	char* buffer = nullptr;
 	unsigned int bufsize = 0;
 	// Sets the BG color of the input
 	int color = 0;
@@ -223,6 +224,7 @@ struct EditorTable
 	std::vector<uint16_t> aliases;
 };
 
+typedef std::map<FasterStringComp, EditorInput*> InputMap;
 
 namespace EditorUtils
 {
@@ -241,10 +243,10 @@ namespace EditorUtils
 	// Changes between unsigned, signed AND hex data type if the field allows it
 	void ChangeFieldDataType(EditorInput* field);
 	// Writes the fullname to every field in a field map
-	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, const std::string& baseIdentifier);
+	void WriteFieldFullname(InputMap& inputMap, const std::string& baseIdentifier);
 
 	template <typename T>
-	EditorInput* CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, std::map<std::string, EditorInput*>& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
+	EditorInput* CreateField(std::string fieldName, VectorSet<std::string>& drawOrder, InputMap& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
 	{
 		drawOrder.push_back(fieldName);
 
@@ -338,15 +340,15 @@ public:
 
 	// Forms
 	// Returns the fields to display to build a single form of a certain type (move, voiceclip, cancel extradata, etc...)
-	virtual std::map<std::string, EditorInput*> GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual InputMap GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns the fields to display to build a list of forms of a certain type (extraproperties, requirements, cancels, etc...)
-	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
-	virtual std::vector<std::map<std::string, EditorInput*>> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
-	virtual std::map<std::string, EditorInput*> GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
+	virtual InputMap GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns true if the given field is valid
 	virtual bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) = 0;
 	// Save a single struct in the moveset
-	virtual void SaveItem(EditorWindowType_ type, uint16_t id, std::map<std::string, EditorInput*>& inputs) = 0;
+	virtual void SaveItem(EditorWindowType_ type, uint16_t id, InputMap& inputs) = 0;
 
 	// -- Iteractions -- //
 	// Sets the current move of a player
@@ -395,7 +397,7 @@ public:
 	// Returns the amount of MOTA animations inside of a specific MOTA
 	virtual unsigned int GetMotaAnimCount(int motaId) = 0;
 	// Returns a string computed based on a movelist displayable's icons value and more
-	virtual std::string GetMovelistDisplayableLabel(std::map<std::string, EditorInput*>& fieldMap) = 0;
+	virtual std::string GetMovelistDisplayableLabel(InputMap& fieldMap) = 0;
 	// Returns the list of inputs in the displayable movelist
 	virtual unsigned int GetMovelistDisplayableInputCount() = 0;
 

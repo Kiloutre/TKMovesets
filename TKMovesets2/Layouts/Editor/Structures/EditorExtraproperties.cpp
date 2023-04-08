@@ -18,7 +18,7 @@ EditorExtraproperties::EditorExtraproperties(std::string windowTitleBase, uint32
 void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
-	auto& fields = m_items[listIdx]->identifierMaps;
+	auto& fields = m_items[listIdx]->identifierMap;
 	const int bufsize = field->bufsize;
 
 	if (name == "value_unsigned")
@@ -86,7 +86,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 {
 	std::string label;
 
-	auto& map = m_items[listIdx]->identifierMaps;
+	auto& map = m_items[listIdx]->identifierMap;
 
 	unsigned int startingFrame = (unsigned int)EditorUtils::GetFieldValue(map["starting_frame"]);
 	unsigned int propId = (unsigned int)EditorUtils::GetFieldValue(map["id"]);
@@ -182,7 +182,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
-	auto& map = m_items[listIdx]->identifierMaps;
+	auto& map = m_items[listIdx]->identifierMap;
 	int id = atoi(field->buffer);
 
 	bool isProjectileRef = m_editor->IsPropertyProjectileRef(map["id"]->buffer);

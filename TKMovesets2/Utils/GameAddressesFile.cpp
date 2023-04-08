@@ -114,21 +114,28 @@ void GameAddressesFile::UnlockEntriesMutex()
 
 const int64_t GameAddressesFile::GetSingleValue(const char* c_addressId)
 {
-	if (m_absolute_pointer_paths.find(c_addressId) != m_absolute_pointer_paths.end()) {
-		return (int64_t)m_absolute_pointer_paths[c_addressId][0];
+    auto entry = m_absolute_pointer_paths.find(c_addressId);
+	if (entry != m_absolute_pointer_paths.end()) {
+		return (int64_t)entry->second[0];
 	}
 	return (int64_t)-1;
 }
 
 const std::vector<gameAddr>& GameAddressesFile::GetAddress(const char* c_addressId, bool& isRelative)
 {
-	if (m_relative_pointer_paths.find(c_addressId) != m_relative_pointer_paths.end()) {
-		isRelative = true;
-		return m_relative_pointer_paths[c_addressId];
-	}
-	isRelative = false;
-	if (m_absolute_pointer_paths.find(c_addressId) != m_absolute_pointer_paths.end()) {
-		return m_absolute_pointer_paths[c_addressId];
-	}
+    {
+        auto entry = m_relative_pointer_paths.find(c_addressId);
+        if (entry != m_relative_pointer_paths.end()) {
+            isRelative = true;
+            return entry->second;
+        }
+    }
+    {
+        auto entry = m_absolute_pointer_paths.find(c_addressId);
+        isRelative = false;
+        if (entry != m_absolute_pointer_paths.end()) {
+            return entry->second;
+        }
+    }
 	return m_emptyPtrPath;
 }

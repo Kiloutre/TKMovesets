@@ -19,7 +19,7 @@ EditorGroupedCancels::EditorGroupedCancels(std::string windowTitleBase, uint32_t
 
 void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
@@ -36,7 +36,7 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	else if (name == "command") {
 		// Command is only clickable
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
-		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMaps["command"]->buffer);
+		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
 		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
 	}
 }
@@ -47,8 +47,8 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 	auto& item = m_items[listIdx];
 
-	EditorInput* commandField = item->identifierMaps["command"];
-	EditorInput* moveIdField = item->identifierMaps["move_id"];
+	EditorInput* commandField = item->identifierMap["command"];
+	EditorInput* moveIdField = item->identifierMap["move_id"];
 
 	if (m_editor->IsCommandInputSequence(commandField->buffer))
 	{
@@ -132,7 +132,7 @@ void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType_ winType, int val
 		int listIdx = 0;
 		for (auto& item : m_items)
 		{
-			EditorInput* field = item->identifierMaps["requirements_addr"];
+			EditorInput* field = item->identifierMap["requirements_addr"];
 
 			if (field->errored) {
 				continue;

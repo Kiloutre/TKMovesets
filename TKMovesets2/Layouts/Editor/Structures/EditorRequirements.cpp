@@ -18,7 +18,7 @@ EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_i
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
-	auto& fields = m_items[listIdx]->identifierMaps;
+	auto& fields = m_items[listIdx]->identifierMap;
 	const int bufsize = field->bufsize;
 
 	if (name == "param_unsigned")
@@ -40,7 +40,7 @@ void EditorRequirements::BuildItemDetails(int listIdx)
 {
 	std::string label;
 
-	auto& map = m_items[listIdx]->identifierMaps;
+	auto& map = m_items[listIdx]->identifierMap;
 
 	int id = (int)EditorUtils::GetFieldValue(map["condition"]);
 	int64_t value = (int64_t)EditorUtils::GetFieldValue(map["param_unsigned"]);

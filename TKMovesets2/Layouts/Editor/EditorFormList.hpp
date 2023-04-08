@@ -18,9 +18,9 @@ enum EditorFormTreeview_
 struct FieldItem
 {
 	// The form's fields, contains the field buffer along with its validity as a boolean and more useful data 
-	std::map<std::string, EditorInput*> identifierMaps;
+	InputMap identifierMap;
 	// Containst the form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
-	std::map<int, std::vector<EditorInput*>> categoryMaps;
+	std::map<int, std::vector<EditorInput*>> categoryMap;
 	// Determines what tree node should be open
 	std::string itemLabel;
 	// Determines what tree node should be open

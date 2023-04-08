@@ -7,7 +7,7 @@
 
 void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movelistBlock;
@@ -51,7 +51,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 	else if (name == "_unk0x153") {
 		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, _unk0x153), value_s8);
 	}
-	else if (Helpers::startsWith(name, "unk_"))
+	else if (name.startsWith("unk_"))
 	{
 		for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
 		{
@@ -61,7 +61,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 			}
 		}
 	}
-	else if (Helpers::startsWith(name, "title_translation_"))
+	else if (name.startsWith("title_translation_"))
 	{
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(buffer);
 		int translationId = atoi((char*)name.c_str() + sizeof("title_translation_") - 1);
@@ -80,7 +80,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		}
 		// Bigger length requires re-allocation: no live edition possible
 	}
-	else if (Helpers::startsWith(name, "translation_"))
+	else if (name.startsWith("translation_"))
 	{
 		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(buffer);
 		int translationId = atoi((char*)name.c_str() + sizeof("translation_") - 1);
@@ -100,7 +100,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movelistBlock;
@@ -157,7 +157,7 @@ void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)
 
 void EditorT7::Live_OnMovelistInputEdit(int id, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& buffer = field->buffer;
 
 	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movelistBlock;

@@ -68,6 +68,70 @@ private:
 	size_t m_size = 0;
 };
 
+// Helper class to avoid help optimize string comparisons in the editor
+class FasterStringComp
+{
+private:
+	std::string m_str;
+	size_t m_size = 0;
+
+public:
+	FasterStringComp() { };
+	FasterStringComp(const char* str) {
+		m_str = std::string(str);
+		m_size = m_str.size();
+	};
+	FasterStringComp(const std::string& str) {
+		m_str = std::string(str);
+		m_size = m_str.size();
+	};
+	void operator=(const char* str)
+	{
+		m_str = std::string(str);
+		m_size = m_str.size();
+	}
+
+	const std::string& str() const { return m_str; }
+	const char* c_str() const { return m_str.c_str(); }
+	size_t size() const { return m_size; }
+
+	//char operator[](int n) const { return m_str[n]; }
+	bool operator==(const char* str) const { return *m_str.c_str() == *str && strcmp(m_str.c_str() + 1, str + 1) == 0; }
+	bool operator==(const std::string& str) const { return m_size == str.size() && m_str == str; }
+
+	std::string operator+(const char* str) const { return m_str + str; }
+	friend std::string operator+(const char* str, const FasterStringComp& self) { return str + self.m_str; }
+	std::string operator+(const std::string& str)const  { return m_str + str; }
+	friend std::string operator+(const std::string& str, const FasterStringComp& self) { return str + self.m_str; }
+
+	// Required for std::set, std::map sincethey are ordered
+	bool operator>(const FasterStringComp& str) const { return m_str > str.str(); }
+	bool operator<(const FasterStringComp& str) const { return m_str > str.str(); }
+	//bool operator==(const FasterStringComp& str) const { return m_size == str.size() && m_str == str.str(); }
+
+	bool startsWith(const char* prefix) const
+	{
+		const char* ptr = m_str.c_str();
+		while (*prefix)
+		{
+			if (*prefix != *ptr) {
+				return false;
+			}
+			++prefix;
+			++ptr;
+		}
+		return true;
+	}
+	bool endsWith(const char* suffix) const
+	{
+		size_t suffixLen = strlen(suffix);
+		if (suffixLen > m_size) {
+			return false;
+		}
+		return strcmp(&m_str.c_str()[m_size - suffixLen], suffix) == 0;
+	}
+};
+
 namespace Helpers
 {
 	// Returns the size of an animation in bytes

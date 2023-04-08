@@ -19,12 +19,12 @@ EditorReactions::EditorReactions(std::string windowTitleBase, uint32_t t_id, Edi
 void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
-	if (Helpers::endsWith(name, "_pushback")) {
+	if (name.endsWith("_pushback")) {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Pushback, id);
 	}
-	else if (Helpers::endsWith(name, "_moveid")) {
+	else if (name.endsWith("_moveid")) {
 		id = m_baseWindow->ValidateMoveId(field->buffer);
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Move, id);

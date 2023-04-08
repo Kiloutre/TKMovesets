@@ -42,9 +42,9 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
-	if (Helpers::startsWith(name, "cancel_addr")) {
+	if (name.startsWith("cancel_addr")) {
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Cancel, id);
 		}

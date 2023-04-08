@@ -20,11 +20,11 @@ EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor*
 void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int referenceId = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
-		if (m_editor->IsCommandGroupedCancelReference(item->identifierMaps["command"]->buffer)) {
+		if (m_editor->IsCommandGroupedCancelReference(item->identifierMap["command"]->buffer)) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, referenceId);
 		}
 		else {
@@ -39,20 +39,20 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 	else if (name == "command") {
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
-		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMaps["command"]->buffer);
+		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
 		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
 	}
 }
 
 void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 	auto& item = m_items[listIdx];
 
 	if (name == "command" || name == "move_id") {
 		// More complex validation than what is shown in the editors.cpp (cross-field validation)
-		EditorInput* commandField = item->identifierMaps["command"];
-		EditorInput* moveIdField = item->identifierMaps["move_id"];
+		EditorInput* commandField = item->identifierMap["command"];
+		EditorInput* moveIdField = item->identifierMap["move_id"];
 
 		if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
 		{
@@ -77,8 +77,8 @@ void EditorCancels::BuildItemDetails(int listIdx)
 
 	auto& item = m_items[listIdx];
 
-	EditorInput* commandField = item->identifierMaps["command"];
-	EditorInput* moveIdField = item->identifierMaps["move_id"];
+	EditorInput* commandField = item->identifierMap["command"];
+	EditorInput* moveIdField = item->identifierMap["move_id"];
 
 	if (m_editor->IsCommandInputSequence(commandField->buffer))
 	{
@@ -168,8 +168,8 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 			int listIdx = 0;
 			for (auto& item : m_items)
 			{
-				EditorInput* commandField = item->identifierMaps["command"];
-				EditorInput* moveIdField = item->identifierMaps["move_id"];
+				EditorInput* commandField = item->identifierMap["command"];
+				EditorInput* moveIdField = item->identifierMap["move_id"];
 
 				if (moveIdField->errored || commandField->errored) {
 					continue;
@@ -195,7 +195,7 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 			int listIdx = 0;
 			for (auto& item : m_items)
 			{
-				EditorInput* field = item->identifierMaps["requirements_addr"];
+				EditorInput* field = item->identifierMap["requirements_addr"];
 
 				if (field->errored) {
 					continue;

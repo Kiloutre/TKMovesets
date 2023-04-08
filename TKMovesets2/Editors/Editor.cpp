@@ -238,7 +238,7 @@ namespace EditorUtils
 		SetInputfieldColor(field);
 	}
 
-	void WriteFieldFullname(std::map<std::string, EditorInput*>& inputMap, const std::string& baseIdentifier)
+	void WriteFieldFullname(InputMap& inputMap, const std::string& baseIdentifier)
 	{
 		// Finishing touch
 		for (auto& [name, input] : inputMap) {

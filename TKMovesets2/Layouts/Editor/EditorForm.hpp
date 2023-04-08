@@ -11,7 +11,7 @@
 namespace EditorFormUtils
 {
 	// Sets the field display text and calculate the text size for alignment
-	void SetFieldDisplayText(EditorInput* field, std::string newName);
+	void SetFieldDisplayText(EditorInput* field, const std::string& newName);
 
 	// Helps calculate the amount of drawable columns for forms
 	int GetColumnCount();
@@ -27,7 +27,7 @@ protected:
 	// Contains the window title to display
 	std::string m_windowTitle;
 	// The form's fields, contains the field buffer along with its validity as a boolean and more useful data 
-	std::map<std::string, EditorInput*> m_fieldIdentifierMap;
+	InputMap m_fieldIdentifierMap;
 	// Te form fields grouped by categories, contained within their draw order. Same data as m_inputMap but stored differently, used for display.
 	std::map<int, std::vector<EditorInput*>> m_fieldsCategoryMap;
 	// Contains the list of category IDs. Does not need to be contiguous. Even categories are open by default, odd ones aren't.

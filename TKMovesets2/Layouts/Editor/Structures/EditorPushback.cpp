@@ -17,7 +17,7 @@ EditorPushback::EditorPushback(std::string windowTitleBase, uint32_t t_id, Edito
 
 void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "extradata_addr")
 	{

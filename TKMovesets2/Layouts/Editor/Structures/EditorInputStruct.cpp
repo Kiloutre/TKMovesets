@@ -26,7 +26,7 @@ void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
 
 void EditorInputStruct::BuildItemDetails(int listIdx)
 {
-	auto& identifierMap = m_items[listIdx]->identifierMaps;
+	auto& identifierMap = m_items[listIdx]->identifierMap;
 
 	m_items[listIdx]->itemLabel = m_editor->GetCommandStr(identifierMap["direction"]->buffer, identifierMap["button"]->buffer);
 }

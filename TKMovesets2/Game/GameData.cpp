@@ -57,29 +57,33 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId)
 
 int8_t GameData::ReadInt8(const char* c_addressId)
 {
-	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
+    auto addrEntry = m_cachedAddresses.find(c_addressId);
+	gameAddr addr = (addrEntry == m_cachedAddresses.end())
+		? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readInt8(addr);
 }
 
 int16_t GameData::ReadInt16(const char* c_addressId)
 {
-	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
+    auto addrEntry = m_cachedAddresses.find(c_addressId);
+	gameAddr addr = (addrEntry == m_cachedAddresses.end())
+		? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readInt16(addr);
 }
 
 int32_t GameData::ReadInt32(const char* c_addressId)
 {
-	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
+    auto addrEntry = m_cachedAddresses.find(c_addressId);
+	gameAddr addr = (addrEntry == m_cachedAddresses.end())
+		? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readInt32(addr);
 }
 
 int64_t GameData::ReadInt64(const char* c_addressId)
 {
-	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
-				? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
+    auto addrEntry = m_cachedAddresses.find(c_addressId);
+	gameAddr addr = (addrEntry == m_cachedAddresses.end())
+				? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readInt64(addr);
 }
 
@@ -90,14 +94,16 @@ gameAddr GameData::ReadPtr(const char* c_addressId)
 
 float GameData::ReadFloat(const char* c_addressId)
 {
-	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
+    auto addrEntry = m_cachedAddresses.find(c_addressId);
+	gameAddr addr = (addrEntry == m_cachedAddresses.end())
+		? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readFloat(addr);
 }
 
 void GameData::ReadBytes(const char* c_addressId, void* buf, size_t readSize)
 {
-	gameAddr addr = (m_cachedAddresses.find(c_addressId) == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : m_cachedAddresses[c_addressId];
+    auto addrEntry = m_cachedAddresses.find(c_addressId);
+	gameAddr addr = (addrEntry == m_cachedAddresses.end())
+		? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readBytes(addr, buf, readSize);
 }

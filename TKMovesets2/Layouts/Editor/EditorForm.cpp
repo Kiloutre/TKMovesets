@@ -10,7 +10,7 @@
 
 namespace EditorFormUtils
 {
-	void SetFieldDisplayText(EditorInput* field, std::string newName)
+	void SetFieldDisplayText(EditorInput* field, const std::string& newName)
 	{
 		field->displayName = newName;
 		field->textSizeHalf = ImGui::CalcTextSize(newName.c_str()).x / 2;

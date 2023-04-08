@@ -23,6 +23,6 @@ void EditorPushbackExtra::OnUpdate(int listIdx, EditorInput* field)
 
 void EditorPushbackExtra::BuildItemDetails(int listIdx)
 {
-	auto& valueBuffer = m_items[listIdx]->identifierMaps["horizontal_offset"]->buffer;
+	auto& valueBuffer = m_items[listIdx]->identifierMap["horizontal_offset"]->buffer;
 	m_items[listIdx]->itemLabel = std::format("{} = {}", _("edition.pushback_extradata.horizontal_offset"), atoi(valueBuffer));
 }

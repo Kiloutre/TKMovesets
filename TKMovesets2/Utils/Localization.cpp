@@ -5,10 +5,11 @@
 #include <string>
 
 #include "Localization.hpp"
+#include "Helpers.hpp"
 
 #include "constants.h"
 
-std::map<std::string, std::string> g_translations;
+std::map<FasterStringComp, std::string> g_translations;
 std::string g_currentLangId;
 
 namespace Localization
@@ -79,8 +80,9 @@ namespace Localization
 
 	const char* GetText(const char* c_stringId)
 	{
-		if (g_translations.find(c_stringId) != g_translations.end()) {
-			return g_translations[c_stringId].c_str();
+		auto item = g_translations.find(c_stringId);
+		if (item != g_translations.end()) {
+			return item->second.c_str();
 		}
 		return c_stringId;
 	}

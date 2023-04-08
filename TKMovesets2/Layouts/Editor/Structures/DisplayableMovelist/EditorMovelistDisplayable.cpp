@@ -27,7 +27,7 @@ void EditorMovelistDisplayable::BuidAllLabels()
 	for (int i = 0; i < m_listSize; ++i)
 	{
 		auto& item = m_items[i];
-		auto& identifierMap = item->identifierMaps;
+		auto& identifierMap = item->identifierMap;
 		auto& typeField = identifierMap["type"];
 		auto& playableField = identifierMap["playable_id"];
 
@@ -73,7 +73,7 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int referenceId = atoi(field->buffer);
-	std::string& name = field->name;
+	auto& name = field->name;
 
 	if (name == "playable_id") {
 		if (referenceId != -1) {
