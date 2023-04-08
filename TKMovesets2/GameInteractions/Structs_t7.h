@@ -415,7 +415,7 @@ namespace StructsT7
 				int32_t translation_offsets_french;
 				int32_t translation_offsets_italian;
 				int32_t translation_offsets_german;
-				int32_t translation_offsets_7;
+				int32_t translation_offsets_mexican;
 				int32_t translation_offsets_cyrillic;
 				int32_t translation_offsets_arabic;
 				int32_t translation_offsets_chinese;

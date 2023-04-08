@@ -132,19 +132,18 @@ public:
 	}
 };
 
-// Vector with unique elements
+// Vector with unique elements, in order to keep insertion order
 template < typename T >
 class VectorSet : public std::vector<T> {
 public:
 	using iterator = typename std::vector<T>::iterator;
 	using value_type = typename std::vector<T>::value_type;
 
-	std::pair<iterator, bool> push_back(const value_type& val) {
+	void push_back(const value_type& val) {
 		auto it = ::std::find(this->begin(), this->end(), val);
-		if (it == this->end())
+		if (it == this->end()) {
 			it = ::std::vector<T>::insert(this->end(), val);
-
-		return std::pair<iterator, bool>(it, true);
+		}
 	}
 };
 

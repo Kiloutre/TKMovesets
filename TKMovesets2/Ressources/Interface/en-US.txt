@@ -382,6 +382,7 @@ edition.mvl_displayable.translation_3 = Spanish
 edition.mvl_displayable.translation_4 = French
 edition.mvl_displayable.translation_5 = Italian
 edition.mvl_displayable.translation_6 = German
+edition.mvl_displayable.translation_7 = Mexican
 edition.mvl_displayable.translation_8 = Cyrillic
 edition.mvl_displayable.translation_9 = Arabic
 edition.mvl_displayable.translation_10 = Chinese
