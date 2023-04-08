@@ -3,11 +3,12 @@
 #include "Submenu_OnlinePlay.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
+#include "Games.hpp"
 
 void Submenu_OnlinePlay::Render()
 {
 	ImGuiExtra::RenderTextbox(_("online.explanation"));
-	ImGui::SeparatorText(_("importation.select_moveset"));
+	ImGui::SeparatorText(_("select_game"));
 
 	/*
 	// Game list. Selecting a game will set the extraction thread to try to attach to it regularly

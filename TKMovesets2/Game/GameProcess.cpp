@@ -7,6 +7,42 @@
 #include "constants.h"
 #include "GameAddresses.h"
 
+// Utils //
+
+namespace GameProcessUtils
+{
+	std::vector<processEntry> GetRunningProcessList()
+	{
+		HANDLE hProcessSnap;
+		PROCESSENTRY32 pe32{ 0 };
+		hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+		std::vector<processEntry> processList;
+
+		if (GetLastError() != ERROR_ACCESS_DENIED)
+		{
+			pe32.dwSize = sizeof(PROCESSENTRY32);
+			if (Process32First(hProcessSnap, &pe32)) {
+				processList.push_back({
+					.name = pe32.szExeFile,
+					.pid = pe32.th32ProcessID
+					});
+
+				while (Process32Next(hProcessSnap, &pe32)) {
+					processList.push_back({
+						.name = pe32.szExeFile,
+						.pid = pe32.th32ProcessID
+						});
+				}
+			}
+
+			CloseHandle(hProcessSnap);
+		}
+		return processList;
+	};
+};
+
+
 // -- Private methods  -- //
 
 GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, DWORD processExtraFlags)
@@ -25,6 +61,7 @@ GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, D
 		}
 	}
 }
+
 
 DWORD GameProcess::GetGamePID(const char* processName)
 {

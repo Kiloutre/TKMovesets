@@ -92,20 +92,64 @@ static void InitMainClasses(MainWindow& program)
 
 	program.extractor.Init(addrFile, &program.storage);
 	program.importer.Init(addrFile, &program.storage);
+	program.onlineImporter.Init(addrFile, &program.storage);
 
-	if (Games::GetExtractableGamesCount() == 1) {
-		program.extractor.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
-		// todo : remove this when we implement more extractors. or maybe make T7 the default period?
-	}
+	{
+		// Detect running games and latch on to them if possible
 
-	if (Games::GetImportableGamesCount() == 1) {
-		program.importer.SetTargetProcess(Games::GetGameInfo(0)->processName, 0);
-		// todo : remove this when we implement more importers. or maybe make T7 the default period?
+		bool attachedExtractor = false;
+		bool attachedImporter = false;
+		bool attachedOnline = false;
+
+		auto processList = GameProcessUtils::GetRunningProcessList();
+
+		// Loop through every game we support
+		for (int gameId = 0; gameId < Games::GetGamesCount(); ++gameId)
+		{
+			auto gameInfo = Games::GetGameInfo(gameId);
+			const char* processName = gameInfo->processName;
+
+			// Detect if the game is running
+			{
+				bool isRunning = false;
+				for (auto& process : processList)
+				{
+					if (process.name == processName)
+					{
+						isRunning = true;
+						break;
+					}
+				}
+				if (!isRunning) {
+					continue;
+				}
+			}
+
+			if (!attachedExtractor && gameInfo->extractor != nullptr) {
+				program.extractor.SetTargetProcess(processName, gameId);
+				attachedExtractor = true;
+				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+			if (!attachedImporter && gameInfo->extractor != nullptr) {
+				program.importer.SetTargetProcess(processName, gameId);
+				attachedImporter = true;
+				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
+				program.onlineImporter.SetTargetProcess(processName, gameId);
+				attachedOnline = true;
+				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+		}
 	}
 
 	program.storage.StartThread();
 	program.extractor.StartThread();
 	program.importer.StartThread();
+	program.onlineImporter.StartThread();
 }
 
 // Free up memory and stop threads cleanly before exiting the program
@@ -113,6 +157,7 @@ static void DestroyMainClasses(MainWindow& program)
 {
 	program.extractor.StopThreadAndCleanup();
 	program.importer.StopThreadAndCleanup();
+	program.onlineImporter.StopThreadAndCleanup();
 
 	for (EditorWindow* win : program.editorWindows) {
 		delete win;

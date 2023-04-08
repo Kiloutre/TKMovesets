@@ -28,9 +28,11 @@ public:
 	GameExtract extractor;
 	// Importer instance, can attach to its own process separately from everyone else
 	GameImport importer;
-	// Storage instance, use to access local moveset informations
+	// Online importer instance, can attach to its own process separately from everyone else
+	GameImport onlineImporter;
+	// Storage instance, use to access local moveset list
 	LocalStorage storage;
-	// Addrfile to pass on child classes (mainly editorWindows)
+	// Addrfile to pass to child classes (mainly editorWindows)
 	GameAddressesFile* addrFile = nullptr;
 
 	// Extraction submenu

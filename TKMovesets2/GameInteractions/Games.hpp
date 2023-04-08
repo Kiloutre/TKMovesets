@@ -50,6 +50,8 @@ struct GameInfo
 	FactoryType_Base* importer;
 	// Dynamic type allocator to store the game's editor. Can be nullptr for no available editor.
 	FactoryType_Base* editor;
+	// Dynamic type allocator to store the game's online handler. Can be nullptr for no available handler.
+	FactoryType_Base* onlineHandler;
 };
 
 namespace Games

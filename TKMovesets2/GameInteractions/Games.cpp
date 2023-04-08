@@ -15,7 +15,8 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "t7",
 		.extractor = new FactoryType<ExtractorT7>,
 		.importer = new FactoryType<ImporterT7>,
-		.editor = new FactoryType <EditorT7>
+		.editor = new FactoryType <EditorT7>,
+		.onlineHandler = nullptr
 	},
 	{
 		.name = "Tekken 8",
@@ -25,7 +26,8 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "t8",
 		.extractor = nullptr,
 		.importer = nullptr,
-		.editor = nullptr
+		.editor = nullptr,
+		.onlineHandler = nullptr
 	},
 	{
 		.name = "Tekken Tag 2",
@@ -35,7 +37,8 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "tag2",
 		.extractor = nullptr,
 		.importer = nullptr,
-		.editor = nullptr
+		.editor = nullptr,
+		.onlineHandler = nullptr
 	},
 };
 

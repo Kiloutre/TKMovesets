@@ -298,7 +298,7 @@ EditorWindow::~EditorWindow()
 	delete labels;
 }
 
-EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile, LocalStorage *storage)
+EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
 {
 	m_importerHelper.Init(addrFile, storage);
 	m_importerHelper.StartThread();
@@ -330,7 +330,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 
 	m_loadedCharacter.filename = movesetInfo->filename;
 	m_loadedCharacter.name = movesetInfo->name;
-	m_loadedCharacter.lastSavedDate= Helpers::formatDateTime(movesetInfo->date);
+	m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(movesetInfo->date);
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 	filename = movesetInfo->filename;
 
@@ -343,7 +343,34 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 
 	editorTable = &m_editor->movesetTable;
 
-	// todo: detect running game process, select it
+	auto processList = GameProcessUtils::GetRunningProcessList();
+	for (int gameId = 0; gameId < Games::GetGamesCount(); ++gameId)
+	{
+		auto gameInfo = Games::GetGameInfo(gameId);
+		const char* processName = gameInfo->processName;
+
+		// Detect if the game is running
+		{
+			bool isRunning = false;
+			for (auto& process : processList)
+			{
+				if (process.name == processName)
+				{
+					isRunning = true;
+					break;
+				}
+			}
+			if (!isRunning) {
+				continue;
+			}
+		}
+
+		if (gameInfo->editor != nullptr) {
+			m_importerHelper.SetTargetProcess(processName, gameId);
+			DEBUG_LOG("Editor-compatible game '%s' already running: attaching.\n", processName);
+			break;
+		}
+	}
 }
 
 void EditorWindow::ReloadMovelistFilter()

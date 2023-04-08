@@ -8,11 +8,21 @@
 
 #include "GameAddresses.h"
 
+struct processEntry
+{
+	std::string name;
+	DWORD pid;
+};
+
 struct moduleEntry
 {
 	std::string name;
 	gameAddr address;
 	uint64_t size;
+};
+namespace GameProcessUtils
+{
+	std::vector<processEntry> GetRunningProcessList();
 };
 
 enum GameProcessErrcode_
