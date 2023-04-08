@@ -168,7 +168,7 @@ namespace Helpers
 		return crc32;
 	}
 
-	std::string currentDateTime(uint64_t date) {
+	std::string formatDateTime(uint64_t date) {
 		time_t     now = date;
 		struct tm  tstruct;
 		char       buf[20];

@@ -177,7 +177,7 @@ void EditorWindow::RenderStatusBar()
 	
 	ImGui::TextUnformatted(_("edition.last_saved"));
 	ImGui::SameLine();
-	ImGui::TextUnformatted(Helpers::currentDateTime(m_loadedCharacter.lastSavedDate).c_str());
+	ImGui::TextUnformatted(m_loadedCharacter.lastSavedDate.c_str());
 	ImGui::SameLine();
 
 	// Vertical separator

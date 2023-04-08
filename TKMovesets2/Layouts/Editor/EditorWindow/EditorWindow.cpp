@@ -267,7 +267,7 @@ void EditorWindow::Save()
 	if (!file.fail()) {
 		file.write((char*)moveset, movesetSize);
 		m_savedLastChange = true;
-		m_loadedCharacter.lastSavedDate = header->infos.date;
+		m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(header->infos.date);
 	}
 	else {
 		// Showing failure would be nice. Even simply changing the Save button text would suffice.
@@ -330,7 +330,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile *addrFile
 
 	m_loadedCharacter.filename = movesetInfo->filename;
 	m_loadedCharacter.name = movesetInfo->name;
-	m_loadedCharacter.lastSavedDate = movesetInfo->date;
+	m_loadedCharacter.lastSavedDate= Helpers::formatDateTime(movesetInfo->date);
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 	filename = movesetInfo->filename;
 

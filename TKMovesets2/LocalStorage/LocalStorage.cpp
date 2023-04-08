@@ -50,6 +50,7 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 				.target_character = std::string(movesetInfos->target_character),
 				.version_string = std::string(movesetInfos->version_string),
 				.date = movesetInfos->date,
+				.date_str = Helpers::formatDateTime(movesetInfos->date),
 				.size = (float)totalSize / 1000 / 1000,
 				.modificationDate = buffer.st_mtime,
 				.gameId = movesetInfos->gameId,

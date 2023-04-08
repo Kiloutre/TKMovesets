@@ -25,22 +25,6 @@
 // Shifting logic for list resizing
 # define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) (((int)id >= (int)listOldEnd) || (valueChange < 0 && ((int)id - valueChange) >= (int)listOldEnd))
 
-// Vector with unique elements
-template < typename T >
-class VectorSet : public std::vector<T> {
-public:
-	using iterator = typename std::vector<T>::iterator;
-	using value_type = typename std::vector<T>::value_type;
-
-	std::pair<iterator, bool> push_back(const value_type& val) {
-		auto it = ::std::find(this->begin(), this->end(), val);
-		if (it == this->end())
-			it = ::std::vector<T>::insert(this->end(), val);
-
-		return std::pair<iterator, bool>(it, true);
-	}
-};
-
 // Animation extraction status
 enum AnimExtractionStatus_
 {
@@ -262,6 +246,7 @@ namespace EditorUtils
 		}
 
 		EditorInput* newField = new EditorInput{
+			.name = fieldName,
 			.category = category,
 			.imguiInputFlags = EditorUtils::GetFieldCharset(flags),
 			.flags = flags,

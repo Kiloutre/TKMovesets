@@ -17,6 +17,7 @@ struct movesetInfo
 	std::string target_character;
 	std::string version_string;
 	uint64_t date;
+	std::string date_str;
 	float size;
 	time_t modificationDate;
 	uint32_t gameId;

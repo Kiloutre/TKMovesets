@@ -132,6 +132,22 @@ public:
 	}
 };
 
+// Vector with unique elements
+template < typename T >
+class VectorSet : public std::vector<T> {
+public:
+	using iterator = typename std::vector<T>::iterator;
+	using value_type = typename std::vector<T>::value_type;
+
+	std::pair<iterator, bool> push_back(const value_type& val) {
+		auto it = ::std::find(this->begin(), this->end(), val);
+		if (it == this->end())
+			it = ::std::vector<T>::insert(this->end(), val);
+
+		return std::pair<iterator, bool>(it, true);
+	}
+};
+
 namespace Helpers
 {
 	// Returns the size of an animation in bytes
@@ -150,8 +166,8 @@ namespace Helpers
 	// Calcualte a crc32 from a list of data blocks. Always skip the first one.
 	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks);
 
-    // Gets the current date format in 'hour:minutes day/month/year'
-    std::string currentDateTime(uint64_t date);
+    // Formats given date in 'hour:minutes day/month/year'
+    std::string formatDateTime(uint64_t date);
 
 	// Returns the current timestamp as a uint64
 	uint64_t getCurrentTimestamp();

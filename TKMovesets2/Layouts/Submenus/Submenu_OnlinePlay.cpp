@@ -8,4 +8,6 @@ void Submenu_OnlinePlay::Render()
 {
 	ImGuiExtra::RenderTextbox(_("online.explanation"));
 	ImGui::SeparatorText(_("importation.select_moveset"));
+
+
 }

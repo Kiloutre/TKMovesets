@@ -243,7 +243,6 @@ namespace EditorUtils
 		// Finishing touch
 		for (auto& [name, input] : inputMap) {
 			// Duplicate the name inside the structure, this is more convenient for me in some places, helps writing a lot shorter code
-			input->name = name;
 			input->fullName = "edition." + baseIdentifier + "." + name;
 		}
 	}

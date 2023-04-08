@@ -111,8 +111,11 @@ importation.error_allocation = Il y a eu une erreur d'allocation lors de lecture
 importation.error_game_allocation = Il y a eu une erreur d'allocation dans le jeu lors de l'écriture des données du personnage
 
 # Jeu en ligne #
+online.explanation = Le jeu en ligne nécessite que les deux joueurs possèdent cet outil en train de tourner.\nVous devez chacun de vôtre côté selectionner un personnage à charger (ou aucun) avant le chargement du match, cet outil se chargera de synchroniser les personnages que vous avez modifié.\nLes moveset personnalisés ne seront pas chargés si vous ou l'adversaire n'avez pas cet outil de lancé.
+online.select_moveset = Sélectionner un personnage
+online.no_selected_moveset = Pas de personnage selectionné
 
-# Moveset Edition #
+# Modifcation de moveset #
 edition.explanation = Vous pouvez ici modifier les personnage extraits. Consultez la documentation pour les information utiles et les tutoriels.\nActivez le mode 'Prévisualisation directe' pour rapidement modifier le personnage choisi : Les petits changement seront immédiatement appliqués dans le jeu, sans temps de chargement.
 edition.select_moveset = Choisissez un personnage
 edition.suggest_new_name = Ce personnage possède un nom par défaut, voulez-vous lui donner un nom différent ?
@@ -401,10 +404,6 @@ edition.mvl_input.frame = Image
 edition.mvl_input.frames = images
 
 edition.suggest_new_name = 
-edition.non_trivial_detected = 
-edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?
-
-
 
 # Documentation #
 

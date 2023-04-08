@@ -8,6 +8,13 @@
 
 #include "GameAddresses.h"
 
+struct moduleEntry
+{
+	std::string name;
+	gameAddr address;
+	uint64_t size;
+};
+
 enum GameProcessErrcode_
 {
 	// This will happen if the process-attaching thread is not started
@@ -31,17 +38,17 @@ class GameProcess
 private:
 	// Stores the handle of the opened process
 	HANDLE m_processHandle = nullptr;
-	// Module addresses and sized of the current process
-	std::vector<std::pair<gameAddr, uint64_t>> m_moduleInfos;
 	// Contains a list of <timestamp, gameAddr>, freeing gameAddr once timestamp is older than 10 seconds
 	std::vector<std::pair<uint64_t, gameAddr>> m_toFree;
+	// Stores the game pid
+	DWORD m_pid;
 
 	// Attach to .processName
 	GameProcessErrcode_ AttachToNamedProcess(const char* processName, DWORD processExtraFlags);
 	// Returns the game PID
 	DWORD GetGamePID(const char* processName);
 	// Load the address of the main module in .moduleAddr
-	bool LoadGameMainModule(const char* processName, DWORD pid);
+	bool LoadGameMainModule(const char* processName);
 public:
 	// Status of the process attachment
 	GameProcessErrcode_ status{ GameProcessErrcode_PROC_NOT_ATTACHED };
@@ -70,6 +77,8 @@ public:
 	bool CheckRunning();
 	// Frees previous allocated memory. Set to false (defult) if you want to only free memory older than 10 seconds.
 	void FreeOldGameMemory(bool instant = false);
+	// Returns a list of module currently loaded in the target remote process
+	std::vector<moduleEntry> GetModuleList();
 
 
 	// Reads an unsigned byte from the game in little endian

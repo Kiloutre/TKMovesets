@@ -112,7 +112,7 @@ importation.error_allocation = There was a memory allocation error while reading
 importation.error_game_allocation = There was a game memory allocation error while writing the moveset data
 
 # Online #
-online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset before the match's loading screen, the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running with a valid moveset selected.
+online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset (or none if you want) before the match's loading screen , the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running.
 online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
 
@@ -406,9 +406,7 @@ edition.mvl_input.frame_duration = Duration
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 
-edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?
-edition.non_trivial_detected = A non-trivial change was detected and requires re-importation to be applied.
-edition.warning_target_change = Changing selected player while live edition is on will turn off live edition for the old player. Continue?
+edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?.
 
 # Documentation #
 

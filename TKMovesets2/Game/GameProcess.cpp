@@ -16,7 +16,7 @@ GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, D
 	if (pid == (DWORD)-1) return GameProcessErrcode_PROC_NOT_FOUND;
 	else {
 		m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | processExtraFlags, FALSE, pid);
-		if (m_processHandle != nullptr && LoadGameMainModule(processName, pid)) {
+		if (m_processHandle != nullptr && LoadGameMainModule(processName)) {
 			processId = pid;
 			return GameProcessErrcode_PROC_ATTACHED;
 		}
@@ -37,16 +37,16 @@ DWORD GameProcess::GetGamePID(const char* processName)
 		pe32.dwSize = sizeof(PROCESSENTRY32);
 		if (Process32First(hProcessSnap, &pe32)) {
 			if (strcmp(pe32.szExeFile, processName) == 0) {
-				DWORD pid = pe32.th32ProcessID;
+				m_pid = pe32.th32ProcessID;
 				CloseHandle(hProcessSnap);
-				return pid;
+				return m_pid;
 			}
 
 			while (Process32Next(hProcessSnap, &pe32)) {
 				if (strcmp(pe32.szExeFile, processName) == 0) {
-					DWORD pid = pe32.th32ProcessID;
+					m_pid = pe32.th32ProcessID;
 					CloseHandle(hProcessSnap);
-					return pid;
+					return m_pid;
 				}
 			}
 		}
@@ -56,48 +56,53 @@ DWORD GameProcess::GetGamePID(const char* processName)
 	return (DWORD)-1;
 }
 
-bool GameProcess::LoadGameMainModule(const char* processName, DWORD pid)
+std::vector<moduleEntry> GameProcess::GetModuleList()
 {
 	HANDLE moduleSnap;
 	MODULEENTRY32 me32{ 0 };
 
 	moduleAddr = -1;
-	m_moduleInfos.clear();
+	std::vector<moduleEntry> modules;
 
-	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, m_pid);
 
 	if (GetLastError() != ERROR_ACCESS_DENIED)
 	{
 		me32.dwSize = sizeof(MODULEENTRY32);
 		if (Module32First(moduleSnap, &me32)) {
-
-			m_moduleInfos.push_back(std::pair<gameAddr, uint64_t>((gameAddr)me32.modBaseAddr, (uint64_t)me32.modBaseSize));
-
-			if (strcmp(me32.szModule, processName) == 0) {
-				moduleAddr = (gameAddr)me32.modBaseAddr;
-				moduleSize = (uint64_t)me32.modBaseSize;
-			}
+			modules.push_back({
+				.name = std::string(me32.szModule),
+				.address = (gameAddr)me32.modBaseAddr,
+				.size = (uint64_t)me32.modBaseSize
+			});
 
 			while (Module32Next(moduleSnap, &me32)) {
-				m_moduleInfos.push_back(std::pair<gameAddr, uint64_t>((gameAddr)me32.modBaseAddr, (uint64_t)me32.modBaseSize));
-
-				if (strcmp(me32.szModule, processName) == 0) {
-
-					moduleAddr = (gameAddr)me32.modBaseAddr;
-					moduleSize = (uint64_t)me32.modBaseSize;
-				}
+				modules.push_back({
+					.name = std::string(me32.szModule),
+					.address = (gameAddr)me32.modBaseAddr,
+					.size = (uint64_t)me32.modBaseSize
+				});
 			}
 		}
 	}
 
-	// Sort them by address for ease of iteration
-	/*
-	std::sort(m_moduleInfos.begin(), m_moduleInfos.end(), [](auto& left, auto& right) {
-		return left.first < right.first;
-	});
-	*/
-
 	CloseHandle(moduleSnap);
+	return modules;
+}
+
+bool GameProcess::LoadGameMainModule(const char* processName)
+{
+	std::vector<moduleEntry> modules = GetModuleList();
+
+	for (auto& module : modules)
+	{
+		if (module.name == processName)
+		{
+			moduleAddr = module.address;
+			moduleSize = module.size;
+		}
+	}
+
 	return moduleAddr != -1;
 }
 
@@ -131,7 +136,8 @@ bool GameProcess::IsAttached()
 
 bool GameProcess::CheckRunning()
 {
-	if (m_processHandle != nullptr) {
+	if (m_processHandle != nullptr)
+	{
 		int32_t value = 0;
 		if (ReadProcessMemory(m_processHandle, (LPCVOID)moduleAddr, (LPVOID)&value, 4, nullptr) == 0)
 		{
@@ -298,7 +304,8 @@ gameAddr GameProcess::allocateMem(size_t amount)
 void GameProcess::freeMem(gameAddr targetAddr)
 {
 	for (std::pair<gameAddr, uint64_t>& block : allocatedMemory) {
-		if (block.first == (gameAddr)targetAddr) {
+		if (block.first == (gameAddr)targetAddr)
+		{
 			allocatedMemory.erase(std::find(allocatedMemory.begin(), allocatedMemory.end(), block));
 			DEBUG_LOG("Queuing freeing of allocated block %llx (size is %lld)\n", block.first, block.second);
 			uint64_t currentDate = Helpers::getCurrentTimestamp();
