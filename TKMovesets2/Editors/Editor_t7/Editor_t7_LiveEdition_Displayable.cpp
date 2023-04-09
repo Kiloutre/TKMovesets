@@ -43,10 +43,10 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
 	}
 	else if (name == "combo_damage") {
-		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
+		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, combo_damage), value_s8);
 	}
 	else if (name == "combo_difficulty") {
-		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
+		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, combo_difficulty), value_s8);
 	}
 	else if (name == "_unk0x153") {
 		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, _unk0x153), value_s8);
@@ -74,9 +74,6 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		if (newLen <= oldLen) {
 			gameAddr stringAddr = blockStart + translationOffset;
 			m_process->writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
-		}
-		else {
-			DEBUG_LOG("Not applying update");
 		}
 		// Bigger length requires re-allocation: no live edition possible
 	}

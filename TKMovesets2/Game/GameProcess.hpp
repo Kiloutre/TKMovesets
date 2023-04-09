@@ -114,6 +114,51 @@ public:
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
 	void    readBytes(gameAddr addr, void* buf, size_t readSize);
 
+	// Writes an integer to an address, automatically detecting the type and size
+	template<typename T>
+	void writeInteger(gameAddr addr, T value)
+	{
+		switch (sizeof(T))
+		{
+		case 4:
+			writeInt32(addr, *(int32_t*)&value);
+			break;
+		case 8:
+			writeInt64(addr, *(int64_t*)&value);
+			break;
+		case 2:
+			writeInt16(addr, *(int16_t*)&value);
+			break;
+		case 1:
+			writeInt8(addr, *(int8_t*)&value);
+			break;
+		}
+	};
+	// Reads an integer, reading a different amount of bytes depending on the expected return type
+	template<typename T>
+	T readInteger(gameAddr addr)
+	{
+		switch (sizeof(T))
+		{
+		case 4:
+			return std::is_same<T, uint32_t>::value ? readUInt32(addr) : readInt32(addr);
+			break;
+		case 8:
+			return std::is_same<T, uint64_t>::value ? readUInt64(addr) : readInt64(addr);
+			return readInt64(addr);
+			break;
+		case 2:
+			return std::is_same<T, uint16_t>::value ? readUInt16(addr) : readInt16(addr);
+			return readInt16(addr);
+			break;
+		case 1:
+			return std::is_same<T, uint8_t>::value ? readUInt8(addr) : readInt8(addr);
+			break;
+		default:
+			throw;
+		}
+	};
+
 	// Writes a byte to the game
 	void writeInt8(gameAddr addr, int8_t value);
 	// Writes a short (2B) to the game
