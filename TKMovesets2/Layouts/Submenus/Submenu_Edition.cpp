@@ -84,7 +84,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::TableNextColumn();
 				if (ImGui::Button(_("moveset.rename"))) {
 					m_toRename = moveset->filename;
-					strcpy(m_newName, moveset->name.c_str());
+					strcpy_s(m_newName, sizeof(m_newName), moveset->name.c_str());
 					m_popupOpen = true;
 					currentErr = RenameErrcode_NoErr;
 				}
@@ -116,7 +116,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		}
 
 		ImGui::SameLine();
-		if (ImGui::Button(_("save")))
+		if (ImGui::Button(_("edition.save")))
 		{
 			currentErr = RenameMoveset(m_toRename, m_newName);
 			if (currentErr == RenameErrcode_NoErr)
