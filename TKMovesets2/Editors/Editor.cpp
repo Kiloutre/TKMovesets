@@ -345,7 +345,7 @@ Editor::Editor(GameProcess* process, GameData* game)
 	m_animOffsetToNameOffset = new std::map<gameAddr, gameAddr>;
 
 	constants = new std::map<EditorConstants_, unsigned int >();
-	animExtractionThread = new std::thread();
+	animExtractionThread = new std::thread(); // todo : does this really need to be allocated here? probably not
 }
 
 Editor::~Editor()
@@ -361,5 +361,5 @@ Editor::~Editor()
 	delete displayableMovelist;
 
 	delete constants;
-	delete animExtractionThread;
+	delete animExtractionThread; // todo: join this thread here
 }

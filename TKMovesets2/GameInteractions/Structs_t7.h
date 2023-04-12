@@ -352,8 +352,9 @@ namespace StructsT7
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t aliases1[112];
-		uint16_t aliases2[36];
+		uint16_t orig_aliases[56];
+		uint16_t current_aliases[56];
+		uint16_t unknown_aliases[36];
 		MovesetTable table;
 		MotaList motas;
 	};

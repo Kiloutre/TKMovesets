@@ -49,16 +49,21 @@ GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, D
 {
 	DWORD pid = GetGamePID(processName);
 
-	if (pid == (DWORD)-1) return GameProcessErrcode_PROC_NOT_FOUND;
+	if (pid == (DWORD)-1) {
+		return GameProcessErrcode_PROC_NOT_FOUND;
+	}
 	else {
 		m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | processExtraFlags, FALSE, pid);
-		if (m_processHandle != nullptr && LoadGameMainModule(processName)) {
-			processId = pid;
-			return GameProcessErrcode_PROC_ATTACHED;
+		if (m_processHandle != nullptr)
+		{
+			if (LoadGameMainModule(processName))
+			{
+				processId = pid;
+				return GameProcessErrcode_PROC_ATTACHED;
+			}
+			CloseHandle(m_processHandle);
 		}
-		else {
-			return GameProcessErrcode_PROC_ATTACH_ERR;
-		}
+		return GameProcessErrcode_PROC_ATTACH_ERR;
 	}
 }
 

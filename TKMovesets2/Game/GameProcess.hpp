@@ -20,6 +20,7 @@ struct moduleEntry
 	gameAddr address;
 	uint64_t size;
 };
+
 namespace GameProcessUtils
 {
 	std::vector<processEntry> GetRunningProcessList();
@@ -132,6 +133,8 @@ public:
 		case 1:
 			writeInt8(addr, *(int8_t*)&value);
 			break;
+		default:
+			throw;
 		}
 	};
 	// Reads an integer, reading a different amount of bytes depending on the expected return type
@@ -141,18 +144,20 @@ public:
 		switch (sizeof(T))
 		{
 		case 4:
-			return std::is_same<T, uint32_t>::value ? readUInt32(addr) : readInt32(addr);
+			uint32_t value = readUInt32(addr);
+			return *(T*)&value;
 			break;
 		case 8:
-			return std::is_same<T, uint64_t>::value ? readUInt64(addr) : readInt64(addr);
-			return readInt64(addr);
+			uint64_t value = readUInt64(addr);
+			return *(T*)&value;
 			break;
 		case 2:
-			return std::is_same<T, uint16_t>::value ? readUInt16(addr) : readInt16(addr);
-			return readInt16(addr);
+			uint16_t value = readUInt16(addr);
+			return *(T*)&value;
 			break;
 		case 1:
-			return std::is_same<T, uint8_t>::value ? readUInt8(addr) : readInt8(addr);
+			uint8_t value = readUInt8(addr);
+			return *(T*)&value;
 			break;
 		default:
 			throw;
