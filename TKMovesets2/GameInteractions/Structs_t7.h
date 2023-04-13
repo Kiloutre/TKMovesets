@@ -334,7 +334,7 @@ namespace StructsT7
 					MotaHeader* face_1; // Face
 					MotaHeader* face_2; // Face
 					MotaHeader* wings_1; // Wings (probably more to it)
-					MotaHeader* wigns_2; // Wings (probablty more to it)
+					MotaHeader* wings_2; // Wings (probably more to it)
 					MotaHeader* camera_1; // Camera
 					MotaHeader* camera_2; // Camera
 					MotaHeader* mota_10; // Unknown
