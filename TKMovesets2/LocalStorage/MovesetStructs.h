@@ -70,7 +70,7 @@ struct TKMovesetHeader_offsets
 			// Stores the .mvl file in order to show the custom movelist in training mode
 			uint64_t movelistBlock;
 		};
-		uint64_t blocks[9];
+		uint64_t blocks[8];
 	};
 };
 
