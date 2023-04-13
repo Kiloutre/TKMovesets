@@ -53,10 +53,11 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 
 	if (moveId >= 0x8000) {
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
-		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
+		moveId = m_process->readInt16(playerMoveset + offsetof(MovesetInfo, current_aliases) + (0x2 * (moveId - 0x8000)));
 	}
 
-	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
+	uint64_t movesOffset = offsetof(MovesetInfo, table) + offsetof(MovesetTable, move);
+	gameAddr moveAddr = m_process->readInt64(playerMoveset + movesOffset) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
 	m_process->writeInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_timer"), 99999);
@@ -69,8 +70,10 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
 {
 	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_camera_mota_offset");
-	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + 0x2C0);
-	gameAddr cameraMota2 = m_process->readInt64(movesetAddr + 0x2C8);
+
+	uint64_t motaOffset = offsetof(MovesetInfo, motas) + offsetof(MotaList, camera_1);
+	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + motaOffset + offsetof(MotaList, camera_1));
+	gameAddr cameraMota2 = m_process->readInt64(movesetAddr + motaOffset + offsetof(MotaList, camera_2));
 
 	m_process->writeInt64(playerAddress + staticCameraOffset, cameraMota1);
 	m_process->writeInt64(playerAddress + staticCameraOffset + 0x8, cameraMota2);
@@ -80,7 +83,7 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeader_offsets& offsets, 
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
-	m_process->readBytes(currentMovesetAddr + 0x280, &currentMotasList, sizeof(MotaList));
+	m_process->readBytes(currentMovesetAddr + offsetof(MovesetInfo, motas), &currentMotasList, sizeof(MotaList));
 
 	MotaList* motaList = (MotaList*)(moveset + offsets.motalistsBlock);
 
@@ -362,7 +365,7 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 
 	{
 		// Make a copy of the moveset that we can modify freely and quickly before importing
-		uint64_t movesetStartOffset = header.infos.header_size + header.offsets.movesetInfoBlock;
+		uint64_t movesetStartOffset = header.infos.moveset_data_start + header.offsets.movesetInfoBlock;
 		s_moveset -= movesetStartOffset;
 		moveset = (Byte*)malloc(s_moveset);
 		if (moveset == nullptr) {
@@ -381,7 +384,6 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	progress = 40;
 
 	// -- Conversions -- //
-
 
 	// Get the table address
 	table = (gAddr::MovesetTable*)(moveset + header.offsets.tableBlock);
@@ -405,7 +407,7 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
-	bool hasDisplayableMovelist = ((header.infos.header_size + header.offsets.movelistBlock + 4) < s_moveset) &&
+	bool hasDisplayableMovelist = ((header.infos.moveset_data_start + header.offsets.movelistBlock + 4) < s_moveset) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {

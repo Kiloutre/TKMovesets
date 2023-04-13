@@ -2,6 +2,17 @@
 
 #include <stdint.h>
 
+enum TKMovesetProperty_
+{
+	TKMovesetProperty_END = 0x0
+};
+// Custom moveset properties used when loading into a game
+struct TKMovesetProperty
+{
+	int id;
+	int value;
+};
+
 // Never resize this
 typedef uint64_t MovesetFlags;
 enum MovesetFlags_
@@ -20,8 +31,10 @@ struct TKMovesetHeader_infos
 	uint32_t gameId;
 	// ID of the extracted character, used internally to make some moves that require it work
 	uint32_t characterId;
-	// Small cost for ensuring future compatibility and less annoying cost
+	// Contains the size of the header, aligned on 8 bytes
 	uint32_t header_size;
+	// Absolute offset of the first block, essentially
+	uint32_t moveset_data_start;
 	// Stores a hash of the moveset data (everything past our TKMovesetHeader_infos structure)
 	uint32_t crc32;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
@@ -57,10 +70,9 @@ struct TKMovesetHeader_offsets
 			// Stores the .mvl file in order to show the custom movelist in training mode
 			uint64_t movelistBlock;
 		};
-		uint64_t blocks[8];
+		uint64_t blocks[9];
 	};
 };
-
 
 // Custom data contained at the head of every extracted movesets
 struct TKMovesetHeader
@@ -69,4 +81,8 @@ struct TKMovesetHeader
 	TKMovesetHeader_infos infos;
 	// Absolute offsets of the moveset-related data blocks within the file
 	TKMovesetHeader_offsets offsets;
+
+	// List of custom properties to use when loading the moveset. Size is variable and minimum is 1.
+	// We don't declare it to not affect the TKMovesetHeader size, but don't forget it exists right after the header.
+	//TKMovesetProperty customPropertyList[];
 };

@@ -239,7 +239,7 @@ void EditorWindow::Save()
 
 	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
-	Byte* movesetData = (Byte*)moveset + header->infos.header_size;
+	Byte* movesetData = (Byte*)moveset + header->infos.moveset_data_start;
 	auto& offsets = header->offsets;
 
 	std::vector<std::pair<Byte*, uint64_t>> fileBlocks{
@@ -253,7 +253,7 @@ void EditorWindow::Save()
 		{movesetData + offsets.movesetBlock, offsets.animationBlock - offsets.movesetBlock },
 		{movesetData + offsets.animationBlock, offsets.motaBlock - offsets.animationBlock },
 		{movesetData + offsets.motaBlock, offsets.movelistBlock - offsets.motaBlock },
-		//{movesetData + offsets.movelistBlock, movesetSize - header->infos.header_size - offsets.movelistBlock }, Don't include displayable movelist block because it isn't important
+		//{movesetData + offsets.movelistBlock, movesetSize - header->infos.moveset_data_start - offsets.movelistBlock }, Don't include displayable movelist block because it isn't important
 	};
 
 	// Because the editor might make corrections to the moveset right as it loads it,

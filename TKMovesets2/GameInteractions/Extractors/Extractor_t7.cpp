@@ -113,7 +113,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const gAddr::Mov
 
 void ExtractorT7::CopyMovesetInfoBlock(gameAddr movesetAddr, gAddr::MovesetInfo* movesetHeader)
 {
-	m_process->readBytes(movesetAddr, movesetHeader, 0x150);
+	m_process->readBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
 
 	// Convert ptrs into offsets
 	movesetHeader->character_name_addr -= movesetAddr;
@@ -143,17 +143,16 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			continue;
 		}
 
-		char buf[0x10];
-		m_process->readBytes(motaAddr, buf, 0x10);
-		if (memcmp(buf, "MOTA", 4) != 0) {
+		MotaHeader header;
+		m_process->readBytes(motaAddr, &header, sizeof(MotaHeader));
+		if (memcmp(header.mota_string, "MOTA", 4) != 0) {
 			DEBUG_LOG("Malformed MOTA %d\n", motaId);
 			// Malformed MOTA, don't save it
 			continue;
 		}
 
-		bool isBigEndian = (buf[4] == 0);
-		uint32_t animCount = *(uint32_t*)(buf + 0xC);
-
+		bool isBigEndian = header.mota_swapped > 1;
+		uint32_t animCount = header.anim_count;
 		if (isBigEndian) {
 			animCount = SWAP_INT32(animCount);
 		}
@@ -172,7 +171,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			throw;
 		}
 
-		m_process->readBytes(motaAddr + 0x14, animOffsetList, sizeof(uint32_t) * animCount);
+		m_process->readBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
 		for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
 		{
 			uint32_t animOffset = animOffsetList[animIdx];
@@ -463,7 +462,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 	}
 }
 
-void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress)
+void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress, uint64_t customPropertyCount)
 {
 	infos.flags = 0; // Currently unused
 	infos.gameId = gameId;
@@ -472,7 +471,11 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, 
 	strcpy_s(infos.origin, sizeof(infos.origin), GetGameOriginString());
 	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
 	infos.date = Helpers::getCurrentTimestamp();
+
 	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(TKMovesetHeader));
+
+	uint64_t propertyListSize = customPropertyCount * sizeof(TKMovesetProperty);
+	infos.moveset_data_start = (uint32_t)Helpers::align8Bytes(infos.header_size + propertyListSize);
 }
 
 // -- Public methods -- //
@@ -573,9 +576,16 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 	progress = 77;
 
+	// Establish the list of default properties
+	TKMovesetProperty customProperties[1] = {
+		{.id = TKMovesetProperty_END, .value = 0 } // END should always be in there
+	};
+	uint64_t s_customProperties = sizeof(customProperties);
+
 	// Fill the header with our own useful informations
-	FillHeaderInfos(customHeader.infos, gameId, playerAddress);
+	FillHeaderInfos(customHeader.infos, gameId, playerAddress, _countof(customProperties));
 	progress = 79;
+
 
 	// Calculate each offsets according to the previous block offset + its size
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
@@ -619,7 +629,10 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				// First block is always ignored in our CRC32 calculation because it is supposed to be our own header
 				{headerBlock, s_headerBlock},
 
-				// Actual moveset reproduction attempt. Accurate up to the animation block
+				// Custom block of variable length containing a list of properties
+				{(Byte*)customProperties, s_customProperties},
+
+				// Actual moveset data start. Accurate up to the animation block
 				{movesetInfoBlock, s_movesetInfoBlock},
 				{tableBlock, s_tableBlock },
 				{motasListBlock, s_motasListBlock},
@@ -627,6 +640,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				{movesetBlock, s_movesetBlock},
 				{animationBlock, s_animationBlock},
 				{motaCustomBlock, s_motaCustomBlock},
+				// Displayable movelist block
 				{movelistBlock, s_movelistBlock},
 			};
 
@@ -681,7 +695,7 @@ bool ExtractorT7::CanExtract()
 		return false;
 	}
 
-	gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
+	gameAddr animAddr = m_process->readInt64(currentMove + offsetof(Move, anim_addr));
 	if (animAddr == 0 || animAddr == -1) {
 		return false;
 	}

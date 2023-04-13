@@ -5,7 +5,7 @@
 
 void EditorT7::ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
 	int listSizeDiff = ModifyGenericMovelistListSize<Requirement>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -51,7 +51,7 @@ void EditorT7::ModifyRequirementListSize(unsigned int listStart, const std::vect
 
 void EditorT7::ModifyHitConditionListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
 	int listSizeDiff = ModifyGenericMovelistListSize<HitCondition>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -74,7 +74,7 @@ void EditorT7::ModifyHitConditionListSize(unsigned int listStart, const std::vec
 
 void EditorT7::ModifyInputListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.input;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.input;
 	int listSizeDiff = ModifyGenericMovelistListSize<Input>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -92,7 +92,7 @@ void EditorT7::ModifyInputListSize(unsigned int listStart, const std::vector<int
 
 void EditorT7::ModifyPushbackExtraListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 	int listSizeDiff = ModifyGenericMovelistListSize<PushbackExtradata>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -110,7 +110,7 @@ void EditorT7::ModifyPushbackExtraListSize(unsigned int listStart, const std::ve
 
 void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
 	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -126,7 +126,7 @@ void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::ve
 
 void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
 	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -150,7 +150,7 @@ void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<in
 
 void EditorT7::ModifyExtraPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 	int listSizeDiff = ModifyGenericMovelistListSize<ExtraMoveProperty>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -166,7 +166,7 @@ void EditorT7::ModifyExtraPropertyListSize(unsigned int listStart, const std::ve
 
 void EditorT7::ModifyStartPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningPropCount;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningPropCount;
 	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -182,7 +182,7 @@ void EditorT7::ModifyStartPropertyListSize(unsigned int listStart, const std::ve
 
 void EditorT7::ModifyEndPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;
@@ -198,7 +198,7 @@ void EditorT7::ModifyEndPropertyListSize(unsigned int listStart, const std::vect
 
 void EditorT7::ModifyVoiceclipListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.header_size + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
 	int listSizeDiff = ModifyGenericMovelistListSize<Voiceclip>(listStart, ids, deletedIds, listHead);
 
 	int oldSize = (int)ids.size() + listSizeDiff;

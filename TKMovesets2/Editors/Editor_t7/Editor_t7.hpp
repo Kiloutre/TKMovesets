@@ -276,7 +276,7 @@ private:
 		uint64_t old_followingBlockStart = m_movesetSize;
 		for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
 		{
-			uint64_t absoluteBlockAddr = (m_header->infos.header_size + m_header->offsets.blocks[i]);
+			uint64_t absoluteBlockAddr = (m_header->infos.moveset_data_start + m_header->offsets.blocks[i]);
 			if (absoluteBlockAddr >= old_listEndPosition) {
 				old_followingBlockStart = absoluteBlockAddr;
 				new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart + structSizeDiff);
@@ -299,7 +299,7 @@ private:
 
 		// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date
 		{
-			uint64_t movesetBlockStart = (m_header->infos.header_size + m_header->offsets.movesetBlock);
+			uint64_t movesetBlockStart = (m_header->infos.moveset_data_start + m_header->offsets.movesetBlock);
 			uint64_t movesetBlockEnd = movesetBlockStart + (m_header->offsets.animationBlock - m_header->offsets.movesetBlock);
 
 			if (movesetBlockStart < listPosition && listPosition < movesetBlockEnd)
@@ -345,7 +345,7 @@ private:
 
 		// There are blocks to shift in the displayble movelist block
 		{
-			uint64_t movelistBlockStart = (m_header->infos.header_size + m_header->offsets.movelistBlock);
+			uint64_t movelistBlockStart = (m_header->infos.moveset_data_start + m_header->offsets.movelistBlock);
 			uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
 
 			if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd && strncmp(m_mvlHead->mvlString, "MVLT", 4) == 0)
@@ -372,7 +372,7 @@ private:
 		// Global moveset blocks must be shifted, better here than later
 		for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
 		{
-			if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= listPosition) {
+			if ((m_header->infos.moveset_data_start + m_header->offsets.blocks[i]) >= listPosition) {
 				m_header->offsets.blocks[i] = Helpers::align8Bytes(m_header->offsets.blocks[i] + structSizeDiff);
 				DEBUG_LOG("Shifted moveset block %d by 0x%x (before alignment)\n", i, structSizeDiff);
 			}

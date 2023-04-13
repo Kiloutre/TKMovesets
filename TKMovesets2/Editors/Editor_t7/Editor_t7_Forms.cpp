@@ -993,12 +993,12 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	Byte* newMoveset = nullptr;
 
 	// Find position where to insert new name
-	const uint64_t moveNameOffset = m_header->infos.header_size + m_header->offsets.nameBlock + move_name_addr;
+	const uint64_t moveNameOffset = m_header->infos.moveset_data_start + m_header->offsets.nameBlock + move_name_addr;
 	const uint64_t moveNameEndOffset = moveNameOffset + moveNameSize;
 	const uint64_t orig_moveNameEndOffset = moveNameOffset + strlen((char*)m_moveset + moveNameOffset) + 1;
 
 	// Find the very last move name ending offset
-	uint64_t lastNameEndOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
+	uint64_t lastNameEndOffset = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock;
 	while (*(m_moveset + (lastNameEndOffset - 2)) == 0)
 	{
 		// Because the block after the nameBlock needs to be aligned, we also have to find the last offset and see
@@ -1007,7 +1007,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	}
 	// Shift by the new size difference
 	const uint64_t orig_moveNameSize = strlen((char*)m_moveset + moveNameOffset) + 1;
-	const uint64_t orig_movelistStartOffset = m_header->infos.header_size + m_header->offsets.movesetBlock;
+	const uint64_t orig_movelistStartOffset = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock;
 	lastNameEndOffset += moveNameSize - orig_moveNameSize;
 
 	// Align the end of the name block to 8 bytes to get the start of the movelist block
@@ -1025,7 +1025,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 
 	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
 	{
-		if ((m_header->infos.header_size + m_header->offsets.blocks[i]) >= orig_movelistStartOffset) {
+		if ((m_header->infos.moveset_data_start + m_header->offsets.blocks[i]) >= orig_movelistStartOffset) {
 			m_header->offsets.blocks[i] += extraBlockSize;
 		}
 	}

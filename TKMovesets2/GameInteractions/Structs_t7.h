@@ -314,13 +314,13 @@ namespace StructsT7
 
 	struct MotaHeader
 	{
-		char motaString[4];
-		__int16 motaSwapped;
-		__int16 unk0xA;
-		__int32 unk0xC;
-		int animCount;
+		char mota_string[4];
+		uint16_t mota_swapped;
+		uint16_t unk0xA;
+		uint32_t unk0xC;
+		uint32_t anim_count;
 		char gap0x10[4];
-		unsigned int animOffsetLIst[1];
+		unsigned int anim_offset_list[1];
 	};
 
 	struct MotaList
@@ -329,14 +329,14 @@ namespace StructsT7
 			struct {
 					MotaHeader* mota_0; // Anims
 					MotaHeader* mota_1; // Anims
-					MotaHeader* mota_2; // Hand
-					MotaHeader* mota_3; // Hand
-					MotaHeader* mota_4; // Face
-					MotaHeader* mota_5; // Face
-					MotaHeader* mota_6; // Wings (probably more to it)
-					MotaHeader* mota_7; // Wings (probablty more to it)
-					MotaHeader* mota_8; // Camera
-					MotaHeader* mota_9; // Camera
+					MotaHeader* hand_1; // Hand
+					MotaHeader* hand_2; // Hand
+					MotaHeader* face_1; // Face
+					MotaHeader* face_2; // Face
+					MotaHeader* wings_1; // Wings (probably more to it)
+					MotaHeader* wigns_2; // Wings (probablty more to it)
+					MotaHeader* camera_1; // Camera
+					MotaHeader* camera_2; // Camera
 					MotaHeader* mota_10; // Unknown
 					MotaHeader* mota_11; // Unknown
 					MotaHeader* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
@@ -347,7 +347,9 @@ namespace StructsT7
 
 	struct MovesetInfo
 	{
-		char _0x0[8];
+		char _0x0[2];
+		bool isInitialized;
+		char _0x3[5];
 		char* character_name_addr;
 		char* character_creator_addr;
 		char* date_addr;
@@ -833,8 +835,9 @@ namespace StructsT7_gameAddr
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t aliases1[112];
-		uint16_t aliases2[36];
+		uint16_t orig_aliases[56];
+		uint16_t current_aliases[56];
+		uint16_t unknown_aliases[36];
 		MovesetTable table;
 		MotaList motas;
 	};
