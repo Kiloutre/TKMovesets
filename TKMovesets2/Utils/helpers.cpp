@@ -141,21 +141,19 @@ namespace Helpers
 		uint64_t cursor = (uint64_t)file.tellp();
 		if ((cursor & 0x7) != 0)
 		{
-			// pad file with 0
-			char b[7] = { 0 };
+			// Pad file with 0xDD for ease of debug
+			char b[7] = { 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD };
 			file.write(b, 8 - cursor & 7);
 		}
 	}
 
 	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks)
 	{
-		// Skip the first item which is always the TKMovesetHeader
-		// also skip the second, for now, because there's 4 pointer in there we need to change (todo)
 		uint32_t crc32 = 0;
 		uint32_t table[256];
 
 		Helpers::crc32_generate_table(table);
-		for (size_t i = 1; i < blocks.size(); ++i) {
+		for (size_t i = 0; i < blocks.size(); ++i) {
 			char* blockData = (char*)blocks[i].first;
 			uint64_t blockSize = blocks[i].second;
 

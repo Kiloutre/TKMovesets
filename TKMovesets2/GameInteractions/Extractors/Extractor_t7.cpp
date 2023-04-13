@@ -625,7 +625,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 		{
 			progress = 80;
 
-			std::vector<std::pair<Byte*, uint64_t>> fileBlocks{
+			std::vector<std::pair<Byte*, uint64_t>> writtenFileBlocks{
 				// First block is always ignored in our CRC32 calculation because it is supposed to be our own header
 				{headerBlock, s_headerBlock},
 
@@ -644,8 +644,18 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				{movelistBlock, s_movelistBlock},
 			};
 
-			customHeader.infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
-			ExtractorUtils::WriteFileData(file, fileBlocks, progress, 95);
+			std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
+				{(Byte*)customProperties, s_customProperties},
+				{movesetInfoBlock, s_movesetInfoBlock},
+				{tableBlock, s_tableBlock },
+				{motasListBlock, s_motasListBlock},
+				{movesetBlock, s_movesetBlock},
+				{animationBlock, s_animationBlock},
+				{motaCustomBlock, s_motaCustomBlock},
+			};
+
+			customHeader.infos.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
+			ExtractorUtils::WriteFileData(file, writtenFileBlocks, progress, 95);
 
 			file.close();
 

@@ -159,7 +159,7 @@ namespace Helpers
     // Make sure a value is divislbe by 8
     uint64_t align8Bytes(uint64_t value);
 
-    // Make sure a file's cursor is divisble by 8
+    // Make sure a file's writing cursor is divisble by 8
     void align8Bytes(std::ofstream& file);
 
 	// Calcualte a crc32 from a list of data blocks. Always skip the first one.

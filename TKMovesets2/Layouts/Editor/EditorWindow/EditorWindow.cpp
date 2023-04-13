@@ -242,25 +242,29 @@ void EditorWindow::Save()
 	Byte* movesetData = (Byte*)moveset + header->infos.moveset_data_start;
 	auto& offsets = header->offsets;
 
-	std::vector<std::pair<Byte*, uint64_t>> fileBlocks{
-		// First block is always ignored in our CRC32 calculation because it is supposed to be our own header
-		{nullptr, 0},
+	// Get list of properties and its count
+	TKMovesetProperty* customPropertyList = (TKMovesetProperty*)(moveset + header->infos.header_size);
+	uint64_t customPropertyCount = 0;
+
+	while (customPropertyList[customPropertyCount++].id != TKMovesetProperty_END)
+		;
+
+	std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
+		{(Byte*)customPropertyList, customPropertyCount * sizeof(TKMovesetProperty)},
 
 		{movesetData + offsets.movesetInfoBlock, offsets.tableBlock - offsets.movesetInfoBlock },
 		{movesetData + offsets.tableBlock, offsets.motalistsBlock - offsets.tableBlock },
 		{movesetData + offsets.motalistsBlock, offsets.nameBlock - offsets.motalistsBlock },
-		//{movesetData + offsets.nameBlock, offsets.movesetBlock - offsets.nameBlock }, Don't include name block because it isn't important
 		{movesetData + offsets.movesetBlock, offsets.animationBlock - offsets.movesetBlock },
 		{movesetData + offsets.animationBlock, offsets.motaBlock - offsets.animationBlock },
 		{movesetData + offsets.motaBlock, offsets.movelistBlock - offsets.motaBlock },
-		//{movesetData + offsets.movelistBlock, movesetSize - header->infos.moveset_data_start - offsets.movelistBlock }, Don't include displayable movelist block because it isn't important
 	};
 
 	// Because the editor might make corrections to the moveset right as it loads it,
 	// ... it is likely the CRC32 will be different from extraction
 	// That isn't that big of a problem
 
-	header->infos.crc32 = Helpers::CalculateCrc32(fileBlocks);
+	header->infos.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
 	header->infos.date = Helpers::getCurrentTimestamp();
 
 	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
@@ -271,6 +275,7 @@ void EditorWindow::Save()
 	}
 	else {
 		// Showing failure would be nice. Even simply changing the Save button text would suffice.
+		//todo
 	}
 }
 
