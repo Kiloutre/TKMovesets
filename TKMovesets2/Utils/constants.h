@@ -64,3 +64,6 @@
 # define MVL_CATEGORY            IM_COL32(77, 131, 219, 50)
 # define MVL_COMBO               IM_COL32(140, 177, 237, 50)
 # define MVL_DISABLED            IM_COL32(33, 21, 51, 150)
+
+# define MOVESET_LIST_MODIFIED   IM_COL32(19, 96, 18, 30)
+# define MOVESET_INVALID         IM_COL32(186, 54, 54, 50)

@@ -13,7 +13,7 @@
 
 Submenu_Extract::Submenu_Extract()
 {
-	// Set all MOTA exportation to none by default
+	// Set all MOTA exportation to zero by default
 	for (int i = 0; i < _countof(m_motaExport); ++i) {
 		m_motaExport[i] = false;
 	}
@@ -199,10 +199,13 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		break;
 	}
 
+	auto availableSpace = ImGui::GetContentRegionAvail();
+	ImVec2 tableSize = ImVec2(0, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
+
 	// List of extracted moveset
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
 	if (ImGui::BeginTable("MovesetExtractionList", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
-				| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImVec2(0, ImGui::GetContentRegionAvail().y)))
+				| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
@@ -213,6 +216,11 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::TableSetupColumn(_("moveset.delete"), 0, 0.0f);
 		ImGui::TableHeadersRow();
 
+
+		// drawList & windowPos are used to display a different row bg
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
+		auto windowPos = ImGui::GetWindowPos();
+
 		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
 		for (size_t i = 0; i < extractorHelper.storage->extractedMovesets.size(); ++i)
 		{
@@ -221,9 +229,20 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
+
+			if (moveset->color != 0)
+			{
+				// Draw BG
+				ImVec2 drawStart = windowPos + ImGui::GetCursorPos();
+				drawStart.y -= ImGui::GetScrollY();
+				ImVec2 drawArea = ImVec2(availableSpace.x, ImGui::GetFrameHeight());
+				drawlist->AddRectFilled(drawStart, drawStart + drawArea, moveset->color);
+			}
+
 			ImGui::TextUnformatted(moveset->name.c_str());
 
 			ImGui::TableNextColumn();
+
 			if (moveset->origin == "INVALID") {
 				// Badly formatted file. Display it, but mention it is invalid
 				ImGui::TextUnformatted(_("moveset.invalid"));

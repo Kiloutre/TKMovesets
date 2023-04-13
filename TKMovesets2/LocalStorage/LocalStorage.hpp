@@ -11,6 +11,7 @@
 // Moveset info, most of which is read straight from the file. Use for display.
 struct movesetInfo
 {
+	int color; // Color is defined by moveset flags
 	std::string filename;
 	std::string name;
 	FasterStringComp origin;

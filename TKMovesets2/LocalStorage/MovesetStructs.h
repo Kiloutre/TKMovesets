@@ -13,11 +13,10 @@ struct TKMovesetProperty
 	int value;
 };
 
-// Never resize this
 typedef uint64_t MovesetFlags;
 enum MovesetFlags_
 {
-	// Used to detect whether to not show the "rename moveset?" prompt when editing a moveset
+	// Used to show which movesets the user has modified (knowing if it's an original or not can be useful)
 	MovesetFlags_MOVESET_MODIFIED = (1 << 0),
 };
 

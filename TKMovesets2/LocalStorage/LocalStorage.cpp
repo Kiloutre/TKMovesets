@@ -14,6 +14,14 @@
 
 // -- Static helpers --
 
+static int getMovesetColor(MovesetFlags flags)
+{
+	if (flags & MovesetFlags_MOVESET_MODIFIED) {
+		return MOVESET_LIST_MODIFIED;
+	}
+	return 0;
+}
+
 // Reads a movest in order to fetch its header informations such as character name, version, etc. Can return null if errors are encountered.
 static movesetInfo* fetchMovesetInformations(const std::string& filename)
 {
@@ -37,6 +45,7 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 			Helpers::isHeaderStringMalformated(movesetInfos->origin, sizeof(movesetInfos->origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos->target_character, sizeof(movesetInfos->target_character))) {
 			// File malformated
+			return nullptr;
 		}
 		else {
 			struct stat buffer;
@@ -44,6 +53,7 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 			stat(filename.c_str(), &buffer);
 
 			return new movesetInfo{
+				.color = getMovesetColor(movesetInfos->flags),
 				.filename = filename,
 				.name = Helpers::getMovesetNameFromFilename(filename),
 				.origin = std::string(movesetInfos->origin),
@@ -118,14 +128,15 @@ void LocalStorage::ReloadMovesetList()
 
 			if (moveset == nullptr) {
 				moveset = new movesetInfo{
-				   .filename = filename,
-				   .name = Helpers::getMovesetNameFromFilename(filename),
-				   .origin = std::string("INVALID"),
-				   .target_character = std::string(""),
-				   .date = 0,
-				   .size = 0,
-				   .modificationDate = 0,
-				   .editable = true // We do want to show it in the moveset edition list
+					.color = MOVESET_INVALID,
+					.filename = filename,
+					.name = Helpers::getMovesetNameFromFilename(filename),
+					.origin = std::string("INVALID"),
+					.target_character = std::string(""),
+					.date = 0,
+					.size = 0,
+					.modificationDate = 0,
+					.editable = false
 				};
 			}
 

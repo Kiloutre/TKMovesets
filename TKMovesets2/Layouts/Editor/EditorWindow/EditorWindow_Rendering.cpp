@@ -363,6 +363,10 @@ void EditorWindow::RenderMovelist()
 			ImGui::TableSetupColumn(_("edition.move_generic_id"));
 			ImGui::TableHeadersRow();
 
+			// drawList & windowPos are used to display a different row bg
+			ImDrawList* drawlist = ImGui::GetWindowDrawList();
+			auto windowPos = ImGui::GetWindowPos();
+
 			for (DisplayableMove* move : m_filteredMovelist)
 			{
 				ImGui::TableNextRow();
@@ -370,12 +374,11 @@ void EditorWindow::RenderMovelist()
 
 				if (move->color != 0)
 				{
-					ImVec2 drawStart = ImGui::GetWindowPos() + ImGui::GetCursorPos();
+					// Draw BG
+					ImVec2 drawStart = windowPos + ImGui::GetCursorPos();
 					drawStart.y -= ImGui::GetScrollY();
 					ImVec2 drawArea = ImVec2(TableSize.x, ImGui::GetTextLineHeight());
-					ImDrawList* drawlist = ImGui::GetWindowDrawList();
 					drawlist->AddRectFilled(drawStart, drawStart + drawArea, move->color);
-					// Draw BG
 				}
 
 				ImGui::TextUnformatted(move->moveId_str.c_str());

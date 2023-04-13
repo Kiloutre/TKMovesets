@@ -261,6 +261,12 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 
 	LoadMovesetPtr(t_moveset, t_movesetSize);
 
+	if ((m_header->infos.flags & MovesetFlags_MOVESET_MODIFIED) == 0) {
+		// First time this moveset is edited
+		strcat_s(m_header->infos.origin, sizeof(m_header->infos.origin), " (M)");
+		m_header->infos.flags |= MovesetFlags_MOVESET_MODIFIED;
+	}
+
 	// Get aliases as a vector
 	uint16_t* aliasesPtr = m_infos->orig_aliases;
 	for (uint16_t i = 0; i < 112 + 36; ++i) {

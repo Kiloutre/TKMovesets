@@ -35,12 +35,15 @@ static RenameErrcode_ RenameMoveset(std::string full_filename, const char* newNa
 movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 {
 	ImGuiExtra::RenderTextbox(_("edition.explanation"));
+	ImGui::SeparatorText(_("edition.select_moveset"));
 
 	movesetInfo* movesetToLoad = nullptr;
 
-	ImGui::SeparatorText(_("edition.select_moveset"));
+	auto availableSpace = ImGui::GetContentRegionAvail();
+	ImVec2 tableSize = ImVec2(0, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
+
 	if (ImGui::BeginTable("MovesetEditionList", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
-		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(0, ImGui::GetContentRegionAvail().y)))
+		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
@@ -51,8 +54,13 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::TableSetupColumn(_("moveset.edit"));
 		ImGui::TableHeadersRow();
 
-		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
 		ImGui::PushID(&storage);
+
+		// drawList & windowPos are used to display a different row bg
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
+		auto windowPos = ImGui::GetWindowPos();
+
+		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
 		for (size_t i = 0; i < storage.extractedMovesets.size(); ++i)
 		{
 			// moveset is guaranteed not to be freed until after this loop
@@ -60,6 +68,16 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
+
+			if (moveset->color != 0)
+			{
+				// Draw BG
+				ImVec2 drawStart = windowPos + ImGui::GetCursorPos();
+				drawStart.y -= ImGui::GetScrollY();
+				ImVec2 drawArea = ImVec2(availableSpace.x, ImGui::GetFrameHeight());
+				drawlist->AddRectFilled(drawStart, drawStart + drawArea, moveset->color);
+			}
+
 			ImGui::TextUnformatted(moveset->name.c_str());
 
 			ImGui::TableNextColumn();
