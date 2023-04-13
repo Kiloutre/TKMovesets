@@ -179,9 +179,10 @@ enum EditorMoveFlags_
 	EditorMoveFlags_Attack = (1 << 0),
 	EditorMoveFlags_OtherAttack = (1 << 1),
 	EditorMoveFlags_Generic = (1 << 2),
-	EditorMoveFlags_Throw = (1 << 3),
-	EditorMoveFlags_ThrowReaction = (1 << 4),
-	EditorMoveFlags_Custom = (1 << 5),
+	EditorMoveFlags_CurrentGeneric = (1 << 3),
+	EditorMoveFlags_Throw = (1 << 4),
+	EditorMoveFlags_ThrowReaction = (1 << 5),
+	EditorMoveFlags_Custom = (1 << 6),
 };
 
 // Used for the move list

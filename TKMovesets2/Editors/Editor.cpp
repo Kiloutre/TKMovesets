@@ -57,6 +57,10 @@ namespace EditorUtils
 			return MOVE_GENERIC;
 		}
 
+		if (flags & EditorMoveFlags_CurrentGeneric) {
+			return MOVE_CURRENT_GENERIC;
+		}
+
 		if (flags & EditorMoveFlags_Custom) {
 			return MOVE_CUSTOM;
 		}
@@ -84,6 +88,7 @@ namespace EditorUtils
 			return 0;
 		}
 		if (flags & EditorInput_Hex) {
+			// Imgui's charset doesn't allow for the 'x' in '0x'...
 			//return ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase;
 			return ImGuiInputTextFlags_CharsNoBlank;
 		}

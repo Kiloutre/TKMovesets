@@ -269,7 +269,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 
 	// Get aliases as a vector
 	uint16_t* aliasesPtr = m_infos->orig_aliases;
-	for (uint16_t i = 0; i < 112 + 36; ++i) {
+	for (uint16_t i = 0; i < _countof(m_infos->orig_aliases); ++i) {
 		m_aliases->push_back(aliasesPtr[i]);
 	}
 
@@ -336,24 +336,13 @@ void EditorT7::ReloadDisplayableMoveList()
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
 
-	uint16_t* aliases = m_infos->orig_aliases;
-	uint8_t aliasesCount = (uint8_t)m_aliases->size();
 
 	uint16_t moveId = 0;
 	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
 	{
 		std::string moveName = std::string(namePtr + move->name_addr);
 
-		uint16_t aliasId = 0;
 		EditorMoveFlags flags = 0;
-
-		for (uint8_t j = 0; j < aliasesCount; ++j) {
-			if (aliases[j] == moveId) {
-				aliasId = 0x8000 + j;
-				flags |= EditorMoveFlags_Generic;
-				break;
-			}
-		}
 
 		if (move->hitlevel || move->hitbox_location || move->first_active_frame || move->last_active_frame) {
 			if (move->hitlevel && move->hitbox_location && move->first_active_frame && move->last_active_frame) {
@@ -378,12 +367,56 @@ void EditorT7::ReloadDisplayableMoveList()
 		displayableMovelist->push_back(new DisplayableMove{
 			.moveId_str = std::to_string(moveId),
 			.name = moveName,
-			.alias_str = aliasId == 0 ? std::string() : std::to_string(aliasId),
+			.alias_str = std::string(),
 			.color = EditorUtils::GetMoveColorFromFlag(flags),
 			.moveId = moveId,
-			.aliasId = aliasId,
+			.aliasId = 0,
 			.flags = flags,
 		});
+	}
+
+	// Mark default generic moves
+	{
+		uint16_t* aliases = m_infos->orig_aliases;
+		uint8_t aliasesCount = (uint8_t)_countof(m_infos->orig_aliases);
+
+		for (uint8_t j = 0; j < aliasesCount; ++j)
+		{
+			uint16_t moveId = aliases[j];
+			uint16_t aliasId = 0x8000 + j;
+
+			auto& move = (*displayableMovelist).at(moveId);
+			move->flags |= EditorMoveFlags_Generic;
+
+			if (move->aliasId == 0)
+			{
+				move->color |= EditorUtils::GetMoveColorFromFlag(move->flags);
+				move->aliasId = aliasId;
+				move->alias_str = std::to_string(aliasId);
+			}
+		}
+	}
+
+	// Mark current generic moves
+	{
+		uint16_t* aliases = m_infos->current_aliases;
+		uint8_t aliasesCount = (uint8_t)_countof(m_infos->current_aliases);
+
+		for (uint8_t j = 0; j < aliasesCount; ++j)
+		{
+			uint16_t moveId = aliases[j];
+			uint16_t aliasId = 0x8000 + j;
+
+			auto& move = (*displayableMovelist).at(moveId);
+			move->flags |= EditorMoveFlags_CurrentGeneric;
+
+			if (move->aliasId != 0)
+			{
+				move->color |= EditorUtils::GetMoveColorFromFlag(move->flags);
+				move->aliasId = aliasId;
+				move->alias_str = std::to_string(aliasId);
+			}
+		}
 	}
 }
 

@@ -43,6 +43,7 @@
 # define FORM_BG_2               IM_COL32(48, 60, 140, 15)
 
 # define MOVE_GENERIC            IM_COL32(77, 131, 219, 50)
+# define MOVE_CURRENT_GENERIC    IM_COL32(77, 131, 219, 10)
 # define MOVE_CUSTOM             IM_COL32(119, 175, 58, 50)
 # define MOVE_THROW              IM_COL32(119, 58, 199, 50)
 # define MOVE_THROWREACTION      IM_COL32(210, 100, 222, 50)
