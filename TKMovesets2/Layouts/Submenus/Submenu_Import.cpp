@@ -9,8 +9,24 @@
 
 Submenu_Import::Submenu_Import()
 {
-	m_err = ImportationErrcode_Successful;
+	m_applyInstantly = true;
+	m_freeUnusedMoveset = true;
 };
+
+ImportSettings Submenu_Import::GetImportationSettings()
+{
+	ImportSettings retVal = 0;
+
+	if (m_applyInstantly) {
+		retVal |= ImportSettings_ApplyInstantly;
+	}
+
+	if (m_freeUnusedMoveset) {
+		retVal |= ImportSettings_FreeUnusedMovesets;
+	}
+
+	return retVal;
+}
 
 void Submenu_Import::Render(GameImport& importerHelper)
 {
@@ -46,7 +62,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	{
 		ImGui::SameLine();
 		char buf[3] = { '1' + importerHelper.currentPlayerId, 'p', '\0' };
-		ImGui::PushItemWidth(150.0f);
+		ImGui::PushItemWidth(100.0f);
 		if (ImGui::BeginCombo("##", _(buf)))
 		{
 			size_t currentPlayerId = importerHelper.currentPlayerId;
@@ -61,14 +77,14 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		}
 	}
 
-	// Extraction settings
+	// Basic importation settings
 	ImGui::SameLine();
-	ImGui::Checkbox(_("importation.apply_instantly"), &importerHelper.apply_instantly);
+	ImGui::Checkbox(_("importation.apply_instantly"), &m_applyInstantly);
 	ImGui::SameLine();
 	ImGuiExtra::HelpMarker(_("importation.apply_instantly_explanation"));
 
 	ImGui::SameLine();
-	ImGui::Checkbox(_("importation.free_unused_movesets"), &importerHelper.free_unused_movesets);
+	ImGui::Checkbox(_("importation.free_unused_movesets"), &m_freeUnusedMoveset);
 	ImGui::SameLine();
 	ImGuiExtra::HelpMarker(_("importation.free_unused_movesets_explanation"));
 
@@ -162,7 +178,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 				ImGui::PushID(moveset->filename.c_str());
 
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
-					importerHelper.QueueCharacterImportation(moveset->filename);
+					importerHelper.QueueCharacterImportation(moveset->filename, GetImportationSettings());
 				}
 				ImGui::PopID();
 			}

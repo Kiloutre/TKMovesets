@@ -9,13 +9,20 @@
 
 #include "GameAddresses.h"
 
+struct importEntry
+{
+	const Byte* moveset; // Can be nullptr. If so, import from filename.
+	uint64_t movesetSize; // Can be 0
+	std::string filename;
+	gameAddr playerAddress;
+	ImportSettings settings;
+};
+
 class GameImport : public virtual GameInteraction
 {
 private:
-	// Movesets (files) to import and corresponding player address 
-	std::vector<std::pair<std::string, gameAddr>> m_plannedFileImportations;
 	// Movesets (data, size) to import and corresponding player address
-	std::vector<std::tuple<const Byte*, uint64_t, gameAddr>> m_plannedImportations;
+	std::vector<importEntry> m_plannedImportations;
 	// List of errors, one extraction fail = 1 error
 	std::vector<ImportationErrcode_> m_errors;
 
@@ -35,10 +42,6 @@ public:
 	Importer* importer = nullptr;
 	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
-	// true = force the 32769 move from the new moveset to apply 
-	bool apply_instantly = true;
-	// Whether to free unused movesets after each importation
-	bool free_unused_movesets = true;
 	// Stores the in-game addresses of the last moveset loaded by the last Queue() call
 	gameAddr lastLoadedMoveset = 0;
 
@@ -51,9 +54,9 @@ public:
 	// Is currently busy with an importation
 	bool IsBusy() override;
 	// Queue a character importation from file
-	void QueueCharacterImportation(std::string filename);
+	void QueueCharacterImportation(std::string filename, ImportSettings settings=0);
 	// Queue a character importation from moveset data.
-	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize);
+	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to

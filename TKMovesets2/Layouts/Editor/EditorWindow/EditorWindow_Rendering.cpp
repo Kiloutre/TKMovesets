@@ -254,7 +254,7 @@ void EditorWindow::RenderStatusBar()
 		uint64_t movesetSize;
 		const Byte* moveset = m_editor->GetMoveset(movesetSize);
 
-		m_importerHelper.QueueCharacterImportation(moveset, movesetSize);
+		m_importerHelper.QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT);
 		m_editor->live_loadedMoveset = 0;
 		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
 		m_importNeeded = false;

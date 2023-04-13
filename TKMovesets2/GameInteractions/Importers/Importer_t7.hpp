@@ -32,7 +32,7 @@ private:
 	void ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
 public:
 	using Importer::Importer; // Inherit constructor too
-	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress) override;
+	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) override;
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;
 

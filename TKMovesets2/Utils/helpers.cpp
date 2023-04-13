@@ -142,7 +142,7 @@ namespace Helpers
 		if ((cursor & 0x7) != 0)
 		{
 			// Pad file with 0xDD for ease of debug
-			char b[7] = { 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD };
+			char b[7] = { (char)0xDD, (char)0xDD, (char)0xDD, (char)0xDD, (char)0xDD, (char)0xDD, (char)0xDD };
 			file.write(b, 8 - cursor & 7);
 		}
 	}

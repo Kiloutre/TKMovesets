@@ -40,9 +40,7 @@ void GameImport::InstantiateFactory()
 
 void GameImport::PreProcessDetach()
 {
-	if (free_unused_movesets) {
-		importer->CleanupUnusedMovesets();
-	}
+	importer->CleanupUnusedMovesets();
 }
 
 void GameImport::RunningUpdate()
@@ -54,20 +52,17 @@ void GameImport::RunningUpdate()
 			ImportationErrcode_ err;
 
 			// Two different ways to import movesets, from filename or from actual moveset data
-			if (m_plannedFileImportations.size() > 0) {
-				auto& [filename, playerAddress] = m_plannedFileImportations[0];
-				err = importer->Import(filename.c_str(), playerAddress, apply_instantly, progress);
-				m_plannedFileImportations.erase(m_plannedFileImportations.begin());
-			}
-			else {
-				auto& [moveset, movesetSize, playerAddress] = m_plannedImportations[0];
-				err = importer->Import(moveset, movesetSize, playerAddress, apply_instantly, progress);
+			if (m_plannedImportations.size() > 0) {
+				auto& [moveset, movesetSize, filename, playerAddress, settings] = m_plannedImportations[0];
+				if (moveset == nullptr) {
+					err = importer->Import(filename.c_str(), playerAddress, settings, progress);
+				}
+				else {
+					err = importer->Import(moveset, movesetSize, playerAddress, settings, progress);
+				}
 				m_plannedImportations.erase(m_plannedImportations.begin());
 			}
 
-			if (free_unused_movesets) {
-				importer->CleanupUnusedMovesets();
-			}
 			if (err != ImportationErrcode_Successful) {
 				m_errors.push_back(err);
 				errored = true;
@@ -95,7 +90,7 @@ void GameImport::StopThreadAndCleanup()
 	m_t.join();
 
 	if (importer != nullptr) {
-		if (free_unused_movesets && process->IsAttached()) {
+		if (process->IsAttached()) {
 			importer->CleanupUnusedMovesets();
 		}
 		delete importer;
@@ -117,21 +112,33 @@ bool GameImport::CanStart()
 bool GameImport::IsBusy()
 {
 	// There are still movesets to import
-	return m_plannedFileImportations.size() > 0 || m_plannedImportations.size() > 0;
+	return m_plannedImportations.size() > 0;
 }
 
-void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize)
+void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = importer->GetCharacterAddress(currentPlayerId);
-	m_plannedImportations.push_back(std::tuple<const Byte*, uint64_t, gameAddr>(moveset, movesetSize, playerAddress));
+	m_plannedImportations.push_back({
+		.moveset = moveset,
+		.movesetSize = movesetSize,
+		.filename = "",
+		.playerAddress = playerAddress,
+		.settings = settings
+	});
 }
 
-void GameImport::QueueCharacterImportation(std::string filename)
+void GameImport::QueueCharacterImportation(std::string filename, ImportSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = importer->GetCharacterAddress(currentPlayerId);
-	m_plannedFileImportations.push_back(std::pair<std::string, gameAddr>(filename, playerAddress));
+	m_plannedImportations.push_back({
+		.moveset = nullptr,
+		.movesetSize = 0,
+		.filename = filename,
+		.playerAddress = playerAddress,
+		.settings = settings
+	});
 }
 
 uint8_t GameImport::GetCharacterCount()

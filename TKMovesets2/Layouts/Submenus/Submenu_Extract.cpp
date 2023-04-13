@@ -13,6 +13,11 @@
 
 Submenu_Extract::Submenu_Extract()
 {
+	// Set all MOTA exportation to none by default
+	for (int i = 0; i < _countof(m_motaExport); ++i) {
+		m_motaExport[i] = false;
+	}
+
 	m_motaExport[2] = true; // Hands
 	m_motaExport[3] = true; // Hands
 	m_motaExport[8] = true; // Camera

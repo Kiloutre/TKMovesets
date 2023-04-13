@@ -338,6 +338,8 @@ void ImporterT7::CleanupUnusedMovesets()
 	}
 }
 
+// Correct the offsets of the starting pointers of the moveset data
+// This doesn't affect gameplay and to my knowledge is not actually used
 static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
 {
 	info->character_name_addr += gameMoveset;
@@ -346,7 +348,28 @@ static void CorrectMovesetInfoValues(MovesetInfo* info, gameAddr gameMoveset)
 	info->fulldate_addr += gameMoveset;
 }
 
-ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, bool applyInstantly, uint8_t& progress)
+// Enforce the alias at the time of the extraction to be the original ones
+static void EnforceCurrentAliasesAsDefault(Byte* moveset)
+{
+	MovesetInfo* infos = (MovesetInfo*)moveset;
+
+	for (int i = 0; i < _countof(infos->current_aliases); ++i) {
+		infos->orig_aliases[i] = infos->current_aliases[i];
+	}
+}
+
+// Enforce the original aliases as the current one
+static void EnforceDefaultAliasesAsCurrent(Byte* moveset)
+{
+	MovesetInfo* infos = (MovesetInfo*)moveset;
+
+	for (int i = 0; i < _countof(infos->current_aliases); ++i) {
+		infos->current_aliases[i] = infos->orig_aliases[i];
+	}
+}
+
+
+ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
 	// Will contain our moveset copy. We do not modify orig_moveset.
 	Byte* moveset;
@@ -422,6 +445,13 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
 	}
 
+	if (settings & ImportSettings_EnforceCurrentAliasesAsDefault) {
+		EnforceCurrentAliasesAsDefault(moveset);
+	}
+	else {
+		EnforceDefaultAliasesAsCurrent(moveset);
+	}
+
 	// Finally write our moveset to the game's memory
 	m_process->writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
@@ -434,8 +464,12 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	// Also write camera mota offsts to the player structure if those motas have been exported
 	WriteCameraMotasToPlayer(gameMoveset, playerAddress);
 
-	if (applyInstantly) {
+	if (settings & ImportSettings_ApplyInstantly) {
 		ForcePlayerMove(playerAddress, gameMoveset, 32769);
+	}
+
+	if (settings & ImportSettings_FreeUnusedMovesets) {
+		CleanupUnusedMovesets();
 	}
 
 	// -- Cleanup -- //
