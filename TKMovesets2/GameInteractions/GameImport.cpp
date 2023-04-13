@@ -61,6 +61,10 @@ void GameImport::RunningUpdate()
 					err = importer->Import(moveset, movesetSize, playerAddress, settings, progress);
 				}
 				m_plannedImportations.erase(m_plannedImportations.begin());
+
+				if (settings & ImportSettings_FreeUnusedMovesets) {
+					importer->CleanupUnusedMovesets();
+				}
 			}
 
 			if (err != ImportationErrcode_Successful) {

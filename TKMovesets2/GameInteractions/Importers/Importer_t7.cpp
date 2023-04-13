@@ -468,10 +468,6 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 		ForcePlayerMove(playerAddress, gameMoveset, 32769);
 	}
 
-	if (settings & ImportSettings_FreeUnusedMovesets) {
-		CleanupUnusedMovesets();
-	}
-
 	// -- Cleanup -- //
 	// Destroy our local copy
 	free(moveset);
