@@ -116,6 +116,8 @@ importation.error_game_allocation = There was a game memory allocation error whi
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset (or none if you want) before the match's loading screen , the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running.
 online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
+online.dll_not_loaded = DLL is not loaded, inject it
+online.inject_dll = Inject
 
 # Movest Edition : rename #
 edition.rename.new_moveset_name = New moveset name

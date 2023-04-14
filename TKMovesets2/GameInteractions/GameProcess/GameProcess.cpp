@@ -360,7 +360,27 @@ void GameProcess::freeMem(gameAddr targetAddr)
 	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 }
 
-void GameProcess::createRemoteThread(gameAddr startAddress)
+void GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument)
 {
-	CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, nullptr, 0, nullptr);
+	CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, &argument, 0, nullptr);
+}
+
+bool GameProcess::InjectDll(const char* fullpath)
+{
+	// Allocate space for dll path in process memory
+	int fullpathSize = strlen(fullpath) + 1;
+	gameAddr bufferAddr = allocateMem(fullpathSize);
+
+	if (bufferAddr == 0) {
+		return false;
+	}
+	// Write path in process memory
+	writeBytes(bufferAddr, (void*)fullpath, fullpathSize);
+
+	// Get address of LoadLibraryW
+	PTHREAD_START_ROUTINE threatStartRoutineAddress = (PTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(TEXT("Kernel32")), "LoadLibraryW");
+
+	// Start thread in remote process
+	CreateRemoteThread(m_processHandle, NULL, 0, threatStartRoutineAddress, (PVOID)bufferAddr, 0, NULL);
+	return true;
 }

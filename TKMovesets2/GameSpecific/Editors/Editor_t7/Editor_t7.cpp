@@ -323,6 +323,94 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	movesetTable.aliases = *m_aliases;
 }
 
+void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
+{
+	auto move = m_iterators.moves[moveId];
+	char const* namePtr = (char const*)(m_movesetData + m_header->offsets.nameBlock);
+
+	std::string moveName = std::string(namePtr + move->name_addr);
+
+	EditorMoveFlags flags = 0;
+
+	if (move->hitlevel || move->hitbox_location || move->first_active_frame || move->last_active_frame) {
+		if (move->hitlevel && move->hitbox_location && move->first_active_frame && move->last_active_frame) {
+			flags |= EditorMoveFlags_Attack;
+		}
+		else {
+			flags |= EditorMoveFlags_OtherAttack;
+		}
+	}
+
+	if (Helpers::endsWith(moveName, "_y")) {
+		flags |= EditorMoveFlags_Throw;
+	}
+	else if (Helpers::endsWith(moveName, "_n")) {
+		flags |= EditorMoveFlags_ThrowReaction;
+	}
+
+	if (Helpers::startsWith(moveName, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
+		flags |= EditorMoveFlags_Custom;
+	}
+
+	uint16_t aliasId = 0;
+	auto displayedMove = displayableMovelist->at(moveId);
+
+	// Mark if default generic moves
+	{
+		uint16_t* aliases = m_infos->orig_aliases;
+		uint8_t aliasesCount = (uint8_t)_countof(m_infos->orig_aliases);
+
+		for (uint8_t j = 0; j < aliasesCount; ++j)
+		{
+			uint16_t aliasMoveId = aliases[j];
+			uint16_t aliasId = 0x8000 + j;
+
+			if (moveId != aliasMoveId) {
+				continue;
+			}
+
+			displayedMove->flags |= EditorMoveFlags_Generic;
+
+			if (displayedMove->aliasId == 0)
+			{
+				displayedMove->color |= EditorUtils::GetMoveColorFromFlag(displayedMove->flags);
+				aliasId = aliasId;
+			}
+		}
+	}
+
+	// Mark if current generic move
+	{
+		uint16_t* aliases = m_infos->current_aliases;
+		uint8_t aliasesCount = (uint8_t)_countof(m_infos->current_aliases);
+
+		for (uint8_t j = 0; j < aliasesCount; ++j)
+		{
+			uint16_t aliasMoveId = aliases[j];
+			uint16_t aliasId = 0x8000 + j;
+
+			if (moveId != aliasMoveId) {
+				continue;
+			}
+
+			displayedMove->flags |= EditorMoveFlags_Generic;
+
+			if (displayedMove->aliasId == 0)
+			{
+				displayedMove->color |= EditorUtils::GetMoveColorFromFlag(displayedMove->flags);
+				aliasId = aliasId;
+			}
+		}
+	}
+
+	displayedMove->moveId_str = std::to_string(moveId);
+	displayedMove->name = moveName;
+	displayedMove->alias_str = aliasId == 0 ? std::string() : std::to_string(aliasId);
+	displayedMove->color = EditorUtils::GetMoveColorFromFlag(flags);
+	displayedMove->aliasId = aliasId;
+	displayedMove->flags = flags;
+}
+
 void EditorT7::ReloadDisplayableMoveList()
 {
 	mustReloadMovelist = true;
@@ -410,7 +498,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			auto& move = (*displayableMovelist).at(moveId);
 			move->flags |= EditorMoveFlags_CurrentGeneric;
 
-			if (move->aliasId != 0)
+			if (move->aliasId == 0)
 			{
 				move->color |= EditorUtils::GetMoveColorFromFlag(move->flags);
 				move->aliasId = aliasId;
@@ -667,6 +755,9 @@ std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
 
 	m_iterators.moves[moveid]->anim_name_addr = relativeName;
 	m_iterators.moves[moveid]->anim_addr = relativeAnim;
+
+	(*m_animNameToOffsetMap)[animName_str] = relativeAnim;
+	(*m_animOffsetToNameOffset)[relativeAnim] = relativeName;
 
 	return animName_str;
 }

@@ -92,7 +92,7 @@ static void InitMainClasses(MainWindow& program)
 
 	program.extractor.Init(addrFile, &program.storage);
 	program.importer.Init(addrFile, &program.storage);
-	program.onlineMenu.importerHelper.Init(addrFile, &program.storage);
+	program.onlineMenu.gameHelper.Init(addrFile, &program.storage);
 
 	{
 		// Detect running games and latch on to them if possible
@@ -149,7 +149,7 @@ static void InitMainClasses(MainWindow& program)
 	program.storage.StartThread();
 	program.extractor.StartThread();
 	program.importer.StartThread();
-	program.onlineMenu.importerHelper.StartThread();
+	program.onlineMenu.gameHelper.StartThread();
 }
 
 // Free up memory and stop threads cleanly before exiting the program
@@ -157,7 +157,7 @@ static void DestroyMainClasses(MainWindow& program)
 {
 	program.extractor.StopThreadAndCleanup();
 	program.importer.StopThreadAndCleanup();
-	program.onlineMenu.importerHelper.StopThreadAndCleanup();
+	program.onlineMenu.gameHelper.StopThreadAndCleanup();
 
 	for (EditorWindow* win : program.editorWindows) {
 		delete win;

@@ -318,6 +318,8 @@ public:
 	virtual void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	// Return the movelist in a quickly displayable format
 	virtual void ReloadDisplayableMoveList() = 0;
+	// For the movelist displayed to the left
+	virtual void RecomputeDisplayableMoveFlags(uint16_t moveId) = 0;
 	// Returns the given player current move id
 	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
 	// Returns the moveset and its size

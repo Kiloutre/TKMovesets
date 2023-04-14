@@ -3,6 +3,7 @@
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
 #include "Editor_t7.hpp"
+#include "Online_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
 // THe IDs correspond to the index of the game in the list
@@ -15,8 +16,8 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "t7",
 		.extractor = new FactoryType<ExtractorT7>,
 		.importer = new FactoryType<ImporterT7>,
-		.editor = new FactoryType <EditorT7>,
-		.onlineHandler = nullptr
+		.editor = new FactoryType<EditorT7>,
+		.onlineHandler = new FactoryType<OnlineT7>
 	},
 	{
 		.name = "Tekken 8",
@@ -113,5 +114,11 @@ namespace Games
 		Editor* ed = (Editor*)cg_gamesInfo[gameId].editor->allocate(process, game);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
+	}
+
+	Online* FactoryGetOnline(uint8_t gameId, GameProcess* process, GameData* game)
+	{
+		Online* on = (Online*)cg_gamesInfo[gameId].onlineHandler->allocate(process, game);
+		return on;
 	}
 };

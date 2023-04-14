@@ -7,6 +7,7 @@
 #include "Importer.hpp"
 #include "Extractor.hpp"
 #include "Editor.hpp"
+#include "Online.hpp"
 
 #include "constants.h"
 
@@ -71,12 +72,15 @@ namespace Games
 	// Returns true if live moveset edition on the moveset is allowed
 	bool IsGameLiveEditable(uint8_t gameId);
 
-	// Istantiate a new game-dependant extractor
+	// Instantiate a new game-specific extractor
 	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game);
 
-	// Istantiate a new game-dependant importer
+	// Instantiate a new game-specific importer
 	DLLCONTENT Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game);
 
-	// Istantiate a new game-dependant importer
+	// Instantiate a new game-specific importer
 	DLLCONTENT Editor* FactoryGetEditor(uint8_t gameId, GameProcess* process, GameData* game);
+
+	// Instantiate a new game-specific online handler
+	DLLCONTENT Online* FactoryGetOnline(uint8_t gameId, GameProcess* process, GameData* game);
 }

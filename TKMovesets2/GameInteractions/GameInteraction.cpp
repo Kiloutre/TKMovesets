@@ -60,3 +60,18 @@ void GameInteraction::Init(GameAddressesFile* addrFile, LocalStorage* t_storage)
 	game = new GameData(process, addrFile);
 	storage = t_storage;
 }
+
+bool GameInteraction::IsAttached()
+{
+	return process != nullptr && process->IsAttached();
+}
+
+void GameInteraction::StopThreadAndCleanup()
+{
+	// Order thread to stop
+	m_threadStarted = false;
+	m_t.join();
+
+	delete process;
+	delete game;
+}
