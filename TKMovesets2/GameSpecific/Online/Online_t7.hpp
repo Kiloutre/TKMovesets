@@ -8,7 +8,7 @@ class DLLCONTENT OnlineT7 : public Online
 {
 private:
 	const TCHAR* GetSharedMemoryName() {
-		return TEXT("TKMovesets2\\T7Mem");
+		return TEXT("Local\\TKMovesets2T7Mem");
 	}
 public:
 	using Online::Online; // Inherit constructor too

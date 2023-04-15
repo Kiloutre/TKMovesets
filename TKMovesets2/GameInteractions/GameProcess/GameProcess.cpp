@@ -363,6 +363,7 @@ void GameProcess::freeMem(gameAddr targetAddr)
 GameProcessThreadCreation_ GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument, bool waitEnd, int32_t* exitCodeThread)
 {
 	auto hThread = CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, (PVOID)argument, 0, nullptr);
+
 	bool result = hThread != nullptr;
 	DEBUG_LOG("CreateRemoteThread at %llx, arg is %llx ; success = %d\n", startAddress, argument, result);
 	if (hThread != nullptr && waitEnd) {
@@ -407,7 +408,7 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 
 	DEBUG_LOG("-- Injecting DLL %S --\n", fullpath);
 	// Allocate space for dll path in process memory
-	int fullpathSize = (wcslen(fullpath) + 1) * sizeof(WCHAR);
+	int fullpathSize = (wcslen(fullpath) + 1) * (int)sizeof(WCHAR);
 	gameAddr bufferAddr = allocateMem(fullpathSize);
 
 	if (bufferAddr == 0) {

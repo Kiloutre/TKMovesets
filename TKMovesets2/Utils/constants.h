@@ -67,4 +67,6 @@
 # define MVL_DISABLED            IM_COL32(33, 21, 51, 150)
 
 # define MOVESET_LIST_MODIFIED   IM_COL32(19, 96, 18, 30)
-# define MOVESET_INVALID         IM_COL32(186, 54, 54, 50)
+# define MOVESET_INVALID         IM_COL32(186, 54, 54, 5)
+
+# define SHARED_MEMORY_BUFSIZE    (2048)

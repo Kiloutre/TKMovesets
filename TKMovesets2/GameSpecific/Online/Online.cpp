@@ -1,4 +1,5 @@
 #include <format>
+#include <windows.h>
 
 #include "Online.hpp"
 
@@ -25,7 +26,13 @@ bool Online::LoadSharedMemory()
     auto sharedMemName = GetSharedMemoryName();
     m_memoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, sharedMemName);
     if (m_memoryHandle == nullptr) {
+        DEBUG_LOG("Error opening file mapping\n");
         return false;
+    }
+    m_sharedMemPtr = (Byte*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    if (m_sharedMemPtr == nullptr) {
+        DEBUG_LOG("Error mapping view of file\n");
+        CloseHandle(m_memoryHandle);
     }
     return true;
 }

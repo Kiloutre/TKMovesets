@@ -18,6 +18,8 @@ protected:
 	GameData* m_game;
 	// Contains whether or not we have injected our DLL
 	bool m_injectedDll = false;
+	// Ptr to the shared memory
+	Byte* m_sharedMemPtr = nullptr;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
