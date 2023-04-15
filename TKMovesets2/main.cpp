@@ -178,7 +178,6 @@ int main(int argc, wchar_t** argv, char** env)
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 #endif
 {
-	WriteToLogFile("Started TKMovesets " PROGRAM_VERSION, false);
 	{
 		std::string oldWorkingDir = std::filesystem::current_path().string();
 		WriteToLogFile(std::format("OLD CWD is {}", oldWorkingDir));

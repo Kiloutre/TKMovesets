@@ -4,7 +4,7 @@
 
 #include "MovesetLoader.hpp"
 
-class DLLCONTENT MovesetLoaderT7 : public MovesetLoader
+class MovesetLoaderT7 : public MovesetLoader
 {
 private:
 	const TCHAR* GetSharedMemoryName() override {

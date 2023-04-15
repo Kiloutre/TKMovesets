@@ -8,8 +8,6 @@
 #include "Structs_t7.h"
 #include "MovesetStructs.h"
 
-using namespace StructsT7;
-
 // This class has no storage and i would like to keep it that way.
 // You should be passing values through method calls and no other way.
 // It should be able to call Export() while another Export() is going on in another thread and this without breaking anything
@@ -28,7 +26,7 @@ private:
 	// Allocate and copy the contents of the name block
 	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT7_gameAddr::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart);
 	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
-	Byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings);
+	Byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, StructsT7::MotaList* motasList, ExtractSettings settings);
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
 	Byte* CopyAnimations(const StructsT7_gameAddr::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets);
 	// Copies the moveset info block (aliases, couple strings)
@@ -41,9 +39,9 @@ private:
 	// Writes bounds of the block containing anim and move names
 	void GetNamesBlockBounds(const StructsT7_gameAddr::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
 	// Returns an allocated block containing mota block offsets followed by mota blocks
-	Byte* AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, ExtractSettings settings);
+	Byte* AllocateMotaCustomBlock(StructsT7::MotaList* motas, uint64_t& size_out, ExtractSettings settings);
 	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
-	uint64_t CalculateMotaCustomBlockSize(const MotaList* motas, std::map<gameAddr, std::pair<gameAddr, uint64_t>>& offsetMap, ExtractSettings settings);
+	uint64_t CalculateMotaCustomBlockSize(const StructsT7::MotaList* motas, std::map<gameAddr, std::pair<gameAddr, uint64_t>>& offsetMap, ExtractSettings settings);
 
 
 	const char* GetGameIdentifierString() override { return "T7_"; }

@@ -8,8 +8,6 @@
 #include "Structs_t7.h"
 #include "MovesetStructs.h"
 
-using namespace StructsT7;
-
 // This class has no storage and i would like to keep it that way.
 // You should be passing values through method calls and no other way.
 // It should be able to call Import() while another Import() is going on in another thread and this without breaking anything
@@ -29,7 +27,7 @@ private:
 	// Fixes move that rely on correct character IDs to work
 	void ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* offsets, const TKMovesetHeader& header);
 	// Import the displayable movelist
-	void ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
+	void ImportMovelist(StructsT7::MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
 public:
 	using Importer::Importer; // Inherit constructor too
 	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) override;

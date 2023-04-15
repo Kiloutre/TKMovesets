@@ -2,9 +2,7 @@
 
 #include <windows.h>
 
-#include "constants.h"
-
-class DLLCONTENT MovesetLoader
+class MovesetLoader
 {
 protected:
 	// Stores a handle to the shared memory
@@ -17,7 +15,9 @@ protected:
 public:
 	MovesetLoader();
 	~MovesetLoader();
-	
+
+	// If set to true, force the Mainloop() to stop
+	bool mustStop = false;
 	// Main loop of the loader
 	void Mainloop();
 };

@@ -5,11 +5,12 @@
 
 #include "Structs_t7.h"
 
+using namespace StructsT7;
+
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
 
-//
 
 static void ConvertDisplayableMovelistOffsets(MvlHead* mvlHead)
 {

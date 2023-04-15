@@ -360,24 +360,26 @@ void GameProcess::freeMem(gameAddr targetAddr)
 	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 }
 
-bool GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument, bool waitEnd)
+GameProcessThreadCreation_ GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument, bool waitEnd, int32_t* exitCodeThread)
 {
-	auto hLoadThread = CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, (PVOID)argument, 0, nullptr);
-	bool result = hLoadThread != nullptr;
+	auto hThread = CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, (PVOID)argument, 0, nullptr);
+	bool result = hThread != nullptr;
 	DEBUG_LOG("CreateRemoteThread at %llx, arg is %llx ; success = %d\n", startAddress, argument, result);
-	if (result && waitEnd) {
-		int x = WaitForSingleObject(hLoadThread, 10000);
-		switch (x)
+	if (hThread != nullptr && waitEnd) {
+		switch (WaitForSingleObject(hThread, 10000))
 		{
 		case WAIT_TIMEOUT:
 			DEBUG_LOG("Thread: not waiting for more than 10secs for it to end.\n");
-			break;
+			return GameProcessThreadCreation_WaitTimeout;
 		default:
 			DEBUG_LOG("Thread finished.\n");
-			break;
+			if (exitCodeThread != nullptr) {
+				GetExitCodeThread(hThread, (DWORD*)exitCodeThread);
+			}
+			return GameProcessThreadCreation_FinishedCleanly;
 		}
 	}
-	return result;
+	return GameProcessThreadCreation_Error;
 }
 
 bool GameProcess::InjectDll(const wchar_t* fullpath)
@@ -387,8 +389,8 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 		std::string dllName;
 		{
 			std::wstring w_dllName = fullpath;
-			if (w_dllName.find_last_of('/\\') != std::wstring::npos) {
-				w_dllName.erase(0, w_dllName.find_last_of('/\\') + 1);
+			if (w_dllName.find_last_of(L"/\\") != std::wstring::npos) {
+				w_dllName.erase(0, w_dllName.find_last_of(L"/\\") + 1);
 			}
 			dllName = std::string(w_dllName.begin(), w_dllName.end());
 		}
@@ -396,7 +398,7 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 		// Check if the DLL is not already loaded
 		for (auto& module : GetModuleList())
 		{
-			if (module.name.c_str() == dllName) {
+			if (module.name == dllName) {
 				DEBUG_LOG("-- DLL '%s' already injected, not re-injecting. --\n", dllName.c_str());
 				return true;
 			}
@@ -414,7 +416,6 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 	}
 	// Write path in process memory
 	writeBytes(bufferAddr, (void*)fullpath, fullpathSize);
-	DEBUG_LOG("Allocated argument at %llx, size is %llu\n", bufferAddr, fullpathSize);
 
 	// Get address of LoadLibraryW
 	auto moduleHandle = GetModuleHandleA(TEXT("Kernel32"));
@@ -424,8 +425,15 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 	}
 	PTHREAD_START_ROUTINE threatStartRoutineAddress = (PTHREAD_START_ROUTINE)GetProcAddress(moduleHandle, "LoadLibraryW");
 
-	bool result = createRemoteThread((gameAddr)threatStartRoutineAddress, bufferAddr, true);
-	freeMem(bufferAddr);
 	// Start thread in remote process
-	return result;
+	auto errcode = createRemoteThread((gameAddr)threatStartRoutineAddress, bufferAddr, true);
+	if (errcode != GameProcessThreadCreation_WaitTimeout) {
+		// Only free if the thread is actually finished
+		// Yes, this means a potential memory leak if the thread takes more than 10sec
+		// Todo: if WaitTimeout, remember the thread handle and regularly check if it is still ongoing
+		// Not really important here though
+		freeMem(bufferAddr);
+	}
+
+	return errcode != GameProcessThreadCreation_Error;
 }

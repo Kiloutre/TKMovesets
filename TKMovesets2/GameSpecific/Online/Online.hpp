@@ -16,6 +16,8 @@ protected:
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt
 	GameData* m_game;
+	// Contains whether or not we have injected our DLL
+	bool m_injectedDll = false;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;

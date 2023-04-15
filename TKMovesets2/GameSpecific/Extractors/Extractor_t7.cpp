@@ -9,11 +9,11 @@
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
 
+using namespace StructsT7;
+
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
-
-// Contains the same structures as StructsT7 but with no pointers: gameAddr instead
 
 // -- Static helpers -- //
 

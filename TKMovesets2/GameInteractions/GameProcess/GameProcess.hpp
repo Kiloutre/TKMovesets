@@ -26,6 +26,14 @@ namespace GameProcessUtils
 	std::vector<processEntry> GetRunningProcessList();
 };
 
+// Thread creation status
+enum GameProcessThreadCreation_
+{
+	GameProcessThreadCreation_FinishedCleanly,
+	GameProcessThreadCreation_WaitTimeout,
+	GameProcessThreadCreation_Error,
+};
+
 enum GameProcessErrcode_
 {
 	// This will happen if the process-attaching thread is not started
@@ -194,6 +202,6 @@ public:
 	gameAddr allocateMem(size_t amount);
 	// Frees memory that we previously allocated. Address must be the exact same as when it was returned by allocateMem().
 	void freeMem(gameAddr addr);
-	// Create a thread in the remote process
-	bool createRemoteThread(gameAddr startAddress, uint64_t argument=0, bool waitEnd=false);
+	// Create a thread in the remote process. Can wait for the end of the thread and receive the thread exit code
+	GameProcessThreadCreation_ createRemoteThread(gameAddr startAddress, uint64_t argument=0, bool waitEnd=false, int32_t* exitCodeThread=nullptr);
 };
