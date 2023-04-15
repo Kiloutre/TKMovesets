@@ -19,8 +19,6 @@ protected:
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
-	// Returns the name of the DLL file to load
-	virtual const char* GetDllName() { return "MovesetLoader.dll"; };
 public:
 	Online(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	~Online();

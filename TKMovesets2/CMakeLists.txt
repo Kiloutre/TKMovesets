@@ -101,17 +101,17 @@ set(IMPORTEXPORT_SOURCES
 
                     # List of games
                     "GameSpecific/Games.cpp"
-                    # Base classes for our extractor & importers
+                    # Base classes for our game-specific stuff
                     "GameSpecific/Extractors/Extractor.cpp"
                     "GameSpecific/Importers/Importer.cpp"
                     "GameSpecific/Editors/Editor.cpp"
                     "GameSpecific/Online/Online.cpp"
-
+                    
                     # Game-specific
                     ## T7
+                    "GameSpecific/Online/Online_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7.cpp"
                     "GameSpecific/Importers/Importer_t7.cpp"
-                    "GameSpecific/Online/Online_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms_DisplayableMovelist.cpp"
@@ -131,13 +131,6 @@ set(MOVESETLOADER_SOURCES
 )
 
 ## Build ##
-# Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
-add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES})
-target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
-target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
-if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-target_compile_definitions(ExportImport PUBLIC BUILD_TYPE_DEBUG)
-endif()
 
 # Build injected MovesetLoader .dll
 add_library(MovesetLoader SHARED ${MOVESETLOADER_SOURCES})
@@ -147,16 +140,26 @@ if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
 target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
+# Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
+add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES})
+target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
+target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+target_compile_definitions(ExportImport PUBLIC BUILD_TYPE_DEBUG)
+endif()
+
 # Build program .exe
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
 add_executable (TKMovesets2 ${BINARY_SOURCES})
-target_compile_definitions(ExportImport PUBLIC BUILD_TYPE_DEBUG)
+target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
 else()
 add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES})
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
+add_dependencies(TKMovesets2 MovesetLoader)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)
+target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for GetModuleHandle() to work, apparently
 
 ## Ressources ##
 # Addresses file #

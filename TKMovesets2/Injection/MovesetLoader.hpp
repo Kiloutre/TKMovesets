@@ -12,7 +12,7 @@ protected:
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() {
-		return TEXT("TKMovesets2\\T7Mem");
+		return TEXT("TKMovesets2\\Mem");
 	}
 public:
 	MovesetLoader();

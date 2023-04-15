@@ -1,5 +1,6 @@
 #include <thread>
 #include <stdint.h>
+#include <string>
 
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
@@ -26,18 +27,54 @@ void MovesetLoader::Mainloop()
     }
 }
 
-void DLLCONTENT StartMovesetLoader(uint8_t gameId)
+static std::string GetModuleFilenameStr()
+{
+    TCHAR szFileName[MAX_PATH];
+
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    return std::string(szFileName);
+}
+
+void DLLCONTENT StartMovesetLoader()
 {
     MovesetLoader* loader;
 
-    switch (gameId)
-    {
-    case 0:
+    std::string processName = GetModuleFilenameStr();
+    if (processName == "TekkenGame-Win64-Shipping.exe") {
         loader = new MovesetLoaderT7;
-    default:
+    }
+    else {
         return;
     }
 
     loader->Mainloop();
     delete loader;
+}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+    switch (fdwReason)
+    {
+    case DLL_PROCESS_ATTACH:
+        MessageBox(
+            NULL,
+            "Meow from evil.dll!",
+            "=^..^=",
+            MB_OK
+        );
+        break;
+
+    case DLL_THREAD_ATTACH:
+        break;
+
+    case DLL_THREAD_DETACH:
+        break;
+
+    case DLL_PROCESS_DETACH: 
+        if (lpvReserved != nullptr) {
+            break;
+        }
+        break;
+    }
+    return TRUE;
 }

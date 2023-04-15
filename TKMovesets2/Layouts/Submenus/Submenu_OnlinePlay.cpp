@@ -49,7 +49,6 @@ void Submenu_OnlinePlay::Render()
 	case GameProcessErrcode_PROC_ATTACHED:
 		if (!m_onlineHandler->IsMemoryLoaded()) {
 			ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));
-			ImGui::SameLine();
 			if (ImGui::Button(_("online.inject_dll"))) {
 				m_onlineHandler->InjectDll();
 			}
@@ -87,6 +86,8 @@ void Submenu_OnlinePlay::OnDetach()
 
 void Submenu_OnlinePlay::SetTargetProcess(const char* processName, uint8_t gameId)
 {
+	// The importer (gameHelper) doesn't have this flag by default, so we have to add it here
+	gameHelper.AddProcessFlags(PROCESS_CREATE_THREAD);
 	gameHelper.SetTargetProcess(processName, gameId);
 }
 

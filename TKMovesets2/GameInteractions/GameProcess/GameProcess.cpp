@@ -360,27 +360,72 @@ void GameProcess::freeMem(gameAddr targetAddr)
 	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 }
 
-void GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument)
+bool GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument, bool waitEnd)
 {
-	CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, &argument, 0, nullptr);
+	auto hLoadThread = CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, (PVOID)argument, 0, nullptr);
+	bool result = hLoadThread != nullptr;
+	DEBUG_LOG("CreateRemoteThread at %llx, arg is %llx ; success = %d\n", startAddress, argument, result);
+	if (result && waitEnd) {
+		int x = WaitForSingleObject(hLoadThread, 10000);
+		switch (x)
+		{
+		case WAIT_TIMEOUT:
+			DEBUG_LOG("Thread: not waiting for more than 10secs for it to end.\n");
+			break;
+		default:
+			DEBUG_LOG("Thread finished.\n");
+			break;
+		}
+	}
+	return result;
 }
 
-bool GameProcess::InjectDll(const char* fullpath)
+bool GameProcess::InjectDll(const wchar_t* fullpath)
 {
+	{
+		// Get .dll name only (including extension)
+		std::string dllName;
+		{
+			std::wstring w_dllName = fullpath;
+			if (w_dllName.find_last_of('/\\') != std::wstring::npos) {
+				w_dllName.erase(0, w_dllName.find_last_of('/\\') + 1);
+			}
+			dllName = std::string(w_dllName.begin(), w_dllName.end());
+		}
+
+		// Check if the DLL is not already loaded
+		for (auto& module : GetModuleList())
+		{
+			if (module.name.c_str() == dllName) {
+				DEBUG_LOG("-- DLL '%s' already injected, not re-injecting. --\n", dllName.c_str());
+				return true;
+			}
+		}
+	}
+
+	DEBUG_LOG("-- Injecting DLL %S --\n", fullpath);
 	// Allocate space for dll path in process memory
-	int fullpathSize = strlen(fullpath) + 1;
+	int fullpathSize = (wcslen(fullpath) + 1) * sizeof(WCHAR);
 	gameAddr bufferAddr = allocateMem(fullpathSize);
 
 	if (bufferAddr == 0) {
+		DEBUG_LOG("DLL injection failure: tried to allocated %d, got nullptr from alloc.\n", fullpathSize);
 		return false;
 	}
 	// Write path in process memory
 	writeBytes(bufferAddr, (void*)fullpath, fullpathSize);
+	DEBUG_LOG("Allocated argument at %llx, size is %llu\n", bufferAddr, fullpathSize);
 
 	// Get address of LoadLibraryW
-	PTHREAD_START_ROUTINE threatStartRoutineAddress = (PTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(TEXT("Kernel32")), "LoadLibraryW");
+	auto moduleHandle = GetModuleHandleA(TEXT("Kernel32"));
+	if (moduleHandle == 0) {
+		DEBUG_LOG("Failed getting the module handle of Kernel32.\n");
+		return false;
+	}
+	PTHREAD_START_ROUTINE threatStartRoutineAddress = (PTHREAD_START_ROUTINE)GetProcAddress(moduleHandle, "LoadLibraryW");
 
+	bool result = createRemoteThread((gameAddr)threatStartRoutineAddress, bufferAddr, true);
+	freeMem(bufferAddr);
 	// Start thread in remote process
-	CreateRemoteThread(m_processHandle, NULL, 0, threatStartRoutineAddress, (PVOID)bufferAddr, 0, NULL);
-	return true;
+	return result;
 }

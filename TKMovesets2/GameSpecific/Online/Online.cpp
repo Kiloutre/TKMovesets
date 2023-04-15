@@ -26,12 +26,31 @@ bool Online::IsMemoryLoaded()
 
 bool Online::InjectDll()
 {
-    const char* DllName = GetDllName();
-    std::string dllPath = std::format("./Resources/{}", DllName);
+    std::wstring currDirectory;
+    {
+        // Get directory of our .exe because this is where the MovesetLoader is located
+        wchar_t currPath[MAX_PATH] = { 0 };
+        GetModuleFileNameW(nullptr, currPath, MAX_PATH);
+        currDirectory = std::wstring(currPath);
+        currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
+    }
 
-    if (!m_process->InjectDll(dllPath.c_str())) {
+    std::wstring w_dllPath = currDirectory + L"MovesetLoader.dll";
+    std::string dllPath = std::string(w_dllPath.begin(), w_dllPath.end());
+
+    if (!m_process->InjectDll(w_dllPath.c_str())) {
         return false;
     }
-    
+
+    auto moduleHandle = GetModuleHandleA(dllPath.c_str());
+    if (moduleHandle == 0) {
+        DEBUG_LOG("Failure getting the module handle for '%s'\n", dllPath.c_str());
+        return false;
+    }
+    gameAddr startAddr = (gameAddr)GetProcAddress(moduleHandle, "StartMovesetLoader");
+    DEBUG_LOG("StartMovesetLoader addr is %llx\n", startAddr);
+
+    m_process->createRemoteThread(startAddr);
+    DEBUG_LOG("Thread successfully created\n");
     return true;
 }

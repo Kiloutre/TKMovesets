@@ -45,8 +45,10 @@ public:
 	// Stores the in-game addresses of the last moveset loaded by the last Queue() call
 	gameAddr lastLoadedMoveset = 0;
 
-	// Default flags are raed-only, so the importer needs this
+	// Default flags are read-only, so the importer needs this
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }
+	// Add flags that will be used during the next process opening
+	void AddProcessFlags(DWORD flags) { m_processExtraFlags |= flags; }
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the extractor will allow an importation (false if it won't, like if characters aren't loaded)
