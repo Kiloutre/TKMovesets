@@ -90,11 +90,11 @@ public:
 	bool Attach(const char* processName, DWORD processExtraFlags);
 	// Detach from the game,
 	void Detach();
-	// Returns true if .status = PROC_NOT_ATTACHED
+	// Returns true if .status = PROC_NOT_ATTACHED. Use CheckRunning() for an actual proper check.
 	bool IsAttached();
 	// Checks if pid still used by process & attempts a read. Updates .status & returns false if it fails.
 	bool CheckRunning();
-	// Frees previous allocated memory. Set to false (defult) if you want to only free memory older than 10 seconds.
+	// Frees previous allocated memory. Set [instant] to false (default) if you want to only free memory older than 10 seconds.
 	void FreeOldGameMemory(bool instant = false);
 	// Returns a list of module currently loaded in the target remote process
 	std::vector<moduleEntry> GetModuleList();

@@ -16,6 +16,8 @@ class GameInteraction : public ThreadedClass
 protected:
 	// Flags that will be used to open the process with
 	DWORD m_processExtraFlags = 0;
+	// Last status of the process, used to detect status change and trigger appropriate events
+	GameProcessErrcode_ m_lastStatus = GameProcessErrcode_PROC_NOT_ATTACHED;
 
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	virtual void InstantiateFactory() = 0;
@@ -41,10 +43,8 @@ public:
 	GameProcess* process = nullptr;
 	// Helper to read on address from their game_addresses.txt identifier
 	GameData* game = nullptr;
-	// Progress of the current task, between 0 and 100
+	// Progress of the current task (import/export), between 0 and 100. 
 	uint8_t progress = 0;
-	// Last status of the process that we want to latch on
-	GameProcessErrcode_ lastStatus = GameProcessErrcode_PROC_NOT_ATTACHED;
 
 	// Returns true if process is attached
 	bool IsAttached();

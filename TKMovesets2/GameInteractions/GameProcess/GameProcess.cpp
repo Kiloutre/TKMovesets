@@ -103,7 +103,6 @@ std::vector<moduleEntry> GameProcess::GetModuleList()
 	HANDLE moduleSnap;
 	MODULEENTRY32 me32{ 0 };
 
-	moduleAddr = -1;
 	std::vector<moduleEntry> modules;
 
 	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, m_pid);
@@ -183,12 +182,14 @@ bool GameProcess::CheckRunning()
 		int32_t value = 0;
 		if (ReadProcessMemory(m_processHandle, (LPCVOID)moduleAddr, (LPVOID)&value, 4, nullptr) == 0)
 		{
+			DEBUG_LOG("! CheckRunning() failed: Process not running anymore !\n");
 			Detach();
 			status = GameProcessErrcode_PROC_EXITED;
 			return false;
 		}
+		return true;
 	}
-	return true;
+	return false;
 }
 
 void GameProcess::FreeOldGameMemory(bool instant)

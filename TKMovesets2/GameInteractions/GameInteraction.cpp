@@ -36,7 +36,6 @@ void GameInteraction::Update()
 			}
 		}
 		else if (currentGameId != -1) {
-			printf("attached: %d, running: %d\n", process->IsAttached(), process->CheckRunning());
 			// Process closed, try to attach again in case it is restarted
 			if (process->Attach(currentGameProcess.c_str(), m_processExtraFlags)) {
 				DEBUG_LOG("Process is now attached - OnProcessAttach()\n");
@@ -44,12 +43,12 @@ void GameInteraction::Update()
 			}
 		}
 
-		if (lastStatus != process->status) {
-			if (lastStatus == GameProcessErrcode_PROC_ATTACHED) {
+		if (m_lastStatus != process->status) {
+			if (m_lastStatus == GameProcessErrcode_PROC_ATTACHED) {
 				DEBUG_LOG("Process is not attached anymore - OnProcessDetach()\n");
 				OnProcessDetach();
 			}
-			lastStatus = process->status;
+			m_lastStatus = process->status;
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
