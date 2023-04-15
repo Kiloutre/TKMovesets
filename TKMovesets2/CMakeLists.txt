@@ -36,6 +36,7 @@ set(BINARY_SOURCES
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
                     "GameInteractions/GameImport.cpp"
+                    "GameInteractions/GameSharedMem.cpp"
                     "GameInteractions/GameProcess/GameData.cpp"
                     "GameInteractions/GameProcess/GameProcess.cpp"
 

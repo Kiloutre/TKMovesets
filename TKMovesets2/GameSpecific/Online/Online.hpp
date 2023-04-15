@@ -21,6 +21,8 @@ protected:
 	// Ptr to the shared memory
 	Byte* m_sharedMemPtr = nullptr;
 
+	// Calls a function of the MovesetLoader inside of the remote process. Returns false if failure was encountered somewhere.
+	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
 public:

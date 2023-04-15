@@ -18,15 +18,15 @@ protected:
 	DWORD m_processExtraFlags = 0;
 
 	// Instantiate an extractor with polymorphism, also destroy the old one
-	virtual void InstantiateFactory() { };
+	virtual void InstantiateFactory() = 0;
 	// Function ran in the parallel thread, executed by Update() only if latched on and if CanStart() returned true
-	virtual void RunningUpdate() { };
+	virtual void RunningUpdate() = 0;
 	// Callback called when the process has latched on a process for the first time
 	virtual void OnProcessAttach() { };
 	// Callback called when the process has detached, on purpose or not (status change from ATTACHED to any other)
-	virtual void OnProcessDetach() {};
+	virtual void OnProcessDetach() { };
 	// Called before detaching from the process when executing SetTargetProces()
-	virtual void PreProcessDetach() {};
+	virtual void PreProcessDetach() { };
 
 	// Function ran in the parallel thread, executed regularly
 	void Update();
@@ -43,16 +43,17 @@ public:
 	GameData* game = nullptr;
 	// Progress of the current task, between 0 and 100
 	uint8_t progress = 0;
+	// Last status of the process that we want to latch on
 	GameProcessErrcode_ lastStatus = GameProcessErrcode_PROC_NOT_ATTACHED;
 
 	// Returns true if process is attached
 	bool IsAttached();
 	// Returns the amount of characters we are able to interact with
-	virtual uint8_t GetCharacterCount() { return 0; };
+	virtual uint8_t GetCharacterCount() = 0;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
-	virtual bool CanStart() { return false; };
+	virtual bool CanStart() = 0;
 	// Is currently busy
-	virtual bool IsBusy() { return false; };
+	virtual bool IsBusy() = 0;
 	// Set the process to open
 	void SetTargetProcess(const char* processName, uint8_t gameId);
 	// Inits the member that needs to be created (.process, .game). Those Must be deleted afterward.

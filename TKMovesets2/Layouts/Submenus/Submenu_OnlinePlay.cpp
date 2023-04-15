@@ -7,26 +7,12 @@
 
 void Submenu_OnlinePlay::Render()
 {
-	// Detect change in attachment status
-	{
-		bool isAttached = gameHelper.IsAttached();
-		if (isAttached != m_isAttached) {
-			if (isAttached) {
-				OnAttach();
-			}
-			else {
-				OnDetach();
-			}
-			m_isAttached = isAttached;
-		}
-	}
-
 	ImGuiExtra::RenderTextbox(_("online.explanation"));
 	ImGui::SeparatorText(_("select_game"));
 
 	// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 	int8_t currentGameId = gameHelper.currentGameId;
-	ImGui::PushItemWidth(120);
+	ImGui::PushItemWidth(160);
 	ImGui::PushID(&gameHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
 	if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
@@ -47,10 +33,11 @@ void Submenu_OnlinePlay::Render()
 	switch (gameHelper.process->status)
 	{
 	case GameProcessErrcode_PROC_ATTACHED:
-		if (!m_onlineHandler->IsMemoryLoaded()) {
+		if (!gameHelper.sharedMemHandler->IsMemoryLoaded())
+		{
 			ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));
 			if (ImGui::Button(_("online.inject_dll"))) {
-				m_onlineHandler->InjectDll();
+				gameHelper.sharedMemHandler->InjectDll();
 			}
 		}
 		break;
@@ -69,29 +56,4 @@ void Submenu_OnlinePlay::Render()
 		ImGuiExtra_TextboxError(_("process.game_attach_err"));
 		break;
 	}
-}
-
-void Submenu_OnlinePlay::OnAttach()
-{
-	m_onlineHandler = Games::FactoryGetOnline(gameHelper.currentGameId, gameHelper.process, gameHelper.game);
-}
-
-void Submenu_OnlinePlay::OnDetach()
-{
-	if (m_onlineHandler != nullptr) {
-		delete m_onlineHandler;
-		m_onlineHandler = nullptr;
-	}
-}
-
-void Submenu_OnlinePlay::SetTargetProcess(const char* processName, uint8_t gameId)
-{
-	// The importer (gameHelper) doesn't have this flag by default, so we have to add it here
-	gameHelper.AddProcessFlags(PROCESS_CREATE_THREAD);
-	gameHelper.SetTargetProcess(processName, gameId);
-}
-
-Submenu_OnlinePlay::~Submenu_OnlinePlay()
-{
-	delete m_onlineHandler;
 }

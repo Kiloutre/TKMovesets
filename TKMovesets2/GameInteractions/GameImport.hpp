@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tuple>
 #include <utility>
 #include <sys/stat.h>
 
@@ -18,9 +17,9 @@ struct importEntry
 	ImportSettings settings;
 };
 
-class GameImport : public virtual GameInteraction
+class GameImport : public GameInteraction
 {
-private:
+protected:
 	// Movesets (data, size) to import and corresponding player address
 	std::vector<importEntry> m_plannedImportations;
 	// List of errors, one extraction fail = 1 error
@@ -47,8 +46,6 @@ public:
 
 	// Default flags are read-only, so the importer needs this
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }
-	// Add flags that will be used during the next process opening
-	void AddProcessFlags(DWORD flags) { m_processExtraFlags |= flags; }
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the extractor will allow an importation (false if it won't, like if characters aren't loaded)

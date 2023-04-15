@@ -34,7 +34,7 @@ void GameImport::InstantiateFactory()
 		delete importer;
 	}
 
-	// Every game has its own extraction subtleties so we use polymorphism to manage that
+	// Every game has its own importation subtleties so we use polymorphism to manage that
 	importer = Games::FactoryGetImporter(currentGameId, process, game);
 }
 

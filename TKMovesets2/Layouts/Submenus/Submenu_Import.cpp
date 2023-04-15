@@ -39,7 +39,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 
 		// Game list
 		int8_t currentGameId = importerHelper.currentGameId;
-		ImGui::PushItemWidth(120.0f);
+		ImGui::PushItemWidth(160.);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))

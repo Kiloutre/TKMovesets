@@ -138,7 +138,7 @@ static void InitMainClasses(MainWindow& program)
 			}
 
 			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
-				program.onlineMenu.SetTargetProcess(processName, gameId);
+				program.onlineMenu.gameHelper.SetTargetProcess(processName, gameId);
 				attachedOnline = true;
 				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
 			}
@@ -245,6 +245,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	}
 	WriteToLogFile(std::format("Locale loaded - {}", Localization::GetCurrLangId()));
 
+	// Load the online moveset loader lib
+	auto movesetLoaderLib = LoadLibraryW(L"MovesetLoader.dll");
+	if (movesetLoaderLib == nullptr) {
+		DEBUG_LOG("Error while calling LoadLibraryW(L\"MovesetLoader.dll\");");
+		return false;
+	}
+
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program(window, c_glsl_version);
@@ -294,6 +301,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
+	FreeLibrary(movesetLoaderLib);
 	Localization::Clear();
 
 #ifdef BUILD_TYPE_DEBUG

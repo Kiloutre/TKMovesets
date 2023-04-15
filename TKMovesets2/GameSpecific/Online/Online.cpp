@@ -5,12 +5,14 @@
 
 Online::~Online()
 {
-    if (m_injectedDll && m_process->IsAttached()) {
+    if (m_injectedDll && m_process->IsAttached())
+    {
         for (auto& module : m_process->GetModuleList())
         {
             if (module.name == "MovesetLoader.dll")
             {
-                // Todo: tell the DLL to unload itself
+                // Tell the DLL to unload itself
+                CallMovesetLoaderFunction("MovesetLoaderStop", true);
                 break;
             }
         }
@@ -42,6 +44,27 @@ bool Online::IsMemoryLoaded()
     return m_memoryHandle != nullptr;
 }
 
+bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
+{
+    auto moduleHandle = GetModuleHandleA("MovesetLoader.dll");
+    if (moduleHandle == 0) {
+        DEBUG_LOG("Failure getting the module handle for 'MovesetLoader.dll'\n");
+        return false;
+    }
+    DEBUG_LOG("Module handle is %llx\n", moduleHandle);
+
+    gameAddr startAddr = (gameAddr)GetProcAddress(moduleHandle, functionName);
+    if (startAddr == 0) {
+        DEBUG_LOG("Failed getting function '%s' address in module 'MovesetLoader.dll'\n", functionName);
+        DEBUG_LAST_ERR();
+        return false;
+    }
+    DEBUG_LOG("%s addr is %llx\n", functionName, startAddr);
+
+    auto errcode = m_process->createRemoteThread(startAddr, 0, waitEnd);
+    return errcode != GameProcessThreadCreation_Error;
+}
+
 bool Online::InjectDll()
 {
     std::wstring currDirectory;
@@ -53,7 +76,6 @@ bool Online::InjectDll()
         currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
     }
 
-    const char* functionName = "MovesetLoaderStart";
     std::wstring w_dllName = L"MovesetLoader.dll";
     std::wstring w_dllPath = currDirectory + w_dllName;
     std::string dllName = std::string(w_dllName.begin(), w_dllName.end());
@@ -65,33 +87,5 @@ bool Online::InjectDll()
     m_injectedDll = true;
 
     // Load said DLL into our own process so that we can call GetProcAddress 
-    auto movesetLoaderLib = LoadLibraryW(w_dllPath.c_str());
-    if (movesetLoaderLib == nullptr) {
-        DEBUG_LOG("Error while calling LoadLibraryW locally (%S)\n", w_dllPath.c_str());
-        return false;
-    }
-
-    auto moduleHandle = GetModuleHandleA(dllName.c_str());
-    if (moduleHandle == 0) {
-        DEBUG_LOG("Failure getting the module handle for '%s'\n", dllName.c_str());
-        FreeLibrary(movesetLoaderLib);
-        return false;
-    }
-    DEBUG_LOG("Module handle is %llx\n", moduleHandle);
-
-    gameAddr startAddr = (gameAddr)GetProcAddress(moduleHandle, functionName);
-    if (startAddr == 0) {
-        DEBUG_LOG("Failed getting function '%s' address in module '%s'\n", functionName, dllName.c_str());
-        DEBUG_LAST_ERR();
-        FreeLibrary(movesetLoaderLib);
-        return false;
-    }
-    DEBUG_LOG("%s addr is %llx\n", functionName, startAddr);
-
-    // Finally free our own library now that we have obtained our proc address
-    FreeLibrary(movesetLoaderLib);
-
-    m_process->createRemoteThread(startAddr);
-    DEBUG_LOG("-- DLL Injected & Thread started --\n");
-    return true;
+    return CallMovesetLoaderFunction("MovesetLoaderStart", true);
 }
