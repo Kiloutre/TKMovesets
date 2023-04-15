@@ -92,7 +92,10 @@ static void InitMainClasses(MainWindow& program)
 
 	program.extractor.Init(addrFile, &program.storage);
 	program.importer.Init(addrFile, &program.storage);
-	program.onlineMenu.gameHelper.Init(addrFile, &program.storage);
+	program.sharedMem.Init(addrFile, &program.storage);
+
+	program.onlineMenu.gameHelper = &program.sharedMem;
+	//program.persistentMenu.gameHelper = &program.sharedMem;
 
 	{
 		// Detect running games and latch on to them if possible
@@ -138,7 +141,7 @@ static void InitMainClasses(MainWindow& program)
 			}
 
 			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
-				program.onlineMenu.gameHelper.SetTargetProcess(processName, gameId);
+				program.sharedMem.SetTargetProcess(processName, gameId);
 				attachedOnline = true;
 				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
 			}
@@ -149,7 +152,7 @@ static void InitMainClasses(MainWindow& program)
 	program.storage.StartThread();
 	program.extractor.StartThread();
 	program.importer.StartThread();
-	program.onlineMenu.gameHelper.StartThread();
+	program.sharedMem.StartThread();
 }
 
 // Free up memory and stop threads cleanly before exiting the program
@@ -157,7 +160,7 @@ static void DestroyMainClasses(MainWindow& program)
 {
 	program.extractor.StopThreadAndCleanup();
 	program.importer.StopThreadAndCleanup();
-	program.onlineMenu.gameHelper.StopThreadAndCleanup();
+	program.sharedMem.StopThreadAndCleanup();
 
 	for (EditorWindow* win : program.editorWindows) {
 		delete win;
@@ -228,7 +231,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		DEBUG_LOG("Unable to context to OpenGL");
-		return 8;
+		return 3;
 	}
 	WriteToLogFile("GLL Loader done");
 
@@ -246,10 +249,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	WriteToLogFile(std::format("Locale loaded - {}", Localization::GetCurrLangId()));
 
 	// Load the online moveset loader lib
-	auto movesetLoaderLib = LoadLibraryW(L"MovesetLoader.dll");
+	auto movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
 	if (movesetLoaderLib == nullptr) {
-		DEBUG_LOG("Error while calling LoadLibraryW(L\"MovesetLoader.dll\");");
-		return false;
+		DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
+		return 4;
 	}
 
 	{

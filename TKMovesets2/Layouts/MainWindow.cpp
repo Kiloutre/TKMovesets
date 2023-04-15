@@ -146,6 +146,8 @@ void MainWindow::Update()
 			case NAV__MENU_ONLINE_PLAY:
 				onlineMenu.Render();
 				break;
+			case NAV__MENU_PERSISTENT_PLAY:
+				break;
 			case NAV__MENU_CAMERA:
 				break;
 			case NAV__MENU_EDITION:

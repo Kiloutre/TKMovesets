@@ -26,13 +26,13 @@ protected:
 	std::vector<ImportationErrcode_> m_errors;
 
 	// Callback called whenever the process is re-attached
-	void OnProcessAttach() override;
+	virtual void OnProcessAttach() override;
 	// Callback called whenever the process is detached
 	void OnProcessDetach() override;
 	// Instantiate an extractor with polymorphism, also destroy the old one
-	void InstantiateFactory() override;
+	virtual void InstantiateFactory() override;
 	// Function ran in the parallel thread, used to latch on to process
-	void RunningUpdate() override;
+	virtual void RunningUpdate() override;
 	// Called before detaching form the current process
 	void PreProcessDetach() override;
 

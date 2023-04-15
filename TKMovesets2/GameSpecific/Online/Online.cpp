@@ -12,7 +12,8 @@ Online::~Online()
             if (module.name == "MovesetLoader.dll")
             {
                 // Tell the DLL to unload itself
-                CallMovesetLoaderFunction("MovesetLoaderStop", true);
+                DEBUG_LOG("~Online(): Calling Remote " MOVESET_LOADER_STOP_FUNC "(); \n");
+                CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC);
                 break;
             }
         }
@@ -28,12 +29,12 @@ bool Online::LoadSharedMemory()
     auto sharedMemName = GetSharedMemoryName();
     m_memoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, sharedMemName);
     if (m_memoryHandle == nullptr) {
-        DEBUG_LOG("Error opening file mapping\n");
+        DEBUG_LOG("Error opening file mapping '%s'\n", sharedMemName);
         return false;
     }
     m_sharedMemPtr = (Byte*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
     if (m_sharedMemPtr == nullptr) {
-        DEBUG_LOG("Error mapping view of file\n");
+        DEBUG_LOG("Error mapping view of file for shared memory '%s'\n", sharedMemName);
         CloseHandle(m_memoryHandle);
     }
     return true;
@@ -46,7 +47,7 @@ bool Online::IsMemoryLoaded()
 
 bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
 {
-    auto moduleHandle = GetModuleHandleA("MovesetLoader.dll");
+    auto moduleHandle = GetModuleHandleA(MOVESET_LOADER_NAME);
     if (moduleHandle == 0) {
         DEBUG_LOG("Failure getting the module handle for 'MovesetLoader.dll'\n");
         return false;
@@ -76,7 +77,7 @@ bool Online::InjectDll()
         currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
     }
 
-    std::wstring w_dllName = L"MovesetLoader.dll";
+    std::wstring w_dllName = L"" MOVESET_LOADER_NAME;
     std::wstring w_dllPath = currDirectory + w_dllName;
     std::string dllName = std::string(w_dllName.begin(), w_dllName.end());
 
@@ -87,5 +88,5 @@ bool Online::InjectDll()
     m_injectedDll = true;
 
     // Load said DLL into our own process so that we can call GetProcAddress 
-    return CallMovesetLoaderFunction("MovesetLoaderStart", true);
+    return CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
 }

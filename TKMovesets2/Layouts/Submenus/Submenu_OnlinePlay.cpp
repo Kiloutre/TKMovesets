@@ -11,7 +11,7 @@ void Submenu_OnlinePlay::Render()
 	ImGui::SeparatorText(_("select_game"));
 
 	// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
-	int8_t currentGameId = gameHelper.currentGameId;
+	int8_t currentGameId = gameHelper->currentGameId;
 	ImGui::PushItemWidth(160);
 	ImGui::PushID(&gameHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
@@ -22,7 +22,7 @@ void Submenu_OnlinePlay::Render()
 			GameInfo* game = Games::GetGameInfo(i);
 			if (game->onlineHandler != nullptr) {
 				if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
-					gameHelper.SetTargetProcess(game->processName, i);
+					gameHelper->SetTargetProcess(game->processName, i);
 				}
 			}
 		}
@@ -30,14 +30,14 @@ void Submenu_OnlinePlay::Render()
 	}
 	ImGui::PopID();
 
-	switch (gameHelper.process->status)
+	switch (gameHelper->process->status)
 	{
 	case GameProcessErrcode_PROC_ATTACHED:
-		if (!gameHelper.sharedMemHandler->IsMemoryLoaded())
+		if (!gameHelper->sharedMemHandler->IsMemoryLoaded())
 		{
 			ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));
 			if (ImGui::Button(_("online.inject_dll"))) {
-				gameHelper.sharedMemHandler->InjectDll();
+				gameHelper->sharedMemHandler->InjectDll();
 			}
 		}
 		break;

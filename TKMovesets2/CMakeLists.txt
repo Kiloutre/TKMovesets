@@ -25,7 +25,7 @@ set(INCLUDE_FOLDERS
                     "LocalStorage"
                     "Utils"
 
-                    "Injection"
+                    "Injected"
 )
 
 # This will be included in the .exe
@@ -127,8 +127,8 @@ set(IMPORTEXPORT_SOURCES
 
 # This will be included in the .dll and should only be related to the injected DLL
 set(MOVESETLOADER_SOURCES
-    "Injection/MovesetLoader.cpp"
-    "Injection/MovesetLoader_t7.cpp"
+    "Injected/MovesetLoader.cpp"
+    "Injected/MovesetLoader_t7.cpp"
 )
 
 ## Build ##
@@ -167,7 +167,7 @@ target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for 
 configure_file("Ressources/game_addresses.txt" "game_addresses.txt" COPYONLY)
 # Interface data #
 add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Ressources/Interface" "${CMAKE_CURRENT_BINARY_DIR}/Interface")
-# Debug
+# Debug. Yes, it's included every time, but that isn't important because its content change when in debug mode.
 add_definitions(/FI"${CMAKE_CURRENT_SOURCE_DIR}/Utils/debug.hpp")
 
 ## Extra dependencies ##

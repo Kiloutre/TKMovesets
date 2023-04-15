@@ -14,6 +14,7 @@
 // Other
 #include "GameExtract.hpp"
 #include "GameImport.hpp"
+#include "GameSharedMem.hpp"
 #include "LocalStorage.hpp"
 #include "GameAddressesFile.hpp"
 
@@ -28,10 +29,11 @@ public:
 	GameExtract extractor;
 	// Importer instance, can attach to its own process separately from everyone else
 	GameImport importer;
-	// Online importer instance, can attach to its own process separately from everyone else
-	GameImport onlineImporter;
+	// Shared mem instance, can attach to its own process, manage shared memory and import movesets
+	GameSharedMem sharedMem;
 	// Storage instance, use to access local moveset list
 	LocalStorage storage;
+
 	// Addrfile to pass to child classes (mainly editorWindows)
 	GameAddressesFile* addrFile = nullptr;
 

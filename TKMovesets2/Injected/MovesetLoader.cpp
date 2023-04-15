@@ -11,7 +11,32 @@
 HINSTANCE hModule = nullptr;
 MovesetLoader* g_loader = nullptr;
 
-void Console();
+// -- Debug console -- //
+// Only if compiled in debug mode
+
+void InitConsole()
+{
+    // Create console
+    AllocConsole();
+    // Redirect stdout to console
+    freopen("CONOUT$", "w", stdout);
+
+    DEBUG_LOG("-- Console started --\n");
+}
+
+// -- Static helpers -- //
+
+static std::string GetModuleFilenameStr()
+{
+    TCHAR szFileName[MAX_PATH];
+
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    std::string filename = std::string(szFileName);
+    filename.erase(0, filename.find_last_of("\\/") + 1);
+    return filename;
+}
+
+//  -- Moveset Loader -- //
 
 MovesetLoader::~MovesetLoader()
 {
@@ -29,16 +54,6 @@ void MovesetLoader::Mainloop()
     }
 }
 
-static std::string GetModuleFilenameStr()
-{
-    TCHAR szFileName[MAX_PATH];
-
-    GetModuleFileName(NULL, szFileName, MAX_PATH);
-    std::string filename = std::string(szFileName);
-    filename.erase(0, filename.find_last_of("\\/") + 1);
-    return filename;
-}
-
 // -- DLL Exported functions -- //
 
 extern "C"
@@ -54,12 +69,8 @@ extern "C"
         // Display console if debug mode
 #ifdef BUILD_TYPE_DEBUG
         {
-            auto threadHandle = CreateThread(NULL, 0x1000, (LPTHREAD_START_ROUTINE)Console, NULL, 0, NULL);
-            if (threadHandle != nullptr)
-            {
-                WaitForSingleObject(threadHandle, 10000);
-                DEBUG_LOG("MovesetLoaderStart\n");
-            }
+            InitConsole();
+            DEBUG_LOG("MovesetLoaderStart\n");
         }
 #endif
 
@@ -84,6 +95,9 @@ extern "C"
             // If mainloop is stopped then we have no reason to let the DLL stay loaded
             delete g_loader;
             g_loader = nullptr;
+#ifdef BUILD_TYPE_DEBUG
+            FreeConsole();
+#endif
             FreeLibraryAndExitThread(hModule, 0);
         }
         else {
@@ -104,14 +118,7 @@ extern "C"
     }
 }
 
-// DLLMAIN & console
-
-void Console()
-{
-    AllocConsole();
-    freopen("CONOUT$", "w", stdout);
-    printf("-- Console started --\n");
-}
+// DLLMAIN
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {

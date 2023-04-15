@@ -27,6 +27,10 @@
 // Anything else indicate a malformed header : a bad file
 # define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
 
+# define MOVESET_LOADER_NAME             "MovesetLoader.dll"
+# define MOVESET_LOADER_START_FUNC       "MovesetLoaderStart"
+# define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
+
 # define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 
@@ -43,7 +47,7 @@
 # define FORM_BG_2               IM_COL32(48, 60, 140, 15)
 
 # define MOVE_GENERIC            IM_COL32(77, 131, 219, 50)
-# define MOVE_CURRENT_GENERIC    IM_COL32(77, 131, 219, 10)
+# define MOVE_CURRENT_GENERIC    IM_COL32(77, 131, 219, 5)
 # define MOVE_CUSTOM             IM_COL32(119, 175, 58, 50)
 # define MOVE_THROW              IM_COL32(119, 58, 199, 50)
 # define MOVE_THROWREACTION      IM_COL32(210, 100, 222, 50)

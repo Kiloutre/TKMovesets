@@ -2,12 +2,14 @@
 
 void GameSharedMem::OnProcessAttach()
 {
+	DEBUG_LOG("GameSharedMem::OnProcessAttach\n");
 	InstantiateFactory();
 	m_plannedImportations.clear();
 }
 
 void GameSharedMem::InstantiateFactory()
 {
+	DEBUG_LOG("GameSharedMem::InstantiateFactory\n");
 	// Delete old instances if needed
 	if (importer != nullptr) {
 		delete importer;

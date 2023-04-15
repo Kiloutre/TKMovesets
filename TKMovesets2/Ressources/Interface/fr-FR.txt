@@ -61,6 +61,7 @@ navmenu.category_moveset = Personnages
 navmenu.extraction = Extraction
 navmenu.import = Importation
 navmenu.online = Jeu en ligne
+navmenu.persistent_play = Jeu persistant
 
 navmenu.category_tools   = Outils
 navmenu.moveset_edit = Modif. de perso

@@ -61,6 +61,7 @@ navmenu.category_moveset = Movesets
 navmenu.extraction = Extraction
 navmenu.import = Import
 navmenu.online = Online play
+navmenu.persistent_play = Persistent play
 
 navmenu.category_tools   = Tools
 navmenu.moveset_edit = Moveset Edition

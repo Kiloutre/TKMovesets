@@ -9,5 +9,5 @@ public:
 	void Render();
 
 	// Helper that contains both an importer and a shared memory manager
-	GameSharedMem gameHelper;
+	GameSharedMem* gameHelper;
 };
