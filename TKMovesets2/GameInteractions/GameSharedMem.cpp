@@ -32,30 +32,44 @@ void GameSharedMem::RunningUpdate()
 	bool errored = false;
 	while (IsBusy())
 	{
-		if (!errored) {
+		if (!errored && m_plannedImportations.size() > 0)
+		{
 			ImportationErrcode_ err;
 
-			// Two different ways to import movesets, from filename or from actual moveset data
-			if (m_plannedImportations.size() > 0) {
-				auto& [moveset, movesetSize, filename, playerAddress, settings] = m_plannedImportations[0];
-				if (moveset == nullptr) {
-					err = importer->Import(filename.c_str(), playerAddress, settings, progress);
-				}
-				else {
-					err = importer->Import(moveset, movesetSize, playerAddress, settings, progress);
-				}
-				m_plannedImportations.erase(m_plannedImportations.begin());
+			auto& [moveset, settings, playerId] = m_plannedImportations[0];
+			err = importer->Import(moveset.filename.c_str(), 0, settings, progress);
 
-				if (settings & ImportSettings_FreeUnusedMovesets) {
-					importer->CleanupUnusedMovesets();
-				}
-			}
-
-			if (err != ImportationErrcode_Successful) {
+			// Send the successfully loaded moveset to the shared memory manager
+			if (err == ImportationErrcode_Successful) {
+				sharedMemHandler->OnMovesetImport(&moveset, importer->lastLoadedMoveset, playerId);
+				lastLoadedMoveset = importer->lastLoadedMoveset;
+			} else {
 				m_errors.push_back(err);
 				errored = true;
 			}
-			lastLoadedMoveset = importer->lastLoadedMoveset;
+
+			m_plannedImportations.erase(m_plannedImportations.begin());
+
+			/*
+			* TODO: think about when to free online-used movesets
+			if (settings & ImportSettings_FreeUnusedMovesets) {
+				importer->CleanupUnusedMovesets();
+			}
+			*/
 		}
 	}
+}
+
+void GameSharedMem::QueueCharacterImportation(movesetInfo* moveset, unsigned int playerId, ImportSettings settings)
+{
+	m_plannedImportations.push_back({
+		.moveset = *moveset,
+		.settings = settings,
+		.playerId = playerId
+	});
+}
+
+bool GameSharedMem::IsBusy()
+{
+	return m_plannedImportations.size() > 0;
 }

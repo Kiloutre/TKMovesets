@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "constants.h"
+#include "SharedMemory.h"
 
 typedef unsigned char Byte;
 
@@ -13,14 +14,17 @@ protected:
 	// Stores a handle to the shared memory
 	HANDLE m_memoryHandle = nullptr;
 	// Ptr to the shared memory
-	Byte* m_sharedMemPtr = nullptr;
+	SharedMemory* m_sharedMemPtr = nullptr;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
 public:
-	virtual bool Init() = 0;
+	// Initializes the shared memory
+	bool Init();
 	~MovesetLoader();
 
+	// Called once shared memory has been successfully loaded
+	virtual void PostInit() = 0;
 	// If set to true, force the Mainloop() to stop
 	bool mustStop = false;
 	// Main loop of the loader

@@ -3,6 +3,13 @@
 
 #include "Online.hpp"
 
+Online::Online(GameProcess* process, GameData* game)
+{
+    m_process = process;
+    m_game = game;
+    movesetInfos = new std::vector<movesetInfo>();
+}
+
 Online::~Online()
 {
     if (m_injectedDll && m_process->IsAttached())
@@ -22,6 +29,8 @@ Online::~Online()
     if (m_memoryHandle != nullptr) {
         CloseHandle(m_memoryHandle);
     }
+
+    delete movesetInfos;
 }
 
 bool Online::LoadSharedMemory()
@@ -29,10 +38,10 @@ bool Online::LoadSharedMemory()
     auto sharedMemName = GetSharedMemoryName();
     m_memoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, sharedMemName);
     if (m_memoryHandle == nullptr) {
-        DEBUG_LOG("Error opening file mapping '%s'\n", sharedMemName);
+        //DEBUG_LOG("Error opening file mapping '%s'\n", sharedMemName);
         return false;
     }
-    m_sharedMemPtr = (Byte*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    m_sharedMemPtr = (SharedMemory*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
     if (m_sharedMemPtr == nullptr) {
         DEBUG_LOG("Error mapping view of file for shared memory '%s'\n", sharedMemName);
         CloseHandle(m_memoryHandle);
@@ -91,4 +100,15 @@ bool Online::InjectDll()
 
     // Load said DLL into our own process so that we can call GetProcAddress 
     return CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
+}
+
+void Online::OnMovesetImport(movesetInfo* moveset, gameAddr movesetAddr, unsigned int playerId)
+{
+    if (movesetInfos->size() > playerId) {
+        (*movesetInfos)[playerId] = *moveset;
+    }
+    else {
+        movesetInfos->push_back(*moveset);
+    }
+    m_sharedMemPtr->player[playerId].customMovesetAddr = movesetAddr;
 }

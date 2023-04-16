@@ -10,5 +10,5 @@ protected:
 	}
 
 public:
-	bool Init() override;
+	void PostInit() override;
 };

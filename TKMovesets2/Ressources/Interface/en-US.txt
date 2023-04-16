@@ -120,6 +120,7 @@ online.no_selected_moveset = No moveset selected
 online.dll_not_loaded = DLL is not loaded, inject it
 online.inject_dll = Inject
 online.select_moveset = Select
+online.selected_moveset = Selected:
 
 # Movest Edition : rename #
 edition.rename.new_moveset_name = New moveset name

@@ -48,30 +48,32 @@ void GameImport::RunningUpdate()
 	bool errored = false;
 	while (IsBusy())
 	{
-		if (!errored) {
+		// Two different ways to import movesets, from filename or from actual moveset data
+		if (!errored && m_plannedImportations.size() > 0)
+		{
 			ImportationErrcode_ err;
 
-			// Two different ways to import movesets, from filename or from actual moveset data
-			if (m_plannedImportations.size() > 0) {
-				auto& [moveset, movesetSize, filename, playerAddress, settings] = m_plannedImportations[0];
-				if (moveset == nullptr) {
-					err = importer->Import(filename.c_str(), playerAddress, settings, progress);
-				}
-				else {
-					err = importer->Import(moveset, movesetSize, playerAddress, settings, progress);
-				}
-				m_plannedImportations.erase(m_plannedImportations.begin());
+			auto& [moveset, movesetSize, filename, playerAddress, settings] = m_plannedImportations[0];
+			if (moveset == nullptr) {
+				err = importer->Import(filename.c_str(), playerAddress, settings, progress);
+			}
+			else {
+				err = importer->Import(moveset, movesetSize, playerAddress, settings, progress);
+			}
 
-				if (settings & ImportSettings_FreeUnusedMovesets) {
-					importer->CleanupUnusedMovesets();
-				}
+			if (settings & ImportSettings_FreeUnusedMovesets) {
+				importer->CleanupUnusedMovesets();
 			}
 
 			if (err != ImportationErrcode_Successful) {
 				m_errors.push_back(err);
 				errored = true;
 			}
-			lastLoadedMoveset = importer->lastLoadedMoveset;
+			else {
+				lastLoadedMoveset = importer->lastLoadedMoveset;
+			}
+
+			m_plannedImportations.erase(m_plannedImportations.begin());
 		}
 	}
 }

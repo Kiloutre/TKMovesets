@@ -19,9 +19,11 @@ struct importEntry
 
 class GameImport : public GameInteraction
 {
-protected:
+private:
 	// Movesets (data, size) to import and corresponding player address
 	std::vector<importEntry> m_plannedImportations;
+
+protected:
 	// List of errors, one extraction fail = 1 error
 	std::vector<ImportationErrcode_> m_errors;
 
@@ -51,11 +53,11 @@ public:
 	// Returns true if the importer  will allow an importation (false if it won't, like if characters aren't loaded)
 	virtual bool CanStart() override;
 	// Is currently busy with an importation
-	bool IsBusy() override;
+	virtual bool IsBusy() override;
 	// Queue a character importation from file
-	void QueueCharacterImportation(std::string filename, ImportSettings settings=0);
+	virtual void QueueCharacterImportation(std::string filename, ImportSettings settings=0);
 	// Queue a character importation from moveset data.
-	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
+	virtual void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to
