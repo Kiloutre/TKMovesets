@@ -19,10 +19,12 @@ struct movesetInfo
 	std::string version_string;
 	uint64_t date;
 	std::string date_str;
-	float size;
+	uint64_t size;
+	std::string sizeStr;
 	time_t modificationDate;
 	uint32_t gameId;
 	bool editable;
+	bool onlineImportable; // Moveset over a certain size can't be used online
 };
 
 class LocalStorage : public ThreadedClass

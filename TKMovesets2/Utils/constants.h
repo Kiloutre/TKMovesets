@@ -31,6 +31,8 @@
 # define MOVESET_LOADER_START_FUNC       "MovesetLoaderStart"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
 
+# define ONLINE_MOVESET_MAX_SIZE_BYTES   15000000
+
 # define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 

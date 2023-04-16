@@ -95,9 +95,6 @@ extern "C"
             // If mainloop is stopped then we have no reason to let the DLL stay loaded
             delete g_loader;
             g_loader = nullptr;
-#ifdef BUILD_TYPE_DEBUG
-            FreeConsole();
-#endif
             FreeLibraryAndExitThread(hModule, 0);
         }
         else {

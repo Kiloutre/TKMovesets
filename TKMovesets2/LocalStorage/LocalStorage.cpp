@@ -6,6 +6,7 @@
 #include <windows.h>
 
 #include "LocalStorage.hpp"
+#include "Localization.hpp"
 #include "Helpers.hpp"
 #include "Games.hpp"
 
@@ -61,10 +62,12 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 				.version_string = std::string(movesetInfos->version_string),
 				.date = movesetInfos->date,
 				.date_str = Helpers::formatDateTime(movesetInfos->date),
-				.size = (float)totalSize / 1000 / 1000,
+				.size = totalSize,
+				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
 				.modificationDate = buffer.st_mtime,
 				.gameId = movesetInfos->gameId,
-				.editable = Games::IsGameEditable(movesetInfos->gameId)
+				.editable = Games::IsGameEditable(movesetInfos->gameId),
+				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES
 			};
 		}
 

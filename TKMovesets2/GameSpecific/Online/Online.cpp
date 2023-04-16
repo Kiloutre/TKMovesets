@@ -36,7 +36,9 @@ bool Online::LoadSharedMemory()
     if (m_sharedMemPtr == nullptr) {
         DEBUG_LOG("Error mapping view of file for shared memory '%s'\n", sharedMemName);
         CloseHandle(m_memoryHandle);
+        m_memoryHandle = nullptr;
     }
+    DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%llx\n", m_sharedMemPtr);
     return true;
 }
 

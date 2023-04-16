@@ -189,8 +189,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 				ImGui::TextUnformatted(moveset->date_str.c_str());
 
 				ImGui::TableNextColumn();
-				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
-				ImGui::TextUnformatted(sizeString.c_str());
+				ImGui::TextUnformatted(moveset->sizeStr.c_str());
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());

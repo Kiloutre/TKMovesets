@@ -263,8 +263,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 				ImGui::TextUnformatted(moveset->date_str.c_str());
 
 				ImGui::TableNextColumn();
-				std::string sizeString = std::format("{:.2f} {}", moveset->size, _("moveset.size_mb"));
-				ImGui::TextUnformatted(sizeString.c_str());
+				ImGui::TextUnformatted(moveset->sizeStr.c_str());
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->version_string.c_str());

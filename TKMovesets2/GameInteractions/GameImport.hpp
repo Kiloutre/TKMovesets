@@ -48,8 +48,8 @@ public:
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
-	// Returns true if the extractor will allow an importation (false if it won't, like if characters aren't loaded)
-	bool CanStart() override;
+	// Returns true if the importer  will allow an importation (false if it won't, like if characters aren't loaded)
+	virtual bool CanStart() override;
 	// Is currently busy with an importation
 	bool IsBusy() override;
 	// Queue a character importation from file

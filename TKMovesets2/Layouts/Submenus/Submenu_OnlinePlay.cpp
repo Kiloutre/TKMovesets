@@ -30,6 +30,10 @@ void Submenu_OnlinePlay::Render()
 	}
 	ImGui::PopID();
 
+	// Store whether or not the shared memory was loaded both in the remote and current process
+	// If so, the link is established
+	bool sharedMemoryLoaded = false;
+
 	switch (gameHelper->process->status)
 	{
 	case GameProcessErrcode_PROC_ATTACHED:
@@ -39,6 +43,9 @@ void Submenu_OnlinePlay::Render()
 			if (ImGui::Button(_("online.inject_dll"))) {
 				gameHelper->sharedMemHandler->InjectDll();
 			}
+		}
+		else {
+			sharedMemoryLoaded = true;
 		}
 		break;
 	case GameProcessErrcode_PROC_NOT_ATTACHED:
@@ -55,5 +62,78 @@ void Submenu_OnlinePlay::Render()
 	case GameProcessErrcode_PROC_ATTACH_ERR:
 		ImGuiExtra_TextboxError(_("process.game_attach_err"));
 		break;
+	}
+
+	// Moveset list
+	bool canSelectMoveset = sharedMemoryLoaded;
+
+	auto availableSpace = ImGui::GetContentRegionAvail();
+	ImVec2 tableSize = ImVec2(availableSpace.x / 2, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
+
+	ImGui::SeparatorText(_("importation.select_moveset"));
+	if (ImGui::BeginTable("MovesetImportationList", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, tableSize))
+	{
+		ImGui::TableSetupColumn("##", 0, 5.0f);
+		ImGui::TableSetupColumn(_("moveset.origin"));
+		ImGui::TableSetupColumn(_("moveset.target_character"));
+		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.import"));
+		ImGui::TableHeadersRow();
+
+		ImGui::PushID(&gameHelper);
+
+		// drawList & windowPos are used to display a different row bg
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
+		auto windowPos = ImGui::GetWindowPos();
+
+		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
+		for (size_t i = 0; i < gameHelper->storage->extractedMovesets.size(); ++i)
+		{
+			// Moveset is guaranteed not to be freed until after this loop
+			movesetInfo* moveset = gameHelper->storage->extractedMovesets[i];
+
+			if (moveset->origin == "INVALID") {
+				continue;
+			}
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+
+			bool isImportable = moveset->onlineImportable; // todo: think about how different games will be handled
+			if (!isImportable)
+			{
+				// Draw BG
+				ImVec2 drawStart = windowPos + ImGui::GetCursorPos();
+				drawStart.y -= ImGui::GetScrollY();
+				ImVec2 drawArea = ImVec2(availableSpace.x, ImGui::GetFrameHeight());
+				drawlist->AddRectFilled(drawStart, drawStart + drawArea, MOVESET_INVALID);
+			}
+
+			ImGui::TextUnformatted(moveset->name.c_str());
+
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(moveset->origin.c_str());
+
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(moveset->target_character.c_str());
+
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(moveset->sizeStr.c_str());
+
+			ImGui::TableNextColumn();
+			ImGui::PushID(moveset->filename.c_str());
+
+			if (ImGuiExtra::RenderButtonEnabled(_("online.select_moveset"), canSelectMoveset && isImportable)) {
+				// todo
+			}
+			ImGui::PopID();
+		}
+		ImGui::PopID();
+
+		// Don't de-allocate moveset infos until we're done iterating on it
+		gameHelper->storage->CleanupUnusedMovesetInfos();
+
+		ImGui::EndTable();
 	}
 }

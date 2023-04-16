@@ -18,7 +18,6 @@
 
 void GameImport::OnProcessAttach()
 {
-	DEBUG_LOG("GameSharedMem::OnProcessAttach\n");
 	InstantiateFactory();
 	m_plannedImportations.clear();
 }
@@ -31,7 +30,6 @@ void GameImport::OnProcessDetach()
 
 void GameImport::InstantiateFactory()
 {
-	DEBUG_LOG("GameSharedMem::InstantiateFactory\n");
 	if (importer != nullptr) {
 		delete importer;
 	}
