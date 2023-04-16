@@ -4,6 +4,7 @@
 
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
+#include "InjectionUtils.hpp"
 
 #include "constants.h"
 
@@ -43,6 +44,14 @@ MovesetLoader::~MovesetLoader()
     if (m_memoryHandle != nullptr) {
         CloseHandle(m_memoryHandle);
     }
+
+    // Unhook any previously hooked function
+    for (auto& hook : m_hooks)
+    {
+        hook.detour->unHook();
+        delete hook.detour;
+    }
+    m_hooks.clear();
 }
 
 void MovesetLoader::Mainloop()
@@ -76,8 +85,16 @@ bool MovesetLoader::Init()
     }
 
     memset(m_sharedMemPtr, 0, sizeof(*m_sharedMemPtr));
+    m_moduleAddr = InjectionUtils::GetSelfModuleAddress(GetMainModuleName());
+    DEBUG_LOG("Module '%s' address is %llx\n", GetMainModuleName(), m_moduleAddr);
+
     PostInit();
     return true;
+}
+
+MovesetLoader* MovesetLoader::GetInstance()
+{
+    return g_loader;
 }
 
 // -- DLL Exported functions -- //
@@ -105,7 +122,7 @@ extern "C"
         {
             std::string processName = GetModuleFilenameStr();
             if (processName == "TekkenGame-Win64-Shipping.exe") {
-                g_loader = new MovesetLoaderT7; //(MovesetLoader*)(new FactoryType< MovesetLoaderT7>)->allocate();
+                g_loader = new MovesetLoaderT7;
             }
             else {
                 return;

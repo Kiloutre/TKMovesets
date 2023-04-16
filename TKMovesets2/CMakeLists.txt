@@ -129,6 +129,7 @@ set(IMPORTEXPORT_SOURCES
 set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
     "Injected/MovesetLoader_t7.cpp"
+    "Injected/InjectionUtils.cpp"
 )
 
 ## Build ##
@@ -172,16 +173,25 @@ add_definitions(/FI"${CMAKE_CURRENT_SOURCE_DIR}/Utils/debug.hpp")
 
 ## Extra dependencies ##
 # Link the other libraries that we use #
+
+# OpenGL (Renderer)
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE glad::glad)
 
+# GLFW (Renderer)
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE glfw)
 
+# ImGUI (Interface)
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
-target_link_libraries(ExportImport PRIVATE imgui::imgui)
+target_link_libraries(ExportImport PRIVATE imgui::imgui) # Only used for the color-defining includes
 
+# Hook (Polyhook)
+find_package(PolyHook_2 CONFIG REQUIRED)
+target_link_libraries(MovesetLoader PRIVATE PolyHook_2::PolyHook_2)
+
+# Compression
 #find_package(liblzma CONFIG REQUIRED)
 #target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)
 #target_link_libraries(ExportImport PRIVATE liblzma::liblzma)
