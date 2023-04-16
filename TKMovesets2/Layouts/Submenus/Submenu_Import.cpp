@@ -202,9 +202,6 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		}
 		ImGui::PopID();
 
-		// Don't de-allocate moveset infos until we're done iterating on it
-		importerHelper.storage->CleanupUnusedMovesetInfos();
-
 		ImGui::EndTable();
 	}
 

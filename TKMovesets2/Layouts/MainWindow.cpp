@@ -199,9 +199,6 @@ void MainWindow::Update()
 	}
 
 	// -- Rendering end -- //
-
-	// Do this here so that we're not modifying the moveset list at the same time as we're displaying it
-	storage.CleanupUnusedMovesetInfos();
 }
 
 void MainWindow::Shutdown()

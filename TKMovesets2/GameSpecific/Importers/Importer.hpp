@@ -19,6 +19,8 @@ enum ImportSettings_
 	ImportSettings_ApplyInstantly = (1 << 1),
 	// Free old movesets if they are unused after successfully importing the new one
 	ImportSettings_FreeUnusedMovesets = (1 << 2),
+	// Don't write the new moveset address to the current player
+	ImportSettings_BasicLoadOnly = (1 << 3),
 
 	ImportSettings_DEFAULT = ImportSettings_ApplyInstantly | ImportSettings_FreeUnusedMovesets,
 };

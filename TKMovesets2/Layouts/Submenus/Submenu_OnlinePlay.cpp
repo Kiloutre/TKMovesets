@@ -125,14 +125,12 @@ void Submenu_OnlinePlay::Render()
 			ImGui::PushID(moveset->filename.c_str());
 
 			if (ImGuiExtra::RenderButtonEnabled(_("online.select_moveset"), canSelectMoveset && isImportable)) {
+				// ImportSettings_BasicLoadOnly
 				// todo
 			}
 			ImGui::PopID();
 		}
 		ImGui::PopID();
-
-		// Don't de-allocate moveset infos until we're done iterating on it
-		gameHelper->storage->CleanupUnusedMovesetInfos();
 
 		ImGui::EndTable();
 	}

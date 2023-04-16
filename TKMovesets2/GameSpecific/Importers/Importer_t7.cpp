@@ -418,10 +418,6 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	ConvertMovesetIndexes(moveset, gameMoveset, table, header.offsets);
 	progress = 70;
 
-	// Fix moves that use characterID conditions to work
-	ApplyCharacterIDFixes(moveset, playerAddress, table, header);
-	progress = 75;
-
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);
 	progress = 80;
@@ -453,20 +449,30 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 		EnforceDefaultAliasesAsCurrent(moveset);
 	}
 
+
+	if ((settings & ImportSettings_BasicLoadOnly) == 0) {
+		// Fix moves that use characterID conditions to work
+		ApplyCharacterIDFixes(moveset, playerAddress, table, header);
+	}
+
 	// Finally write our moveset to the game's memory
 	m_process->writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
-	DEBUG_LOG("-- Imported moveset --\n");
+	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
-	// Then write our moveset address to the current player
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"), gameMoveset);
+	if ((settings & ImportSettings_BasicLoadOnly) == 0) {
+		// Then write our moveset address to the current player
+		m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"), gameMoveset);
+	}
 	progress = 100;
 
 	// Also write camera mota offsts to the player structure if those motas have been exported
 	WriteCameraMotasToPlayer(gameMoveset, playerAddress);
 
-	if (settings & ImportSettings_ApplyInstantly) {
-		ForcePlayerMove(playerAddress, gameMoveset, 32769);
+	if ((settings & ImportSettings_BasicLoadOnly) == 0) {
+		if (settings & ImportSettings_ApplyInstantly) {
+			ForcePlayerMove(playerAddress, gameMoveset, 32769);
+		}
 	}
 
 	// -- Cleanup -- //
