@@ -407,11 +407,12 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 	}
 
 	// There are blocks to shift in the displayble movelist block
+	if (m_mvlHead != nullptr)
 	{
 		uint64_t movelistBlockStart = (m_header->moveset_data_start + m_offsets->movelistBlock);
 		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
 
-		if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd && strncmp(m_mvlHead->mvlString, "MVLT", 4) == 0)
+		if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd)
 		{
 			uint64_t relativeOffset = listPosition - movelistBlockStart;
 

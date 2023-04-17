@@ -254,7 +254,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		   {EditorConstants_RequirementEnd, 881},
 		   {EditorConstants_CancelCommandEnd, 0x8000},
 		   {EditorConstants_ExtraProperty_Instant, 32769}, // 0x8001
-		   {EditorConstants_ExtraPropertyEnd, 0}, // 0x8001
+		   {EditorConstants_ExtraPropertyEnd, 0},
 		   {EditorConstants_GroupedCancelCommand, 0x800B},
 		   {EditorConstants_GroupedCancelCommandEnd, 0x800C},
 		   {EditorConstants_InputSequenceCommandStart, 0x800D},
@@ -274,7 +274,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		m_aliases->push_back(aliasesPtr[i]);
 	}
 
-	if ((m_offsets->movelistBlock + 8) <= m_movesetDataSize && \
+	if ((m_offsets->movelistBlock + 4) < m_movesetDataSize && \
 		strncmp((char*)m_movesetData + m_offsets->movelistBlock, "MVLT", 4) == 0) {
 		m_mvlHead = (MvlHead*)(m_movesetData + m_offsets->movelistBlock);
 		hasDisplayableMovelist = true;

@@ -364,6 +364,7 @@ void EditorForm::Render()
 		}
 		else
 		{
+			// Render Apply button
 			bool enabledBtn = unsavedChanges;
 			const float buttonHeight = 25;// ImGui::GetFrameHeightWithSpacing();
 
@@ -379,10 +380,12 @@ void EditorForm::Render()
 			if (enabledBtn) {
 				ImGui::PopStyleColor();
 			}
-
+		
+			// Render form content
 			ImGui::SetCursorPos(startPos);
 			RenderInternal();
 
+			// Render Apply button (again)
 			// Yes, it's a bit off to render a button twice, but i didn't find any other reliable way to give priority to the button input
 			if (ImGui::GetCursorPosY() + buttonHeight >= m_winInfo.size.y)
 			{

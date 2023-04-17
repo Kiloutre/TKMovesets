@@ -113,7 +113,7 @@ enum EditorInputFlag_
 
 	EditorInput_Float = (1 << 15),
 
-	// Used internally for fancy behaviour
+	// Used for fancy data-switch behaviour (signed -> unsigned -> hex -> signed...)
 	EditorInput_DataChangeable = (1 << 16),
 
 	// Shortcuts
@@ -141,6 +141,7 @@ enum EditorInputFlag_
 	EditorInput_32b = (EditorInput_U32 | EditorInput_S32 | EditorInput_H32 | EditorInput_Float),
 	EditorInput_16b = (EditorInput_U16 | EditorInput_S16 | EditorInput_H16),
 	EditorInput_8b = (EditorInput_U8 | EditorInput_S8 | EditorInput_H8),
+
 };
 
 struct EditorInput

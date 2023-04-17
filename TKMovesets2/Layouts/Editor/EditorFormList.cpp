@@ -350,8 +350,14 @@ void EditorFormList::RenderInternal()
 			ImGui::SetNextItemOpen(openStatus == EditorFormTreeview_ForceOpen);
 		}
 
+		// Node styling
+		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth;
+		if (item->id == -1) {
+			nodeFlags |= ImGuiTreeNodeFlags_Framed;
+		}
+
 		ImGui::PushID(listIndex);
-		if (!ImGui::TreeNodeEx(this + listIndex, ImGuiTreeNodeFlags_SpanAvailWidth, item->itemLabel.c_str())) {
+		if (!ImGui::TreeNodeEx(this + listIndex, nodeFlags, item->itemLabel.c_str())) {
 			// Tree node hidden so no need to render anything
 			ImGui::PopID();
 			item->openStatus = EditorFormTreeview_Closed;
