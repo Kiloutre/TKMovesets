@@ -4,7 +4,6 @@
 
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
-#include "InjectionUtils.hpp"
 
 #include "constants.h"
 
@@ -46,7 +45,7 @@ MovesetLoader::~MovesetLoader()
     }
 
     // Unhook any previously hooked function
-    for (auto& hook : m_hooks)
+    for (auto& [name, hook] : m_hooks)
     {
         hook.detour->unHook();
         delete hook.detour;
@@ -85,16 +84,20 @@ bool MovesetLoader::Init()
     }
 
     memset(m_sharedMemPtr, 0, sizeof(*m_sharedMemPtr));
-    m_moduleAddr = InjectionUtils::GetSelfModuleAddress(GetMainModuleName());
-    DEBUG_LOG("Module '%s' address is %llx\n", GetMainModuleName(), m_moduleAddr);
 
     PostInit();
     return true;
 }
 
-MovesetLoader* MovesetLoader::GetInstance()
+PLH::x64Detour* MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr)
 {
-    return g_loader;
+    m_hooks[hookName] = {};
+    auto& hook = m_hooks[hookName];
+
+    // Initialize the original function's hook
+    hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline, m_disassembler);
+    // Returns the detour to allow
+    return hook.detour;
 }
 
 // -- DLL Exported functions -- //
@@ -127,6 +130,7 @@ extern "C"
             else {
                 return;
             }
+            g_loader->SetMainModule(processName.c_str());
         }
 
         // Start loop only if Init() succeeds
