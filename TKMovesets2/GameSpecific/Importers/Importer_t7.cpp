@@ -72,7 +72,7 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 {
 	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_camera_mota_offset");
 
-	uint64_t motaOffset = offsetof(MovesetInfo, motas) + offsetof(MotaList, camera_1);
+	uint64_t motaOffset = offsetof(MovesetInfo, motas);
 	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + motaOffset + offsetof(MotaList, camera_1));
 	gameAddr cameraMota2 = m_process->readInt64(movesetAddr + motaOffset + offsetof(MotaList, camera_2));
 

@@ -411,18 +411,18 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 
 		// Use the biggest input offset in order to get the end of the movelist
 		// Haven't found a better way but it doesn't crash so there probably is nothing after the inputs
-		uint64_t biggestInpuOffset = 0;
+		uint64_t biggestInputOffset = 0;
 		for (size_t i = 0; i < head.playables_count; ++i)
 		{
 			uint64_t lastInputOffset = playables[i].input_sequence_offset + sizeof(MvlInput) * playables[i].input_count;
 			lastInputOffset += (i * sizeof(MvlPlayable));
-			if (lastInputOffset > biggestInpuOffset) {
-				biggestInpuOffset = lastInputOffset;
+			if (lastInputOffset > biggestInputOffset) {
+				biggestInputOffset = lastInputOffset;
 			}
 		}
 
 		free(playables);
-		gameAddr blockEnd = blockStart + biggestInpuOffset + head.playables_offset;
+		gameAddr blockEnd = blockStart + biggestInputOffset + head.playables_offset;
 		Byte* mvlBlock = allocateAndReadBlock(blockStart, blockEnd, size_out);
 		if (mvlBlock == nullptr) {
 			return nullptr;
