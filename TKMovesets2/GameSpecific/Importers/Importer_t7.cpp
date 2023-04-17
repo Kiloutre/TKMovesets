@@ -70,7 +70,7 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 
 void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
 {
-	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_camera_mota_offset");
+	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_static_camera_offset");
 
 	uint64_t motaOffset = offsetof(MovesetInfo, motas);
 	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + motaOffset + offsetof(MotaList, camera_1));
@@ -88,18 +88,18 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, By
 
 	MotaList* motaList = (MotaList*)(moveset + offsets->motalistsBlock);
 
-	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
-	uint64_t* fileMotaCursor = (uint64_t*)motaList;
+	uint64_t* gameMotas = (uint64_t*)&currentMotasList;
+	uint64_t* fileMotas = (uint64_t*)motaList;
 
 	// This is just a list of uint64_t anyway so might as well do this
 	for (size_t i = 0; i <= 12; ++i)
 	{
-		if (fileMotaCursor[i] == MOVESET_ADDR_MISSING) {
+		if (fileMotas[i] == MOVESET_ADDR_MISSING) {
 			// Moveset block was not included in the file: copy the currently used one
-			fileMotaCursor[i] = gameMotaCursor[i];
+			fileMotas[i] = gameMotas[i];
 		}
 		else {
-			fileMotaCursor[i] += gameMoveset + offsets->motaBlock;
+			fileMotas[i] += gameMoveset + offsets->motaBlock;
 		}
 	}
 }
