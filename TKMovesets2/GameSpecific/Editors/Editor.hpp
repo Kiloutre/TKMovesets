@@ -392,4 +392,7 @@ public:
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
 	virtual void Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field) { };
+
+	// CRC32 calculation
+	virtual uint32_t CalculateCRC32() = 0;
 };

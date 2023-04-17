@@ -933,7 +933,7 @@ InputMap EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 
 	auto move = m_iterators.moves[id];
 
-	char* nameBlock = (char*)(m_movesetData + m_header->offsets.nameBlock);
+	char* nameBlock = (char*)(m_movesetData + m_offsets->nameBlock);
 
 	// TODO to do TOFIX to fix : crash on move->anim_name_addr
 
@@ -993,12 +993,12 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	Byte* newMoveset = nullptr;
 
 	// Find position where to insert new name
-	const uint64_t moveNameOffset = m_header->infos.moveset_data_start + m_header->offsets.nameBlock + move_name_addr;
+	const uint64_t moveNameOffset = m_header->moveset_data_start + m_offsets->nameBlock + move_name_addr;
 	const uint64_t moveNameEndOffset = moveNameOffset + moveNameSize;
 	const uint64_t orig_moveNameEndOffset = moveNameOffset + strlen((char*)m_moveset + moveNameOffset) + 1;
 
 	// Find the very last move name ending offset
-	uint64_t lastNameEndOffset = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock;
+	uint64_t lastNameEndOffset = m_header->moveset_data_start + m_offsets->movesetBlock;
 	while (*(m_moveset + (lastNameEndOffset - 2)) == 0)
 	{
 		// Because the block after the nameBlock needs to be aligned, we also have to find the last offset and see
@@ -1007,7 +1007,7 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	}
 	// Shift by the new size difference
 	const uint64_t orig_moveNameSize = strlen((char*)m_moveset + moveNameOffset) + 1;
-	const uint64_t orig_movelistStartOffset = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock;
+	const uint64_t orig_movelistStartOffset = m_header->moveset_data_start + m_offsets->movesetBlock;
 	lastNameEndOffset += moveNameSize - orig_moveNameSize;
 
 	// Align the end of the name block to 8 bytes to get the start of the movelist block
@@ -1023,10 +1023,10 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	// Shift offsets in the moveset table & in our header
 	const uint64_t extraBlockSize = movelistStartOffset - orig_movelistStartOffset;
 
-	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
 	{
-		if ((m_header->infos.moveset_data_start + m_header->offsets.blocks[i]) >= orig_movelistStartOffset) {
-			m_header->offsets.blocks[i] += extraBlockSize;
+		if ((m_header->moveset_data_start + m_offsets->blocks[i]) >= orig_movelistStartOffset) {
+			m_offsets->blocks[i] += extraBlockSize;
 		}
 	}
 
@@ -1110,7 +1110,7 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 
 	// Save move name at the end because it may imply reallocation and invalidation of existing pointers
 	char* newName = inputs["move_name"]->buffer;
-	char* namePtr = (char*)(m_movesetData + m_header->offsets.nameBlock);
+	char* namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
 
 	if (strlen(newName) != strlen(namePtr + move->name_addr)) {
 		// Only re-allocate moveset & shift offsets if the length doesn't match

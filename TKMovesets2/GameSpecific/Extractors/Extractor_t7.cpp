@@ -462,9 +462,9 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 	}
 }
 
-void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress, uint64_t customPropertyCount)
+void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, uint8_t gameId, gameAddr playerAddress, uint64_t customPropertyCount)
 {
-	infos.flags = 0; // Currently unused
+	infos.flags = 0;
 	infos.gameId = gameId;
 	infos.characterId = GetCharacterID(playerAddress);
 	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
@@ -472,10 +472,12 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, 
 	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
 	infos.date = Helpers::getCurrentTimestamp();
 
-	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(TKMovesetHeader));
-
 	uint64_t propertyListSize = customPropertyCount * sizeof(TKMovesetProperty);
-	infos.moveset_data_start = (uint32_t)Helpers::align8Bytes(infos.header_size + propertyListSize);
+
+	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(TKMovesetHeader));
+	infos.block_list = (uint32_t)infos.header_size + Helpers::align8Bytes(propertyListSize);
+	infos.block_list_size = (uint32_t)_countof(((TKMovesetHeaderBlocks*)0)->blocks);
+	infos.moveset_data_start = infos.block_list + (uint32_t)Helpers::align8Bytes(infos.block_list_size * sizeof(uint64_t));
 }
 
 // -- Public methods -- //
@@ -485,6 +487,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
 	Byte* headerBlock;
+	Byte* customPropertiesBlock;
+	Byte* offsetListBlock;
 	Byte* movesetInfoBlock;
 	Byte* tableBlock;
 	Byte* motasListBlock;
@@ -496,6 +500,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
+	uint64_t s_customProperties;
+	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
 	uint64_t s_movesetInfoBlock = 0x150; // Yeah, fixed size, this is on purpose. I do want to extract table and mota separately.
 	uint64_t s_tableBlock = sizeof(MovesetTable);
 	uint64_t s_motasListBlock = sizeof(MotaList);
@@ -505,10 +511,19 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	uint64_t s_motaCustomBlock;
 	uint64_t s_movelistBlock;
 
+	// Establish the list of default properties
+	TKMovesetProperty customProperties[1] = {
+		// END should always be in there to mark the end as the list size isn't stored
+		{.id = TKMovesetProperty_END, .value = 0 }
+	};
+	s_customProperties = sizeof(customProperties);
+
 	// Will contain our own informations such as date, version, character id
-	TKMovesetHeader customHeader{ 0 };
-	memset(&customHeader, 0, sizeof(customHeader));
+	TKMovesetHeader customHeader;
 	progress = 5;
+
+	// Will contain the offsets for each block we extract
+	TKMovesetHeaderBlocks offsetList{ 0 };
 
 	// The address of the moveset we will be extracting
 	gameAddr movesetAddr;
@@ -527,6 +542,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// Assign these blocks right away because they're fixed-size structures we write into
 	headerBlock = (Byte*)&customHeader;
+	customPropertiesBlock = (Byte*)&customProperties;
+	offsetListBlock = (Byte*)&offsetList;
 	tableBlock = (Byte*)offsets;
 	motasListBlock = (Byte*)&motasList;
 	movesetInfoBlock = (Byte*)&movesetHeader;
@@ -576,14 +593,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 	progress = 77;
 
-	// Establish the list of default properties
-	TKMovesetProperty customProperties[1] = {
-		{.id = TKMovesetProperty_END, .value = 0 } // END should always be in there
-	};
-	uint64_t s_customProperties = sizeof(customProperties);
-
 	// Fill the header with our own useful informations
-	FillHeaderInfos(customHeader.infos, gameId, playerAddress, _countof(customProperties));
+	FillHeaderInfos(customHeader, gameId, playerAddress, _countof(customProperties));
 	progress = 79;
 
 
@@ -591,14 +602,14 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
 	// This is because you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
 	// 8 bytes alignment isn't strictly needed, but i've had problems in the past on misaligned structures so this is safer
-	customHeader.offsets.movesetInfoBlock = 0x0;
-	customHeader.offsets.tableBlock = Helpers::align8Bytes(customHeader.offsets.movesetInfoBlock + s_movesetInfoBlock);
-	customHeader.offsets.motalistsBlock = Helpers::align8Bytes(customHeader.offsets.tableBlock + s_tableBlock);
-	customHeader.offsets.nameBlock = Helpers::align8Bytes(customHeader.offsets.motalistsBlock + s_motasListBlock);
-	customHeader.offsets.movesetBlock = Helpers::align8Bytes(customHeader.offsets.nameBlock + s_nameBlock);
-	customHeader.offsets.animationBlock = Helpers::align8Bytes(customHeader.offsets.movesetBlock + s_movesetBlock);
-	customHeader.offsets.motaBlock = Helpers::align8Bytes(customHeader.offsets.animationBlock + s_animationBlock);
-	customHeader.offsets.movelistBlock = Helpers::align8Bytes(customHeader.offsets.motaBlock + s_motaCustomBlock);
+	offsetList.movesetInfoBlock = 0;
+	offsetList.tableBlock = Helpers::align8Bytes(offsetList.movesetInfoBlock + s_movesetInfoBlock);
+	offsetList.motalistsBlock = Helpers::align8Bytes(offsetList.tableBlock + s_tableBlock);
+	offsetList.nameBlock = Helpers::align8Bytes(offsetList.motalistsBlock + s_motasListBlock);
+	offsetList.movesetBlock = Helpers::align8Bytes(offsetList.nameBlock + s_nameBlock);
+	offsetList.animationBlock = Helpers::align8Bytes(offsetList.movesetBlock + s_movesetBlock);
+	offsetList.motaBlock = Helpers::align8Bytes(offsetList.animationBlock + s_animationBlock);
+	offsetList.movelistBlock = Helpers::align8Bytes(offsetList.motaBlock + s_motaCustomBlock);
 
 	ExtractionErrcode_ errcode;
 
@@ -625,12 +636,14 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 		{
 			progress = 80;
 
+			// List of blocks that will be written to the file. Each block is 8 bytes aligned
 			std::vector<std::pair<Byte*, uint64_t>> writtenFileBlocks{
-				// First block is always ignored in our CRC32 calculation because it is supposed to be our own header
+				// Header block containing important moveset informations
 				{headerBlock, s_headerBlock},
-
-				// Custom block of variable length containing a list of properties
-				{(Byte*)customProperties, s_customProperties},
+				// Custom block of variable length containing a list of custom properties to apply on import
+				{customPropertiesBlock, s_customProperties},
+				// Contains the list of moveset data blocks' offsets
+				{offsetListBlock, s_offsetListBlock},
 
 				// Actual moveset data start. Accurate up to the animation block
 				{movesetInfoBlock, s_movesetInfoBlock},
@@ -644,8 +657,11 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				{movelistBlock, s_movelistBlock},
 			};
 
+			// List of blocks used for the CRC32 calculation. Some blocks above are purposefully ignored.
+			// Every block that can be manually modified is in there
 			std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
-				{(Byte*)customProperties, s_customProperties},
+				{customPropertiesBlock, s_customProperties},
+
 				{movesetInfoBlock, s_movesetInfoBlock},
 				{tableBlock, s_tableBlock },
 				{motasListBlock, s_motasListBlock},
@@ -654,7 +670,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 				{motaCustomBlock, s_motaCustomBlock},
 			};
 
-			customHeader.infos.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
+			customHeader.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
 			ExtractorUtils::WriteFileData(file, writtenFileBlocks, progress, 95);
 
 			file.close();

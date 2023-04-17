@@ -12,7 +12,7 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 		return;
 	}
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr move = (uint64_t)m_infos->table.move + blockStart + id * sizeof(Move);
 	union {
 		uint64_t value_u64;
@@ -24,7 +24,7 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 	value_u64 = EditorUtils::GetFieldValue(field);
 
 	if (name == "anim_name") {
-		uint64_t animBlockStart = live_loadedMoveset + m_header->offsets.animationBlock;
+		uint64_t animBlockStart = live_loadedMoveset + m_offsets->animationBlock;
 		gameAddr animAddr = animBlockStart + m_animNameToOffsetMap->at(field->buffer);
 		m_process->writeInt64(move + offsetof(Move, anim_addr), animAddr);
 	}
@@ -146,7 +146,7 @@ void EditorT7::Live_OnCancelEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr cancel = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
 	union {
 		uint64_t value_u64;
@@ -192,7 +192,7 @@ void EditorT7::Live_OnGroupedCancelEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr cancel = blockStart + (uint64_t)m_infos->table.groupCancel + id * sizeof(Cancel);
 	union {
 		uint64_t value_u64;
@@ -238,7 +238,7 @@ void EditorT7::Live_OnVoiceclipEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr voiceclip = blockStart + (uint64_t)m_infos->table.voiceclip + id * sizeof(Voiceclip);
 	union {
 		uint64_t value_u64;
@@ -261,7 +261,7 @@ void EditorT7::Live_OnCancelExtraEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr cancelExtra = blockStart + (uint64_t)m_infos->table.cancelExtradata + id * sizeof(CancelExtradata);
 	union {
 		uint64_t value_u64;
@@ -284,7 +284,7 @@ void EditorT7::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr prop = blockStart + (uint64_t)m_infos->table.extraMoveProperty + id * sizeof(ExtraMoveProperty);
 	union {
 		uint64_t value_u64;
@@ -325,7 +325,7 @@ void EditorT7::Live_OnMoveBeginPropEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr prop = blockStart + (uint64_t)m_infos->table.moveBeginningProp + id * sizeof(OtherMoveProperty);
 	union {
 		uint64_t value_u64;
@@ -355,7 +355,7 @@ void EditorT7::Live_OnMoveEndPropEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr prop = blockStart + (uint64_t)m_infos->table.moveEndingProp + id * sizeof(OtherMoveProperty);
 	union {
 		uint64_t value_u64;
@@ -385,7 +385,7 @@ void EditorT7::Live_OnRequirementEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr requirement = blockStart + (uint64_t)m_infos->table.requirement + id * sizeof(Requirement);
 	union {
 		uint64_t value_u64;
@@ -414,7 +414,7 @@ void EditorT7::Live_OnHitConditionPropEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr hitCondition = blockStart + (uint64_t)m_infos->table.hitCondition + id * sizeof(HitCondition);
 	union {
 		uint64_t value_u64;
@@ -448,7 +448,7 @@ void EditorT7::Live_OnReactionsEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr reactions = blockStart + (uint64_t)m_infos->table.reactions + id * sizeof(Reactions);
 	union {
 		uint64_t value_u64;
@@ -572,7 +572,7 @@ void EditorT7::Live_OnPushbackEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr pushback = blockStart + (uint64_t)m_infos->table.hitCondition + id * sizeof(Pushback);
 	union {
 		uint64_t value_u64;
@@ -606,7 +606,7 @@ void EditorT7::Live_OnPushbackExtraEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr pushbackExtra = blockStart + (uint64_t)m_infos->table.pushbackExtradata + id * sizeof(PushbackExtradata);
 	union {
 		uint64_t value_u64;
@@ -629,7 +629,7 @@ void EditorT7::Live_OnInputSequenceEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr inputSequence = blockStart + (uint64_t)m_infos->table.inputSequence + id * sizeof(InputSequence);
 	union {
 		uint64_t value_u64;
@@ -662,7 +662,7 @@ void EditorT7::Live_OnInputEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr input = blockStart + (uint64_t)m_infos->table.input + id * sizeof(Input);
 	union {
 		uint64_t value_u64;
@@ -689,7 +689,7 @@ void EditorT7::Live_OnThrowCameraEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr throwCamera = blockStart + (uint64_t)m_infos->table.throwCameras + id * sizeof(ThrowCamera);
 	union {
 		uint64_t value_u64;
@@ -717,7 +717,7 @@ void EditorT7::Live_OnCameraDataEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	gameAddr cameraData = blockStart + (uint64_t)m_infos->table.cameraData + id * sizeof(CameraData);
 	union {
 		uint64_t value_u64;
@@ -752,7 +752,7 @@ void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movesetBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movesetBlock;
 	uint64_t projectile = blockStart + (uint64_t)m_infos->table.projectile + id * sizeof(Projectile);
 	union {
 		uint64_t value_u64;

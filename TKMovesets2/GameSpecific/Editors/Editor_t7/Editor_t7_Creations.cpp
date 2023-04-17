@@ -6,7 +6,7 @@
 uint32_t EditorT7::CreateNewProjectile()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.projectileCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.projectile;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.projectile;
 
 	ModifyGenericMovelistListSize<Projectile>(newStructId, { -1 }, {}, listHead);
 
@@ -16,7 +16,7 @@ uint32_t EditorT7::CreateNewProjectile()
 uint32_t EditorT7::CreateInputSequence()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.inputSequenceCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.inputSequence;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.inputSequence;
 
 	ModifyGenericMovelistListSize<InputSequence>(newStructId, { -1 }, {}, listHead);
 
@@ -26,7 +26,7 @@ uint32_t EditorT7::CreateInputSequence()
 uint32_t EditorT7::CreateInputList()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.inputCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.input;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
 
 	ModifyGenericMovelistListSize<Input>(newStructId, { -1 }, {}, listHead);
 
@@ -36,7 +36,7 @@ uint32_t EditorT7::CreateInputList()
 uint32_t EditorT7::CreateNewPushbackExtra()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.pushbackExtradataCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 
 	ModifyGenericMovelistListSize<PushbackExtradata>(newStructId, { -1 }, {}, listHead);
 
@@ -46,7 +46,7 @@ uint32_t EditorT7::CreateNewPushbackExtra()
 uint32_t EditorT7::CreateNewPushback()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.pushbackCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.pushback;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushback;
 
 	ModifyGenericMovelistListSize<Pushback>(newStructId, { -1 }, {}, listHead);
 
@@ -56,7 +56,7 @@ uint32_t EditorT7::CreateNewPushback()
 uint32_t EditorT7::CreateNewReactions()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.reactionsCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.reactions;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.reactions;
 
 	ModifyGenericMovelistListSize<Reactions>(newStructId, { -1 }, {}, listHead);
 
@@ -66,7 +66,7 @@ uint32_t EditorT7::CreateNewReactions()
 uint32_t EditorT7::CreateNewHitConditions()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.hitConditionCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.hitCondition;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
 
 	ModifyGenericMovelistListSize<HitCondition>(newStructId, { -1 }, {}, listHead);
 	auto* newStruct = m_iterators.hit_conditions[newStructId];
@@ -79,7 +79,7 @@ uint32_t EditorT7::CreateNewHitConditions()
 uint32_t EditorT7::CreateNewExtraProperties()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.extraMovePropertyCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 
 	ModifyGenericMovelistListSize<ExtraMoveProperty>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.extra_move_properties[newStructId];
@@ -92,7 +92,7 @@ uint32_t EditorT7::CreateNewExtraProperties()
 uint32_t EditorT7::CreateNewMoveBeginProperties()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.moveBeginningPropCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
 
 	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
 	auto* newStruct = m_iterators.move_start_properties[newStructId];
@@ -104,7 +104,7 @@ uint32_t EditorT7::CreateNewMoveBeginProperties()
 uint32_t EditorT7::CreateNewMoveEndProperties()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.moveEndingPropCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 
 	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
 	auto* newStruct = m_iterators.move_end_properties[newStructId];
@@ -116,7 +116,7 @@ uint32_t EditorT7::CreateNewMoveEndProperties()
 uint32_t EditorT7::CreateNewRequirements()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.requirementCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.requirement;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
 
 	ModifyGenericMovelistListSize<Requirement>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.requirements[newStructId];
@@ -128,7 +128,7 @@ uint32_t EditorT7::CreateNewRequirements()
 uint32_t EditorT7::CreateNewVoiceclipList()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.voiceclipCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
 
 	ModifyGenericMovelistListSize<Voiceclip>(newStructId, { -1 }, {}, listHead);
 	auto* newStruct = m_iterators.voiceclips[newStructId];
@@ -140,7 +140,7 @@ uint32_t EditorT7::CreateNewVoiceclipList()
 uint32_t EditorT7::CreateNewCancelExtra()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.cancelExtradataCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
 
 	ModifyGenericMovelistListSize<CancelExtradata>(newStructId, { -1 }, {}, listHead);
 
@@ -150,7 +150,7 @@ uint32_t EditorT7::CreateNewCancelExtra()
 uint32_t EditorT7::CreateNewCancelList()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.cancelCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cancel;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
 
 	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.cancels[newStructId];
@@ -162,7 +162,7 @@ uint32_t EditorT7::CreateNewCancelList()
 uint32_t EditorT7::CreateNewGroupedCancelList()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.groupCancelCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.groupCancel;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
 
 	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.grouped_cancels[newStructId];
@@ -174,7 +174,7 @@ uint32_t EditorT7::CreateNewGroupedCancelList()
 uint32_t EditorT7::CreateNewThrowCamera()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.throwCamerasCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.throwCameras;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.throwCameras;
 
 	ModifyGenericMovelistListSize<ThrowCamera>(newStructId, { -1 }, {}, listHead);
 
@@ -184,7 +184,7 @@ uint32_t EditorT7::CreateNewThrowCamera()
 uint32_t EditorT7::CreateNewCameraData()
 {
 	uint32_t newStructId = (uint32_t)m_infos->table.cameraDataCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.cameraData;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cameraData;
 
 	ModifyGenericMovelistListSize<CameraData>(newStructId, { -1 }, {}, listHead);
 
@@ -196,7 +196,7 @@ uint32_t EditorT7::CreateNewMove()
 	uint64_t nameOffset = CreateMoveName(MOVESET_CUSTOM_MOVE_NAME_PREFIX);
 
 	uint32_t newStructId = (uint32_t)m_infos->table.moveCount;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movesetBlock + (uint64_t)m_infos->table.move;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 
 	ModifyGenericMovelistListSize<Move>(newStructId, { -1 }, {}, listHead);
 	auto* baseStruct = m_iterators.moves[0];

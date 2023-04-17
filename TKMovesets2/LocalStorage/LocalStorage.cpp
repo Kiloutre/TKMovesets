@@ -31,20 +31,18 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 
 	if (!file.fail())
 	{
-		TKMovesetHeader header{ 0 };
-		file.read((char*)&header, sizeof(TKMovesetHeader));
+		TKMovesetHeader movesetInfos;
+		file.read((char*)&movesetInfos, sizeof(TKMovesetHeader));
 
 		size_t readBytes = file.gcount();
 		file.seekg(0, std::ios::end);
 		size_t totalSize = file.tellg();
 		file.close();
 
-		TKMovesetHeader_infos* movesetInfos = (TKMovesetHeader_infos*)&header;
-
 		if (readBytes != sizeof(TKMovesetHeader) ||
-			Helpers::isHeaderStringMalformated(movesetInfos->version_string, sizeof(movesetInfos->version_string)) ||
-			Helpers::isHeaderStringMalformated(movesetInfos->origin, sizeof(movesetInfos->origin)) ||
-			Helpers::isHeaderStringMalformated(movesetInfos->target_character, sizeof(movesetInfos->target_character))) {
+			Helpers::isHeaderStringMalformated(movesetInfos.version_string, sizeof(movesetInfos.version_string)) ||
+			Helpers::isHeaderStringMalformated(movesetInfos.origin, sizeof(movesetInfos.origin)) ||
+			Helpers::isHeaderStringMalformated(movesetInfos.target_character, sizeof(movesetInfos.target_character))) {
 			// File malformated
 			return nullptr;
 		}
@@ -54,19 +52,19 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 			stat(filename.c_str(), &buffer);
 
 			return new movesetInfo{
-				.color = getMovesetColor(movesetInfos->flags),
+				.color = getMovesetColor(movesetInfos.flags),
 				.filename = filename,
 				.name = Helpers::getMovesetNameFromFilename(filename),
-				.origin = std::string(movesetInfos->origin),
-				.target_character = std::string(movesetInfos->target_character),
-				.version_string = std::string(movesetInfos->version_string),
-				.date = movesetInfos->date,
-				.date_str = Helpers::formatDateTime(movesetInfos->date),
+				.origin = std::string(movesetInfos.origin),
+				.target_character = std::string(movesetInfos.target_character),
+				.version_string = std::string(movesetInfos.version_string),
+				.date = movesetInfos.date,
+				.date_str = Helpers::formatDateTime(movesetInfos.date),
 				.size = totalSize,
 				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
 				.modificationDate = buffer.st_mtime,
-				.gameId = movesetInfos->gameId,
-				.editable = Games::IsGameEditable(movesetInfos->gameId),
+				.gameId = movesetInfos.gameId,
+				.editable = Games::IsGameEditable(movesetInfos.gameId),
 				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES
 			};
 		}

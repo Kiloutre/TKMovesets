@@ -10,7 +10,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movelistBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movelistBlock;
 	gameAddr structAddr = blockStart + (uint64_t)m_mvlHead->displayables_offset + id * sizeof(MvlDisplayable);
 	union {
 		uint64_t value_u64;
@@ -100,7 +100,7 @@ void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movelistBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movelistBlock;
 	gameAddr structAddr = blockStart + (uint64_t)m_mvlHead->playables_offset + id * sizeof(MvlPlayable);
 	union {
 		uint64_t value_u64;
@@ -157,7 +157,7 @@ void EditorT7::Live_OnMovelistInputEdit(int id, EditorInput* field)
 	auto& name = field->name;
 	auto& buffer = field->buffer;
 
-	uint64_t blockStart = live_loadedMoveset + m_header->offsets.movelistBlock;
+	uint64_t blockStart = live_loadedMoveset + m_offsets->movelistBlock;
 	gameAddr structAddr = blockStart + (uint64_t)m_mvlHead->inputs_offset + id * sizeof(MvlInput);
 	union {
 		uint64_t value_u64;

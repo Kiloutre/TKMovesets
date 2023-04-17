@@ -238,40 +238,14 @@ void EditorWindow::Save()
 	const Byte* moveset = m_editor->GetMoveset(movesetSize);
 
 	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
-
-	Byte* movesetData = (Byte*)moveset + header->infos.moveset_data_start;
-	auto& offsets = header->offsets;
-
-	// Get list of properties and its count
-	TKMovesetProperty* customPropertyList = (TKMovesetProperty*)(moveset + header->infos.header_size);
-	uint64_t customPropertyCount = 0;
-
-	while (customPropertyList[customPropertyCount++].id != TKMovesetProperty_END)
-		;
-
-	std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
-		{(Byte*)customPropertyList, customPropertyCount * sizeof(TKMovesetProperty)},
-
-		{movesetData + offsets.movesetInfoBlock, offsets.tableBlock - offsets.movesetInfoBlock },
-		{movesetData + offsets.tableBlock, offsets.motalistsBlock - offsets.tableBlock },
-		{movesetData + offsets.motalistsBlock, offsets.nameBlock - offsets.motalistsBlock },
-		{movesetData + offsets.movesetBlock, offsets.animationBlock - offsets.movesetBlock },
-		{movesetData + offsets.animationBlock, offsets.motaBlock - offsets.animationBlock },
-		{movesetData + offsets.motaBlock, offsets.movelistBlock - offsets.motaBlock },
-	};
-
-	// Because the editor might make corrections to the moveset right as it loads it,
-	// ... it is likely the CRC32 will be different from extraction
-	// That isn't that big of a problem
-
-	header->infos.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
-	header->infos.date = Helpers::getCurrentTimestamp();
+	header->crc32 = m_editor->CalculateCRC32();
+	header->date = Helpers::getCurrentTimestamp();
 
 	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
 	if (!file.fail()) {
 		file.write((char*)moveset, movesetSize);
 		m_savedLastChange = true;
-		m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(header->infos.date);
+		m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(header->date);
 	}
 	else {
 		// Showing failure would be nice. Even simply changing the Save button text would suffice.

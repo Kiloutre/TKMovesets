@@ -20,7 +20,7 @@ private:
 	// Fill the moveset table & its corresponding offset table brother.
 	void FillMovesetTables(gameAddr movesetAddr, StructsT7_gameAddr::MovesetTable* table, StructsT7_gameAddr::MovesetTable* offsets);
 	// Fill moveset header with our own various useful informations
-	void FillHeaderInfos(TKMovesetHeader_infos& infos, uint8_t gameId, gameAddr playerAddress, uint64_t propertyCount);
+	void FillHeaderInfos(TKMovesetHeader& infos, uint8_t gameId, gameAddr playerAddress, uint64_t propertyCount);
 	// Allocate and copy the contents of the moveset block
 	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT7_gameAddr::MovesetTable& table);
 	// Allocate and copy the contents of the name block

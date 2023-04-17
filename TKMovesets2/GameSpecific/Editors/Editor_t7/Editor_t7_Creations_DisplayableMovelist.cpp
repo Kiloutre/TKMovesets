@@ -14,17 +14,17 @@ void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int 
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;
 
-	const uint64_t listOffset = m_header->infos.moveset_data_start + m_header->offsets.movelistBlock + listStart_offset + ((uint64_t)listId * structSize);
+	const uint64_t listOffset = m_header->moveset_data_start + m_offsets->movelistBlock + listStart_offset + ((uint64_t)listId * structSize);
 
 	uint64_t postListOffset = listOffset + structSize * newSize;
 	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
 
-	// Compute following m_header->offsets block position. We do this because we want to make sure it always stays 8 bytes aligned
+	// Compute following m_offsets-> block position. We do this because we want to make sure it always stays 8 bytes aligned
 	uint64_t new_followingBlockStart = m_movesetSize + structListSizeDiff;
 	uint64_t old_followingBlockStart = m_movesetSize;
-	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
 	{
-		uint64_t absoluteBlockAddr = (m_header->infos.moveset_data_start + m_header->offsets.blocks[i]);
+		uint64_t absoluteBlockAddr = (m_header->moveset_data_start + m_offsets->blocks[i]);
 		if (absoluteBlockAddr >= orig_postListOffset) {
 			old_followingBlockStart = absoluteBlockAddr;
 			new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart + structListSizeDiff);
@@ -39,7 +39,7 @@ void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int 
 	}
 
 	// Shift offsets in the mvl head right away so that iterators can work later on
-	uint64_t orig_relative_postLisOffset = orig_postListOffset - (m_header->infos.moveset_data_start + m_header->offsets.movelistBlock);
+	uint64_t orig_relative_postLisOffset = orig_postListOffset - (m_header->moveset_data_start + m_offsets->movelistBlock);
 
 	if (m_mvlHead->inputs_offset >= orig_relative_postLisOffset) {
 		m_mvlHead->inputs_offset += structListSizeDiff;
@@ -56,10 +56,10 @@ void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int 
 	}
 
 	// Shift moveset blocks offsets if necessary (at the time of this commit, it isn't)
-	for (int i = 0; i < _countof(m_header->offsets.blocks); ++i)
+	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
 	{
-		if ((m_header->infos.moveset_data_start + m_header->offsets.blocks[i]) >= orig_postListOffset) {
-			m_header->offsets.blocks[i] = Helpers::align8Bytes(m_header->offsets.blocks[i] + structListSizeDiff);
+		if ((m_header->moveset_data_start + m_offsets->blocks[i]) >= orig_postListOffset) {
+			m_offsets->blocks[i] = Helpers::align8Bytes(m_offsets->blocks[i] + structListSizeDiff);
 			DEBUG_LOG("Shifted moveset block %d by 0x%x\n", i, structListSizeDiff);
 		}
 	}
@@ -116,7 +116,7 @@ void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::
 					continue;
 				}
 			}
-			deletedTranslatons[addr] = (uint32_t)strlen((char*)m_movesetData + m_header->offsets.movelistBlock + addr);
+			deletedTranslatons[addr] = (uint32_t)strlen((char*)m_movesetData + m_offsets->movelistBlock + addr);
 		}
 	}
 
@@ -165,7 +165,7 @@ void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::
 		}
 	}
 
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movelistBlock + m_mvlHead->displayables_offset;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + m_mvlHead->displayables_offset;
 	int listSizeDiff = ModifyGenericMovelistListSize<MvlDisplayable>(listStart, ids, deletedIds, listHead);
 
 	// Update count and iterator's count
@@ -175,7 +175,7 @@ void EditorT7::ModifyMovelistDisplayableSize(unsigned int listStart, const std::
 
 void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movelistBlock + m_mvlHead->inputs_offset;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + m_mvlHead->inputs_offset;
 	int listSizeDiff = ModifyGenericMovelistListSize<MvlInput>(listStart, ids, deletedIds, listHead);
 
 	// No real need to update count for input list in term of structure data
@@ -200,7 +200,7 @@ void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector
 uint32_t EditorT7::CreateNewMvlPlayable()
 {
 	uint32_t newStructId = m_mvlHead->playables_count;
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movelistBlock + m_mvlHead->playables_offset;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + m_mvlHead->playables_offset;
 
 	ModifyGenericMovelistListSize<MvlPlayable>(newStructId, { -1 }, {}, listHead);
 	MvlPlayable* playable = m_iterators.mvl_playables[newStructId];
@@ -214,7 +214,7 @@ uint32_t EditorT7::CreateNewMvlPlayable()
 uint32_t EditorT7::CreateNewMvlInputs()
 {
 	uint32_t newStructId = (uint32_t)m_iterators.mvl_inputs.size();
-	uint64_t listHead = m_header->infos.moveset_data_start + m_header->offsets.movelistBlock + m_mvlHead->inputs_offset;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + m_mvlHead->inputs_offset;
 
 	ModifyGenericMovelistListSize<MvlInput>(newStructId, { -1, -1 }, {}, listHead);
 	MvlInput* inputs = m_iterators.mvl_inputs[newStructId];

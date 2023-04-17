@@ -80,13 +80,13 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 	m_process->writeInt64(playerAddress + staticCameraOffset + 0x8, cameraMota2);
 }
 
-void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeader_offsets& offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
+void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
 	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
 	m_process->readBytes(currentMovesetAddr + offsetof(MovesetInfo, motas), &currentMotasList, sizeof(MotaList));
 
-	MotaList* motaList = (MotaList*)(moveset + offsets.motalistsBlock);
+	MotaList* motaList = (MotaList*)(moveset + offsets->motalistsBlock);
 
 	uint64_t* gameMotaCursor = (uint64_t*)&currentMotasList;
 	uint64_t* fileMotaCursor = (uint64_t*)motaList;
@@ -99,15 +99,15 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeader_offsets& offsets, 
 			fileMotaCursor[i] = gameMotaCursor[i];
 		}
 		else {
-			fileMotaCursor[i] += gameMoveset + offsets.motaBlock;
+			fileMotaCursor[i] += gameMoveset + offsets->motaBlock;
 		}
 	}
 }
 
-void ImporterT7::ConvertMovesetTableOffsets(const TKMovesetHeader_offsets& offsets, Byte* moveset, gameAddr gameMoveset)
+void ImporterT7::ConvertMovesetTableOffsets(const TKMovesetHeaderBlocks* offsets, Byte* moveset, gameAddr gameMoveset)
 {
-	gAddr::MovesetTable* table = (gAddr::MovesetTable*)(moveset + offsets.tableBlock);
-	gameAddr offset = gameMoveset + offsets.movesetBlock;
+	gAddr::MovesetTable* table = (gAddr::MovesetTable*)(moveset + offsets->tableBlock);
+	gameAddr offset = gameMoveset + offsets->movesetBlock;
 
 	table->reactions += offset;
 	table->requirement += offset;
@@ -130,18 +130,18 @@ void ImporterT7::ConvertMovesetTableOffsets(const TKMovesetHeader_offsets& offse
 	table->throwCameras += offset;
 }
 
-void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const gAddr::MovesetTable* offsets, const TKMovesetHeader& header)
+void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const gAddr::MovesetTable* table, const TKMovesetHeader* header, const TKMovesetHeaderBlocks* offsets)
 {
 	// In movesets, some moves (for some reason) can be transitionned into only on specific character IDs
 	// I am taking about mundane moves such as EWHF not working where WHF does
 	// The why is hard to understand and might possibly be linked to Mokujin/Combot, but anyway, this fixes things
-	uint16_t movesetCharacterId = header.infos.characterId;
+	uint16_t movesetCharacterId = header->characterId;
 	uint16_t currentCharacterId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_chara_id_offset"));
 
-	Requirement* requirement = (Requirement*)(moveset + header.offsets.movesetBlock + offsets->requirement);
+	Requirement* requirement = (Requirement*)(moveset + offsets->movesetBlock + table->requirement);
 	const int c_characterIdCondition = (int)m_game->addrFile->GetSingleValue("val:t7_character_id_condition");
 
-	for (size_t i = 0; i < offsets->requirementCount; ++i)
+	for (size_t i = 0; i < table->requirementCount; ++i)
 	{
 		// When the requirement ask "am i X character ID", X = extracted character ID
 		// i will change that X character ID to be the one of the current character, to make it always true.
@@ -153,96 +153,96 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 	}
 }
 
-void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* offsets, const TKMovesetHeader_offsets& blockOffsets)
+void ImporterT7::ConvertMovesetIndexes(Byte* moveset, gameAddr gameMoveset, const gAddr::MovesetTable* table, const TKMovesetHeaderBlocks* offsets)
 {
-	gameAddr blockOffset = gameMoveset + blockOffsets.movesetBlock;
+	gameAddr blockOffset = gameMoveset + offsets->movesetBlock;
 
-	for (auto& move : StructIterator<gAddr::Move>(moveset, blockOffsets.movesetBlock + offsets->move, offsets->moveCount))
+	for (auto& move : StructIterator<gAddr::Move>(moveset, offsets->movesetBlock + table->move, table->moveCount))
 	{
-		move.name_addr += gameMoveset + blockOffsets.nameBlock;
-		move.anim_name_addr += gameMoveset + blockOffsets.nameBlock;
-		move.anim_addr += gameMoveset + blockOffsets.animationBlock;
+		move.name_addr += gameMoveset + offsets->nameBlock;
+		move.anim_name_addr += gameMoveset + offsets->nameBlock;
+		move.anim_addr += gameMoveset + offsets->animationBlock;
 
-		FROM_INDEX(move.cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move._0x28_cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move._0x38_cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move._0x48_cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(move.hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
-		FROM_INDEX(move.voicelip_addr, blockOffset + offsets->voiceclip, Voiceclip);
-		FROM_INDEX(move.extra_move_property_addr, blockOffset + offsets->extraMoveProperty, ExtraMoveProperty);
-		FROM_INDEX(move.move_start_extraprop_addr, blockOffset + offsets->moveBeginningProp, OtherMoveProperty);
-		FROM_INDEX(move.move_end_extraprop_addr, blockOffset + offsets->moveEndingProp, OtherMoveProperty);
+		FROM_INDEX(move.cancel_addr, blockOffset + table->cancel, Cancel);
+		FROM_INDEX(move._0x28_cancel_addr, blockOffset + table->cancel, Cancel);
+		FROM_INDEX(move._0x38_cancel_addr, blockOffset + table->cancel, Cancel);
+		FROM_INDEX(move._0x48_cancel_addr, blockOffset + table->cancel, Cancel);
+		FROM_INDEX(move.hit_condition_addr, blockOffset + table->hitCondition, HitCondition);
+		FROM_INDEX(move.voicelip_addr, blockOffset + table->voiceclip, Voiceclip);
+		FROM_INDEX(move.extra_move_property_addr, blockOffset + table->extraMoveProperty, ExtraMoveProperty);
+		FROM_INDEX(move.move_start_extraprop_addr, blockOffset + table->moveBeginningProp, OtherMoveProperty);
+		FROM_INDEX(move.move_end_extraprop_addr, blockOffset + table->moveEndingProp, OtherMoveProperty);
 	}
 
 	// Convert projectile ptrs
-	for (auto& projectile : StructIterator<gAddr::Projectile>(moveset, blockOffsets.movesetBlock + offsets->projectile, offsets->projectileCount))
+	for (auto& projectile : StructIterator<gAddr::Projectile>(moveset, offsets->movesetBlock + table->projectile, table->projectileCount))
 	{
 		// One projectile actually has both at NULL for some reason ? todo : check
-		FROM_INDEX(projectile.cancel_addr, blockOffset + offsets->cancel, Cancel);
-		FROM_INDEX(projectile.hit_condition_addr, blockOffset + offsets->hitCondition, HitCondition);
+		FROM_INDEX(projectile.cancel_addr, blockOffset + table->cancel, Cancel);
+		FROM_INDEX(projectile.hit_condition_addr, blockOffset + table->hitCondition, HitCondition);
 	}
 
 	// Convert cancel ptrs
-	for (auto& cancel : StructIterator<gAddr::Cancel>(moveset, blockOffsets.movesetBlock + offsets->cancel, offsets->cancelCount))
+	for (auto& cancel : StructIterator<gAddr::Cancel>(moveset, offsets->movesetBlock + table->cancel, table->cancelCount))
 	{
-		FROM_INDEX(cancel.requirements_addr, blockOffset + offsets->requirement, Requirement);
-		FROM_INDEX(cancel.extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
+		FROM_INDEX(cancel.requirements_addr, blockOffset + table->requirement, Requirement);
+		FROM_INDEX(cancel.extradata_addr, blockOffset + table->cancelExtradata, CancelExtradata);
 	}
 
 	// Convert groupe dcancel ptrs
-	for (auto& groupCancel : StructIterator<gAddr::Cancel>(moveset, blockOffsets.movesetBlock + offsets->groupCancel, offsets->groupCancelCount))
+	for (auto& groupCancel : StructIterator<gAddr::Cancel>(moveset, offsets->movesetBlock + table->groupCancel, table->groupCancelCount))
 	{
-		FROM_INDEX(groupCancel.requirements_addr, blockOffset + offsets->requirement, Requirement);
-		FROM_INDEX(groupCancel.extradata_addr, blockOffset + offsets->cancelExtradata, CancelExtradata);
+		FROM_INDEX(groupCancel.requirements_addr, blockOffset + table->requirement, Requirement);
+		FROM_INDEX(groupCancel.extradata_addr, blockOffset + table->cancelExtradata, CancelExtradata);
 	}
 
 	// Convert reaction ptrs
-	for (auto& reaction : StructIterator<gAddr::Reactions>(moveset, blockOffsets.movesetBlock + offsets->reactions, offsets->reactionsCount))
+	for (auto& reaction : StructIterator<gAddr::Reactions>(moveset, offsets->movesetBlock + table->reactions, table->reactionsCount))
 	{
-		FROM_INDEX(reaction.front_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction.backturned_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction.left_side_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction.right_side_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction.front_counterhit_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction.downed_pushback, blockOffset + offsets->pushback, Pushback);
-		FROM_INDEX(reaction.block_pushback, blockOffset + offsets->pushback, Pushback);
+		FROM_INDEX(reaction.front_pushback, blockOffset + table->pushback, Pushback);
+		FROM_INDEX(reaction.backturned_pushback, blockOffset + table->pushback, Pushback);
+		FROM_INDEX(reaction.left_side_pushback, blockOffset + table->pushback, Pushback);
+		FROM_INDEX(reaction.right_side_pushback, blockOffset + table->pushback, Pushback);
+		FROM_INDEX(reaction.front_counterhit_pushback, blockOffset + table->pushback, Pushback);
+		FROM_INDEX(reaction.downed_pushback, blockOffset + table->pushback, Pushback);
+		FROM_INDEX(reaction.block_pushback, blockOffset + table->pushback, Pushback);
 	}
 
 	// Convert input sequence ptrs
-	for (auto& inputSequence : StructIterator<gAddr::InputSequence>(moveset, blockOffsets.movesetBlock + offsets->inputSequence, offsets->inputSequenceCount))
+	for (auto& inputSequence : StructIterator<gAddr::InputSequence>(moveset, offsets->movesetBlock + table->inputSequence, table->inputSequenceCount))
 	{
-		FROM_INDEX(inputSequence.input_addr, blockOffset + offsets->input, Input);
+		FROM_INDEX(inputSequence.input_addr, blockOffset + table->input, Input);
 	}
 
 	// Convert throwCameras ptrs
-	for (auto& throwCameras : StructIterator<gAddr::ThrowCamera>(moveset, blockOffsets.movesetBlock + offsets->throwCameras, offsets->throwCamerasCount))
+	for (auto& throwCameras : StructIterator<gAddr::ThrowCamera>(moveset, offsets->movesetBlock + table->throwCameras, table->throwCamerasCount))
 	{
-		FROM_INDEX(throwCameras.cameradata_addr, blockOffset + offsets->cameraData, CameraData);
+		FROM_INDEX(throwCameras.cameradata_addr, blockOffset + table->cameraData, CameraData);
 	}
 
 	// Convert hit conditions ptrs
-	for (auto& hitCondition : StructIterator<gAddr::HitCondition>(moveset, blockOffsets.movesetBlock + offsets->hitCondition, offsets->hitConditionCount))
+	for (auto& hitCondition : StructIterator<gAddr::HitCondition>(moveset, offsets->movesetBlock + table->hitCondition, table->hitConditionCount))
 	{
-		FROM_INDEX(hitCondition.requirements_addr, blockOffset + offsets->requirement, Requirement);
-		FROM_INDEX(hitCondition.reactions_addr, blockOffset + offsets->reactions, Reactions);
+		FROM_INDEX(hitCondition.requirements_addr, blockOffset + table->requirement, Requirement);
+		FROM_INDEX(hitCondition.reactions_addr, blockOffset + table->reactions, Reactions);
 	}
 
 	// Convert pushback ptrs
-	for (auto& pushback : StructIterator<gAddr::Pushback>(moveset, blockOffsets.movesetBlock + offsets->pushback, offsets->pushbackCount))
+	for (auto& pushback : StructIterator<gAddr::Pushback>(moveset, offsets->movesetBlock + table->pushback, table->pushbackCount))
 	{
-		FROM_INDEX(pushback.extradata_addr, blockOffset + offsets->pushbackExtradata, PushbackExtradata);
+		FROM_INDEX(pushback.extradata_addr, blockOffset + table->pushbackExtradata, PushbackExtradata);
 	}
 
 	// Convert move-start ptrs
-	for (auto& moveBeginProp : StructIterator<gAddr::OtherMoveProperty>(moveset, blockOffsets.movesetBlock + offsets->moveBeginningProp, offsets->moveBeginningPropCount))
+	for (auto& moveBeginProp : StructIterator<gAddr::OtherMoveProperty>(moveset, offsets->movesetBlock + table->moveBeginningProp, table->moveBeginningPropCount))
 	{
-		FROM_INDEX(moveBeginProp.requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(moveBeginProp.requirements_addr, blockOffset + table->requirement, Requirement);
 	}
 
 	// Convert move-end prop ptrs
-	for (auto& moveEndProp : StructIterator<gAddr::OtherMoveProperty>(moveset, blockOffsets.movesetBlock + offsets->moveEndingProp, offsets->moveEndingPropCount))
+	for (auto& moveEndProp : StructIterator<gAddr::OtherMoveProperty>(moveset, offsets->movesetBlock + table->moveEndingProp, table->moveEndingPropCount))
 	{
-		FROM_INDEX(moveEndProp.requirements_addr, blockOffset + offsets->requirement, Requirement);
+		FROM_INDEX(moveEndProp.requirements_addr, blockOffset + table->requirement, Requirement);
 	}
 }
 
@@ -325,7 +325,7 @@ void ImporterT7::CleanupUnusedMovesets()
 
 			}
 
-		
+
 			if (isUsed) {
 				// Skip
 				++i;
@@ -333,7 +333,7 @@ void ImporterT7::CleanupUnusedMovesets()
 			else {
 				m_process->freeMem(movesetAddress);
 			}
-		
+
 		}
 
 	}
@@ -376,26 +376,30 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	Byte* moveset;
 
 	// Header of the moveset that will contain our own information about it
-	TKMovesetHeader header;
+	const TKMovesetHeader* header;
+
+	// List of data blocks within the moveset
+	const TKMovesetHeaderBlocks* offsets;
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
 
-	// -- File reading & allocations -- //
+	// -- Basic reading & allocations -- //
 
-	// Read important header information (our own header)
-	memcpy_s(&header, sizeof(TKMovesetHeader), orig_moveset, sizeof(TKMovesetHeader));
 	progress = 20;
 
 	{
-		// Make a copy of the moveset that we can modify freely and quickly before importing
-		uint64_t movesetStartOffset = header.infos.moveset_data_start + header.offsets.movesetInfoBlock;
-		s_moveset -= movesetStartOffset;
+		// Get ptrs to the two most important structures
+		header = (const TKMovesetHeader*)orig_moveset;
+		offsets = (const TKMovesetHeaderBlocks*)(orig_moveset + header->block_list);
+
+		// Create a copy of the moveset to work with (we will be applying modifications to it before import)
+		s_moveset -= header->moveset_data_start;
 		moveset = (Byte*)malloc(s_moveset);
 		if (moveset == nullptr) {
 			return ImportationErrcode_AllocationErr;
 		}
-		memcpy(moveset, orig_moveset + movesetStartOffset, s_moveset);
+		memcpy(moveset, orig_moveset + header->moveset_data_start, s_moveset);
 	}
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
@@ -410,24 +414,30 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	// -- Conversions -- //
 
 	// Get the table address
-	table = (gAddr::MovesetTable*)(moveset + header.offsets.tableBlock);
+	table = (gAddr::MovesetTable*)(moveset + offsets->tableBlock);
 
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, header.offsets);
+	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
 	progress = 70;
 
+	if ((settings & ImportSettings_BasicLoadOnly) == 0) {
+		// Fix moves that use characterID conditions to work
+		ApplyCharacterIDFixes(moveset, playerAddress, table, header, offsets);
+	}
+	progress = 85;
+
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
-	ConvertMovesetTableOffsets(header.offsets, moveset, gameMoveset);
+	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(header.offsets, moveset, gameMoveset, playerAddress);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress);
 	progress = 90;
 
-	MvlHead* mvlHead = (MvlHead*)(moveset + header.offsets.movelistBlock);
-	bool hasDisplayableMovelist = ((header.infos.moveset_data_start + header.offsets.movelistBlock + 4) < s_moveset) &&
+	MvlHead* mvlHead = (MvlHead*)(moveset + offsets->movelistBlock);
+	bool hasDisplayableMovelist = ((header->moveset_data_start + offsets->movelistBlock + 4) < s_moveset) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
@@ -438,7 +448,7 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 
 	if (hasDisplayableMovelist)
 	{
-		gameAddr game_mvlHead = (gameAddr)gameMoveset + header.offsets.movelistBlock;
+		gameAddr game_mvlHead = (gameAddr)gameMoveset + offsets->movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
 	}
 
@@ -447,12 +457,6 @@ ImportationErrcode_ ImporterT7::Import(const Byte* orig_moveset, uint64_t s_move
 	}
 	else {
 		EnforceDefaultAliasesAsCurrent(moveset);
-	}
-
-
-	if ((settings & ImportSettings_BasicLoadOnly) == 0) {
-		// Fix moves that use characterID conditions to work
-		ApplyCharacterIDFixes(moveset, playerAddress, table, header);
 	}
 
 	// Finally write our moveset to the game's memory
