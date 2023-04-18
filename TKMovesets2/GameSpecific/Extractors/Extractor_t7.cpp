@@ -467,6 +467,7 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, uint8_t gameId, gameAd
 	infos.flags = 0;
 	infos.gameId = gameId;
 	infos.characterId = GetCharacterID(playerAddress);
+	memset(infos.gameVersionId, 0, sizeof(infos.gameVersionId));
 	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
 	strcpy_s(infos.origin, sizeof(infos.origin), GetGameOriginString());
 	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());

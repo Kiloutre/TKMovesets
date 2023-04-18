@@ -123,53 +123,19 @@ public:
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
 	void    readBytes(gameAddr addr, void* buf, size_t readSize);
 
-	// Writes an integer to an address, automatically detecting the type and size
+	// Writes a value to the remote process's memory, adapting to the value type's size
 	template<typename T>
-	void writeInteger(gameAddr addr, T value)
+	void write(gameAddr addr, T value)
 	{
-		switch (sizeof(T))
-		{
-		case 4:
-			writeInt32(addr, *(int32_t*)&value);
-			break;
-		case 8:
-			writeInt64(addr, *(int64_t*)&value);
-			break;
-		case 2:
-			writeInt16(addr, *(int16_t*)&value);
-			break;
-		case 1:
-			writeInt8(addr, *(int8_t*)&value);
-			break;
-		default:
-			throw;
-		}
+		WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&T, sizeof(T), nullptr);
 	};
-	// Reads an integer, reading a different amount of bytes depending on the expected return type
+	// Reads a value in the remote process's memory, adapting to the expected return value type's size
 	template<typename T>
-	T readInteger(gameAddr addr)
+	T read(gameAddr addr)
 	{
-		switch (sizeof(T))
-		{
-		case 4:
-			uint32_t value = readUInt32(addr);
-			return *(T*)&value;
-			break;
-		case 8:
-			uint64_t value = readUInt64(addr);
-			return *(T*)&value;
-			break;
-		case 2:
-			uint16_t value = readUInt16(addr);
-			return *(T*)&value;
-			break;
-		case 1:
-			uint8_t value = readUInt8(addr);
-			return *(T*)&value;
-			break;
-		default:
-			throw;
-		}
+		T value{ (T)-1 };
+		ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+		return T;
 	};
 
 	// Writes a byte to the game
