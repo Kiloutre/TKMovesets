@@ -4,7 +4,7 @@
 struct SharedMemoryPlayer
 {
 	// Can be null, in which case no moveset is to be loaded
-	uint64_t customMovesetAddr;
+	uint64_t custom_moveset_addr;
 };
 
 struct SharedMemory

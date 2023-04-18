@@ -677,6 +677,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 			file.close();
 
 			ExtractorUtils::CompressFile(filepath, tmp_filepath);
+			DEBUG_LOG("- Saved moveset at '%S' -\n", filepath.c_str());
 
 			progress = 100;
 			// Extraction is over

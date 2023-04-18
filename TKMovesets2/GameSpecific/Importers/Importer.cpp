@@ -21,7 +21,7 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 	progress = 0;
 	// Read file data
 
-	DEBUG_LOG("Loading file '%s'\n", filename);
+	DEBUG_LOG("Loading file '%S'\n", filename);
 	std::ifstream file(filename, std::ios::binary);
 
 	if (file.fail()) {

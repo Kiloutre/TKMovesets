@@ -3,6 +3,7 @@
 #include <cctype>
 #include <fstream>
 #include <chrono>
+#include <codecvt>
 
 #include "helpers.hpp"
 
@@ -11,6 +12,18 @@
 
 namespace Helpers
 {
+	std::string to_utf8(const std::wstring& ws)
+	{
+		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+		return converter.to_bytes(ws);
+	}
+
+	std::wstring to_unicode(const std::string& s)
+	{
+		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+		return converter.from_bytes(s);
+	}
+
 	std::string wstring_to_string(const std::wstring& ws)
 	{
 		return std::string(ws.begin(), ws.end());
@@ -228,13 +241,11 @@ namespace Helpers
 		std::wstring tmp;
 
 		if (lastSlash == std::string::npos) {
-			tmp = filename.substr(0, filename.size() - strlen(MOVESET_FILENAME_EXTENSION));
+			return to_utf8(filename.substr(0, filename.size() - strlen(MOVESET_FILENAME_EXTENSION)));
 		}
 		else {
-			tmp = filename.substr(lastSlash + 1, filename.size() - lastSlash - strlen(MOVESET_FILENAME_EXTENSION) - 1);
+			return to_utf8(filename.substr(lastSlash + 1, filename.size() - lastSlash - strlen(MOVESET_FILENAME_EXTENSION) - 1));
 		}
-
-		return wstring_to_string(tmp);
 	}
 
 	bool isHeaderStringMalformated(const char* str, size_t size)

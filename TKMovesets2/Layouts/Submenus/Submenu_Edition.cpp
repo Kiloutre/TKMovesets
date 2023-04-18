@@ -16,8 +16,7 @@ static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newN
 		return RenameErrcode_EmptyName;
 	}
 
-	std::string s_newName = newName;
-	std::wstring w_newName(s_newName.begin(), s_newName.end());
+	std::wstring w_newName = Helpers::to_unicode(newName);
 	std::wstring new_full_filename = full_filename.substr(0, full_filename.find_last_of(L"/\\") + 1)
 									+ w_newName + (L"" MOVESET_FILENAME_EXTENSION);
 

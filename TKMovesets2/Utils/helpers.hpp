@@ -149,6 +149,10 @@ public:
 
 namespace Helpers
 {
+	// Converts a unicode-encoded string to UTF8
+	std::string to_utf8(const std::wstring& ws);
+	// Converts a UTF8-encoded string to Unicode
+	std::wstring to_unicode(const std::string& s);
 	// Quick wchar/wstring to string conversion
 	std::string wstring_to_string(const std::wstring& ws);
 	std::wstring string_to_wstring(const std::string& ws);

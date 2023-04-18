@@ -110,5 +110,5 @@ void Online::OnMovesetImport(movesetInfo* moveset, gameAddr movesetAddr, unsigne
     else {
         movesetInfos->push_back(*moveset);
     }
-    m_sharedMemPtr->player[playerId].customMovesetAddr = movesetAddr;
+    m_sharedMemPtr->player[playerId].custom_moveset_addr = movesetAddr;
 }
