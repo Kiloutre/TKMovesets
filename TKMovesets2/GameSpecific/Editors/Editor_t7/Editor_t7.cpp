@@ -342,14 +342,14 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 		}
 	}
 
-	if (Helpers::endsWith(moveName, "_y")) {
+	if (Helpers::endsWith<std::string>(moveName, "_y")) {
 		flags |= EditorMoveFlags_Throw;
 	}
-	else if (Helpers::endsWith(moveName, "_n")) {
+	else if (Helpers::endsWith<std::string>(moveName, "_n")) {
 		flags |= EditorMoveFlags_ThrowReaction;
 	}
 
-	if (Helpers::startsWith(moveName, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
+	if (Helpers::startsWith<std::string>(moveName, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
 		flags |= EditorMoveFlags_Custom;
 	}
 
@@ -442,14 +442,14 @@ void EditorT7::ReloadDisplayableMoveList()
 			}
 		}
 
-		if (Helpers::endsWith(moveName, "_y")) {
+		if (Helpers::endsWith<std::string>(moveName, "_y")) {
 			flags |= EditorMoveFlags_Throw;
 		}
-		else if (Helpers::endsWith(moveName, "_n")) {
+		else if (Helpers::endsWith<std::string>(moveName, "_n")) {
 			flags |= EditorMoveFlags_ThrowReaction;
 		}
 
-		if (Helpers::startsWith(moveName, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
+		if (Helpers::startsWith<std::string>(moveName, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
 			flags |= EditorMoveFlags_Custom;
 		}
 
@@ -649,12 +649,13 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 }
 
 
-std::string EditorT7::ImportAnimation(const char* filepath, int moveid)
+std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 {
 	// Keep file name only
-	std::string animName_str = std::string(filepath);
-	animName_str = animName_str.substr(animName_str.find_last_of("/\\") + 1);
-	animName_str = animName_str.substr(0, animName_str.find_last_of('.'));
+	std::wstring animName_wstr = filepath;
+	animName_wstr = animName_wstr.substr(animName_wstr.find_last_of(L"/\\") + 1);
+	animName_wstr = animName_wstr.substr(0, animName_wstr.find_last_of(L'.'));
+	std::string animName_str = Helpers::wstring_to_string(animName_wstr);
 
 	Byte* anim;
 	uint64_t animSize;

@@ -12,7 +12,7 @@ struct importEntry
 {
 	const Byte* moveset; // Can be nullptr. If so, import from filename.
 	uint64_t movesetSize; // Can be 0
-	std::string filename;
+	std::wstring filename;
 	gameAddr playerAddress;
 	ImportSettings settings;
 };
@@ -55,7 +55,7 @@ public:
 	// Is currently busy with an importation
 	virtual bool IsBusy() override;
 	// Queue a character importation from file
-	virtual void QueueCharacterImportation(std::string filename, ImportSettings settings=0);
+	virtual void QueueCharacterImportation(std::wstring filename, ImportSettings settings=0);
 	// Queue a character importation from moveset data.
 	virtual void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such

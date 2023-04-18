@@ -8,7 +8,7 @@ struct AnimationLibFile
 {
 	std::string name;
 	std::string lowercaseName;
-	std::string filepath;
+	std::wstring filepath;
 	std::string duration;
 	std::string size_megabytes;
 };
@@ -44,7 +44,7 @@ public:
 	// True if the thread we created finished loading the list
 	bool loadedList = false;
 	// Stores the animation filename that needs to be imported
-	const char* animationToImport = nullptr;
+	const wchar_t* animationToImport = nullptr;
 
 	EditorMove_Animations();
 	~EditorMove_Animations();

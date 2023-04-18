@@ -345,7 +345,7 @@ public:
 	// Saves all the moveset animations in our library
 	virtual void OrderAnimationsExtraction(const std::string& characterFilename) = 0;
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
-	virtual std::string ImportAnimation(const char* filepath, int moveid) = 0;
+	virtual std::string ImportAnimation(const wchar_t* filepath, int moveid) = 0;
 
 	// -- Creation -- //
 	// Create a new structure or structure list

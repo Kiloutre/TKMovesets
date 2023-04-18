@@ -128,13 +128,13 @@ void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t moveset
 	m_plannedImportations.push_back({
 		.moveset = moveset,
 		.movesetSize = movesetSize,
-		.filename = "",
+		.filename = L"",
 		.playerAddress = playerAddress,
 		.settings = settings
 	});
 }
 
-void GameImport::QueueCharacterImportation(std::string filename, ImportSettings settings)
+void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = importer->GetCharacterAddress(currentPlayerId);

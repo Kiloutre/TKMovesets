@@ -1,5 +1,7 @@
 #include <ImGui.h>
 #include <format>
+#include <filesystem>
+#include <system_error>
 
 #include "Submenu_Edition.hpp"
 #include "Localization.hpp"
@@ -8,14 +10,16 @@
 
 // -- Public methods -- //
 
-static RenameErrcode_ RenameMoveset(std::string full_filename, const char* newName)
+static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newName)
 {
 	if (strlen(newName) == 0) {
 		return RenameErrcode_EmptyName;
 	}
 
-	std::string new_full_filename = full_filename.substr(0, full_filename.find_last_of("/\\") + 1)
-									+ newName + MOVESET_FILENAME_EXTENSION;
+	std::string s_newName = newName;
+	std::wstring w_newName(s_newName.begin(), s_newName.end());
+	std::wstring new_full_filename = full_filename.substr(0, full_filename.find_last_of(L"/\\") + 1)
+									+ w_newName + (L"" MOVESET_FILENAME_EXTENSION);
 
 	if (std::string(newName).find_first_of("/\\<>:\"|?*") != -1) {
 		return RenameErrcode_InvalidName;
@@ -25,9 +29,10 @@ static RenameErrcode_ RenameMoveset(std::string full_filename, const char* newNa
 		return RenameErrcode_AlreadyExists;
 	}
 
-	if (std::rename(full_filename.c_str(), new_full_filename.c_str()) != 0) {
-		return RenameErrcode_RenameErr;
-	}
+	std::filesystem::rename(full_filename.c_str(), new_full_filename.c_str());
+	//if () {
+		//return RenameErrcode_RenameErr;
+	//}
 
 	return RenameErrcode_NoErr;
 }

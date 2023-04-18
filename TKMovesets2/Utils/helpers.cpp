@@ -16,6 +16,11 @@ namespace Helpers
 		return std::string(ws.begin(), ws.end());
 	}
 
+	std::wstring string_to_wstring(const std::string& s)
+	{
+		return std::wstring(s.begin(), s.end());
+	}
+
 	uint64_t GetAnimationSize(Byte* anim)
 	{
 		uint16_t animType = *(uint16_t*)anim;
@@ -217,47 +222,19 @@ namespace Helpers
 		}
 	}
 
-	bool endsWith(const std::string& str, const std::string& suffix)
+	std::string getMovesetNameFromFilename(const std::wstring& filename)
 	{
-		if (str.length() < suffix.length())
-			return false;
-		size_t i = str.length() - suffix.length();
+		size_t lastSlash = filename.find_last_of(L"/\\");
+		std::wstring tmp;
 
-		for (char c : suffix)
-		{
-			if (c != str[i]) {
-				return false;
-			}
-			++i;
-		}
-
-		return true;
-	}
-
-	bool startsWith(const std::string& str, const std::string& prefix)
-	{
-		if (str.length() < prefix.length())
-			return false;
-
-		for (size_t i = 0; prefix[i]; ++i)
-		{
-			if (prefix[i] != str[i]) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	std::string getMovesetNameFromFilename(const std::string& filename)
-	{
-		size_t lastSlash = filename.find_last_of("/\\");
 		if (lastSlash == std::string::npos) {
-			return filename.substr(0, filename.size() - strlen(MOVESET_FILENAME_EXTENSION));
+			tmp = filename.substr(0, filename.size() - strlen(MOVESET_FILENAME_EXTENSION));
 		}
 		else {
-			return filename.substr(lastSlash + 1, filename.size() - lastSlash - strlen(MOVESET_FILENAME_EXTENSION) - 1);
+			tmp = filename.substr(lastSlash + 1, filename.size() - lastSlash - strlen(MOVESET_FILENAME_EXTENSION) - 1);
 		}
+
+		return wstring_to_string(tmp);
 	}
 
 	bool isHeaderStringMalformated(const char* str, size_t size)
@@ -278,11 +255,15 @@ namespace Helpers
 		return str[i] != '\0'; // Ensure last char is a nullbyte
 	}
 
+	bool fileExists(const wchar_t* name) {
+		struct _stat buffer;
+		return (_wstat(name, &buffer) == 0);
+	}
+
 	bool fileExists(const char* name) {
 		struct stat buffer;
 		return (stat(name, &buffer) == 0);
 	}
-
 
 	uint32_t crc32_update(uint32_t(&table)[256], uint32_t initial, const void* buf, size_t len)
 	{

@@ -24,7 +24,7 @@ static int getMovesetColor(MovesetFlags flags)
 }
 
 // Reads a movest in order to fetch its header informations such as character name, version, etc. Can return null if errors are encountered.
-static movesetInfo* fetchMovesetInformations(const std::string& filename)
+static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 {
 	std::ifstream file;
 	file.open(filename, std::ios::binary);
@@ -47,9 +47,9 @@ static movesetInfo* fetchMovesetInformations(const std::string& filename)
 			return nullptr;
 		}
 		else {
-			struct stat buffer;
-			// stat() the file to read modification time
-			stat(filename.c_str(), &buffer);
+			struct _stat buffer;
+			// _wstat() the file to read modification time
+			_wstat(filename.c_str(), &buffer);
 
 			return new movesetInfo{
 				.color = getMovesetColor(movesetInfos.flags),
@@ -114,9 +114,9 @@ void LocalStorage::ReloadMovesetList()
 	for (const auto& entry : std::filesystem::directory_iterator(MOVESET_DIRECTORY))
 	{
 		// Todo: Unicode .name support
-		std::string filename = entry.path().string();
+		std::wstring filename = entry.path().wstring();
 
-		if (!Helpers::endsWith(filename, MOVESET_FILENAME_EXTENSION)) {
+		if (!Helpers::endsWith<std::wstring>(filename, L"" MOVESET_FILENAME_EXTENSION)) {
 			// Skip files that we do not recognize
 			continue;
 		}
@@ -148,9 +148,9 @@ void LocalStorage::ReloadMovesetList()
 	// Delete moveset entries that don't exist anymore (deleted files)
 	for (size_t i = 0; i < extractedMovesets.size();) {
 		movesetInfo* moveset = extractedMovesets[i];
-		struct stat buffer;
+		struct _stat buffer;
 
-		if ((stat(moveset->filename.c_str(), &buffer) != 0) || (moveset->modificationDate != 0 && buffer.st_mtime != moveset->modificationDate)) {
+		if ((_wstat(moveset->filename.c_str(), &buffer) != 0) || (moveset->modificationDate != 0 && buffer.st_mtime != moveset->modificationDate)) {
 			// File does not exist anymore or was recently modified, de-allocate the info we stored about it
 			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
@@ -173,9 +173,9 @@ void LocalStorage::CleanupUnusedMovesetInfos()
 	}
 }
 
-void LocalStorage::DeleteMoveset(const char* filename)
+void LocalStorage::DeleteMoveset(const wchar_t* filename)
 {
-	remove(filename);
+	std::filesystem::remove(filename);
 }
 
 LocalStorage::~LocalStorage()

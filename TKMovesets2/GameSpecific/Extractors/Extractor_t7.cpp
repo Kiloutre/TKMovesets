@@ -626,8 +626,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	else {
 		// Create the file
 
-		std::string filepath;
-		std::string tmp_filepath;
+		std::wstring filepath;
+		std::wstring tmp_filepath;
 		
 		GetFilepath(characterName.c_str(), filepath, tmp_filepath, (settings & ExtractSettings_OVERWRITE_SAME_FILENAME) != 0);
 

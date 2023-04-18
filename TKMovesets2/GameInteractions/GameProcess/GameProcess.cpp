@@ -137,7 +137,6 @@ bool GameProcess::LoadGameMainModule(const char* processName)
 {
 	std::vector<moduleEntry> modules = GetModuleList();
 
-
 	for (auto& m : modules)
 	{
 		if (m.name == processName)
@@ -184,7 +183,6 @@ bool GameProcess::CheckRunning()
 	if (m_processHandle != nullptr)
 	{
 		int32_t value = 0;
-		printf("checking addr %llx\n", mainModule.address);
 		if (ReadProcessMemory(m_processHandle, (LPCVOID)mainModule.address, (LPVOID)&value, 4, nullptr) == 0)
 		{
 			DEBUG_LOG("! CheckRunning() failed: Process not running anymore !\n");

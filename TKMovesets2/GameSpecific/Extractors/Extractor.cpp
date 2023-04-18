@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <windows.h>
+#include <filesystem>
 //#include "lzma.h"
 
 #include "Helpers.hpp"
@@ -129,12 +130,9 @@ namespace ExtractorUtils
 		}
 	}
 
-	void CompressFile(const std::string& dest_filename, const std::string& src_filename)
+	void CompressFile(const std::wstring& dest_filename, const std::wstring& src_filename)
 	{
-		std::remove(dest_filename.c_str());
-		if (std::rename(src_filename.c_str(), dest_filename.c_str()) != 0) {
-			// todo
-		}
+		std::filesystem::rename(src_filename.c_str(), dest_filename.c_str());
 
 		// Todo: find a fast compression algorithm, or do it on the background while leaving the uncompressed file available until the compression is done
 		// Decompression speed is also really important.
@@ -224,24 +222,30 @@ Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	return block;
 }
 
-std::string Extractor::GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId)
+std::wstring Extractor::GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId)
 {
 	if (suffixId <= 1) {
-		return std::format("{}/{}{}{}", cm_extractionDir, gameIdentifierString, characterName, extension);
+		std::wstring outputFilename = Helpers::string_to_wstring(cm_extractionDir) + L"/" +
+			Helpers::string_to_wstring(gameIdentifierString) + Helpers::string_to_wstring(characterName)
+			+ Helpers::string_to_wstring(extension);
+		return outputFilename;
 	}
 	else {
-		return std::format("{}/{}{} ({}){}", cm_extractionDir, gameIdentifierString, characterName, suffixId, extension);
+		std::wstring outputFilename = Helpers::string_to_wstring(cm_extractionDir) + L"/" +
+			Helpers::string_to_wstring(gameIdentifierString) + Helpers::string_to_wstring(characterName)
+			+ L" (" + std::to_wstring(suffixId) + L")" + Helpers::string_to_wstring(extension);
+		return outputFilename;
 	}
 }
 
-void Extractor::GetFilepath(const char* characterName, std::string& out, std::string& out_tmp, bool overwriteSameFilename)
+void Extractor::GetFilepath(const char* characterName, std::wstring& out, std::wstring& out_tmp, bool overwriteSameFilename)
 {
 	CreateDirectory(cm_extractionDir, NULL);
 	// Make sure the directory for extraction exists 
 
 	const char* gameIdentifierstring = GetGameIdentifierString();
 
-	std::string filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, 0);
+	std::wstring filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, 0);
 
 	if (!overwriteSameFilename && Helpers::fileExists(filePath.c_str())) {
 		// File exists: try to add numbered suffix, loop until we find a free one

@@ -151,6 +151,7 @@ namespace Helpers
 {
 	// Quick wchar/wstring to string conversion
 	std::string wstring_to_string(const std::wstring& ws);
+	std::wstring string_to_wstring(const std::string& ws);
 
 	// Returns the size of an animation in bytes
 	uint64_t GetAnimationSize(Byte* anim);
@@ -179,18 +180,48 @@ namespace Helpers
     void convertPtrsToOffsets(void* listAddr, const std::map<gameAddr, uint64_t>& m, uint64_t struct_size, uint64_t amount);
 
     // Returns true if a string ends with [suffix]
-    bool endsWith(const std::string& str, const std::string& suffix);
-    // Returns true if a string starts with [prefix]
-    bool startsWith(const std::string& str, const std::string& prefix);
-    //bool endsWith(std::u32string str, std::u32string suffix);
+	template<typename T>
+	bool endsWith(const T& str, const T& suffix)
+	{
+		if (str.length() < suffix.length())
+			return false;
+		size_t i = str.length() - suffix.length();
+
+		for (auto c : suffix)
+		{
+			if (c != str[i]) {
+				return false;
+			}
+			++i;
+		}
+
+		return true;
+	}
+	// Returns true if a string starts with [prefix]
+	template<typename T>
+	bool startsWith(const T& str, const T& prefix)
+	{
+		if (str.length() < prefix.length())
+			return false;
+
+		for (size_t i = 0; prefix[i]; ++i)
+		{
+			if (prefix[i] != str[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
     // Converts filename into displayable name. U32 for UTF8
-    std::string getMovesetNameFromFilename(const std::string& filename);
+    std::string getMovesetNameFromFilename(const std::wstring& filename);
 
     // Returns true if one of the header strings is not properly formatted indicating a bad moveset file
     bool isHeaderStringMalformated(const char* string, size_t size);
 
     // Returns true if file exists
+    bool fileExists(const wchar_t* name);
     bool fileExists(const char* name);
 
     // Update a crc32 with new data

@@ -51,7 +51,7 @@ public:
 
 	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
 	// Import moveset from filename. Just a wrapper for Import(Byte*...). Does not need to be overriden, will send the entire file to the Import() function.
-	ImportationErrcode_ Import(const char* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
+	ImportationErrcode_ Import(const wchar_t* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	// Secondary import method taking bytes instead of a file
 	virtual ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
 	// Returns true if importation is possible

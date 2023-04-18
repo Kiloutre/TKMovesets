@@ -169,7 +169,7 @@ void EditorMove::PostRender()
 
 		if (m_animationList->Render())
 		{
-			const char* animPath = m_animationList->animationToImport;
+			const wchar_t* animPath = m_animationList->animationToImport;
 			if (animPath != nullptr) {
 				// User clicked on "Import" button on an anim
 				std::string animName = m_editor->ImportAnimation(animPath, structureId);

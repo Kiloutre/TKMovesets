@@ -37,6 +37,6 @@ public:
 	void QueueCharacterImportation(movesetInfo* moveset, unsigned int playerId, ImportSettings settings = 0);
 
 	// Forbid access to these
-	void QueueCharacterImportation(std::string filename, ImportSettings settings = 0) override { throw; };
+	void QueueCharacterImportation(std::wstring filename, ImportSettings settings = 0) override { throw; };
 	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0) override { throw; };
 };

@@ -16,7 +16,7 @@ static Byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
 	return moveset;
 }
 
-ImportationErrcode_ Importer::Import(const char* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
+ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
 	progress = 0;
 	// Read file data

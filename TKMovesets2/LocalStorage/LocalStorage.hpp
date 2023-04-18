@@ -12,7 +12,7 @@
 struct movesetInfo
 {
 	int color; // Color is defined by moveset flags
-	std::string filename;
+	std::wstring filename;
 	std::string name;
 	FasterStringComp origin;
 	std::string target_character;
@@ -33,7 +33,7 @@ private:
 	// Contains the list of movesets found in the extraction directory
 	std::vector<movesetInfo*> localMovesets;
 	// A set containing the list of moveset files in the configured extraction dir. Used to determine when to fetch new movesets info
-	std::set<std::string> m_extractedMovesetFilenames;
+	std::set<std::wstring> m_extractedMovesetFilenames;
 	// .extractedMovesets garbage, because it can be accessed in another thread while we remove items for it.
 	std::vector<movesetInfo*> m_garbage;
 
@@ -52,5 +52,5 @@ public:
 	// Frees the content of .garbage. Must be called by the display thread after being finished with .extractedMovesets
 	void CleanupUnusedMovesetInfos();
 	// Delete a moveset's file entirely
-	void DeleteMoveset(const char* filename);
+	void DeleteMoveset(const wchar_t* filename);
 };

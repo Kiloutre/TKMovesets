@@ -14,7 +14,7 @@
 // -- Static helpers -- //
 
 // Gets the animation duration in frame or -1 if the file is invalid (validation isn't extensive)
-static int GetAnimationDuration(const char* filename)
+static int GetAnimationDuration(const wchar_t* filename)
 {
 	std::ifstream file(filename, std::ios::binary);
 
@@ -109,8 +109,8 @@ void EditorMove_Animations::LoadAnimationList()
 			continue;
 		}
 
-		std::string characterFolder = directory.path().string();
-		std::string characterName = characterFolder.substr(characterFolder.find_last_of("/\\"));
+		std::wstring characterFolder = directory.path().wstring();
+		std::string characterName = Helpers::wstring_to_string(characterFolder.substr(characterFolder.find_last_of(L"/\\")));
 
 		AnimationLibChar* charAnims = new AnimationLibChar;
 		charAnims->name = characterName;
@@ -127,13 +127,13 @@ void EditorMove_Animations::LoadAnimationList()
 				continue;
 			}
 
-			std::string filename = file.path().string();
+			std::wstring filename = file.path().wstring();
 
-			if (!Helpers::endsWith(filename, ".bin")) {
+			if (!Helpers::endsWith<std::wstring>(filename, L".bin")) {
 				continue;
 			}
 
-			std::string name = filename.substr(filename.find_last_of("/\\") + 1);
+			std::string name = Helpers::wstring_to_string(filename.substr(filename.find_last_of(L"/\\") + 1));
 			name = name.substr(0, name.find_last_of('.'));
 			std::string lowercaseName = name;
 			std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);

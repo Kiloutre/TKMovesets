@@ -22,7 +22,7 @@ private:
 	// Name of the moveset to apply in the rename popup
 	char m_newName[256];
 	// Filename of the moveset to rename in the rename popup
-	std::string m_toRename;
+	std::wstring m_toRename;
 
 public:
 	movesetInfo* Render(LocalStorage& storage);

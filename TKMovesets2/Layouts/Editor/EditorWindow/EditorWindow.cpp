@@ -310,8 +310,8 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 	m_loadedCharacter.filename = movesetInfo->filename;
 	m_loadedCharacter.name = movesetInfo->name;
 	m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(movesetInfo->date);
+	filename = m_loadedCharacter.filename.c_str();
 	m_loadedCharacter.gameId = movesetInfo->gameId;
-	filename = movesetInfo->filename;
 
 	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
 

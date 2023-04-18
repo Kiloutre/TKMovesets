@@ -273,7 +273,7 @@ public:
 	// Saves all the moveset animations in our library. Explicit copy of the parameters because this runs in another thread and the source data might be freed in parallel.
 	void ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeaderBlocks offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset);
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
-	std::string ImportAnimation(const char* filepath, int moveid) override;
+	std::string ImportAnimation(const wchar_t* filepath, int moveid) override;
 
 	// -- Command Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;

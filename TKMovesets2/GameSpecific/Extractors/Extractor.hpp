@@ -61,7 +61,7 @@ namespace ExtractorUtils
 	// Returns the size in bytes of a 0x64 animation (big endian anim)
 	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
 	// Compress
-	void CompressFile(const std::string& dest_filename, const std::string& src_filename);
+	void CompressFile(const std::wstring& dest_filename, const std::wstring& src_filename);
 };
 
 // Base class for extracting from a game
@@ -69,7 +69,7 @@ class DLLCONTENT Extractor
 {
 private:
 	// Generates the filename to write, with a suffix (or not if [suffixId] is 0)
-	std::string GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId=0);
+	std::wstring GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId=0);
 protected:
 	// Stores the extraction directory
 	const char* cm_extractionDir = MOVESET_DIRECTORY;
@@ -81,7 +81,7 @@ protected:
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
 	Byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
 	// Generates the full filepath and the full tmp filepath to write to
-	void GetFilepath(const char* characterName, std::string& out, std::string& out_tmp, bool overwriteSameFilename);
+	void GetFilepath(const char* characterName, std::wstring& out, std::wstring& out_tmp, bool overwriteSameFilename);
 
 	// Returns the game identifier string, used for moveset file pefix
 	virtual const char* GetGameIdentifierString() = 0;

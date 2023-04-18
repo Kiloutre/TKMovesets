@@ -27,7 +27,7 @@ struct EditorMovelist_Move
 
 struct EditorInfos
 {
-	std::string filename;
+	std::wstring filename;
 	std::string name;
 	std::string lastSavedDate;
 	int32_t gameId;
@@ -46,7 +46,7 @@ private:
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
-	EditorInfos m_loadedCharacter = { .filename = "", .name = "", .lastSavedDate = "", .gameId = -1};
+	EditorInfos m_loadedCharacter = { .filename = L"", .name = "", .lastSavedDate = "", .gameId = -1};
 	// True if we need to enable the save button
 	bool m_savedLastChange = true;
 	// If the moveset can be live edited or not (need to actually code it)
@@ -104,10 +104,10 @@ private:
 public:
 	// Determines if the main window is open or not. If not, this tells the MainWindow parent class to free the ressources we have allocated
 	bool popen = true;
-	// Stores the filename
-	std::string filename;
 	// True is we need to call SetNextWindowFocus() before rendering our own
 	bool setFocus = false;
+	// Expose filename specifically and not the full editorInfos
+	const wchar_t* filename;
 
 	// Constructor that loads the moveset and starts its own importer
 	EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
