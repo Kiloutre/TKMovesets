@@ -11,6 +11,11 @@
 
 namespace Helpers
 {
+	std::string wstring_to_string(const std::wstring& ws)
+	{
+		return std::string(ws.begin(), ws.end());
+	}
+
 	uint64_t GetAnimationSize(Byte* anim)
 	{
 		uint16_t animType = *(uint16_t*)anim;

@@ -16,8 +16,9 @@ struct processEntry
 
 struct moduleEntry
 {
-	std::string name;
 	gameAddr address;
+	std::string name;
+	std::wstring path;
 	uint64_t size;
 };
 
@@ -66,7 +67,7 @@ private:
 	GameProcessErrcode_ AttachToNamedProcess(const char* processName, DWORD processExtraFlags);
 	// Returns the game PID
 	DWORD GetGamePID(const char* processName);
-	// Load the address of the main module in .moduleAddr
+	// Load informations about the main module in .mainModule
 	bool LoadGameMainModule(const char* processName);
 public:
 	// Status of the process attachment
@@ -75,10 +76,8 @@ public:
 	bool threadStarted{ false };
 	// pid of process we latch on
 	DWORD processId{ (DWORD)-1 };
-	// Address of main module in game
-	gameAddr moduleAddr{ (gameAddr)0x0 };
-	// Contains the size of the module in bytes
-	uint64_t moduleSize{ 0 };
+	// Stores informations about the main module (address, size, name, exe path)
+	moduleEntry mainModule;
 	// List of allocated blocks within the game's memory
 	std::vector<std::pair<gameAddr, uint64_t>> allocatedMemory;
 	// Base address. Every read & write will be done on base + addr.
@@ -134,7 +133,7 @@ public:
 	T read(gameAddr addr)
 	{
 		T value{ (T)-1 };
-		ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+		ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, sizeof(T), nullptr);
 		return T;
 	};
 

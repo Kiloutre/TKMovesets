@@ -149,6 +149,9 @@ public:
 
 namespace Helpers
 {
+	// Quick wchar/wstring to string conversion
+	std::string wstring_to_string(const std::wstring& ws);
+
 	// Returns the size of an animation in bytes
 	uint64_t GetAnimationSize(Byte* anim);
 	uint64_t get64AnimSize_LittleEndian(Byte* anim);

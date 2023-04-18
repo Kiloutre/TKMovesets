@@ -101,7 +101,7 @@ DWORD GameProcess::GetGamePID(const char* processName)
 std::vector<moduleEntry> GameProcess::GetModuleList()
 {
 	HANDLE moduleSnap;
-	MODULEENTRY32 me32{ 0 };
+	MODULEENTRY32W me32{ 0 };
 
 	std::vector<moduleEntry> modules;
 
@@ -109,18 +109,20 @@ std::vector<moduleEntry> GameProcess::GetModuleList()
 
 	if (GetLastError() != ERROR_ACCESS_DENIED)
 	{
-		me32.dwSize = sizeof(MODULEENTRY32);
-		if (Module32First(moduleSnap, &me32)) {
+		me32.dwSize = sizeof(me32);
+		if (Module32FirstW(moduleSnap, &me32)) {
 			modules.push_back({
-				.name = std::string(me32.szModule),
 				.address = (gameAddr)me32.modBaseAddr,
+				.name = Helpers::wstring_to_string(me32.szModule),
+				.path = std::wstring(me32.szExePath),
 				.size = (uint64_t)me32.modBaseSize
 			});
 
-			while (Module32Next(moduleSnap, &me32)) {
+			while (Module32NextW(moduleSnap, &me32)) {
 				modules.push_back({
-					.name = std::string(me32.szModule),
 					.address = (gameAddr)me32.modBaseAddr,
+					.name = Helpers::wstring_to_string(me32.szModule),
+					.path = std::wstring(me32.szExePath),
 					.size = (uint64_t)me32.modBaseSize
 				});
 			}
@@ -135,16 +137,17 @@ bool GameProcess::LoadGameMainModule(const char* processName)
 {
 	std::vector<moduleEntry> modules = GetModuleList();
 
-	for (auto& module : modules)
+
+	for (auto& m : modules)
 	{
-		if (module.name == processName)
+		if (m.name == processName)
 		{
-			moduleAddr = module.address;
-			moduleSize = module.size;
+			mainModule = m;
+			break;
 		}
 	}
 
-	return moduleAddr != -1;
+	return mainModule.address != -1;
 }
 
 // -- Public methods -- //
@@ -167,6 +170,7 @@ void GameProcess::Detach()
 		CloseHandle(m_processHandle);
 		m_processHandle = nullptr;
 	}
+	mainModule.address = -1;
 	status = GameProcessErrcode_PROC_NOT_ATTACHED;
 }
 
@@ -180,7 +184,8 @@ bool GameProcess::CheckRunning()
 	if (m_processHandle != nullptr)
 	{
 		int32_t value = 0;
-		if (ReadProcessMemory(m_processHandle, (LPCVOID)moduleAddr, (LPVOID)&value, 4, nullptr) == 0)
+		printf("checking addr %llx\n", mainModule.address);
+		if (ReadProcessMemory(m_processHandle, (LPCVOID)mainModule.address, (LPVOID)&value, 4, nullptr) == 0)
 		{
 			DEBUG_LOG("! CheckRunning() failed: Process not running anymore !\n");
 			Detach();
