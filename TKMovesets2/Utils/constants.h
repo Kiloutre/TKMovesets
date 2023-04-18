@@ -10,10 +10,11 @@
 # define PROGRAM_VERSION         "0.6"
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
-# define PROGRAM_DEFAULT_LANG    "en-US"
+# define PROGRAM_DEFAULT_LOCALE  "en-US"
 # define PROGRAM_DEBUG_LOG_FILE  "tkmovesets_logs.log"
 
-# define INTERFACE_DATA_DIR      "Interface"
+# define INTERFACE_DATA_DIR      "TKMInterface"
+# define GAME_ADDRESSES_FILE     "game_addresses.ini"
 
 # define MOVESET_EXTRACTED_NAME_PREFIX   "Tkm:"
 # define MOVESET_CUSTOM_MOVE_NAME_PREFIX "tkm_"

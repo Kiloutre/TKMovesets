@@ -24,11 +24,6 @@ const NavMenuBtn cg_other_btns[] = {
 	{NAV__MENU_ABOUT, "navmenu.about"},
 };
 
-const LangSelect cg_languages[] = {
-	{ .name = "English", .langId = "en-US" },
-	{ .name = (const char*)u8"Français", .langId = "fr-FR" },
-};
-
 // -- Private methods -- //
 
 void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width)
@@ -47,14 +42,8 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, float
 
 NavigationMenu::NavigationMenu()
 {
-	const char* currentLangId = Localization::GetCurrLangId();
-	for (int i = 0; i < _countof(cg_languages); ++i)
-	{
-		if (strcmp(cg_languages[i].langId, currentLangId) == 0) {
-			m_languageId = i;
-			break;
-		}
-	}
+	unsigned int m_languageId = Localization::GetCurrLangId();
+	Localization::GetTranslationList(&m_translations, &m_translations_count);
 }
 
 void NavigationMenu::Render(float width)
@@ -70,15 +59,13 @@ void NavigationMenu::Render(float width)
 
 	// Language list
 	ImGui::PushItemWidth(width);
-	if (ImGui::BeginCombo("##", cg_languages[m_languageId].name))
+	if (ImGui::BeginCombo("##", m_translations[m_languageId].displayName))
 	{
-		for (int i = 0; i < _countof(cg_languages); ++i)
+		for (int i = 0; i < m_translations_count; ++i)
 		{
 			ImGui::PushID(&i);
-			if (ImGui::Selectable(cg_languages[i].name, i == m_languageId))
-			{
-				Localization::LoadFile(cg_languages[i].langId);
-				m_languageId = i;
+			if (ImGui::Selectable(m_translations[i].displayName, i == m_languageId)) {
+				Localization::LoadFile(m_translations[i].locale, true);
 			}
 			ImGui::PopID();
 		}

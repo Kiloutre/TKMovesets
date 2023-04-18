@@ -63,23 +63,8 @@ static bool LoadLocaleTranslation()
 		}
 	}
 
-	WriteToLogFile(std::format("Searching for locale {}", name));
-
-	const uint64_t filenameMaxSize = LOCALE_NAME_MAX_LENGTH + 5 + sizeof(INTERFACE_DATA_DIR);
-	char filename[filenameMaxSize];
-
-	strcpy_s(filename, filenameMaxSize, INTERFACE_DATA_DIR);
-	strcat_s(filename, filenameMaxSize, "/");
-	strcat_s(filename, filenameMaxSize, name);
-	strcat_s(filename, filenameMaxSize, ".txt");
-
-	struct stat buffer;
-	if (stat(filename, &buffer) == 0) {
-		Localization::LoadFile(name);
-		return true;
-	}
-
-	return false;
+	WriteToLogFile(std::format("Attempting to load locale {}", name));
+	return Localization::LoadFile(name);
 }
 
 // Initialize the important members of mainwindow. I prefer doing it here because it is mostly a layout and GUI-related class
@@ -244,7 +229,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	// Load translation
 	if (!LoadLocaleTranslation()) {
-		Localization::LoadFile(PROGRAM_DEFAULT_LANG);
+		Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
 	}
 	WriteToLogFile(std::format("Locale loaded - {}", Localization::GetCurrLangId()));
 

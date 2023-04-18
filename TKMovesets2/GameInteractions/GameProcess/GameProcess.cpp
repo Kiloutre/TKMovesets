@@ -397,10 +397,10 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 			if (w_dllName.find_last_of(L"/\\") != std::wstring::npos) {
 				w_dllName.erase(0, w_dllName.find_last_of(L"/\\") + 1);
 			}
-			dllName = std::string(w_dllName.begin(), w_dllName.end());
+			dllName = Helpers::wstring_to_string(w_dllName);
 		}
 
-		// Check if the DLL is not already loaded
+		// Check if the DLL is not already injected. If so, don't bother injecting again.
 		for (auto& module : GetModuleList())
 		{
 			if (module.name == dllName) {

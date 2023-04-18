@@ -26,9 +26,9 @@ enum MovesetFlags_
 struct TKMovesetHeader
 {
 	const char _signature[4] = { 'T', 'K', 'M', '2' };
-	// Version string of the extracted moveset
+	// Version string of the extractor at the time of the extraction
 	char version_string[28];
-	// Array of bytes where you can store a unique identifier for the game version, allowing you to detect which version the moveset was extracted form
+	// Array of bytes where you can store a unique identifier/hash for the game version, allowing you to detect which version the moveset was extracted form
 	Byte gameVersionId[32];
 	// ID of the game that the moveset was extracted from
 	uint32_t gameId;
@@ -48,7 +48,7 @@ struct TKMovesetHeader
 	uint32_t characterId;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
 	MovesetFlags flags;
-	// Origin (Game name + author if you want)
+	// Origin (Game name)
 	char origin[32];
 	// Target character to play on
 	char target_character[32];

@@ -2,6 +2,7 @@
 
 #include <mutex>
 #include <vector>
+#include <fstream>
 
 #include "GameAddresses.h"
 
@@ -18,6 +19,9 @@ private:
 	std::mutex m_entries_mutex;
 	// Returned by GetAddress() if address is not found
 	std::vector<gameAddr> m_emptyPtrPath;
+
+	// Load the addresses from a stream
+	void LoadFromStream(std::istream& stream);
 public:
 	GameAddressesFile();
 

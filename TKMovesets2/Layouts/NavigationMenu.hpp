@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Localization.hpp"
+
 enum NAV__MENU
 {
 	NAV__MENU_EXTRACT,
@@ -21,16 +23,15 @@ struct NavMenuBtn
 	//const char* icon;
 };
 
-struct LangSelect
+class NavigationMenu
 {
-	const char* name;
-	const char* langId;
-};
-
-class NavigationMenu {
 private:
-	// Selected lang ID
+	// Currently selected lang ID
 	int m_languageId = 0;
+	// List of translations to display
+	TranslationData* m_translations;
+	// Amount of translations
+	unsigned int m_translations_count;
 
 	// Render a list of buttons with predetermined size for use in the navbar
 	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width);

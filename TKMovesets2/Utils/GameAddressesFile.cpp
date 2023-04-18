@@ -5,6 +5,13 @@
 #include <vector>
 
 #include "GameAddressesFile.hpp"
+#include "Helpers.hpp"
+
+#include "constants.h"
+
+// Embedded addresses file data
+extern "C" const char game_addresses_ini[];
+extern "C" const size_t game_addresses_ini_size;
 
 static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 {
@@ -42,17 +49,14 @@ GameAddressesFile::GameAddressesFile()
 	Reload();
 }
 
-void GameAddressesFile::Reload()
+void GameAddressesFile::LoadFromStream(std::istream& stream)
 {
 	std::map<std::string, std::vector<gameAddr>> absolute_pointer_paths;
 	std::map<std::string, std::vector<gameAddr>> relative_pointer_paths;
 	std::vector<std::string> entries;
-
-	std::ifstream infile;
 	std::string line;
 
-	infile.open("game_addresses.txt");
-	while (std::getline(infile, line))
+	while (std::getline(stream, line))
 	{
 		size_t commentStart = line.find_first_of('#');
 
@@ -95,14 +99,29 @@ void GameAddressesFile::Reload()
 	// So can't clear them at the start and build them little by little.
 	m_absolute_pointer_paths = absolute_pointer_paths;
 	m_relative_pointer_paths = relative_pointer_paths;
-	
+
 	m_entries_mutex.lock();
 	m_entries = entries;
 	m_entries_mutex.unlock();
 }
 
-const std::vector<std::string>& GameAddressesFile::GetAllEntries()
+void GameAddressesFile::Reload()
 {
+	// Always attempt to prioritxize file data, but in cases where it can't be found, load from embedded data instead
+	if (Helpers::fileExists(GAME_ADDRESSES_FILE)) {
+		std::ifstream infile(GAME_ADDRESSES_FILE);
+		LoadFromStream(infile);
+		DEBUG_LOG("Found file '" GAME_ADDRESSES_FILE "'.n");
+	}
+	else {
+		std::stringstream indata(game_addresses_ini);
+		LoadFromStream(indata);
+		DEBUG_LOG("Could not find '" GAME_ADDRESSES_FILE "' : Loaded from embedded data.\n");
+	}
+}
+
+const std::vector<std::string>& GameAddressesFile::GetAllEntries()
+{	
 	m_entries_mutex.lock();
 	return m_entries;
 }

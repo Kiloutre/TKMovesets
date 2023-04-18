@@ -9,25 +9,66 @@
 
 #include "constants.h"
 
+// Embedded translation file data
+extern "C" const char en_US_txt[];
+extern "C" const size_t en_US_txt_size;
+//
+extern "C" const char fr_FR_txt[];
+extern "C" const size_t fr_FR_txt_size;
+// --
+TranslationData g_translation_datas[] = {
+	{
+		.displayName = "English",
+		.locale = "en-US",
+		.data = en_US_txt,
+		.data_size = &en_US_txt_size
+	},
+	{
+		.displayName = (const char*)u8"Français",
+		.locale = "fr-FR",
+		.data = fr_FR_txt,
+		.data_size = &fr_FR_txt_size
+	},
+};
+//
+
 std::map<FasterStringComp, std::string> g_translations;
-std::string g_currentLangId;
+unsigned int g_langId = 0;
 
 namespace Localization
 {
-	void LoadFile(const char* c_langId, bool unloadPrevious)
+	bool LoadFile(const char* locale, bool unloadPrevious)
 	{
+		int langId = -1;
+		
+		// Attempt to find locale in translation list
+		for (int i = 0; i < _countof(g_translation_datas); ++i)
+		{
+			if (strcmp(g_translation_datas[i].locale, locale) == 0)
+			{
+				langId = i;
+				break;
+			}
+		}
+
+		if (langId == -1) {
+			DEBUG_LOG("Translation not found for locale '%s'\n", locale);
+			return false;
+		}
+
 		// If you want fallback lines (like en_US by default when the current file is lacking an entry), set unloadPrevious to false.
 		// I generally don't like this idea though because i want lacking translations to be made clear visually.
 		if (unloadPrevious) {
 			Clear();
 		}
 
-		std::ifstream infile;
+		g_langId = langId;
+		TranslationData* newTranslation = &g_translation_datas[g_langId];
+
+		std::stringstream inputData(newTranslation->data);
 		std::string line;
 
-		infile.open(std::format("{}/{}.txt", INTERFACE_DATA_DIR, c_langId));
-		g_currentLangId = std::string(c_langId);
-		while (std::getline(infile, line))
+		while (std::getline(inputData, line))
 		{
 			size_t commentStart = line.find_first_of('#');
 
@@ -71,11 +112,15 @@ namespace Localization
 
 			g_translations[key] = value;
 		}
+
+
+		DEBUG_LOG("Loaded translation '%s'.\n", locale);
+		return true;
 	}
 
-	const char* GetCurrLangId()
+	unsigned int GetCurrLangId()
 	{
-		return g_currentLangId.c_str();
+		return g_langId;
 	}
 
 	const char* GetText(const char* c_stringId)
@@ -90,5 +135,12 @@ namespace Localization
 	void Clear()
 	{
 		g_translations.clear();
+	}
+
+
+	void GetTranslationList(TranslationData** out_list, unsigned int* out_count)
+	{
+		*out_list = g_translation_datas;
+		*out_count = (int)_countof(g_translation_datas);
 	}
 }

@@ -3,6 +3,28 @@ set(CMAKE_CXX_STANDARD 20)
 # This is needed or CMake will expect a .lib file instead of .dll for our own libs
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+# Function to cimpile Resources folder into a .c
+function(create_resources dir output)
+    # Create empty output file
+    file(WRITE ${output} "")
+    # Collect input files
+    file(GLOB bins ${dir}/*.*)
+    # Iterate through input files
+    foreach(bin ${bins})
+        # Get short filename
+        string(REGEX MATCH "([^/]+)$" filename ${bin})
+        # Replace filename spaces & extension separator for C compatibility
+        string(REGEX REPLACE "\\.| |-" "_" filename ${filename})
+        # Read hex data from file
+        file(READ ${bin} filedata HEX)
+        # Convert hex data for C compatibility
+        string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," filedata ${filedata})
+        # Append data to output file
+        file(APPEND ${output} "const unsigned char ${filename}[] = {${filedata}};\nconst unsigned ${filename}_size = sizeof(${filename});\n")
+    endforeach()
+endfunction()
+
+
 set(INCLUDE_FOLDERS
                     "GameInteractions"
                     "GameInteractions/GameProcess"
@@ -132,10 +154,14 @@ set(MOVESETLOADER_SOURCES
     "Injected/InjectionUtils.cpp"
 )
 
+## Setup embedded ressources ##
+set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
+create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
+
 ## Build ##
 
 # Build injected MovesetLoader .dll
-add_library(MovesetLoader SHARED ${MOVESETLOADER_SOURCES})
+add_library(MovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(MovesetLoader PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(MovesetLoader PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
@@ -143,7 +169,7 @@ target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
-add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES})
+add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
@@ -152,10 +178,10 @@ endif()
 
 # Build program .exe
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-add_executable (TKMovesets2 ${BINARY_SOURCES})
+add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES})
 target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
 else()
-add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES})
+add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES})
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
@@ -163,11 +189,10 @@ add_dependencies(TKMovesets2 MovesetLoader)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)
 target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for GetModuleHandle() to work, apparently
 
-## Ressources ##
 # Addresses file #
-configure_file("Ressources/game_addresses.txt" "game_addresses.txt" COPYONLY)
-# Interface data #
-add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Ressources/Interface" "${CMAKE_CURRENT_BINARY_DIR}/Interface")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/game_addresses.ini" "game_addresses.ini" COPYONLY)
+# Copies TKMInterface folder containg extra, optional interface data (editor labels, maybe more later down the line)
+add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Resources/TKMInterface" "${CMAKE_CURRENT_BINARY_DIR}/TKMInterface")
 # Debug. Yes, it's included every time, but that isn't important because its content change when in debug mode.
 add_definitions(/FI"${CMAKE_CURRENT_SOURCE_DIR}/Utils/debug.hpp")
 

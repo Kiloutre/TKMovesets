@@ -85,8 +85,9 @@ bool Online::InjectDll()
         wchar_t currPath[MAX_PATH] = { 0 };
         GetModuleFileNameW(nullptr, currPath, MAX_PATH);
         currDirectory = std::wstring(currPath);
-        currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
     }
+
+    currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
 
     std::wstring w_dllName = L"" MOVESET_LOADER_NAME;
     std::wstring w_dllPath = currDirectory + w_dllName;
