@@ -5,27 +5,20 @@
 #include "GameProcess.hpp"
 #include "GameData.hpp"
 #include "LocalStorage.hpp"
+#include "BaseGameSpecificClass.hpp"
 
 #include "constants.h"
 #include "SharedMemory.h"
 
-class DLLCONTENT Online
+class DLLCONTENT Online : public BaseGameSpecificClass
 {
 protected:
 	// Stores a handle to the shared memory
 	HANDLE m_memoryHandle = nullptr;
-	// Stores the process
-	GameProcess* m_process;
-	// Stores a helper class to read the game's memory from strings in game_addresses.txt
-	GameData* m_game;
 	// Contains whether or not we have injected our DLL
 	bool m_injectedDll = false;
 	// Ptr to the shared memory
 	SharedMemory* m_sharedMemPtr = nullptr;
-	// ID of the game
-	uint16_t m_gameId;
-	// ID of the minor version
-	uint16_t m_minorVersion;
 
 	// Calls a function of the MovesetLoader inside of the remote process. Returns false if failure was encountered somewhere.
 	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);

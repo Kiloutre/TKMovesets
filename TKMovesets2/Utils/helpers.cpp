@@ -8,7 +8,7 @@
 #include "helpers.hpp"
 
 #include "constants.h"
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 namespace Helpers
 {

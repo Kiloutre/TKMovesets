@@ -10,7 +10,7 @@
 #include "helpers.hpp"
 
 #include "constants.h"
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 /// Class storing an extraction queue and an Extractor* instance to feed it to
 

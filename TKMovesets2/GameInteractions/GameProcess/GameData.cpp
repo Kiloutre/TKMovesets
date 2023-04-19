@@ -3,7 +3,7 @@
 
 #include "GameData.hpp"
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 void GameData::CacheAddresses()
 {

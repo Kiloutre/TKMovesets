@@ -338,13 +338,8 @@ bool Editor::ValidateFieldType(EditorInput* field)
 	return true;
 }
 
-Editor::Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion)
+Editor::Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : BaseGameSpecificClass(process, game, gameId, minorVersion)
 {
-	m_process = process;
-	m_game = game;
-	m_gameId = gameId;
-	m_minorVersion = minorVersion;
-
 	m_aliases = new std::vector<uint16_t>;
 	displayableMovelist = new std::vector<DisplayableMove*>;
 

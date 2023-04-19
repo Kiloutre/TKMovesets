@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 class GameAddressesFile
 {

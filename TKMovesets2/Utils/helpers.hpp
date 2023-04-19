@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 #ifndef _countof
 #define _countof(array) (sizeof(array) / sizeof(array[0]))

@@ -2,7 +2,6 @@
 
 #include <ImGui.h>
 #include <string>
-#include <stdint.h>
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -12,9 +11,10 @@
 #include "GameData.hpp"
 #include "GameProcess.hpp"
 #include "Helpers.hpp"
+#include "BaseGameSpecificClass.hpp"
 
 #include "constants.h"
-#include "GameAddresses.h"
+#include "GameTypes.h"
 #include "MovesetStructs.h"
 
 # define FORM_BUFSIZE (32) // Regular fields
@@ -264,18 +264,9 @@ namespace EditorUtils
 	}
 }
 
-class DLLCONTENT Editor
+class DLLCONTENT Editor : public BaseGameSpecificClass
 {
 protected:
-	// Access the game's data through here. Use for live edition and live data querying only, not import
-	GameProcess* m_process = nullptr;
-	// Stores a helper to access both the game addresses file and the value they point to
-	GameData* m_game = nullptr;
-	// ID of the game
-	uint16_t m_gameId;
-	// ID of the minor version
-	uint16_t m_minorVersion;
-
 	// Contains our header data
 	TKMovesetHeader* m_header = nullptr;
 	// Store move ID aliases

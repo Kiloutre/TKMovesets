@@ -6,7 +6,7 @@
 #include "Importer.hpp"
 #include "GameInteraction.hpp"
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 struct importEntry
 {

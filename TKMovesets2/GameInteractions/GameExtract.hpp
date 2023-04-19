@@ -5,7 +5,7 @@
 #include "Extractor.hpp"
 #include "GameInteraction.hpp"
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 class GameExtract : public virtual GameInteraction
 {

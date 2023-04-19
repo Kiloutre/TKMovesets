@@ -4,9 +4,10 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "BaseGameSpecificClass.hpp"
 
 #include "constants.h"
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 // Converts a ptr to an index, -1 if the address is null
 # define TO_INDEX(field, listStartAddr, type) (field = (field == 0 ? -1 : (field - listStartAddr) / sizeof(type)))
@@ -65,7 +66,7 @@ namespace ExtractorUtils
 };
 
 // Base class for extracting from a game
-class DLLCONTENT Extractor
+class DLLCONTENT Extractor : public BaseGameSpecificClass
 {
 private:
 	// Generates the filename to write, with a suffix (or not if [suffixId] is 0)
@@ -73,14 +74,6 @@ private:
 protected:
 	// Stores the extraction directory
 	const char* cm_extractionDir = MOVESET_DIRECTORY;
-	// Stores the process to read on
-	GameProcess* m_process;
-	// Stores a helper class to read the game's memory from strings in game_addresses.txt
-	GameData* m_game;
-	// ID of the game
-	uint16_t m_gameId;
-	// ID of the minor version
-	uint16_t m_minorVersion;
 
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
 	Byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
@@ -99,7 +92,9 @@ public:
 	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
 	uint8_t characterCount = 1;
 
-	Extractor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : m_process(process), m_game(game), m_gameId(gameId), m_minorVersion(minorVersion) {}
+	// Inherit copy constructor
+	using BaseGameSpecificClass::BaseGameSpecificClass;
+
 	// Pure virtual base method meant to do the heavy lifting
 	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...

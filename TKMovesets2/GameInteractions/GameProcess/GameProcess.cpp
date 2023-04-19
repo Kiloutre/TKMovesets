@@ -5,7 +5,7 @@
 #include "Helpers.hpp"
 
 #include "constants.h"
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 // Utils //
 

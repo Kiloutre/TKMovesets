@@ -6,7 +6,7 @@
 #include "EditorForm.hpp"
 #include "EditorWindowBase.hpp"
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 enum EditorMovelistFilter_
 {

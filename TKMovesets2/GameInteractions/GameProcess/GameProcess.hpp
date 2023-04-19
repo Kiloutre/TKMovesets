@@ -6,7 +6,7 @@
 #include <utility>
 #include <windows.h>
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 struct processEntry
 {

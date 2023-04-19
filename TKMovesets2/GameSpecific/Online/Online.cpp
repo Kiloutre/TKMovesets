@@ -3,12 +3,8 @@
 
 #include "Online.hpp"
 
-Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion)
+Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : BaseGameSpecificClass(process, game, gameId, minorVersion)
 {
-    m_process = process;
-    m_game = game;
-    m_gameId = gameId;
-    m_minorVersion = minorVersion;
     movesetInfos = new std::vector<movesetInfo>();
 }
 

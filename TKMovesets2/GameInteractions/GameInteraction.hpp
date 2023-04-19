@@ -9,7 +9,7 @@
 
 #include "Games.hpp"
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 class GameInteraction : public ThreadedClass
 {

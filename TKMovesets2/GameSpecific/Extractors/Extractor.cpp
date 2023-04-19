@@ -8,7 +8,7 @@
 #include "Helpers.hpp"
 #include "Extractor.hpp"
 
-#include "GameAddresses.h"
+#include "GameTypes.h"
 
 // -- Helpers -- //
 
