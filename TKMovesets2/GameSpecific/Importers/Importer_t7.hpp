@@ -28,9 +28,10 @@ private:
 	void ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* table, const TKMovesetHeader* header, const StructsT7::TKMovesetHeaderBlocks& blockOoffsetsffsets);
 	// Import the displayable movelist
 	void ImportMovelist(StructsT7::MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
+
+	ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) override;
 public:
 	using Importer::Importer; // Inherit constructor too
-	ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) override;
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;
 

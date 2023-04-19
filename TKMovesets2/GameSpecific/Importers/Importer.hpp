@@ -38,6 +38,9 @@ enum ImportationErrcode_
 class DLLCONTENT Importer : public BaseGameSpecificClass
 {
 protected:
+	// Actual importation method, will modify the moveset passed to it
+	virtual ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
+
 public:
 	// Stores the number of character we are expected be able to import to
 	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
@@ -52,8 +55,7 @@ public:
 	ImportationErrcode_ Import(const wchar_t* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	// Import moveset from bytes. Does not need to be overriden. Will make a copy of the passed moveset and send it to _Import()
 	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
-	// Secondary import method taking bytes instead of a file
-	virtual ImportationErrcode_ _Import(Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
+
 	// Returns true if importation is possible
 	virtual bool CanImport() = 0;
 	// Look through movesets that we previously allocated in the game and free the unused ones
