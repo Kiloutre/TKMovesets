@@ -32,7 +32,7 @@ public:
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
-	bool CanStart() override;
+	bool CanStart(bool cached=true) override;
 	// Is currently busy with an extraction
 	bool IsBusy() override;
 	// Queue a character extraction. -1 of all characters

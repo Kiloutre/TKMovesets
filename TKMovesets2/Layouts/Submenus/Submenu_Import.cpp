@@ -30,6 +30,8 @@ ImportSettings Submenu_Import::GetImportationSettings()
 
 void Submenu_Import::Render(GameImport& importerHelper)
 {
+	bool busy = importerHelper.IsBusy();
+
 	ImGuiExtra::RenderTextbox(_("importation.explanation"));
 	ImGui::SeparatorText(_("importation.importation"));
 
@@ -39,6 +41,10 @@ void Submenu_Import::Render(GameImport& importerHelper)
 
 		// Game list
 		auto currentGame = importerHelper.currentGame;
+
+		if (busy) {
+			ImGui::BeginDisabled();
+		}
 
 		ImGui::PushItemWidth(160);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
@@ -57,6 +63,10 @@ void Submenu_Import::Render(GameImport& importerHelper)
 			ImGui::EndCombo();
 		}
 		ImGui::PopID();
+
+		if (busy) {
+			ImGui::EndDisabled();
+		}
 	}
 
 
@@ -92,7 +102,6 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	// If we can't import, display a warning detailling why
 	GameProcess* p = importerHelper.process;
 
-	bool busy = importerHelper.IsBusy();
 	bool canImport = p->IsAttached() && !busy && importerHelper.CanStart();
 
 	if (importerHelper.progress > 0) {

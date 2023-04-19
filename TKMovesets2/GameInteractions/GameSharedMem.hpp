@@ -30,7 +30,7 @@ public:
 	// Default flags are read-only, so the importer needs this
 	GameSharedMem() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD; }
 	// Always true because SharedMem can function as long as the process is started. Condition used to trigger RunningUpdate()
-	bool CanStart() override { return true; };
+	bool CanStart(bool cached=true) override { return true; };
 	// Is currently busy with an importation
 	bool IsBusy() override;
 

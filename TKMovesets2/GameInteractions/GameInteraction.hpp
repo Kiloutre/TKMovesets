@@ -18,6 +18,8 @@ protected:
 	DWORD m_processExtraFlags = 0;
 	// Last status of the process, used to detect status change and trigger appropriate events
 	GameProcessErrcode_ m_lastStatus = GameProcessErrcode_PROC_NOT_ATTACHED;
+	// Variable containing whether or not we can start our program's action, updated every thread loop
+	bool m_canStart = false;
 
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	virtual void InstantiateFactory() = 0;
@@ -51,7 +53,7 @@ public:
 	// Returns the amount of characters we are able to interact with
 	virtual uint8_t GetCharacterCount() = 0;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
-	virtual bool CanStart() = 0;
+	virtual bool CanStart(bool cached=true) = 0;
 	// Is currently busy
 	virtual bool IsBusy() = 0;
 	// Set the process to open

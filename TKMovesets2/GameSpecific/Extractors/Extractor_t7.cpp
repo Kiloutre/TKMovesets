@@ -708,9 +708,8 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 bool ExtractorT7::CanExtract()
 {
-	// todo: this is invalid, because when we import our own moveset and leave back to main menu, this will still return true
-	// this is very bad because some of the data we may export, such as mota offsets, are not allocated.
-
+	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
+	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
@@ -719,18 +718,25 @@ bool ExtractorT7::CanExtract()
 		return false;
 	}
 
-	gameAddr currentMove = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove"));
-	if (currentMove == 0 || currentMove == -1) {
-		return false;
-	}
+	for (int i = 0; i < 2; ++i)
+	{
+		gameAddr player = playerAddress + i * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetSingleValue("val:t7_currmove"));
+		if (currentMove == 0 || currentMove == -1) {
+			return false;
+		}
 
-	gameAddr animAddr = m_process->readInt64(currentMove + offsetof(Move, anim_addr));
-	if (animAddr == 0 || animAddr == -1) {
-		return false;
-	}
+		gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
+		if (animAddr == 0 || animAddr == -1) {
+			return false;
+		}
 
-	uint8_t animType = m_process->readInt8(animAddr);
-	return animType == 0x64 || animType == 0xC8;
+		uint8_t animType = m_process->readInt8(animAddr);
+		if (animType != 0x64 && animType != 0xC8) {
+			return false;
+		}
+	}
+	return true;
 }
 
 

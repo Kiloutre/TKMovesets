@@ -51,7 +51,7 @@ public:
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the importer  will allow an importation (false if it won't, like if characters aren't loaded)
-	virtual bool CanStart() override;
+	virtual bool CanStart(bool cached=true) override;
 	// Is currently busy with an importation
 	virtual bool IsBusy() override;
 	// Queue a character importation from file

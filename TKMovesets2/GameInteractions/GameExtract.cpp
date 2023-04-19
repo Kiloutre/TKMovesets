@@ -90,10 +90,13 @@ void GameExtract::StopThreadAndCleanup()
 	delete game;
 }
 
-bool GameExtract::CanStart()
+bool GameExtract::CanStart(bool cached)
 {
 	if (m_extractor == nullptr) {
 		return false;
+	}
+	if (cached) {
+		return m_canStart;
 	}
 	// Per-game definition
 	return m_extractor->CanExtract();

@@ -185,11 +185,16 @@ void EditorWindow::RenderStatusBar()
 	ImGui::SameLine();
 
 	// Game list
+	bool busy = m_importerHelper.IsBusy();
 	auto currentGame = m_importerHelper.currentGame;
 
 	ImGui::PushItemWidth(100.0f);
 	ImGui::PushID(&m_importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
+
+	if (busy) {
+		ImGui::BeginDisabled();
+	}
 
 	if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
 	{
@@ -208,9 +213,12 @@ void EditorWindow::RenderStatusBar()
 		ImGui::EndCombo();
 	}
 	ImGui::PopID();
+
+	if (busy) {
+		ImGui::EndDisabled();
+	}
+
 	ImGui::SameLine();
-
-
 	// Process error
 	bool isAttached = m_importerHelper.process->IsAttached();
 	if (currentGame != nullptr && !isAttached)

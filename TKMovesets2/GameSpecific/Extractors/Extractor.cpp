@@ -210,6 +210,12 @@ Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 {
 	size_t blockSize = blockEnd - blockStart;
 
+	if (blockSize >= (MOVESET_MAX_BLOCK_SIZE_MB * 1000000)) { // 50 MB
+		DEBUG_LOG("Block size too big to be valid, returning nullptr\n");
+		// Arbitrary max block size in case something bad happened and we get a very invalid start & end
+		return nullptr;
+	}
+
 	Byte* block = (Byte*)malloc(blockSize);
 	if (block == nullptr) {
 		size_out = 0;

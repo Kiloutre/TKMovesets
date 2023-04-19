@@ -31,8 +31,12 @@ void GameInteraction::Update()
 		// Ensure the process is still open and valid before possibly extracting
 		if (process->IsAttached() && process->CheckRunning()) {
 			process->FreeOldGameMemory();
-			if (CanStart()) {
+			if (CanStart(false)) {
+				m_canStart = true;
 				RunningUpdate();
+			}
+			else {
+				m_canStart = false;
 			}
 		}
 		else if (currentGame != nullptr) {

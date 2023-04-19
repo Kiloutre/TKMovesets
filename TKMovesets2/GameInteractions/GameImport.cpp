@@ -106,10 +106,13 @@ void GameImport::StopThreadAndCleanup()
 	delete game;
 }
 
-bool GameImport::CanStart()
+bool GameImport::CanStart(bool cached)
 {
 	if (importer == nullptr) {
 		return false;
+	}
+	if (cached) {
+		return m_canStart;
 	}
 	// Per-game definition
 	return importer->CanImport();

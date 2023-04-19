@@ -52,6 +52,8 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 
 void Submenu_Extract::Render(GameExtract& extractorHelper)
 {
+	bool busy = extractorHelper.IsBusy();
+
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
 
 	{
@@ -59,6 +61,10 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		auto currentGame = extractorHelper.currentGame;
+
+		if (busy) {
+			ImGui::BeginDisabled();
+		}
 
 		ImGui::PushItemWidth(160);
 		ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
@@ -78,6 +84,9 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		}
 		ImGui::PopID();
 
+		if (busy) {
+			ImGui::EndDisabled();
+		}
 
 		// Extraction settings
 		ImGui::SameLine();
@@ -124,7 +133,6 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	{
 		ImGui::SameLine();
 
-		bool busy = extractorHelper.IsBusy();
 		bool canExtract = p->IsAttached() && !busy && extractorHelper.CanStart();
 		bool canExtractAll = canExtract;
 

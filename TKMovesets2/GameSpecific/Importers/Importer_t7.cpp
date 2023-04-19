@@ -482,18 +482,25 @@ bool ImporterT7::CanImport()
 		return false;
 	}
 
-	gameAddr currentMove = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove"));
-	if (currentMove == 0 || currentMove == -1) {
-		return false;
-	}
+	for (int i = 0; i < 2; ++i)
+	{
+		gameAddr player = playerAddress + i * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetSingleValue("val:t7_currmove"));
+		if (currentMove == 0 || currentMove == -1) {
+			return false;
+		}
 
-	gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
-	if (animAddr == 0 || animAddr == -1) {
-		return false;
-	}
+		gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
+		if (animAddr == 0 || animAddr == -1) {
+			return false;
+		}
 
-	uint8_t animType = m_process->readInt8(animAddr);
-	return animType == 0x64 || animType == 0xC8;
+		uint8_t animType = m_process->readInt8(animAddr);
+		if (animType != 0x64 && animType != 0xC8) {
+			return false;
+		}
+	}
+	return true;
 }
 
 gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
