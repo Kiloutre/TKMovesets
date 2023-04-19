@@ -109,23 +109,19 @@ void Submenu_OnlinePlay::Render()
 
 	// Store whether or not the shared memory was loaded both in the remote and current process
 	// If so, the link is established
-	bool sharedMemoryLoaded = false;
+	bool sharedMemoryLoaded = gameHelper->IsAttached() && gameHelper->sharedMemHandler->IsMemoryLoaded();
 	bool isBusy = gameHelper->IsBusy();
+
+	if (!sharedMemoryLoaded) {
+		ImGui::SameLine();
+		if (ImGui::Button(_("online.inject_dll"))) {
+			gameHelper->sharedMemHandler->InjectDll();
+		}
+		ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));
+	}
 
 	switch (gameHelper->process->status)
 	{
-	case GameProcessErrcode_PROC_ATTACHED:
-		if (!gameHelper->sharedMemHandler->IsMemoryLoaded())
-		{
-			ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));
-			if (ImGui::Button(_("online.inject_dll"))) {
-				gameHelper->sharedMemHandler->InjectDll();
-			}
-		}
-		else {
-			sharedMemoryLoaded = true;
-		}
-		break;
 	case GameProcessErrcode_PROC_NOT_ATTACHED:
 	case GameProcessErrcode_PROC_EXITED:
 	case GameProcessErrcode_PROC_ATTACHING:

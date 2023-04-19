@@ -169,7 +169,7 @@ target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
-add_library(ExportImport SHARED ${IMPORTEXPORT_SOURCES} ${EMBEDDED_RESOURCES})
+add_library(ExportImport STATIC ${IMPORTEXPORT_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
