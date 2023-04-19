@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Games.hpp"
+
 class EditorLabel
 {
 private:
@@ -8,7 +10,7 @@ private:
 	// Loats a file into our labels
 	void LoadFile(const char* dataString, const char* name);
 public:
-	EditorLabel(int gameId);
+	EditorLabel(const GameInfo* gameInfo);
 
 	// Returns a string for the given requirement/property ID
 	const char* GetText(int id);

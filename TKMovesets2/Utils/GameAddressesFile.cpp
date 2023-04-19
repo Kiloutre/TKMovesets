@@ -111,7 +111,7 @@ void GameAddressesFile::Reload()
 	if (Helpers::fileExists(GAME_ADDRESSES_FILE)) {
 		std::ifstream infile(GAME_ADDRESSES_FILE);
 		LoadFromStream(infile);
-		DEBUG_LOG("Found file '" GAME_ADDRESSES_FILE "'.n");
+		DEBUG_LOG("Found file '" GAME_ADDRESSES_FILE "'\n");
 	}
 	else {
 		std::stringstream indata(game_addresses_ini);

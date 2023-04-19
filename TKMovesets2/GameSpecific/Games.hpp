@@ -86,14 +86,14 @@ namespace Games
 	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion);
 
 	// Instantiate a new game-specific extractor
-	DLLCONTENT Extractor* FactoryGetExtractor(uint16_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific importer
-	DLLCONTENT Importer* FactoryGetImporter(uint16_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific importer
-	DLLCONTENT Editor* FactoryGetEditor(uint16_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Editor* FactoryGetEditor(const GameInfo* gameInfo, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific online handler
-	DLLCONTENT Online* FactoryGetOnline(uint16_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess* process, GameData* game);
 }

@@ -282,8 +282,12 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 	m_importerHelper.Init(addrFile, storage);
 	m_importerHelper.StartThread();
 
-	m_editor = Games::FactoryGetEditor(movesetInfo->gameId, m_importerHelper.process, m_importerHelper.game);
-	labels = new EditorLabel(movesetInfo->gameId);
+	{
+		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId);
+
+		m_editor = Games::FactoryGetEditor(gameInfo, m_importerHelper.process, m_importerHelper.game);
+		labels = new EditorLabel(gameInfo);
+	}
 
 	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
 
@@ -346,7 +350,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 		}
 
 		if (gameInfo->editor != nullptr) {
-			m_importerHelper.SetTargetProcess(processName, gameIdx);
+			m_importerHelper.SetTargetProcess(gameInfo);
 			DEBUG_LOG("Editor-compatible game '%s' already running: attaching.\n", processName);
 			break;
 		}

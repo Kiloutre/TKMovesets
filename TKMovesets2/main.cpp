@@ -114,19 +114,19 @@ static void InitMainClasses(MainWindow& program)
 			}
 
 			if (!attachedExtractor && gameInfo->extractor != nullptr) {
-				program.extractor.SetTargetProcess(processName, gameIdx);
+				program.extractor.SetTargetProcess(gameInfo);
 				attachedExtractor = true;
 				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
 			}
 
 			if (!attachedImporter && gameInfo->extractor != nullptr) {
-				program.importer.SetTargetProcess(processName, gameIdx);
+				program.importer.SetTargetProcess(gameInfo);
 				attachedImporter = true;
 				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
 			}
 
 			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
-				program.sharedMem.SetTargetProcess(processName, gameIdx);
+				program.sharedMem.SetTargetProcess(gameInfo);
 				attachedOnline = true;
 				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
 			}

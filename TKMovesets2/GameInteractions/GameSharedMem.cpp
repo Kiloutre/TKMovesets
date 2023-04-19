@@ -18,8 +18,8 @@ void GameSharedMem::InstantiateFactory()
 	}
 
 	// Every game has its own subtleties so we use polymorphism to manage that
-	importer = Games::FactoryGetImporter(currentGameId, process, game);
-	sharedMemHandler = Games::FactoryGetOnline(currentGameId, process, game);
+	importer = Games::FactoryGetImporter(currentGame, process, game);
+	sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
 }
 
 void GameSharedMem::RunningUpdate()

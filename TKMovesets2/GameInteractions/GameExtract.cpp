@@ -39,7 +39,7 @@ void GameExtract::InstantiateFactory()
 	if (m_extractor != nullptr) {
 		delete m_extractor;
 	}
-	m_extractor = Games::FactoryGetExtractor(currentGameId, process, game);
+	m_extractor = Games::FactoryGetExtractor(currentGame, process, game);
 }
 
 void GameExtract::RunningUpdate()

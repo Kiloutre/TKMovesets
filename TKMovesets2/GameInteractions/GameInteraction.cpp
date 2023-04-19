@@ -8,14 +8,14 @@
 
 // -- Public methods -- //
 
-void GameInteraction::SetTargetProcess(const char* processName, uint8_t gameId)
+void GameInteraction::SetTargetProcess(const GameInfo* gameInfo)
 {
 	if (IsBusy()) {
 		return;
 	}
 
-	currentGameProcess = std::string(processName);
-	currentGameId = gameId;
+	currentGame = gameInfo;
+	currentGameProcess = std::string(gameInfo->processName);
 
 	if (process->IsAttached()) {
 		PreProcessDetach();
@@ -35,7 +35,7 @@ void GameInteraction::Update()
 				RunningUpdate();
 			}
 		}
-		else if (currentGameId != -1) {
+		else if (currentGame != nullptr) {
 			// Process closed, try to attach again in case it is restarted
 			if (process->Attach(currentGameProcess.c_str(), m_processExtraFlags)) {
 				DEBUG_LOG("Process is now attached - OnProcessAttach()\n");

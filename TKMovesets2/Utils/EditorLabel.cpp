@@ -77,9 +77,9 @@ void EditorLabel::LoadFile(const char* dataString, const char* name)
 
 // -- Public methods -- //
 
-EditorLabel::EditorLabel(int gameId)
+EditorLabel::EditorLabel(const GameInfo* gameInfo)
 {
-	const char* dataString = Games::GetGameInfoFromIndex(gameId)->dataString;
+	const char* dataString = gameInfo->dataString;
 
 	LoadFile(dataString, "properties");
 	LoadFile(dataString, "requirements");

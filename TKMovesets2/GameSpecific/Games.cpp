@@ -127,33 +127,29 @@ namespace Games
 
 	//
 	
-	Extractor* FactoryGetExtractor(uint16_t gameId, GameProcess* process, GameData* game)
+	Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		auto gameInfo = &cg_gamesInfo[gameId];
 		Extractor* ex = (Extractor*)gameInfo->extractor->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
 		ex->characterCount = gameInfo->characterCount;
 		return ex;
 	}
 
-	Importer* FactoryGetImporter(uint16_t gameId, GameProcess* process, GameData* game)
+	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		auto gameInfo = &cg_gamesInfo[gameId];
 		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
 		im->characterCount = gameInfo->characterCount;
 		return im;
 	}
 
-	Editor* FactoryGetEditor(uint16_t gameId, GameProcess* process, GameData* game)
+	Editor* FactoryGetEditor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		auto gameInfo = &cg_gamesInfo[gameId];
 		Editor* ed = (Editor*)gameInfo->editor->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
 	}
 
-	Online* FactoryGetOnline(uint16_t gameId, GameProcess* process, GameData* game)
+	Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		auto gameInfo = &cg_gamesInfo[gameId];
 		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
 		return on;
 	}

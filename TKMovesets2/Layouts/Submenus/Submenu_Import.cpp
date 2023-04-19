@@ -38,18 +38,19 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		ImGui::SameLine();
 
 		// Game list
-		int8_t currentGameId = importerHelper.currentGameId;
-		ImGui::PushItemWidth(160.);
+		auto currentGame = importerHelper.currentGame;
+
+		ImGui::PushItemWidth(160);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 		auto gameListCount = Games::GetGamesCount();
-		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfoFromIndex(currentGameId)->name))
+		if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
 		{
 			for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
 			{
-				auto game = Games::GetGameInfoFromIndex(gameIdx);
-				if (game->importer != nullptr) {
-					if (ImGui::Selectable(game->name, currentGameId == gameIdx, 0, ImVec2(100.0f, 0))) {
-						importerHelper.SetTargetProcess(game->processName, gameIdx);
+				auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+				if (gameInfo->importer != nullptr) {
+					if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
+						importerHelper.SetTargetProcess(gameInfo);
 					}
 				}
 			}

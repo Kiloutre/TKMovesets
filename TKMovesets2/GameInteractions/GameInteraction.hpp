@@ -35,10 +35,8 @@ protected:
 public:
 	// Everything that is related to files is done through .storage. Listing, deleting, etc. We store this here because GameData* needs a storage copy anyway.
 	LocalStorage* storage = nullptr;
-	// Stores the ID of the currently opened game
-	int16_t currentGameId = -1;
-	// Minor version of the currently selected game
-	int16_t minorVersion;
+	// Stores the currently selected game's info
+	GameInfo const * currentGame = nullptr;
 	// Used to know which process is currently being searched/opened
 	std::string currentGameProcess;
 	// Currently opened process for extraction.
@@ -57,7 +55,7 @@ public:
 	// Is currently busy
 	virtual bool IsBusy() = 0;
 	// Set the process to open
-	void SetTargetProcess(const char* processName, uint8_t gameId);
+	void SetTargetProcess(const GameInfo* gameInfo);
 	// Inits the member that needs to be created (.process, .game). Those Must be deleted afterward.
 	void Init(GameAddressesFile* addrFile, LocalStorage* t_storage);
 	// Destroys the thread

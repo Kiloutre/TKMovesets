@@ -35,7 +35,7 @@ void GameImport::InstantiateFactory()
 	}
 
 	// Every game has its own importation subtleties so we use polymorphism to manage that
-	importer = Games::FactoryGetImporter(currentGameId, process, game);
+	importer = Games::FactoryGetImporter(currentGame, process, game);
 }
 
 void GameImport::PreProcessDetach()

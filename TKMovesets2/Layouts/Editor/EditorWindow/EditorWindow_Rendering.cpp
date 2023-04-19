@@ -185,20 +185,20 @@ void EditorWindow::RenderStatusBar()
 	ImGui::SameLine();
 
 	// Game list
-	auto currentGameId = m_importerHelper.currentGameId;
+	auto currentGame = m_importerHelper.currentGame;
 
 	ImGui::PushItemWidth(100.0f);
 	ImGui::PushID(&m_importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
 
-	if (ImGui::BeginCombo("##", (currentGameId == -1) ? _("select_game") : Games::GetGameInfoFromIndex(currentGameId)->name))
+	if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
 	{
 		for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
 		{
-			auto game = Games::GetGameInfoFromIndex(gameIdx);
-			if (game->importer != nullptr) {
-				if (ImGui::Selectable(game->name, currentGameId == gameIdx, 0, ImVec2(100.0f, 0))) {
-					m_importerHelper.SetTargetProcess(game->processName, gameIdx);
+			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+			if (gameInfo->importer != nullptr) {
+				if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
+					m_importerHelper.SetTargetProcess(gameInfo);
 					m_loadedMoveset = 0;
 					m_importNeeded = true;
 					m_editor->live_loadedMoveset = 0;
@@ -213,7 +213,7 @@ void EditorWindow::RenderStatusBar()
 
 	// Process error
 	bool isAttached = m_importerHelper.process->IsAttached();
-	if (currentGameId != -1 && !isAttached)
+	if (currentGame != nullptr && !isAttached)
 	{
 		// Short process error message
 		ImGuiExtra::RenderTextbox(_("edition.process_err"), TEXTBOX_BORDER_ERROR, TEXTBOX_BORDER_ERROR, 2.0f);
