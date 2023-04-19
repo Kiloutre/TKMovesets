@@ -32,6 +32,7 @@ void GameInteraction::Update()
 		if (process->IsAttached() && process->CheckRunning()) {
 			process->FreeOldGameMemory();
 			if (CanStart(false)) {
+				actionStartDate = Helpers::getCurrentTimestamp();
 				m_canStart = true;
 				RunningUpdate();
 			}

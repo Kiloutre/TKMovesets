@@ -47,6 +47,8 @@ public:
 	GameData* game = nullptr;
 	// Progress of the current task (import/export), between 0 and 100. 
 	uint8_t progress = 0;
+	// Timestamp of the current action's start, currently unused but can be used to implement timeout on actions. TODO
+	uint64_t actionStartDate = 0;
 
 	// Returns true if process is attached
 	bool IsAttached();
