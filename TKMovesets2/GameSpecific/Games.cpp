@@ -115,40 +115,46 @@ namespace Games
 
 	bool IsGameEditable(uint16_t gameId, uint16_t minorVersion)
 	{
-		return GetGameInfoFromIdentifier(gameId, minorVersion)->editor != nullptr;
+		auto game = GetGameInfoFromIdentifier(gameId, minorVersion);
+		return game && game->editor != nullptr;
 	}
 
 	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion)
 	{
-		return (GetGameInfoFromIdentifier(gameId, minorVersion)->flags & GameFlag_MovesetLiveEditable) > 0;
+		auto game = GetGameInfoFromIdentifier(gameId, minorVersion);
+		return game && (game->flags & GameFlag_MovesetLiveEditable) > 0;
 	}
 
 	//
 	
 	Extractor* FactoryGetExtractor(uint16_t gameId, GameProcess* process, GameData* game)
 	{
-		Extractor* ex = (Extractor*)cg_gamesInfo[gameId].extractor->allocate(process, game);
-		ex->characterCount = cg_gamesInfo[gameId].characterCount;
+		auto gameInfo = &cg_gamesInfo[gameId];
+		Extractor* ex = (Extractor*)gameInfo->extractor->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
+		ex->characterCount = gameInfo->characterCount;
 		return ex;
 	}
 
 	Importer* FactoryGetImporter(uint16_t gameId, GameProcess* process, GameData* game)
 	{
-		Importer* im = (Importer*)cg_gamesInfo[gameId].importer->allocate(process, game);
-		im->characterCount = cg_gamesInfo[gameId].characterCount;
+		auto gameInfo = &cg_gamesInfo[gameId];
+		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
+		im->characterCount = gameInfo->characterCount;
 		return im;
 	}
 
 	Editor* FactoryGetEditor(uint16_t gameId, GameProcess* process, GameData* game)
 	{
-		Editor* ed = (Editor*)cg_gamesInfo[gameId].editor->allocate(process, game);
+		auto gameInfo = &cg_gamesInfo[gameId];
+		Editor* ed = (Editor*)gameInfo->editor->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
 	}
 
 	Online* FactoryGetOnline(uint16_t gameId, GameProcess* process, GameData* game)
 	{
-		Online* on = (Online*)cg_gamesInfo[gameId].onlineHandler->allocate(process, game);
+		auto gameInfo = &cg_gamesInfo[gameId];
+		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
 		return on;
 	}
 };

@@ -269,8 +269,13 @@ class DLLCONTENT Editor
 protected:
 	// Access the game's data through here. Use for live edition and live data querying only, not import
 	GameProcess* m_process = nullptr;
-	//
+	// Stores a helper to access both the game addresses file and the value they point to
 	GameData* m_game = nullptr;
+	// ID of the game
+	uint16_t m_gameId;
+	// ID of the minor version
+	uint16_t m_minorVersion;
+
 	// Contains our header data
 	TKMovesetHeader* m_header = nullptr;
 	// Store move ID aliases
@@ -310,7 +315,7 @@ public:
 	// Set to true when updating displayableMovelist
 	bool mustReloadMovelist = false;
 
-	Editor(GameProcess* process, GameData* game);
+	Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	~Editor();
 
 	// Loads important moveset data in our class, required to start functionning

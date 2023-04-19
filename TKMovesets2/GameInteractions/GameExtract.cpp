@@ -54,7 +54,7 @@ void GameExtract::RunningUpdate()
 		if (!errored) {
 			// Start extraction
 			auto&[ playerAddress, settings ] = m_extractionQueue[0];
-			ExtractionErrcode_ err = m_extractor->Extract(playerAddress, settings, currentGameId, progress);
+			ExtractionErrcode_ err = m_extractor->Extract(playerAddress, settings, progress);
 			if (err != ExtractionErrcode_Successful) {
 				m_errors.push_back(err);
 				errored = true;

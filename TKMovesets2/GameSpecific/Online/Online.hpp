@@ -22,6 +22,10 @@ protected:
 	bool m_injectedDll = false;
 	// Ptr to the shared memory
 	SharedMemory* m_sharedMemPtr = nullptr;
+	// ID of the game
+	uint16_t m_gameId;
+	// ID of the minor version
+	uint16_t m_minorVersion;
 
 	// Calls a function of the MovesetLoader inside of the remote process. Returns false if failure was encountered somewhere.
 	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);
@@ -31,7 +35,7 @@ public:
 	// Contains a copy of the basic moveset informations we have loaded
 	std::vector<movesetInfo>* movesetInfos;
 
-	Online(GameProcess* process, GameData* game);
+	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	~Online();
 
 	// Load the shared memory handle

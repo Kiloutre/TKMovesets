@@ -41,6 +41,10 @@ protected:
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt
 	GameData* m_game;
+	// ID of the game
+	uint16_t m_gameId;
+	// ID of the minor version
+	uint16_t m_minorVersion;
 
 public:
 	// Stores the number of character we are expected be able to import to
@@ -49,7 +53,7 @@ public:
 	// Stores the in-game address of the moveset successfully loaded by the last Import() call
 	gameAddr lastLoadedMoveset = 0;
 
-	Importer(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
+	Importer(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : m_process(process), m_game(game), m_gameId(gameId), m_minorVersion(minorVersion) {}
 	// Import moveset from filename. Just a wrapper for Import(Byte*...). Does not need to be overriden, will send the entire file to the Import() function.
 	ImportationErrcode_ Import(const wchar_t* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	// Secondary import method taking bytes instead of a file

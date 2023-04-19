@@ -20,7 +20,7 @@ private:
 	// Fill the moveset table & its corresponding offset table brother.
 	void FillMovesetTables(gameAddr movesetAddr, StructsT7_gameAddr::MovesetTable* table, StructsT7_gameAddr::MovesetTable* offsets);
 	// Fill moveset header with our own various useful informations
-	void FillHeaderInfos(TKMovesetHeader& infos, uint8_t gameId, gameAddr playerAddress, uint64_t propertyCount);
+	void FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t propertyCount);
 	// Allocate and copy the contents of the moveset block
 	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT7_gameAddr::MovesetTable& table);
 	// Allocate and copy the contents of the name block
@@ -49,7 +49,7 @@ private:
 
 public:
 	using Extractor::Extractor; // Inherit constructor too
-	ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress) override;
+	ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress) override;
 	bool CanExtract() override;
 
 	std::string GetPlayerCharacterName(gameAddr playerAddress) override;

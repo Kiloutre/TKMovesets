@@ -77,6 +77,10 @@ protected:
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt
 	GameData* m_game;
+	// ID of the game
+	uint16_t m_gameId;
+	// ID of the minor version
+	uint16_t m_minorVersion;
 
 	// Calculates a block size from start to end, writes it to &size_out and return a pointer pointing to a new allocated space containing the data in the block
 	Byte* allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out);
@@ -95,9 +99,9 @@ public:
 	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
 	uint8_t characterCount = 1;
 
-	Extractor(GameProcess* process, GameData* game) : m_process(process), m_game(game) {}
+	Extractor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : m_process(process), m_game(game), m_gameId(gameId), m_minorVersion(minorVersion) {}
 	// Pure virtual base method meant to do the heavy lifting
-	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress) = 0;
+	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanExtract() = 0;
 	// Returns a string containing the character name of the provided playerId.

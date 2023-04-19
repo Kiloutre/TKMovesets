@@ -462,10 +462,11 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 	}
 }
 
-void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, uint8_t gameId, gameAddr playerAddress, uint64_t customPropertyCount)
+void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
 {
 	infos.flags = 0;
-	infos.gameId = gameId;
+	infos.gameId = m_gameId;
+	infos.minorVersion = m_minorVersion;
 	infos.characterId = GetCharacterID(playerAddress);
 	memset(infos.gameVersionHash, 0, sizeof(infos.gameVersionHash));
 	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
@@ -483,7 +484,7 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, uint8_t gameId, gameAd
 
 // -- Public methods -- //
 
-ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t gameId, uint8_t& progress)
+ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress)
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
@@ -595,7 +596,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	progress = 77;
 
 	// Fill the header with our own useful informations
-	FillHeaderInfos(customHeader, gameId, playerAddress, _countof(customProperties));
+	FillHeaderInfos(customHeader, playerAddress, _countof(customProperties));
 	progress = 79;
 
 

@@ -22,14 +22,14 @@ class FactoryType_Base
 {
 public:
 	virtual ~FactoryType_Base() {}
-	virtual void* allocate(GameProcess* process, GameData* game) const = 0;
+	virtual void* allocate(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) const = 0;
 	virtual void* cast(void* obj) const = 0;
 };
 
 template<typename T> class FactoryType : public FactoryType_Base
 {
 public:
-	virtual void* allocate(GameProcess* process, GameData* game) const { return new T(process, game); }
+	virtual void* allocate(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) const { return new T(process, game, gameId, minorVersion); }
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
 };
 
