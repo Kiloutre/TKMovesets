@@ -11,6 +11,8 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
+		.gameId = GameId_T7,
+		.minorVersion = 0,
 		.characterCount = 2,
 		.flags = GameFlag_MovesetLiveEditable,
 		.dataString = "t7",
@@ -22,6 +24,8 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		.name = "Tekken 8",
 		.processName = "Tekken8.exe",
+		.gameId = GameId_T8,
+		.minorVersion = 0,
 		.characterCount = 2,
 		.flags = 0,
 		.dataString = "t8",
@@ -33,6 +37,8 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		.name = "Tekken Tag 2",
 		.processName = "Cemu.exe",
+		.gameId = GameId_TTT2,
+		.minorVersion = 0,
 		.characterCount = 2,
 		.flags = 0,
 		.dataString = "tag2",
@@ -45,14 +51,26 @@ const GameInfo cg_gamesInfo[] = {
 
 namespace Games
 {
-	GameInfo* GetGameInfo(uint8_t idx)
+	const GameInfo* GetGameInfoFromIndex(unsigned int idx)
 	{
 		return (GameInfo*)&cg_gamesInfo[idx];
 	}
 
-	uint8_t GetGamesCount()
+	const GameInfo* GetGameInfoFromIdentifier(uint16_t gameId)
 	{
-		return sizeof(cg_gamesInfo) / sizeof(*cg_gamesInfo);
+		for (size_t i = 0; i < _countof(cg_gamesInfo); ++i)
+		{
+			if (cg_gamesInfo[i].gameId == gameId)
+			{
+				return &cg_gamesInfo[i];
+			}
+		}
+		return nullptr;
+	}
+
+	unsigned int GetGamesCount()
+	{
+		return (int)_countof(cg_gamesInfo);
 	}
 
 	//
@@ -85,12 +103,12 @@ namespace Games
 
 	bool IsGameEditable(uint8_t gameId)
 	{
-		return GetGameInfo(gameId)->editor != nullptr;
+		return GetGameInfoFromIndex(gameId)->editor != nullptr;
 	}
 
 	bool IsGameLiveEditable(uint8_t gameId)
 	{
-		return (GetGameInfo(gameId)->flags & GameFlag_MovesetLiveEditable) > 0;
+		return (GetGameInfoFromIndex(gameId)->flags & GameFlag_MovesetLiveEditable) > 0;
 	}
 
 	//

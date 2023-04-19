@@ -62,11 +62,11 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::PushItemWidth(160);
 		ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 		uint8_t gameListCount = Games::GetGamesCount();
-		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfo(currentGameId)->name))
+		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfoFromIndex(currentGameId)->name))
 		{
 			for (uint8_t i = 0; i < gameListCount; ++i)
 			{
-				GameInfo* game = Games::GetGameInfo(i);
+				auto game = Games::GetGameInfoFromIndex(i);
 				if (game->extractor != nullptr) {
 					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
 						extractorHelper.SetTargetProcess(game->processName, i);

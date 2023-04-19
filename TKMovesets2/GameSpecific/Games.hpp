@@ -11,6 +11,13 @@
 
 #include "constants.h"
 
+enum GameId_
+{
+	GameId_T7,
+	GameId_T8,
+	GameId_TTT2,
+};
+
 class FactoryType_Base
 {
 public:
@@ -39,6 +46,10 @@ struct GameInfo
 	const char* name;
 	// Process that will be opened and main module name
 	const char* processName;
+	// ID of the game, used to decide which extractor/importer/etc to use
+	uint16_t gameId;
+	// Minor version, used to implement behaviour variations inside of the extractor/importer/etc
+	uint16_t minorVersion;
 	// Amount of characters at once the game is able to load
 	uint8_t characterCount;
 	// Determines what can be done with the game. See GameFlag enum for more details
@@ -58,10 +69,11 @@ struct GameInfo
 namespace Games
 {
 	// Returns a pointer to a struct containing a game's name, process name, character count
-	DLLCONTENT GameInfo* GetGameInfo(uint8_t idx);
+	DLLCONTENT const GameInfo* GetGameInfoFromIndex(unsigned int);
+	DLLCONTENT const GameInfo* GetGameInfoFromIdentifier(uint8_t gameId);
 
 	// Returns the amount of supported games
-	DLLCONTENT uint8_t GetGamesCount();
+	DLLCONTENT unsigned int GetGamesCount();
 	// Returns the amount of games that upport extraction
 	DLLCONTENT size_t GetExtractableGamesCount();
 	// Returns the amount of games that upport importation

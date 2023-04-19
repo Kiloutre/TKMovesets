@@ -29,9 +29,11 @@ struct TKMovesetHeader
 	// Version string of the extractor at the time of the extraction
 	char version_string[28];
 	// Array of bytes where you can store a unique identifier/hash for the game version, allowing you to detect which version the moveset was extracted form
-	Byte gameVersionId[32];
+	Byte gameVersionHash[32];
 	// ID of the game that the moveset was extracted from
-	uint32_t gameId;
+	uint16_t gameId;
+	// Minor version of the game that the moveset was extracted from
+	uint16_t minorVersion;
 	// Contains the size of the header, aligned on 8 bytes
 	uint32_t header_size;
 	// Offset to the list of blocks

@@ -325,7 +325,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 	auto processList = GameProcessUtils::GetRunningProcessList();
 	for (int gameId = 0; gameId < Games::GetGamesCount(); ++gameId)
 	{
-		auto gameInfo = Games::GetGameInfo(gameId);
+		auto gameInfo = Games::GetGameInfoFromIndex(gameId);
 		const char* processName = gameInfo->processName;
 
 		// Detect if the game is running

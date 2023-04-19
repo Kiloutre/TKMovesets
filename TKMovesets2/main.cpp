@@ -94,7 +94,7 @@ static void InitMainClasses(MainWindow& program)
 		// Loop through every game we support
 		for (int gameId = 0; gameId < Games::GetGamesCount(); ++gameId)
 		{
-			auto gameInfo = Games::GetGameInfo(gameId);
+			auto gameInfo = Games::GetGameInfoFromIndex(gameId);
 			const char* processName = gameInfo->processName;
 
 			// Detect if the game is running
