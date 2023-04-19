@@ -17,12 +17,16 @@ struct movesetInfo
 	FasterStringComp origin;
 	std::string target_character;
 	std::string version_string;
+
 	uint64_t date;
 	std::string date_str;
+
 	uint64_t size;
 	std::string sizeStr;
+
 	time_t modificationDate;
-	uint32_t gameId;
+	uint16_t gameId;
+	uint16_t minorVersion;
 	bool editable;
 	bool onlineImportable; // Moveset over a certain size can't be used online
 };

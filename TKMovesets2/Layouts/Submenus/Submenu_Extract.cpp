@@ -64,12 +64,12 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		uint8_t gameListCount = Games::GetGamesCount();
 		if (ImGui::BeginCombo("##", currentGameId == -1 ? _("select_game") : Games::GetGameInfoFromIndex(currentGameId)->name))
 		{
-			for (uint8_t i = 0; i < gameListCount; ++i)
+			for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
 			{
-				auto game = Games::GetGameInfoFromIndex(i);
+				auto game = Games::GetGameInfoFromIndex(gameIdx);
 				if (game->extractor != nullptr) {
-					if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
-						extractorHelper.SetTargetProcess(game->processName, i);
+					if (ImGui::Selectable(game->name, currentGameId == gameIdx, 0, ImVec2(100.0f, 0))) {
+						extractorHelper.SetTargetProcess(game->processName, gameIdx);
 					}
 				}
 			}

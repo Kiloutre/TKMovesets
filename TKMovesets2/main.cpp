@@ -92,9 +92,9 @@ static void InitMainClasses(MainWindow& program)
 		auto processList = GameProcessUtils::GetRunningProcessList();
 
 		// Loop through every game we support
-		for (int gameId = 0; gameId < Games::GetGamesCount(); ++gameId)
+		for (int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
 		{
-			auto gameInfo = Games::GetGameInfoFromIndex(gameId);
+			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 			const char* processName = gameInfo->processName;
 
 			// Detect if the game is running
@@ -114,19 +114,19 @@ static void InitMainClasses(MainWindow& program)
 			}
 
 			if (!attachedExtractor && gameInfo->extractor != nullptr) {
-				program.extractor.SetTargetProcess(processName, gameId);
+				program.extractor.SetTargetProcess(processName, gameIdx);
 				attachedExtractor = true;
 				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
 			}
 
 			if (!attachedImporter && gameInfo->extractor != nullptr) {
-				program.importer.SetTargetProcess(processName, gameId);
+				program.importer.SetTargetProcess(processName, gameIdx);
 				attachedImporter = true;
 				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
 			}
 
 			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
-				program.sharedMem.SetTargetProcess(processName, gameId);
+				program.sharedMem.SetTargetProcess(processName, gameIdx);
 				attachedOnline = true;
 				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
 			}

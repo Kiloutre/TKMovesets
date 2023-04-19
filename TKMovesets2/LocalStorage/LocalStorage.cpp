@@ -64,7 +64,8 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
 				.modificationDate = buffer.st_mtime,
 				.gameId = movesetInfos.gameId,
-				.editable = Games::IsGameEditable(movesetInfos.gameId),
+				.minorVersion = movesetInfos.minorVersion,
+				.editable = Games::IsGameEditable(movesetInfos.gameId, movesetInfos.minorVersion),
 				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES
 			};
 		}

@@ -69,30 +69,31 @@ struct GameInfo
 namespace Games
 {
 	// Returns a pointer to a struct containing a game's name, process name, character count
-	DLLCONTENT const GameInfo* GetGameInfoFromIndex(unsigned int);
-	DLLCONTENT const GameInfo* GetGameInfoFromIdentifier(uint8_t gameId);
+	DLLCONTENT const GameInfo* GetGameInfoFromIndex(unsigned int index);
+	DLLCONTENT const GameInfo* GetGameInfoFromIdentifier(uint16_t gameId);
+	DLLCONTENT const GameInfo* GetGameInfoFromIdentifier(uint16_t gameId, uint16_t minorVersion);
 
 	// Returns the amount of supported games
 	DLLCONTENT unsigned int GetGamesCount();
 	// Returns the amount of games that upport extraction
-	DLLCONTENT size_t GetExtractableGamesCount();
+	DLLCONTENT unsigned int GetExtractableGamesCount();
 	// Returns the amount of games that upport importation
-	DLLCONTENT size_t GetImportableGamesCount();
+	DLLCONTENT unsigned int GetImportableGamesCount();
 
 	// Returns true if moveset edition on the moveset is allowed
-	bool IsGameEditable(uint8_t gameId);
+	bool IsGameEditable(uint16_t gameId, uint16_t minorVersion);
 	// Returns true if live moveset edition on the moveset is allowed
-	bool IsGameLiveEditable(uint8_t gameId);
+	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion);
 
 	// Instantiate a new game-specific extractor
-	DLLCONTENT Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Extractor* FactoryGetExtractor(uint16_t gameId, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific importer
-	DLLCONTENT Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Importer* FactoryGetImporter(uint16_t gameId, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific importer
-	DLLCONTENT Editor* FactoryGetEditor(uint8_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Editor* FactoryGetEditor(uint16_t gameId, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific online handler
-	DLLCONTENT Online* FactoryGetOnline(uint8_t gameId, GameProcess* process, GameData* game);
+	DLLCONTENT Online* FactoryGetOnline(uint16_t gameId, GameProcess* process, GameData* game);
 }

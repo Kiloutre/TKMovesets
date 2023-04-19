@@ -185,19 +185,20 @@ void EditorWindow::RenderStatusBar()
 	ImGui::SameLine();
 
 	// Game list
-	int8_t currentGameId = m_importerHelper.currentGameId;
+	auto currentGameId = m_importerHelper.currentGameId;
+
 	ImGui::PushItemWidth(100.0f);
 	ImGui::PushID(&m_importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
 
 	if (ImGui::BeginCombo("##", (currentGameId == -1) ? _("select_game") : Games::GetGameInfoFromIndex(currentGameId)->name))
 	{
-		for (uint8_t i = 0; i < gameListCount; ++i)
+		for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
 		{
-			auto game = Games::GetGameInfoFromIndex(i);
+			auto game = Games::GetGameInfoFromIndex(gameIdx);
 			if (game->importer != nullptr) {
-				if (ImGui::Selectable(game->name, currentGameId == i, 0, ImVec2(100.0f, 0))) {
-					m_importerHelper.SetTargetProcess(game->processName, i);
+				if (ImGui::Selectable(game->name, currentGameId == gameIdx, 0, ImVec2(100.0f, 0))) {
+					m_importerHelper.SetTargetProcess(game->processName, gameIdx);
 					m_loadedMoveset = 0;
 					m_importNeeded = true;
 					m_editor->live_loadedMoveset = 0;

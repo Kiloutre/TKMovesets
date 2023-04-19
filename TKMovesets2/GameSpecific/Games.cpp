@@ -68,6 +68,18 @@ namespace Games
 		return nullptr;
 	}
 
+	const GameInfo* GetGameInfoFromIdentifier(uint16_t gameId, uint16_t minorVersion)
+	{
+		for (size_t i = 0; i < _countof(cg_gamesInfo); ++i)
+		{
+			if (cg_gamesInfo[i].gameId == gameId && cg_gamesInfo[i].minorVersion == minorVersion)
+			{
+				return &cg_gamesInfo[i];
+			}
+		}
+		return nullptr;
+	}
+
 	unsigned int GetGamesCount()
 	{
 		return (int)_countof(cg_gamesInfo);
@@ -75,9 +87,9 @@ namespace Games
 
 	//
 
-	size_t GetExtractableGamesCount()
+	unsigned int GetExtractableGamesCount()
 	{
-		size_t count = 0;
+		unsigned int count = 0;
 		for (size_t i = 0; i < _countof(cg_gamesInfo); ++i)
 		{
 			if (cg_gamesInfo[i].extractor != nullptr) {
@@ -87,9 +99,9 @@ namespace Games
 		return count;
 	}
 
-	size_t GetImportableGamesCount()
+	unsigned int GetImportableGamesCount()
 	{
-		size_t count = 0;
+		unsigned int count = 0;
 		for (size_t i = 0; i < _countof(cg_gamesInfo); ++i)
 		{
 			if (cg_gamesInfo[i].importer != nullptr) {
@@ -101,40 +113,40 @@ namespace Games
 
 	//
 
-	bool IsGameEditable(uint8_t gameId)
+	bool IsGameEditable(uint16_t gameId, uint16_t minorVersion)
 	{
-		return GetGameInfoFromIndex(gameId)->editor != nullptr;
+		return GetGameInfoFromIdentifier(gameId, minorVersion)->editor != nullptr;
 	}
 
-	bool IsGameLiveEditable(uint8_t gameId)
+	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion)
 	{
-		return (GetGameInfoFromIndex(gameId)->flags & GameFlag_MovesetLiveEditable) > 0;
+		return (GetGameInfoFromIdentifier(gameId, minorVersion)->flags & GameFlag_MovesetLiveEditable) > 0;
 	}
 
 	//
 	
-	Extractor* FactoryGetExtractor(uint8_t gameId, GameProcess* process, GameData* game)
+	Extractor* FactoryGetExtractor(uint16_t gameId, GameProcess* process, GameData* game)
 	{
 		Extractor* ex = (Extractor*)cg_gamesInfo[gameId].extractor->allocate(process, game);
 		ex->characterCount = cg_gamesInfo[gameId].characterCount;
 		return ex;
 	}
 
-	Importer* FactoryGetImporter(uint8_t gameId, GameProcess* process, GameData* game)
+	Importer* FactoryGetImporter(uint16_t gameId, GameProcess* process, GameData* game)
 	{
 		Importer* im = (Importer*)cg_gamesInfo[gameId].importer->allocate(process, game);
 		im->characterCount = cg_gamesInfo[gameId].characterCount;
 		return im;
 	}
 
-	Editor* FactoryGetEditor(uint8_t gameId, GameProcess* process, GameData* game)
+	Editor* FactoryGetEditor(uint16_t gameId, GameProcess* process, GameData* game)
 	{
 		Editor* ed = (Editor*)cg_gamesInfo[gameId].editor->allocate(process, game);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
 	}
 
-	Online* FactoryGetOnline(uint8_t gameId, GameProcess* process, GameData* game)
+	Online* FactoryGetOnline(uint16_t gameId, GameProcess* process, GameData* game)
 	{
 		Online* on = (Online*)cg_gamesInfo[gameId].onlineHandler->allocate(process, game);
 		return on;

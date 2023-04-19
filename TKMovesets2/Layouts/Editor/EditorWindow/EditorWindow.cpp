@@ -305,7 +305,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 	file.close();
 
 	m_editor->LoadMoveset(moveset, movesetSize);
-	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId);
+	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId, movesetInfo->minorVersion);
 
 	m_loadedCharacter.filename = movesetInfo->filename;
 	m_loadedCharacter.name = movesetInfo->name;
@@ -322,10 +322,11 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 	editorTable = &m_editor->movesetTable;
 
+	// Attempt to attach to game associated to moveset
 	auto processList = GameProcessUtils::GetRunningProcessList();
-	for (int gameId = 0; gameId < Games::GetGamesCount(); ++gameId)
+	for (int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
 	{
-		auto gameInfo = Games::GetGameInfoFromIndex(gameId);
+		auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 		const char* processName = gameInfo->processName;
 
 		// Detect if the game is running
@@ -345,7 +346,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 		}
 
 		if (gameInfo->editor != nullptr) {
-			m_importerHelper.SetTargetProcess(processName, gameId);
+			m_importerHelper.SetTargetProcess(processName, gameIdx);
 			DEBUG_LOG("Editor-compatible game '%s' already running: attaching.\n", processName);
 			break;
 		}
