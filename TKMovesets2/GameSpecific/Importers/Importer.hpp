@@ -48,10 +48,12 @@ public:
 	// Inherit copy constructor
 	using BaseGameSpecificClass::BaseGameSpecificClass;
 
-	// Import moveset from filename. Just a wrapper for Import(Byte*...). Does not need to be overriden, will send the entire file to the Import() function.
+	// Import moveset from filename. Does not need to be overriden, will send the entire file to the _Import() function.
 	ImportationErrcode_ Import(const wchar_t* filename, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
+	// Import moveset from bytes. Does not need to be overriden. Will make a copy of the passed moveset and send it to _Import()
+	ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	// Secondary import method taking bytes instead of a file
-	virtual ImportationErrcode_ Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
+	virtual ImportationErrcode_ _Import(Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
 	// Returns true if importation is possible
 	virtual bool CanImport() = 0;
 	// Look through movesets that we previously allocated in the game and free the unused ones

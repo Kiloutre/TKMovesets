@@ -38,8 +38,23 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 		return ImportationErrcode_AllocationErr;
 	}
 
-	ImportationErrcode_ errcode = Import(moveset, s_moveset, playerAddress, settings, progress);
+	ImportationErrcode_ errcode = _Import(moveset, s_moveset, playerAddress, settings, progress);
 
 	free(moveset);
+	return errcode;
+}
+
+ImportationErrcode_ Importer::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
+{
+	Byte* moveset = (Byte*)malloc(s_moveset);
+	if (moveset == nullptr) {
+		return ImportationErrcode_AllocationErr;
+	}
+
+	memcpy(moveset, orig_moveset, s_moveset);
+
+	ImportationErrcode_ errcode = _Import(moveset, s_moveset, playerAddress, settings, progress);
+	free(moveset);
+
 	return errcode;
 }
