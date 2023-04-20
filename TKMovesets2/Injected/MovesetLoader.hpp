@@ -31,6 +31,8 @@ protected:
 	PLH::ZydisDisassembler m_disassembler = PLH::ZydisDisassembler(PLH::Mode::x64);
 	// Contains our own module address
 	uint64_t m_moduleAddr;
+	// Size of the main module
+	uint64_t m_moduleSize;
 	// Contains the module name
 	std::string m_moduleName;
 
@@ -58,7 +60,7 @@ public:
 	// Sets the main module name and address
 	void SetMainModule(const char* name) {
 		m_moduleName = name;
-		m_moduleAddr = InjectionUtils::GetSelfModuleAddress(name);
+		InjectionUtils::GetSelfModuleInfos(name, m_moduleAddr, m_moduleSize);
 	}
 };
 

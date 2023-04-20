@@ -4,7 +4,7 @@
 
 namespace InjectionUtils
 {
-	uint64_t GetSelfModuleAddress(std::string moduleName)
+	void GetSelfModuleInfos(std::string moduleName, uint64_t& moduleAddr_out, uint64_t& moduleSize_out)
 	{
 		HANDLE moduleSnap;
 		MODULEENTRY32 me32{ 0 };
@@ -18,13 +18,15 @@ namespace InjectionUtils
 			if (Module32First(moduleSnap, &me32))
 			{
 				if (me32.szModule == moduleName) {
-					moduleAddress = (uint64_t)me32.modBaseAddr;
+					moduleAddr_out = (uint64_t)me32.modBaseAddr;
+					moduleSize_out = (uint64_t)me32.modBaseSize;
 				}
 				else {
 					while (Module32Next(moduleSnap, &me32)) {
 						if (me32.szModule == moduleName)
 						{
-							moduleAddress = (uint64_t)me32.modBaseAddr;
+							moduleAddr_out = (uint64_t)me32.modBaseAddr;
+							moduleSize_out = (uint64_t)me32.modBaseSize;
 							break;
 						}
 					}
@@ -33,7 +35,5 @@ namespace InjectionUtils
 
 			CloseHandle(moduleSnap);
 		}
-
-		return moduleAddress;
 	};
 }
