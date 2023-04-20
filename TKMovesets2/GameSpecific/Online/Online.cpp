@@ -56,6 +56,7 @@ bool Online::IsMemoryLoaded()
 
 bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
 {
+    DEBUG_LOG("Caling remote process '%s'...\n", functionName);
     auto moduleHandle = GetModuleHandleA(MOVESET_LOADER_NAME);
     if (moduleHandle == 0) {
         DEBUG_LOG("Failure getting the module handle for 'MovesetLoader.dll'\n");
@@ -75,7 +76,13 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
     return errcode != GameProcessThreadCreation_Error;
 }
 
-bool Online::InjectDll()
+void Online::InjectDll()
+{
+    std::thread m1(&Online::InjectDllAndWaitEnd, this);
+    m1.detach();
+}
+
+bool Online::InjectDllAndWaitEnd()
 {
     if (isInjecting) {
         return false;
@@ -100,12 +107,15 @@ bool Online::InjectDll()
         return false;
     }
 
-    // Call this here to not set isInjecting before the DL has finished loading
-    bool result = CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
+    bool result = CallMovesetLoaderFunction(MOVESET_LOADER_INIT_FUNC, true);
+    if (result) {
+        result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
+    }
 
     m_injectedDll = true;
     isInjecting = false;
 
+    DEBUG_LOG("Online::InjectDll() -> return\n");
     return result;
 }
 

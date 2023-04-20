@@ -32,7 +32,8 @@
 # define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
 
 # define MOVESET_LOADER_NAME             "MovesetLoader.dll"
-# define MOVESET_LOADER_START_FUNC       "MovesetLoaderStart"
+# define MOVESET_LOADER_INIT_FUNC        "MovesetLoaderInit"
+# define MOVESET_LOADER_RUN_FUNC         "MovesetLoaderRun"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
 
 # define ANIMATION_EXTENSION             ".tkanim"

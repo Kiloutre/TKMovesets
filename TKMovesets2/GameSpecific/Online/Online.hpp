@@ -37,8 +37,10 @@ public:
 	bool LoadSharedMemory();
 	// Returns true if the shared memory has been found and loaded
 	bool IsMemoryLoaded();
-	// Injects the DLL into the current process
-	bool InjectDll();
+	// Injects the DLL into the current process, not waiting for it to be completed
+	void InjectDll();
+	// Injects the DLL into the current process, waiting for it to be completed. Returns true/false if the library was successfully loaded or not.
+	bool InjectDllAndWaitEnd();
 	// Called when a moveset is successfully loaded in the game's memory by the importer
 	void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId);
 };

@@ -171,8 +171,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 #endif
 {
 	{
-		std::string oldWorkingDir = std::filesystem::current_path().string();
-		WriteToLogFile(std::format("OLD CWD is {}", oldWorkingDir));
+		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
 
 		// Make sure working dir is same as .exe
 		wchar_t currPath[MAX_PATH] = { 0 };
@@ -182,8 +181,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		std::filesystem::current_path(ws);
 
 		WriteToLogFile("Started TKMovesets " PROGRAM_VERSION, false);
-		WriteToLogFile(std::format("OLD CWD is {}", oldWorkingDir));
-		WriteToLogFile(std::format("Set CWD to {}", std::string(ws.begin(), ws.end())));
+		WriteToLogFile(std::format("OLD CWD is {}", Helpers::wstring_to_string(oldWorkingDir)));
+		WriteToLogFile(std::format("Set CWD to {}", Helpers::wstring_to_string(ws)));
 	}
 
 	// Initialize GLFW library

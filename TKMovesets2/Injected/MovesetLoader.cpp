@@ -179,6 +179,52 @@ uint64_t MovesetLoader::GetFunctionAddr(const std::string& functionName)
 
 // -- Static helper -- //
 
+static bool Init()
+{
+    // Safety in case this function is called multiple times
+    if (g_loader != nullptr && g_loader->isInitialized()) {
+        DEBUG_LOG("Loader already started: not starting again\n");
+        return;
+    }
+    if (g_loading) {
+        DEBUG_LOG("Loader already starting...\n");
+        return;
+    }
+
+    g_loading = true;
+    // Display console if debug mode
+#ifdef BUILD_TYPE_DEBUG
+    {
+        InitConsole();
+        DEBUG_LOG("MovesetLoaderStart\n");
+    }
+#endif
+
+    // Most likely g_loader is already null, but if previous initialization has failed, it won't be
+    if (g_loader == nullptr)
+    {
+        std::string processName = GetModuleFilenameStr();
+        if (processName == "TekkenGame-Win64-Shipping.exe") {
+            g_loader = new MovesetLoaderT7;
+        }
+        else {
+            return;
+        }
+        g_loading = false;
+        g_loader->SetMainModule(processName.c_str());
+    }
+
+    // Start loop only if Init() succeeds
+    // Mainloop will run until process is closed or if MovesetLoaderStop() is called externally
+    if (!g_loader->Init()) {
+        DEBUG_LOG("Error during MovesetLoader::Init()\n");
+        delete g_loader;
+        g_loader = nullptr;
+        return false;
+    }
+    return true;
+}
+
 static void Run()
 {
     DEBUG_LOG("Starting mainloop.\n");
@@ -194,62 +240,29 @@ static void Run()
 
 extern "C"
 {
-    void __declspec(dllexport) MovesetLoaderStart()
+    bool __declspec(dllexport) MovesetLoaderInit()
     {
-        // Safety in case this function is called multiple times
-        if (g_loader != nullptr && g_loader->isInitialized()) {
-            DEBUG_LOG("Loader already started: not starting again\n");
-            return;
-        }
-        if (g_loading) {
-            DEBUG_LOG("Loader already starting...\n");
-            return;
-        }
+        DEBUG_LOG("MovesetLoaderInit\n");
+        bool res = Init();
+        DEBUG_LOG("MovesetLoaderInit() -> return(%d)\n", res);
+        return res;
+    }
 
-        g_loading = true;
-        // Display console if debug mode
-#ifdef BUILD_TYPE_DEBUG
-        {
-            InitConsole();
-            DEBUG_LOG("MovesetLoaderStart\n");
-        }
-#endif
-
-        // Most likely g_loader is already null, but if previous initialization has failed, it won't be
-        if (g_loader == nullptr)
-        {
-            std::string processName = GetModuleFilenameStr();
-            if (processName == "TekkenGame-Win64-Shipping.exe") {
-                g_loader = new MovesetLoaderT7;
-            }
-            else {
-                return;
-            }
-            g_loading = false;
-            g_loader->SetMainModule(processName.c_str());
-        }
-
-        // Start loop only if Init() succeeds
-        // Mainloop will run until process is closed or if MovesetLoaderStop() is called externally
-        if (g_loader->Init()) {
-            // todo, Run() in another thread so that we can wait for MovesetLoaderStart() to end in the main process
-            Run();
-        }
-        else {
-            DEBUG_LOG("Error during MovesetLoader::Init()\n");
-            delete g_loader;
-            g_loader = nullptr;
-        }
+    void __declspec(dllexport) MovesetLoaderRun()
+    {
+        DEBUG_LOG("MovesetLoaderRun\n");
+        Run();
+        DEBUG_LOG("MovesetLoaderRun() -> return\n");
     }
 
     void __declspec(dllexport) MovesetLoaderStop()
     {
         // Clean way of stopping the loader
         DEBUG_LOG("MovesetLoaderStop\n");
-
         if (g_loader != nullptr) {
             g_loader->mustStop = true;
         }
+        DEBUG_LOG("MovesetLoaderStop() -> return\n");
     }
 }
 
