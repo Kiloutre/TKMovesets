@@ -27,6 +27,8 @@
 
 static void WriteToLogFile(const std::string& content, bool append=true)
 {
+	DEBUG_LOG(content.c_str());
+	/*
 	std::ofstream file;
 
 	if (append) {
@@ -40,6 +42,7 @@ static void WriteToLogFile(const std::string& content, bool append=true)
 		file.write(content.c_str(), content.size());
 		file.write("\n", 1);
 	}
+	*/
 }
 
 static void glfw_error_callback(int error, const char* description)

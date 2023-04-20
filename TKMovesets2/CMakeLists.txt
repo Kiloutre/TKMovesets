@@ -113,7 +113,7 @@ set(BINARY_SOURCES
                     "Utils/GameAddressesFile.cpp"
 )
 
-# This will be included in the .dll and should only be related to extraction/importation/edition (anything game specific)
+# Everything game-specific is in here
 set(IMPORTEXPORT_SOURCES
                     # Keep a copy of these since Extractor & Importers are reliant on them
                     "GameInteractions/GameProcess/GameProcess.cpp"
@@ -187,7 +187,7 @@ target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 ExportImport)
 add_dependencies(TKMovesets2 MovesetLoader)
 target_link_libraries(TKMovesets2 PRIVATE ExportImport)
-target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for GetModuleHandle() to work, apparently
+#target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for GetModuleHandle() to work, apparently
 
 # Addresses file #
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/game_addresses.ini" "game_addresses.ini" COPYONLY)
