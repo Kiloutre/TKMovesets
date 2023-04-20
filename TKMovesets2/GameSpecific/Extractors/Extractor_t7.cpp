@@ -473,6 +473,7 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 	strcpy_s(infos.origin, sizeof(infos.origin), GetGameOriginString());
 	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
 	infos.date = Helpers::getCurrentTimestamp();
+	infos.extraction_date = infos.date;
 
 	uint64_t propertyListSize = customPropertyCount * sizeof(TKMovesetProperty);
 
@@ -673,6 +674,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 			};
 
 			customHeader.crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
+			customHeader.orig_crc32 = customHeader.crc32;
 			ExtractorUtils::WriteFileData(file, writtenFileBlocks, progress, 95);
 
 			file.close();

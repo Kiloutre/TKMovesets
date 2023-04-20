@@ -122,14 +122,16 @@ void EditorMove_Animations::LoadAnimationList()
 				break;
 			}
 
-			if (!file.
-				is_regular_file()) {
+			if (!file.is_regular_file()) {
 				continue;
 			}
 
 			std::wstring filename = file.path().wstring();
 
-			if (!Helpers::endsWith<std::wstring>(filename, L".bin")) {
+			if (!Helpers::endsWith<std::wstring>(filename, L".bin") &&
+				!Helpers::endsWith<std::wstring>(filename, L"" ANIMATION_EXTENSION L"C8") &&
+				!Helpers::endsWith<std::wstring>(filename, L"" ANIMATION_EXTENSION L"64")
+				) {
 				continue;
 			}
 

@@ -23,8 +23,8 @@
 # define MOVESET_CUSTOM_MOVE_NAME_PREFIX "tkm_"
 # define MOVESET_DIRECTORY               "./extracted_chars"
 # define EDITOR_LIB_DIRECTORY            "./editor_library"
-# define MOVESET_FILENAME_EXTENSION      ".tkbin"
-# define MOVESET_TMPFILENAME_EXTENSION   "._tmp_tkbin"
+# define MOVESET_FILENAME_EXTENSION      ".tkmvst"
+# define MOVESET_TMPFILENAME_EXTENSION   "._tmp_tkmvst"
 // We might update extractors/importers without touching the main tool, so this is separated
 # define MOVESET_VERSION_STRING          "0.3"
 // Accepted chars in header strings are alphanum + those specified here
@@ -34,6 +34,12 @@
 # define MOVESET_LOADER_NAME             "MovesetLoader.dll"
 # define MOVESET_LOADER_START_FUNC       "MovesetLoaderStart"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
+
+# define ANIMATION_EXTENSION             ".tkanim"
+# define ANIMATION_FACE_EXTENSION        ".tkfaceanim"
+# define ANIMATION_HAND_EXTENSION        ".tkhandanim"
+# define ANIMATION_CAM_EXTENSION         ".tkcamanim"
+# define ANIMATION__OTHEREXTENSION       ".tkotheranim"
 
 # define ONLINE_MOVESET_MAX_SIZE_BYTES   15000000
 

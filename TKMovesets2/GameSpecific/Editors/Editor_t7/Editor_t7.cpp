@@ -612,7 +612,13 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 	{
 		const char* name = namePtr + it->second;
 		auto& offset = it->first;
+		const char* anim = (char*)baseAnimPtr + offset;
+		Byte animType = *(Byte*)anim;
 		uint64_t size;
+
+		if (animType == 0) {
+			animType = *(Byte*)(anim + 1);
+		}
 
 		std::advance(it, 1);
 		if (it == end) {
@@ -632,7 +638,7 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 			}
 		}
 
-		std::string filename = std::format("{}/{}.bin", outputFolder, name);
+		std::string filename = std::format("{}/{}" ANIMATION_EXTENSION "{:X}" , outputFolder, name, animType);
 		// todo: check if anim exists already
 		std::ofstream file(filename.c_str(), std::ios::binary);
 
@@ -640,7 +646,6 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 			continue;
 		}
 
-		const char* anim = (char*)baseAnimPtr + offset;
 		file.write(anim, size);
 	}
 

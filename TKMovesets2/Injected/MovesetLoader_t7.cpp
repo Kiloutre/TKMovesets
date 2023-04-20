@@ -17,6 +17,9 @@ namespace T7Hooks
 	{
 		DEBUG_LOG("ApplyNewMoveset on player %llx, moveset is %llx\n", (uint64_t)player, (uint64_t)newMoveset);
 		DEBUG_LOG("g_loader is %llx\n", g_loader);
+		// todo: TK__GetPlayer(), maybe?
+		// put function signature in game_addresses.txt
+		// Get player side also
 
 		return g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
 	}

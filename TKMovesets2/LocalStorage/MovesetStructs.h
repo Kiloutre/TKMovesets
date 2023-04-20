@@ -42,10 +42,14 @@ struct TKMovesetHeader
 	uint32_t block_list_size;
 	// Absolute offset of the block offset list
 	uint32_t moveset_data_start;
-	// Stores a hash of the moveset data (everything past our TKMovesetHeader_infos structure)
+	// Stores a hash of the moveset data 
 	uint32_t crc32;
+	// Original crc32 of the moveset data at the time of extraction
+	uint32_t orig_crc32;
 	// Date of last modification
 	uint64_t date;
+	// Date of initial file extraction
+	uint64_t extraction_date;
 	// ID of the extracted character, used internally to make some moves that require it work
 	uint32_t characterId;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
