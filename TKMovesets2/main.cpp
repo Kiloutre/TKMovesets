@@ -27,7 +27,7 @@
 
 static void WriteToLogFile(const std::string& content, bool append=true)
 {
-	DEBUG_LOG(content.c_str());
+	DEBUG_LOG("%s\n", content.c_str());
 	/*
 	std::ofstream file;
 

@@ -64,6 +64,23 @@ void MovesetLoader::Mainloop()
 
 bool MovesetLoader::Init()
 {
+    // Initialize the list of hooks and error out if a required one is not found
+    {
+        InitHooks();
+
+        bool requiredHookErr = false;
+        for (auto& name : m_requiredHooks)
+        {
+            if (!m_hooks.contains(name)) {
+                DEBUG_LOG("Error: failed to find required function '%s'()\n", name.c_str());
+                requiredHookErr = true;
+            }
+        }
+        if (requiredHookErr) {
+            return false;
+        }
+    }
+
     // Load the shared memory handle
     auto sharedMemName = GetSharedMemoryName();
     DEBUG_LOG("Shared memory name is '%s'\n", sharedMemName);
@@ -84,20 +101,20 @@ bool MovesetLoader::Init()
     }
 
     memset(m_sharedMemPtr, 0, sizeof(*m_sharedMemPtr));
-
-    PostInit();
     return true;
 }
 
-PLH::x64Detour* MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr)
+void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr)
 {
+    if (originalAddr == 0) {
+        return ;
+    }
+
     m_hooks[hookName] = {};
     auto& hook = m_hooks[hookName];
 
     // Initialize the original function's hook
     hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline, m_disassembler);
-    // Returns the detour to allow
-    return hook.detour;
 }
 
 // -- DLL Exported functions -- //

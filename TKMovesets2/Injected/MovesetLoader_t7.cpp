@@ -24,17 +24,22 @@ namespace T7Hooks
 
 // -- Hooking --
 
-void MovesetLoaderT7::PostInit()
+void MovesetLoaderT7::InitHooks()
 {
 	// Set the global reference to us
 	g_loader = this;
 	DEBUG_LOG("g_loader is set to %llx\n", g_loader);
+
+	// Declare which hooks must absolutely be found
+	m_requiredHooks = {
+		"TK__ApplyNewMoveset",
+	};
 
 	/// TK__ApplyNewMoveset
 	{
 		// Get the original address
 		T7Functions::ApplyNewMoveset TK__ApplyNewMoveset = 0;
 		// Initialize and create the ook
-		InitHook("TK__ApplyNewMoveset", (uint64_t)TK__ApplyNewMoveset, (uint64_t)&T7Hooks::ApplyNewMoveset)->hook();
+		InitHook("TK__ApplyNewMoveset", (uint64_t)TK__ApplyNewMoveset, (uint64_t)&T7Hooks::ApplyNewMoveset);
 	}
 }

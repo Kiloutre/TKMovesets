@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <map>
+#include <set>
 #include <polyhook2/Detour/x64Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
 
@@ -35,6 +36,8 @@ protected:
 	uint64_t m_moduleSize;
 	// Contains the module name
 	std::string m_moduleName;
+	// List of required hooks,will error out if one of them isn't found
+	std::set<std::string> m_requiredHooks;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
@@ -46,11 +49,11 @@ public:
 
 	// Cast a trampoline function and returns it
 	template<class T> T CastTrampoline(std::string hookName);
-	// Initializes a hook for a game function and returns a pointer to its detour (call ->hook() to actually hook)
-	PLH::x64Detour* InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr);
+	// Initializes a hook for a game function. Does not actually trigger it
+	void InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr);
 
-	// Called once shared memory has been successfully loaded
-	virtual void PostInit() = 0;
+	// Initializes the list of hook
+	virtual void InitHooks() = 0;
 	// If set to true, force the Mainloop() to stop
 	bool mustStop = false;
 	// Main loop of the loader
