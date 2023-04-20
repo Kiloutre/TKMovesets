@@ -28,8 +28,6 @@ class MovesetLoader
 protected:
 	// Stores a handle to the shared memory
 	HANDLE m_memoryHandle = nullptr;
-	// Ptr to the shared memory
-	SharedMemory* m_sharedMemPtr = nullptr;
 	// List of hooked functions
 	std::map<std::string, functionHook> m_hooks;
 	// Disassembler that must be passed to any hook creation
@@ -43,18 +41,22 @@ protected:
 	uint64_t m_moduleSize;
 	// Contains the module name
 	std::string m_moduleName;
-	// List of required function and hooks,will error out if one of them isn't found
-	std::set<std::string> m_requiredFunctions;
+	// List of required function/variables/ hooks, will error out if one of them isn't found
+	std::set<std::string> m_requiredSymbols;
 	// Stores addresses of useful functions
 	std::map<std::string, uint64_t> m_functions;
 	// List of modules with their name, size and addresses in the current process
 	std::map<std::string, moduleEntry> m_modules;
+	// List of important variable addresses that we can cache early on in there
+	std::map<std::string, uint64_t> m_variables;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
 public:
 	// Store addresses, pointers path and such from the game_addresses.ini file (or from embedded data if not found, which currently is the case)
 	GameAddressesFile addresses;
+	// Ptr to the shared memory
+	SharedMemory* sharedMemPtr = nullptr;
 
 	// Initializes the shared memory
 	bool Init();
@@ -65,11 +67,15 @@ public:
 	// Initializes a hook for a game function. Does not actually trigger it
 	void InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr);
 	// Registers a function in the m_functions map, searching in a specific module for the bytes in game_addresses.ini
-	void RegisterFunction(const char* functionName, const char* moduleName, const char* c_addressId);
+	void RegisterFunction(const char* functionName, const std::string& moduleName, const char* c_addressId);
 	// Registers a hook in the m_hooks map, searching in a specific module for the bytes in game_addresses.ini
-	void RegisterHook(const char* functionName, const char* moduleName, const char* c_addressId, uint64_t hookAddr);
+	void RegisterHook(const char* functionName, const std::string& moduleName, const char* c_addressId, uint64_t hookAddr);
 	// Returns the casted address of a previously registered fnction
 	template<class T> T CastFunction(const std::string& functionName);
+	// Returns the value of a variable, reading sizeof(T)
+	template<typename T> T CastVariable(const std::string& variableName);
+	// Returns the address of the function
+	uint64_t GetFunctionAddr(const std::string& functionName);
 
 	// Initializes the list of hook
 	virtual void InitHooks() = 0;
@@ -102,3 +108,14 @@ template<class T> T MovesetLoader::CastFunction(const std::string& functionName)
 	DEBUG_LOG("CastFunction(): Function '%s' not found\n", functionName.c_str());
 	return nullptr;
 }
+
+
+template<class T> T MovesetLoader::CastVariable(const std::string& functionName)
+{
+	if (m_variables.contains(functionName)) {
+		return *(T*)m_variables[functionName];
+	}
+	DEBUG_LOG("CastVariable(): Function '%s' not found\n", functionName.c_str());
+	return (T)0;
+}
+

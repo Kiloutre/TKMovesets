@@ -56,6 +56,7 @@ struct GameInfo
 	GameFlag flags;
 	// Used to build path for label files
 	const char* dataString;
+	// todo: minorDataString that takes priority over dataString, but if no resource/entry found, defaults to dataString in the function that uses it
 	// Dynamic type allocator to store the game's extractor. Can be nullptr for no available extractor.
 	FactoryType_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.

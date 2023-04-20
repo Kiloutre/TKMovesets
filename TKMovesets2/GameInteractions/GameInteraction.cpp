@@ -63,6 +63,7 @@ void GameInteraction::Update()
 void GameInteraction::Init(GameAddressesFile* addrFile, LocalStorage* t_storage)
 {
 	// todo: Clean this up, we don't need to instantiate multiple GameData classes.
+    // or maybe we do for data strings?
 	process = new GameProcess;
 	game = new GameData(process, addrFile);
 	storage = t_storage;

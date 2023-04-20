@@ -9,5 +9,7 @@ struct SharedMemoryPlayer
 
 struct SharedMemory
 {
+	// Only load custom movesets if locked in
+	bool locked_in;
 	SharedMemoryPlayer player[4];
 };

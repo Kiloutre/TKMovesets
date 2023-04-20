@@ -69,9 +69,10 @@ bool MovesetLoader::Init()
         InitHooks();
 
         bool requiredHookErr = false;
-        for (auto& name : m_requiredFunctions)
+        for (auto& name : m_requiredSymbols)
         {
-            if (!m_hooks.contains(name) && (!m_functions.contains(name) || m_functions[name] == 0)) {
+            if (!m_hooks.contains(name) && (!m_functions.contains(name) || m_functions[name] == 0)
+                && (!m_variables.contains(name) || m_variables[name] == 0)) {
                 DEBUG_LOG("Error: failed to find required function '%s()'\n", name.c_str());
                 requiredHookErr = true;
             }
@@ -91,16 +92,16 @@ bool MovesetLoader::Init()
         return false;
     }
 
-    m_sharedMemPtr = (SharedMemory*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
-    DEBUG_LOG("Shared memory address: %llx\n", (unsigned long long)m_sharedMemPtr);
-    if (m_sharedMemPtr == nullptr)
+    sharedMemPtr = (SharedMemory*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    DEBUG_LOG("Shared memory address: %llx\n", (unsigned long long)sharedMemPtr);
+    if (sharedMemPtr == nullptr)
     {
         CloseHandle(m_memoryHandle);
         m_memoryHandle = nullptr;
         return false;
     }
 
-    memset(m_sharedMemPtr, 0, sizeof(*m_sharedMemPtr));
+    memset(sharedMemPtr, 0, sizeof(*sharedMemPtr));
     PostInit();
     return true;
 }
@@ -125,7 +126,7 @@ void MovesetLoader::SetMainModule(const char* name)
     m_modules = InjectionUtils::GetModuleList(name, m_moduleAddr, m_moduleSize);
 }
 
-void MovesetLoader::RegisterFunction(const char* functionName, const char* moduleName, const char* c_addressId)
+void MovesetLoader::RegisterFunction(const char* functionName, const std::string& moduleName, const char* c_addressId)
 {
     auto mod = m_modules.find(moduleName);
     uint64_t moduleAddr;
@@ -142,9 +143,10 @@ void MovesetLoader::RegisterFunction(const char* functionName, const char* modul
 
     const char* functionBytes = addresses.GetString(c_addressId);
     m_functions[functionName] = (uint64_t)Sig::find((void*)moduleAddr, moduleSize, functionBytes);
+    DEBUG_LOG("RegisterFunction(%s): Found function at %llx (+%llx)\n", functionName, m_functions[functionName], m_functions[functionName] - moduleAddr);
 }
 
-void MovesetLoader::RegisterHook(const char* functionName, const char* moduleName, const char* c_addressId, uint64_t hookAddr)
+void MovesetLoader::RegisterHook(const char* functionName, const std::string& moduleName, const char* c_addressId, uint64_t hookAddr)
 {
     auto mod = m_modules.find(moduleName);
     uint64_t moduleAddr;
@@ -160,9 +162,20 @@ void MovesetLoader::RegisterHook(const char* functionName, const char* moduleNam
     }
 
     const char* functionBytes = addresses.GetString(c_addressId);
-    auto functionAddr = Sig::find((void*)moduleAddr, moduleSize, functionBytes);
-    InitHook(functionName, (uint64_t)functionAddr, hookAddr);
+    uint64_t functionAddr = (uint64_t)Sig::find((void*)moduleAddr, moduleSize, functionBytes);
+    InitHook(functionName, functionAddr, hookAddr);
+    DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx)\n", functionName, functionAddr, functionAddr - moduleAddr);
 }
+
+uint64_t MovesetLoader::GetFunctionAddr(const std::string& functionName)
+{
+    if (m_functions.contains(functionName)) {
+        return m_functions[functionName];
+    }
+    DEBUG_LOG("GetFunctionAddr(): Function '%s' not found\n", functionName.c_str());
+    return 0;
+}
+
 
 // -- DLL Exported functions -- //
 

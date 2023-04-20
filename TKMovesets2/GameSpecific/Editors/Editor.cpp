@@ -347,7 +347,7 @@ Editor::Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t m
 	m_animOffsetToNameOffset = new std::map<gameAddr, gameAddr>;
 
 	constants = new std::map<EditorConstants_, unsigned int >();
-	animExtractionThread = new std::thread(); // todo : does this really need to be allocated here? probably not
+	animExtractionThread = new std::thread();
 }
 
 Editor::~Editor()

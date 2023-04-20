@@ -935,8 +935,6 @@ InputMap EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 
 	char* nameBlock = (char*)(m_movesetData + m_offsets->nameBlock);
 
-	// TODO to do TOFIX to fix : crash on move->anim_name_addr
-
 	// Set up fields. Draw order is same as declaration order because of macro.
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
