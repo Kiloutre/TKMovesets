@@ -6,6 +6,7 @@
 #include <set>
 #include <polyhook2/Detour/x64Detour.hpp>
 #include <polyhook2/ZydisDisassembler.hpp>
+#include <Sig/Sig.hpp>
 
 #include "constants.h"
 #include "SharedMemory.h"
@@ -54,6 +55,8 @@ public:
 
 	// Initializes the list of hook
 	virtual void InitHooks() = 0;
+	// Called upon a successful Init()
+	virtual void PostInit() = 0;
 	// If set to true, force the Mainloop() to stop
 	bool mustStop = false;
 	// Main loop of the loader

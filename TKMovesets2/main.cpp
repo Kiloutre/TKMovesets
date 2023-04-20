@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <fstream>
 
+#include <Sig/Sig.hpp>
 #include "MainWindow.hpp"
 #include "Localization.hpp"
 #include "GameAddressesFile.hpp"

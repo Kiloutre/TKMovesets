@@ -33,6 +33,16 @@ This project requires external libraries to be downloaded & built to function. T
 - **If you do not have visual studio installed:** go into the project folder and run `vcpkg install` to install the dependencies
 vcpkg is now installed.
 
+## Submodules dependencies
+
+If cloning with git from the command line, use this command to also download the required submodules:
+`git clone --recurse-submodules https://github.com/Kiloutre/TKMovesets.git`
+If you already have the repository cloned and want to bring the submodules over, execute those two commands inside of TKMovesets's repository:
+`git submodule init ; git submodule update`
+If downloading the project manually (.zip or such), you will also have to manually download the dependencies.
+If using a GUI program to download this project, there will most likely be an option to bring the submodules over.
+
+
 ## Building
 - **If you have visual studio installed**: Make sure to close Visual Studio and delete the folders `.vs` and `out` before trying your first build, they may contain bad cache if you attempted building the project with an incomplete environment
 -- Open the project in visual studio, and if prompted to **Generate** the cmake config, say yes. It probably already started doing it on its own.

@@ -48,6 +48,8 @@ set(INCLUDE_FOLDERS
                     "Utils"
 
                     "Injected"
+
+                    "${CMAKE_SOURCE_DIR}/Sig/include"
 )
 
 # This will be included in the .exe
@@ -220,3 +222,4 @@ target_link_libraries(MovesetLoader PRIVATE PolyHook_2::PolyHook_2)
 #find_package(liblzma CONFIG REQUIRED)
 #target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)
 #target_link_libraries(ExportImport PRIVATE liblzma::liblzma)
+

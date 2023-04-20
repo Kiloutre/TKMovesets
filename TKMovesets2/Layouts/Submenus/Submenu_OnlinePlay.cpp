@@ -112,7 +112,7 @@ void Submenu_OnlinePlay::Render()
 	bool sharedMemoryLoaded = gameHelper->IsAttached() && gameHelper->sharedMemHandler->IsMemoryLoaded();
 	bool isBusy = gameHelper->IsBusy();
 
-	if (!sharedMemoryLoaded) {
+	if (!sharedMemoryLoaded && gameHelper->IsAttached()) {
 		ImGui::SameLine();
 		if (ImGui::Button(_("online.inject_dll"))) {
 			gameHelper->sharedMemHandler->InjectDll();

@@ -11,4 +11,5 @@ private:
 
 public:
 	void InitHooks() override;
+	void PostInit() override;
 };

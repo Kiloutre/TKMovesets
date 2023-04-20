@@ -101,6 +101,7 @@ bool MovesetLoader::Init()
     }
 
     memset(m_sharedMemPtr, 0, sizeof(*m_sharedMemPtr));
+    PostInit();
     return true;
 }
 
