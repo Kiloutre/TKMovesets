@@ -45,6 +45,7 @@ set(INCLUDE_FOLDERS
                     "Layouts/Editor/TStructures/DisplayableMovelist"
 
                     "LocalStorage"
+                    "ResourcesClasses"
                     "Utils"
 
                     "Injected"
@@ -110,20 +111,15 @@ set(BINARY_SOURCES
                     "Utils/helpers.cpp"
                     "Utils/imgui_extras.cpp"
                     "Utils/ThreadedClass.cpp"
-                    "Utils/Localization.cpp"
-                    "Utils/EditorLabel.cpp"
-                    "Utils/GameAddressesFile.cpp"
+
+                    # Resources-accessing
+                    "ResourcesClasses/Localization.cpp"
+                    "ResourcesClasses/EditorLabel.cpp"
+                    "ResourcesClasses/GameAddressesFile.cpp"
 )
 
 # Everything game-specific is in here
-set(IMPORTEXPORT_SOURCES
-                    # Keep a copy of these since Extractor & Importers are reliant on them
-                    "GameInteractions/GameProcess/GameProcess.cpp"
-                    "GameInteractions/GameProcess/GameData.cpp"
-                    "Utils/GameAddressesFile.cpp"
-                    "Utils/helpers.cpp"
-                    
-
+set(GAMESPECIFIC_SOURCES
                     # List of games
                     "GameSpecific/Games.cpp"
                     # Base classes for our game-specific stuff
@@ -171,11 +167,11 @@ target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
-add_library(ExportImport STATIC ${IMPORTEXPORT_SOURCES} ${EMBEDDED_RESOURCES})
-target_include_directories(ExportImport PRIVATE ${INCLUDE_FOLDERS})
-target_compile_definitions(ExportImport PUBLIC DLL_EXPORTING)
+add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES})
+target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS})
+target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-target_compile_definitions(ExportImport PUBLIC BUILD_TYPE_DEBUG)
+target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build program .exe
@@ -186,9 +182,9 @@ else()
 add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES})
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
-add_dependencies(TKMovesets2 ExportImport)
+add_dependencies(TKMovesets2 GameSpecific)
 add_dependencies(TKMovesets2 MovesetLoader)
-target_link_libraries(TKMovesets2 PRIVATE ExportImport)
+target_link_libraries(TKMovesets2 PRIVATE GameSpecific)
 #target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for GetModuleHandle() to work, apparently
 
 # Addresses file #
@@ -212,7 +208,7 @@ target_link_libraries(TKMovesets2 PRIVATE glfw)
 # ImGUI (Interface)
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
-target_link_libraries(ExportImport PRIVATE imgui::imgui) # Only used for the color-defining includes
+target_link_libraries(GameSpecific PRIVATE imgui::imgui) # Only used for the color-defining includes
 
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)
@@ -221,5 +217,5 @@ target_link_libraries(MovesetLoader PRIVATE PolyHook_2::PolyHook_2)
 # Compression
 #find_package(liblzma CONFIG REQUIRED)
 #target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)
-#target_link_libraries(ExportImport PRIVATE liblzma::liblzma)
+#target_link_libraries(GameSpecific PRIVATE liblzma::liblzma)
 
