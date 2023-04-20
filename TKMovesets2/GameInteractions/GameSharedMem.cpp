@@ -41,7 +41,7 @@ void GameSharedMem::RunningUpdate()
 
 			// Send the successfully loaded moveset to the shared memory manager
 			if (err == ImportationErrcode_Successful) {
-				sharedMemHandler->OnMovesetImport(&moveset, importer->lastLoadedMoveset, playerId);
+				sharedMemHandler->OnMovesetImport(&moveset, importer->lastLoadedMoveset, playerId, importer->lastLoadedMoveset_charId);
 				lastLoadedMoveset = importer->lastLoadedMoveset;
 			} else {
 				m_errors.push_back(err);

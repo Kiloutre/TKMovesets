@@ -38,5 +38,5 @@ public:
 	// Injects the DLL into the current process
 	bool InjectDll();
 	// Called when a moveset is successfully loaded in the game's memory by the importer
-	void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId);
+	void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId);
 };

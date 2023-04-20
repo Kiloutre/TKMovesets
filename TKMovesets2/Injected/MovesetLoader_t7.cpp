@@ -65,6 +65,7 @@ namespace T7Hooks
 	{
 		DEBUG_LOG("ApplyNewMoveset on player %llx, moveset is %llx\n", (uint64_t)player, (uint64_t)newMoveset);
 
+		auto retVal = g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
 
 		if (g_loader->sharedMemPtr->locked_in || true)
 		{
@@ -78,7 +79,7 @@ namespace T7Hooks
 			DEBUG_LOG("playerIndex: %d\n", playerIndex);
 			if (playerIndex < 0x2F)
 			{
-				auto& playerData = g_loader->sharedMemPtr->player[playerIndex];
+				auto& playerData = g_loader->sharedMemPtr->players[playerIndex];
 				MovesetInfo* customMoveset = (MovesetInfo*)playerData.custom_moveset_addr;
 				if (customMoveset)
 				{
@@ -87,32 +88,41 @@ namespace T7Hooks
 					// Copy missing MOTA offsets
 					for (unsigned int i = 0; i < _countof(customMoveset->motas.motas); ++i)
 					{
-						if ((uint64_t)customMoveset->motas.motas[i] == MOVESET_ADDR_MISSING || true) {
+						if ((uint64_t)customMoveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
 							// todo
 							customMoveset->motas.motas[i] = newMoveset->motas.motas[i];
 						}
 					}
 					
 					// Fix moves relying on character IDs
-					int previousCharacterId = 0; // todo
 					int currentPlayerId = *(int*)((char*)player + 0xDC);
+					int previousCharacterId = playerData.previous_character_id;
+					if (previousCharacterId == SHARED_MEM_MOVESET_NO_CHAR) {
+						previousCharacterId = playerData.moveset_character_id;
+					}
+
 					int c_characterIdCondition = (int)g_loader->addresses.GetValue("val:t7_character_id_condition");
 
 					for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
 					{
 						if (requirement.condition == c_characterIdCondition) {
-							requirement.param_unsigned = requirement.param_unsigned == previousCharacterId ? currentPlayerId : currentPlayerId + 1;
+							requirement.param_unsigned = (requirement.param_unsigned == previousCharacterId) ? currentPlayerId : currentPlayerId + 1;
 						}
 					}
 
-					playerData.moveset_character_id = currentPlayerId;
-					newMoveset = customMoveset;
+					playerData.previous_character_id = currentPlayerId;
+
+					auto motaOffset = g_loader->addresses.GetValue("val:t7_motbin_offset");
+					*(MovesetInfo**)((char*)player + motaOffset) = customMoveset;
+					*(MovesetInfo**)((char*)player + motaOffset + 8) = customMoveset;
+					*(MovesetInfo**)((char*)player + motaOffset + 16) = customMoveset;
+					*(MovesetInfo**)((char*)player + motaOffset + 24) = customMoveset;
+					*(MovesetInfo**)((char*)player + motaOffset + 32) = customMoveset;
 				}
 			}
 		}
 
-		//g_loader->CastFunction<T7Functions::GetPlayerFromID>()(0);
-		return g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
+		return retVal;
 	}
 }
 
@@ -152,4 +162,9 @@ void MovesetLoaderT7::PostInit()
 
 	// Apply the hooks that need to be applied immediately
 	m_hooks["TK__ApplyNewMoveset"].detour->hook();
+
+	for (unsigned int i = 0; i < _countof(sharedMemPtr->players); ++i)
+	{
+		sharedMemPtr->players[i].previous_character_id = SHARED_MEM_MOVESET_NO_CHAR;
+	}
 }

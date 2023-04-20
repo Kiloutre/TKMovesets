@@ -101,7 +101,7 @@ bool Online::InjectDll()
     return CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
 }
 
-void Online::OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId)
+void Online::OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId)
 {
     if (displayedMovesets->size() > playerId) {
         (*displayedMovesets)[playerId] = *displayedMoveset;
@@ -109,5 +109,6 @@ void Online::OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr
     else {
         displayedMovesets->push_back(*displayedMoveset);
     }
-    m_sharedMemPtr->player[playerId].custom_moveset_addr = movesetAddr;
+    m_sharedMemPtr->players[playerId].custom_moveset_addr = movesetAddr;
+    m_sharedMemPtr->players[playerId].moveset_character_id = characterId;
 }

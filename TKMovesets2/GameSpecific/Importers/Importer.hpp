@@ -47,6 +47,8 @@ public:
 	uint8_t characterCount = 1;
 	// Stores the in-game address of the moveset successfully loaded by the last Import() call
 	gameAddr lastLoadedMoveset = 0;
+	// Last loaded moveset's character ID, used by online importer
+	uint8_t lastLoadedMoveset_charId = 0;
 
 	// Inherit copy constructor
 	using BaseGameSpecificClass::BaseGameSpecificClass;
