@@ -8,9 +8,12 @@
 #include <polyhook2/ZydisDisassembler.hpp>
 #include <Sig/Sig.hpp>
 
+#include "InjectionUtils.hpp"
+#include "GameAddressesFile.hpp"
+
 #include "constants.h"
 #include "SharedMemory.h"
-#include "InjectionUtils.hpp"
+
 
 typedef unsigned char Byte;
 
@@ -32,7 +35,10 @@ protected:
 	// Disassembler that must be passed to any hook creation
 	PLH::ZydisDisassembler m_disassembler = PLH::ZydisDisassembler(PLH::Mode::x64);
 	// Contains our own module address
-	uint64_t m_moduleAddr;
+	union {
+		uint64_t m_moduleAddr;
+		void* m_moduleAddrPtr;
+	};
 	// Size of the main module
 	uint64_t m_moduleSize;
 	// Contains the module name
@@ -43,6 +49,8 @@ protected:
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
 public:
+	// Store addresses, pointers path and such from the game_addresses.ini file (or from embedded data if not found, which currently is the case)
+	GameAddressesFile addresses;
 
 	// Initializes the shared memory
 	bool Init();

@@ -18,7 +18,6 @@ void GameData::CacheAddresses()
 
 		cachedAddresses[addressId] = ReadPtrPath(addressId.c_str());
 	}
-	addrFile->UnlockEntriesMutex();
 	m_cachedAddresses = cachedAddresses;
 }
 

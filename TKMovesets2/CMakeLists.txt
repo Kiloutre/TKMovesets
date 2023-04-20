@@ -150,6 +150,9 @@ set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
     "Injected/MovesetLoader_t7.cpp"
     "Injected/InjectionUtils.cpp"
+
+    "ResourcesClasses/GameAddressesFile.cpp"
+    "Utils/helpers.cpp"
 )
 
 ## Setup embedded ressources ##

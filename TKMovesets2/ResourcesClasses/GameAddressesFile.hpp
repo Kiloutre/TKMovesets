@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mutex>
 #include <vector>
 #include <fstream>
 
@@ -13,12 +12,13 @@ private:
 	std::map<std::string, std::vector<gameAddr> > m_absolute_pointer_paths;
 	// List of relative pointer pahs in the address list file
 	std::map<std::string, std::vector<gameAddr> > m_relative_pointer_paths;
+	// List of entries starting with 'val':
+	std::map<std::string, int64_t> m_values;
+	// List of entries starting with 'str:'
+	std::map<std::string, std::string> m_strings;
+
 	// List of entry in the address list file
 	std::vector<std::string> m_entries;
-	// Mutex used to avoid m_entries iterator crashing because of concurrent m_entries modification
-	std::mutex m_entries_mutex;
-	// Returned by GetAddress() if address is not found
-	std::vector<gameAddr> m_emptyPtrPath;
 
 	// Load the addresses from a stream
 	void LoadFromStream(std::istream& stream);
@@ -27,12 +27,12 @@ public:
 
 	// Reload the game addresses file.
 	void Reload();
-	// Returns a list of every game_address.txt entry (key only). Locks a mutex that has to be unlocked by UnlockEntriesMutex() after finishing with the variable.
+	// Returns a list of every game_address.txt entry (key only).
 	const std::vector<std::string>& GetAllEntries();
-	// Unlocks the mutex locked by GetAllEntries()
-	void UnlockEntriesMutex();
 	// Returns a single numerical value from the file
-	const int64_t GetSingleValue(const char* c_addressId);
+	int64_t GetValue(const char* c_addressId);
+	// Returns a string from the file
+	const char* GetString(const char* c_addressId);
 	// Returns a pointer path, that may rely on the base address or not.
 	const std::vector<gameAddr>& GetAddress(const char* c_addressId, bool& isRelative);
 };

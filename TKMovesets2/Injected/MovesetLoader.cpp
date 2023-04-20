@@ -108,6 +108,7 @@ bool MovesetLoader::Init()
 void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr)
 {
     if (originalAddr == 0) {
+        DEBUG_LOG("Could not find function '%s'\n", hookName);
         return ;
     }
 

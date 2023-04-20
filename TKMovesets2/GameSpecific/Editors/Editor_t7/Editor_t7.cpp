@@ -515,10 +515,10 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		playerAddress += playerId * m_game->addrFile->GetValue("val:t7_playerstruct_size");
 	}
 
-	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"));
+	uint16_t moveId = m_process->readInt16(playerAddress + m_game->addrFile->GetValue("val:t7_currmove_id"));
 	if (moveId >= 0x8000) {
 		moveId = m_aliases->at((size_t)(moveId - (uint16_t)0x8000));
 	}
@@ -530,11 +530,11 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		playerAddress += playerId * m_game->addrFile->GetValue("val:t7_playerstruct_size");
 	}
 
 	{
-		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset");
 		// movesetOffset is the one offset we can't touch because it is the moveset the characte reverts to when transitioning to a generic anim
 		// Since we want P2 to be able to play those moves here without changing their moveset, we don't write on it
 		m_process->writeInt64(movesetOffset + 0x8, playerMoveset);
@@ -551,11 +551,11 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
-	m_process->writeInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_timer"), 99999);
+	m_process->writeInt32(playerAddress + m_game->addrFile->GetValue("val:t7_currmove_timer"), 99999);
 	// Tell the game which move to play NEXT
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetValue("val:t7_currmove_id"), moveId);
 }
 
 // -- Anim extraction -- //

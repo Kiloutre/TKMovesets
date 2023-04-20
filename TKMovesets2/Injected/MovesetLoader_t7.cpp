@@ -41,14 +41,15 @@ void MovesetLoaderT7::InitHooks()
 	/// TK__ApplyNewMoveset
 	{
 		// Get the original address
-		const char* TK__ApplyNewMoveset_bytes = "48 85 D2 0F 84 CF 01 00 00 56 57 48 83 EC 28 48 89 5C 24 40 48 8B FA 48 89 6C 24 48 48 8B F1 48 89 91 20 15 00 00 48 89 91 28 15 00 00 48 89 91";
-		T7Functions::ApplyNewMoveset TK__ApplyNewMoveset = (T7Functions::ApplyNewMoveset)Sig::find((void*)m_moduleAddr, m_moduleSize, TK__ApplyNewMoveset_bytes);
-		// Initialize and create the ook
+		auto TK__ApplyNewMoveset_bytes = addresses.GetString("str:t7_f_apply_new_moveset");
+		auto TK__ApplyNewMoveset = Sig::find(m_moduleAddrPtr, m_moduleSize, TK__ApplyNewMoveset_bytes);
+		// Initialize the hook
 		InitHook("TK__ApplyNewMoveset", (uint64_t)TK__ApplyNewMoveset, (uint64_t)&T7Hooks::ApplyNewMoveset);
 	}
 }
 
 void MovesetLoaderT7::PostInit()
 {
+	// Apply the hooks we need to apply right now
 	m_hooks["TK__ApplyNewMoveset"].detour->hook();
 }

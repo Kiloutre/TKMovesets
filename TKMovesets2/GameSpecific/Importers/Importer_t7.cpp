@@ -46,7 +46,7 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 		// Each player actually holds 5 copies of its moveset ptr.
 		// One of them is the one to default to when going back to aliases move (>= 32768)
 		// One of them is the one of the move that is currently playing, which may come from the opponent's moveset
-		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
+		gameAddr movesetOffset = playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset");
 		for (size_t i = 1; i < 5; ++i) {
 			m_process->writeInt64(movesetOffset + i * 8, playerMoveset);
 		}
@@ -61,16 +61,16 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 	gameAddr moveAddr = m_process->readInt64(playerMoveset + movesOffset) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
-	m_process->writeInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_timer"), 99999);
+	m_process->writeInt32(playerAddress + m_game->addrFile->GetValue("val:t7_currmove_timer"), 99999);
 	// Tell the game which move to play NEXT
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_nextmove_addr"), moveAddr);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetValue("val:t7_nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_currmove_id"), moveId);
+	m_process->writeInt64(playerAddress + m_game->addrFile->GetValue("val:t7_currmove_id"), moveId);
 }
 
 void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress)
 {
-	const uint64_t staticCameraOffset = m_game->addrFile->GetSingleValue("val:t7_static_camera_offset");
+	const uint64_t staticCameraOffset = m_game->addrFile->GetValue("val:t7_static_camera_offset");
 
 	uint64_t motaOffset = offsetof(MovesetInfo, motas);
 	gameAddr cameraMota1 = m_process->readInt64(movesetAddr + motaOffset + offsetof(MotaList, camera_1));
@@ -83,7 +83,7 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks& offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress)
 {
 	MotaList currentMotasList{};
-	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
+	gameAddr currentMovesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"));
 	m_process->readBytes(currentMovesetAddr + offsetof(MovesetInfo, motas), &currentMotasList, sizeof(MotaList));
 
 	MotaList* motaList = (MotaList*)(moveset + offsets.motalistsBlock);
@@ -136,10 +136,10 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 	// I am taking about mundane moves such as EWHF not working where WHF does
 	// The why is hard to understand and might possibly be linked to Mokujin/Combot, but anyway, this fixes things
 	uint16_t movesetCharacterId = header->characterId;
-	uint16_t currentCharacterId = m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_chara_id_offset"));
+	uint16_t currentCharacterId = m_process->readInt16(playerAddress + m_game->addrFile->GetValue("val:t7_chara_id_offset"));
 
 	Requirement* requirement = (Requirement*)(moveset + offsets.movesetBlock + table->requirement);
-	const int c_characterIdCondition = (int)m_game->addrFile->GetSingleValue("val:t7_character_id_condition");
+	const int c_characterIdCondition = (int)m_game->addrFile->GetValue("val:t7_character_id_condition");
 
 	for (size_t i = 0; i < table->requirementCount; ++i)
 	{
@@ -250,7 +250,7 @@ void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAdd
 {
 	gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
 
-	int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
+	int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetValue("val:t7_playerid_offset"));
 
 	if (playerId == 1) {
 		managerAddr += sizeof(MvlManager);
@@ -266,8 +266,8 @@ void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAdd
 void ImporterT7::CleanupUnusedMovesets()
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
-	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
-	uint64_t motbinOffset = m_game->addrFile->GetSingleValue("val:t7_motbin_offset");
+	uint64_t playerstructSize = m_game->addrFile->GetValue("val:t7_playerstruct_size");
+	uint64_t motbinOffset = m_game->addrFile->GetValue("val:t7_motbin_offset");
 
 	/*
 	uint64_t offsetsToWatch[] = {
@@ -453,7 +453,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 
 	if ((settings & ImportSettings_BasicLoadOnly) == 0) {
 		// Then write our moveset address to the current player
-		m_process->writeInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"), gameMoveset);
+		m_process->writeInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"), gameMoveset);
 	}
 	progress = 100;
 
@@ -484,8 +484,8 @@ bool ImporterT7::CanImport()
 
 	for (int i = 0; i < 2; ++i)
 	{
-		gameAddr player = playerAddress + i * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
-		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetSingleValue("val:t7_currmove"));
+		gameAddr player = playerAddress + i * m_game->addrFile->GetValue("val:t7_playerstruct_size");
+		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetValue("val:t7_currmove"));
 		if (currentMove == 0 || currentMove == -1) {
 			return false;
 		}
@@ -507,7 +507,7 @@ gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		playerAddress += playerId * m_game->addrFile->GetValue("val:t7_playerstruct_size");
 	}
 	return playerAddress;
 }
@@ -516,8 +516,8 @@ gameAddr ImporterT7::GetMovesetAddress(uint8_t playerId)
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	if (playerAddress > 0) {
-		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
-		return m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
+		playerAddress += playerId * m_game->addrFile->GetValue("val:t7_playerstruct_size");
+		return m_process->readInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"));
 	}
 	return 0;
 }

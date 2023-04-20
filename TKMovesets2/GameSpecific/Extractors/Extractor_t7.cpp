@@ -389,7 +389,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 	{
 		gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
 
-		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetSingleValue("val:t7_playerid_offset"));
+		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetValue("val:t7_playerid_offset"));
 
 		if (playerId == 1) {
 			managerAddr += sizeof(MvlManager);
@@ -530,7 +530,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// The address of the moveset we will be extracting
 	gameAddr movesetAddr;
-	movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
+	movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"));
 
 	// Will read the header of the moveset and write it here
 	gAddr::MovesetInfo movesetHeader{ 0 };
@@ -722,8 +722,8 @@ bool ExtractorT7::CanExtract()
 
 	for (int i = 0; i < 2; ++i)
 	{
-		gameAddr player = playerAddress + i * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
-		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetSingleValue("val:t7_currmove"));
+		gameAddr player = playerAddress + i * m_game->addrFile->GetValue("val:t7_playerstruct_size");
+		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetValue("val:t7_currmove"));
 		if (currentMove == 0 || currentMove == -1) {
 			return false;
 		}
@@ -744,7 +744,7 @@ bool ExtractorT7::CanExtract()
 
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
-	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetSingleValue("val:t7_motbin_offset"));
+	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"));
 
 	std::string characterName;
 	if (movesetAddr == 0) {
@@ -788,14 +788,14 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 
 uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)
 {
-	return m_process->readInt16(playerAddress + m_game->addrFile->GetSingleValue("val:t7_chara_id_offset"));
+	return m_process->readInt16(playerAddress + m_game->addrFile->GetValue("val:t7_chara_id_offset"));
 }
 
 gameAddr ExtractorT7::GetCharacterAddress(uint8_t playerId)
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+		playerAddress += playerId * m_game->addrFile->GetValue("val:t7_playerstruct_size");
 	}
 	return playerAddress;
 }
@@ -803,7 +803,7 @@ gameAddr ExtractorT7::GetCharacterAddress(uint8_t playerId)
 std::vector<gameAddr> ExtractorT7::GetCharacterAddresses()
 {
 	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
-	uint64_t playerstructSize = m_game->addrFile->GetSingleValue("val:t7_playerstruct_size");
+	uint64_t playerstructSize = m_game->addrFile->GetValue("val:t7_playerstruct_size");
 	std::vector<gameAddr> addresses;
 
 	for (uint8_t i = 0; i < characterCount; ++i) {

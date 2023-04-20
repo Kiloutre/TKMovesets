@@ -53,6 +53,9 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 {
 	std::map<std::string, std::vector<gameAddr>> absolute_pointer_paths;
 	std::map<std::string, std::vector<gameAddr>> relative_pointer_paths;
+	std::map<std::string, int64_t> values;
+	std::map<std::string, std::string> strings;
+
 	std::vector<std::string> entries;
 	std::string line;
 
@@ -84,12 +87,32 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 			continue;
 		}
 
-		if (value.rfind("+", 0) == 0) {
-			// Entries starting with '+' are relative to the module address
-			relative_pointer_paths[key] = parsePtrPathString(value.substr(1));
+		if (Helpers::startsWith<std::string>(key, "val:")) {
+			values[key] = strtoll(value.c_str(), nullptr, 0);
 		}
-		else {
-			absolute_pointer_paths[key] = parsePtrPathString(value);
+		else if (Helpers::startsWith<std::string>(key, "str:")) {
+			strings[key] = "";
+			unsigned int idx = 0;
+			for (unsigned char c : value)
+			{
+				if (!isprint(c)) {
+					DEBUG_LOG("GameAddresses warning: string '%s' contains non-printable char '%u' (0x%x) at index %u. Removing it.\n", key.c_str(), c, c, idx);
+				}
+				else {
+					strings[key] += (char)c;
+				}
+				++idx;
+			}
+		}
+		else
+		{
+			if (value.rfind("+", 0) == 0) {
+				// Entries starting with '+' are relative to the module address
+				relative_pointer_paths[key] = parsePtrPathString(value.substr(1));
+			}
+			else {
+				absolute_pointer_paths[key] = parsePtrPathString(value);
+			}
 		}
 
 		entries.push_back(key);
@@ -99,45 +122,51 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 	// So can't clear them at the start and build them little by little.
 	m_absolute_pointer_paths = absolute_pointer_paths;
 	m_relative_pointer_paths = relative_pointer_paths;
+	m_values = values;
+	m_strings = strings;
 
-	m_entries_mutex.lock();
 	m_entries = entries;
-	m_entries_mutex.unlock();
 }
 
 void GameAddressesFile::Reload()
 {
 	// Always attempt to prioritxize file data, but in cases where it can't be found, load from embedded data instead
-	if (Helpers::fileExists(GAME_ADDRESSES_FILE)) {
+	if (false && Helpers::fileExists(GAME_ADDRESSES_FILE)) {
 		std::ifstream infile(GAME_ADDRESSES_FILE);
-		LoadFromStream(infile);
 		DEBUG_LOG("Found file '" GAME_ADDRESSES_FILE "'\n");
+		LoadFromStream(infile);
 	}
 	else {
+		DEBUG_LOG("Could not find '" GAME_ADDRESSES_FILE "' : loading from embedded data.\n");
 		std::stringstream indata(game_addresses_ini);
 		LoadFromStream(indata);
-		DEBUG_LOG("Could not find '" GAME_ADDRESSES_FILE "' : Loaded from embedded data.\n");
 	}
+	DEBUG_LOG("Addresses loaded.\n");
 }
 
 const std::vector<std::string>& GameAddressesFile::GetAllEntries()
 {	
-	m_entries_mutex.lock();
 	return m_entries;
 }
 
-void GameAddressesFile::UnlockEntriesMutex()
+int64_t GameAddressesFile::GetValue(const char* c_addressId)
 {
-	m_entries_mutex.unlock();
+    auto entry = m_values.find(c_addressId);
+	if (entry != m_values.end()) {
+		return entry->second;
+	}
+	throw;
+	return (int64_t)-1;
 }
 
-const int64_t GameAddressesFile::GetSingleValue(const char* c_addressId)
+const char* GameAddressesFile::GetString(const char* c_addressId)
 {
-    auto entry = m_absolute_pointer_paths.find(c_addressId);
-	if (entry != m_absolute_pointer_paths.end()) {
-		return (int64_t)entry->second[0];
+	auto entry = m_strings.find(c_addressId);
+	if (entry != m_strings.end()) {
+		return entry->second.c_str();
 	}
-	return (int64_t)-1;
+	throw;
+	return nullptr;
 }
 
 const std::vector<gameAddr>& GameAddressesFile::GetAddress(const char* c_addressId, bool& isRelative)
@@ -156,5 +185,6 @@ const std::vector<gameAddr>& GameAddressesFile::GetAddress(const char* c_address
             return entry->second;
         }
     }
-	return m_emptyPtrPath;
+	throw;
+	return std::vector<gameAddr>();
 }
