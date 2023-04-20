@@ -69,10 +69,10 @@ bool MovesetLoader::Init()
         InitHooks();
 
         bool requiredHookErr = false;
-        for (auto& name : m_requiredHooks)
+        for (auto& name : m_requiredFunctions)
         {
-            if (!m_hooks.contains(name)) {
-                DEBUG_LOG("Error: failed to find required function '%s'()\n", name.c_str());
+            if (!m_hooks.contains(name) && (!m_functions.contains(name) || m_functions[name] == 0)) {
+                DEBUG_LOG("Error: failed to find required function '%s()'\n", name.c_str());
                 requiredHookErr = true;
             }
         }
@@ -117,6 +117,51 @@ void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64
 
     // Initialize the original function's hook
     hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline, m_disassembler);
+}
+
+void MovesetLoader::SetMainModule(const char* name)
+{
+    m_moduleName = name;
+    m_modules = InjectionUtils::GetModuleList(name, m_moduleAddr, m_moduleSize);
+}
+
+void MovesetLoader::RegisterFunction(const char* functionName, const char* moduleName, const char* c_addressId)
+{
+    auto mod = m_modules.find(moduleName);
+    uint64_t moduleAddr;
+    uint64_t moduleSize;
+
+    if (mod == m_modules.end()) {
+        DEBUG_LOG("RegisterFunction(%s, %s, %s) : Could not find module\n", functionName, moduleName, c_addressId);
+        return;
+    }
+    else {
+        moduleAddr = mod->second.address;
+        moduleSize = mod->second.size;
+    }
+
+    const char* functionBytes = addresses.GetString(c_addressId);
+    m_functions[functionName] = (uint64_t)Sig::find((void*)moduleAddr, moduleSize, functionBytes);
+}
+
+void MovesetLoader::RegisterHook(const char* functionName, const char* moduleName, const char* c_addressId, uint64_t hookAddr)
+{
+    auto mod = m_modules.find(moduleName);
+    uint64_t moduleAddr;
+    uint64_t moduleSize;
+
+    if (mod == m_modules.end()) {
+        DEBUG_LOG("RegisterHook(%s, %s, %s, ?) : Could not find module\n", functionName, moduleName, c_addressId);
+        return;
+    }
+    else {
+        moduleAddr = mod->second.address;
+        moduleSize = mod->second.size;
+    }
+
+    const char* functionBytes = addresses.GetString(c_addressId);
+    auto functionAddr = Sig::find((void*)moduleAddr, moduleSize, functionBytes);
+    InitHook(functionName, (uint64_t)functionAddr, hookAddr);
 }
 
 // -- DLL Exported functions -- //

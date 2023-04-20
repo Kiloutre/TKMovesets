@@ -9,6 +9,9 @@ namespace T7Functions
 {
 	// Called after every loading screen on each player address to write the moveset to their offsets
 	typedef uint64_t(*ApplyNewMoveset)(void* player, void* newMoveset);
+
+	// Returns the address of a player from his playerid (this is character-related stuff)
+	typedef uint64_t(*GetPlayerFromID)(unsigned int playerId);
 }
 
 namespace T7Hooks
@@ -34,18 +37,13 @@ void MovesetLoaderT7::InitHooks()
 	DEBUG_LOG("g_loader is set to %llx\n", g_loader);
 
 	// Declare which hooks must absolutely be found
-	m_requiredHooks = {
+	m_requiredFunctions = {
 		"TK__ApplyNewMoveset",
+		"TK__GetPlayerFromID"
 	};
 
-	/// TK__ApplyNewMoveset
-	{
-		// Get the original address
-		auto TK__ApplyNewMoveset_bytes = addresses.GetString("str:t7_f_apply_new_moveset");
-		auto TK__ApplyNewMoveset = Sig::find(m_moduleAddrPtr, m_moduleSize, TK__ApplyNewMoveset_bytes);
-		// Initialize the hook
-		InitHook("TK__ApplyNewMoveset", (uint64_t)TK__ApplyNewMoveset, (uint64_t)&T7Hooks::ApplyNewMoveset);
-	}
+	RegisterHook("TK__ApplyNewMoveset", m_moduleName.c_str(), "str:t7_f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
+	RegisterFunction("TK__GetPlayerFromID", m_moduleName.c_str(), "str:t7_f_GetPlayerFromID");
 }
 
 void MovesetLoaderT7::PostInit()

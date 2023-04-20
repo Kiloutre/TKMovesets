@@ -1,10 +1,18 @@
 #pragma once
 
 #include <string>
-#include <windows.h>
+#include <map>
+
+struct moduleEntry
+{
+	uint64_t address;
+	std::string name;
+	std::wstring path;
+	uint64_t size;
+};
 
 namespace InjectionUtils
 {
-	// Returns the module address of the given module name inside of the current process the DLL is injected in
-	void GetSelfModuleInfos(std::string moduleName, uint64_t& moduleAddr_out, uint64_t& moduleSize_out);
+	// Returns the list of modules and stores the main module address & size inside of the provided variables.
+	std::map<std::string, moduleEntry> GetModuleList(std::string mainModuleName, uint64_t& moduleAddr_out, uint64_t& moduleSize_out);
 }
