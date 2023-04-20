@@ -27,6 +27,8 @@ protected:
 public:
 	// Contains a copy of the basic moveset informations we have loaded
 	std::vector<movesetInfo>* displayedMovesets;
+	// True if we are currently injecting a DLL
+	bool isInjecting = false;
 
 	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	~Online();

@@ -10,6 +10,7 @@
 // Store info globally that way repeated calls to MovesetLoaderStart() won't start multiple loaders
 HINSTANCE hModule = nullptr;
 MovesetLoader* g_loader = nullptr;
+bool g_loading = false;
 
 // -- Debug console -- //
 // Only if compiled in debug mode
@@ -176,6 +177,18 @@ uint64_t MovesetLoader::GetFunctionAddr(const std::string& functionName)
     return 0;
 }
 
+// -- Static helper -- //
+
+static void Run()
+{
+    DEBUG_LOG("Starting mainloop.\n");
+    g_loader->Mainloop();
+    DEBUG_LOG("Mainloop stopped. Unloading the DLL.\n");
+    // If mainloop is stopped then we have no reason to let the DLL stay loaded
+    delete g_loader;
+    FreeLibraryAndExitThread(hModule, 0);
+}
+
 
 // -- DLL Exported functions -- //
 
@@ -188,7 +201,12 @@ extern "C"
             DEBUG_LOG("Loader already started: not starting again\n");
             return;
         }
+        if (g_loading) {
+            DEBUG_LOG("Loader already starting...\n");
+            return;
+        }
 
+        g_loading = true;
         // Display console if debug mode
 #ifdef BUILD_TYPE_DEBUG
         {
@@ -207,19 +225,15 @@ extern "C"
             else {
                 return;
             }
+            g_loading = false;
             g_loader->SetMainModule(processName.c_str());
         }
 
         // Start loop only if Init() succeeds
         // Mainloop will run until process is closed or if MovesetLoaderStop() is called externally
         if (g_loader->Init()) {
-            DEBUG_LOG("Starting mainloop.\n");
-            g_loader->Mainloop();
-            DEBUG_LOG("Mainloop stopped. Unloading the DLL.\n");
-            // If mainloop is stopped then we have no reason to let the DLL stay loaded
-            delete g_loader;
-            g_loader = nullptr;
-            FreeLibraryAndExitThread(hModule, 0);
+            // todo, Run() in another thread so that we can wait for MovesetLoaderStart() to end in the main process
+            Run();
         }
         else {
             DEBUG_LOG("Error during MovesetLoader::Init()\n");

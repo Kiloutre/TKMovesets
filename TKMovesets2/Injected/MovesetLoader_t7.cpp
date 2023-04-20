@@ -49,6 +49,7 @@ static unsigned int GetPlayerIdFromAddress(void* playerAddr)
 	auto playerList = (uint64_t*)g_loader->variables["gTK_playerList"];
 	for (int i = 0; i < 6; ++i)
 	{
+		printf("Player addr: %llx - %llx\n", playerAddr, playerList[i]);
 		if (playerList[i] == (uint64_t)playerAddr)
 		{
 			return i;
@@ -95,7 +96,7 @@ namespace T7Hooks
 					}
 					
 					// Fix moves relying on character IDs
-					int currentPlayerId = *(int*)((char*)player + 0xDC);
+					int currentPlayerId = *(int*)((char*)player + 0xD8);
 					int previousCharacterId = playerData.previous_character_id;
 					if (previousCharacterId == SHARED_MEM_MOVESET_NO_CHAR) {
 						previousCharacterId = playerData.moveset_character_id;

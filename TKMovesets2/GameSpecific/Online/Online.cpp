@@ -77,6 +77,11 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
 
 bool Online::InjectDll()
 {
+    if (isInjecting) {
+        return false;
+    }
+    DEBUG_LOG("Online::InjectDll()\n");
+    isInjecting = true;
     std::wstring currDirectory;
     {
         // Get directory of our .exe because this is where the MovesetLoader is located
@@ -95,10 +100,13 @@ bool Online::InjectDll()
         return false;
     }
 
-    m_injectedDll = true;
+    // Call this here to not set isInjecting before the DL has finished loading
+    bool result = CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
 
-    // Load said DLL into our own process so that we can call GetProcAddress 
-    return CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
+    m_injectedDll = true;
+    isInjecting = false;
+
+    return result;
 }
 
 void Online::OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId)

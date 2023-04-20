@@ -119,6 +119,7 @@ online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
 online.dll_not_loaded = DLL is not loaded, inject it
 online.inject_dll = Inject
+online.injecting_dll = Injecting...
 online.select_moveset = Select
 online.selected_moveset = Selected:
 

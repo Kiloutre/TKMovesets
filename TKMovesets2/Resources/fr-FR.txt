@@ -118,6 +118,7 @@ online.select_moveset = Sélectionner un personnage
 online.no_selected_moveset = Pas de personnage selectionné
 online.dll_not_loaded = DLL non-chargée, injectez la
 online.inject_dll = Injecter
+online.injecting_dll = Injection...
 online.select_moveset = Sélectionner
 online.selected_moveset = Sélectionné:
 
