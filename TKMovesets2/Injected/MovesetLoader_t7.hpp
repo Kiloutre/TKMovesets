@@ -2,6 +2,8 @@
 
 #include "MovesetLoader.hpp"
 
+#include "Structs_t7.h"
+
 class MovesetLoaderT7 : public MovesetLoader
 {
 private:

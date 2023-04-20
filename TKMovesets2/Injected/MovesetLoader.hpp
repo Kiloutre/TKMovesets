@@ -13,6 +13,7 @@
 
 #include "constants.h"
 #include "SharedMemory.h"
+#include "GameTypes.h"
 
 
 typedef unsigned char Byte;
@@ -47,8 +48,6 @@ protected:
 	std::map<std::string, uint64_t> m_functions;
 	// List of modules with their name, size and addresses in the current process
 	std::map<std::string, moduleEntry> m_modules;
-	// List of important variable addresses that we can cache early on in there
-	std::map<std::string, uint64_t> m_variables;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
@@ -57,6 +56,8 @@ public:
 	GameAddressesFile addresses;
 	// Ptr to the shared memory
 	SharedMemory* sharedMemPtr = nullptr;
+	// List of important variable addresses that we can cache early on in there
+	std::map<std::string, uint64_t> variables;
 
 	// Initializes the shared memory
 	bool Init();
@@ -73,7 +74,7 @@ public:
 	// Returns the casted address of a previously registered fnction
 	template<class T> T CastFunction(const std::string& functionName);
 	// Returns the value of a variable, reading sizeof(T)
-	template<typename T> T CastVariable(const std::string& variableName);
+	template<typename T> T ReadVariable(const std::string& variableName);
 	// Returns the address of the function
 	uint64_t GetFunctionAddr(const std::string& functionName);
 
@@ -81,7 +82,7 @@ public:
 	virtual void InitHooks() = 0;
 	// Called upon a successful Init()
 	virtual void PostInit() = 0;
-	// If set to true, force the Mainloop() to stop
+	// If set to true, forces the Mainloop() to stop
 	bool mustStop = false;
 	// Main loop of the loader
 	void Mainloop();
@@ -109,11 +110,10 @@ template<class T> T MovesetLoader::CastFunction(const std::string& functionName)
 	return nullptr;
 }
 
-
-template<class T> T MovesetLoader::CastVariable(const std::string& functionName)
+template<class T> T MovesetLoader::ReadVariable(const std::string& functionName)
 {
-	if (m_variables.contains(functionName)) {
-		return *(T*)m_variables[functionName];
+	if (variables.contains(functionName)) {
+		return *(T*)variables[functionName];
 	}
 	DEBUG_LOG("CastVariable(): Function '%s' not found\n", functionName.c_str());
 	return (T)0;

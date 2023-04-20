@@ -169,8 +169,8 @@ void Submenu_OnlinePlay::Render()
 			if (sharedMemoryLoaded)
 			{
 				// Purposefuly copy the whole list in case it gets deallocated while we iterate on it
-				auto selectedMovestList_copy = *gameHelper->sharedMemHandler->movesetInfos;
-				for (auto& moveset : selectedMovestList_copy)
+				auto selectedMovesetList_copy = *gameHelper->sharedMemHandler->displayedMovesets;
+				for (auto& moveset : selectedMovesetList_copy)
 				{
 					ImGui::Text("%s %s", _("online.selected_moveset"), moveset.name.c_str());
 				}

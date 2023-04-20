@@ -26,7 +26,7 @@ protected:
 	virtual const TCHAR* GetSharedMemoryName() = 0;
 public:
 	// Contains a copy of the basic moveset informations we have loaded
-	std::vector<movesetInfo>* movesetInfos;
+	std::vector<movesetInfo>* displayedMovesets;
 
 	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	~Online();
@@ -38,5 +38,5 @@ public:
 	// Injects the DLL into the current process
 	bool InjectDll();
 	// Called when a moveset is successfully loaded in the game's memory by the importer
-	void OnMovesetImport(movesetInfo* moveset, gameAddr movesetAddr, unsigned int playerId);
+	void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId);
 };

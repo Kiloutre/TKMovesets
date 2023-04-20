@@ -72,7 +72,7 @@ bool MovesetLoader::Init()
         for (auto& name : m_requiredSymbols)
         {
             if (!m_hooks.contains(name) && (!m_functions.contains(name) || m_functions[name] == 0)
-                && (!m_variables.contains(name) || m_variables[name] == 0)) {
+                && (!variables.contains(name) || variables[name] == 0)) {
                 DEBUG_LOG("Error: failed to find required function '%s()'\n", name.c_str());
                 requiredHookErr = true;
             }

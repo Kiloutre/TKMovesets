@@ -5,7 +5,7 @@
 
 Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : BaseGameSpecificClass(process, game, gameId, minorVersion)
 {
-    movesetInfos = new std::vector<movesetInfo>();
+    displayedMovesets = new std::vector<movesetInfo>();
 }
 
 Online::~Online()
@@ -28,7 +28,7 @@ Online::~Online()
         CloseHandle(m_memoryHandle);
     }
 
-    delete movesetInfos;
+    delete displayedMovesets;
 }
 
 bool Online::LoadSharedMemory()
@@ -101,13 +101,13 @@ bool Online::InjectDll()
     return CallMovesetLoaderFunction(MOVESET_LOADER_START_FUNC);
 }
 
-void Online::OnMovesetImport(movesetInfo* moveset, gameAddr movesetAddr, unsigned int playerId)
+void Online::OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId)
 {
-    if (movesetInfos->size() > playerId) {
-        (*movesetInfos)[playerId] = *moveset;
+    if (displayedMovesets->size() > playerId) {
+        (*displayedMovesets)[playerId] = *displayedMoveset;
     }
     else {
-        movesetInfos->push_back(*moveset);
+        displayedMovesets->push_back(*displayedMoveset);
     }
     m_sharedMemPtr->player[playerId].custom_moveset_addr = movesetAddr;
 }
