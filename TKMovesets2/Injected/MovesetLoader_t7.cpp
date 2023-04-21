@@ -97,37 +97,44 @@ namespace T7Hooks
 			}
 		}
 
-					
-		/*
-		// Fix moves relying on character IDs
-		int currentCharId = *(int*)((char*)player + 0xD8);
-		int previousCharacterId = playerData.previous_character_id;
-		if (previousCharacterId == SHARED_MEM_MOVESET_NO_CHAR) {
-			previousCharacterId = playerData.moveset_character_id;
-		}
-
-		int c_characterIdCondition = (int)g_loader->addresses.GetValue("character_id_condition");
-
-		for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
 		{
-			if (requirement.condition == c_characterIdCondition) {
-				requirement.param_unsigned = (requirement.param_unsigned == previousCharacterId) ? currentCharId : currentPlayerId + 1;
-			}
-		}
+			// Fix moves relying on character IDs
 
-		*/
+			// Find out which character ID we will be replacing and with which
+			int new_char_id = *(int*)((char*)player + 0xD8);
+			int char_id_to_replace = playerData.previous_character_id;
+
+			DEBUG_LOG("Char ID that we will be replacing: %d. Replacement: %d\n", char_id_to_replace, new_char_id);
+
+			// Get the 'Is character ID' condition
+			// todo: there are more than one condition that use character IDs. Might be relevant to also work on those?
+			int c_characterIdCondition = (int)g_loader->addresses.GetValue("character_id_condition");
+
+			// Loop through every requirement, replace character IDs in relevant requirements' values
+			for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
+			{
+				if (requirement.condition == c_characterIdCondition) {
+					requirement.param_unsigned = (requirement.param_unsigned == char_id_to_replace) ? new_char_id : (new_char_id + 1);
+				}
+			}
+
+			// Mark which character ID we will have to replace on the next ApplyNewMoveset() call
+			playerData.previous_character_id = new_char_id;
+		}
 
 		
-		// Apply new moveset to our character*
-		DEBUG_LOG("Applying new moveset to character...\n");
-		auto addr = (char*)player + g_loader->addresses.GetValue("motbin_offset");
-		auto motbinOffsetList = (MovesetInfo**)(addr);
+		{
+			// Apply custom moveset to our character*
+			DEBUG_LOG("Applying custom moveset to character...\n");
+			auto addr = (char*)player + g_loader->addresses.GetValue("motbin_offset");
+			auto motbinOffsetList = (MovesetInfo**)(addr);
 
-		motbinOffsetList[0] = customMoveset;
-		motbinOffsetList[1] = customMoveset;
-		motbinOffsetList[2] = customMoveset;
-		motbinOffsetList[3] = customMoveset;
-		motbinOffsetList[4] = customMoveset;
+			motbinOffsetList[0] = customMoveset;
+			motbinOffsetList[1] = customMoveset;
+			motbinOffsetList[2] = customMoveset;
+			motbinOffsetList[3] = customMoveset;
+			motbinOffsetList[4] = customMoveset;
+		}
 
 		return retVal;
 	}
@@ -147,7 +154,10 @@ static void InitializeMoveset(SharedMemT7_Player& player)
 		}
 	}
 
-	//player.previous_character_id = player.moveset_character_id;
+	// .previous_character_id is used to determine which character id we will have to replace in requirements
+	// Ensure it is at the right value for the first ApplyNewMoveset()
+	player.previous_character_id = player.moveset_character_id;
+
 	player.is_initialized = true;
 }
 
@@ -199,17 +209,19 @@ void MovesetLoaderT7::PostInit()
 
 void MovesetLoaderT7::Mainloop()
 {
+	auto& players = sharedMemPtr->players;
 	while (!mustStop)
 	{
-		auto& players = sharedMemPtr->players;
-		for (int i = 0; i < 2; ++i)
+		for (unsigned int i = 0; i < 2; ++i)
 		{
-			if (!players[i].is_initialized && players[i].custom_moveset_addr != 0) {
+			auto& player = players[i];
+			// Detect movesets that have been loaded and initialize them as they aren't ready for import yet
+			if (!player.is_initialized && player.custom_moveset_addr != 0) {
 				DEBUG_LOG("New moveset loaded, initializing moveset of player [%d] in the array\n", i);
-				InitializeMoveset(players[i]);
+				InitializeMoveset(player);
 			}
 		}
-		//
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
 }
