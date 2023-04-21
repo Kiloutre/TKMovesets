@@ -11,6 +11,18 @@
 // Turns an index into an absolute address, or NULL (0) if index is -1
 # define FROM_INDEX(field, listStartAddr, type) (field = (field == -1 ? 0 : listStartAddr + (field * sizeof(type))))
 
+#ifndef LAST_LOADED_DEFINED
+# define LAST_LOADED_DEFINED
+struct s_lastLoaded {
+	// Last loaded moveset's CRC32 ID, used right after import by online importer
+	uint8_t charId = 0;
+	// Last loaded moveset's character ID, used right after import by online importer
+	uint32_t crc32 = 0;
+	// Stores the in-game address of the moveset successfully loaded by the last Import() call
+	gameAddr address = 0;
+};
+#endif
+
 typedef uint64_t ImportSettings; // 64 flags
 enum ImportSettings_
 {
@@ -45,10 +57,8 @@ public:
 	// Stores the number of character we are expected be able to import to
 	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
 	uint8_t characterCount = 1;
-	// Stores the in-game address of the moveset successfully loaded by the last Import() call
-	gameAddr lastLoadedMoveset = 0;
-	// Last loaded moveset's character ID, used by online importer
-	uint8_t lastLoadedMoveset_charId = 0;
+	// Store informations about the last loaded moveset such as its address, crc32, character ID. Used by online shared memory.
+	s_lastLoaded lastLoaded;
 
 	// Inherit copy constructor
 	using BaseGameSpecificClass::BaseGameSpecificClass;

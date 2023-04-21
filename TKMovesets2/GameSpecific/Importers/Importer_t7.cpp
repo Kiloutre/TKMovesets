@@ -471,8 +471,9 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 		}
 	}
 
-	lastLoadedMoveset_charId = header->characterId;
-	lastLoadedMoveset = gameMoveset;
+	lastLoaded.crc32 = header->crc32;
+	lastLoaded.charId = header->characterId;
+	lastLoaded.address = gameMoveset;
 
 	return ImportationErrcode_Successful;
 }

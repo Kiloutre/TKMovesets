@@ -18,5 +18,5 @@ public:
 	using Online::Online; // Inherit constructor too
 
 	void Init() override;
-	void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId);
+	void OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playerId, const s_lastLoaded& lastLoadedMoveset) override;
 };

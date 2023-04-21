@@ -24,15 +24,6 @@ namespace T7Functions
 // -- Helpers --
 // Try to cache variable addresses when possible instead of calling the helpers too much
 
-/*
-static void GetPlayerIDs(unsigned int& playerId, unsigned int& remotePlayerId)
-{
-	auto structAddr = g_loader->CastFunction<T7Functions::GetTK3447820>("TK__GetTK3447820")();
-	playerId = *(unsigned int*)(structAddr + 0x6C);
-	remotePlayerId = playerId ^ 1;
-}
-*/
-
 static uint64_t* GetPlayerList()
 {
 	uint64_t baseFuncAddr = g_loader->GetFunctionAddr("TK__GetPlayerFromID");
@@ -54,6 +45,37 @@ static int GetPlayerIdFromAddress(void* playerAddr)
 		}
 	}
 	return -1;
+}
+
+static void ApplyStaticMotas(void* player, MovesetInfo* newMoveset)
+{
+	// This is required for some MOTAs to be properly applied (such as camera, maybe more)
+	const uint64_t staticCameraOffset = g_loader->addresses.GetValue("static_camera_offset");
+	MotaHeader** staticMotas = (MotaHeader**)((char*)player + staticCameraOffset);
+
+	staticMotas[0] = newMoveset->motas.camera_1;
+	staticMotas[1] = newMoveset->motas.camera_2;
+}
+
+// -- Other helpers -- //
+
+static void InitializeMoveset(SharedMemT7_Player& player)
+{
+	MovesetInfo* moveset = (MovesetInfo*)player.custom_moveset_addr;
+
+	// Mark missing motas with bitflag
+	for (unsigned int i = 0; i < _countof(moveset->motas.motas); ++i)
+	{
+		if ((uint64_t)moveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
+			player.SetMotaMissing(i);
+		}
+	}
+
+	// .previous_character_id is used to determine which character id we will have to replace in requirements
+	// Ensure it is at the right value for the first ApplyNewMoveset()
+	player.previous_character_id = player.moveset_character_id;
+
+	player.is_initialized = true;
 }
 
 // -- Hook functions --
@@ -87,6 +109,10 @@ namespace T7Hooks
 			return retVal;
 		}
 		DEBUG_LOG("Custom moveset %llx\n", customMoveset);
+
+		if (!playerData.is_initialized) {
+			InitializeMoveset(playerData);
+		}
 
 		// Copy missing MOTA offsets from newMoveset
 		for (unsigned int i = 0; i < _countof(customMoveset->motas.motas); ++i)
@@ -134,31 +160,12 @@ namespace T7Hooks
 			motbinOffsetList[2] = customMoveset;
 			motbinOffsetList[3] = customMoveset;
 			motbinOffsetList[4] = customMoveset;
+
+			ApplyStaticMotas(player, customMoveset);
 		}
 
 		return retVal;
 	}
-}
-
-// -- Other -- //
-
-static void InitializeMoveset(SharedMemT7_Player& player)
-{
-	MovesetInfo* moveset = (MovesetInfo*)player.custom_moveset_addr;
-
-	// Mark missing motas with bitflag
-	for (unsigned int i = 0; i < _countof(moveset->motas.motas); ++i)
-	{
-		if ((uint64_t)moveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
-			player.SetMotaMissing(i);
-		}
-	}
-
-	// .previous_character_id is used to determine which character id we will have to replace in requirements
-	// Ensure it is at the right value for the first ApplyNewMoveset()
-	player.previous_character_id = player.moveset_character_id;
-
-	player.is_initialized = true;
 }
 
 // -- Hooking init --
@@ -200,6 +207,7 @@ void MovesetLoaderT7::PostInit()
 	// Apply the hooks that need to be applied immediately
 	m_hooks["TK__ApplyNewMoveset"].detour->hook();
 
+	// Mark char IDs with SHARED_MEM_MOVESET_NO_CHAR to indicate they haven't been loaded
 	for (unsigned int i = 0; i < _countof(sharedMemPtr->players); ++i) {
 		sharedMemPtr->players[i].previous_character_id = SHARED_MEM_MOVESET_NO_CHAR;
 	}
@@ -209,9 +217,10 @@ void MovesetLoaderT7::PostInit()
 
 void MovesetLoaderT7::Mainloop()
 {
-	auto& players = sharedMemPtr->players;
+	//auto& players = sharedMemPtr->players;
 	while (!mustStop)
 	{
+		/*
 		for (unsigned int i = 0; i < 2; ++i)
 		{
 			auto& player = players[i];
@@ -221,6 +230,7 @@ void MovesetLoaderT7::Mainloop()
 				InitializeMoveset(player);
 			}
 		}
+		*/
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}

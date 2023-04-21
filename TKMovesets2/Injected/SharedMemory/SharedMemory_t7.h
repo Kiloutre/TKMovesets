@@ -9,10 +9,12 @@
 
 struct SharedMemT7_Player
 {
-	// Nth bit set = Nth bit mota missing
-	uint16_t missingMotas;
+	// CRC32 of the moveset, currently unused
+	uint32_t crc32;
 	// Can be null, in which case no moveset is to be loaded
 	uint64_t custom_moveset_addr;
+	// Nth bit set = Nth bit mota missing
+	uint16_t missingMotas;
 	// True if moveset is ready to apply, false if moveset needs initialization
 	bool is_initialized;
 	// Original character ID of the loaded moveset
@@ -30,8 +32,8 @@ struct SharedMemT7_Player
 
 struct SharedMemT7
 {
-	// Only load custom movesets if locked in
-	bool locked_in;
 	// List of players to send custom movesets to
 	SharedMemT7_Player players[6];
+	// Only load custom movesets if locked in
+	bool locked_in;
 };

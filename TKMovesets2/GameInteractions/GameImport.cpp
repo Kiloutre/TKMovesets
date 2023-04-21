@@ -72,7 +72,7 @@ void GameImport::RunningUpdate()
 				errored = true;
 			}
 			else {
-				lastLoadedMoveset = importer->lastLoadedMoveset;
+				lastLoadedMoveset = importer->lastLoaded.address;
 			}
 
 			m_plannedImportations.erase(m_plannedImportations.begin());
