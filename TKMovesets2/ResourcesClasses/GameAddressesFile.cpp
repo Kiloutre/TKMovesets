@@ -105,15 +105,15 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 			}
 
 			// Also remove the game key from the addresses
-			shortKey = key.substr(end + 1);
+			shortKey = key.substr(end + start + 1);
 		}
 
 		// Insert value into the appropriate map
 		if (Helpers::startsWith<std::string>(key, "val:")) {
-			entries[gameKey].values[shortKey.substr(4)] = strtoll(value.c_str(), nullptr, 0);
+			entries[gameKey].values[shortKey] = strtoll(value.c_str(), nullptr, 0);
 
 		}
-		else if (Helpers::startsWith<std::string>(shortKey, "str:")) {
+		else if (Helpers::startsWith<std::string>(key, "str:")) {
 			std::string filteredString;
 			unsigned int idx = 0;
 			for (unsigned char c : value)
@@ -126,7 +126,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 				}
 				++idx;
 			}
-			entries[gameKey].strings[shortKey.substr(4)] = filteredString;
+			entries[gameKey].strings[shortKey] = filteredString;
 		}
 		else
 		{
@@ -177,7 +177,9 @@ int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_ad
 		return entry->second;
 	}
 
-	throw GameAddressNotFound(gameKey, c_addressId);
+	auto ex = GameAddressNotFound("val:", gameKey, c_addressId);
+	DEBUG_LOG(ex.what().c_str());
+	throw ex;
 	return (int64_t)-1;
 }
 
@@ -189,7 +191,9 @@ const char* GameAddressesFile::GetString(const std::string& gameKey, const char*
 		return entry->second.c_str();
 	}
 
-	throw GameAddressNotFound(gameKey, c_addressId);
+	auto ex = GameAddressNotFound("str:", gameKey, c_addressId);
+	DEBUG_LOG(ex.what().c_str());
+	throw ex;
 	return nullptr;
 }
 
@@ -212,6 +216,8 @@ const std::vector<gameAddr>& GameAddressesFile::GetAddress(const std::string& ga
         }
     }
 
-	throw GameAddressNotFound(gameKey, c_addressId);
+	auto ex = GameAddressNotFound("", gameKey, c_addressId);
+	DEBUG_LOG(ex.what().c_str());
+	throw ex;
 	return std::vector<gameAddr>();
 }

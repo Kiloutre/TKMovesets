@@ -95,6 +95,7 @@ namespace T7Hooks
 						}
 					}
 					
+					/*
 					// Fix moves relying on character IDs
 					int currentPlayerId = *(int*)((char*)player + 0xD8);
 					int previousCharacterId = playerData.previous_character_id;
@@ -112,6 +113,7 @@ namespace T7Hooks
 					}
 
 					playerData.previous_character_id = currentPlayerId;
+					*/
 
 					/*
 					auto motaOffset = g_loader->addresses.GetValue("motbin_offset");
@@ -147,9 +149,9 @@ void MovesetLoaderT7::InitHooks()
 	};
 
 	// Find the functions and register them
-	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "str:f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
-	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "str:f_GetPlayerFromID");
-	RegisterFunction("TK__GetTK3447820", m_moduleName, "str:f_GetTK3447820");
+	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
+	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "f_GetPlayerFromID");
+	RegisterFunction("TK__GetTK3447820", m_moduleName, "f_GetTK3447820");
 }
 
 void MovesetLoaderT7::PostInit()

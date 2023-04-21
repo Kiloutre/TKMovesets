@@ -8,14 +8,15 @@
 #include "GameTypes.h"
 
 class GameAddressNotFound : public std::exception {
+	std::string m_reason;
 	std::string m_gameKey;
 	std::string m_addressKey;
 
 public:
-	GameAddressNotFound(const std::string& gameKey, const std::string& addressKey) : m_gameKey(gameKey), m_addressKey(addressKey) {}
+	GameAddressNotFound(const std::string& reason, const std::string& gameKey, const std::string& addressKey) : m_reason(reason), m_gameKey(gameKey), m_addressKey(addressKey) {}
 
 	std::string what() {
-		return std::format("[{}] Key not found: {}", m_gameKey.c_str(), m_addressKey.c_str());
+		return std::format("Addresses key: '{}{}_{}' not found\n", m_reason.c_str(), m_gameKey.c_str(), m_addressKey.c_str());
 	}
 };
 
