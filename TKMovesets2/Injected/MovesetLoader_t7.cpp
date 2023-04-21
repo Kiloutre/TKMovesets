@@ -62,7 +62,7 @@ namespace T7Hooks
 {
 	uint64_t ApplyNewMoveset(void* player, MovesetInfo* newMoveset)
 	{
-		DEBUG_LOG("ApplyNewMoveset on player %llx, moveset is %llx\n", (uint64_t)player, (uint64_t)newMoveset);
+		DEBUG_LOG("\n- ApplyNewMoveset on player %llx, moveset is %llx -\n", (uint64_t)player, (uint64_t)newMoveset);
 
 		auto retVal = g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
 
@@ -76,7 +76,7 @@ namespace T7Hooks
 		// Determine the player index of the player argument, and correct it with isLocalP1
 		auto playerIndex = GetPlayerIdFromAddress(player) ^ (!isLocalP1);
 		DEBUG_LOG("Corrected player index: %d. Is Local P1: %d\n", playerIndex, isLocalP1);
-		if (playerIndex == -1) {
+		if (playerIndex < 0) {
 			return retVal;
 		}
 
