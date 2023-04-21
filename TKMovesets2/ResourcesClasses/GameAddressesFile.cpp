@@ -197,7 +197,7 @@ const char* GameAddressesFile::GetString(const std::string& gameKey, const char*
 	return nullptr;
 }
 
-const std::vector<gameAddr>& GameAddressesFile::GetAddress(const std::string& gameKey, const char* c_addressId, bool& isRelative)
+const std::vector<gameAddr>& GameAddressesFile::GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative)
 {
     {
 		auto& relative_pointer_paths = m_entries[gameKey].relative_pointer_paths;

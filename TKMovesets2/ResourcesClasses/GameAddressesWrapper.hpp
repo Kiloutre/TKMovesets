@@ -16,5 +16,5 @@ public:
 	// -- Game addresses interfaces -- //
 	int64_t GetValue(const char* c_addressId);
 	const char* GetString(const char* c_addressId);
-	const std::vector<gameAddr>& GetAddress(const char* c_addressId, bool& isRelative);
+	const std::vector<gameAddr>& GetPtrPath(const char* c_addressId, bool& isRelative);
 };

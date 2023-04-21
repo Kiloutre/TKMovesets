@@ -54,5 +54,5 @@ public:
 	// Returns a string from the file
 	const char* GetString(const std::string& gameKey, const char* c_addressId);
 	// Returns a pointer path, that may rely on the base address or not.
-	const std::vector<gameAddr>& GetAddress(const std::string& gameKey, const char* c_addressId, bool& isRelative);
+	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative);
 };

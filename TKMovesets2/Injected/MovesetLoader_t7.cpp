@@ -49,7 +49,6 @@ static unsigned int GetPlayerIdFromAddress(void* playerAddr)
 	auto playerList = (uint64_t*)g_loader->variables["gTK_playerList"];
 	for (int i = 0; i < 6; ++i)
 	{
-		printf("Player addr: %llx - %llx\n", playerAddr, playerList[i]);
 		if (playerList[i] == (uint64_t)playerAddr)
 		{
 			return i;
@@ -89,7 +88,7 @@ namespace T7Hooks
 					// Copy missing MOTA offsets
 					for (unsigned int i = 0; i < _countof(customMoveset->motas.motas); ++i)
 					{
-						if ((uint64_t)customMoveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
+						if ((uint64_t)customMoveset->motas.motas[i] == MOVESET_ADDR_MISSING || true) {
 							// todo
 							customMoveset->motas.motas[i] = newMoveset->motas.motas[i];
 						}

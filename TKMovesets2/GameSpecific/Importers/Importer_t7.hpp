@@ -16,7 +16,7 @@ class DLLCONTENT ImporterT7 : public Importer
 {
 private:
 	// In our locally allocated moveset, correct the mota lists offsets or copy the motas from the currently loaded character if we can't provide them
-	void ConvertMotaListOffsets(const StructsT7::TKMovesetHeaderBlocks& offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress);
+	void ConvertMotaListOffsets(const StructsT7::TKMovesetHeaderBlocks& offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress, bool replaceEmpty);
 	// In our locally allocated movest, correct the lists pointing to the various moveset structure lists
 	void ConvertMovesetTableOffsets(const StructsT7::TKMovesetHeaderBlocks& offsets, Byte* moveset, gameAddr gameMoveset);
 	//  Convert indexes of moves, cancels, hit conditions, etc... into ptrs

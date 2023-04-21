@@ -24,7 +24,7 @@ void GameData::CacheAddresses()
 gameAddr GameData::ReadPtrPath(const char* c_addressId)
 {
 	bool isRelative;
-	const std::vector<gameAddr>& ptrPath = GetAddress(c_addressId, isRelative);
+	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
 
 	if (ptrPath.size() == 0) {
 		return GAME_ADDR_NULL;
