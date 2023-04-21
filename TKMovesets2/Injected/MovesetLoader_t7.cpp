@@ -102,7 +102,7 @@ namespace T7Hooks
 						previousCharacterId = playerData.moveset_character_id;
 					}
 
-					int c_characterIdCondition = (int)g_loader->addresses.GetValue("val:t7_character_id_condition");
+					int c_characterIdCondition = (int)g_loader->addresses.GetValue("character_id_condition");
 
 					for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
 					{
@@ -114,7 +114,7 @@ namespace T7Hooks
 					playerData.previous_character_id = currentPlayerId;
 
 					/*
-					auto motaOffset = g_loader->addresses.GetValue("val:t7_motbin_offset");
+					auto motaOffset = g_loader->addresses.GetValue("motbin_offset");
 					*(MovesetInfo**)((char*)player + motaOffset) = customMoveset;
 					*(MovesetInfo**)((char*)player + motaOffset + 8) = customMoveset;
 					*(MovesetInfo**)((char*)player + motaOffset + 16) = customMoveset;
@@ -147,9 +147,9 @@ void MovesetLoaderT7::InitHooks()
 	};
 
 	// Find the functions and register them
-	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "str:t7_f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
-	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "str:t7_f_GetPlayerFromID");
-	RegisterFunction("TK__GetTK3447820", m_moduleName, "str:t7_f_GetTK3447820");
+	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "str:f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
+	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "str:f_GetPlayerFromID");
+	RegisterFunction("TK__GetTK3447820", m_moduleName, "str:f_GetTK3447820");
 }
 
 void MovesetLoaderT7::PostInit()

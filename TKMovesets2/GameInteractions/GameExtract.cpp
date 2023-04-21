@@ -39,6 +39,9 @@ void GameExtract::InstantiateFactory()
 	if (m_extractor != nullptr) {
 		delete m_extractor;
 	}
+
+	game->gameKey = currentGame->dataString;
+	game->minorGameKey = currentGame->minorDataString;
 	m_extractor = Games::FactoryGetExtractor(currentGame, process, game);
 }
 

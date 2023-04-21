@@ -17,6 +17,8 @@ void GameSharedMem::InstantiateFactory()
 		delete sharedMemHandler;
 	}
 
+	game->gameKey = currentGame->dataString;
+	game->minorGameKey = currentGame->minorDataString;
 	// Every game has its own subtleties so we use polymorphism to manage that
 	importer = Games::FactoryGetImporter(currentGame, process, game);
 	sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);

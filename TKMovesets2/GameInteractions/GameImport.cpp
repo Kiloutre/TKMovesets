@@ -34,6 +34,8 @@ void GameImport::InstantiateFactory()
 		delete importer;
 	}
 
+	game->gameKey = currentGame->dataString;
+	game->minorGameKey = currentGame->minorDataString;
 	// Every game has its own importation subtleties so we use polymorphism to manage that
 	importer = Games::FactoryGetImporter(currentGame, process, game);
 }

@@ -51,7 +51,9 @@ MovesetLoader::~MovesetLoader()
         hook.detour->unHook();
         delete hook.detour;
     }
+
     m_hooks.clear();
+    delete addresses.addrFile;
 }
 
 void MovesetLoader::Mainloop()
@@ -65,6 +67,9 @@ void MovesetLoader::Mainloop()
 
 bool MovesetLoader::Init()
 {
+    SetAddressesGameKey();
+    addresses.addrFile = new GameAddressesFile;
+
     // Initialize the list of hooks and error out if a required one is not found
     {
         InitHooks();

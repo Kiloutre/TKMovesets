@@ -51,10 +51,7 @@ GameAddressesFile::GameAddressesFile()
 
 void GameAddressesFile::LoadFromStream(std::istream& stream)
 {
-	std::map<std::string, std::vector<gameAddr>> absolute_pointer_paths;
-	std::map<std::string, std::vector<gameAddr>> relative_pointer_paths;
-	std::map<std::string, int64_t> values;
-	std::map<std::string, std::string> strings;
+	std::map <std::string, GameAddresses_GameEntries> entries;
 
 	std::vector<std::string> keys;
 	std::string line;
@@ -77,7 +74,9 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 			line = line.substr(0, commentStart);
 		}
 
+		std::string gameKey;
 		std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
+		std::string shortKey;
 		std::string value;
 		{
 			size_t value_start = line.find_first_not_of(" =", separator);
@@ -87,11 +86,35 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 			continue;
 		}
 
-		if (Helpers::startsWith<std::string>(key, "val:")) {
-			values[key] = strtoll(value.c_str(), nullptr, 0);
+		// Compute game key from the addreses key
+		{
+			size_t start = key.find_first_of(':');
+			size_t end;
+
+			if (start == std::string::npos) {
+				start = 0;
+			}
+			else {
+				++start;
+			}
+
+			end = key.find_first_of('_', start) - start;
+			gameKey = key.substr(start, end);
+			if (!entries.contains(gameKey)) {
+				entries[gameKey] = {};
+			}
+
+			// Also remove the game key from the addresses
+			shortKey = key.substr(end + 1);
 		}
-		else if (Helpers::startsWith<std::string>(key, "str:")) {
-			strings[key] = "";
+
+		// Insert value into the appropriate map
+		if (Helpers::startsWith<std::string>(key, "val:")) {
+			entries[gameKey].values[shortKey.substr(4)] = strtoll(value.c_str(), nullptr, 0);
+
+		}
+		else if (Helpers::startsWith<std::string>(shortKey, "str:")) {
+			std::string filteredString;
 			unsigned int idx = 0;
 			for (unsigned char c : value)
 			{
@@ -99,32 +122,29 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 					DEBUG_LOG("GameAddresses warning: string '%s' contains non-printable char '%u' (0x%x) at index %u. Removing it.\n", key.c_str(), c, c, idx);
 				}
 				else {
-					strings[key] += (char)c;
+					filteredString += (char)c;
 				}
 				++idx;
 			}
+			entries[gameKey].strings[shortKey.substr(4)] = filteredString;
 		}
 		else
 		{
 			if (value.rfind("+", 0) == 0) {
 				// Values starting with '+' are relative to the module address
-				relative_pointer_paths[key] = parsePtrPathString(value.substr(1));
+				entries[gameKey].relative_pointer_paths[shortKey] = parsePtrPathString(value.substr(1));
 			}
 			else {
-				absolute_pointer_paths[key] = parsePtrPathString(value);
+				entries[gameKey].absolute_pointer_paths[shortKey] = parsePtrPathString(value);
 			}
 		}
 
 		keys.push_back(key);
 	}
 
-	// Replace these only when we have a proper replacement built, because functions running on other threads require these to be completley built at all times
+	// Replace these only when we have a proper replacement built, because functions running on other threads require these to be completely built at all times
 	// So can't clear them at the start and build them little by little.
-	m_absolute_pointer_paths = absolute_pointer_paths;
-	m_relative_pointer_paths = relative_pointer_paths;
-	m_values = values;
-	m_strings = strings;
-
+	m_entries = entries;
 	m_keys = keys;
 }
 
@@ -149,42 +169,49 @@ const std::vector<std::string>& GameAddressesFile::GetAllKeys()
 	return m_keys;
 }
 
-int64_t GameAddressesFile::GetValue(const char* c_addressId)
+int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_addressId)
 {
-    auto entry = m_values.find(c_addressId);
-	if (entry != m_values.end()) {
+	auto& values = m_entries[gameKey].values;
+    auto entry = values.find(c_addressId);
+	if (entry != values.end()) {
 		return entry->second;
 	}
-	throw;
+
+	throw GameAddressNotFound(gameKey, c_addressId);
 	return (int64_t)-1;
 }
 
-const char* GameAddressesFile::GetString(const char* c_addressId)
+const char* GameAddressesFile::GetString(const std::string& gameKey, const char* c_addressId)
 {
-	auto entry = m_strings.find(c_addressId);
-	if (entry != m_strings.end()) {
+	auto& strings = m_entries[gameKey].strings;
+	auto entry = strings.find(c_addressId);
+	if (entry != strings.end()) {
 		return entry->second.c_str();
 	}
-	throw;
+
+	throw GameAddressNotFound(gameKey, c_addressId);
 	return nullptr;
 }
 
-const std::vector<gameAddr>& GameAddressesFile::GetAddress(const char* c_addressId, bool& isRelative)
+const std::vector<gameAddr>& GameAddressesFile::GetAddress(const std::string& gameKey, const char* c_addressId, bool& isRelative)
 {
     {
-        auto entry = m_relative_pointer_paths.find(c_addressId);
-        if (entry != m_relative_pointer_paths.end()) {
+		auto& relative_pointer_paths = m_entries[gameKey].relative_pointer_paths;
+        auto entry = relative_pointer_paths.find(c_addressId);
+        if (entry != relative_pointer_paths.end()) {
             isRelative = true;
             return entry->second;
         }
     }
     {
-        auto entry = m_absolute_pointer_paths.find(c_addressId);
+		auto& absolute_pointer_paths = m_entries[gameKey].absolute_pointer_paths;
+        auto entry = absolute_pointer_paths.find(c_addressId);
         isRelative = false;
-        if (entry != m_absolute_pointer_paths.end()) {
+        if (entry != absolute_pointer_paths.end()) {
             return entry->second;
         }
     }
-	throw;
+
+	throw GameAddressNotFound(gameKey, c_addressId);
 	return std::vector<gameAddr>();
 }

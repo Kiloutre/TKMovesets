@@ -9,7 +9,7 @@
 #include <Sig/Sig.hpp>
 
 #include "InjectionUtils.hpp"
-#include "GameAddressesFile.hpp"
+#include "GameAddressesWrapper.hpp"
 
 #include "constants.h"
 #include "SharedMemory.h"
@@ -51,9 +51,11 @@ protected:
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
+	// Sets the addresses game key 
+	virtual void SetAddressesGameKey() = 0;
 public:
 	// Store addresses, pointers path and such from the game_addresses.ini file (or from embedded data if not found, which currently is the case)
-	GameAddressesFile addresses;
+	GameAddressesWrapper addresses;
 	// Ptr to the shared memory
 	SharedMemory* sharedMemPtr = nullptr;
 	// List of important variable addresses that we can cache early on in there

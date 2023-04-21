@@ -117,6 +117,7 @@ set(BINARY_SOURCES
                     "ResourcesClasses/Localization.cpp"
                     "ResourcesClasses/EditorLabel.cpp"
                     "ResourcesClasses/GameAddressesFile.cpp"
+                    "ResourcesClasses/GameAddressesWrapper.cpp"
 )
 
 # Everything game-specific is in here
@@ -153,6 +154,7 @@ set(MOVESETLOADER_SOURCES
     "Injected/InjectionUtils.cpp"
 
     "ResourcesClasses/GameAddressesFile.cpp"
+    "ResourcesClasses/GameAddressesWrapper.cpp"
     "Utils/helpers.cpp"
 )
 

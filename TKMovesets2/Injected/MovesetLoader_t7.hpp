@@ -11,6 +11,12 @@ private:
 		return TEXT("Local\\TKMovesets2T7Mem");
 	}
 
+	void SetAddressesGameKey() override
+	{
+		addresses.gameKey = "t7";
+		addresses.minorGameKey = "t7";
+	}
+
 public:
 	void InitHooks() override;
 	void PostInit() override;

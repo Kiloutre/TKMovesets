@@ -387,9 +387,9 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 
 	if (settings & ExtractSettings_DisplayableMovelist)
 	{
-		gameAddr managerAddr = m_game->ReadPtr("t7_movelist_manager_addr");
+		gameAddr managerAddr = m_game->ReadPtr("movelist_manager_addr");
 
-		int playerId = m_process->readInt32(playerAddress + m_game->addrFile->GetValue("val:t7_playerid_offset"));
+		int playerId = m_process->readInt32(playerAddress + m_game->GetValue("playerid_offset"));
 
 		if (playerId == 1) {
 			managerAddr += sizeof(MvlManager);
@@ -530,7 +530,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// The address of the moveset we will be extracting
 	gameAddr movesetAddr;
-	movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"));
+	movesetAddr = m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
 
 	// Will read the header of the moveset and write it here
 	gAddr::MovesetInfo movesetHeader{ 0 };
@@ -712,7 +712,7 @@ bool ExtractorT7::CanExtract()
 {
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
-	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
@@ -722,8 +722,8 @@ bool ExtractorT7::CanExtract()
 
 	for (int i = 0; i < 2; ++i)
 	{
-		gameAddr player = playerAddress + i * m_game->addrFile->GetValue("val:t7_playerstruct_size");
-		gameAddr currentMove = m_process->readInt64(player + m_game->addrFile->GetValue("val:t7_currmove"));
+		gameAddr player = playerAddress + i * m_game->GetValue("playerstruct_size");
+		gameAddr currentMove = m_process->readInt64(player + m_game->GetValue("currmove"));
 		if (currentMove == 0 || currentMove == -1) {
 			return false;
 		}
@@ -744,7 +744,7 @@ bool ExtractorT7::CanExtract()
 
 std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
-	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->addrFile->GetValue("val:t7_motbin_offset"));
+	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
 
 	std::string characterName;
 	if (movesetAddr == 0) {
@@ -788,22 +788,22 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 
 uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)
 {
-	return m_process->readInt16(playerAddress + m_game->addrFile->GetValue("val:t7_chara_id_offset"));
+	return m_process->readInt16(playerAddress + m_game->GetValue("chara_id_offset"));
 }
 
 gameAddr ExtractorT7::GetCharacterAddress(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->addrFile->GetValue("val:t7_playerstruct_size");
+		playerAddress += playerId * m_game->GetValue("playerstruct_size");
 	}
 	return playerAddress;
 }
 
 std::vector<gameAddr> ExtractorT7::GetCharacterAddresses()
 {
-	gameAddr playerAddress = m_game->ReadPtr("t7_p1_addr");
-	uint64_t playerstructSize = m_game->addrFile->GetValue("val:t7_playerstruct_size");
+	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	uint64_t playerstructSize = m_game->GetValue("playerstruct_size");
 	std::vector<gameAddr> addresses;
 
 	for (uint8_t i = 0; i < characterCount; ++i) {

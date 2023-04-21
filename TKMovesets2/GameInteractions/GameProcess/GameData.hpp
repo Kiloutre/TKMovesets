@@ -4,14 +4,15 @@
 #include <string>
 
 #include "GameProcess.hpp"
-#include "GameAddressesFile.hpp"
+#include "GameAddressesWrapper.hpp"
 
 #include "GameTypes.h"
+
 
 // Class that allows you to read from the game using only the address identifier from game_address.txt
 // Also provides caching of pointer paths. But overall this is still a high-level class aimed at cleaning up code elsewhere and keeping things segmented.
 // Todo: store current player datas here for fancy displaying later on, maybe?
-class GameData
+class GameData : public GameAddressesWrapper
 {
 private:
 	// Cached addresses and pointer path so that we don't have to re-compute everything mid-extraction/importation
@@ -22,8 +23,6 @@ private:
 	// Reads a ptr path from an address identifier and return its last pointer
 	gameAddr ReadPtrPath(const char* c_addressId);
 public:
-	// Stores ptr paths, absolute addresses, values and such 
-	GameAddressesFile* addrFile;
 	// Reads a char (1b) from the game in little endian
 	int8_t ReadInt8(const char* c_addressId);
 	// Reads a short (2b) from the game in little endian
@@ -40,7 +39,12 @@ public:
 	void ReadBytes(const char* c_addressId, void* buf, size_t readSize);
 	// Todo: writing functions
 
-	GameData(GameProcess* process, GameAddressesFile* t_addrFile) : m_process(process), addrFile(t_addrFile) {}
+	GameData(GameProcess* process, GameAddressesFile* t_addrFile)
+	{
+		m_process = process;
+		addrFile = t_addrFile;
+	}
+
 	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
 	void CacheAddresses();
 };

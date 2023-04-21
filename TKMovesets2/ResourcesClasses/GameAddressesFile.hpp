@@ -1,9 +1,23 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include <fstream>
+#include <format>
 
 #include "GameTypes.h"
+
+class GameAddressNotFound : public std::exception {
+	std::string m_gameKey;
+	std::string m_addressKey;
+
+public:
+	GameAddressNotFound(const std::string& gameKey, const std::string& addressKey) : m_gameKey(gameKey), m_addressKey(addressKey) {}
+
+	std::string what() {
+		return std::format("[{}] Key not found: {}", m_gameKey.c_str(), m_addressKey.c_str());
+	}
+};
 
 struct GameAddresses_GameEntries
 {
@@ -20,19 +34,9 @@ struct GameAddresses_GameEntries
 class GameAddressesFile
 {
 private:
-	// List of absolute pointer paths in the address list file
-	std::map<std::string, std::vector<gameAddr> > m_absolute_pointer_paths;
-	// List of relative pointer pahs in the address list file
-	std::map<std::string, std::vector<gameAddr> > m_relative_pointer_paths;
-	// List of entries starting with 'val':
-	std::map<std::string, int64_t> m_values;
-	// List of entries starting with 'str:'
-	std::map<std::string, std::string> m_strings;
-
 	// Addresses entries grouped by game
 	std::map <std::string, GameAddresses_GameEntries> m_entries;
-
-	// List of entry in the address list file
+	// List of keys in the address list file
 	std::vector<std::string> m_keys;
 
 	// Load the addresses from a stream
@@ -45,9 +49,9 @@ public:
 	// Returns a list of every game_address.txt entry (key only).
 	const std::vector<std::string>& GetAllKeys();
 	// Returns a single numerical value from the file
-	int64_t GetValue(const char* c_addressId);
+	int64_t GetValue(const std::string& gameKey, const char* c_addressId);
 	// Returns a string from the file
-	const char* GetString(const char* c_addressId);
+	const char* GetString(const std::string& gameKey, const char* c_addressId);
 	// Returns a pointer path, that may rely on the base address or not.
-	const std::vector<gameAddr>& GetAddress(const char* c_addressId, bool& isRelative);
+	const std::vector<gameAddr>& GetAddress(const std::string& gameKey, const char* c_addressId, bool& isRelative);
 };
