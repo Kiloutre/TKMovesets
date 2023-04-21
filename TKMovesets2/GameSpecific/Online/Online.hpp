@@ -23,6 +23,8 @@ protected:
 	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
+	// Called after the shared memory has been successfully initialized
+	virtual void Init() = 0;
 public:
 	// Contains a copy of the basic moveset informations we have loaded
 	std::vector<movesetInfo>* displayedMovesets;

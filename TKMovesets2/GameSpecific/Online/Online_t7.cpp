@@ -1,6 +1,6 @@
 #include "Online_t7.hpp"
 
-void OnlineT7::OnInit()
+void OnlineT7::Init()
 {
     m_sharedMemPtr = (SharedMemT7*)m_orig_sharedMemPtr;
 }

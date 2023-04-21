@@ -45,6 +45,7 @@ bool Online::LoadSharedMemory()
         m_memoryHandle = nullptr;
     }
     DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%llx\n", m_orig_sharedMemPtr);
+    Init();
     return true;
 }
 

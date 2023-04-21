@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-
 namespace StructsT7
 {
 	// Custom-made offset list containing the list of blocks that compose our extracted moveset

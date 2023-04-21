@@ -372,7 +372,8 @@ static void EnforceDefaultAliasesAsCurrent(Byte* moveset)
 
 ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
-	const bool BASIC_LOAD = (settings & ImportSettings_BasicLoadOnly) == 0;
+	// Basic load is tied to online importing where we might want to import the moveset but not populate empty MOTA and apply character-specific fixes just yet
+	const bool BASIC_LOAD = (settings & ImportSettings_BasicLoadOnly) != 0;
 
 	// Header of the moveset that will contain our own information about it
 	const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
@@ -411,7 +412,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
 	progress = 70;
 
-	if (BASIC_LOAD) {
+	if (!BASIC_LOAD) {
 		// Fix moves that use characterID conditions to work
 		ApplyCharacterIDFixes(moveset, playerAddress, table, header, offsets);
 	}
@@ -422,7 +423,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, BASIC_LOAD == false);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD);
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + offsets.movelistBlock);
@@ -453,16 +454,18 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
-	if (BASIC_LOAD) {
+	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
 		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
 	}
 	progress = 100;
 
-	// Also write camera mota offsts to the player structure if those motas have been exported
-	WriteCameraMotasToPlayer(gameMoveset, playerAddress);
+	if (!BASIC_LOAD) {
+		// Also write camera mota offsts to the player structure if those motas have been exported
+		WriteCameraMotasToPlayer(gameMoveset, playerAddress);
+	}
 
-	if (BASIC_LOAD) {
+	if (!BASIC_LOAD) {
 		if (settings & ImportSettings_ApplyInstantly) {
 			ForcePlayerMove(playerAddress, gameMoveset, 32769);
 		}

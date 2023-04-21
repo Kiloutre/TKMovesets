@@ -72,10 +72,10 @@ namespace T7Hooks
 
 		// Determine if we, the user, are the main player or if we are p2
 		bool isLocalP1 = g_loader->ReadVariable<unsigned int>("gTK_playerid") == 0;
-		DEBUG_LOG("Is Local P1: %d\n", isLocalP1);
 
 		// Determine the player index of the player argument, and correct it with isLocalP1
 		auto playerIndex = GetPlayerIdFromAddress(player) ^ (!isLocalP1);
+		DEBUG_LOG("Corrected player index: %d. Is Local P1: %d\n", playerIndex, isLocalP1);
 		if (playerIndex == -1) {
 			return retVal;
 		}
@@ -91,10 +91,12 @@ namespace T7Hooks
 		// Copy missing MOTA offsets from newMoveset
 		for (unsigned int i = 0; i < _countof(customMoveset->motas.motas); ++i)
 		{
-			if ((playerData.flags & (1 << i)) || true) {
+			if (playerData.isMotaMissing(i)) {
+				DEBUG_LOG("Missing mota %d, getting it from game's moveset\n", i);
 				customMoveset->motas.motas[i] = newMoveset->motas.motas[i];
 			}
 		}
+
 					
 		/*
 		// Fix moves relying on character IDs
@@ -115,6 +117,18 @@ namespace T7Hooks
 
 		*/
 
+		
+		// Apply new moveset to our character*
+		DEBUG_LOG("Applying new moveset to character...\n");
+		auto addr = (char*)player + g_loader->addresses.GetValue("motbin_offset");
+		auto motbinOffsetList = (MovesetInfo**)(addr);
+
+		motbinOffsetList[0] = customMoveset;
+		motbinOffsetList[1] = customMoveset;
+		motbinOffsetList[2] = customMoveset;
+		motbinOffsetList[3] = customMoveset;
+		motbinOffsetList[4] = customMoveset;
+
 		return retVal;
 	}
 }
@@ -129,7 +143,7 @@ static void InitializeMoveset(SharedMemT7_Player& player)
 	for (unsigned int i = 0; i < _countof(moveset->motas.motas); ++i)
 	{
 		if ((uint64_t)moveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
-			player.flags |= (1 << i);
+			player.SetMotaMissing(i);
 		}
 	}
 
@@ -191,7 +205,7 @@ void MovesetLoaderT7::Mainloop()
 		for (int i = 0; i < 2; ++i)
 		{
 			if (!players[i].is_initialized && players[i].custom_moveset_addr != 0) {
-				DEBUG_LOG("Initializing player %d\n", i);
+				DEBUG_LOG("New moveset loaded, initializing moveset of player [%d] in the array\n", i);
 				InitializeMoveset(players[i]);
 			}
 		}
