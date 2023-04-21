@@ -113,12 +113,15 @@ namespace T7Hooks
 
 					playerData.previous_character_id = currentPlayerId;
 
+					/*
 					auto motaOffset = g_loader->addresses.GetValue("val:t7_motbin_offset");
 					*(MovesetInfo**)((char*)player + motaOffset) = customMoveset;
 					*(MovesetInfo**)((char*)player + motaOffset + 8) = customMoveset;
 					*(MovesetInfo**)((char*)player + motaOffset + 16) = customMoveset;
 					*(MovesetInfo**)((char*)player + motaOffset + 24) = customMoveset;
 					*(MovesetInfo**)((char*)player + motaOffset + 32) = customMoveset;
+					*
+					* */
 				}
 			}
 		}

@@ -184,11 +184,11 @@ static bool Init()
     // Safety in case this function is called multiple times
     if (g_loader != nullptr && g_loader->isInitialized()) {
         DEBUG_LOG("Loader already started: not starting again\n");
-        return;
+        return false;
     }
     if (g_loading) {
         DEBUG_LOG("Loader already starting...\n");
-        return;
+        return false;
     }
 
     g_loading = true;
@@ -208,7 +208,8 @@ static bool Init()
             g_loader = new MovesetLoaderT7;
         }
         else {
-            return;
+            g_loading = false;
+            return false;
         }
         g_loading = false;
         g_loader->SetMainModule(processName.c_str());

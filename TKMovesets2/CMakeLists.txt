@@ -30,6 +30,7 @@ set(INCLUDE_FOLDERS
                     "GameInteractions/GameProcess"
 
                     "GameSpecific"
+                    "GameSpecific/Structures"
                     "GameSpecific/Editors"
                     "GameSpecific/Editors/Editor_t7"
                     "GameSpecific/Extractors"

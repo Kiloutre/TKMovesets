@@ -9,7 +9,7 @@ void GameData::CacheAddresses()
 {
 	std::map<std::string, gameAddr> cachedAddresses;
 
-	for (const std::string& addressId : addrFile->GetAllEntries())
+	for (const std::string& addressId : addrFile->GetAllKeys())
 	{
 		if (addressId.rfind("val_", 0) == 0) {
 			// Ignore if not address / ptr path

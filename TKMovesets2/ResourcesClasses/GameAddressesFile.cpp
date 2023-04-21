@@ -56,7 +56,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 	std::map<std::string, int64_t> values;
 	std::map<std::string, std::string> strings;
 
-	std::vector<std::string> entries;
+	std::vector<std::string> keys;
 	std::string line;
 
 	while (std::getline(stream, line))
@@ -107,7 +107,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 		else
 		{
 			if (value.rfind("+", 0) == 0) {
-				// Entries starting with '+' are relative to the module address
+				// Values starting with '+' are relative to the module address
 				relative_pointer_paths[key] = parsePtrPathString(value.substr(1));
 			}
 			else {
@@ -115,7 +115,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 			}
 		}
 
-		entries.push_back(key);
+		keys.push_back(key);
 	}
 
 	// Replace these only when we have a proper replacement built, because functions running on other threads require these to be completley built at all times
@@ -125,7 +125,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 	m_values = values;
 	m_strings = strings;
 
-	m_entries = entries;
+	m_keys = keys;
 }
 
 void GameAddressesFile::Reload()
@@ -144,9 +144,9 @@ void GameAddressesFile::Reload()
 	DEBUG_LOG("Addresses loaded.\n");
 }
 
-const std::vector<std::string>& GameAddressesFile::GetAllEntries()
+const std::vector<std::string>& GameAddressesFile::GetAllKeys()
 {	
-	return m_entries;
+	return m_keys;
 }
 
 int64_t GameAddressesFile::GetValue(const char* c_addressId)
