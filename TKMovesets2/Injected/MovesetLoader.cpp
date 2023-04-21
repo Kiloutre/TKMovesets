@@ -56,15 +56,6 @@ MovesetLoader::~MovesetLoader()
     delete addresses.addrFile;
 }
 
-void MovesetLoader::Mainloop()
-{
-    while (!mustStop)
-    {
-        //
-        std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
-    }
-}
-
 bool MovesetLoader::Init()
 {
     SetAddressesGameKey();
@@ -98,16 +89,16 @@ bool MovesetLoader::Init()
         return false;
     }
 
-    sharedMemPtr = (SharedMemory*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
-    DEBUG_LOG("Shared memory address: %llx\n", (unsigned long long)sharedMemPtr);
-    if (sharedMemPtr == nullptr)
+    orig_sharedMemPtr = (void*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    DEBUG_LOG("Shared memory address: %p\n", orig_sharedMemPtr);
+    if (orig_sharedMemPtr == nullptr)
     {
         CloseHandle(m_memoryHandle);
         m_memoryHandle = nullptr;
         return false;
     }
+    memset(orig_sharedMemPtr, 0, SHARED_MEMORY_BUFSIZE);
 
-    memset(sharedMemPtr, 0, sizeof(*sharedMemPtr));
     PostInit();
     return true;
 }

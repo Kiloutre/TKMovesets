@@ -8,7 +8,6 @@
 #include "BaseGameSpecificClass.hpp"
 
 #include "constants.h"
-#include "SharedMemory.h"
 
 class DLLCONTENT Online : public BaseGameSpecificClass
 {
@@ -18,7 +17,7 @@ protected:
 	// Contains whether or not we have injected our DLL
 	bool m_injectedDll = false;
 	// Ptr to the shared memory
-	SharedMemory* m_sharedMemPtr = nullptr;
+	void* m_orig_sharedMemPtr = nullptr;
 
 	// Calls a function of the MovesetLoader inside of the remote process. Returns false if failure was encountered somewhere.
 	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);
@@ -42,5 +41,5 @@ public:
 	// Injects the DLL into the current process, waiting for it to be completed. Returns true/false if the library was successfully loaded or not.
 	bool InjectDllAndWaitEnd();
 	// Called when a moveset is successfully loaded in the game's memory by the importer
-	void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId);
+	virtual void OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId) = 0;
 };

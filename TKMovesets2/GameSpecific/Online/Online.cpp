@@ -36,16 +36,15 @@ bool Online::LoadSharedMemory()
     auto sharedMemName = GetSharedMemoryName();
     m_memoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, sharedMemName);
     if (m_memoryHandle == nullptr) {
-        //DEBUG_LOG("Error opening file mapping '%s'\n", sharedMemName);
         return false;
     }
-    m_sharedMemPtr = (SharedMemory*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
-    if (m_sharedMemPtr == nullptr) {
+    m_orig_sharedMemPtr = (void*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    if (m_orig_sharedMemPtr == nullptr) {
         DEBUG_LOG("Error mapping view of file for shared memory '%s'\n", sharedMemName);
         CloseHandle(m_memoryHandle);
         m_memoryHandle = nullptr;
     }
-    DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%llx\n", m_sharedMemPtr);
+    DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%llx\n", m_orig_sharedMemPtr);
     return true;
 }
 
@@ -117,16 +116,4 @@ bool Online::InjectDllAndWaitEnd()
 
     DEBUG_LOG("Online::InjectDll() -> return\n");
     return result;
-}
-
-void Online::OnMovesetImport(movesetInfo* displayedMoveset, gameAddr movesetAddr, unsigned int playerId, uint8_t characterId)
-{
-    if (displayedMovesets->size() > playerId) {
-        (*displayedMovesets)[playerId] = *displayedMoveset;
-    }
-    else {
-        displayedMovesets->push_back(*displayedMoveset);
-    }
-    m_sharedMemPtr->players[playerId].custom_moveset_addr = movesetAddr;
-    m_sharedMemPtr->players[playerId].moveset_character_id = characterId;
 }

@@ -50,6 +50,7 @@ set(INCLUDE_FOLDERS
                     "Utils"
 
                     "Injected"
+                    "Injected/SharedMemory"
 
                     "${CMAKE_SOURCE_DIR}/Sig/include"
 )

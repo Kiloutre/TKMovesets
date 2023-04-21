@@ -12,7 +12,6 @@
 #include "GameAddressesWrapper.hpp"
 
 #include "constants.h"
-#include "SharedMemory.h"
 #include "GameTypes.h"
 
 
@@ -56,10 +55,12 @@ protected:
 public:
 	// Store addresses, pointers path and such from the game_addresses.ini file (or from embedded data if not found, which currently is the case)
 	GameAddressesWrapper addresses;
-	// Ptr to the shared memory
-	SharedMemory* sharedMemPtr = nullptr;
+	// Ptr to the shared memory, not casted
+	void* orig_sharedMemPtr = nullptr;
 	// List of important variable addresses that we can cache early on in there
 	std::map<std::string, uint64_t> variables;
+	// If set to true, forces the Mainloop() to stop
+	bool mustStop = false;
 
 	// Initializes the shared memory
 	bool Init();
@@ -84,10 +85,8 @@ public:
 	virtual void InitHooks() = 0;
 	// Called upon a successful Init()
 	virtual void PostInit() = 0;
-	// If set to true, forces the Mainloop() to stop
-	bool mustStop = false;
 	// Main loop of the loader
-	void Mainloop();
+	virtual void Mainloop() = 0;
 	// Returns true if shared memory file has been successfully initialized
 	bool isInitialized() { return m_memoryHandle != nullptr; }
 	// Sets the main module name and address

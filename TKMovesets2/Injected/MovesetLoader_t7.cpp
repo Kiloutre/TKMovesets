@@ -44,17 +44,16 @@ static uint64_t* GetPlayerList()
 	return (uint64_t*)(offsetBase + offset);
 }
 
-static unsigned int GetPlayerIdFromAddress(void* playerAddr)
+static int GetPlayerIdFromAddress(void* playerAddr)
 {
 	auto playerList = (uint64_t*)g_loader->variables["gTK_playerList"];
-	for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 2; ++i) // The list technically goes to 6 but this game doesn't handle it so who cares
 	{
-		if (playerList[i] == (uint64_t)playerAddr)
-		{
+		if (playerList[i] == (uint64_t)playerAddr) {
 			return i;
 		}
 	}
-	return 0x2f;
+	return -1;
 }
 
 // -- Hook functions --
@@ -67,68 +66,75 @@ namespace T7Hooks
 
 		auto retVal = g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
 
-		if (g_loader->sharedMemPtr->locked_in || true)
+		if (!g_loader->sharedMemPtr->locked_in) {
+			//return retVal;
+		}
+
+		// Determine if we, the user, are the main player or if we are p2
+		bool isLocalP1 = g_loader->ReadVariable<unsigned int>("gTK_playerid") == 0;
+		DEBUG_LOG("Is Local P1: %d\n", isLocalP1);
+
+		// Determine the player index of the player argument, and correct it with isLocalP1
+		auto playerIndex = GetPlayerIdFromAddress(player) ^ (!isLocalP1);
+		if (playerIndex == -1) {
+			return retVal;
+		}
+
+		// Obtain custom player data to apply
+		auto& playerData = g_loader->sharedMemPtr->players[playerIndex];
+		MovesetInfo* customMoveset = (MovesetInfo*)playerData.custom_moveset_addr;
+		if (!customMoveset) {
+			return retVal;
+		}
+		DEBUG_LOG("Custom moveset %llx\n", customMoveset);
+
+		// Copy missing MOTA offsets from newMoveset
+		for (unsigned int i = 0; i < _countof(customMoveset->motas.motas); ++i)
 		{
-			// Get player IDs (0 is p1, if p2)
-			unsigned int playerId = g_loader->ReadVariable<unsigned int>("gTK_playerid");
-			unsigned int remotePlayerId = playerId ^ 1;
-			DEBUG_LOG("Local player: %d, remote player: %d\n", playerId, remotePlayerId);
-
-			// Get index of the player in the playerlist, correcting for playerId
-			auto playerIndex = GetPlayerIdFromAddress(player) ^ playerId;
-			DEBUG_LOG("playerIndex: %d\n", playerIndex);
-			if (playerIndex < 0x2F)
-			{
-				auto& playerData = g_loader->sharedMemPtr->players[playerIndex];
-				MovesetInfo* customMoveset = (MovesetInfo*)playerData.custom_moveset_addr;
-				if (customMoveset)
-				{
-					DEBUG_LOG("Custom moveset %llx\n", customMoveset);
-
-					// Copy missing MOTA offsets
-					for (unsigned int i = 0; i < _countof(customMoveset->motas.motas); ++i)
-					{
-						if ((uint64_t)customMoveset->motas.motas[i] == MOVESET_ADDR_MISSING || true) {
-							// todo
-							customMoveset->motas.motas[i] = newMoveset->motas.motas[i];
-						}
-					}
+			if ((playerData.flags & (1 << i)) || true) {
+				customMoveset->motas.motas[i] = newMoveset->motas.motas[i];
+			}
+		}
 					
-					/*
-					// Fix moves relying on character IDs
-					int currentPlayerId = *(int*)((char*)player + 0xD8);
-					int previousCharacterId = playerData.previous_character_id;
-					if (previousCharacterId == SHARED_MEM_MOVESET_NO_CHAR) {
-						previousCharacterId = playerData.moveset_character_id;
-					}
+		/*
+		// Fix moves relying on character IDs
+		int currentCharId = *(int*)((char*)player + 0xD8);
+		int previousCharacterId = playerData.previous_character_id;
+		if (previousCharacterId == SHARED_MEM_MOVESET_NO_CHAR) {
+			previousCharacterId = playerData.moveset_character_id;
+		}
 
-					int c_characterIdCondition = (int)g_loader->addresses.GetValue("character_id_condition");
+		int c_characterIdCondition = (int)g_loader->addresses.GetValue("character_id_condition");
 
-					for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
-					{
-						if (requirement.condition == c_characterIdCondition) {
-							requirement.param_unsigned = (requirement.param_unsigned == previousCharacterId) ? currentPlayerId : currentPlayerId + 1;
-						}
-					}
-
-					playerData.previous_character_id = currentPlayerId;
-					*/
-
-					/*
-					auto motaOffset = g_loader->addresses.GetValue("motbin_offset");
-					*(MovesetInfo**)((char*)player + motaOffset) = customMoveset;
-					*(MovesetInfo**)((char*)player + motaOffset + 8) = customMoveset;
-					*(MovesetInfo**)((char*)player + motaOffset + 16) = customMoveset;
-					*(MovesetInfo**)((char*)player + motaOffset + 24) = customMoveset;
-					*(MovesetInfo**)((char*)player + motaOffset + 32) = customMoveset;
-					*
-					* */
-				}
+		for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
+		{
+			if (requirement.condition == c_characterIdCondition) {
+				requirement.param_unsigned = (requirement.param_unsigned == previousCharacterId) ? currentCharId : currentPlayerId + 1;
 			}
 		}
 
+		*/
+
 		return retVal;
 	}
+}
+
+// -- Other -- //
+
+static void InitializeMoveset(SharedMemT7_Player& player)
+{
+	MovesetInfo* moveset = (MovesetInfo*)player.custom_moveset_addr;
+
+	// Mark missing motas with bitflag
+	for (unsigned int i = 0; i < _countof(moveset->motas.motas); ++i)
+	{
+		if ((uint64_t)moveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
+			player.flags |= (1 << i);
+		}
+	}
+
+	//player.previous_character_id = player.moveset_character_id;
+	player.is_initialized = true;
 }
 
 // -- Hooking init --
@@ -155,6 +161,8 @@ void MovesetLoaderT7::InitHooks()
 
 void MovesetLoaderT7::PostInit()
 {
+	sharedMemPtr = (SharedMemT7*)orig_sharedMemPtr;
+
 	// Compute important variable addresses
 	variables["gTK_playerList"] = (uint64_t)GetPlayerList();
 
@@ -168,8 +176,26 @@ void MovesetLoaderT7::PostInit()
 	// Apply the hooks that need to be applied immediately
 	m_hooks["TK__ApplyNewMoveset"].detour->hook();
 
-	for (unsigned int i = 0; i < _countof(sharedMemPtr->players); ++i)
-	{
+	for (unsigned int i = 0; i < _countof(sharedMemPtr->players); ++i) {
 		sharedMemPtr->players[i].previous_character_id = SHARED_MEM_MOVESET_NO_CHAR;
+	}
+}
+
+// -- Main -- //
+
+void MovesetLoaderT7::Mainloop()
+{
+	while (!mustStop)
+	{
+		auto& players = sharedMemPtr->players;
+		for (int i = 0; i < 2; ++i)
+		{
+			if (!players[i].is_initialized && players[i].custom_moveset_addr != 0) {
+				DEBUG_LOG("Initializing player %d\n", i);
+				InitializeMoveset(players[i]);
+			}
+		}
+		//
+		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
 }
