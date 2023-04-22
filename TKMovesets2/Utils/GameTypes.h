@@ -11,5 +11,20 @@
 typedef uint64_t gameAddr;
 typedef uint32_t gameAddr32;
 
+
 // Used for ptr to Byte*, i really don't like using char* for those, char* should be explicity for characters
 typedef unsigned char Byte;
+
+
+// IDA sometimes shows us this __int128 type, so define it here
+typedef char __ida_int128[16]; // todo: turn this into a struct but without crashing the game
+
+#define SET_INT128(s, first, second) ((*(int64_t*)s = first), ((*(int64_t*)((char*)s + 8)) = second))
+
+static void print_int128(__ida_int128 val) // todo: remove this
+{
+	// debug
+	printf("%llx|%llx, ", *(uint64_t*)&val, *(uint64_t*)(&val + 8));
+}
+
+
