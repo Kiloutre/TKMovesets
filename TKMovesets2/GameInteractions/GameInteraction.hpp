@@ -21,7 +21,7 @@ protected:
 	// Variable containing whether or not we can start our program's action, updated every thread loop
 	bool m_canStart = false;
 
-	// Instantiate an extractor with polymorphism, also destroy the old one
+	// Instantiate a class with polymorphism, also destroy the old one
 	virtual void InstantiateFactory() = 0;
 	// Function ran in the parallel thread, executed by Update() only if latched on and if CanStart() returned true
 	virtual void RunningUpdate() = 0;
@@ -64,4 +64,6 @@ public:
 	void Init(GameAddressesFile* addrFile, LocalStorage* t_storage);
 	// Destroys the thread
 	virtual void StopThreadAndCleanup();
+	// Frees the factory-obtained class we allocated earlier
+	virtual void FreeExpiredFactoryClasses() = 0;
 };

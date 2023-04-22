@@ -9,6 +9,7 @@
 #include "Extractor.hpp"
 
 #include "GameTypes.h"
+#include "lz4.h"
 
 // -- Helpers -- //
 
@@ -133,74 +134,6 @@ namespace ExtractorUtils
 	void CompressFile(const std::wstring& dest_filename, const std::wstring& src_filename)
 	{
 		std::filesystem::rename(src_filename.c_str(), dest_filename.c_str());
-
-		// Todo: find a fast compression algorithm, or do it on the background while leaving the uncompressed file available until the compression is done
-		// Decompression speed is also really important.
-
-		/*
-		lzma_stream strm = LZMA_STREAM_INIT;
-		uint32_t preset = 1;
-		if (lzma_easy_encoder(&strm, preset, LZMA_CHECK_CRC64) != LZMA_OK) {
-			// todo: justcopy file if compression failure
-			printf("cant init lzma\n");
-			return;
-		}
-
-		const unsigned int bufSize = pow(2, 20);
-
-		printf("read size %d\n", bufSize);
-		std::ifstream in(src_filename, std::ios::binary);
-		std::ofstream out(dest_filename, std::ios::binary | std::ios::out);
-		uint8_t* inbuf = new uint8_t[bufSize];
-		uint8_t* outbuf = new uint8_t[bufSize];
-
-		strm.next_out = outbuf;
-		strm.avail_out = bufSize;
-		while (true)
-		{
-			lzma_action action = LZMA_RUN;
-
-			if (strm.avail_in == 0 && !in.eof()) {
-				// Tell lzma where to read from (this apparently resets after every read)
-				in.read((char*)inbuf, bufSize);
-				strm.next_in = inbuf;
-				strm.avail_in = in.gcount();
-				// Still more data to read from the file, and lzma buffer is empty so nothing to write until we feed him more file data
-				if (in.eof()) {
-					// Input file has been read fully
-					action = LZMA_FINISH;
-				}
-			}
-
-			// Compress data
-			lzma_ret ret = lzma_code(&strm, action);
-
-			// Output buffer full, write it to the output file
-			if (strm.avail_out == 0 || ret == LZMA_STREAM_END) {
-				size_t write_size = bufSize - strm.avail_out;
-				out.write((char*)outbuf, write_size);
-
-				strm.next_out = outbuf;
-				strm.avail_out = bufSize;
-			}
-
-			if (ret == LZMA_OK || ret == LZMA_STREAM_END) {
-				if (ret == LZMA_STREAM_END) {
-					break;
-				}
-			}
-			else {
-				printf("Error");
-				break;
-			}
-		}
-		printf("gucci\n");
-
-		delete[] inbuf;
-		delete[] outbuf;
-
-		lzma_end(&strm);
-		*/
 	}
 };
 

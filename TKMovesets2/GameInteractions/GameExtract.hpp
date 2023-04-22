@@ -10,12 +10,14 @@
 class GameExtract : public virtual GameInteraction
 {
 private:
-	// Extractor class, never stores an Extractor*, used for polymorphism
-	Extractor* m_extractor = nullptr;
 	// Player addresses to extract and their respective extraction settings
 	std::vector<std::pair<gameAddr, ExtractSettings>> m_extractionQueue;
 	// List of errors, one extraction fail = 1 error
 	std::vector<ExtractionErrcode_> m_errors;
+	// Extractor class, never stores an Extractor*, used for polymorphism
+	Extractor* m_extractor = nullptr;
+	// Extractor class that is going to be freed next FreeExpiredFactoryClasses() call
+	Extractor* m_toFree_extractor = nullptr;
 
 	// Reads the movesets for the players characters' names. Accessible under .characterNames
 	void LoadCharacterNames();
@@ -41,4 +43,6 @@ public:
 	ExtractionErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to
 	uint8_t GetCharacterCount() override;
+	// Frees the factory-obtained class we allocated earlier
+	void FreeExpiredFactoryClasses() override;
 };

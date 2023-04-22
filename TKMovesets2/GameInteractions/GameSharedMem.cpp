@@ -19,11 +19,11 @@ void GameSharedMem::InstantiateFactory()
 {
 	// Delete old instances if needed
 	if (m_importer != nullptr) {
-		delete m_importer;
+		m_toFree_importer = m_importer;
 	}
 
 	if (m_sharedMemHandler != nullptr) {
-		delete m_sharedMemHandler;
+		m_toFree_sharedMemHandler = m_sharedMemHandler;
 	}
 
 	game->gameKey = currentGame->dataString;
@@ -144,4 +144,22 @@ void GameSharedMem::StopThreadAndCleanup()
 
 	delete process;
 	delete game;
+}
+
+void GameSharedMem::FreeExpiredFactoryClasses()
+{
+	if (m_toFree_importer) {
+		delete m_toFree_importer;
+		delete m_toFree_sharedMemHandler;
+
+		if (m_toFree_importer == m_importer) {
+			m_importer = nullptr;
+		}
+		if (m_toFree_sharedMemHandler == m_sharedMemHandler) {
+			m_sharedMemHandler = nullptr;
+		}
+
+		m_toFree_importer = nullptr;
+		m_toFree_sharedMemHandler = nullptr;
+	}
 }

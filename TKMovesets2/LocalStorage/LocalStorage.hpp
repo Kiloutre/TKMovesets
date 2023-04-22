@@ -57,6 +57,6 @@ public:
 	void ReloadMovesetList();
 	// Frees the content of .garbage. Must be called by the display thread after being finished with .extractedMovesets
 	void CleanupUnusedMovesetInfos();
-	// Delete a moveset's file entirely
-	void DeleteMoveset(const wchar_t* filename);
+	// Delete a moveset's file entirely, returns false if deletion failed
+	bool DeleteMoveset(const wchar_t* filename);
 };

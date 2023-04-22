@@ -9,6 +9,7 @@
     },
     "glfw3",
     "glad",
-    "polyhook2"
+    "polyhook2",
+    "lz4"
   ]
 }

@@ -31,7 +31,7 @@ void GameImport::OnProcessDetach()
 void GameImport::InstantiateFactory()
 {
 	if (m_importer != nullptr) {
-		delete m_importer;
+		m_toFree_importer = m_importer;
 	}
 
 	game->gameKey = currentGame->dataString;
@@ -169,4 +169,15 @@ gameAddr GameImport::GetCurrentPlayerMovesetAddr()
 		return m_importer->GetMovesetAddress(currentPlayerId);
 	}
 	return 0;
+}
+
+void GameImport::FreeExpiredFactoryClasses()
+{
+	if (m_toFree_importer) {
+		delete m_toFree_importer;
+		if (m_toFree_importer == m_importer) {
+			m_importer = nullptr;
+		}
+		m_toFree_importer = nullptr;
+	}
 }

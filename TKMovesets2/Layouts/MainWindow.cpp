@@ -200,6 +200,13 @@ void MainWindow::Update()
 	}
 
 	// -- Rendering end -- //
+	{
+		// Cleanup stuff that we really don't want to clean up during Render()
+		storage.CleanupUnusedMovesetInfos();
+		extractor.FreeExpiredFactoryClasses();
+		importer.FreeExpiredFactoryClasses();
+		sharedMem.FreeExpiredFactoryClasses();
+	}
 }
 
 void MainWindow::Shutdown()

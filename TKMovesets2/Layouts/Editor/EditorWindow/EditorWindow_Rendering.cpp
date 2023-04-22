@@ -532,4 +532,6 @@ void EditorWindow::Render(int dockid)
 	{
 		//popen = true;
 	}
+
+	m_importerHelper.FreeExpiredFactoryClasses();
 }

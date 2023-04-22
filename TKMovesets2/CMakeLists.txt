@@ -218,12 +218,10 @@ find_package(imgui CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
 target_link_libraries(GameSpecific PRIVATE imgui::imgui) # Only used for the color-defining includes
 
+# Compression
+find_package(lz4 CONFIG REQUIRED)
+target_link_libraries(TKMovesets2 PRIVATE lz4::lz4)
+
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)
 target_link_libraries(MovesetLoader PRIVATE PolyHook_2::PolyHook_2)
-
-# Compression
-#find_package(liblzma CONFIG REQUIRED)
-#target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)
-#target_link_libraries(GameSpecific PRIVATE liblzma::liblzma)
-

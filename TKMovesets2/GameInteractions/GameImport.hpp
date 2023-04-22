@@ -28,6 +28,8 @@ protected:
 	std::vector<ImportationErrcode_> m_errors;
 	// Importer class, never stores an Importer*, used for polymorphism
 	Importer* m_importer = nullptr;
+	// Importer class that is going to be freed next FreeExpiredFactoryClasses() call
+	Importer* m_toFree_importer = nullptr;
 
 	// Callback called whenever the process is re-attached
 	virtual void OnProcessAttach() override;
@@ -62,6 +64,8 @@ public:
 	ImportationErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to
 	uint8_t GetCharacterCount() override;
-
+	// Returns the moveset address of the currently selected player
 	gameAddr GetCurrentPlayerMovesetAddr();
+	// Frees the factory-obtained class we allocated earlier
+	void FreeExpiredFactoryClasses() override;
 };

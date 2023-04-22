@@ -19,6 +19,8 @@ private:
 	bool m_requestedInjection = false;
 	// Online class, manages shared memory
 	Online* m_sharedMemHandler = nullptr;
+	// Online class that is going to be freed next FreeExpiredFactoryClasses() call
+	Online* m_toFree_sharedMemHandler = nullptr;
 
 	// Callback called whenever the process is re-attached
 	void OnProcessAttach() override;
@@ -49,6 +51,8 @@ public:
 	bool IsBusy() override;
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
+	// Frees the factory-obtained class we allocated earlier
+	void FreeExpiredFactoryClasses() override;
 
 	// Queue a DLL injection for the next RunningUpdate() tick
 	void InjectDll();

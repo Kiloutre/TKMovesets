@@ -87,24 +87,38 @@ bool Online::InjectDllAndWaitEnd()
         currDirectory = std::wstring(currPath);
     }
 
+    // Load the MovesetLoader in our own process so that we can know its function addresses
+    HMODULE movesetLoaderLib;
+    {
+        movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
+        if (movesetLoaderLib == nullptr) {
+            DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
+            return false;
+        }
+    }
+
     currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
 
     std::wstring w_dllName = L"" MOVESET_LOADER_NAME;
     std::wstring w_dllPath = currDirectory + w_dllName;
     std::string dllName = std::string(w_dllName.begin(), w_dllName.end());
 
-    if (!m_process->InjectDll(w_dllPath.c_str())) {
-        return false;
+
+    // Call the functions to initiate and run the moveset loader
+    bool result = false;
+    if (m_process->InjectDll(w_dllPath.c_str()))
+    {
+        result = CallMovesetLoaderFunction(MOVESET_LOADER_INIT_FUNC, true);
+        if (result) {
+            result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
+        }
+
+        injectedDll = true;
+        isInjecting = false;
+
+        DEBUG_LOG("Online::InjectDll() -> return\n");
     }
 
-    bool result = CallMovesetLoaderFunction(MOVESET_LOADER_INIT_FUNC, true);
-    if (result) {
-        result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
-    }
-
-    injectedDll = true;
-    isInjecting = false;
-
-    DEBUG_LOG("Online::InjectDll() -> return\n");
+    FreeLibrary(movesetLoaderLib);
     return result;
 }

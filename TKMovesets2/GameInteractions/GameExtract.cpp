@@ -36,9 +36,7 @@ void GameExtract::OnProcessAttach()
 
 void GameExtract::InstantiateFactory()
 {
-	if (m_extractor != nullptr) {
-		delete m_extractor;
-	}
+	m_toFree_extractor = m_extractor;
 
 	game->gameKey = currentGame->dataString;
 	game->minorGameKey = currentGame->minorDataString;
@@ -134,4 +132,17 @@ uint8_t GameExtract::GetCharacterCount()
 		return m_extractor->characterCount;
 	}
 	return 2;
+}
+
+void GameExtract::FreeExpiredFactoryClasses()
+{
+	if (m_toFree_extractor) {
+		delete m_toFree_extractor;
+
+		if (m_toFree_extractor == m_extractor) {
+			m_extractor = nullptr;
+		}
+
+		m_toFree_extractor = nullptr;
+	}
 }
