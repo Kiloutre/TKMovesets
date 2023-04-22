@@ -17,4 +17,7 @@ public:
 	int64_t GetValue(const char* c_addressId);
 	const char* GetString(const char* c_addressId);
 	const std::vector<gameAddr>& GetPtrPath(const char* c_addressId, bool& isRelative);
+
+	// Reads a ptr path, not in the remote process but in the local une. Used by injected DLL.
+	uint64_t ReadPtrPathInCurrProcess(const char* c_addressId, uint64_t moduleAddress);
 };

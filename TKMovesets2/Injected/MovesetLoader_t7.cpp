@@ -1,5 +1,6 @@
-#include "MovesetLoader_t7.hpp"
+#include <stdarg.h>
 
+#include "MovesetLoader_t7.hpp"
 #include "Helpers.hpp"
 
 using namespace StructsT7;
@@ -167,6 +168,15 @@ namespace T7Hooks
 
 		return retVal;
 	}
+
+	// Log function 
+	void Log(const char* format, ...)
+	{
+		va_list argptr;
+		va_start(argptr, format);
+		vfprintf(stdout, format, argptr);
+		va_end(argptr);
+	}
 }
 
 // -- Hooking init --
@@ -189,6 +199,19 @@ void MovesetLoaderT7::InitHooks()
 	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
 	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "f_GetPlayerFromID");
 	RegisterFunction("TK__GetTK3447820", m_moduleName, "f_GetTK3447820");
+
+	// Other less important things
+	{
+#ifdef BUILD_TYPE_DEBUG
+		// Find TK__Log
+		auto funcAddr = addresses.ReadPtrPathInCurrProcess("f_Log_addr", m_moduleAddr);
+		if (InjectionUtils::compare_memory_string((void*)funcAddr, addresses.GetString("f_Log")))
+		{
+			InitHook("TK__Log", funcAddr, (uint64_t)&T7Hooks::Log);
+			DEBUG_LOG("Found Log function\n");
+		}
+#endif
+	}
 }
 
 void MovesetLoaderT7::PostInit()
@@ -207,6 +230,10 @@ void MovesetLoaderT7::PostInit()
 
 	// Apply the hooks that need to be applied immediately
 	m_hooks["TK__ApplyNewMoveset"].detour->hook();
+
+	if (m_hooks.contains("TK__Log")) {
+		m_hooks["TK__Log"].detour->hook();
+	}
 }
 
 // -- Main -- //
