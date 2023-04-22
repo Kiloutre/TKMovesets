@@ -1,11 +1,6 @@
 #pragma once
 
-# include <cstdint>
-
-// Used to determine if a player was loaded before or not
-# define SHARED_MEM_MOVESET_NO_CHAR (0xFF)
-
-// todo: make this entirely game specific
+#include "SharedMemory.h"
 
 struct SharedMemT7_Player
 {
@@ -19,8 +14,8 @@ struct SharedMemT7_Player
 	bool is_initialized;
 	// Original character ID of the loaded moveset
 	uint8_t moveset_character_id;
-	// Character ID of the last loaded char, or SHARED_MEM_MOVESET_NO_CHAR is none
-	uint8_t previous_character_id = SHARED_MEM_MOVESET_NO_CHAR;
+	// Character ID of the last loaded char
+	uint8_t previous_character_id;
 
 	void SetMotaMissing(int id) {
 		missingMotas |= (1 << id);
@@ -30,7 +25,7 @@ struct SharedMemT7_Player
 	}
 };
 
-struct SharedMemT7
+struct SharedMemT7 : SharedMemBase
 {
 	// List of players to send custom movesets to
 	SharedMemT7_Player players[2];

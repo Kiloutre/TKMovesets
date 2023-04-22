@@ -207,11 +207,6 @@ void MovesetLoaderT7::PostInit()
 
 	// Apply the hooks that need to be applied immediately
 	m_hooks["TK__ApplyNewMoveset"].detour->hook();
-
-	// Mark char IDs with SHARED_MEM_MOVESET_NO_CHAR to indicate they haven't been loaded
-	for (unsigned int i = 0; i < _countof(sharedMemPtr->players); ++i) {
-		sharedMemPtr->players[i].previous_character_id = SHARED_MEM_MOVESET_NO_CHAR;
-	}
 }
 
 // -- Main -- //
