@@ -65,50 +65,29 @@ namespace InjectionUtils
 			return false;
 		}
 
-		char* filteredBytesStr;
-		{
-			unsigned int spaceCount = 0;
-			unsigned int i;
-			for (i = 0; bytesString[i]; ++i) {
-				if (bytesString[i] == ' ') ++spaceCount;
-			}
-
-			unsigned int newLength = i - spaceCount;
-			bool isOdd = newLength & 1;
-			filteredBytesStr = new char[newLength + isOdd + 1];
-
-			for (i = 0; *bytesString; ++bytesString) {
-				if (*bytesString != ' ') {
-					filteredBytesStr[i++] = *bytesString;
-				}
-			}
-
-			if (isOdd) {
-				filteredBytesStr[newLength] = '?';
-				filteredBytesStr[newLength + 1] = '\0';
-			}
-			else {
-				filteredBytesStr[newLength] = '\0';
-			}
-		}
-
 		Byte* currentAddress = (Byte*)address;
 
 		char buf[3];
 		buf[2] = '\0';
 
-		for (unsigned int i = 0; filteredBytesStr[i]; i += 2)
+		while (*bytesString != '\0')
 		{
-			// Ignore spaces
+			while (*bytesString == ' ' || !isprint(*bytesString)) ++bytesString; // Ignore spaces
+			if (*bytesString == '\0') break;
+
 			Byte b = *currentAddress;
 
-			char firstChar = filteredBytesStr[i];
-			char secondChar = filteredBytesStr[i + 1];
+			char firstChar = bytesString[0];
+			while (*bytesString == ' ' || !isprint(*bytesString)) ++bytesString;  // Ignore spaces in betwene, you never know
+			char secondChar = *bytesString ? bytesString[1] : '?';
+
 			bool firstCharWildcard = firstChar == '?';
 			bool secondCharWildcard = secondChar == '?' || secondChar == '\0';
 
 			if (firstCharWildcard && secondCharWildcard) {
 				++currentAddress;
+				++bytesString;
+				if (*bytesString != '\0') ++bytesString;
 				continue;
 			}
 			else {
@@ -124,15 +103,12 @@ namespace InjectionUtils
 			}
 
 			Byte value = strtol(buf, 0, 16);
-			if (b != value) {
-				delete[] filteredBytesStr;
-				return false;
-			}
+			if (b != value)  return false;
 
 			++currentAddress;
+			++bytesString;
+			if (*bytesString != '\0') ++bytesString;
 		}
-
-		delete[] filteredBytesStr;
 		return true;
 	}
 }
