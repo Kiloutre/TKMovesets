@@ -178,11 +178,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		GetModuleFileNameW(nullptr, currPath, MAX_PATH);
 		std::wstring ws(currPath);
 		ws.erase(ws.find_last_of(L"\\"));
-		std::filesystem::current_path(ws);
+
+		if (ws != std::filesystem::current_path()) {
+			std::filesystem::current_path(ws);
+			WriteToLogFile(std::format("OLD CWD is {}", Helpers::wstring_to_string(oldWorkingDir)));
+			WriteToLogFile(std::format("Set CWD to {}", Helpers::wstring_to_string(ws)));
+		}
 
 		WriteToLogFile("Started TKMovesets " PROGRAM_VERSION, false);
-		WriteToLogFile(std::format("OLD CWD is {}", Helpers::wstring_to_string(oldWorkingDir)));
-		WriteToLogFile(std::format("Set CWD to {}", Helpers::wstring_to_string(ws)));
 	}
 
 	// Initialize GLFW library
