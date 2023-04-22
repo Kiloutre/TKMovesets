@@ -58,6 +58,7 @@ moveset.version = Version
 
 # Navmenu #
 navmenu.category_moveset = Movesets
+navmenu.category_play = Play
 navmenu.extraction = Extraction
 navmenu.import = Import
 navmenu.online = Online play
@@ -108,10 +109,12 @@ importation.apply_instantly = Apply instantly
 importation.apply_instantly_explanation = Turning this to off will let the game wait until the current move ends before switching to the new moveset.\nIn the cases of some moves (like Negan's idle animation), this can take pretty long.
 importation.free_unused_movesets = Free unused movesets
 importation.free_unused_movesets_explanation = If turned on, movesets that were previously allocated but are now unused will be freed from memory.\nThis helps prevent this tool from using all your RAM.
-importation.error = There was an error while importing the moveset
 importation.error_file_reading = There was an error while reading the moveset file
 importation.error_allocation = There was a memory allocation error while reading the moveset data
 importation.error_game_allocation = There was a game memory allocation error while writing the moveset data
+
+# Persistent play #
+persistent.explanation = The persistent mode allows you to select one to two movesets to place on both players, with those movesets staying even across loading screens and even if you switch the side you're playing on.\nThis can be used online if the opponent also has this tool running, with each of you having downloaded/extracted both movesets already:\nYou must then each set your own moveset (or None) as "Player", and the opponent's moveset (or None) as "Opponent", and lock-in.
 
 # Online #
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset (or none if you want) before the match's loading screen , the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running.

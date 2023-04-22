@@ -58,6 +58,7 @@ moveset.version = Version
 
 # Navmenu #
 navmenu.category_moveset = Personnages
+navmenu.category_play = Jouer
 navmenu.extraction = Extraction
 navmenu.import = Importation
 navmenu.online = Jeu en ligne
