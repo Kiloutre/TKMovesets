@@ -38,7 +38,7 @@ public:
 	// Everything that is related to files is done through .storage. Listing, deleting, etc. We store this here because GameData* needs a storage copy anyway.
 	LocalStorage* storage = nullptr;
 	// Stores the currently selected game's info
-	GameInfo const * currentGame = nullptr;
+	GameInfo const* currentGame = nullptr;
 	// Used to know which process is currently being searched/opened
 	std::string currentGameProcess;
 	// Currently opened process for extraction.

@@ -17,8 +17,8 @@ void GameSharedMem::OnProcessDetach()
 void GameSharedMem::InstantiateFactory()
 {
 	// Delete old instances if needed
-	if (importer != nullptr) {
-		delete importer;
+	if (m_importer != nullptr) {
+		delete m_importer;
 	}
 
 	if (m_sharedMemHandler != nullptr) {
@@ -28,7 +28,7 @@ void GameSharedMem::InstantiateFactory()
 	game->gameKey = currentGame->dataString;
 	game->minorGameKey = currentGame->minorDataString;
 	// Every game has its own subtleties so we use polymorphism to manage that
-	importer = Games::FactoryGetImporter(currentGame, process, game);
+	m_importer = Games::FactoryGetImporter(currentGame, process, game);
 	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
 }
 
@@ -67,11 +67,11 @@ void GameSharedMem::RunningUpdate()
 			ImportationErrcode_ err;
 
 			auto& [moveset, settings, playerId] = m_plannedImportations[0];
-			err = importer->Import(moveset.filename.c_str(), 0, settings, progress);
+			err = m_importer->Import(moveset.filename.c_str(), 0, settings, progress);
 
 			// Send the successfully loaded moveset to the shared memory manager
 			if (err == ImportationErrcode_Successful) {
-				auto& lastLoaded = importer->lastLoaded;
+				auto& lastLoaded = m_importer->lastLoaded;
 				m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
 				// Make a copy of the displayed movesets to avoid the GUI having to iterate on a vector that might be destroyed at any time
 				displayedMovesets = *m_sharedMemHandler->displayedMovesets;
@@ -87,7 +87,7 @@ void GameSharedMem::RunningUpdate()
 			* Should check both player offsets and shared memory
 			* Importer should return a list of unused movesets and then shared mem handler should be checked too before proceeding
 			if (settings & ImportSettings_FreeUnusedMovesets) {
-				importer->CleanupUnusedMovesets();
+				m_importer->CleanupUnusedMovesets();
 			}
 			*/
 		}

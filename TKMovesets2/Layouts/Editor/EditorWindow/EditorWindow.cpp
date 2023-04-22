@@ -223,7 +223,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 
 bool EditorWindow::MovesetStillLoaded()
 {
-	gameAddr movesetAddress = m_importerHelper.importer->GetMovesetAddress(m_importerHelper.currentPlayerId);
+	gameAddr movesetAddress = m_importerHelper.GetCurrentPlayerMovesetAddr();
 #ifdef BUILD_TYPE_DEBUG
 	if (movesetAddress != m_loadedMoveset) {
 		DEBUG_LOG("MovesetStillLoaded = false, current is %llx, old was %llx\n", movesetAddress, m_loadedMoveset);

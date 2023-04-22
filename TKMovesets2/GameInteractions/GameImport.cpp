@@ -30,19 +30,19 @@ void GameImport::OnProcessDetach()
 
 void GameImport::InstantiateFactory()
 {
-	if (importer != nullptr) {
-		delete importer;
+	if (m_importer != nullptr) {
+		delete m_importer;
 	}
 
 	game->gameKey = currentGame->dataString;
 	game->minorGameKey = currentGame->minorDataString;
 	// Every game has its own importation subtleties so we use polymorphism to manage that
-	importer = Games::FactoryGetImporter(currentGame, process, game);
+	m_importer = Games::FactoryGetImporter(currentGame, process, game);
 }
 
 void GameImport::PreProcessDetach()
 {
-	importer->CleanupUnusedMovesets();
+	m_importer->CleanupUnusedMovesets();
 }
 
 void GameImport::RunningUpdate()
@@ -57,14 +57,14 @@ void GameImport::RunningUpdate()
 
 			auto& [moveset, movesetSize, filename, playerAddress, settings] = m_plannedImportations[0];
 			if (moveset == nullptr) {
-				err = importer->Import(filename.c_str(), playerAddress, settings, progress);
+				err = m_importer->Import(filename.c_str(), playerAddress, settings, progress);
 			}
 			else {
-				err = importer->Import(moveset, movesetSize, playerAddress, settings, progress);
+				err = m_importer->Import(moveset, movesetSize, playerAddress, settings, progress);
 			}
 
 			if (settings & ImportSettings_FreeUnusedMovesets) {
-				importer->CleanupUnusedMovesets();
+				m_importer->CleanupUnusedMovesets();
 			}
 
 			if (err != ImportationErrcode_Successful) {
@@ -72,7 +72,7 @@ void GameImport::RunningUpdate()
 				errored = true;
 			}
 			else {
-				lastLoadedMoveset = importer->lastLoaded.address;
+				lastLoadedMoveset = m_importer->lastLoaded.address;
 			}
 
 			m_plannedImportations.erase(m_plannedImportations.begin());
@@ -97,11 +97,11 @@ void GameImport::StopThreadAndCleanup()
 	m_threadStarted = false;
 	m_t.join();
 
-	if (importer != nullptr) {
+	if (m_importer != nullptr) {
 		if (process->IsAttached()) {
-			importer->CleanupUnusedMovesets();
+			m_importer->CleanupUnusedMovesets();
 		}
-		delete importer;
+		delete m_importer;
 	}
 
 	delete process;
@@ -110,14 +110,14 @@ void GameImport::StopThreadAndCleanup()
 
 bool GameImport::CanStart(bool cached)
 {
-	if (importer == nullptr) {
+	if (m_importer == nullptr) {
 		return false;
 	}
 	if (cached) {
 		return m_canStart;
 	}
 	// Per-game definition
-	return importer->CanImport();
+	return m_importer->CanImport();
 }
 
 bool GameImport::IsBusy()
@@ -129,7 +129,7 @@ bool GameImport::IsBusy()
 void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
-	gameAddr playerAddress = importer->GetCharacterAddress(currentPlayerId);
+	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
 	m_plannedImportations.push_back({
 		.moveset = moveset,
 		.movesetSize = movesetSize,
@@ -142,7 +142,7 @@ void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t moveset
 void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
-	gameAddr playerAddress = importer->GetCharacterAddress(currentPlayerId);
+	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
 	m_plannedImportations.push_back({
 		.moveset = nullptr,
 		.movesetSize = 0,
@@ -154,9 +154,19 @@ void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings
 
 uint8_t GameImport::GetCharacterCount()
 {
-	if (importer != nullptr) {
-		return importer->characterCount;
+	// todo: If the importer gets deallocated while we do this, things can go bad
+	if (m_importer != nullptr) {
+		return m_importer->characterCount;
 	}
 	// Return 1 by default on purpose, easier to debug stuff that way
 	return 1;
+}
+
+gameAddr GameImport::GetCurrentPlayerMovesetAddr()
+{
+	// todo: If the importer gets deallocated while we do this, things can go bad
+	if (m_importer != nullptr) {
+		return m_importer->GetMovesetAddress(currentPlayerId);
+	}
+	return 0;
 }

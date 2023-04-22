@@ -26,6 +26,8 @@ private:
 protected:
 	// List of errors, one extraction fail = 1 error
 	std::vector<ImportationErrcode_> m_errors;
+	// Importer class, never stores an Importer*, used for polymorphism
+	Importer* m_importer = nullptr;
 
 	// Callback called whenever the process is re-attached
 	virtual void OnProcessAttach() override;
@@ -39,8 +41,6 @@ protected:
 	void PreProcessDetach() override;
 
 public:
-	// Importer class, never stores an Importer*, used for polymorphism
-	Importer* importer = nullptr;
 	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
 	// Stores the in-game addresses of the last moveset loaded by the last Queue() call
@@ -62,4 +62,6 @@ public:
 	ImportationErrcode_ GetLastError();
 	// Returns the amount of characters we are able to import to
 	uint8_t GetCharacterCount() override;
+
+	gameAddr GetCurrentPlayerMovesetAddr();
 };
