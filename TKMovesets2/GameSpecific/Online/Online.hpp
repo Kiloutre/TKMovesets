@@ -44,7 +44,7 @@ public:
 	bool injectedDll = false;
 
 	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
-	~Online();
+	virtual ~Online();
 
 	// Load the shared memory handle
 	bool LoadSharedMemory();

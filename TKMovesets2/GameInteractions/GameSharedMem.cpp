@@ -8,7 +8,6 @@ void GameSharedMem::OnProcessAttach()
 
 void GameSharedMem::OnProcessDetach()
 {
-	DEBUG_LOG("OnProcessDetach\n");
 	isMemoryLoaded = false;
 	isInjecting = false;
 	m_requestedInjection = false;
@@ -127,4 +126,22 @@ bool GameSharedMem::IsBusy()
 void GameSharedMem::InjectDll()
 {
 	isInjecting = true;
+}
+
+void GameSharedMem::StopThreadAndCleanup()
+{
+	// Order thread to stop
+	m_threadStarted = false;
+	m_t.join();
+
+	if (m_importer != nullptr) {
+		if (process->IsAttached()) {
+			m_importer->CleanupUnusedMovesets();
+		}
+		delete m_sharedMemHandler;
+		delete m_importer;
+	}
+
+	delete process;
+	delete game;
 }

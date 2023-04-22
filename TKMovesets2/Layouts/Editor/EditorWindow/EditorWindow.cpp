@@ -317,6 +317,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 	filename = m_loadedCharacter.filename.c_str();
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 
+
 	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
 
 	// Read what needs to be read and potentially displayed right away

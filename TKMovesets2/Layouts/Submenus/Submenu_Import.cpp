@@ -204,7 +204,8 @@ void Submenu_Import::Render(GameImport& importerHelper)
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
 
-				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
+				bool canImportMoveset = canImport && importerHelper.currentGame->SupportsGameImport(moveset->gameId);
+				if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImportMoveset)) {
 					importerHelper.QueueCharacterImportation(moveset->filename, GetImportationSettings());
 				}
 				ImGui::PopID();

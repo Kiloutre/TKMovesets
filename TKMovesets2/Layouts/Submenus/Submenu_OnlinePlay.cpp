@@ -46,7 +46,7 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 
-			bool isImportable = moveset->onlineImportable; // todo: think about how different games will be handled
+			bool isImportable = moveset->onlineImportable;
 			if (!isImportable)
 			{
 				// Draw BG
@@ -70,7 +70,8 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TableNextColumn();
 			ImGui::PushID(moveset->filename.c_str());
 
-			if (ImGuiExtra::RenderButtonEnabled(_("online.select_moveset"), canSelectMoveset && isImportable)) {
+			bool canImportSpecificMoveset = canSelectMoveset && isImportable && gameHelper->currentGame->SupportsGameImport(moveset->gameId);
+			if (ImGuiExtra::RenderButtonEnabled(_("online.select_moveset"), canImportSpecificMoveset)) {
 				SelectMoveset(moveset);
 			}
 			ImGui::PopID();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <set>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -42,6 +43,7 @@ enum GameFlag_
 
 struct GameInfo
 {
+public:
 	// Displayed name of the game
 	const char* name;
 	// Process that will be opened and main module name
@@ -58,6 +60,8 @@ struct GameInfo
 	const char* dataString;
 	// Used to build path for label files and game addresses, higher priority than .dataString
 	const char* minorDataString;
+	// List of movesets' games we can import from, doesn't have to include ourselves
+	std::set<uint16_t> supportedImports;
 	// Dynamic type allocator to store the game's extractor. Can be nullptr for no available extractor.
 	FactoryType_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.
@@ -66,6 +70,12 @@ struct GameInfo
 	FactoryType_Base* editor;
 	// Dynamic type allocator to store the game's online handler. Can be nullptr for no available handler.
 	FactoryType_Base* onlineHandler;
+
+
+	bool SupportsGameImport(uint16_t t_gameId) const
+	{
+		return this != nullptr && (gameId == t_gameId || supportedImports.contains(t_gameId));
+	}
 };
 
 namespace Games

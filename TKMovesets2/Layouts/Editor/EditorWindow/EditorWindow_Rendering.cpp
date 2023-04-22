@@ -257,6 +257,7 @@ void EditorWindow::RenderStatusBar()
 	// Import button
 	ImGui::SameLine();
 	bool canImport = isAttached && !m_importerHelper.IsBusy() && m_canInteractWithGame && m_importNeeded;
+	bool isMovesetCompatible = m_importerHelper.currentGame->SupportsGameImport(m_loadedCharacter.gameId);
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		m_importerHelper.lastLoadedMoveset = 0;
 

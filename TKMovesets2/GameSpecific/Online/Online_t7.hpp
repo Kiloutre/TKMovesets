@@ -16,6 +16,7 @@ private:
 	}
 public:
 	using Online::Online; // Inherit constructor too
+	~OnlineT7() override;
 
 	void Init() override;
 	void OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playerId, const s_lastLoaded& lastLoadedMoveset) override;	// Called when the user wants to de-select a moveset for a given player

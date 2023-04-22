@@ -47,6 +47,8 @@ public:
 	bool CanStart(bool cached=true) override { return true; };
 	// Is currently busy with an importation
 	bool IsBusy() override;
+	// Stops the thread started above
+	void StopThreadAndCleanup() override;
 
 	// Queue a DLL injection for the next RunningUpdate() tick
 	void InjectDll();

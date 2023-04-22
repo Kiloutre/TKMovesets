@@ -12,16 +12,9 @@ Online::~Online()
 {
     if (injectedDll && m_process->CheckRunning())
     {
-        for (auto& module : m_process->GetModuleList())
-        {
-            if (module.name == "MovesetLoader.dll")
-            {
-                // Tell the DLL to unload itself
-                DEBUG_LOG("~Online(): Calling Remote " MOVESET_LOADER_STOP_FUNC "(); \n");
-                CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC);
-                break;
-            }
-        }
+        // Tell the DLL to unload itself
+        DEBUG_LOG("~Online(): Calling Remote " MOVESET_LOADER_STOP_FUNC "(); \n");
+        CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC);
     }
 
     if (m_memoryHandle != nullptr) {

@@ -1,5 +1,12 @@
 #include "Online_t7.hpp"
 
+OnlineT7::~OnlineT7()
+{
+    if (injectedDll && m_process->CheckRunning()) {
+        m_sharedMemPtr->locked_in = false;
+    }
+}
+
 void OnlineT7::Init()
 {
     m_sharedMemPtr = (SharedMemT7*)m_orig_sharedMemPtr;
