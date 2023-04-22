@@ -10,6 +10,7 @@
 #include "Submenu_Extract.hpp"
 #include "Submenu_Edition.hpp"
 #include "Submenu_OnlinePlay.hpp"
+#include "Submenu_PersistentPlay.hpp"
 
 // Other
 #include "GameExtract.hpp"
@@ -45,6 +46,8 @@ public:
 	Submenu_Edition editionMenu;
 	// Online submenu
 	Submenu_OnlinePlay onlineMenu;
+	// Persistent play submenu
+	Submenu_PersistentPlay persistentPlayMenu;
 
 	// Edition windows
 	std::vector<EditorWindow*> editorWindows;

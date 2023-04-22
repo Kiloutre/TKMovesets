@@ -2,7 +2,7 @@
 
 #include "GameSharedMem.hpp"
 
-class Submenu_OnlinePlay {
+class Submenu_PersistentPlay {
 private:
 	// Orders the loading of a moveset in the game memory and set it as the local player's moveset
 	void SelectMoveset(movesetInfo* moveset);

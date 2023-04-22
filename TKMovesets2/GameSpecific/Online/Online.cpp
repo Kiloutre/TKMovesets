@@ -10,7 +10,7 @@ Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t m
 
 Online::~Online()
 {
-    if (m_injectedDll && m_process->IsAttached())
+    if (injectedDll && m_process->CheckRunning())
     {
         for (auto& module : m_process->GetModuleList())
         {
@@ -78,17 +78,14 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
 
 void Online::InjectDll()
 {
+    isInjecting = true;
     std::thread m1(&Online::InjectDllAndWaitEnd, this);
     m1.detach();
 }
 
 bool Online::InjectDllAndWaitEnd()
 {
-    if (isInjecting) {
-        return false;
-    }
     DEBUG_LOG("Online::InjectDll()\n");
-    isInjecting = true;
     std::wstring currDirectory;
     {
         // Get directory of our .exe because this is where the MovesetLoader is located
@@ -112,7 +109,7 @@ bool Online::InjectDllAndWaitEnd()
         result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
     }
 
-    m_injectedDll = true;
+    injectedDll = true;
     isInjecting = false;
 
     DEBUG_LOG("Online::InjectDll() -> return\n");

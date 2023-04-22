@@ -26,8 +26,6 @@ class DLLCONTENT Online : public BaseGameSpecificClass
 protected:
 	// Stores a handle to the shared memory
 	HANDLE m_memoryHandle = nullptr;
-	// Contains whether or not we have injected our DLL
-	bool m_injectedDll = false;
 	// Ptr to the shared memory
 	void* m_orig_sharedMemPtr = nullptr;
 
@@ -42,6 +40,8 @@ public:
 	std::vector<movesetInfo>* displayedMovesets;
 	// True if we are currently injecting a DLL
 	bool isInjecting = false;
+	// Contains whether or not we have injected our DLL
+	bool injectedDll = false;
 
 	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	~Online();

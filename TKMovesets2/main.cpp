@@ -84,7 +84,7 @@ static void InitMainClasses(MainWindow& program)
 	program.sharedMem.Init(addrFile, &program.storage);
 
 	program.onlineMenu.gameHelper = &program.sharedMem;
-	//program.persistentMenu.gameHelper = &program.sharedMem;
+	program.persistentPlayMenu.gameHelper = &program.sharedMem;
 
 	{
 		// Detect running games and latch on to them if possible

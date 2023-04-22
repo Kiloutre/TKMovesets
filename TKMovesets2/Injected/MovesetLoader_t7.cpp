@@ -86,10 +86,11 @@ namespace T7Hooks
 	{
 		DEBUG_LOG("\n- ApplyNewMoveset on player %llx, moveset is %llx -\n", (uint64_t)player, (uint64_t)newMoveset);
 
+		// First, call the original function to let the game initialize all the important values in their new moveset
 		auto retVal = g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
 
 		if (!g_loader->sharedMemPtr->locked_in) {
-			//return retVal;
+			return retVal;
 		}
 
 		// Determine if we, the user, are the main player or if we are p2

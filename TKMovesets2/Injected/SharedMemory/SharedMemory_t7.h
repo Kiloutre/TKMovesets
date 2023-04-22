@@ -33,7 +33,7 @@ struct SharedMemT7_Player
 struct SharedMemT7
 {
 	// List of players to send custom movesets to
-	SharedMemT7_Player players[6];
+	SharedMemT7_Player players[2];
 	// Only load custom movesets if locked in
 	bool locked_in;
 };

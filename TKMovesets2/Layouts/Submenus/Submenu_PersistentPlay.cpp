@@ -1,17 +1,17 @@
 #include <ImGui.h>
 
-#include "Submenu_OnlinePlay.hpp"
+#include "Submenu_PersistentPlay.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "Games.hpp"
 
-void Submenu_OnlinePlay::SelectMoveset(movesetInfo* moveset)
+void Submenu_PersistentPlay::SelectMoveset(movesetInfo* moveset)
 {
 	unsigned int playerId = 0;
 	gameHelper->QueueCharacterImportation(moveset, playerId, ImportSettings_BasicLoadOnly);
 }
 
-void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
+void Submenu_PersistentPlay::RenderMovesetList(bool canSelectMoveset)
 {
 	auto availableSpace = ImGui::GetContentRegionAvail();
 	ImVec2& tableSize = availableSpace;
@@ -81,9 +81,9 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 	}
 }
 
-void Submenu_OnlinePlay::Render()
+void Submenu_PersistentPlay::Render()
 {
-	ImGuiExtra::RenderTextbox(_("online.explanation"));
+	ImGuiExtra::RenderTextbox(_("persistent.explanation"));
 	ImGui::SeparatorText(_("select_game"));
 
 	// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
@@ -171,7 +171,7 @@ void Submenu_OnlinePlay::Render()
 					ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), gameHelper->progress);
 				}
 			}
-
+				
 			// Show selected moveset info
 			if (sharedMemoryLoaded)
 			{

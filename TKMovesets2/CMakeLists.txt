@@ -75,8 +75,9 @@ set(BINARY_SOURCES
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
-                    "Layouts/Submenus/Submenu_OnlinePlay.cpp"
                     "Layouts/Submenus/Submenu_Edition.cpp"
+                    "Layouts/Submenus/Submenu_OnlinePlay.cpp"
+                    "Layouts/Submenus/Submenu_PersistentPlay.cpp"
                     "Layouts/Submenus/Submenu_About.cpp"
                     # Layout: editor window
                     "Layouts/Editor/EditorWindow/EditorWindow.cpp"
