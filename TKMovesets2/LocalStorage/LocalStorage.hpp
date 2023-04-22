@@ -24,6 +24,8 @@ struct movesetInfo
 	uint64_t size;
 	std::string sizeStr;
 
+	std::string crc32Str;
+
 	time_t modificationDate;
 	uint16_t gameId;
 	uint16_t minorVersion;

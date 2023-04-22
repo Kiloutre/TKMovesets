@@ -856,7 +856,9 @@ namespace StructsT7_gameAddr
 
 	struct MovesetInfo
 	{
-		char _0x0[8];
+		char _0x0[2];
+		bool isInitialized;
+		char _0x3[5];
 		char* character_name_addr;
 		char* character_creator_addr;
 		char* date_addr;

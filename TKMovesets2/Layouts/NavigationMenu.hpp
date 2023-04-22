@@ -27,7 +27,7 @@ class NavigationMenu
 {
 private:
 	// Currently selected lang ID
-	int m_languageId = 0;
+	unsigned int m_languageId = 0;
 	// List of translations to display
 	TranslationData* m_translations;
 	// Amount of translations
@@ -40,6 +40,7 @@ public:
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
 
 	NavigationMenu();
+
 	// Main render function
 	void Render(float width);
 

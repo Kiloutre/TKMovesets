@@ -38,6 +38,8 @@ public:
 	bool isMemoryLoaded = false;
 	// True if the DLL was successfully injected
 	bool isInjected = false;
+	// True if we are locked in
+	bool lockedIn = false;
 
 	// Default flags are read-only, so the importer needs this
 	GameSharedMem() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD; }
@@ -46,7 +48,9 @@ public:
 	// Is currently busy with an importation
 	bool IsBusy() override;
 
+	// Queue a DLL injection for the next RunningUpdate() tick
 	void InjectDll();
+
 	void QueueCharacterImportation(movesetInfo* moveset, unsigned int playerId, ImportSettings settings = 0);
 
 	// Forbid access to these

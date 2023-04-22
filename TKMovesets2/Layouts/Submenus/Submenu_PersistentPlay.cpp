@@ -7,18 +7,28 @@
 
 void Submenu_PersistentPlay::SelectMoveset(movesetInfo* moveset)
 {
-	unsigned int playerId = 0;
-	gameHelper->QueueCharacterImportation(moveset, playerId, ImportSettings_BasicLoadOnly);
+	gameHelper->QueueCharacterImportation(moveset, currentPlayerCursor, ImportSettings_BasicLoadOnly);
+	currentPlayerCursor = -1;
+}
+
+void Submenu_PersistentPlay::ClearMoveset()
+{
+	// Pass a moveset of size 0 to indicate the GameSharedMem class that we want to clear and not import a moveset
+	movesetInfo emptyMoveset;
+	emptyMoveset.size = 0;
+
+	gameHelper->QueueCharacterImportation(&emptyMoveset, currentPlayerCursor, ImportSettings_BasicLoadOnly);
+	currentPlayerCursor = -1;
 }
 
 void Submenu_PersistentPlay::RenderMovesetList(bool canSelectMoveset)
 {
 	auto availableSpace = ImGui::GetContentRegionAvail();
-	ImVec2& tableSize = availableSpace;
+	availableSpace.y -= ImGui::GetFrameHeightWithSpacing();
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
 	if (ImGui::BeginTable("MovesetImportationList", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
-		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, tableSize))
+		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, availableSpace))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
@@ -148,15 +158,15 @@ void Submenu_PersistentPlay::Render()
 	// Moveset list
 
 	auto availableSpace = ImGui::GetContentRegionAvail();
-	ImVec2 tableSize = ImVec2(availableSpace.x, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
+	ImVec2 tableSize = ImVec2(availableSpace.x, availableSpace.y);
 
 	if (ImGui::BeginTable("MovesetOnlineSelect", 2, ImGuiTableFlags_NoHostExtendY, tableSize))
 	{
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		{
 
-			bool canSelectMoveset = sharedMemoryLoaded && !isBusy;
+		{
+			bool canSelectMoveset = sharedMemoryLoaded && !isBusy && currentPlayerCursor != -1;
 			RenderMovesetList(canSelectMoveset);
 		}
 

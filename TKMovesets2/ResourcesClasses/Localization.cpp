@@ -39,6 +39,7 @@ namespace Localization
 {
 	bool LoadFile(const char* locale, bool unloadPrevious)
 	{
+		DEBUG_LOG("-- LoadFile(%s) --\n", locale);
 		int langId = -1;
 		
 		// Attempt to find locale in translation list
@@ -114,7 +115,7 @@ namespace Localization
 		}
 
 
-		DEBUG_LOG("Loaded translation '%s'.\n", locale);
+		DEBUG_LOG("Loaded translation '%s', id %d.\n", locale, g_langId);
 		return true;
 	}
 

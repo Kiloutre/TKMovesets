@@ -45,7 +45,7 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, float
 
 NavigationMenu::NavigationMenu()
 {
-	unsigned int m_languageId = Localization::GetCurrLangId();
+	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
 }
 
@@ -67,11 +67,13 @@ void NavigationMenu::Render(float width)
 	ImGui::PushItemWidth(width);
 	if (ImGui::BeginCombo("##", m_translations[m_languageId].displayName))
 	{
-		for (int i = 0; i < m_translations_count; ++i)
+		for (unsigned int i = 0; i < m_translations_count; ++i)
 		{
 			ImGui::PushID(&i);
 			if (ImGui::Selectable(m_translations[i].displayName, i == m_languageId)) {
-				Localization::LoadFile(m_translations[i].locale, true);
+				if (Localization::LoadFile(m_translations[i].locale, true)) {
+					m_languageId = Localization::GetCurrLangId();
+				}
 			}
 			ImGui::PopID();
 		}

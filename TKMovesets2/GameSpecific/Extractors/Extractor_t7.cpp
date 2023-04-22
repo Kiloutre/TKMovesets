@@ -723,19 +723,36 @@ bool ExtractorT7::CanExtract()
 	for (int i = 0; i < 2; ++i)
 	{
 		gameAddr player = playerAddress + i * m_game->GetValue("playerstruct_size");
-		gameAddr currentMove = m_process->readInt64(player + m_game->GetValue("currmove"));
-		if (currentMove == 0 || currentMove == -1) {
-			return false;
+
+		// Read into current moveset to see if it has been initialized
+		{
+			gameAddr movesetAddr = m_process->readUInt64(playerAddress + m_game->GetValue("motbin_offset"));
+			if (movesetAddr == 0 || movesetAddr == -1) {
+				return false;
+			}
+
+			int8_t isInitialized = m_process->readInt8(movesetAddr + offsetof(MovesetInfo, isInitialized));
+			if (isInitialized != 1) {
+				return false;
+			}
 		}
 
-		gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
-		if (animAddr == 0 || animAddr == -1) {
-			return false;
-		}
+		// Read into current move to see if it is valid
+		{
+			gameAddr currentMove = m_process->readUInt64(player + m_game->GetValue("currmove"));
+			if (currentMove == 0 || currentMove == -1) {
+				return false;
+			}
 
-		uint8_t animType = m_process->readInt8(animAddr);
-		if (animType != 0x64 && animType != 0xC8) {
-			return false;
+			gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
+			if (animAddr == 0 || animAddr == -1) {
+				return false;
+			}
+
+			uint8_t animType = m_process->readInt8(animAddr);
+			if (animType != 0x64 && animType != 0xC8) {
+				return false;
+			}
 		}
 	}
 	return true;

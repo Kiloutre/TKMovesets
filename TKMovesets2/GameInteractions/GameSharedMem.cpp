@@ -11,6 +11,7 @@ void GameSharedMem::OnProcessDetach()
 	isMemoryLoaded = false;
 	isInjecting = false;
 	m_requestedInjection = false;
+	lockedIn = false;
 	displayedMovesets.clear();
 }
 
@@ -58,6 +59,11 @@ void GameSharedMem::RunningUpdate()
 			}
 		}
 	}
+	else
+	{
+		m_sharedMemHandler->SetLockIn(lockedIn);
+	}
+
 
 	bool errored = false;
 	while (IsBusy())
@@ -67,18 +73,27 @@ void GameSharedMem::RunningUpdate()
 			ImportationErrcode_ err;
 
 			auto& [moveset, settings, playerId] = m_plannedImportations[0];
-			err = m_importer->Import(moveset.filename.c_str(), 0, settings, progress);
 
-			// Send the successfully loaded moveset to the shared memory manager
-			if (err == ImportationErrcode_Successful) {
-				auto& lastLoaded = m_importer->lastLoaded;
-				m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
-				// Make a copy of the displayed movesets to avoid the GUI having to iterate on a vector that might be destroyed at any time
-				displayedMovesets = *m_sharedMemHandler->displayedMovesets;
-			} else {
-				m_errors.push_back(err);
-				errored = true;
+			// The only case where .size can be 0 is if a Submenu purposefully set it that way, to indicate that we want to clear the selection
+			if (moveset.size == 0) {
+				m_sharedMemHandler->ClearMovesetSelection(playerId);
 			}
+			else
+			{
+				err = m_importer->Import(moveset.filename.c_str(), 0, settings, progress);
+
+				// Send the successfully loaded moveset to the shared memory manager
+				if (err == ImportationErrcode_Successful) {
+					auto& lastLoaded = m_importer->lastLoaded;
+					m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
+				} else {
+					m_errors.push_back(err);
+					errored = true;
+				}
+			}
+
+			// Make a copy of the displayed movesets to avoid the GUI having to iterate on a vector that might be destroyed at any time
+			displayedMovesets = *m_sharedMemHandler->displayedMovesets;
 
 			m_plannedImportations.erase(m_plannedImportations.begin());
 

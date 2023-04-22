@@ -56,4 +56,8 @@ public:
 	bool InjectDllAndWaitEnd();
 	// Called when a moveset is successfully loaded in the game's memory by the importer
 	virtual void OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playerId, const s_lastLoaded& lastLoadedMoveset) = 0;
+	// Called when the user wants to de-select a moveset for a given player
+	virtual void ClearMovesetSelection(unsigned int playerid) = 0;
+	// Enable or disable custom moveset loading for the game
+	virtual void SetLockIn(bool locked) = 0;
 };

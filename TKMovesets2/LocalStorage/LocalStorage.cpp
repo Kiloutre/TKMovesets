@@ -51,6 +51,14 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 			// _wstat() the file to read modification time
 			_wstat(filename.c_str(), &buffer);
 
+			// Build crc32 str string
+			std::string crc32Str;
+			{
+				char buffer[9];
+				sprintf(buffer, "%08X", movesetInfos.crc32);
+				crc32Str = buffer;
+			}
+
 			return new movesetInfo{
 				.color = getMovesetColor(movesetInfos.flags),
 				.filename = filename,
@@ -62,6 +70,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.date_str = Helpers::formatDateTime(movesetInfos.date),
 				.size = totalSize,
 				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
+				.crc32Str = crc32Str,
 				.modificationDate = buffer.st_mtime,
 				.gameId = movesetInfos.gameId,
 				.minorVersion = movesetInfos.minorVersion,
