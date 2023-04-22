@@ -14,6 +14,7 @@ void OnlineT7::OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playe
     while (displayedMovesets->size() <= playerid) {
         displayedMovesets->push_back({.size = 0});
     }
+
     (*displayedMovesets)[playerid] = *displayedMoveset;
 
     m_sharedMemPtr->players[playerid].crc32 = lastLoadedMoveset.crc32;
@@ -24,11 +25,12 @@ void OnlineT7::OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playe
 
 void OnlineT7::ClearMovesetSelection(unsigned int playerid)
 {
+    movesetInfo emptyMoveset{ .size = 0 };
+
     while (displayedMovesets->size() <= playerid) {
-        displayedMovesets->push_back({.size = 0});
+        displayedMovesets->push_back(emptyMoveset);
     }
-    movesetInfo emptyMoveset;
-    emptyMoveset.size = 0;
+
     (*displayedMovesets)[playerid] = emptyMoveset;
     m_sharedMemPtr->players[playerid].custom_moveset_addr = 0;
 }

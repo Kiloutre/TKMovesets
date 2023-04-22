@@ -114,13 +114,13 @@ importation.error_allocation = Il y a eu une erreur d'allocation lors de lecture
 importation.error_game_allocation = Il y a eu une erreur d'allocation dans le jeu lors de l'écriture des données du personnage
 
 # Jeu persistant #
-persistent.explanation = Le mode persistant permet de sélectionner deux moveset et de les garder appliqués à travers les écrans de chargement et différents modes de jeu.\nSi le joueur distant possède aussi ce programme, ce menu peut être utilisé pour jouer en ligne: il faudra alors que vous et le joueur disant possédiez tous les deux les movesets à appliquer sur l'un et l'autre. Appliquez ensuite votre moveset (ou aucun) sur J1, et son moveset (ou aucun) sur J2, puis verrouillez.
+persistent.explanation = Le mode persistant permet de sélectionner deux moveset et de les garder appliqués à travers les écrans de chargement et différents modes de jeu.\nSi le joueur distant possède aussi ce programme, ce menu peut être utilisé pour jouer en ligne: il faudra alors que vous et le joueur disant possédiez tous les deux les movesets à appliquer sur l'un et l'autre. Appliquez ensuite votre moveset (ou aucun) sur 'Joueur 1', et son moveset (ou aucun) sur 'Joueur 2', puis verrouillez.
 persistent.player_1 = Joueur 1:
 persistent.player_2 = Joueur 2:
 persistent.none = Aucun personnage
-persistent.lock = Verrouiller
+persistent.lock = Verrouiller les personnages
 persistent.unlock = Déverrouiller
-persistent.hash = Hash:
+persistent.hash = Hachage:
 persistent.select_moveset = Sélectionner personnage
 persistent.clear_moveset = Enlever personnage
 
@@ -134,7 +134,7 @@ online.injecting_dll = Injection...
 online.select_moveset = Sélectionner
 online.selected_moveset = Sélectionné:
 
-# Modifcation de moveset : Renommage #
+# Modification de moveset : Renommage #
 edition.rename.new_moveset_name = Nouveau nom
 edition.rename.empty_name = Nom est vide
 edition.rename.already_exists = Le nom est déjà utilisé par un autre fichier

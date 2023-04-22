@@ -114,15 +114,16 @@ importation.error_allocation = There was a memory allocation error while reading
 importation.error_game_allocation = There was a game memory allocation error while writing the moveset data
 
 # Persistent play #
-persistent.explanation = The persistent mode allows you to select one to two movesets to place on both players, with those movesets staying even across loading screens and even if you switch the side you're playing on.\nThis can be used online if the opponent also has this tool running, with each of you having downloaded/extracted both movesets already:\nYou must then each set your own moveset (or None) as "Player", and the opponent's moveset (or None) as "Opponent", and lock-in.
+persistent.explanation = The persistent mode allows you to select the movesets to apply on players, with those movesets staying even across loading screens and even if you switch the side you're playing on.\nThis can be used online if the opponent also has this tool running, with each of you having downloaded/extracted both movesets already:\nYou must then each set your own moveset (or None) as "Player 1", and the opponent's moveset (or None) as "Player 2", and lock-in.
 persistent.player_1 = Player 1:
 persistent.player_2 = Player 2:
 persistent.none = No moveset
-persistent.lock = Lock-in
+persistent.lock = Lock characters
 persistent.unlock = Unlock
 persistent.hash = Hash:
 persistent.select_moveset = Select moveset
 persistent.clear_moveset = Clear moveset
+
 # Online #
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset (or none if you want) before the match's loading screen , the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running.
 online.select_moveset = Select moveset

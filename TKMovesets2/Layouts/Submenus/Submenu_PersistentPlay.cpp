@@ -14,8 +14,7 @@ void Submenu_PersistentPlay::SelectMoveset(movesetInfo* moveset)
 void Submenu_PersistentPlay::ClearMoveset()
 {
 	// Pass a moveset of size 0 to indicate the GameSharedMem class that we want to clear and not import a moveset
-	movesetInfo emptyMoveset;
-	emptyMoveset.size = 0;
+	movesetInfo emptyMoveset{ .size = 0 };
 
 	gameHelper->QueueCharacterImportation(&emptyMoveset, m_currentPlayerCursor, ImportSettings_BasicLoadOnly);
 	m_currentPlayerCursor = -1;
@@ -160,6 +159,19 @@ void Submenu_PersistentPlay::RenderGameControls()
 			}
 			else {
 				ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), gameHelper->progress);
+			}
+		}
+		else if (isAttached && sharedMemoryLoaded) {
+			ImGui::SameLine();
+			if (gameHelper->lockedIn) {
+				if (ImGui::Button(_("persistent.unlock"))) {
+					gameHelper->lockedIn = false;
+				}
+			}
+			else {
+				if (ImGuiExtra::RenderButtonEnabled(_("persistent.lock"), m_currentPlayerCursor == -1)) {
+					gameHelper->lockedIn = true;
+				}
 			}
 		}
 	}

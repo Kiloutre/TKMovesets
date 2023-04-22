@@ -124,7 +124,7 @@ void MainWindow::Update()
 			ImGui::SetNextWindowPos(mainView->Pos);
 			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height));
 			ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
-			navMenu.Render((float)(navMenuWidth - 10));
+			navMenu.Render((float)(navMenuWidth - 10), persistentPlayMenu.gameHelper->lockedIn);
 			ImGui::End();
 		}
 

@@ -34,7 +34,7 @@ private:
 	unsigned int m_translations_count;
 
 	// Render a list of buttons with predetermined size for use in the navbar
-	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width);
+	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width, bool navigationLocked);
 public:
 	// Stores the ID of the current menu to render
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
@@ -42,6 +42,6 @@ public:
 	NavigationMenu();
 
 	// Main render function
-	void Render(float width);
+	void Render(float width, bool navigationLocked);
 
 };
