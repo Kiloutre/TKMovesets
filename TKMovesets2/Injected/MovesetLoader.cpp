@@ -164,13 +164,22 @@ void MovesetLoader::RegisterHook(const char* functionName, const std::string& mo
     DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx)\n", functionName, functionAddr, functionAddr - moduleAddr);
 }
 
-uint64_t MovesetLoader::GetFunctionAddr(const std::string& functionName)
+uint64_t MovesetLoader::GetFunctionAddr(const char* functionName)
 {
-    if (m_functions.contains(functionName)) {
-        return m_functions[functionName];
+    auto func = m_functions.find(functionName);
+    if (func != m_functions.end()) {
+        return func->second;
     }
     DEBUG_LOG("GetFunctionAddr(): Function '%s' not found\n", functionName.c_str());
     return 0;
+}
+
+void MovesetLoader::HookFunction(const char* functionName)
+{
+    auto hook = m_hooks.find(functionName);
+    if (hook != m_hooks.end()) {
+        hook->second.detour->hook();
+    }
 }
 
 // -- Static helper -- //

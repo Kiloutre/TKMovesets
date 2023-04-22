@@ -533,5 +533,6 @@ void EditorWindow::Render(int dockid)
 		//popen = true;
 	}
 
+	// -- Now that rendering is done, we can clean up what needs to be cleaned up -- //
 	m_importerHelper.FreeExpiredFactoryClasses();
 }

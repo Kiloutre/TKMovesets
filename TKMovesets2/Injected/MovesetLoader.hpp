@@ -67,19 +67,21 @@ public:
 	~MovesetLoader();
 
 	// Cast a trampoline function and returns it
-	template<class T> T CastTrampoline(const std::string& hookName);
+	template<class T> T CastTrampoline(const char* hookName);
 	// Initializes a hook for a game function. Does not actually trigger it
 	void InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr);
 	// Registers a function in the m_functions map, searching in a specific module for the bytes in game_addresses.ini
 	void RegisterFunction(const char* functionName, const std::string& moduleName, const char* c_addressId);
 	// Registers a hook in the m_hooks map, searching in a specific module for the bytes in game_addresses.ini
 	void RegisterHook(const char* functionName, const std::string& moduleName, const char* c_addressId, uint64_t hookAddr);
+	// Hooks a function if it exists and was successfully registered before, does nothing otherwise
+	void HookFunction(const char* functionName);
 	// Returns the casted address of a previously registered fnction
-	template<class T> T CastFunction(const std::string& functionName);
+	template<class T> T CastFunction(const char* functionName);
 	// Returns the value of a variable, reading sizeof(T)
-	template<typename T> T ReadVariable(const std::string& variableName);
+	template<typename T> T ReadVariable(const char* variableName);
 	// Returns the address of the function
-	uint64_t GetFunctionAddr(const std::string& functionName);
+	uint64_t GetFunctionAddr(const char* functionName);
 
 	// Initializes the list of hook
 	virtual void InitHooks() = 0;
@@ -93,7 +95,7 @@ public:
 	void SetMainModule(const char* name);
 };
 
-template<class T> T MovesetLoader::CastTrampoline(const std::string& hookName)
+template<class T> T MovesetLoader::CastTrampoline(const char* hookName)
 {
 	if (m_hooks.contains(hookName)) {
 		return (T)m_hooks[hookName].trampoline;
@@ -102,7 +104,7 @@ template<class T> T MovesetLoader::CastTrampoline(const std::string& hookName)
 	return nullptr;
 }
 
-template<class T> T MovesetLoader::CastFunction(const std::string& functionName)
+template<class T> T MovesetLoader::CastFunction(const char* functionName)
 {
 	if (m_functions.contains(functionName)) {
 		return (T)m_functions[functionName];
@@ -111,7 +113,7 @@ template<class T> T MovesetLoader::CastFunction(const std::string& functionName)
 	return nullptr;
 }
 
-template<class T> T MovesetLoader::ReadVariable(const std::string& functionName)
+template<class T> T MovesetLoader::ReadVariable(const char* functionName)
 {
 	if (variables.contains(functionName)) {
 		return *(T*)variables[functionName];

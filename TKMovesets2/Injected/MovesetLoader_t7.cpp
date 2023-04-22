@@ -20,6 +20,8 @@ namespace T7Functions
 
 	// Returns address of a structure that contains playerid among other things
 	typedef uint64_t(*GetTK3447820)();
+
+	typedef void(*ExecuteExtraprop)(int* prop, void *player, char a3[16], char a4, char a5, float a6, char a7[16], char a8[16], char a9[16], char a10[16], char a11[16], uint64_t a12);
 }
 
 // -- Helpers --
@@ -177,6 +179,14 @@ namespace T7Hooks
 		vfprintf(stdout, format, argptr);
 		va_end(argptr);
 	}
+
+
+	void ExecuteExtraprop(int* prop, void* player, char a3[16], char a4, char a5, float a6, char a7[16], char a8[16], char a9[16], char a10[16], char a11[16], uint64_t a12)
+	{
+		DEBUG_LOG("TK__ExecuteExtraprop - %p %p ", prop, player);
+		DEBUG_LOG(" ?? %u %u %.3f ?? ?? ?? ?? , %llx\n", a4, a5, a6, a12);
+		g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(prop, player, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
+	}
 }
 
 // -- Hooking init --
@@ -201,6 +211,7 @@ void MovesetLoaderT7::InitHooks()
 	RegisterFunction("TK__GetTK3447820", m_moduleName, "f_GetTK3447820");
 
 	// Other less important things
+	RegisterHook("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop", (uint64_t)&T7Hooks::ExecuteExtraprop);
 	{
 #ifdef BUILD_TYPE_DEBUG
 		// Find TK__Log
@@ -229,11 +240,11 @@ void MovesetLoaderT7::PostInit()
 	}
 
 	// Apply the hooks that need to be applied immediately
-	m_hooks["TK__ApplyNewMoveset"].detour->hook();
+	HookFunction("TK__ApplyNewMoveset");
+	HookFunction("TK__ExecuteExtraprop");
 
-	if (m_hooks.contains("TK__Log")) {
-		m_hooks["TK__Log"].detour->hook();
-	}
+	// Other
+	HookFunction("TK__Log");
 }
 
 // -- Main -- //
