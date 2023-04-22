@@ -23,7 +23,7 @@ private:
 	// Callback called whenever the process is re-attached
 	void OnProcessAttach() override;
 	// Callback called whenever the process is detached
-	virtual void OnProcessDetach() override;
+	void OnProcessDetach() override;
 	// Instantiate an extractor with polymorphism, also destroy the old one
 	void InstantiateFactory() override;
 	// Function ran in the parallel thread, used to latch on to process and load the shared memory

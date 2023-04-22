@@ -36,7 +36,7 @@ private:
 	// Render a list of buttons with predetermined size for use in the navbar
 	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width);
 public:
-	// Stores the ID of the current menu to ender
+	// Stores the ID of the current menu to render
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
 
 	NavigationMenu();

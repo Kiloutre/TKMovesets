@@ -115,6 +115,14 @@ importation.error_game_allocation = Il y a eu une erreur d'allocation dans le je
 
 # Jeu persistant #
 persistent.explanation = Le mode persistant permet de sélectionner deux moveset et de les garder appliqués à travers les écrans de chargement et différents modes de jeu.\nSi le joueur distant possède aussi ce programme, ce menu peut être utilisé pour jouer en ligne: il faudra alors que vous et le joueur disant possédiez tous les deux les movesets à appliquer sur l'un et l'autre. Appliquez ensuite votre moveset (ou aucun) sur J1, et son moveset (ou aucun) sur J2, puis verrouillez.
+persistent.player_1 = Joueur 1:
+persistent.player_2 = Joueur 2:
+persistent.none = Aucun personnage
+persistent.lock = Verrouiller
+persistent.unlock = Déverrouiller
+persistent.hash = Hash:
+persistent.select_moveset = Sélectionner personnage
+persistent.clear_moveset = Enlever personnage
 
 # Jeu en ligne #
 online.explanation = Le jeu en ligne nécessite que les deux joueurs possèdent cet outil en train de tourner.\nVous devez chacun de vôtre côté selectionner un personnage à charger (ou aucun) avant le chargement du match, cet outil se chargera de synchroniser les personnages que vous avez modifié.\nLes moveset personnalisés ne seront pas chargés si vous ou l'adversaire n'avez pas cet outil de lancé.
@@ -340,6 +348,7 @@ edition.projectile.horizontal_velocity = Vélocité horizontale
 edition.projectile.duration = Durée
 edition.projectile.no_collision = Pas de collision
 edition.projectile.size = Taille
+edition.projectile.hash = Hachage
 edition.projectile.can_hitbox_connect = "Can hitbox connect"
 edition.projectile.gravity = Gravité
 edition.projectile.hit_level = Hauteur de coup

@@ -8,6 +8,7 @@ void GameSharedMem::OnProcessAttach()
 
 void GameSharedMem::OnProcessDetach()
 {
+	DEBUG_LOG("OnProcessDetach\n");
 	isMemoryLoaded = false;
 	isInjecting = false;
 	m_requestedInjection = false;

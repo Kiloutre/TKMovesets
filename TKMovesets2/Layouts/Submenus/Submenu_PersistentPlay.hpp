@@ -4,7 +4,7 @@
 
 class Submenu_PersistentPlay {
 private:
-	int32_t currentPlayerCursor = -1;
+	int32_t m_currentPlayerCursor = -1;
 
 	// Orders the loading of a moveset in the game memory and set it as the local player's moveset
 	void SelectMoveset(movesetInfo* moveset);
@@ -18,4 +18,6 @@ public:
 	void Render();
 	// Renders the movelist
 	void RenderMovesetList(bool canSelectMoveset);
+	// Render the game selector, dll inject button
+	void RenderGameControls();
 };

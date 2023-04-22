@@ -20,6 +20,7 @@ void GameInteraction::SetTargetProcess(const GameInfo* gameInfo)
 	if (process->IsAttached()) {
 		PreProcessDetach();
 		process->Detach();
+		OnProcessDetach();
 	}
 }
 
