@@ -162,7 +162,6 @@ void Submenu_PersistentPlay::RenderGameControls()
 			}
 		}
 		else if (isAttached && sharedMemoryLoaded) {
-			ImGui::SameLine();
 			if (gameHelper->lockedIn) {
 				if (ImGui::Button(_("persistent.unlock"))) {
 					gameHelper->lockedIn = false;
@@ -187,7 +186,8 @@ void Submenu_PersistentPlay::Render()
 
 	auto availableSpace = ImGui::GetContentRegionAvail();
 
-	if (ImGui::BeginTable("OnlinePlayCharSelect", 3, ImGuiTableFlags_NoHostExtendY, ImVec2(0, 75)))
+	unsigned int playerCount = gameHelper->GetCharacterCount();
+	if (ImGui::BeginTable("OnlinePlayCharSelect", 1 + playerCount, ImGuiTableFlags_NoHostExtendY, ImVec2(0, 75)))
 	{
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
@@ -218,7 +218,7 @@ void Submenu_PersistentPlay::Render()
 		auto selectedMovesetList_copy = gameHelper->displayedMovesets;
 		auto rowWidth = availableSpace.x / 3;
 		bool movesetListNotEmpty = gameHelper->storage->extractedMovesets.size();
-		for (unsigned int playerid = 0; playerid < 2; ++playerid)
+		for (unsigned int playerid = 0; playerid < playerCount; ++playerid)
 		{
 			auto p = ImGui::GetCursorPos();
 			ImGui::TableNextColumn();
