@@ -204,7 +204,7 @@ namespace T7Hooks
 
 void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 {
-	if (!g_loader->HasHook("TK__ExecuteExtraprop")) {
+	if (!g_loader->HasFunction("TK__ExecuteExtraprop")) {
 		return;
 	}
 
@@ -251,7 +251,7 @@ void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 	a12 = 0;
 
 
-	g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, &prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
+	g_loader->CastFunction<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, &prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
 }
 
 // -- Hooking init --
@@ -276,9 +276,13 @@ void MovesetLoaderT7::InitHooks()
 	RegisterFunction("TK__GetTK3447820", m_moduleName, "f_GetTK3447820");
 
 	// Other less important things
-	RegisterHook("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop", (uint64_t)&T7Hooks::ExecuteExtraprop);
+	RegisterFunction("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop");
+
 	{
 #ifdef BUILD_TYPE_DEBUG
+		// Also hook extraprop to debug print it
+		RegisterHook("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop", (uint64_t)&T7Hooks::ExecuteExtraprop);
+
 		// Find TK__Log
 		auto funcAddr = addresses.ReadPtrPathInCurrProcess("f_Log_addr", m_moduleAddr);
 		if (InjectionUtils::compare_memory_string((void*)funcAddr, addresses.GetString("f_Log")))
