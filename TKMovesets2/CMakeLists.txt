@@ -53,6 +53,7 @@ set(INCLUDE_FOLDERS
                     "Injected/SharedMemory"
 
                     "${CMAKE_SOURCE_DIR}/Sig/include"
+                    "${CMAKE_SOURCE_DIR}/stb"
 )
 
 # This will be included in the .exe
@@ -171,7 +172,7 @@ add_library(MovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(MovesetLoader PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(MovesetLoader PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
+    target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
@@ -179,15 +180,18 @@ add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)
+    target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build program .exe
+enable_language("RC") # Icon and more resources later, if needed
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES})
-target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
+    # Console mode
+    add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} "app.rc")
+    target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
 else()
-add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES})
+    # GUI-only mode
+    add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES}  "app.rc")
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
@@ -200,7 +204,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/game_addresses.ini" "game_
 # Copies TKMInterface folder containg extra, optional interface data (editor labels, maybe more later down the line)
 add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Resources/TKMInterface" "${CMAKE_CURRENT_BINARY_DIR}/TKMInterface")
 # Debug. Yes, it's included every time, but that isn't important because its content change when in debug mode.
-add_definitions(/FI"${CMAKE_CURRENT_SOURCE_DIR}/Utils/debug.hpp")
 
 ## Extra dependencies ##
 # Link the other libraries that we use #

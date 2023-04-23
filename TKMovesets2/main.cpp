@@ -24,6 +24,13 @@
 
 #include "constants.h"
 
+// -- Errcodes -- //
+# define MAIN_ERR_GLFW_INIT       (1)
+# define MAIN_ERR_WINDOW_CREATION (2)
+# define MAIN_ERR_OPENGL_CONTEXT  (3)
+# define MAIN_ERR_MOVESET_LOADER  (4)
+# define MAIN_ERR_NO_ERR          (0)
+
 // -- Static helpers -- //
 
 static void WriteToLogFile(const std::string& content, bool append=true)
@@ -191,7 +198,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	// Initialize GLFW library
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) {
-		return 1;
+		return MAIN_ERR_GLFW_INIT;
 	}
 	WriteToLogFile("Initiated GLFW");
 
@@ -212,8 +219,24 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	WriteToLogFile("GLFW window created");
 
 	if (window == nullptr) {
-		return 2;
+		return MAIN_ERR_WINDOW_CREATION;
 	}
+	
+#ifndef BUILD_TYPE_DEBUG
+	{
+		// Set program icon (release only)
+		auto iconHandle = LoadImageA(hInstance, "IDI_ICON1", IMAGE_ICON, 256, 256, LR_SHARED | LR_DEFAULTSIZE);
+		if (iconHandle == nullptr) {
+			DEBUG_LOG("FAILED TO LOAD ICON\n");
+		}
+		else {
+			unsigned char* imageData;
+			GLFWimage icon = { 256, 256, imageData };
+			//glfwSetWindowIcon(window, 1, &icon);
+		}
+
+	}
+#endif
 
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
@@ -222,7 +245,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		DEBUG_LOG("Unable to context to OpenGL");
-		return 3;
+		return MAIN_ERR_OPENGL_CONTEXT;
 	}
 	WriteToLogFile("GLL Loader done");
 
@@ -245,7 +268,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
 		if (movesetLoaderLib == nullptr) {
 			DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
-			return 1;
+			return MAIN_ERR_MOVESET_LOADER;
 		}
 	}
 
@@ -306,5 +329,5 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	_CrtDumpMemoryLeaks();
 #endif
 
-	return 0;
+	return MAIN_ERR_NO_ERR;
 }

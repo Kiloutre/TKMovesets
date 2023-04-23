@@ -1,5 +1,7 @@
 #pragma once
 
+#include "debug.hpp"
+
 #ifdef DLL_EXPORTING
 #define DLLCONTENT __declspec(dllexport)
 #else
