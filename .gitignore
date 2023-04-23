@@ -16,7 +16,7 @@ _deps
 to_ignore
 vcpkg_installed
 enc_temp_folder
-.psd
+*.psd
 
 ##### Windows
 # Windows thumbnail cache files

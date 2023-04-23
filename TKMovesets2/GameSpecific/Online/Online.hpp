@@ -47,6 +47,9 @@ public:
 	bool isInjecting = false;
 	// Contains whether or not we have injected our DLL
 	bool injectedDll = false;
+	// If the shared memory is to be reseted && the injected DLL freed when this instance gets deleted.
+	// If you have multiple instances of sharedMem, it might be good to only have one reset the shared memory & free the dll
+	bool resetMemOnDestroy = false;
 
 	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	virtual ~Online();

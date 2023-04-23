@@ -145,6 +145,7 @@ void Submenu_PersistentPlay::RenderGameControls()
 		else {
 			if (ImGui::Button(_("online.inject_dll"))) {
 				gameHelper->InjectDll();
+				gameHelper->SetSharedMemDestroyBehaviour(true);
 			}
 		}
 		ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));

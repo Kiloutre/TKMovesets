@@ -2,7 +2,7 @@
 
 OnlineT7::~OnlineT7()
 {
-    if (injectedDll && m_process->CheckRunning()) {
+    if (resetMemOnDestroy && injectedDll && m_process->CheckRunning()) {
         m_sharedMemPtr->locked_in = false;
     }
 }

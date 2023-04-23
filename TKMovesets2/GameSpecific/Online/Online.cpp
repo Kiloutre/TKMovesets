@@ -11,12 +11,16 @@ Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t m
 
 Online::~Online()
 {
-    if (injectedDll && m_process->CheckRunning())
+#ifndef BUILD_TYPE_DEBUG
+    // Unload the DLL from the game if in release-mode
+    // Todo: test, see if this works
+    if (resetMemOnDestroy && injectedDll && m_process->CheckRunning())
     {
         // Tell the DLL to unload itself
         DEBUG_LOG("~Online(): Calling Remote " MOVESET_LOADER_STOP_FUNC "(); \n");
         CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC);
     }
+#endif
 
     if (m_memoryHandle != nullptr) {
         CloseHandle(m_memoryHandle);

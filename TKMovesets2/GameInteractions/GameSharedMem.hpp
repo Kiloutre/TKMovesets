@@ -59,6 +59,13 @@ public:
 	void ResetTargetProcess() override;
 	// Returns the shared memory handler
 	Online** GetSharedMemHandler() { return &m_sharedMemHandler; }
+	// Orders the shared memory to be cleared when the Online instance gets destroyed
+	void SetSharedMemDestroyBehaviour(bool resetMemOnDestroy)
+	{
+		if (m_sharedMemHandler) {
+			m_sharedMemHandler->resetMemOnDestroy = resetMemOnDestroy;
+		}
+	}
 
 	// Queue a DLL injection for the next RunningUpdate() tick
 	void InjectDll();
