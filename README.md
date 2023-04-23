@@ -33,7 +33,7 @@ This project requires external libraries to be downloaded & built to function. T
 - **If you do not have visual studio installed:** go into the project folder and run `vcpkg install` to install the dependencies
 vcpkg is now installed.
 
-## Submodules dependencies
+### Submodules dependencies
 
 If cloning with git from the command line, use this command to also download the required submodules:
 `git clone --recurse-submodules https://github.com/Kiloutre/TKMovesets.git`

@@ -307,7 +307,7 @@ public:
 	bool mustReloadMovelist = false;
 
 	Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
-	~Editor();
+	virtual ~Editor();
 
 	// Loads important moveset data in our class, required to start functionning
 	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;

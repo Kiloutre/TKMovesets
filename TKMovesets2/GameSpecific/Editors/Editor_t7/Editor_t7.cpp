@@ -793,3 +793,11 @@ uint32_t EditorT7::CalculateCRC32()
 	// That isn't that big of a problem
 	return Helpers::CalculateCrc32(hashedFileBlocks);
 }
+
+EditorT7::~EditorT7()
+{
+	if (animationExtractionStatus & AnimExtractionStatus_Finished) {
+		// Join the thread if it was ever created. Could be ongoing or finished, we still need to join it.
+		animExtractionThread->join();
+	}
+}

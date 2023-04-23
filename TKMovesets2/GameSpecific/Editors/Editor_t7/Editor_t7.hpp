@@ -252,6 +252,7 @@ private:
 
 public:
 	using Editor::Editor;
+	~EditorT7();
 
 	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
 	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
