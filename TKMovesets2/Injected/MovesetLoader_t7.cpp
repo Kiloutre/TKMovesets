@@ -194,7 +194,7 @@ namespace T7Hooks
 			print_int128(a9);
 			print_int128(a10);
 			print_int128(a11);
-			printf("%llx\n", a12);
+			DEBUG_LOG("%llx\n", a12);
 		}
 		g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
 	}

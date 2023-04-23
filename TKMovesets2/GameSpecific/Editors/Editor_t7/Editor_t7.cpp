@@ -794,6 +794,27 @@ uint32_t EditorT7::CalculateCRC32()
 	return Helpers::CalculateCrc32(hashedFileBlocks);
 }
 
+void EditorT7::SetSharedMemHandler(Online** sharedMemHandler)
+{
+	m_sharedMemHandler = (OnlineT7**)sharedMemHandler;
+}
+
+void EditorT7::ExecuteExtraprop(EditorInput* idField, EditorInput* valueField)
+{
+	if (m_sharedMemHandler && *m_sharedMemHandler && m_process->IsAttached())
+	{
+		if (!(*m_sharedMemHandler)->injectedDll) {
+			if (!(*m_sharedMemHandler)->InjectDllAndWaitEnd()) {
+				return;
+			}
+		}
+
+		uint32_t id = (uint32_t)EditorUtils::GetFieldValue(idField);
+		uint32_t value = (uint32_t)EditorUtils::GetFieldValue(valueField);
+		(*m_sharedMemHandler)->ExecuteExtraprop(currentPlayerId, (uint32_t)id, (uint32_t)value);
+	}
+}
+
 EditorT7::~EditorT7()
 {
 	if (animationExtractionStatus & AnimExtractionStatus_Finished) {

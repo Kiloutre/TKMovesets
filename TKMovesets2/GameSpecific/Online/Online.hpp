@@ -65,6 +65,4 @@ public:
 	virtual void ClearMovesetSelection(unsigned int playerid) = 0;
 	// Enable or disable custom moveset loading for the game
 	virtual void SetLockIn(bool locked) = 0;
-	// Execute an extraproperty inside of the game
-	virtual void ExecuteExtraprop(uint32_t playerid, uint64_t id, uint64_t value) = 0;
 };

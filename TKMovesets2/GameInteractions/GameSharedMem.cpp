@@ -163,21 +163,6 @@ void GameSharedMem::FreeExpiredFactoryClasses()
 	}
 }
 
-void GameSharedMem::ExecuteExtraprop(uint64_t id, uint64_t value)
-{
-	if (m_sharedMemHandler == nullptr || !process->IsAttached()) {
-		return;
-	}
-
-	if (!m_sharedMemHandler->injectedDll) {
-		if (!m_sharedMemHandler->InjectDllAndWaitEnd()) {
-			return;
-		}
-	}
-
-	m_sharedMemHandler->ExecuteExtraprop(currentPlayerId, id, value);
-}
-
 void GameSharedMem::ResetTargetProcess()
 {
 	if (process->IsAttached())

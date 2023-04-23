@@ -252,9 +252,10 @@ void EditorWindow::RenderStatusBar()
 			{
 				buf[0] = '1' + i;
 				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
+					m_editor->currentPlayerId = i;
 					m_importerHelper.currentPlayerId = i;
-					m_importerHelper.lastLoadedMoveset = 0;
 					m_sharedMemHelper.currentPlayerId = i;
+					m_importerHelper.lastLoadedMoveset = 0;
 				}
 			}
 			ImGui::EndCombo();

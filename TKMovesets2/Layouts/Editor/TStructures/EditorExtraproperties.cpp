@@ -221,10 +221,7 @@ void EditorExtraproperties::PreItemRender(int listIdx)
 		}
 
 		if (!errored) {
-			uint64_t id = EditorUtils::GetFieldValue(identifierMap["id"]);
-			uint64_t value = EditorUtils::GetFieldValue(identifierMap["value_unsigned"]);
-
-			m_baseWindow->ExecuteExtraproperty(id, value);
+			m_editor->ExecuteExtraprop(identifierMap["id"], identifierMap["value_unsigned"]);
 		}
 
 	}

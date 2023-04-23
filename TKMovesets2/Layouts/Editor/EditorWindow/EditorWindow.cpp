@@ -336,6 +336,9 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 	editorTable = &m_editor->movesetTable;
 
+	// Set the shared mem handler
+	m_editor->SetSharedMemHandler(m_sharedMemHelper.GetSharedMemHandler());
+
 	// Attempt to attach to game associated to moveset
 	auto processList = GameProcessUtils::GetRunningProcessList();
 	for (int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
@@ -385,12 +388,5 @@ void EditorWindow::IssueFieldUpdate(EditorWindowType_ winType, int valueChange, 
 		if (window->popen) {
 			window->RequestFieldUpdate(winType, valueChange, listStart, listEnd);
 		}
-	}
-}
-
-void EditorWindow::ExecuteExtraproperty(uint64_t id, uint64_t value)
-{
-	if (m_importerHelper.CanStart()) {
-		m_sharedMemHelper.ExecuteExtraprop(id, value);
 	}
 }

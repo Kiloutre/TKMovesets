@@ -57,8 +57,8 @@ public:
 	void FreeExpiredFactoryClasses() override;
 	// Deattach the current process if attached
 	void ResetTargetProcess() override;
-	// Execute an extraproperty
-	void ExecuteExtraprop(uint64_t id, uint64_t value);
+	// Returns the shared memory handler
+	Online** GetSharedMemHandler() { return &m_sharedMemHandler; }
 
 	// Queue a DLL injection for the next RunningUpdate() tick
 	void InjectDll();

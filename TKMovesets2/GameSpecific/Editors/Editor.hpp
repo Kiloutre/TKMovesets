@@ -12,6 +12,7 @@
 #include "GameProcess.hpp"
 #include "Helpers.hpp"
 #include "BaseGameSpecificClass.hpp"
+#include "Online.hpp"
 
 #include "constants.h"
 #include "GameTypes.h"
@@ -258,8 +259,6 @@ namespace EditorUtils
 
 		inputMap[fieldName] = newField;
 		EditorUtils::SetInputfieldColor(newField);
-		printf(EditorUtils::GetFieldFormat(flags), value);
-		printf("\n");
 		sprintf_s(newField->buffer, newField->bufsize, EditorUtils::GetFieldFormat(flags), value);
 
 		return newField;
@@ -282,6 +281,7 @@ protected:
 	Byte* m_movesetData = nullptr;
 	// Contains the moveset size, without our header
 	uint64_t m_movesetDataSize = 0;
+
 
 	// Stores a <name, offset> animation map
 	std::map<std::string, gameAddr>* m_animNameToOffsetMap = nullptr;
@@ -307,6 +307,8 @@ public:
 	std::vector<DisplayableMove*>* displayableMovelist;
 	// Set to true when updating displayableMovelist
 	bool mustReloadMovelist = false;
+	// Id of the currently selected player, used for extra properties execution
+	uint32_t currentPlayerId = 0;
 
 	Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	virtual ~Editor();
@@ -394,4 +396,8 @@ public:
 
 	// CRC32 calculation
 	virtual uint32_t CalculateCRC32() = 0;
+
+	// Shared memory, used for extra properties execution
+	virtual void SetSharedMemHandler(Online** sharedMemHandler) {}
+	virtual void ExecuteExtraprop(EditorInput* idField, EditorInput* valueField) {};
 };

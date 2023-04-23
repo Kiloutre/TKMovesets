@@ -4,6 +4,7 @@
 
 #include "Editor.hpp"
 #include "Helpers.hpp"
+#include "Online_t7.hpp"
 
 #include "Structs_t7.h"
 
@@ -54,6 +55,8 @@ private:
 	MvlHead* m_mvlHead = nullptr;
 	// Contains iterators for the various structure lists
 	StructIterators m_iterators;
+	// Used to execute extra properties if handled by the game
+	OnlineT7** m_sharedMemHandler = nullptr;
 
 
 	// Extra iterators setup
@@ -309,6 +312,10 @@ public:
 
 	// CRC32 calculation
 	uint32_t CalculateCRC32() override;
+
+	// Shared memory, used for extra properties execution
+	void SetSharedMemHandler(Online** sharedMemHandler) override;
+	void ExecuteExtraprop(EditorInput* idField, EditorInput* valueField) override;
 };
 
 template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
