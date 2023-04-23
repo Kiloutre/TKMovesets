@@ -33,7 +33,7 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 
 		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", value_int32);
 		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
-		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", value_float);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%.7g", value_float);
 	}
 	else if (name == "value_signed")
 	{
@@ -47,7 +47,7 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 
 		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%d", value_uint32);
 		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
-		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", value_float);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%.7g", value_float);
 	}
 	else if (name == "value_hex")
 	{
@@ -61,7 +61,7 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 
 		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", value_int32);
 		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "0x%X", value_uint32);
-		sprintf_s(fields["value_float"]->buffer, bufsize, "%f", value_float);
+		sprintf_s(fields["value_float"]->buffer, bufsize, "%.7g", value_float);
 	}
 	else if (name == "value_float")
 	{

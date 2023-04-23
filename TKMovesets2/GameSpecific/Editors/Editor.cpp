@@ -116,7 +116,7 @@ namespace EditorUtils
 			return "%u";
 		}
 		if (flags & (EditorInput_Float)) {
-			return "%f";
+			return "%.7g";
 		}
 		if (flags & (EditorInput_String)) {
 			return "%s";

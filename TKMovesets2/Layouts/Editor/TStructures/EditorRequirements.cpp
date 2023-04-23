@@ -24,7 +24,7 @@ void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 	if (name == "param_unsigned")
 	{
 		uint64_t value = EditorUtils::GetFieldValue(field);
-		sprintf_s(fields["param_float"]->buffer, bufsize, "%f", *(float*)&value);
+		sprintf_s(fields["param_float"]->buffer, bufsize, "%.7g", *(float*)&value);
 	}
 	else if (name == "param_float")
 	{

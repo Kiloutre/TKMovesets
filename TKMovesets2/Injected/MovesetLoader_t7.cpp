@@ -184,17 +184,18 @@ namespace T7Hooks
 
 	void ExecuteExtraprop(void* player, Requirement* prop, __ida_int128 a3, char a4, char a5, float a6, __ida_int128 a7, __ida_int128 a8, __ida_int128 a9, __ida_int128 a10, __ida_int128 a11, uint64_t a12)
 	{
-		/*
-		DEBUG_LOG("TK__ExecuteExtraprop - PROP[%x|%u], %p, ", prop->condition, prop->param_unsigned, player);
-		//print_int128(a3);
-		DEBUG_LOG("%u, %u, %.3f, ", a4, a5, a6);
-		print_int128(a7);
-		print_int128(a8);
-		print_int128(a9);
-		print_int128(a10);
-		print_int128(a11);
-		printf("%llx\n", a12);
-		*/
+
+		if ((uint64_t)player == GetPlayerList()[0]) {
+
+			DEBUG_LOG("TK__ExecuteExtraprop - PROP[%x|%u], %p, ", prop->condition, prop->param_unsigned, player);
+			DEBUG_LOG("%u, %u, %.3f, ", a4, a5, a6);
+			print_int128(a7);
+			print_int128(a8);
+			print_int128(a9);
+			print_int128(a10);
+			print_int128(a11);
+			printf("%llx\n", a12);
+		}
 		g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
 	}
 }
@@ -213,22 +214,41 @@ void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 	Requirement prop = { .condition = propId, .param_unsigned = propValue };
 
 	__ida_int128 a3;
-	char a4 = 0;
-	char a5 = 0;
-	float a6 = 0;
+	char a4;
+	char a5;
+	float a6;
 	__ida_int128 a7;
 	__ida_int128 a8;
 	__ida_int128 a9;
 	__ida_int128 a10;
 	__ida_int128 a11;
-	uint64_t a12 = 0;
+	uint64_t a12;
 
+	// Trail vfx
+	/*
 	SET_INT128(a3, 0, 0x4000000000000000);
+	a4 = 0;
+	a5 = 0;
+	a6 = 0;
 	SET_INT128(a7, 0, 0x4000000000000000);
 	SET_INT128(a8, 0, 0x4000000000000000);
 	SET_INT128(a9, 1, 0x4000000000000000);
 	SET_INT128(a10, 1, 0x4000000000000000);
 	SET_INT128(a11, 0, 0x4000000000000000);
+	a12 = 0;
+	*/
+
+	// Projectile
+	SET_INT128(a3, 0, 0x4000000000000000);
+	a4 = 0;
+	a5 = 0;
+	a6 = 0;
+	SET_INT128(a7, 0, 0x4000000000000000);
+	SET_INT128(a8, 0, 0x4000000000000000);
+	SET_INT128(a9, 1, 0x4000000000000000);
+	SET_INT128(a10, 1, 0x4000000000000000);
+	SET_INT128(a11, 0, 0x4000000000000000);
+	a12 = 0;
 
 
 	g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, &prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);

@@ -18,7 +18,7 @@
 #include "MovesetStructs.h"
 
 # define FORM_BUFSIZE (32) // Regular fields
-# define FORM_STRING_BUFSIZE (64) // String fields
+# define FORM_STRING_BUFSIZE (128) // String fields
 # define FORM_INPUT_MAX_BUFSIZE (256) // Some very long fields like displayable movelist use this
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
@@ -258,6 +258,8 @@ namespace EditorUtils
 
 		inputMap[fieldName] = newField;
 		EditorUtils::SetInputfieldColor(newField);
+		printf(EditorUtils::GetFieldFormat(flags), value);
+		printf("\n");
 		sprintf_s(newField->buffer, newField->bufsize, EditorUtils::GetFieldFormat(flags), value);
 
 		return newField;
