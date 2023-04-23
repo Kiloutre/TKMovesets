@@ -82,6 +82,14 @@ public:
 	template<typename T> T ReadVariable(const char* variableName);
 	// Returns the address of the function
 	uint64_t GetFunctionAddr(const char* functionName);
+	// Returns true if a function name was registered and is callable
+	bool HasFunction(const char* funcName) {
+		return m_functions.contains(funcName);
+	}
+	// Returns true if a hook name was registered and is callable
+	bool HasHook(const char* funcName) {
+		return m_hooks.contains(funcName);
+	}
 
 	// Initializes the list of hook
 	virtual void InitHooks() = 0;
@@ -93,6 +101,8 @@ public:
 	bool isInitialized() { return m_memoryHandle != nullptr; }
 	// Sets the main module name and address
 	void SetMainModule(const char* name);
+	// Can be called by outside processes to execute an extraproperty within the game
+	virtual void ExecuteExtraprop() = 0;
 };
 
 template<class T> T MovesetLoader::CastTrampoline(const char* hookName)

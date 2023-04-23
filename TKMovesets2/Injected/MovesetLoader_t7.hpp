@@ -26,4 +26,5 @@ public:
 	void InitHooks() override;
 	void PostInit() override;
 	void Mainloop() override;
+	void ExecuteExtraprop() override;
 };

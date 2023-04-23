@@ -42,6 +42,8 @@ public:
 	bool isInjected = false;
 	// True if we are locked in
 	bool lockedIn = false;
+	// If true, will synchronise the .lockedIn variable to the shared memory every RunningUpdate()
+	bool synchronizeLockin = true;
 
 	// Default flags are read-only, so the importer needs this
 	GameSharedMem() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD; }
@@ -53,6 +55,8 @@ public:
 	void StopThreadAndCleanup() override;
 	// Frees the factory-obtained class we allocated earlier
 	void FreeExpiredFactoryClasses() override;
+	// Execute an extraproperty
+	void ExecuteExtraprop(uint64_t id, uint64_t value);
 
 	// Queue a DLL injection for the next RunningUpdate() tick
 	void InjectDll();

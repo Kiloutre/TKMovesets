@@ -259,6 +259,7 @@ void EditorWindow::Save()
 EditorWindow::~EditorWindow()
 {
 	m_importerHelper.StopThreadAndCleanup();
+	m_sharedMemHelper.StopThreadAndCleanup();
 
 	for (auto& win : m_structWindows) {
 		delete win;
@@ -274,34 +275,47 @@ EditorWindow::~EditorWindow()
 
 EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
 {
-	m_importerHelper.Init(addrFile, storage);
-	m_importerHelper.StartThread();
+	{
+		// Init classes that interact with game process
+		m_importerHelper.Init(addrFile, storage);
+		m_sharedMemHelper.Init(addrFile, storage);
+
+		m_importerHelper.StartThread();
+		m_sharedMemHelper.synchronizeLockin = false;
+		m_sharedMemHelper.StartThread();
+	}
 
 	{
+		// Init editor logic class
 		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId);
 
 		m_editor = Games::FactoryGetEditor(gameInfo, m_importerHelper.process, m_importerHelper.game);
 		labels = new EditorLabel(gameInfo);
 	}
 
-	std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
+	Byte* moveset;
+	uint64_t movesetSize;
+	{
+		// Read moveset
+		std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
 
-	if (file.fail()) {
-		throw EditorWindow_MovesetLoadFail();
+		if (file.fail()) {
+			throw EditorWindow_MovesetLoadFail();
+		}
+
+		file.seekg(0, std::ios::end);
+		movesetSize = file.tellg();
+
+		moveset = (Byte*)malloc(movesetSize);
+		if (moveset == nullptr) {
+			throw EditorWindow_MovesetLoadFail();
+		}
+
+		file.seekg(0, std::ios::beg);
+		file.read((char*)moveset, movesetSize);
+
+		file.close();
 	}
-
-	file.seekg(0, std::ios::end);
-	uint64_t movesetSize = file.tellg();
-
-	Byte* moveset = (Byte*)malloc(movesetSize);
-	if (moveset == nullptr) {
-		throw EditorWindow_MovesetLoadFail();
-	}
-
-	file.seekg(0, std::ios::beg);
-	file.read((char*)moveset, movesetSize);
-
-	file.close();
 
 	m_editor->LoadMoveset(moveset, movesetSize);
 	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId, movesetInfo->minorVersion);
@@ -347,6 +361,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 		if (gameInfo->editor != nullptr) {
 			m_importerHelper.SetTargetProcess(gameInfo);
+			m_sharedMemHelper.SetTargetProcess(gameInfo);
 			DEBUG_LOG("Editor-compatible game '%s' already running: attaching.\n", processName);
 			break;
 		}
@@ -365,5 +380,12 @@ void EditorWindow::IssueFieldUpdate(EditorWindowType_ winType, int valueChange, 
 		if (window->popen) {
 			window->RequestFieldUpdate(winType, valueChange, listStart, listEnd);
 		}
+	}
+}
+
+void EditorWindow::ExecuteExtraproperty(uint64_t id, uint64_t value)
+{
+	if (m_importerHelper.CanStart()) {
+		m_sharedMemHelper.ExecuteExtraprop(id, value);
 	}
 }

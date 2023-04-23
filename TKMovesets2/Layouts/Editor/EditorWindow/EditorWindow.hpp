@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameImport.hpp"
+#include "GameSharedMem.hpp"
 #include "LocalStorage.hpp"
 #include "Editor.hpp"
 #include "EditorForm.hpp"
@@ -81,6 +81,8 @@ private:
 	Editor* m_editor = nullptr;
 	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
 	GameImport m_importerHelper;
+	// Copy of the shared mem helper, used to play extra propreties
+	GameSharedMem m_sharedMemHelper;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -124,4 +126,6 @@ public:
 	void ReloadMovelistFilter() override;
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
 	void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart=-1, int listEnd = -1) override;
+	// Execute an extraproperty
+	void ExecuteExtraproperty(uint64_t id, uint64_t value) override;
 };

@@ -239,6 +239,16 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	}
 	WriteToLogFile(std::format("Locale loaded - {}", Localization::GetCurrLangId()));
 
+	// Load the MovesetLoader in our own process so that we can know its function addresses
+	HMODULE movesetLoaderLib;
+	{
+		movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
+		if (movesetLoaderLib == nullptr) {
+			DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
+			return 1;
+		}
+	}
+
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program(window, c_glsl_version);
@@ -288,6 +298,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
+	FreeLibrary(movesetLoaderLib);
 	Localization::Clear();
 
 #ifdef BUILD_TYPE_DEBUG

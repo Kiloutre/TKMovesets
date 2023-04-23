@@ -46,3 +46,16 @@ void OnlineT7::SetLockIn(bool locked)
 {
     m_sharedMemPtr->locked_in = locked;
 }
+
+void OnlineT7::ExecuteExtraprop(uint32_t playerid, uint64_t id, uint64_t value)
+{
+    if (m_sharedMemPtr != nullptr) {
+        DEBUG_LOG("ExecuteExtraprop(): m_sharedMemPtr is NULL\n");
+        m_sharedMemPtr->propToPlay = {
+            .playerid = playerid,
+            .id = id,
+            .value = value
+        };
+        CallMovesetLoaderFunction("ExecuteExtraprop", true);
+    }
+}

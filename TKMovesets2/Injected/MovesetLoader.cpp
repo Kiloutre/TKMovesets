@@ -270,6 +270,13 @@ extern "C"
         }
         DEBUG_LOG("MovesetLoaderStop() -> return\n");
     }
+
+    void __declspec(dllexport) ExecuteExtraprop()
+    {
+        if (g_loader != nullptr) {
+            g_loader->ExecuteExtraprop();
+        }
+    }
 }
 
 // DLLMAIN

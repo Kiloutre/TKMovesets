@@ -204,6 +204,7 @@ void EditorWindow::RenderStatusBar()
 			if (gameInfo->importer != nullptr) {
 				if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
 					m_importerHelper.SetTargetProcess(gameInfo);
+					m_sharedMemHelper.SetTargetProcess(gameInfo);
 					m_loadedMoveset = 0;
 					m_importNeeded = true;
 					m_editor->live_loadedMoveset = 0;
@@ -248,6 +249,7 @@ void EditorWindow::RenderStatusBar()
 				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
 					m_importerHelper.currentPlayerId = i;
 					m_importerHelper.lastLoadedMoveset = 0;
+					m_sharedMemHelper.currentPlayerId = i;
 				}
 			}
 			ImGui::EndCombo();
@@ -535,4 +537,5 @@ void EditorWindow::Render(int dockid)
 
 	// -- Now that rendering is done, we can clean up what needs to be cleaned up -- //
 	m_importerHelper.FreeExpiredFactoryClasses();
+	m_sharedMemHelper.FreeExpiredFactoryClasses();
 }

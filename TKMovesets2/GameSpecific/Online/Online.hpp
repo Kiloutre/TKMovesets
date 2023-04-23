@@ -1,6 +1,7 @@
 #pragma once
 
 #include <windows.h>
+#include <thread>
 
 #include "GameProcess.hpp"
 #include "GameData.hpp"
@@ -28,6 +29,10 @@ protected:
 	HANDLE m_memoryHandle = nullptr;
 	// Ptr to the shared memory
 	void* m_orig_sharedMemPtr = nullptr;
+	// Thread that will run the DLL injection
+	std::thread* m_dllInjectionThread;
+	// True if dllInjection thread has been started at least once and must be joined
+	bool m_startedThread = false;
 
 	// Calls a function of the MovesetLoader inside of the remote process. Returns false if failure was encountered somewhere.
 	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);
@@ -60,4 +65,6 @@ public:
 	virtual void ClearMovesetSelection(unsigned int playerid) = 0;
 	// Enable or disable custom moveset loading for the game
 	virtual void SetLockIn(bool locked) = 0;
+	// Execute an extraproperty inside of the game
+	virtual void ExecuteExtraprop(uint32_t playerid, uint64_t id, uint64_t value) = 0;
 };

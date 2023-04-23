@@ -202,14 +202,33 @@ void EditorExtraproperties::PreItemRender(int listIdx)
 	}
 
 	auto cursor = ImGui::GetCursorPos();
-	float pos_x = ImGui::GetContentRegionAvail().x - 150;
+	float pos_x = ImGui::GetContentRegionAvail().x - 140;
 	
 	ImGui::SetCursorPosX(pos_x);
 	ImGui::PushStyleColor(ImGuiCol_Button, FORM_SPECIAL_BTN);
+	ImGui::PushID(listIdx);
 	if (ImGui::Button(">", ImVec2(20, 18)))
 	{
-		//play
+		auto identifierMap = m_items[listIdx]->identifierMap;
+
+		// Only execute if none of the related fields are errored
+		bool errored = false;
+		for (auto& [key, v] : identifierMap) {
+			if (v->errored) {
+				errored = true;
+				break;
+			}
+		}
+
+		if (!errored) {
+			uint64_t id = EditorUtils::GetFieldValue(identifierMap["id"]);
+			uint64_t value = EditorUtils::GetFieldValue(identifierMap["value_unsigned"]);
+
+			m_baseWindow->ExecuteExtraproperty(id, value);
+		}
+
 	}
+	ImGui::PopID();
 	ImGui::PopStyleColor();
 
 	ImGui::SetCursorPos(cursor);

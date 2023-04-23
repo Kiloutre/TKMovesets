@@ -59,8 +59,7 @@ void GameSharedMem::RunningUpdate()
 			}
 		}
 	}
-	else
-	{
+	else if (synchronizeLockin) {
 		m_sharedMemHandler->SetLockIn(lockedIn);
 	}
 
@@ -162,4 +161,19 @@ void GameSharedMem::FreeExpiredFactoryClasses()
 		m_toFree_importer = nullptr;
 		m_toFree_sharedMemHandler = nullptr;
 	}
+}
+
+void GameSharedMem::ExecuteExtraprop(uint64_t id, uint64_t value)
+{
+	if (m_sharedMemHandler == nullptr || !process->IsAttached()) {
+		return;
+	}
+
+	if (!m_sharedMemHandler->injectedDll) {
+		if (!m_sharedMemHandler->InjectDllAndWaitEnd()) {
+			return;
+		}
+	}
+
+	m_sharedMemHandler->ExecuteExtraprop(currentPlayerId, id, value);
 }

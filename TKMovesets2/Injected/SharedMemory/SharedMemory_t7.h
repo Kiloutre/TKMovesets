@@ -25,10 +25,17 @@ struct SharedMemT7_Player
 	}
 };
 
+struct SharedMemT7_Extraprop
+{
+	uint32_t playerid;
+	uint64_t id;
+	uint64_t value;
+};
+
 struct SharedMemT7 : SharedMemBase
 {
 	// List of players to send custom movesets to
 	SharedMemT7_Player players[2];
-	// Only load custom movesets if locked in
-	bool locked_in;
+	// Property to play when the exported ExecuteExtraprop() function is being called
+	SharedMemT7_Extraprop propToPlay;
 };

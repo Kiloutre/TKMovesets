@@ -184,6 +184,7 @@ namespace T7Hooks
 
 	void ExecuteExtraprop(void* player, Requirement* prop, __ida_int128 a3, char a4, char a5, float a6, __ida_int128 a7, __ida_int128 a8, __ida_int128 a9, __ida_int128 a10, __ida_int128 a11, uint64_t a12)
 	{
+		/*
 		DEBUG_LOG("TK__ExecuteExtraprop - PROP[%x|%u], %p, ", prop->condition, prop->param_unsigned, player);
 		//print_int128(a3);
 		DEBUG_LOG("%u, %u, %.3f, ", a4, a5, a6);
@@ -193,6 +194,7 @@ namespace T7Hooks
 		print_int128(a10);
 		print_int128(a11);
 		printf("%llx\n", a12);
+		*/
 		g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
 	}
 }
@@ -201,6 +203,12 @@ namespace T7Hooks
 
 void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 {
+	if (!g_loader->HasHook("TK__ExecuteExtraprop")) {
+		return;
+	}
+
+	DEBUG_LOG("ExecuteInstantExtraprop(%d, %x, %u)\n", playerid, propId, propValue);
+
 	void* player = (void*)(GetPlayerList()[playerid]);
 	Requirement prop = { .condition = propId, .param_unsigned = propValue };
 
@@ -223,7 +231,7 @@ void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 	SET_INT128(a11, 0, 0x4000000000000000);
 
 
-	T7Hooks::ExecuteExtraprop(player, &prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
+	g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, &prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
 }
 
 // -- Hooking init --
@@ -306,4 +314,12 @@ void MovesetLoaderT7::Mainloop()
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
+}
+
+// -- Interaction -- //
+
+void MovesetLoaderT7::ExecuteExtraprop()
+{
+	auto& propData = sharedMemPtr->propToPlay;
+	ExecuteInstantExtraprop(propData.playerid, propData.id, propData.value);
 }

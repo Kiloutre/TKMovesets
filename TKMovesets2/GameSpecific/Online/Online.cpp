@@ -6,6 +6,7 @@
 Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : BaseGameSpecificClass(process, game, gameId, minorVersion)
 {
     displayedMovesets = new std::vector<movesetInfo>();
+    m_dllInjectionThread = new std::thread();
 }
 
 Online::~Online()
@@ -21,6 +22,9 @@ Online::~Online()
         CloseHandle(m_memoryHandle);
     }
 
+    if (m_startedThread) {
+        m_dllInjectionThread->join();
+    }
     delete displayedMovesets;
 }
 
@@ -71,9 +75,14 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
 
 void Online::InjectDll()
 {
+    if (m_startedThread) {
+        // Ensure that the previous injection attempt was finished before trying a new one
+        m_dllInjectionThread->join();
+    }
+
     isInjecting = true;
-    std::thread m1(&Online::InjectDllAndWaitEnd, this);
-    m1.detach();
+    *m_dllInjectionThread = std::thread(&Online::InjectDllAndWaitEnd, this);
+    m_startedThread = true;
 }
 
 bool Online::InjectDllAndWaitEnd()
@@ -85,16 +94,6 @@ bool Online::InjectDllAndWaitEnd()
         wchar_t currPath[MAX_PATH] = { 0 };
         GetModuleFileNameW(nullptr, currPath, MAX_PATH);
         currDirectory = std::wstring(currPath);
-    }
-
-    // Load the MovesetLoader in our own process so that we can know its function addresses
-    HMODULE movesetLoaderLib;
-    {
-        movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
-        if (movesetLoaderLib == nullptr) {
-            DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
-            return false;
-        }
     }
 
     currDirectory.erase(currDirectory.find_last_of(L"\\/") + 1);
@@ -119,6 +118,5 @@ bool Online::InjectDllAndWaitEnd()
         DEBUG_LOG("Online::InjectDll() -> return\n");
     }
 
-    FreeLibrary(movesetLoaderLib);
     return result;
 }
