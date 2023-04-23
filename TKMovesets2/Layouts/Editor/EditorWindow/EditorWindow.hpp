@@ -97,16 +97,16 @@ private:
 
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorMovelistFilter_ filter);
-	// Returns true if our allocated moveset is still loaded on our character
+	// Returns true if our allocated moveset is still loaded on our character, in-game
 	bool MovesetStillLoaded();
 	// Save the loaded moveset to a file
 	void Save();
 public:
-	// Determines if the main window is open or not. If not, this tells the MainWindow parent class to free the ressources we have allocated
+	// Determines if main window is open or not. If not, this tells the MainWindow parent class to destroy this very class
 	bool popen = true;
-	// True is we need to call SetNextWindowFocus() before rendering our own
+	// True is we need to call SetNextWindowFocus() before rendering our own window
 	bool setFocus = false;
-	// Expose filename specifically and not the full editorInfos
+	// Expose filename specifically and not the full editorInfos. Used to avoid editing the same moveset twice.
 	const wchar_t* filename;
 
 	// Constructor that loads the moveset and starts its own importer

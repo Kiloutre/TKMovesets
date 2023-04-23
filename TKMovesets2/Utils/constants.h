@@ -58,6 +58,8 @@
 # define FORM_DELETE_BTN         IM_COL32(158, 47, 25, 255)
 # define FORM_BG_1               IM_COL32(48, 60, 140, 40)
 # define FORM_BG_2               IM_COL32(48, 60, 140, 15)
+# define FORM_SPECIAL_BTN        IM_COL32(156, 104, 33, 255)
+# define FORM_LIST_NEW_ITEM      IM_COL32(156, 104, 33, 50)
 
 # define MOVE_GENERIC            IM_COL32(77, 131, 219, 50)
 # define MOVE_CURRENT_GENERIC    IM_COL32(77, 131, 219, 5)

@@ -193,3 +193,24 @@ void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 		m_baseWindow->OpenFormWindow(EditorWindowType_Projectile, id);
 	}
 }
+
+
+void EditorExtraproperties::PreItemRender(int listIdx)
+{
+	if (listIdx + 1 == m_listSize) {
+		return;
+	}
+
+	auto cursor = ImGui::GetCursorPos();
+	float pos_x = ImGui::GetContentRegionAvail().x - 150;
+	
+	ImGui::SetCursorPosX(pos_x);
+	ImGui::PushStyleColor(ImGuiCol_Button, FORM_SPECIAL_BTN);
+	if (ImGui::Button(">", ImVec2(20, 18)))
+	{
+		//play
+	}
+	ImGui::PopStyleColor();
+
+	ImGui::SetCursorPos(cursor);
+}

@@ -340,6 +340,7 @@ void EditorFormList::RenderInternal()
 			drawlist->AddRectFilled(drawStart, drawStart + ImVec2(drawWidth, ImGui::GetTextLineHeightWithSpacing() + 4), color);
 		}
 
+		PreItemRender(listIndex);
 		RenderListControlButtons(listIndex);
 
 		auto& item = m_items[listIndex];
@@ -354,6 +355,7 @@ void EditorFormList::RenderInternal()
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth;
 		if (item->id == -1) {
 			nodeFlags |= ImGuiTreeNodeFlags_Framed;
+			ImGui::PushStyleColor(ImGuiCol_Header, FORM_LIST_NEW_ITEM);
 		}
 
 		ImGui::PushID(listIndex);
@@ -361,10 +363,16 @@ void EditorFormList::RenderInternal()
 			// Tree node hidden so no need to render anything
 			ImGui::PopID();
 			item->openStatus = EditorFormTreeview_Closed;
+			if (item->id == -1) {
+				ImGui::PopStyleColor();
+			}
 			continue;
 		}
 		ImGui::PopID();
 		item->openStatus = EditorFormTreeview_Opened;
+		if (item->id == -1) {
+			ImGui::PopStyleColor();
+		}
 
 		// Responsive form that tries to use big widths to draw up to 4 fields (+ 4 labels) per line
 		for (uint8_t category : m_categories)

@@ -44,7 +44,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	movesetInfo* movesetToLoad = nullptr;
 
 	auto availableSpace = ImGui::GetContentRegionAvail();
-	ImVec2 tableSize = ImVec2(0, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
+	ImVec2 tableSize = ImVec2(0, availableSpace.y);
 
 	if (ImGui::BeginTable("MovesetEditionList", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
