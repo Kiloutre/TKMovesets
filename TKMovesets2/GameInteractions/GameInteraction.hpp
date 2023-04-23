@@ -66,4 +66,6 @@ public:
 	virtual void StopThreadAndCleanup();
 	// Frees the factory-obtained class we allocated earlier
 	virtual void FreeExpiredFactoryClasses() = 0;
+	// Deattach the current process if attached
+	virtual void ResetTargetProcess() {};
 };

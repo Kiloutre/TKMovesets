@@ -55,6 +55,8 @@ public:
 	void StopThreadAndCleanup() override;
 	// Frees the factory-obtained class we allocated earlier
 	void FreeExpiredFactoryClasses() override;
+	// Deattach the current process if attached
+	void ResetTargetProcess() override;
 	// Execute an extraproperty
 	void ExecuteExtraprop(uint64_t id, uint64_t value);
 

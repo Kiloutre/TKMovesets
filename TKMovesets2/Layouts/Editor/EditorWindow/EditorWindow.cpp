@@ -215,7 +215,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
-		moveId = editorTable->aliases[moveId - 0x8000];
+		moveId = editorTable->aliases[moveId - (uint16_t)0x8000];
 	}
 
 	return moveId;
@@ -361,7 +361,12 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 		if (gameInfo->editor != nullptr) {
 			m_importerHelper.SetTargetProcess(gameInfo);
-			m_sharedMemHelper.SetTargetProcess(gameInfo);
+			if (gameInfo->onlineHandler != nullptr) {
+				m_sharedMemHelper.SetTargetProcess(gameInfo);
+			}
+			else {
+				m_sharedMemHelper.ResetTargetProcess();
+			}
 			DEBUG_LOG("Editor-compatible game '%s' already running: attaching.\n", processName);
 			break;
 		}

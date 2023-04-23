@@ -204,7 +204,12 @@ void EditorWindow::RenderStatusBar()
 			if (gameInfo->importer != nullptr) {
 				if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
 					m_importerHelper.SetTargetProcess(gameInfo);
-					m_sharedMemHelper.SetTargetProcess(gameInfo);
+					if (gameInfo->onlineHandler != nullptr) {
+						m_sharedMemHelper.SetTargetProcess(gameInfo);
+					}
+					else {
+						m_sharedMemHelper.ResetTargetProcess();
+					}
 					m_loadedMoveset = 0;
 					m_importNeeded = true;
 					m_editor->live_loadedMoveset = 0;

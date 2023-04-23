@@ -151,10 +151,9 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			continue;
 		}
 
-		bool isBigEndian = header.mota_swapped > 1;
 		uint32_t animCount = header.anim_count;
-		if (isBigEndian) {
-			animCount = SWAP_INT32(animCount);
+		if (header.is_big_endian) {
+			animCount = BYTESWAP_INT32(animCount);
 		}
 
 		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
@@ -171,12 +170,14 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			throw;
 		}
 
+		// Loop through every offset, find the highest
+		// There is no guarantee they are ordered so looking through all of them is quite safe
 		m_process->readBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
 		for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
 		{
 			uint32_t animOffset = animOffsetList[animIdx];
-			if (isBigEndian) {
-				animOffset = SWAP_INT32(animOffset);
+			if (header.is_big_endian) {
+				animOffset = BYTESWAP_INT32(animOffset);
 			}
 			if (animOffset > lastAnimOffset) {
 				lastAnimOffset = animOffset;
@@ -720,7 +721,7 @@ bool ExtractorT7::CanExtract()
 		return false;
 	}
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
 		gameAddr player = playerAddress + i * m_game->GetValue("playerstruct_size");
 
@@ -735,6 +736,21 @@ bool ExtractorT7::CanExtract()
 			if (isInitialized != 1) {
 				return false;
 			}
+
+			// Todo: Some mota are converted to little endian when movesets are loaded in the game
+			// Some aren't, find which, to avoid bad exports
+			/*
+			uint64_t listStart = offsetof(MovesetInfo, motas);
+			for (size_t motaId = 0; motaId < _countof(((MotaList*)0)->motas); ++motaId)
+			{
+				gameAddr motaAddr = m_process->readUInt64(movesetAddr + listStart + (8 * motaId));
+				if (motaAddr == 0 || motaAddr == -1) {
+					return false;
+				}
+
+				auto mota_swapped = m_process->readInt16(motaAddr + offsetof(MotaHeader, is_little_endian));
+			}
+			*/
 		}
 
 		// Read into current move to see if it is valid

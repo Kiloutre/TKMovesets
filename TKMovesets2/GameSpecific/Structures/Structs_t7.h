@@ -341,7 +341,8 @@ namespace StructsT7
 	struct MotaHeader
 	{
 		char mota_string[4];
-		uint16_t mota_swapped;
+		bool is_little_endian;
+		bool is_big_endian;
 		uint16_t unk0xA;
 		uint32_t unk0xC;
 		uint32_t anim_count;

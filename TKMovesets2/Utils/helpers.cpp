@@ -38,7 +38,7 @@ namespace Helpers
 	{
 		uint16_t animType = *(uint16_t*)anim;
 		if ((animType & 0xFF) == 0) {
-			animType = SWAP_INT16(animType);
+			animType = BYTESWAP_INT16(animType);
 		}
 
 		if (animType == 0xC8) {
@@ -63,7 +63,7 @@ namespace Helpers
 
 		uint32_t length = *(uint32_t*)&anim[4];
 		if (isSwapped) {
-			length = SWAP_INT32(length);
+			length = BYTESWAP_INT32(length);
 		}
 
 		return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
@@ -80,15 +80,15 @@ namespace Helpers
 		// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
 
 		uint64_t boneCount = *(uint16_t*)&anim[2];
-		boneCount = SWAP_INT16(boneCount);
+		boneCount = BYTESWAP_INT16(boneCount);
 
 		uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
 		Byte* anim_postBoneDescriptorAddr = (anim + postBoneDescriptor_offset);
 
 		uint64_t animLength = *(uint16_t*)&anim_postBoneDescriptorAddr[0];
 		uint64_t __unknown__ = *(uint16_t*)&anim_postBoneDescriptorAddr[4];
-		animLength = SWAP_INT16(animLength);
-		__unknown__ = SWAP_INT16(__unknown__);
+		animLength = BYTESWAP_INT16(animLength);
+		__unknown__ = BYTESWAP_INT16(__unknown__);
 
 		uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
 		uint64_t aa4 = 6 * (__unknown__ + boneCount);
@@ -98,7 +98,7 @@ namespace Helpers
 		unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
 		unsigned int keyframe = baseFrame / 16;
 		unsigned int _v56_intPtr = *(unsigned int*)&animPtr[4 * (uint64_t)keyframe];
-		_v56_intPtr = SWAP_INT32(_v56_intPtr);
+		_v56_intPtr = BYTESWAP_INT32(_v56_intPtr);
 
 		Byte* animPtr_2 = animPtr + _v56_intPtr;
 		int lastArg_copy = (int)boneCount;

@@ -96,7 +96,7 @@ static void InitMainClasses(MainWindow& program)
 		auto processList = GameProcessUtils::GetRunningProcessList();
 
 		// Loop through every game we support
-		for (int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
+		for (unsigned int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
 		{
 			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 			const char* processName = gameInfo->processName;

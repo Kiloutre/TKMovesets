@@ -7,7 +7,7 @@ class GameAddressesWrapper
 {
 public:
 	// Stores ptr paths, absolute addresses, values and such 
-	GameAddressesFile* addrFile;
+	GameAddressesFile* addrFile = nullptr;
 	// Secondary key used to obtain values from the addresses file
 	std::string gameKey;
 	// Primary key used to obtain values from the addresses file

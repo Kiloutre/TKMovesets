@@ -32,7 +32,7 @@ static uint64_t* GetPlayerList()
 	uint64_t baseFuncAddr = g_loader->GetFunctionAddr("TK__GetPlayerFromID");
 
 	// Base ourselves on the instructions (lea rcx, ...) to find the address since values are relative form the function start
-	uint64_t offset = *(uint32_t*)(baseFuncAddr + 11);
+	uint64_t offset = (uint64_t)*(uint32_t*)(baseFuncAddr + 11);
 	uint64_t offsetBase = baseFuncAddr + 15;
 
 	return (uint64_t*)(offsetBase + offset);
@@ -113,7 +113,7 @@ namespace T7Hooks
 		if (!customMoveset) {
 			return retVal;
 		}
-		DEBUG_LOG("Custom moveset %llx\n", customMoveset);
+		DEBUG_LOG("Custom moveset %p\n", customMoveset);
 
 		if (!playerData.is_initialized) {
 			InitializeMoveset(playerData);

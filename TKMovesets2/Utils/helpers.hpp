@@ -14,8 +14,8 @@
 
 #define offsetofVar(st, m) (offsetof(decltype(st), m))
 
-#define SWAP_INT32(x) (((x & 0xFF000000) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x & 0xFF) << 24))
-#define SWAP_INT16(x) (((x & 0xFFFF) >> 8) | ((x & 0xFF) << 8))
+#define BYTESWAP_INT32(x) (((x & 0xFF000000) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x & 0xFF) << 24))
+#define BYTESWAP_INT16(x) (((x & 0xFFFF) >> 8) | ((x & 0xFF) << 8))
 
 // Helper class to iterate on struct pts
 template<class T>

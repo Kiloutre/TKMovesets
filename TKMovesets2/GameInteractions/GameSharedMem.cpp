@@ -177,3 +177,23 @@ void GameSharedMem::ExecuteExtraprop(uint64_t id, uint64_t value)
 
 	m_sharedMemHandler->ExecuteExtraprop(currentPlayerId, id, value);
 }
+
+void GameSharedMem::ResetTargetProcess()
+{
+	if (process->IsAttached())
+	{
+		PreProcessDetach();
+		process->Detach();
+		OnProcessDetach();
+	}
+
+	currentGame = nullptr;
+
+	if (m_importer != nullptr) {
+		m_toFree_importer = m_importer;
+	}
+
+	if (m_sharedMemHandler != nullptr) {
+		m_toFree_sharedMemHandler = m_sharedMemHandler;
+	}
+}
