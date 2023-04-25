@@ -20,8 +20,10 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+    printf("Embedder: opening file %s ...\n", argv[2]);
     const char* sym = argv[1];
-    FILE* in = open_or_exit(argv[2], "r");
+    FILE* in = open_or_exit(argv[2], "rb");
+    printf("Embedder: opened file.\n", argv[2]);
 
     char symfile[256];
     snprintf(symfile, sizeof(symfile), "%s.c", sym);
@@ -32,21 +34,20 @@ int main(int argc, char** argv)
 
     unsigned char buf[256];
     size_t nread = 0;
-    size_t linecount = 0;
     do {
         nread = fread(buf, 1, sizeof(buf), in);
         size_t i;
         for (i = 0; i < nread; i++) {
-            fprintf(out, "0x%02x, ", buf[i]);
-            if (++linecount == 10) { fprintf(out, "\n"); linecount = 0; }
+            fprintf(out, "%d,", buf[i]);
         }
     } while (nread > 0);
-    if (linecount > 0) fprintf(out, "\n");
     fprintf(out, "};\n");
     fprintf(out, "const size_t %s_len = sizeof(%s);\n\n", sym, sym);
 
     fclose(in);
     fclose(out);
+
+    printf("Embedder: Finished.\n");
 
     return EXIT_SUCCESS;
 }

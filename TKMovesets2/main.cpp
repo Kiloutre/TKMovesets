@@ -25,11 +25,16 @@
 #include "constants.h"
 
 // -- Errcodes -- //
-# define MAIN_ERR_GLFW_INIT       (1)
-# define MAIN_ERR_WINDOW_CREATION (2)
-# define MAIN_ERR_OPENGL_CONTEXT  (3)
-# define MAIN_ERR_MOVESET_LOADER  (4)
-# define MAIN_ERR_NO_ERR          (0)
+# define MAIN_ERR_GLFW_INIT         (1)
+# define MAIN_ERR_WINDOW_CREATION   (2)
+# define MAIN_ERR_OPENGL_CONTEXT    (3)
+# define MAIN_ERR_MOVESET_LOADER    (4)
+# define MAIN_ERR_NO_MOVESET_LOADER (5)
+# define MAIN_ERR_NO_ERR            (0)
+
+// Embedded moveset loader .dll
+extern "C" const char TKMovesetLoader[];
+extern "C" const size_t TKMovesetLoader_len;
 
 // -- Static helpers -- //
 
@@ -166,7 +171,7 @@ static void DestroyMainClasses(MainWindow& program)
 	delete program.addrFile;
 
 	// Once every thread that may use storage has been stopped, we can finally stop storage
-	program.storage.StopThreadAndCleanup();
+program.storage.StopThreadAndCleanup();
 }
 
 // -- main -- //
@@ -221,7 +226,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	if (window == nullptr) {
 		return MAIN_ERR_WINDOW_CREATION;
 	}
-	
+
 #ifndef BUILD_TYPE_DEBUG
 	{
 		// Set program icon (release only)
@@ -264,6 +269,18 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	// Load the MovesetLoader in our own process so that we can know its function addresses
 	HMODULE movesetLoaderLib;
 	{
+		if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
+		{
+			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'.");
+			std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
+			if (file.fail()) {
+				return MAIN_ERR_NO_MOVESET_LOADER;
+			}
+
+			file.write((char*)TKMovesetLoader, TKMovesetLoader_len);
+			DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'.");
+		}
+
 		movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
 		if (movesetLoaderLib == nullptr) {
 			DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");

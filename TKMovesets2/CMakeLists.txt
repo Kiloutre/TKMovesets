@@ -161,7 +161,7 @@ set(MOVESETLOADER_SOURCES
     "Utils/helpers.cpp"
 )
 
-## Setup embedded ressources ##
+## Setup embedded resources ##
 set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
 create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
 
@@ -183,15 +183,34 @@ if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
+
+## Embedded TKMovesetLoader for mai nbinary ##
+set(MOVESET_LOADER_EMBEDDED "${CMAKE_CURRENT_BINARY_DIR}/../TKMovesetLoader.c")
+set(embed_file_exe_path "${CMAKE_CURRENT_BINARY_DIR}/../embedfile.exe")
+# Build file embedder .exe
+add_custom_command(TARGET TKMovesetLoader PRE_BUILD 
+    COMMAND "cl.exe" "${CMAKE_CURRENT_SOURCE_DIR}/Utils/embedfile.c"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
+    COMMENT "Compiling embedfile.exe ..."
+)
+# Convert moveset loader into .c
+add_custom_command(OUTPUT ${MOVESET_LOADER_EMBEDDED}
+    COMMAND "${embed_file_exe_path}" "TKMovesetLoader" "${CMAKE_CURRENT_BINARY_DIR}/TKMovesetLoader.dll"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
+    COMMENT "Converting moveset loader data into .c ..."
+    DEPENDS TKMovesetLoader
+)
+
+message("!!!!!!!!!!!" ${MOVESET_LOADER_EMBEDDED})
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    # Console mode
-    add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} "app.rc")
+    # With console mode
+    add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
     target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
 else()
     # GUI-only mode
-    add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES}  "app.rc")
+    add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
