@@ -151,7 +151,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 void GameAddressesFile::Reload()
 {
 	// Always attempt to prioritxize file data, but in cases where it can't be found, load from embedded data instead
-	if (false && Helpers::fileExists(GAME_ADDRESSES_FILE)) {
+	if (Helpers::fileExists(GAME_ADDRESSES_FILE)) {
 		std::ifstream infile(GAME_ADDRESSES_FILE);
 		DEBUG_LOG("Found file '" GAME_ADDRESSES_FILE "'\n");
 		LoadFromStream(infile);

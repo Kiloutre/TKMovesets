@@ -18,9 +18,6 @@ namespace T7Functions
 	// Returns the address of a player from his playerid (this is character-related stuff)
 	typedef uint64_t(*GetPlayerFromID)(unsigned int playerId);
 
-	// Returns address of a structure that contains playerid among other things
-	typedef uint64_t(*GetTK3447820)();
-
 	typedef void(*ExecuteExtraprop)(void* player, Requirement* prop, __ida_int128 a3, char a4, char a5, float a6, __ida_int128 a7, __ida_int128 a8, __ida_int128 a9, __ida_int128 a10, __ida_int128 a11, uint64_t a12);
 }
 
@@ -36,6 +33,15 @@ static uint64_t* GetPlayerList()
 	uint64_t offsetBase = baseFuncAddr + 15;
 
 	return (uint64_t*)(offsetBase + offset);
+}
+
+static unsigned int IsLocalPlayerP1()
+{
+	auto addr = g_loader->addresses.ReadPtrPathInCurrProcess("pid_addr", g_loader->moduleAddr);
+	if (addr != 0) {
+		return *(unsigned int*)addr == 0;
+	}
+	return true;
 }
 
 static int GetPlayerIdFromAddress(void* playerAddr)
@@ -98,7 +104,7 @@ namespace T7Hooks
 		}
 
 		// Determine if we, the user, are the main player or if we are p2
-		bool isLocalP1 = g_loader->ReadVariable<unsigned int>("gTK_playerid") == 0;
+		bool isLocalP1 = IsLocalPlayerP1();
 
 		// Determine the player index of the player argument, and correct it with isLocalP1
 		auto playerIndex = GetPlayerIdFromAddress(player) ^ (!isLocalP1);
@@ -267,13 +273,11 @@ void MovesetLoaderT7::InitHooks()
 		"TK__ApplyNewMoveset",
 		// Functions
 		"TK__GetPlayerFromID",
-		"TK__GetTK3447820",
 	};
 
 	// Find the functions and register them
 	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
 	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "f_GetPlayerFromID");
-	RegisterFunction("TK__GetTK3447820", m_moduleName, "f_GetTK3447820");
 
 	// Other less important things
 	RegisterFunction("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop");
@@ -284,7 +288,7 @@ void MovesetLoaderT7::InitHooks()
 		RegisterHook("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop", (uint64_t)&T7Hooks::ExecuteExtraprop);
 
 		// Find TK__Log
-		auto funcAddr = addresses.ReadPtrPathInCurrProcess("f_Log_addr", m_moduleAddr);
+		auto funcAddr = addresses.ReadPtrPathInCurrProcess("f_Log_addr", moduleAddr);
 		if (InjectionUtils::compare_memory_string((void*)funcAddr, addresses.GetString("f_Log")))
 		{
 			InitHook("TK__Log", funcAddr, (uint64_t)&T7Hooks::Log);
@@ -300,13 +304,6 @@ void MovesetLoaderT7::PostInit()
 
 	// Compute important variable addresses
 	variables["gTK_playerList"] = (uint64_t)GetPlayerList();
-
-	{
-		// There is an actual player side global variable outside of any structure
-		// That isn't it, but this function allows us to get the same value in a more reliable way
-		auto structAddr = g_loader->CastFunction<T7Functions::GetTK3447820>("TK__GetTK3447820")();
-		variables["gTK_playerid"] = structAddr + 0x6C;
-	}
 
 	// Apply the hooks that need to be applied immediately
 	HookFunction("TK__ApplyNewMoveset");

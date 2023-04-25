@@ -260,7 +260,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	if (!LoadLocaleTranslation()) {
 		Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
 	}
-	WriteToLogFile(std::format("Locale loaded - {}", Localization::GetCurrLangId()));
 
 	// Load the MovesetLoader in our own process so that we can know its function addresses
 	HMODULE movesetLoaderLib;

@@ -120,7 +120,7 @@ void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64
 void MovesetLoader::SetMainModule(const char* name)
 {
     m_moduleName = name;
-    m_modules = InjectionUtils::GetModuleList(name, m_moduleAddr, m_moduleSize);
+    m_modules = InjectionUtils::GetModuleList(name, moduleAddr, moduleSize);
 }
 
 void MovesetLoader::RegisterFunction(const char* functionName, const std::string& moduleName, const char* c_addressId)

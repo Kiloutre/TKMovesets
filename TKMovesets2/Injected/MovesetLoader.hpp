@@ -32,13 +32,6 @@ protected:
 	std::map<std::string, functionHook> m_hooks;
 	// Disassembler that must be passed to any hook creation
 	PLH::ZydisDisassembler m_disassembler = PLH::ZydisDisassembler(PLH::Mode::x64);
-	// Contains our own module address
-	union {
-		uint64_t m_moduleAddr;
-		void* m_moduleAddrPtr;
-	};
-	// Size of the main module
-	uint64_t m_moduleSize;
 	// Contains the module name
 	std::string m_moduleName;
 	// List of required function/variables/ hooks, will error out if one of them isn't found
@@ -61,6 +54,13 @@ public:
 	std::map<std::string, uint64_t> variables;
 	// If set to true, forces the Mainloop() to stop
 	bool mustStop = false;
+	// Contains our own module address
+	union {
+		uint64_t moduleAddr;
+		void* moduleAddrPtr;
+	};
+	// Size of the main module
+	uint64_t moduleSize;
 
 	// Initializes the shared memory
 	bool Init();
