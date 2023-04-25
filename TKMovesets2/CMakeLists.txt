@@ -167,12 +167,12 @@ create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
 
 ## Build ##
 
-# Build injected MovesetLoader .dll
-add_library(MovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})
-target_include_directories(MovesetLoader PRIVATE ${INCLUDE_FOLDERS})
-target_compile_definitions(MovesetLoader PUBLIC DLL_EXPORTING)
+# Build injected TKTKMovesetLoader.dll
+add_library(TKMovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})
+target_include_directories(TKMovesetLoader PRIVATE ${INCLUDE_FOLDERS})
+target_compile_definitions(TKMovesetLoader PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    target_compile_definitions(MovesetLoader PUBLIC BUILD_TYPE_DEBUG)
+    target_compile_definitions(TKMovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
@@ -195,9 +195,9 @@ else()
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
-add_dependencies(TKMovesets2 MovesetLoader)
+add_dependencies(TKMovesets2 TKMovesetLoader)
 target_link_libraries(TKMovesets2 PRIVATE GameSpecific)
-#target_link_libraries(TKMovesets2 PRIVATE MovesetLoader) # This is required for GetModuleHandle() to work, apparently
+#target_link_libraries(TKMovesets2 PRIVATE TKMovesetLoader) # This is required for GetModuleHandle() to work, apparently
 
 # Addresses file #
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/game_addresses.ini" "game_addresses.ini" COPYONLY)
@@ -227,4 +227,4 @@ target_link_libraries(TKMovesets2 PRIVATE lz4::lz4)
 
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)
-target_link_libraries(MovesetLoader PRIVATE PolyHook_2::PolyHook_2)
+target_link_libraries(TKMovesetLoader PRIVATE PolyHook_2::PolyHook_2)

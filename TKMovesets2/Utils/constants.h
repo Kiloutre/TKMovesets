@@ -33,7 +33,7 @@
 // Anything else indicate a malformed header : a bad file
 # define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
 
-# define MOVESET_LOADER_NAME             "MovesetLoader.dll"
+# define MOVESET_LOADER_NAME             "TKMovesetLoader.dll"
 # define MOVESET_LOADER_INIT_FUNC        "MovesetLoaderInit"
 # define MOVESET_LOADER_RUN_FUNC         "MovesetLoaderRun"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"

@@ -60,14 +60,14 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
     DEBUG_LOG("Caling remote process '%s'...\n", functionName);
     auto moduleHandle = GetModuleHandleA(MOVESET_LOADER_NAME);
     if (moduleHandle == 0) {
-        DEBUG_LOG("Failure getting the module handle for 'MovesetLoader.dll'\n");
+        DEBUG_LOG("Failure getting the module handle for 'TKMovesetLoader.dll'\n");
         return false;
     }
     DEBUG_LOG("Module handle is %llx\n", moduleHandle);
 
     gameAddr startAddr = (gameAddr)GetProcAddress(moduleHandle, functionName);
     if (startAddr == 0) {
-        DEBUG_LOG("Failed getting function '%s' address in module 'MovesetLoader.dll'\n", functionName);
+        DEBUG_LOG("Failed getting function '%s' address in module 'TKMovesetLoader.dll'\n", functionName);
         DEBUG_LAST_ERR();
         return false;
     }

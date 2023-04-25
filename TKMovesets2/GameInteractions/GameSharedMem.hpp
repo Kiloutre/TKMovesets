@@ -15,7 +15,7 @@ class GameSharedMem : public GameImport
 private:
 	// Movesets (data, size) to import and corresponding player address
 	std::vector<onlineImportEntry> m_plannedImportations;
-	// If true, will order the MovesetLoader.dll to be injected on the next RunningUpdate, in another thread
+	// If true, will order the TKMovesetLoader.dll to be injected on the next RunningUpdate, in another thread
 	bool m_requestedInjection = false;
 	// Online class, manages shared memory
 	Online* m_sharedMemHandler = nullptr;
