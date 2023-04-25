@@ -8,6 +8,25 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 
+// -- Static helpers -- //
+
+void DuplicateMoveset(std::wstring filename)
+{
+	size_t extPos = filename.find_last_of(L"\.");;
+	std::wstring name = filename.substr(0, extPos);
+	std::wstring extension = filename.substr(extPos);
+
+	unsigned int number = 2;
+	std::wstring new_name = name + L" (" + std::to_wstring(number) + L")" + extension;
+	while (Helpers::fileExists(new_name.c_str()))
+	{
+		++number;
+		new_name = name + L" (" + std::to_wstring(number) + L")" + extension;
+	}
+
+	std::filesystem::copy_file(filename, new_name);
+}
+
 // -- Public methods -- //
 
 static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newName)
@@ -46,7 +65,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	auto availableSpace = ImGui::GetContentRegionAvail();
 	ImVec2 tableSize = ImVec2(0, availableSpace.y);
 
-	if (ImGui::BeginTable("MovesetEditionList", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetEditionList", 8, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
@@ -54,6 +73,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.duplicate"));
 		ImGui::TableSetupColumn(_("moveset.rename"));
 		ImGui::TableSetupColumn(_("moveset.edit"));
 		ImGui::TableHeadersRow();
@@ -103,6 +123,11 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 				ImGui::PushID(moveset->filename.c_str());
 				ImGui::TableNextColumn();
+				if (ImGui::Button(_("moveset.duplicate"))) {
+					DuplicateMoveset(moveset->filename);
+				}
+
+				ImGui::TableNextColumn();
 				if (ImGui::Button(_("moveset.rename"))) {
 					m_toRename = moveset->filename;
 					strcpy_s(m_newName, sizeof(m_newName), moveset->name.c_str());
@@ -111,9 +136,11 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				}
 
 				ImGui::TableNextColumn();
+				ImGui::PushStyleColor(ImGuiCol_Button, FORM_INPUT_HEX);
 				if (ImGuiExtra::RenderButtonEnabled(_("moveset.edit"), moveset->editable)) {
 					movesetToLoad = moveset;
 				}
+				ImGui::PopStyleColor();
 				ImGui::PopID();
 			}
 		}

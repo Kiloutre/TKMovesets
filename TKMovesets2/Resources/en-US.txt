@@ -38,7 +38,6 @@ process.game_attached = Game is running and attached.
 process.game_not_running = Game is not running or could not be found.
 process.game_version_mismatch = The current game version is not supported by game_address.txt.
 process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
-process.game_unexpected_exit = Game exited unexpectedly.
 
 # Moveset #
 moveset.origin = Origin
@@ -49,6 +48,7 @@ moveset.size = Size
 moveset.size_mb = MB
 moveset.size_kb = KB
 moveset.rename = Rename
+moveset.duplicate = Duplicate
 moveset.import = Import
 moveset.edit = Edit
 moveset.delete = Delete
@@ -64,11 +64,11 @@ navmenu.import = Import
 navmenu.online = Online play
 navmenu.persistent_play = Persistent play
 
-navmenu.category_tools   = Tools
+navmenu.category_tools = Tools
 navmenu.moveset_edit = Moveset Edition
 navmenu.camera = Camera
 
-navmenu.category_other   = Other
+navmenu.category_other = Other
 navmenu.documentation = Documentation
 navmenu.about = About
 
@@ -86,7 +86,6 @@ extraction.progress = Extracting... (%u%%)
 extraction.progress_error = Extracting error (%u%%)
 extraction.progress_done = Extracting... Done!
 extraction.extracted_movesets = Extracted movesets
-extraction.rename = Rename moveset
 extraction.cant_extract = Cannot extract because characters aren't loaded.
 extraction.error_file_creation = There was an error while creating the moveset file
 extraction.error_allocation = There was a memory allocation error while copying the moveset data
@@ -99,7 +98,6 @@ extraction.settings.other = Other
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
 importation.importation = Importation
 importation.select_moveset = Select moveset to import
-importation.deallocate_unused = Deallocate unused movesets
 importation.cant_import = Cannot import because you are not loaded into an active game (training mode, etc).
 importation.import_to = Import to:
 importation.progress = Importing... (%u%%)
@@ -172,7 +170,6 @@ edition.window_controls_explanation = Click on a move in the movelist to open it
 edition.extract_animations = Extract animations
 edition.extract_animations_finished = Animation extraction finished!
 
-
 edition.create_new = Create new
 edition.requirement = Requirement list
 edition.move = Move
@@ -203,7 +200,6 @@ edition.move.category_3 = Extras
 edition.move.category_5 = Unnamed fields
 edition.move.move_name = Name
 edition.move.anim_name = Animation
-edition.move.vulnerability = Vuln
 edition.move.vulnerability = Vuln
 edition.move.hitlevel = Hit level
 edition.move.transition = Transition
@@ -357,7 +353,7 @@ edition.projectile.gravity = Gravity
 edition.projectile.hit_level = Hit level
 edition.projectile.hit_condition_addr = Hit Conditions ID
 edition.projectile.cancel_addr = Cancels ID
-edition.projectile.voiceclip_on_hit = Voiceclip (HIT)
+edition.projectile.voiceclip_on_hit = Voix (COUP)
 
 edition.pushback.window_name = Pushback
 edition.pushback.duration = Duration
@@ -419,6 +415,7 @@ edition.mvl_displayable.icons = Icons
 edition.mvl_displayable.icons_2 = Icons 2
 edition.mvl_displayable.combo_difficulty = Difficulty
 edition.mvl_displayable.combo_damage = Damage
+edition.mvl_displayable.p2_action = P2 action
 
 edition.mvl_playable.window_name = Movelist: Playable
 edition.mvl_playable.distance = Distance
@@ -426,7 +423,6 @@ edition.mvl_playable.p2_rotation = P2 Rotation
 edition.mvl_playable.input_count = Input count
 edition.mvl_playable.input_sequence_id = Input sequence ID
 edition.mvl_playable.has_rage = Has Rage
-edition.mvl_displayable.p2_action = P2 action
 
 edition.mvl_input.window_name = Movelist: Input
 edition.mvl_input.directions = Directions
@@ -434,8 +430,6 @@ edition.mvl_input.buttons = Buttons
 edition.mvl_input.frame_duration = Duration
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
-
-edition.suggest_new_name = This moveset appears to be a freshly extracted one. Do you want to give the modified copy a new name?.
 
 # Documentation #
 

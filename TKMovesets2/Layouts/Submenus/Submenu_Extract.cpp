@@ -257,9 +257,11 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 				ImGui::TextUnformatted(_("moveset.invalid"));
 				ImGui::TableSetColumnIndex(6);
 				ImGui::PushID(moveset->filename.c_str());
+				ImGui::PushStyleColor(ImGuiCol_Button, FORM_DELETE_BTN);
 				if (ImGui::Button("X")) {
 					extractorHelper.storage->DeleteMoveset(moveset->filename.c_str());
 				}
+				ImGui::PopStyleColor();
 				ImGui::PopID();
 			}
 			else {
@@ -279,9 +281,11 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());
+				ImGui::PushStyleColor(ImGuiCol_Button, FORM_DELETE_BTN);
 				if (ImGui::Button("X")) {
 					extractorHelper.storage->DeleteMoveset(moveset->filename.c_str());
 				}
+				ImGui::PopStyleColor();
 				ImGui::PopID();
 			}
 		}
