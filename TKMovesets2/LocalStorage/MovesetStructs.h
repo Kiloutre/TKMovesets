@@ -43,6 +43,8 @@ struct TKMovesetHeader
 	uint32_t block_list_size = (uint32_t)-1;
 	// Absolute offset of the block offset list
 	uint32_t moveset_data_start = (uint32_t)-1;
+	// Size of the moveset data
+	int32_t moveset_data_size = -1;
 	// Stores a hash of the moveset data 
 	uint32_t crc32 = (uint32_t)-1;
 	// Original crc32 of the moveset data at the time of extraction

@@ -64,47 +64,43 @@ void GameSharedMem::RunningUpdate()
 	}
 
 
-	bool errored = false;
 	while (IsBusy())
 	{
-		if (!errored && m_plannedImportations.size() > 0)
-		{
-			ImportationErrcode_ err;
+		auto& [moveset, settings, playerId] = m_plannedImportations[0];
 
-			auto& [moveset, settings, playerId] = m_plannedImportations[0];
-
-			// The only case where .size can be 0 is if a Submenu purposefully set it that way, to indicate that we want to clear the selection
-			if (moveset.size == 0) {
-				m_sharedMemHandler->ClearMovesetSelection(playerId);
-			}
-			else
-			{
-				err = m_importer->Import(moveset.filename.c_str(), 0, settings, progress);
-
-				// Send the successfully loaded moveset to the shared memory manager
-				if (err == ImportationErrcode_Successful) {
-					auto& lastLoaded = m_importer->lastLoaded;
-					m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
-				} else {
-					m_errors.push_back(err);
-					errored = true;
-				}
-			}
-
-			// Make a copy of the displayed movesets to avoid the GUI having to iterate on a vector that might be destroyed at any time
-			displayedMovesets = *m_sharedMemHandler->displayedMovesets;
-
-			m_plannedImportations.erase(m_plannedImportations.begin());
-
-			/*
-			* TODO: think about when to free online-used movesets
-			* Should check both player offsets and shared memory
-			* Importer should return a list of unused movesets and then shared mem handler should be checked too before proceeding
-			if (settings & ImportSettings_FreeUnusedMovesets) {
-				m_importer->CleanupUnusedMovesets();
-			}
-			*/
+		// The only case where .size can be 0 is if a Submenu purposefully set it that way, to indicate that we want to clear the selection
+		if (moveset.size == 0) {
+			m_sharedMemHandler->ClearMovesetSelection(playerId);
 		}
+		else
+		{
+			ImportationErrcode_ errcode;
+			errcode = m_importer->Import(moveset.filename.c_str(), 0, settings, progress);
+
+			// Send the successfully loaded moveset to the shared memory manager
+			if (errcode == ImportationErrcode_Successful) {
+				auto& lastLoaded = m_importer->lastLoaded;
+				m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
+				m_plannedImportations.erase(m_plannedImportations.begin());
+				lastLoadedMoveset = 0;
+			} else {
+				m_errors.push_back(errcode);
+				m_plannedImportations.clear();
+			}
+		}
+
+		// Make a copy of the displayed movesets to avoid the GUI having to iterate on a vector that might be destroyed at any time
+		displayedMovesets = *m_sharedMemHandler->displayedMovesets;
+
+
+		/*
+		* TODO: think about when to free online-used movesets
+		* Should check both player offsets and shared memory
+		* Importer should return a list of unused movesets and then shared mem handler should be checked too before proceeding
+		if (settings & ImportSettings_FreeUnusedMovesets) {
+			m_importer->CleanupUnusedMovesets();
+		}
+		*/
 	}
 }
 

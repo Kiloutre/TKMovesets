@@ -43,6 +43,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 			Helpers::isHeaderStringMalformated(movesetInfos.version_string, sizeof(movesetInfos.version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.origin, sizeof(movesetInfos.origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.target_character, sizeof(movesetInfos.target_character))) {
+			DEBUG_LOG("HEADER MALFORMATED\n");
 			// File malformated
 			return nullptr;
 		}
@@ -125,9 +126,10 @@ void LocalStorage::ReloadMovesetList()
 	{
 		// Todo: Unicode .name support
 		std::wstring filename = entry.path().wstring();
+		
 
-		if (!Helpers::endsWith<std::wstring>(filename, L"" MOVESET_FILENAME_EXTENSION)) {
-			// Skip files that we do not recognize
+		if (!Helpers::endsWith<std::wstring>(filename, L"" MOVESET_FILENAME_EXTENSION) || entry.file_size() == 0) {
+			// Skip files that we do not recognize or that are not yet fully written
 			continue;
 		}
 
@@ -160,7 +162,10 @@ void LocalStorage::ReloadMovesetList()
 		movesetInfo* moveset = extractedMovesets[i];
 		struct _stat buffer;
 
-		if ((_wstat(moveset->filename.c_str(), &buffer) != 0) || (moveset->modificationDate != 0 && buffer.st_mtime != moveset->modificationDate)) {
+		bool statFailed= _wstat(moveset->filename.c_str(), &buffer) != 0;
+
+		if (statFailed ||
+			(moveset->modificationDate != 0 && (buffer.st_mtime != moveset->modificationDate || buffer.st_size != moveset->size))) {
 			// File does not exist anymore or was recently modified, de-allocate the info we stored about it
 			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));

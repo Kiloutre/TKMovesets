@@ -47,11 +47,10 @@ void GameImport::PreProcessDetach()
 
 void GameImport::RunningUpdate()
 {
-	bool errored = false;
 	while (IsBusy())
 	{
 		// Two different ways to import movesets, from filename or from actual moveset data
-		if (!errored && m_plannedImportations.size() > 0)
+		if (m_plannedImportations.size() > 0)
 		{
 			ImportationErrcode_ err;
 
@@ -65,17 +64,17 @@ void GameImport::RunningUpdate()
 
 			if (settings & ImportSettings_FreeUnusedMovesets) {
 				m_importer->CleanupUnusedMovesets();
+				m_plannedImportations.erase(m_plannedImportations.begin());
 			}
 
 			if (err != ImportationErrcode_Successful) {
 				m_errors.push_back(err);
-				errored = true;
+				m_plannedImportations.clear();
+				lastLoadedMoveset = 0;
 			}
 			else {
 				lastLoadedMoveset = m_importer->lastLoaded.address;
 			}
-
-			m_plannedImportations.erase(m_plannedImportations.begin());
 		}
 	}
 }
