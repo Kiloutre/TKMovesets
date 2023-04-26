@@ -164,18 +164,19 @@ set(MOVESETLOADER_SOURCES
 ## Setup embedded resources ##
 set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
 create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
-
-## Build ##
+# Build file embedder .EXE
+add_executable (FileEmbedder "External/embedfile.cpp")
 
 # Build injected TKTKMovesetLoader.dll
 add_library(TKMovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(TKMovesetLoader PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(TKMovesetLoader PUBLIC DLL_EXPORTING)
+add_dependencies(TKMovesetLoader FileEmbedder)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(TKMovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
-# Build .dll containing per-game Import/Export movesets functions, that there won't be 'need to update the whole software when they change#
+# Build lib containing per-game Import/Export movesets functions
 add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
@@ -186,22 +187,16 @@ endif()
 
 ## Embedded TKMovesetLoader for mai nbinary ##
 set(MOVESET_LOADER_EMBEDDED "${CMAKE_CURRENT_BINARY_DIR}/../TKMovesetLoader.c")
-set(embed_file_exe_path "${CMAKE_CURRENT_BINARY_DIR}/../embedfile.exe")
-# Build file embedder .exe
-add_custom_command(TARGET TKMovesetLoader PRE_BUILD 
-    COMMAND "cl.exe" "${CMAKE_CURRENT_SOURCE_DIR}/Utils/embedfile.c"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
-    COMMENT "Compiling embedfile.exe ..."
-)
+set(embed_file_exe_path "${CMAKE_CURRENT_BINARY_DIR}/FileEmbedder.exe")
+
 # Convert moveset loader into .c
 add_custom_command(OUTPUT ${MOVESET_LOADER_EMBEDDED}
-    COMMAND "${embed_file_exe_path}" "TKMovesetLoader" "${CMAKE_CURRENT_BINARY_DIR}/TKMovesetLoader.dll"
+    COMMAND "${embed_file_exe_path}" "${CMAKE_CURRENT_BINARY_DIR}/TKMovesetLoader.dll" "TKMovesetLoader"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
     COMMENT "Converting moveset loader data into .c ..."
     DEPENDS TKMovesetLoader
 )
 
-message("!!!!!!!!!!!" ${MOVESET_LOADER_EMBEDDED})
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
@@ -243,6 +238,7 @@ target_link_libraries(GameSpecific PRIVATE imgui::imgui) # Only used for the col
 # Compression
 find_package(lz4 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE lz4::lz4)
+target_link_libraries(FileEmbedder PRIVATE lz4::lz4)
 
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)

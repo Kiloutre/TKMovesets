@@ -16,8 +16,9 @@
 #include <locale>
 #include <filesystem>
 #include <fstream>
-
 #include <Sig/Sig.hpp>
+#include <lz4.h>
+
 #include "MainWindow.hpp"
 #include "Localization.hpp"
 #include "GameAddressesFile.hpp"
@@ -35,6 +36,7 @@
 // Embedded moveset loader .dll
 extern "C" const char TKMovesetLoader[];
 extern "C" const size_t TKMovesetLoader_len;
+extern "C" const size_t TKMovesetLoader_orig_len;
 
 // -- Static helpers -- //
 
@@ -272,12 +274,17 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
 		{
 			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'.");
+			char* buf = new char[TKMovesetLoader_orig_len];
+
+			LZ4_decompress_safe((char*)TKMovesetLoader, buf, TKMovesetLoader_len, TKMovesetLoader_orig_len);
+
 			std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
 			if (file.fail()) {
 				return MAIN_ERR_NO_MOVESET_LOADER;
 			}
 
-			file.write((char*)TKMovesetLoader, TKMovesetLoader_len);
+			file.write(buf, TKMovesetLoader_orig_len);
+			delete[] buf;
 			DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'.");
 		}
 
