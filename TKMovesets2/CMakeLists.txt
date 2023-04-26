@@ -1,9 +1,9 @@
 ﻿# Set C++20, mostly for std::format
 set(CMAKE_CXX_STANDARD 20)
-# This is needed or CMake will expect a .lib file instead of .dll for our own libs
+# This is needed or CMake will expect a .lib file instead of .dll for our shared libs
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# Function to cimpile Resources folder into a .c
+# Function to compile a folder into a .c
 function(create_resources dir output)
     # Create empty output file
     file(WRITE ${output} "")
@@ -163,7 +163,7 @@ set(MOVESETLOADER_SOURCES
 ## Setup embedded resources ##
 set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
 create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
-# Build file embedder .EXE
+# Build file embedder .EXE. This file embedder applies lz4 compression and can be used on files generated at compile them
 add_executable (FileEmbedder "External/embedfile.cpp")
 
 # Build injected TKTKMovesetLoader.dll
@@ -175,6 +175,18 @@ if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(TKMovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
+## Embedded TKMovesetLoader for main binary ##
+set(MOVESET_LOADER_EMBEDDED "${CMAKE_CURRENT_BINARY_DIR}/../TKMovesetLoader.c")
+set(embed_file_exe_path "${CMAKE_CURRENT_BINARY_DIR}/FileEmbedder.exe")
+
+# Convert moveset loader into .c that the main program will build
+add_custom_command(OUTPUT ${MOVESET_LOADER_EMBEDDED}
+    COMMAND "${embed_file_exe_path}" "${CMAKE_CURRENT_BINARY_DIR}/TKMovesetLoader.dll" "TKMovesetLoader"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
+    COMMENT "Converting moveset loader data into .c ..."
+    DEPENDS TKMovesetLoader
+)
+
 # Build lib containing per-game Import/Export movesets functions
 add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS})
@@ -182,19 +194,6 @@ target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)
 endif()
-
-
-## Embedded TKMovesetLoader for mai nbinary ##
-set(MOVESET_LOADER_EMBEDDED "${CMAKE_CURRENT_BINARY_DIR}/../TKMovesetLoader.c")
-set(embed_file_exe_path "${CMAKE_CURRENT_BINARY_DIR}/FileEmbedder.exe")
-
-# Convert moveset loader into .c
-add_custom_command(OUTPUT ${MOVESET_LOADER_EMBEDDED}
-    COMMAND "${embed_file_exe_path}" "${CMAKE_CURRENT_BINARY_DIR}/TKMovesetLoader.dll" "TKMovesetLoader"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
-    COMMENT "Converting moveset loader data into .c ..."
-    DEPENDS TKMovesetLoader
-)
 
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
@@ -210,13 +209,11 @@ target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
 add_dependencies(TKMovesets2 TKMovesetLoader)
 target_link_libraries(TKMovesets2 PRIVATE GameSpecific)
-#target_link_libraries(TKMovesets2 PRIVATE TKMovesetLoader) # This is required for GetModuleHandle() to work, apparently
 
-# Addresses file #
+# Copy addresses file to build folder, even if it's already embedded '#
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/game_addresses.ini" "game_addresses.ini" COPYONLY)
 # Copies TKMInterface folder containg extra, optional interface data (editor labels, maybe more later down the line)
 add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/Resources/TKMInterface" "${CMAKE_CURRENT_BINARY_DIR}/TKMInterface")
-# Debug. Yes, it's included every time, but that isn't important because its content change when in debug mode.
 
 ## Extra dependencies ##
 # Link the other libraries that we use #
