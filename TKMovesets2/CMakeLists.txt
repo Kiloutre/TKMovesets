@@ -53,7 +53,6 @@ set(INCLUDE_FOLDERS
                     "Injected/SharedMemory"
 
                     "${CMAKE_SOURCE_DIR}/Sig/include"
-                    "${CMAKE_SOURCE_DIR}/stb"
 )
 
 # This will be included in the .exe

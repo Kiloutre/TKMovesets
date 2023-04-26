@@ -31,12 +31,7 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 {
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
 	const char* moveName = m_fieldIdentifierMap["move_name"]->buffer;
-	m_windowTitle = std::format("{} {} {} - {}", windowName, structureId, moveName, m_windowTitleBase.c_str());
-
-	if (reapplyWindowProperties) {
-		nextDockId = ImGui::GetWindowDockID();
-		m_winInfo.applyNextRender = true;
-	}
+	m_windowTitle = std::format("{} {} {} - {}###{}{}{}", windowName, structureId, moveName, m_windowTitleBase.c_str(), windowName, structureId,m_windowTitleBase.c_str());
 }
 
 void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)

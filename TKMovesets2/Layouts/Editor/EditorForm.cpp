@@ -258,12 +258,7 @@ void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 {
 	if (reapplyWindowProperties) return;
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
-	m_windowTitle = std::format("{} {} - {}", windowName, structureId, m_windowTitleBase.c_str());
-
-	if (reapplyWindowProperties) {
-		m_winInfo.applyNextRender = true;
-		nextDockId = ImGui::GetWindowDockID();
-	}
+	m_windowTitle = std::format("{} {} - {}###{}", windowName, structureId, m_windowTitleBase.c_str(), windowName);
 }
 
 // -- Public methods -- //
@@ -343,17 +338,11 @@ void EditorForm::Render()
 		nextDockId = -1;
 	}
 
-	if (m_winInfo.applyNextRender) {
-		m_winInfo.applyNextRender = false;
-		// + (100, 100) because i haven't managed to get the window to do back where it was
-		ImGui::SetNextWindowPos(m_winInfo.pos + ImVec2(100, 100));
-		ImGui::SetNextWindowSize(m_winInfo.size);
-	}
-
 	// Setup style
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5, 0));
 
+	ImGui::PushID(structureId);
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
 		m_winInfo.pos = ImGui::GetWindowPos();
@@ -405,8 +394,9 @@ void EditorForm::Render()
 
 		}
 	}
-
 	ImGui::End();
+
+	ImGui::PopID();
 	ImGui::PopStyleVar();
 	ImGui::PopStyleVar();
 

@@ -26,6 +26,11 @@ int main(int argc, char** argv)
     std::string input_filename = argv[1];
     std::string output_filename = std::string(argv[2]) + ".c";
     std::string filtered_name = std::string(argv[2]);
+
+    auto lastSlash = filtered_name.find_last_of("/\\");
+    if (lastSlash != std::string::npos) {
+        filtered_name.erase(0, lastSlash + 1);
+    }
     std::regex reg("[\\. \-]+");
     filtered_name = std::regex_replace(filtered_name, reg, "_");
 

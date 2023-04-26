@@ -455,60 +455,73 @@ void ImporterT7::CleanupUnusedMovesets()
 	};
 	*/
 
-	// Call CanImport() because it's a quick way to see if players are loaded. If they're not, we can free memory worry-free.
-	if (CanImport())
-	{
-		// Check mvl manager
-		MvlManager mvlManager[2];
-		m_process->readBytes(m_game->ReadPtr("movelist_manager_addr"), mvlManager, sizeof(MvlManager) * 2);
-
-		for (size_t i = 0; i + 1 < m_process->allocatedMemory.size();)
-		{
+	// Call CanImport() because it's a quick way to see if players are loaded.
+	// If they're not, we can free memory worry-free.
+	if (!CanImport()) {
+		for (size_t i = 0; i < m_process->allocatedMemory.size(); ++i) {
 			std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
 			gameAddr movesetAddress = block.first;
-			uint64_t movesetEnd = movesetAddress + block.second;
-			bool isUsed = false;
+			m_process->freeMem(movesetAddress);
+		}
+		return;
+	}
 
-			for (int j = 0; j < 2; ++j) {
-				if (
-					(movesetAddress <= (gameAddr)mvlManager[j].mvlHead && (gameAddr)mvlManager[j].mvlHead <= movesetEnd)
-					|| (movesetAddress <= (gameAddr)mvlManager[j].sequenceEnd && (gameAddr)mvlManager[j].sequenceEnd <= movesetEnd)
-					|| (movesetAddress <= (gameAddr)mvlManager[j].sequenceStart && (gameAddr)mvlManager[j].sequenceStart <= movesetEnd)
-					) {
+	// Check mvl manager
+	MvlManager mvlManager[2];
+	uint64_t mvlManagerAddr = m_game->ReadPtr("movelist_manager_addr");
+	if (mvlManagerAddr != 0) {
+		m_process->readBytes(mvlManagerAddr, mvlManager, sizeof(mvlManager));
+	}
+	else {
+		memset(mvlManager, 0, sizeof(mvlManager));
+		DEBUG_LOG("::CleanupUnusedMovesets() : MVL Manager ptr path empty\n");
+	}
+
+	for (size_t i = 0; i + 1 < m_process->allocatedMemory.size();)
+	{
+		std::pair<gameAddr, uint64_t> block = m_process->allocatedMemory[i];
+		gameAddr movesetAddress = block.first;
+		uint64_t movesetEnd = movesetAddress + block.second;
+		bool isUsed = false;
+
+		for (int j = 0; j < 2; ++j) {
+			if (
+				(movesetAddress <= (gameAddr)mvlManager[j].mvlHead && (gameAddr)mvlManager[j].mvlHead <= movesetEnd)
+				|| (movesetAddress <= (gameAddr)mvlManager[j].sequenceEnd && (gameAddr)mvlManager[j].sequenceEnd <= movesetEnd)
+				|| (movesetAddress <= (gameAddr)mvlManager[j].sequenceStart && (gameAddr)mvlManager[j].sequenceStart <= movesetEnd)
+				) {
+				isUsed = true;
+				break;
+			}
+		}
+
+		// Check movesets of both players
+		for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid)
+		{
+			gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
+
+			// Maybe overkill to check every offset, but drastically reduces the chance of a crash, and isn't that slow
+			gameAddr pStart = currentPlayerAddress;
+			gameAddr pEnd = pStart + playerstructSize;
+			while (pStart < pEnd)
+			{
+				uint64_t offsetValue = m_process->readUInt64(pStart);
+				if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
 					isUsed = true;
 					break;
 				}
+				pStart += 8;
 			}
 
-			// Check movesets of both players
-			for (size_t playerid = 0; playerid < 2 && !isUsed; ++playerid)
-			{
-				gameAddr currentPlayerAddress = playerAddress + playerid * playerstructSize;
-
-				// Maybe overkill to check every offset, but drastically reduces the chance of a crash, and isn't that slow
-				gameAddr pStart = currentPlayerAddress;
-				gameAddr pEnd = pStart + playerstructSize;
-				while (pStart < pEnd)
-				{
-					uint64_t offsetValue = m_process->readInt64(pStart);
-					if (movesetAddress <= offsetValue && offsetValue < movesetEnd) {
-						isUsed = true;
-						break;
-					}
-					pStart += 8;
-				}
-
-			}
+		}
 
 
-			if (isUsed) {
-				// Skip
-				++i;
-			}
-			else {
-				m_process->freeMem(movesetAddress);
-			}
-
+		if (isUsed) {
+			// Skip
+			++i;
+		}
+		else {
+			m_process->freeMem(movesetAddress);
 		}
 
 	}

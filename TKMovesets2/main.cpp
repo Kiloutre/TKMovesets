@@ -43,7 +43,6 @@ extern "C" const size_t TKMovesetLoader_orig_len;
 static void WriteToLogFile(const std::string& content, bool append=true)
 {
 	DEBUG_LOG("%s\n", content.c_str());
-	/*
 	std::ofstream file;
 
 	if (append) {
@@ -57,7 +56,6 @@ static void WriteToLogFile(const std::string& content, bool append=true)
 		file.write(content.c_str(), content.size());
 		file.write("\n", 1);
 	}
-	*/
 }
 
 static void glfw_error_callback(int error, const char* description)
@@ -173,16 +171,68 @@ static void DestroyMainClasses(MainWindow& program)
 	delete program.addrFile;
 
 	// Once every thread that may use storage has been stopped, we can finally stop storage
-program.storage.StopThreadAndCleanup();
+	program.storage.StopThreadAndCleanup();
+}
+
+static void LoadEmbeddedIcon(GLFWwindow* window)
+{
+	HMODULE hInstance = GetModuleHandle(NULL);
+
+	HRSRC hResource = FindResource(hInstance, MAKEINTRESOURCE(1), RT_ICON);
+	HGLOBAL hResourceData = LoadResource(hInstance, hResource);
+	if (hResource == nullptr) {
+		return;
+	}
+
+	DWORD iconSize = SizeofResource(hInstance, hResource);
+	LPVOID iconData = LockResource(hResourceData);
+
+	// Create an HICON object from the resource data
+	HICON hIcon = CreateIconFromResourceEx((PBYTE)iconData, iconSize, TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
+
+	// Convert the HICON object to a GLFWimage structure
+	ICONINFO iconInfo;
+	GetIconInfo(hIcon, &iconInfo);
+
+	BITMAPINFO bitmapInfo;
+	ZeroMemory(&bitmapInfo, sizeof(BITMAPINFO));
+	bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmapInfo.bmiHeader.biWidth = iconInfo.xHotspot * 2;
+	bitmapInfo.bmiHeader.biHeight = -(iconInfo.yHotspot * 2);
+	bitmapInfo.bmiHeader.biPlanes = 1;
+	bitmapInfo.bmiHeader.biBitCount = 32;
+
+	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * abs(bitmapInfo.bmiHeader.biHeight) * 4;
+	BYTE* bitmapData = new BYTE[allocSize];
+	ZeroMemory(bitmapData, allocSize);
+
+	GetDIBits(GetDC(NULL), iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
+
+	GLFWimage image;
+	image.width = iconInfo.xHotspot * 2;
+	image.height = iconInfo.yHotspot * 2;
+	image.pixels = bitmapData;
+
+	// Set the window icon
+	glfwSetWindowIcon(window, 1, &image);
+
+	// Clean up
+	DeleteObject(iconInfo.hbmColor);
+	DeleteObject(iconInfo.hbmMask);
+	DestroyIcon(hIcon);
 }
 
 // -- main -- //
 
+// I'd like to avoid declaring bad arguments for the main() but visual studio hates it
+// Just make sure not to actually use any of those arguments unless in release mode
 #ifdef BUILD_TYPE_DEBUG
-int main(int argc, wchar_t** argv, char** env)
+# define MAIN_NAME main
 #else
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+# define MAIN_NAME WinMain
 #endif
+
+int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
@@ -229,22 +279,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		return MAIN_ERR_WINDOW_CREATION;
 	}
 
-#ifndef BUILD_TYPE_DEBUG
-	{
-		// Set program icon (release only)
-		auto iconHandle = LoadImageA(hInstance, "IDI_ICON1", IMAGE_ICON, 256, 256, LR_SHARED | LR_DEFAULTSIZE);
-		if (iconHandle == nullptr) {
-			DEBUG_LOG("FAILED TO LOAD ICON\n");
-		}
-		else {
-			unsigned char* imageData;
-			GLFWimage icon = { 256, 256, imageData };
-			//glfwSetWindowIcon(window, 1, &icon);
-		}
-
-	}
-#endif
-
+	LoadEmbeddedIcon(window);
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
 	// Enable vsync
@@ -276,16 +311,21 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'.");
 			char* buf = new char[TKMovesetLoader_orig_len];
 
-			LZ4_decompress_safe((char*)TKMovesetLoader, buf, TKMovesetLoader_len, TKMovesetLoader_orig_len);
+			int decompressed = LZ4_decompress_safe((char*)TKMovesetLoader, buf, (int)TKMovesetLoader_len, (int)TKMovesetLoader_orig_len);
 
-			std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
-			if (file.fail()) {
-				return MAIN_ERR_NO_MOVESET_LOADER;
+			if (decompressed > 0) {
+				std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
+				if (file.fail()) {
+					return MAIN_ERR_NO_MOVESET_LOADER;
+				}
+
+				file.write(buf, TKMovesetLoader_orig_len);
+				DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'.");
 			}
-
-			file.write(buf, TKMovesetLoader_orig_len);
+			else {
+				DEBUG_LOG("Failed to decompress '" MOVESET_LOADER_NAME "'.");
+			}
 			delete[] buf;
-			DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'.");
 		}
 
 		movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
@@ -310,7 +350,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			// Probably framebuffer related? Required
 			program.NewFrame();
 
-			// Main layout function : every we display is in there
+			// Main layout function : everything we display is in there
 			program.Update();
 
 			// Let imgui do its stuff

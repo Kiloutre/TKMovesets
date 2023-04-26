@@ -46,13 +46,11 @@ protected:
 	std::map<int, std::string> m_categoryStringIdentifiers;
 	// Contains the base title of the main window that we will preprend our title to
 	std::string m_windowTitleBase;
-	// Contains wndow info to re-apply when renaming the window
+	// Contains window info to avoid re-fetching it multiple times per render
 	struct WindowInfo
 	{
 		ImVec2 pos;
 		ImVec2 size;
-		ImGuiID dockId = 0;
-		bool applyNextRender = false;
 	} m_winInfo;
 	// Used for alignment calculations
 	float m_labelWidthHalf = 0.0f;
