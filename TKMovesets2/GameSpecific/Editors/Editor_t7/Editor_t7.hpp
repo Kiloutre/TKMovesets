@@ -258,7 +258,7 @@ public:
 	~EditorT7();
 
 	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
-	void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
+	bool LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
 	void ReloadDisplayableMoveList() override;
 	void RecomputeDisplayableMoveFlags(uint16_t moveId) override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;

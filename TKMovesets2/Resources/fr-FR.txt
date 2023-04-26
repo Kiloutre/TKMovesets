@@ -88,6 +88,7 @@ extraction.progress_done = Progrès: Fini !
 extraction.extracted_movesets = Personnages extraits 
 extraction.cant_extract = Impossible d'extraire car aucun personnage chargé.
 extraction.error_file_creation = Il y a eu une erreur lors de la création du fichier du personnage
+extraction.error_compression = Il y a eu une erreur lors de la compression
 extraction.error_allocation = Il y a eu une erreur d'allocation lors de la copie des données du personnage
 extraction.mota_explanation = Animations additionnelles 
 extraction.settings = Paramètres

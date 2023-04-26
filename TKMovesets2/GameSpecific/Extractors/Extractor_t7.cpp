@@ -464,7 +464,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 	}
 }
 
-void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount, int32_t movesetDataSize)
+void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
 {
 	infos.flags = 0;
 	infos.gameId = m_gameId;
@@ -483,7 +483,7 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 	infos.block_list = (uint32_t)infos.header_size + Helpers::align8Bytes(propertyListSize);
 	infos.block_list_size = (uint32_t)_countof(((TKMovesetHeaderBlocks*)0)->blocks);
 	infos.moveset_data_start = infos.block_list + (uint32_t)Helpers::align8Bytes(infos.block_list_size * sizeof(uint64_t));
-	infos.moveset_data_size = movesetDataSize;
+	infos.moveset_data_size = 0;
 }
 
 // -- Public methods -- //
@@ -599,39 +599,10 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	std::string characterName = GetPlayerCharacterName(playerAddress);
 	progress = 77;
 
-
-	// List of blocks that will be written to the file. Each block is 8 bytes aligned
-	std::vector<std::pair<Byte*, uint64_t>> writtenFileBlocks{
-		// Header block containing important moveset informations
-		{headerBlock, s_headerBlock},
-		// Custom block of variable length containing a list of custom properties to apply on import
-		{customPropertiesBlock, s_customProperties},
-		// Contains the list of moveset data blocks' offsets
-		{offsetListBlock, s_offsetListBlock},
-
-		// Actual moveset data start. Accurate up to the animation block
-		{movesetInfoBlock, s_movesetInfoBlock},
-		{tableBlock, s_tableBlock },
-		{motasListBlock, s_motasListBlock},
-		{(Byte*)nameBlock, s_nameBlock},
-		{movesetBlock, s_movesetBlock},
-		{animationBlock, s_animationBlock},
-		{motaCustomBlock, s_motaCustomBlock},
-		// Displayable movelist block
-		{movelistBlock, s_movelistBlock},
-	};
-
-	// Calculate size of actual moveset data, ignoring the first 3 blocks since they are not part of it,
-	// and taking itno account alignment
-	int32_t movesetDataSize = 0;
-	if (settings & ExtractSettings_Compress) {
-		for (unsigned int i = 3; i < writtenFileBlocks.size(); ++i) {
-			movesetDataSize += Helpers::align8Bytes(writtenFileBlocks[i].second);
-		}
-	}
 	// Fill the header with our own useful informations
-	FillHeaderInfos(customHeader, playerAddress, _countof(customProperties), movesetDataSize);
+	FillHeaderInfos(customHeader, playerAddress, _countof(customProperties));
 	progress = 79;
+
 	// Calculate each offsets according to the previous block offset + its size
 	// Offsets are relative to movesetInfoBlock (which is always 0) and not absolute within the file
 	// This is because you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
@@ -645,7 +616,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	offsetList.motaBlock = Helpers::align8Bytes(offsetList.animationBlock + s_animationBlock);
 	offsetList.movelistBlock = Helpers::align8Bytes(offsetList.motaBlock + s_motaCustomBlock);
 
-	ExtractionErrcode_ errcode;
+	ExtractionErrcode_ errcode = ExtractionErrcode_Successful;
 
 	// -- Writing the file -- 
 
@@ -670,6 +641,28 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 		{
 			progress = 80;
 
+
+			// List of blocks that will be written to the file. Each block is 8 bytes aligned
+			std::vector<std::pair<Byte*, uint64_t>> writtenFileBlocks{
+				// Header block containing important moveset informations
+				{headerBlock, s_headerBlock},
+				// Custom block of variable length containing a list of custom properties to apply on import
+				{customPropertiesBlock, s_customProperties},
+				// Contains the list of moveset data blocks' offsets
+				{offsetListBlock, s_offsetListBlock},
+
+				// Actual moveset data start. Accurate up to the animation block
+				{movesetInfoBlock, s_movesetInfoBlock},
+				{tableBlock, s_tableBlock },
+				{motasListBlock, s_motasListBlock},
+				{(Byte*)nameBlock, s_nameBlock},
+				{movesetBlock, s_movesetBlock},
+				{animationBlock, s_animationBlock},
+				{motaCustomBlock, s_motaCustomBlock},
+				// Displayable movelist block
+				{movelistBlock, s_movelistBlock},
+			};
+
 			// List of blocks used for the CRC32 calculation. Some blocks above are purposefully ignored.
 			// Every block that can be manually modified is in there
 			std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
@@ -691,7 +684,9 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 			if (settings & ExtractSettings_Compress) {
 				DEBUG_LOG("Saved temp moveset, compressing...\n");
-				ExtractorUtils::CompressFile(customHeader.moveset_data_start, filepath, tmp_filepath);
+				if (!ExtractorUtils::CompressFile(customHeader.moveset_data_start, filepath, tmp_filepath)) {
+					errcode = ExtractionErrcode_CompressionFailure;
+				}
 			}
 			else {
 				std::filesystem::rename(tmp_filepath, filepath);
@@ -701,7 +696,6 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 			progress = 100;
 			// Extraction is over
-			errcode = ExtractionErrcode_Successful;
 		}
 		else {
 			errcode = ExtractionErrcode_FileCreationErr;

@@ -48,6 +48,7 @@ enum ExtractionErrcode_
 	ExtractionErrcode_Successful,
 	ExtractionErrcode_AllocationErr,
 	ExtractionErrcode_FileCreationErr,
+	ExtractionErrcode_CompressionFailure,
 };
 
 namespace ExtractorUtils
@@ -62,8 +63,8 @@ namespace ExtractorUtils
 	uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim);
 	// Returns the size in bytes of a 0x64 animation (big endian anim)
 	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
-	// Compress
-	void CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
+	// Compress a moveset. Returns false on failure. Modifies header->moveset_data_size automatically.
+	bool CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
 };
 
 // Base class for extracting from a game

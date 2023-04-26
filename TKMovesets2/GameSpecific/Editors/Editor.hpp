@@ -313,8 +313,8 @@ public:
 	Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
 	virtual ~Editor();
 
-	// Loads important moveset data in our class, required to start functionning
-	virtual void LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;
+	// Loads important moveset data in our class, required to start functionning. Returns false on error.
+	virtual bool LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	// Assigns the moveset pointer and useful ptrs to it
 	virtual void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) = 0;
 	// Return the movelist in a quickly displayable format

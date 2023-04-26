@@ -88,6 +88,7 @@ extraction.progress_done = Extracting... Done!
 extraction.extracted_movesets = Extracted movesets
 extraction.cant_extract = Cannot extract because characters aren't loaded.
 extraction.error_file_creation = There was an error while creating the moveset file
+extraction.error_compression = There was an error while compressing the moveset file
 extraction.error_allocation = There was a memory allocation error while copying the moveset data
 extraction.mota_explanation = Additional animations
 extraction.settings = Settings

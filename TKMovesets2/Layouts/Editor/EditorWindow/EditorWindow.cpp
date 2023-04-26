@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <format>
+#include <filesystem>
 
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
@@ -241,13 +242,36 @@ void EditorWindow::Save()
 	header->crc32 = m_editor->CalculateCRC32();
 	header->date = Helpers::getCurrentTimestamp();
 
-	std::ofstream file(m_loadedCharacter.filename, std::ios::binary);
+	std::wstring dst_filename = m_loadedCharacter.filename;
+	std::wstring tmp_filename = dst_filename;
+	tmp_filename.erase(tmp_filename.find_last_of(L"."));
+	tmp_filename += L"" MOVESET_TMPFILENAME_EXTENSION;
+
+	std::ofstream file(tmp_filename, std::ios::binary);
 	if (!file.fail()) {
 		file.write((char*)moveset, movesetSize);
-		m_savedLastChange = true;
-		m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(header->date);
+		file.close();
+
+		bool isCompressed = true;
+		bool success = true;
+
+		if (isCompressed) {
+			success = ExtractorUtils::CompressFile(header->moveset_data_start, dst_filename, tmp_filename);
+		}
+		else {
+			std::filesystem::rename(tmp_filename, dst_filename);
+		}
+
+		if (success) {
+			m_savedLastChange = true;
+			m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(header->date);
+		}
+		else {
+			DEBUG_LOG("Err: failed to compress file\n");
+		}
 	}
 	else {
+		DEBUG_LOG("!! Editor: failed to save. !!\n");
 		// Showing failure would be nice. Even simply changing the Save button text would suffice.
 		//todo
 	}
@@ -317,7 +341,10 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 		file.close();
 	}
 
-	m_editor->LoadMoveset(moveset, movesetSize);
+	if (!m_editor->LoadMoveset(moveset, movesetSize)) {
+		this->popen = false;
+	}
+
 	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId, movesetInfo->minorVersion);
 
 	m_loadedCharacter.filename = movesetInfo->filename;

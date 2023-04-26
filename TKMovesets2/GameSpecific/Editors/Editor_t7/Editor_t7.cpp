@@ -4,6 +4,7 @@
 
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
+# include "Importer.hpp"
 
 using namespace EditorUtils;
 
@@ -248,7 +249,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 	live_loadedMoveset = 0;
 }
 
-void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
+bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
 	*constants = {
 		   {EditorConstants_RequirementEnd, 881},
@@ -259,6 +260,34 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		   {EditorConstants_GroupedCancelCommandEnd, 0x800C},
 		   {EditorConstants_InputSequenceCommandStart, 0x800D},
 	};
+
+	{
+		TKMovesetHeader* header = (TKMovesetHeader*)t_moveset;
+		if (header->moveset_data_size > 0) {
+			// Compressed moveset data, must decompress
+			uint64_t new_size = header->moveset_data_start + header->moveset_data_size;
+			int32_t src_size = t_movesetSize - header->moveset_data_start;
+
+			Byte* new_moveset = new Byte[new_size];
+			memcpy(new_moveset, t_moveset, header->moveset_data_start);
+
+			Byte* old_moveset_data_start = t_moveset + header->moveset_data_start;
+			Byte* new_moveset_data_start = new_moveset + header->moveset_data_start;
+
+			if (!ImporterUtils::DecompressMoveset(new_moveset_data_start, old_moveset_data_start, src_size, header->moveset_data_size)) {
+				DEBUG_LOG("Decompression error\n");
+				return false;
+			}
+
+			delete[] t_moveset;
+			t_moveset = new_moveset;
+			t_movesetSize = new_size;
+
+			// Mark the moveset as decompressed while it's in the editor
+			// Compressor should mark it on its own if compressing, when saving
+			((TKMovesetHeader*)t_moveset)->moveset_data_size = 0;
+		}
+	}
 
 	LoadMovesetPtr(t_moveset, t_movesetSize);
 
@@ -322,6 +351,7 @@ void EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	}
 
 	movesetTable.aliases = *m_aliases;
+	return true;
 }
 
 void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)

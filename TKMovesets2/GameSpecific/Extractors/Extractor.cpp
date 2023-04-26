@@ -8,6 +8,7 @@
 #include "Helpers.hpp"
 #include "Extractor.hpp"
 
+#include "MovesetStructs.h"
 #include "GameTypes.h"
 
 // -- Helpers -- //
@@ -130,7 +131,7 @@ namespace ExtractorUtils
 		}
 	}
 
-	void CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename)
+	bool CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename)
 	{
 		std::ifstream orig_file(src_filename, std::ios::binary);
 		std::ofstream new_file(dest_filename, std::ios::binary);
@@ -138,13 +139,20 @@ namespace ExtractorUtils
 		// Copy up to moveset_data_start, get size of moveset data
 		int32_t moveset_data_size;
 		{
+			// Read up to moveset data start
 			char* buf = new char[moveset_data_start];
 			orig_file.read(buf, moveset_data_start);
-			new_file.write(buf, moveset_data_start);
-			delete[] buf;
 
+			// Calculate moveset data size
 			orig_file.seekg(0, std::ios::end);
 			moveset_data_size = (int32_t)orig_file.tellg() - moveset_data_start;
+
+			// Mark moveset as compressed
+			((TKMovesetHeader*)buf)->moveset_data_size = moveset_data_size;
+
+			// Write header
+			new_file.write(buf, moveset_data_start);
+			delete[] buf;
 
 			// Move cursor back to the start of the moveset data
 			orig_file.seekg(moveset_data_start, std::ios::beg);
@@ -163,7 +171,7 @@ namespace ExtractorUtils
 		compressed_size = LZ4_compress_default(inbuf, outbuf, moveset_data_size, moveset_data_size);
 		DEBUG_LOG("Compression: Old size was %d, compressed size is %d\n", moveset_data_size, compressed_size);
 
-		if (compressed_size == 0)
+		if (compressed_size <= 0)
 		{
 			new_file.close();
 			std::filesystem::remove(dest_filename);
@@ -175,6 +183,7 @@ namespace ExtractorUtils
 
 		delete[] inbuf;
 		delete[] outbuf;
+		return compressed_size >= 0;
 	}
 };
 

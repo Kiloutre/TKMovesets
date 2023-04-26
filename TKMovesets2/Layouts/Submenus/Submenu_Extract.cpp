@@ -313,6 +313,9 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		case ExtractionErrcode_FileCreationErr:
 			ImGui::Text(_("extraction.error_file_creation"));
 			break;
+		case ExtractionErrcode_CompressionFailure:
+			ImGui::Text(_("extraction.error_compression"));
+			break;
 		}
 
 		if (ImGui::Button(_("close")))
