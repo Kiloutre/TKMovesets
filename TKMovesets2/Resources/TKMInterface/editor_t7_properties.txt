@@ -12,8 +12,8 @@
 0x8011,Fire burn VFX (self)
 0x8012,Fire burn VFX (opponent)
 0x8017,Hit spark (self)
-0x8019,Elecric Effect (self)
-0x801a,Elecric Effect (opponent)
+0x8019,Electric Effect (self)
+0x801a,Electric Effect (opponent)
 0x801b,Rage Drive VFX
 0x801e,Mouth Fog VFX
 0x8021,Hit spark (self)
