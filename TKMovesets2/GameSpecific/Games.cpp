@@ -11,6 +11,7 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
+		.movesetNamePrefix = "T7_",
 		.gameId = GameId_T7,
 		.minorVersion = 0,
 		.characterCount = 2,
@@ -26,6 +27,7 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		.name = "Tekken 8",
 		.processName = "Tekken8.exe",
+		.movesetNamePrefix = "T8_",
 		.gameId = GameId_T8,
 		.minorVersion = 0,
 		.characterCount = 2,
@@ -41,6 +43,7 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		.name = "Tekken Tag 2",
 		.processName = "Cemu.exe",
+		.movesetNamePrefix = "TTT2_",
 		.gameId = GameId_TTT2,
 		.minorVersion = 0,
 		.characterCount = 2,
@@ -135,28 +138,28 @@ namespace Games
 	
 	Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Extractor* ex = (Extractor*)gameInfo->extractor->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
+		Extractor* ex = (Extractor*)gameInfo->extractor->allocate(process, game, gameInfo);
 		ex->characterCount = gameInfo->characterCount;
 		return ex;
 	}
 
 	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
+		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo);
 		im->characterCount = gameInfo->characterCount;
 		return im;
 	}
 
 	Editor* FactoryGetEditor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Editor* ed = (Editor*)gameInfo->editor->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
+		Editor* ed = (Editor*)gameInfo->editor->allocate(process, game, gameInfo);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
 	}
 
 	Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo->gameId, gameInfo->minorVersion);
+		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo);
 		return on;
 	}
 };

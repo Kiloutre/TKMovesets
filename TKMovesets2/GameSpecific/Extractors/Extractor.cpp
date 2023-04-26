@@ -232,7 +232,7 @@ void Extractor::GetFilepath(const char* characterName, std::wstring& out, std::w
 	CreateDirectory(cm_extractionDir, NULL);
 	// Make sure the directory for extraction exists 
 
-	const char* gameIdentifierstring = GetGameIdentifierString();
+	const char* gameIdentifierstring = m_gameInfo.movesetNamePrefix;
 
 	std::wstring filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, 0);
 

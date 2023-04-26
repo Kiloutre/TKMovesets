@@ -310,7 +310,7 @@ public:
 	// Id of the currently selected player, used for extra properties execution
 	uint32_t currentPlayerId = 0;
 
-	Editor(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
+	Editor(GameProcess* process, GameData* game, const GameInfo* gameInfo);
 	virtual ~Editor();
 
 	// Loads important moveset data in our class, required to start functionning. Returns false on error.

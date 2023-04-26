@@ -51,7 +51,7 @@ public:
 	// If you have multiple instances of sharedMem, it might be good to only have one reset the shared memory & free the dll
 	bool resetMemOnDestroy = false;
 
-	Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion);
+	Online(GameProcess* process, GameData* game, const GameInfo* gameInfo);
 	virtual ~Online();
 
 	// Load the shared memory handle

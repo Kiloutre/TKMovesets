@@ -82,11 +82,6 @@ protected:
 	// Generates the full filepath and the full tmp filepath to write to
 	void GetFilepath(const char* characterName, std::wstring& out, std::wstring& out_tmp, bool overwriteSameFilename);
 
-	// Returns the game identifier string, used for moveset file pefix
-	virtual const char* GetGameIdentifierString() = 0;
-	// Returns the game name, used in moveset headers
-	virtual const char* GetGameOriginString() = 0;
-
 	// Returns the amount of bytes an animation contains
 	uint64_t GetAnimationSize(gameAddr anim);
 public:

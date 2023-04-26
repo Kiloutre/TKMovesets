@@ -3,7 +3,7 @@
 
 #include "Online.hpp"
 
-Online::Online(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : BaseGameSpecificClass(process, game, gameId, minorVersion)
+Online::Online(GameProcess* process, GameData* game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
 {
     displayedMovesets = new std::vector<movesetInfo>();
     m_dllInjectionThread = new std::thread();

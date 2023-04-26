@@ -2,6 +2,7 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "GameInfo.hpp"
 
 #include "constants.h"
 #include "GameTypes.h"
@@ -14,11 +15,9 @@ protected:
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt
 	GameData* m_game;
-	// ID of the game
-	uint16_t m_gameId;
-	// ID of the minor version of the game
-	uint16_t m_minorVersion;
+	// Structure containing ID of the game, minor version, an dmore
+	const GameInfo m_gameInfo;
 
 public:
-	BaseGameSpecificClass(GameProcess* process, GameData* game, uint16_t gameId, uint16_t minorVersion) : m_process(process), m_game(game), m_gameId(gameId), m_minorVersion(minorVersion) {}
+	BaseGameSpecificClass(GameProcess* process, GameData* game, const GameInfo* gameInfo) : m_process(process), m_game(game), m_gameInfo(*gameInfo) {}
 };
