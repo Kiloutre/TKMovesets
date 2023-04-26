@@ -235,6 +235,9 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		case ImportationErrcode_FileReadErr:
 			ImGui::Text(_("importation.error_file_creation"));
 			break;
+		case ImportationErrcode_DecompressionError:
+			ImGui::Text(_("importation.error_decompression"));
+			break;
 		}
 
 		if (ImGui::Button(_("close")))

@@ -40,6 +40,7 @@ enum ExtractSettings_
 
 	ExtractSettings_OVERWRITE_SAME_FILENAME = (1 << 12),
 	ExtractSettings_DisplayableMovelist = (1 << 13),
+	ExtractSettings_Compress = (1 << 14),
 };
 
 enum ExtractionErrcode_
@@ -62,7 +63,7 @@ namespace ExtractorUtils
 	// Returns the size in bytes of a 0x64 animation (big endian anim)
 	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
 	// Compress
-	void CompressFile(const std::wstring& dest_filename, const std::wstring& src_filename);
+	void CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
 };
 
 // Base class for extracting from a game

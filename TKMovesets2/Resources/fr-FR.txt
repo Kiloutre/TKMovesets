@@ -110,6 +110,7 @@ importation.free_unused_movesets_explanation = Si activé, les personnages ancie
 importation.error_file_reading = Il y a eu une erreur lors de la création du fichier du personnage
 importation.error_allocation = Il y a eu une erreur d'allocation lors de lecture des données du personnage
 importation.error_game_allocation = Il y a eu une erreur d'allocation dans le jeu lors de l'écriture des données du personnage
+importation.error_decompression = Il y a eu une erreur d'allocation lors de la decompression
 
 # Jeu persistant #
 persistent.explanation = Le mode persistant permet de sélectionner deux moveset et de les garder appliqués à travers les écrans de chargement et différents modes de jeu.\nSi le joueur distant possède aussi ce programme, ce menu peut être utilisé pour jouer en ligne: il faudra alors que vous et le joueur disant possédiez tous les deux les movesets à appliquer sur l'un et l'autre. Appliquez ensuite votre moveset (ou aucun) sur 'Joueur 1', et son moveset (ou aucun) sur 'Joueur 2', puis verrouillez.

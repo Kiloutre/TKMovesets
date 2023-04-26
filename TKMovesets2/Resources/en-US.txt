@@ -110,6 +110,7 @@ importation.free_unused_movesets_explanation = If turned on, movesets that were 
 importation.error_file_reading = There was an error while reading the moveset file
 importation.error_allocation = There was a memory allocation error while reading the moveset data
 importation.error_game_allocation = There was a game memory allocation error while writing the moveset data
+importation.error_decompression = Therewas an error while decompressing the moveset data
 
 # Persistent play #
 persistent.explanation = The persistent mode allows you to select the movesets to apply on players, with those movesets staying across loading screens and even if you switch the side you're playing on.\nThis can be used online if the opponent also has this tool running, with each of you having downloaded/extracted both movesets already:\nYou must then each set your own moveset (or None) as "Player 1", and the opponent's moveset (or None) as "Player 2", and lock-in.

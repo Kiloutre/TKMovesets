@@ -31,6 +31,9 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 {
 	ExtractSettings settings = 0;
 
+	// Compression always on, but disableable by simply removing this line
+	settings |= ExtractSettings_Compress;
+
 	if (m_overwriteSameFilename) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
 	}

@@ -44,7 +44,14 @@ enum ImportationErrcode_
 	ImportationErrcode_AllocationErr,
 	ImportationErrcode_GameAllocationErr,
 	ImportationErrcode_FileReadErr,
+	ImportationErrcode_DecompressionError,
 };
+
+namespace ImporterUtils
+{
+	// Return an allocated copy of the decompressed moveset data (moveset_data_start and on)
+	bool DecompressMoveset(Byte* outputDest, const Byte* moveset_data_start, uint64_t src_size, int32_t original_size);
+}
 
 // Base class for extracting from a game
 class DLLCONTENT Importer : public BaseGameSpecificClass

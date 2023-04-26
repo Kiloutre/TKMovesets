@@ -18,6 +18,7 @@ enum MovesetFlags_
 {
 	// Used to show which movesets the user has modified (knowing if it's an original or not can be useful)
 	MovesetFlags_MOVESET_MODIFIED = (1 << 0),
+	MovesetFlags_Compressed = (1 << 1),
 };
 
 // This structure should really not change or it would break compatibility with all previous movesets
@@ -43,7 +44,7 @@ struct TKMovesetHeader
 	uint32_t block_list_size = (uint32_t)-1;
 	// Absolute offset of the block offset list
 	uint32_t moveset_data_start = (uint32_t)-1;
-	// Size of the moveset data
+	// Size of the moveset data. Purposefully a int32_t. 0 if not compressed.
 	int32_t moveset_data_size = -1;
 	// Stores a hash of the moveset data 
 	uint32_t crc32 = (uint32_t)-1;

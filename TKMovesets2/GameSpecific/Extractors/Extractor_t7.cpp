@@ -5,6 +5,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
+#include <filesystem>
 
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
@@ -623,8 +624,10 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	// Calculate size of actual moveset data, ignoring the first 3 blocks since they are not part of it,
 	// and taking itno account alignment
 	int32_t movesetDataSize = 0;
-	for (unsigned int i = 3; i < writtenFileBlocks.size(); ++i) {
-		movesetDataSize += Helpers::align8Bytes(writtenFileBlocks[i].second);
+	if (settings & ExtractSettings_Compress) {
+		for (unsigned int i = 3; i < writtenFileBlocks.size(); ++i) {
+			movesetDataSize += Helpers::align8Bytes(writtenFileBlocks[i].second);
+		}
 	}
 	// Fill the header with our own useful informations
 	FillHeaderInfos(customHeader, playerAddress, _countof(customProperties), movesetDataSize);
@@ -685,9 +688,15 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 			ExtractorUtils::WriteFileData(file, writtenFileBlocks, progress, 95);
 
 			file.close();
-			DEBUG_LOG("Saved temp moveset, compressing...\n");
 
-			ExtractorUtils::CompressFile(customHeader.moveset_data_start, filepath, tmp_filepath);
+			if (settings & ExtractSettings_Compress) {
+				DEBUG_LOG("Saved temp moveset, compressing...\n");
+				ExtractorUtils::CompressFile(customHeader.moveset_data_start, filepath, tmp_filepath);
+			}
+			else {
+				std::filesystem::rename(tmp_filepath, filepath);
+			}
+
 			DEBUG_LOG("- Saved moveset at '%S' -\n", filepath.c_str());
 
 			progress = 100;
