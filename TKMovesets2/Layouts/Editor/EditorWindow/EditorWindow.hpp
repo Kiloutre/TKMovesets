@@ -83,6 +83,8 @@ private:
 	GameImport m_importerHelper;
 	// Copy of the shared mem helper, used to play extra propreties
 	GameSharedMem m_sharedMemHelper;
+	// If true, will compress the moveset file when saving
+	bool m_compressOnSave = false;
 
 
 	// Render the top toolbar containing useful moveset editing tools

@@ -297,6 +297,8 @@ void EditorWindow::RenderStatusBar()
 		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"), m_liveEdition == false || m_editor->live_loadedMoveset != 0);
 	}
 
+	ImGui::SameLine();
+	ImGui::Checkbox(_("edition.compress_moveset"), &m_compressOnSave);
 }
 
 void EditorWindow::RenderMovesetData()

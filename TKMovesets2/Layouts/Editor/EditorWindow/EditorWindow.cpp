@@ -252,10 +252,9 @@ void EditorWindow::Save()
 		file.write((char*)moveset, movesetSize);
 		file.close();
 
-		bool isCompressed = true;
 		bool success = true;
 
-		if (isCompressed) {
+		if (m_compressOnSave) {
 			success = ExtractorUtils::CompressFile(header->moveset_data_start, dst_filename, tmp_filename);
 		}
 		else {
