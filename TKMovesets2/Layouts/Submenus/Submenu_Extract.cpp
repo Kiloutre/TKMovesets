@@ -31,8 +31,9 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 {
 	ExtractSettings settings = 0;
 
-	// Compression always on, but disableable by simply removing this line
-	settings |= ExtractSettings_Compress;
+	if (m_compressMoveset) {
+		settings |= ExtractSettings_Compress;
+	}
 
 	if (m_overwriteSameFilename) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
@@ -123,6 +124,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 		ImGui::SeparatorText(_("extraction.settings.other"));
 		ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
+		ImGui::Checkbox(_("extraction.settings.compress_moveset"), &m_compressMoveset);
 
 		ImGui::Separator();
 		if (ImGui::Button(_("close"))) {

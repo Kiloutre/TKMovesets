@@ -92,8 +92,9 @@ extraction.error_compression = There was an error while compressing the moveset 
 extraction.error_allocation = There was a memory allocation error while copying the moveset data
 extraction.mota_explanation = Additional animations
 extraction.settings = Settings
-extraction.settings.displayable_movelist = Displayable movelist
 extraction.settings.other = Other
+extraction.settings.displayable_movelist = Displayable movelist
+extraction.settings.compress_moveset = Compress moveset
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
