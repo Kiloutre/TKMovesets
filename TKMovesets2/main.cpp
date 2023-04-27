@@ -231,6 +231,96 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	return true;
 }
 
+// -- update -- //
+
+static void CleanupUpdateFiles(const std::string& filename)
+{
+	DEBUG_LOG("CleanupUpdateFiles()\n");
+	// Wait until [filename] process has ended
+	{
+		bool found = true;
+		while (found)
+		{
+			found = false;
+			for (auto& process : GameProcessUtils::GetRunningProcessList())
+			{
+				DEBUG_LOG("- %s\n", process.name.c_str());
+				if (process.name == filename) {
+					DEBUG_LOG("Found [%s]\n", filename.c_str());
+					found = true;
+					break;
+				}
+			}
+			if (found) {
+				Sleep(500);
+			}
+			else {
+				DEBUG_LOG("Not found.\n");
+			}
+		}
+	}
+	DEBUG_LOG("CleanupUpdateFiles() - Removing file\n");
+	std::filesystem::remove(filename);
+}
+
+// Copy self .exe into TKMovesets.exe
+static void ApplyUpdate(const std::string& filename)
+{
+	DEBUG_LOG("ApplyUpdate()\n");
+	// Wait until [UPDATE_FINALFILENAME] process has ended
+	{
+		bool found = true;
+		while (found)
+		{
+			found = false;
+			for (auto& process : GameProcessUtils::GetRunningProcessList())
+			{
+				DEBUG_LOG("- %s\n", process.name.c_str());
+				if (process.name == UPDATE_FINAL_FILENAME) {
+					DEBUG_LOG("Found [" UPDATE_FINAL_FILENAME "]\n");
+					found = true;
+					break;
+				}
+			}
+			if (found) {
+				Sleep(500);
+			}
+			else {
+				DEBUG_LOG("Not found.\n");
+			}
+		}
+	}
+	DEBUG_LOG("ApplyUpdate() - Copying file\n");
+	std::filesystem::remove(UPDATE_FINAL_FILENAME);
+	std::filesystem::copy_file(filename, UPDATE_FINAL_FILENAME);
+
+
+	// Start process
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	// set the size of the structures
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	// start the program up
+	CreateProcess(".\\" UPDATE_FINAL_FILENAME,   // the path
+		NULL,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		FALSE,          // Set handle inheritance to FALSE
+		0,              // No creation flags
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+	);
+	// Close process and thread handles. 
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+}
+
 // -- main -- //
 
 // I'd like to avoid declaring bad arguments for the main() but visual studio hates it
@@ -250,6 +340,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		wchar_t currPath[MAX_PATH] = { 0 };
 		GetModuleFileNameW(nullptr, currPath, MAX_PATH);
 		std::wstring ws(currPath);
+		std::string filename = Helpers::wstring_to_string(ws.substr(ws.find_last_of(L"\\") + 1));
 		ws.erase(ws.find_last_of(L"\\"));
 
 		if (ws != std::filesystem::current_path()) {
@@ -259,6 +350,16 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		}
 
 		WriteToLogFile("Started TKMovesets " PROGRAM_VERSION, false);
+
+		std::string update_file_name = std::string(UPDATE_TMP_FILENAME) + ".exe";
+		if (filename == update_file_name) {
+			// Copy self .exe into TKMovesets.exe
+			ApplyUpdate(update_file_name);
+			return 0;
+		}
+		else if (Helpers::fileExists(update_file_name.c_str())) {
+			CleanupUpdateFiles(update_file_name);
+		}
 	}
 
 	// Initialize GLFW library
