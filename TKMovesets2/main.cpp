@@ -100,6 +100,7 @@ static void InitMainClasses(MainWindow& program)
 	program.onlineMenu.gameHelper = &program.sharedMem;
 	program.persistentPlayMenu.gameHelper = &program.sharedMem;
 
+	program.navMenu.requestedExitPtr = &program.requestedExit;
 	program.navMenu.SetAddrFile(addrFile);
 
 	{
@@ -238,8 +239,9 @@ static void CleanupUpdateFiles(const std::string& filename)
 	DEBUG_LOG("CleanupUpdateFiles()\n");
 	// Wait until [filename] process has ended
 	{
-		bool found = true;
-		while (found)
+		// Max is 200 * 25 = 5 secs
+		bool found = false;
+		for (int i = 0; found && i < 25; ++i)
 		{
 			found = false;
 			for (auto& process : GameProcessUtils::GetRunningProcessList())
@@ -252,14 +254,20 @@ static void CleanupUpdateFiles(const std::string& filename)
 				}
 			}
 			if (found) {
-				Sleep(500);
+				Sleep(200);
 			}
 			else {
 				DEBUG_LOG("Not found.\n");
 			}
 		}
+
+		if (found) {
+			// timeout, don't do anything
+			return;
+		}
 	}
 	DEBUG_LOG("CleanupUpdateFiles() - Removing file\n");
+
 	std::filesystem::remove(filename);
 }
 
@@ -269,8 +277,9 @@ static void ApplyUpdate(const std::string& filename)
 	DEBUG_LOG("ApplyUpdate()\n");
 	// Wait until [UPDATE_FINALFILENAME] process has ended
 	{
-		bool found = true;
-		while (found)
+		// Max is 200 * 25 = 5 secs
+		bool found = false;
+		for (int i = 0; found && i < 25; ++i)
 		{
 			found = false;
 			for (auto& process : GameProcessUtils::GetRunningProcessList())
@@ -283,11 +292,16 @@ static void ApplyUpdate(const std::string& filename)
 				}
 			}
 			if (found) {
-				Sleep(500);
+				Sleep(200);
 			}
 			else {
 				DEBUG_LOG("Not found.\n");
 			}
+		}
+
+		if (found) {
+			// timeout, don't do anything
+			return;
 		}
 	}
 	DEBUG_LOG("ApplyUpdate() - Copying file\n");
@@ -454,7 +468,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		InitMainClasses(program);
 
 		WriteToLogFile("Initiated main classes");
-		while (!glfwWindowShouldClose(window))
+		while (!glfwWindowShouldClose(window) && !program.requestedExit)
 		{
 			// Poll and handle events such as MKB inputs, window resize. Required
 			glfwPollEvents();

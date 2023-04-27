@@ -77,6 +77,7 @@ navmenu.updated_addr = Addresses à jour !
 navmenu.update_check = Vérification...
 navmenu.update = Mettre à jour
 navmenu.update_error = MÀJ Erreur 
+navmenu.update_explanation = Une mise à jour a été trouvée. Voulez-vous redémarrer maintenant ?
 
 ## Sous-menus ##
 

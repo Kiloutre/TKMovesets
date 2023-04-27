@@ -24,6 +24,10 @@ private:
 	// Attempt to load a moveset, open a new editor window on success
 	void LoadMovesetEditor(movesetInfo* movesetInfos);
 public:
+	// If true, program will exit
+	bool requestedExit = false;
+
+	// Navigation menu, also handles language selection and update button
 	NavigationMenu navMenu;
 
 	// Extractor instance, can attach to its own process separately from everyone else

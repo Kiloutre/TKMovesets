@@ -59,6 +59,8 @@ private:
 public:
 	// Stores the ID of the current menu to render
 	NAV__MENU menuId{ NAV__MENU_DEFAULT };
+	// Ptr to MainProgram.requestedExit, set to true when updating in order to close the program
+	bool* requestedExitPtr = nullptr;
 
 	NavigationMenu();
 	~NavigationMenu();

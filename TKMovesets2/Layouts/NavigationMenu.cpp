@@ -114,6 +114,24 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("navmenu.updated_addr"));
 			}
 		}
+
 	}
 
+	// Update popup
+	if (m_updateStatus.programUpdateAvailable) {
+		ImGui::OpenPopup("ProgramUpdatePopup");
+		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
+	}
+	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
+	{
+		ImGui::Text(_("navmenu.update_explanation"));
+		if (ImGui::Button(_("yes"))) {
+			*requestedExitPtr = true;
+		}
+		if (ImGui::Button(_("no"))) {
+			ImGui::CloseCurrentPopup();
+			m_updateStatus.programUpdateAvailable = false;
+		}
+		ImGui::EndPopup();
+	}
 }
