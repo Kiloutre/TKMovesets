@@ -35,12 +35,17 @@ private:
 	TranslationData* m_translations;
 	// Amount of translations
 	unsigned int m_translations_count;
-	// True if we are currently checking for updates
-	bool m_checking_for_updates = false;
-	// Thread that will check for updates
-	std::thread update_check_thread;
 	// PTR to addresses file
 	GameAddressesFile* m_addresses = nullptr;
+	// Struct related to updating of addr & program
+	struct {
+		bool addrFile = false;
+		bool programUpdateAvailable = false;
+		bool up_to_date = false; // up_to_date is only used to show 'Up to date' (true) text or nothing
+		bool verifying = false;
+		bool verifiedOnce = false; // Used to properly join the thread.
+		std::thread thread;
+	} m_updateStatus;
 
 	// Start a thread that will check for updates
 	void RequestCheckForUpdates();

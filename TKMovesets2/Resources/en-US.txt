@@ -72,6 +72,10 @@ navmenu.category_other = Other
 navmenu.documentation = Documentation
 navmenu.about = About
 
+navmenu.updated_addr = Updated addresses!
+navmenu.updated_check = Checking for updates...
+navmenu.update = Update
+
 ## Submenus ##
 
 # Extraction #

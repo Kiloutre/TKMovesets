@@ -72,6 +72,11 @@ navmenu.category_other = Autre
 navmenu.documentation = Documentation
 navmenu.about = À propos
 
+navmenu.up_to_date = À jour
+navmenu.updated_addr = Addresses mises à jour !
+navmenu.updated_check = Vérification de mises à jour...
+navmenu.update = Mettre à jour
+
 ## Sous-menus ##
 
 # Extraction #

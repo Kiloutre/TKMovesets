@@ -55,7 +55,9 @@ NavigationMenu::NavigationMenu()
 
 NavigationMenu::~NavigationMenu()
 {
-	update_check_thread.join();
+	if (m_updateStatus.verifiedOnce) {
+		m_updateStatus.thread.join();
+	}
 }
 
 
@@ -89,15 +91,23 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 		}
 		ImGui::EndCombo();
 	}
-	ImGui::PopItemWidth();
 
-	// Updater button
-	if (m_checking_for_updates) {
+	// Updating
+	if (ImGuiExtra::RenderButtonEnabled(_("navmenu.update"), !m_updateStatus.verifying)) {
+		RequestCheckForUpdates();
+	}
+
+	if (m_updateStatus.verifying) {
 		ImGui::TextUnformatted(_("navmenu.update_check"));
 	}
+	if (m_updateStatus.up_to_date) {
+		ImGui::TextUnformatted(_("navmenu.up_to_date"));
+	}
 	else {
-		if (ImGui::Button(_("navmenu.update"))) {
-			RequestCheckForUpdates();
+		if (m_updateStatus.addrFile) {
+			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("navmenu.updated_addr"));
 		}
 	}
+
+	ImGui::PopItemWidth();
 }
