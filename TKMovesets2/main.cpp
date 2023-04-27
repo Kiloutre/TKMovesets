@@ -100,7 +100,7 @@ static void InitMainClasses(MainWindow& program)
 	program.onlineMenu.gameHelper = &program.sharedMem;
 	program.persistentPlayMenu.gameHelper = &program.sharedMem;
 
-	program.navMenu.requestedExitPtr = &program.requestedExit;
+	program.navMenu.requestedUpdatePtr = &program.requestedUpdate;
 	program.navMenu.SetAddrFile(addrFile);
 
 	{
@@ -232,108 +232,9 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	return true;
 }
 
-// -- update -- //
-
-static void CleanupUpdateFiles(const std::string& filename)
-{
-	DEBUG_LOG("CleanupUpdateFiles()\n");
-	// Wait until [filename] process has ended
-	{
-		// Max is 200 * 25 = 5 secs
-		bool found = false;
-		for (int i = 0; found && i < 25; ++i)
-		{
-			found = false;
-			for (auto& process : GameProcessUtils::GetRunningProcessList())
-			{
-				DEBUG_LOG("- %s\n", process.name.c_str());
-				if (process.name == filename) {
-					DEBUG_LOG("Found [%s]\n", filename.c_str());
-					found = true;
-					break;
-				}
-			}
-			if (found) {
-				Sleep(200);
-			}
-			else {
-				DEBUG_LOG("Not found.\n");
-			}
-		}
-
-		if (found) {
-			// timeout, don't do anything
-			return;
-		}
-	}
-	DEBUG_LOG("CleanupUpdateFiles() - Removing file\n");
-
-	std::filesystem::remove(filename);
-}
-
-// Copy self .exe into TKMovesets.exe
-static void ApplyUpdate(const std::string& filename)
-{
-	DEBUG_LOG("ApplyUpdate()\n");
-	// Wait until [UPDATE_FINALFILENAME] process has ended
-	{
-		// Max is 200 * 25 = 5 secs
-		bool found = false;
-		for (int i = 0; found && i < 25; ++i)
-		{
-			found = false;
-			for (auto& process : GameProcessUtils::GetRunningProcessList())
-			{
-				DEBUG_LOG("- %s\n", process.name.c_str());
-				if (process.name == UPDATE_FINAL_FILENAME) {
-					DEBUG_LOG("Found [" UPDATE_FINAL_FILENAME "]\n");
-					found = true;
-					break;
-				}
-			}
-			if (found) {
-				Sleep(200);
-			}
-			else {
-				DEBUG_LOG("Not found.\n");
-			}
-		}
-
-		if (found) {
-			// timeout, don't do anything
-			return;
-		}
-	}
-	DEBUG_LOG("ApplyUpdate() - Copying file\n");
-	std::filesystem::remove(UPDATE_FINAL_FILENAME);
-	std::filesystem::copy_file(filename, UPDATE_FINAL_FILENAME);
-
-
-	// Start process
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-
-	// set the size of the structures
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
-
-	// start the program up
-	CreateProcess(".\\" UPDATE_FINAL_FILENAME,   // the path
-		NULL,        // Command line
-		NULL,           // Process handle not inheritable
-		NULL,           // Thread handle not inheritable
-		FALSE,          // Set handle inheritance to FALSE
-		0,              // No creation flags
-		NULL,           // Use parent's environment block
-		NULL,           // Use parent's starting directory 
-		&si,            // Pointer to STARTUPINFO structure
-		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
-	);
-	// Close process and thread handles. 
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-}
+void StartProcess(const std::string& file);
+void ApplyUpdate(const std::string& filename);
+void CleanupUpdateFiles(const std::string& filename);
 
 // -- main -- //
 
@@ -468,7 +369,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		InitMainClasses(program);
 
 		WriteToLogFile("Initiated main classes");
-		while (!glfwWindowShouldClose(window) && !program.requestedExit)
+		while (!glfwWindowShouldClose(window) && !program.requestedUpdate)
 		{
 			// Poll and handle events such as MKB inputs, window resize. Required
 			glfwPollEvents();
@@ -500,11 +401,16 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 			glfwSwapBuffers(window);
 		}
 
+
 		DestroyMainClasses(program);
 		WriteToLogFile("Destroyed main classes");
 		// Cleanup what needs to be cleaned up
 		program.Shutdown();
 		WriteToLogFile("Shut down");
+
+		if (program.requestedUpdate) {
+			StartProcess(std::string(UPDATE_TMP_FILENAME) + ".exe");
+		}
 	}
 
 	glfwDestroyWindow(window);
@@ -512,6 +418,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 
 	FreeLibrary(movesetLoaderLib);
 	Localization::Clear();
+
 
 #ifdef BUILD_TYPE_DEBUG
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

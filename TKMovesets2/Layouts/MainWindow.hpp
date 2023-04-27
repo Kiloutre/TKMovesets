@@ -25,7 +25,7 @@ private:
 	void LoadMovesetEditor(movesetInfo* movesetInfos);
 public:
 	// If true, program will exit
-	bool requestedExit = false;
+	bool requestedUpdate = false;
 
 	// Navigation menu, also handles language selection and update button
 	NavigationMenu navMenu;

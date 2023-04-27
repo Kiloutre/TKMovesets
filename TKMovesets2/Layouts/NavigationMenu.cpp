@@ -125,9 +125,11 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
 	{
 		ImGui::Text(_("navmenu.update_explanation"));
+        
 		if (ImGui::Button(_("yes"))) {
-			*requestedExitPtr = true;
+			*requestedUpdatePtr = true;
 		}
+        ImGui::SameLine();
 		if (ImGui::Button(_("no"))) {
 			ImGui::CloseCurrentPopup();
 			m_updateStatus.programUpdateAvailable = false;

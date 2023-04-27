@@ -59,6 +59,7 @@ set(INCLUDE_FOLDERS
 set(BINARY_SOURCES
                     # Main sources
                     "main.cpp"
+                    "UpdateLogic.cpp"
 
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
