@@ -10,6 +10,7 @@
     "glfw3",
     "glad",
     "polyhook2",
-    "lz4"
+    "lz4",
+    "curlpp"
   ]
 }

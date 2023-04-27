@@ -41,13 +41,23 @@ void NavigationMenu::RenderBtnList(const NavMenuBtn* c_btns, size_t count, float
 	}
 }
 
+
 // -- Public methods -- //
+
 
 NavigationMenu::NavigationMenu()
 {
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
+	RequestCheckForUpdates();
 }
+
+
+NavigationMenu::~NavigationMenu()
+{
+	update_check_thread.join();
+}
+
 
 void NavigationMenu::Render(float width, bool navigationLocked)
 {
@@ -80,4 +90,14 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 		ImGui::EndCombo();
 	}
 	ImGui::PopItemWidth();
+
+	// Updater button
+	if (m_checking_for_updates) {
+		ImGui::TextUnformatted(_("navmenu.update_check"));
+	}
+	else {
+		if (ImGui::Button(_("navmenu.update"))) {
+			RequestCheckForUpdates();
+		}
+	}
 }

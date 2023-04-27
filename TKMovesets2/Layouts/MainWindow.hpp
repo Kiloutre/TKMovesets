@@ -21,11 +21,11 @@
 
 class MainWindow {
 private:
-	NavigationMenu navMenu;
-
 	// Attempt to load a moveset, open a new editor window on success
 	void LoadMovesetEditor(movesetInfo* movesetInfos);
 public:
+	NavigationMenu navMenu;
+
 	// Extractor instance, can attach to its own process separately from everyone else
 	GameExtract extractor;
 	// Importer instance, can attach to its own process separately from everyone else

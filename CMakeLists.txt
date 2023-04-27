@@ -20,3 +20,4 @@ set(VCPKG_LIBRARY_LINKAGE static)
 
 project ("TKMovesets2")
 add_subdirectory ("TKMovesets2")
+

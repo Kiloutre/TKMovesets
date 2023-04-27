@@ -72,6 +72,7 @@ set(BINARY_SOURCES
                     # Main Layout
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
+                    "Layouts/UpdateCheck.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
@@ -239,3 +240,7 @@ target_link_libraries(FileEmbedder PRIVATE lz4::lz4)
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)
 target_link_libraries(TKMovesetLoader PRIVATE PolyHook_2::PolyHook_2)
+
+# HTTP requests
+find_package(unofficial-curlpp CONFIG REQUIRED)
+target_link_libraries(TKMovesets2 PRIVATE unofficial::curlpp::curlpp)

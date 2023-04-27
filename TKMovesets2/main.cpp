@@ -98,6 +98,8 @@ static void InitMainClasses(MainWindow& program)
 	program.onlineMenu.gameHelper = &program.sharedMem;
 	program.persistentPlayMenu.gameHelper = &program.sharedMem;
 
+	program.navMenu.SetAddrFile(addrFile);
+
 	{
 		// Detect running games and latch on to them if possible
 
@@ -212,8 +214,8 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	GetDIBits(GetDC(NULL), iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
 
 	GLFWimage image{
-		.width = iconInfo.xHotspot * 2,
-		.height = iconInfo.yHotspot * 2,
+		.width = (int)(iconInfo.xHotspot * 2),
+		.height = (int)(iconInfo.yHotspot * 2),
 		.pixels = bitmapData
 	};
 
