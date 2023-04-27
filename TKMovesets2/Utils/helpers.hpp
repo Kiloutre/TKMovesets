@@ -232,4 +232,7 @@ namespace Helpers
     uint32_t crc32_update(uint32_t(&table)[256], uint32_t initial, const void* buf, size_t len);
     // Create a table required for the crc32 generation
     void crc32_generate_table(uint32_t(&table)[256]);
+
+	// Compares the version of the current program to the given one. Used for updating purposes
+	bool remoteVersionGreater(const char* otherVersion);
 }

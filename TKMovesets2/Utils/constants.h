@@ -18,6 +18,9 @@
 # define INTERFACE_DATA_DIR      "TKMInterface"
 # define GAME_ADDRESSES_FILE     "game_addresses.ini"
 
+# define UPDATE_TMP_FILENAME     "TKMovesets2_update"
+# define HTTP_REQUEST_TIMEOUT    10
+
 // Arbitrary max block size in case something bad happened during extraction and we get a very invalid block
 # define MOVESET_MAX_BLOCK_SIZE_MB       (50)
 

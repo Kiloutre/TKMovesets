@@ -26,6 +26,16 @@ struct NavMenuBtn
 	//const char* icon;
 };
 
+struct s_updateStatus {
+	bool error = false;
+	bool addrFile = false;
+	bool programUpdateAvailable = false;
+	bool up_to_date = false; // up_to_date is only used to show 'Up to date' (true) text or nothing
+	bool verifying = false;
+	bool verifiedOnce = false; // Used to properly join the thread.
+	std::thread thread;
+};
+
 class NavigationMenu
 {
 private:
@@ -38,15 +48,7 @@ private:
 	// PTR to addresses file
 	GameAddressesFile* m_addresses = nullptr;
 	// Struct related to updating of addr & program
-	struct {
-		bool error = false;
-		bool addrFile = false;
-		bool programUpdateAvailable = false;
-		bool up_to_date = false; // up_to_date is only used to show 'Up to date' (true) text or nothing
-		bool verifying = false;
-		bool verifiedOnce = false; // Used to properly join the thread.
-		std::thread thread;
-	} m_updateStatus;
+	s_updateStatus m_updateStatus;
 
 	// Start a thread that will check for updates
 	void RequestCheckForUpdates();

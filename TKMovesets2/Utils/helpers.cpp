@@ -305,4 +305,10 @@ namespace Helpers
 			table[i] = c;
 		}
 	}
+
+	bool remoteVersionGreater(const char* otherVersion)
+	{
+		const char* currentVersion = PROGRAM_VERSION;
+		return strcmp(currentVersion, otherVersion) < 0;
+	}
 }
