@@ -4,6 +4,7 @@
 #include <curlpp/Infos.hpp>
 #include <sstream>
 #include <regex>
+#include <filesystem>
 #include <fstream>
 
 #include "NavigationMenu.hpp"
@@ -94,6 +95,7 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 
 	// Finally download the file
 	{
+		bool validFile = true;
 		const std::string userAgent = "curl/7.83.1";
 		std::list<std::string> headers;
 		headers.push_back("Host: github.com");
@@ -114,6 +116,13 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 			curlpp::options::WriteStream ws(&ofs);
 			myRequest.setOpt(ws);
 			myRequest.perform();
+			ofs.close();
+
+			// First validation step is filesize
+			auto fileSize = ofs.tellp();
+			if (fileSize < 1000000) {
+				validFile = false;
+			}
 		}
 		catch (curlpp::LibcurlRuntimeError&) {
 			*error = true;
@@ -125,6 +134,25 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
 		}
+
+		// Second validation step, after we obtained the .exe, is magic bytes
+		std::wstring exe_filename = std::wstring(L"" UPDATE_TMP_FILENAME) + L".exe";
+		if (validFile) {
+			std::ifstream executableFile(exe_filename, std::ios::binary);
+
+			unsigned char buf[2];
+			executableFile.read((char*)buf, 2);
+
+			if (buf[0] != 0x4D || buf[1] != 0x5A) {
+				validFile = false;
+			}
+		}
+
+		if (!validFile) {
+			std::filesystem::remove(exe_filename);
+			return false;
+		}
+
 	}
 
 	return true;
@@ -189,6 +217,12 @@ void NavigationMenu::CheckForUpdates(bool programUpdateOnly)
 	DEBUG_LOG("::CheckForUpdates(%d)\n", programUpdateOnly);
 	bool updatedAnything = false;
 
+	// Now check for new releases
+	if (VerifyProgramUpdate(&m_updateStatus.error, m_addresses)) {
+		m_updateStatus.programUpdateAvailable = true;
+		updatedAnything = true;
+	}
+
 	if (!programUpdateOnly) {
 
 		// Check for addresses update first
@@ -196,12 +230,9 @@ void NavigationMenu::CheckForUpdates(bool programUpdateOnly)
 			m_updateStatus.addrFile = true;
 			updatedAnything = true;
 		}
+
 	}
-	// Now check for new releases
-	if (VerifyProgramUpdate(&m_updateStatus.error, m_addresses)) {
-		m_updateStatus.programUpdateAvailable = true;
-		updatedAnything = true;
-	}
+
 
 	m_updateStatus.verifying = false;
 	m_updateStatus.up_to_date = !updatedAnything;

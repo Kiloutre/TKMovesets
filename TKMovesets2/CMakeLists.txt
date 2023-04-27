@@ -59,7 +59,8 @@ set(INCLUDE_FOLDERS
 set(BINARY_SOURCES
                     # Main sources
                     "main.cpp"
-                    "UpdateLogic.cpp"
+                    "UpdateApply.cpp"
+                    "UpdateCheck.cpp"
 
                     "GameInteractions/GameInteraction.cpp"
                     "GameInteractions/GameExtract.cpp"
@@ -73,7 +74,6 @@ set(BINARY_SOURCES
                     # Main Layout
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
-                    "Layouts/UpdateCheck.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
