@@ -74,8 +74,9 @@ navmenu.about = À propos
 
 navmenu.up_to_date = À jour
 navmenu.updated_addr = Addresses mises à jour !
-navmenu.updated_check = Vérification de mises à jour...
+navmenu.update_check = Vérification de mises à jour...
 navmenu.update = Mettre à jour
+navmenu.update_error = Erreur lors de la mise à jour
 
 ## Sous-menus ##
 

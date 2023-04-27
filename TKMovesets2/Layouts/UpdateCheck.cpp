@@ -14,48 +14,69 @@
 
 void NavigationMenu::CheckForUpdates()
 {
+	DEBUG_LOG("::CheckForUpdates()\n");
 	bool updatedAnything = false;
 
-	std::string url = m_addresses->GetString("global", "repo_url");
-	url.replace(url.find("github.com"), sizeof("github.com") - 1, "raw.githubusercontent.com");
-	url += "/master/TKMovesets2/Resources/game_addresses.ini";
+	std::string url = m_addresses->GetString("global", "addresses_url");
 
 	std::ostringstream os;
 	std::string content;
+	DEBUG_LOG("aa\n");
 	try {
-		os << curlpp::options::Url("dogjfjgporpogre");
+		os << curlpp::options::Url(url);
 		content = os.str();
 	}
 	catch (curlpp::LibcurlRuntimeError& e) {
-		// error
+		m_updateStatus.error = true;
+		DEBUG_LOG("!! CURL ERROR !!\n");
 	}
+	DEBUG_LOG("bb\n");
 
-	// Check for addresses update first
+	if (!m_updateStatus.error)
 	{
-		std::smatch m;
-		std::regex expr("^ *val:global_addr_version *= *(\\d+) *$");
-		int addrVersion = -1;
-		int currVersion = m_addresses->GetValue("global", "addr_version");
+		// Check for addresses update first
+		{
+			std::smatch m;
+			std::regex expr("^ *val:global_addr_version *= *(\\d+) *$");
+			int addrVersion = -1;
+			int currVersion = m_addresses->GetValue("global", "addr_version");
 
-		while (std::regex_search(content, m, expr)) {
-			addrVersion = std::stoi(m[1].str());
-		}
+			while (std::regex_search(content, m, expr)) {
+				addrVersion = std::stoi(m[1].str());
+				break;
+			}
 
-		if (addrVersion != -1 && (addrVersion > currVersion || true)) {
-			std::ofstream addrFile(GAME_ADDRESSES_FILE);
-			addrFile << content;
-			addrFile.close();
-			m_updateStatus.addrFile = true;
-			updatedAnything = true;
-			m_addresses->Reload();
+			if (addrVersion != -1 && (addrVersion > currVersion)) {
+				DEBUG_LOG("!! writing file... !!\n");
+
+				std::ofstream addrFile(GAME_ADDRESSES_FILE);
+				if (addrFile.fail()) {
+					DEBUG_LOG("Updater: Failed to write addresses file.\n");
+				}
+				else {
+					addrFile << content;
+					addrFile.close();
+				}
+
+				m_updateStatus.addrFile = true;
+				updatedAnything = true;
+
+				m_addresses->Reload();
+			}
+			else {
+				m_updateStatus.addrFile = false;
+			}
 		}
-		else {
-			m_updateStatus.addrFile = false;
-		}
+	}
+	else {
+		m_updateStatus.addrFile = false;
+		m_updateStatus.programUpdateAvailable = false;
 	}
 
 	m_updateStatus.verifying = false;
 	m_updateStatus.up_to_date = !updatedAnything;
+
+	DEBUG_LOG("::CheckForUpdates() - END\n");
 }
 
 
@@ -72,6 +93,7 @@ void NavigationMenu::RequestCheckForUpdates()
 	m_addresses->Reload();
 
 	m_updateStatus.verifiedOnce = true;
+	m_updateStatus.error = false;
 	m_updateStatus.addrFile = false;
 	m_updateStatus.up_to_date = false;
 

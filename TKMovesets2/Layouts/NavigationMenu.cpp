@@ -49,7 +49,6 @@ NavigationMenu::NavigationMenu()
 {
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
-	RequestCheckForUpdates();
 }
 
 
@@ -100,12 +99,18 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 	if (m_updateStatus.verifying) {
 		ImGui::TextUnformatted(_("navmenu.update_check"));
 	}
-	if (m_updateStatus.up_to_date) {
-		ImGui::TextUnformatted(_("navmenu.up_to_date"));
+
+	if (m_updateStatus.error) {
+		ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("navmenu.update_error"));
 	}
 	else {
-		if (m_updateStatus.addrFile) {
-			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("navmenu.updated_addr"));
+		if (m_updateStatus.up_to_date) {
+			ImGui::TextUnformatted(_("navmenu.up_to_date"));
+		}
+		else {
+			if (m_updateStatus.addrFile) {
+				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("navmenu.updated_addr"));
+			}
 		}
 	}
 

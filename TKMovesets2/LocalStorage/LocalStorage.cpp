@@ -119,41 +119,41 @@ void LocalStorage::StopThreadAndCleanup()
 
 void LocalStorage::ReloadMovesetList()
 {
-	// Create extraction directory if it doesn't exist
-	CreateDirectory(MOVESET_DIRECTORY, NULL);
-
-	for (const auto& entry : std::filesystem::directory_iterator(MOVESET_DIRECTORY))
+	if (Helpers::fileExists(L"" MOVESET_DIRECTORY))
 	{
-		// Todo: Unicode .name support
-		std::wstring filename = entry.path().wstring();
+		for (const auto& entry : std::filesystem::directory_iterator(L"" MOVESET_DIRECTORY))
+		{
+			// Todo: Unicode .name support
+			std::wstring filename = entry.path().wstring();
 		
 
-		if (!Helpers::endsWith<std::wstring>(filename, L"" MOVESET_FILENAME_EXTENSION) || entry.file_size() == 0) {
-			// Skip files that we do not recognize or that are not yet fully written
-			continue;
-		}
-
-		// If new file is detected, fetch its infos
-		if (!m_extractedMovesetFilenames.contains(filename))
-		{
-			m_extractedMovesetFilenames.insert(filename);
-			movesetInfo* moveset = fetchMovesetInformations(filename);
-
-			if (moveset == nullptr) {
-				moveset = new movesetInfo{
-					.color = MOVESET_INVALID,
-					.filename = filename,
-					.name = Helpers::getMovesetNameFromFilename(filename),
-					.origin = std::string("INVALID"),
-					.target_character = std::string(""),
-					.date = 0,
-					.size = 0,
-					.modificationDate = 0,
-					.editable = false
-				};
+			if (!Helpers::endsWith<std::wstring>(filename, L"" MOVESET_FILENAME_EXTENSION) || entry.file_size() == 0) {
+				// Skip files that we do not recognize or that are not yet fully written
+				continue;
 			}
 
-			extractedMovesets.push_back(moveset);
+			// If new file is detected, fetch its infos
+			if (!m_extractedMovesetFilenames.contains(filename))
+			{
+				m_extractedMovesetFilenames.insert(filename);
+				movesetInfo* moveset = fetchMovesetInformations(filename);
+
+				if (moveset == nullptr) {
+					moveset = new movesetInfo{
+						.color = MOVESET_INVALID,
+						.filename = filename,
+						.name = Helpers::getMovesetNameFromFilename(filename),
+						.origin = std::string("INVALID"),
+						.target_character = std::string(""),
+						.date = 0,
+						.size = 0,
+						.modificationDate = 0,
+						.editable = false
+					};
+				}
+
+				extractedMovesets.push_back(moveset);
+			}
 		}
 	}
 
@@ -162,7 +162,7 @@ void LocalStorage::ReloadMovesetList()
 		movesetInfo* moveset = extractedMovesets[i];
 		struct _stat buffer;
 
-		bool statFailed= _wstat(moveset->filename.c_str(), &buffer) != 0;
+		bool statFailed = _wstat(moveset->filename.c_str(), &buffer) != 0;
 
 		if (statFailed ||
 			(moveset->modificationDate != 0 && (buffer.st_mtime != moveset->modificationDate || buffer.st_size != moveset->size))) {

@@ -39,6 +39,7 @@ private:
 	GameAddressesFile* m_addresses = nullptr;
 	// Struct related to updating of addr & program
 	struct {
+		bool error = false;
 		bool addrFile = false;
 		bool programUpdateAvailable = false;
 		bool up_to_date = false; // up_to_date is only used to show 'Up to date' (true) text or nothing

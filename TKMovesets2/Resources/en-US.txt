@@ -72,9 +72,11 @@ navmenu.category_other = Other
 navmenu.documentation = Documentation
 navmenu.about = About
 
+navmenu.up_to_date = Up to date
 navmenu.updated_addr = Updated addresses!
-navmenu.updated_check = Checking for updates...
+navmenu.update_check = Checking for updates...
 navmenu.update = Update
+navmenu.update_error = Updating error
 
 ## Submenus ##
 
