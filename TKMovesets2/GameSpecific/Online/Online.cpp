@@ -45,7 +45,7 @@ bool Online::LoadSharedMemory()
         CloseHandle(m_memoryHandle);
         m_memoryHandle = nullptr;
     }
-    DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%llx\n", m_orig_sharedMemPtr);
+    DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%p\n", m_orig_sharedMemPtr);
     Init();
     return true;
 }
@@ -63,7 +63,7 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
         DEBUG_LOG("Failure getting the module handle for 'TKMovesetLoader.dll'\n");
         return false;
     }
-    DEBUG_LOG("Module handle is %llx\n", moduleHandle);
+    DEBUG_LOG("Module handle is %p\n", moduleHandle);
 
     gameAddr startAddr = (gameAddr)GetProcAddress(moduleHandle, functionName);
     if (startAddr == 0) {

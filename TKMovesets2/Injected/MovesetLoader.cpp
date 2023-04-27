@@ -130,7 +130,7 @@ void MovesetLoader::RegisterFunction(const char* functionName, const std::string
     uint64_t moduleSize;
 
     if (mod == m_modules.end()) {
-        DEBUG_LOG("RegisterFunction(%s, %s, %s) : Could not find module\n", functionName, moduleName, c_addressId);
+        DEBUG_LOG("RegisterFunction(%s, %s, %s) : Could not find module\n", functionName, moduleName.c_str(), c_addressId);
         return;
     }
     else {
@@ -150,7 +150,7 @@ void MovesetLoader::RegisterHook(const char* functionName, const std::string& mo
     uint64_t moduleSize;
 
     if (mod == m_modules.end()) {
-        DEBUG_LOG("RegisterHook(%s, %s, %s, ?) : Could not find module\n", functionName, moduleName, c_addressId);
+        DEBUG_LOG("RegisterHook(%s, %s, %s, ?) : Could not find module\n", functionName, moduleName.c_str(), c_addressId);
         return;
     }
     else {
@@ -170,7 +170,7 @@ uint64_t MovesetLoader::GetFunctionAddr(const char* functionName)
     if (func != m_functions.end()) {
         return func->second;
     }
-    DEBUG_LOG("GetFunctionAddr(): Function '%s' not found\n", functionName.c_str());
+    DEBUG_LOG("GetFunctionAddr(): Function '%s' not found\n", functionName);
     return 0;
 }
 

@@ -22,5 +22,5 @@ public:
 	void OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playerId, const s_lastLoaded& lastLoadedMoveset) override;	// Called when the user wants to de-select a moveset for a given player
 	void ClearMovesetSelection(unsigned int playerid) override;
 	void SetLockIn(bool locked) override;
-	void ExecuteExtraprop(uint32_t playerid, uint64_t id, uint64_t value);
+	void ExecuteExtraprop(uint32_t playerid, uint32_t id, uint32_t value);
 };

@@ -480,7 +480,7 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 	uint64_t propertyListSize = customPropertyCount * sizeof(TKMovesetProperty);
 
 	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(TKMovesetHeader));
-	infos.block_list = (uint32_t)infos.header_size + Helpers::align8Bytes(propertyListSize);
+	infos.block_list = infos.header_size + (uint32_t)Helpers::align8Bytes(propertyListSize);
 	infos.block_list_size = (uint32_t)_countof(((TKMovesetHeaderBlocks*)0)->blocks);
 	infos.moveset_data_start = infos.block_list + (uint32_t)Helpers::align8Bytes(infos.block_list_size * sizeof(uint64_t));
 	infos.moveset_data_size = 0;

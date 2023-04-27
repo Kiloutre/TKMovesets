@@ -47,7 +47,7 @@ void OnlineT7::SetLockIn(bool locked)
     m_sharedMemPtr->locked_in = locked;
 }
 
-void OnlineT7::ExecuteExtraprop(uint32_t playerid, uint64_t id, uint64_t value)
+void OnlineT7::ExecuteExtraprop(uint32_t playerid, uint32_t id, uint32_t value)
 {
     if (m_sharedMemPtr != nullptr) {
         m_sharedMemPtr->propToPlay = {

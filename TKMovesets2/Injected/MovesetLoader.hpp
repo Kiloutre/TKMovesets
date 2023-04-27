@@ -110,7 +110,7 @@ template<class T> T MovesetLoader::CastTrampoline(const char* hookName)
 	if (m_hooks.contains(hookName)) {
 		return (T)m_hooks[hookName].trampoline;
 	}
-	DEBUG_LOG("CastTrampoline(): Hook '%s' not found\n", hookName.c_str());
+	DEBUG_LOG("CastTrampoline(): Hook '%s' not found\n", hookName);
 	return nullptr;
 }
 
@@ -119,7 +119,7 @@ template<class T> T MovesetLoader::CastFunction(const char* functionName)
 	if (m_functions.contains(functionName)) {
 		return (T)m_functions[functionName];
 	}
-	DEBUG_LOG("CastFunction(): Function '%s' not found\n", functionName.c_str());
+	DEBUG_LOG("CastFunction(): Function '%s' not found\n", functionName);
 	return nullptr;
 }
 
@@ -128,7 +128,7 @@ template<class T> T MovesetLoader::ReadVariable(const char* functionName)
 	if (variables.contains(functionName)) {
 		return *(T*)variables[functionName];
 	}
-	DEBUG_LOG("CastVariable(): Function '%s' not found\n", functionName.c_str());
+	DEBUG_LOG("CastVariable(): Function '%s' not found\n", functionName);
 	return (T)0;
 }
 

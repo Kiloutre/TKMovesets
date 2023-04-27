@@ -67,8 +67,7 @@ namespace InjectionUtils
 
 		Byte* currentAddress = (Byte*)address;
 
-		char buf[3];
-		buf[2] = '\0';
+		char buf[3]{ 0, 0, 0 };
 
 		while (*bytesString != '\0')
 		{
@@ -102,7 +101,7 @@ namespace InjectionUtils
 				}
 			}
 
-			Byte value = strtol(buf, 0, 16);
+			Byte value = (Byte)strtol(buf, 0, 16);
 			if (b != value)  return false;
 
 			++currentAddress;

@@ -216,7 +216,7 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
-		moveId = editorTable->aliases[moveId - (uint16_t)0x8000];
+		moveId = editorTable->aliases[(uint16_t)moveId - (uint16_t)0x8000];
 	}
 
 	return moveId;

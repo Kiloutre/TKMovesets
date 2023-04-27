@@ -266,7 +266,7 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		if (header->moveset_data_size > 0) {
 			// Compressed moveset data, must decompress
 			uint64_t new_size = header->moveset_data_start + header->moveset_data_size;
-			int32_t src_size = t_movesetSize - header->moveset_data_start;
+			int32_t src_size = (int32_t)(t_movesetSize - header->moveset_data_start);
 
 			Byte* new_moveset = new Byte[new_size];
 			memcpy(new_moveset, t_moveset, header->moveset_data_start);

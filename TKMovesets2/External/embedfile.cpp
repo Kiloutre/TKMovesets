@@ -4,16 +4,6 @@
 #include <fstream>
 #include <regex>
 
-FILE* open_or_exit(const char* fname, const char* mode)
-{
-    FILE* f = fopen(fname, mode);
-    if (f == NULL) {
-        perror(fname);
-        exit(EXIT_FAILURE);
-    }
-    return f;
-}
-
 int main(int argc, char** argv)
 {
     if (argc < 3) {
@@ -31,7 +21,7 @@ int main(int argc, char** argv)
     if (lastSlash != std::string::npos) {
         filtered_name.erase(0, lastSlash + 1);
     }
-    std::regex reg("[\\. \-]+");
+    std::regex reg("[\\. \\-]+");
     filtered_name = std::regex_replace(filtered_name, reg, "_");
 
     printf("Embedder: opening file %s ...\n", input_filename.c_str());
@@ -43,9 +33,12 @@ int main(int argc, char** argv)
     printf("Embedder: opened file.\n");
 
     // Start writing base output file
-    FILE* out = open_or_exit(output_filename.c_str(), "w");
-    fprintf(out, "#include <stdlib.h>\n");
-    fprintf(out, "const char %s[] = {", filtered_name.c_str());
+    std::ofstream output_file(output_filename);
+    if (output_file.fail()) {
+        return EXIT_FAILURE;
+    }
+    output_file << "#include <stdlib.h>\n";
+    output_file << "const char " << filtered_name << "[] = {";
 
     int file_size;
     char* inbuf;
@@ -72,14 +65,13 @@ int main(int argc, char** argv)
     }
 
     printf("Compressed size is %d. Writing...\n", compressedSize);
-    for (unsigned int i = 0; i < compressedSize; ++i)  {
-        fprintf(out, "%d,", outbuf[i]);
+    for (int i = 0; i < compressedSize; ++i)  {
+#pragma warning(suppress:)
+        output_file << std::to_string(outbuf[i]) << ",";
     }
-    fprintf(out, "};\n");
-    fprintf(out, "const size_t %s_len = sizeof(%s);\n", filtered_name.c_str(), filtered_name.c_str());
-    fprintf(out, "const size_t %s_orig_len = %d;\n\n", filtered_name.c_str(), file_size);
-
-    fclose(out);
+    output_file << "};\n";
+    output_file << "const size_t " << filtered_name << "_len = sizeof(" << filtered_name << "); \n";
+    output_file << "const size_t " << filtered_name << "_orig_len = " << file_size << "; \n";
 
     printf("Embedder: Finished.\n");
 

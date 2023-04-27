@@ -174,14 +174,17 @@ static void DestroyMainClasses(MainWindow& program)
 	program.storage.StopThreadAndCleanup();
 }
 
-static void LoadEmbeddedIcon(GLFWwindow* window)
+static bool LoadEmbeddedIcon(GLFWwindow* window)
 {
 	HMODULE hInstance = GetModuleHandle(NULL);
 
 	HRSRC hResource = FindResource(hInstance, MAKEINTRESOURCE(1), RT_ICON);
-	HGLOBAL hResourceData = LoadResource(hInstance, hResource);
 	if (hResource == nullptr) {
-		return;
+		return false;
+	}
+	HGLOBAL hResourceData = LoadResource(hInstance, hResource);
+	if (hResourceData == nullptr) {
+		return false;
 	}
 
 	DWORD iconSize = SizeofResource(hInstance, hResource);
@@ -198,20 +201,21 @@ static void LoadEmbeddedIcon(GLFWwindow* window)
 	ZeroMemory(&bitmapInfo, sizeof(BITMAPINFO));
 	bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bitmapInfo.bmiHeader.biWidth = iconInfo.xHotspot * 2;
-	bitmapInfo.bmiHeader.biHeight = -(iconInfo.yHotspot * 2);
+	bitmapInfo.bmiHeader.biHeight = -((signed)iconInfo.yHotspot * 2);
 	bitmapInfo.bmiHeader.biPlanes = 1;
 	bitmapInfo.bmiHeader.biBitCount = 32;
 
-	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * abs(bitmapInfo.bmiHeader.biHeight) * 4;
+	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * (uint64_t) abs(bitmapInfo.bmiHeader.biHeight) * 4;
 	BYTE* bitmapData = new BYTE[allocSize];
 	ZeroMemory(bitmapData, allocSize);
 
 	GetDIBits(GetDC(NULL), iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
 
-	GLFWimage image;
-	image.width = iconInfo.xHotspot * 2;
-	image.height = iconInfo.yHotspot * 2;
-	image.pixels = bitmapData;
+	GLFWimage image{
+		.width = iconInfo.xHotspot * 2,
+		.height = iconInfo.yHotspot * 2,
+		.pixels = bitmapData
+	};
 
 	// Set the window icon
 	glfwSetWindowIcon(window, 1, &image);
@@ -220,6 +224,7 @@ static void LoadEmbeddedIcon(GLFWwindow* window)
 	DeleteObject(iconInfo.hbmColor);
 	DeleteObject(iconInfo.hbmMask);
 	DestroyIcon(hIcon);
+	return true;
 }
 
 // -- main -- //
@@ -279,7 +284,9 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		return MAIN_ERR_WINDOW_CREATION;
 	}
 
-	LoadEmbeddedIcon(window);
+	if (!LoadEmbeddedIcon(window)) {
+		DEBUG_LOG("Failed to load icon\n");
+	}
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
 	// Enable vsync

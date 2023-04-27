@@ -184,7 +184,7 @@ add_custom_command(OUTPUT ${MOVESET_LOADER_EMBEDDED}
     COMMAND "${embed_file_exe_path}" "${CMAKE_CURRENT_BINARY_DIR}/TKMovesetLoader.dll" "TKMovesetLoader"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
     COMMENT "Converting moveset loader data into .c ..."
-    DEPENDS TKMovesetLoader
+    DEPENDS TKMovesetLoader FileEmbedder
 )
 
 # Build lib containing per-game Import/Export movesets functions

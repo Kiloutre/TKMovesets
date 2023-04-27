@@ -28,8 +28,8 @@ struct SharedMemT7_Player
 struct SharedMemT7_Extraprop
 {
 	uint32_t playerid;
-	uint64_t id;
-	uint64_t value;
+	uint32_t id;
+	uint32_t value;
 };
 
 struct SharedMemT7 : SharedMemBase
