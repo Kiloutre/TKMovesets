@@ -5,6 +5,8 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 
+bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only);
+
 // - Const layout definition - //
 
 const NavMenuBtn cg_moveset_btns[] = {
@@ -54,9 +56,7 @@ NavigationMenu::NavigationMenu()
 
 NavigationMenu::~NavigationMenu()
 {
-	if (m_updateStatus.verifiedOnce) {
-		m_updateStatus.thread.join();
-	}
+	CleanupThread();
 }
 
 
@@ -124,9 +124,16 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 	}
 	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
 	{
-		ImGui::Text(_("navmenu.update_explanation"));
-        
+		ImGui::TextUnformatted(_("navmenu.update_explanation"));
+
+		ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
+		// Todo: textbox
+		ImGui::TextUnformatted(m_updateStatus.changelog.c_str());
+        //
+
 		if (ImGui::Button(_("yes"))) {
+			m_updateStatus.thread.join();
+			m_updateStatus.thread = std::thread(&DownloadProgramUpdate, &m_updateStatus, m_addresses, false);
 			*requestedUpdatePtr = true;
 		}
         ImGui::SameLine();

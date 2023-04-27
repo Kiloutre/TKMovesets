@@ -409,6 +409,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		WriteToLogFile("Shut down");
 
 		if (program.requestedUpdate) {
+			program.navMenu.CleanupThread();
 			StartProcess(std::string(UPDATE_TMP_FILENAME) + ".exe");
 		}
 	}

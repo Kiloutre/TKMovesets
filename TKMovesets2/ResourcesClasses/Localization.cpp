@@ -16,18 +16,19 @@ extern "C" const size_t en_US_txt_size;
 extern "C" const char fr_FR_txt[];
 extern "C" const size_t fr_FR_txt_size;
 // --
-TranslationData g_translation_datas[] = {
+
+const TranslationData g_translation_datas[] = {
 	{
 		.displayName = "English",
 		.locale = "en-US",
 		.data = en_US_txt,
-		.data_size = &en_US_txt_size
+		.needs_extra_font = false
 	},
 	{
 		.displayName = (const char*)u8"Français",
 		.locale = "fr-FR",
 		.data = fr_FR_txt,
-		.data_size = &fr_FR_txt_size
+		.needs_extra_font = false
 	},
 };
 //
@@ -64,7 +65,7 @@ namespace Localization
 		}
 
 		g_langId = langId;
-		TranslationData* newTranslation = &g_translation_datas[g_langId];
+		const TranslationData* newTranslation = &g_translation_datas[g_langId];
 
 		std::stringstream inputData(newTranslation->data);
 		std::string line;
@@ -139,9 +140,14 @@ namespace Localization
 	}
 
 
-	void GetTranslationList(TranslationData** out_list, unsigned int* out_count)
+	void GetTranslationList(const TranslationData** out_list, unsigned int* out_count)
 	{
 		*out_list = g_translation_datas;
 		*out_count = (int)_countof(g_translation_datas);
+	}
+
+	bool RequiresFontLoad()
+	{
+		return g_translation_datas[g_langId].needs_extra_font;
 	}
 }

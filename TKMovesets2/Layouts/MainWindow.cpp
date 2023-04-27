@@ -68,6 +68,21 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 	}
 }
 
+void MainWindow::LoadFonts()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	// Font import
+	ImFontConfig config;
+	config.MergeMode = true;
+
+	// Attempt to load fonts for specific glyph ranges, loading the first foond that is found in the provided lists
+	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
+	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
+	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
+
+	m_mustRebuildFonts = true;
+}
+
 // -- Public methods -- //
 
 MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
@@ -86,21 +101,24 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
-	// Font import
-	ImFont* font = io.Fonts->AddFontDefault();
-	ImFontConfig config;
-	config.MergeMode = true;
-
-	// Attempt to load fonts for specific glyph ranges, loading the first foond that is found in the provided lists
-	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
-	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
-	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
-
-	io.Fonts->Build();
+	if (Localization::RequiresFontLoad()) {
+		LoadFonts();
+	}
+	else {
+		// Load in another thread if the fonts don't need to be loaded right away
+		ImFont* font = io.Fonts->AddFontDefault();
+		io.Fonts->Build();
+		std::thread t(&MainWindow::LoadFonts, this);
+		t.detach();
+	}
 }
 
 void MainWindow::NewFrame()
 {
+	if (m_mustRebuildFonts) {
+		ImGui::GetIO().Fonts->Build();
+		m_mustRebuildFonts = false;
+	}
 	// I believe this inits the current frame buffer
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -111,29 +129,30 @@ void MainWindow::NewFrame()
 void MainWindow::Update()
 {
 	// Main window rendering
+	ImGuiViewport* mainView = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(mainView->Pos);
+	ImGui::SetNextWindowSize(mainView->Size);
+
+	if (ImGui::Begin("###", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking))
 	{
 		const int navMenuWidth = 160;
 
-		ImGuiViewport* mainView = ImGui::GetMainViewport();
 		const float width = mainView->Size.x;
 		const float height = mainView->Size.y;
 
 		// Navbar
 		if (navMenuWidth > 0)
 		{
-			ImGui::SetNextWindowPos(mainView->Pos);
-			ImGui::SetNextWindowSize(ImVec2(navMenuWidth, height));
-			ImGui::Begin("Navbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+			ImGui::BeginChild("Navbar", ImVec2(navMenuWidth, 0), true, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 			navMenu.Render((float)(navMenuWidth - 10), persistentPlayMenu.gameHelper->lockedIn);
-			ImGui::End();
+			ImGui::EndChild();
 		}
 
 
 		// Menus
 		{
-			ImGui::SetNextWindowPos(ImVec2(mainView->Pos.x + navMenuWidth, mainView->Pos.y));
-			ImGui::SetNextWindowSize(ImVec2(width - navMenuWidth, height));
-			ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+			ImGui::SameLine();
+			ImGui::BeginChild("Tools", ImVec2(width - navMenuWidth - 25, 0), false, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 			switch (navMenu.menuId)
 			{
@@ -166,7 +185,7 @@ void MainWindow::Update()
 				break;
 			}
 
-			ImGui::End();
+			ImGui::EndChild();
 		}
 
 		// Editor windows
@@ -197,6 +216,8 @@ void MainWindow::Update()
 				delete w;
 			}
 		}
+
+		ImGui::End();
 	}
 
 	// -- Rendering end -- //

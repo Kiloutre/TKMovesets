@@ -14,7 +14,7 @@
 
 // -- Private methods -- //
 
-static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
+bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only)
 {
 	std::string repoUrl = addresses->GetString("global", "repo_url");
 	std::string releasesUrl = repoUrl;
@@ -46,12 +46,12 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 			releasesContent = os.str();
 		}
 		catch (curlpp::LibcurlRuntimeError&) {
-			*error = true;
+			updateStatus->error = true;
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
 		}
 		catch (curlpp::LogicError&) {
-			*error = true;
+			updateStatus->error = true;
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
 		}
@@ -61,14 +61,19 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 	std::smatch m;
 	std::regex urlExpr("browser_download_url\" *: *\"([^\"]+)\"");
 	std::regex tagExpr("tag_name\" *: *\"([^\"]+)\"");
+	std::regex bodyExpr("body\" *: *\"([^\"]+)\"");
 	std::string downloadUrl;
 	std::string tagName;
+	std::string changelog;
 
 	if (std::regex_search(releasesContent, m, urlExpr)) {
 		downloadUrl = m[1].str();
 	}
 	if (std::regex_search(releasesContent, m, tagExpr)) {
 		tagName = m[1].str();
+	}
+	if (std::regex_search(releasesContent, m, bodyExpr)) {
+		changelog = m[1].str();
 	}
 
 	DEBUG_LOG("Remote URL: [%s]\n", downloadUrl.c_str());
@@ -77,6 +82,10 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 	if (downloadUrl.empty() || tagName.empty()) {
 		return false;
 	}
+
+	updateStatus->tagName = tagName;
+	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("navmenu.changelog"), tagName);
+	updateStatus->changelog = changelog;
 
 	if (!Helpers::remoteVersionGreater(tagName.c_str())) {
 		return false;
@@ -91,68 +100,72 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 	// In case other extensions are ever handled, fetch the extension dynamically to write the proper file name
 	std::string extension = downloadUrl.substr(downloadUrl.find_last_of("."));
 
-	DEBUG_LOG("New release found. Downloading it.\n");
+	if (verify_only) {
+		DEBUG_LOG("New release available.\n");
+	} else {
+		DEBUG_LOG("New release download...\n");
 
-	// Finally download the file
-	{
-		bool validFile = true;
-		const std::string userAgent = "curl/7.83.1";
-		std::list<std::string> headers;
-		headers.push_back("Host: github.com");
-		headers.push_back("Accept: */*");
-		headers.push_back("User-Agent: curl/7.83.1");
+		// Finally download the file
+		{
+			bool validFile = true;
+			const std::string userAgent = "curl/7.83.1";
+			std::list<std::string> headers;
+			headers.push_back("Host: github.com");
+			headers.push_back("Accept: */*");
+			headers.push_back("User-Agent: curl/7.83.1");
 
-		curlpp::Cleanup myCleanup;
-		curlpp::Easy myRequest;
-		myRequest.setOpt(new curlpp::options::FollowLocation(true));
-		myRequest.setOpt(new curlpp::options::Url(downloadUrl));
-		myRequest.setOpt(new curlpp::options::HttpHeader(headers));
-		myRequest.setOpt(new curlpp::options::Timeout(HTTP_REQUEST_TIMEOUT));
+			curlpp::Cleanup myCleanup;
+			curlpp::Easy myRequest;
+			myRequest.setOpt(new curlpp::options::FollowLocation(true));
+			myRequest.setOpt(new curlpp::options::Url(downloadUrl));
+			myRequest.setOpt(new curlpp::options::HttpHeader(headers));
+			myRequest.setOpt(new curlpp::options::Timeout(HTTP_REQUEST_TIMEOUT));
 
-		std::wstring filename = L"" UPDATE_TMP_FILENAME;
-		filename += Helpers::string_to_wstring(extension);
-		try {
-			std::ofstream ofs(filename, std::ios::out | std::ios::trunc | std::ios::binary);
-			curlpp::options::WriteStream ws(&ofs);
-			myRequest.setOpt(ws);
-			myRequest.perform();
-			ofs.close();
+			std::wstring filename = L"" UPDATE_TMP_FILENAME;
+			filename += Helpers::string_to_wstring(extension);
+			try {
+				std::ofstream ofs(filename, std::ios::out | std::ios::trunc | std::ios::binary);
+				curlpp::options::WriteStream ws(&ofs);
+				myRequest.setOpt(ws);
+				myRequest.perform();
+				ofs.close();
 
-			// First validation step is filesize
-			auto fileSize = ofs.tellp();
-			if (fileSize < 1000000) {
-				validFile = false;
+				// First validation step is filesize
+				auto fileSize = ofs.tellp();
+				if (fileSize < 1000000) {
+					validFile = false;
+				}
 			}
-		}
-		catch (curlpp::LibcurlRuntimeError&) {
-			*error = true;
-			DEBUG_LOG("!! CURL ERROR !!\n");
-			return false;
-		}
-		catch (curlpp::LogicError&) {
-			*error = true;
-			DEBUG_LOG("!! CURL ERROR !!\n");
-			return false;
-		}
-
-		// Second validation step, after we obtained the .exe, is magic bytes
-		std::wstring exe_filename = std::wstring(L"" UPDATE_TMP_FILENAME) + L".exe";
-		if (validFile) {
-			std::ifstream executableFile(exe_filename, std::ios::binary);
-
-			unsigned char buf[2];
-			executableFile.read((char*)buf, 2);
-
-			if (buf[0] != 0x4D || buf[1] != 0x5A) {
-				validFile = false;
+			catch (curlpp::LibcurlRuntimeError&) {
+				updateStatus->error = true;
+				DEBUG_LOG("!! CURL ERROR !!\n");
+				return false;
 			}
-		}
+			catch (curlpp::LogicError&) {
+				updateStatus->error = true;
+				DEBUG_LOG("!! CURL ERROR !!\n");
+				return false;
+			}
 
-		if (!validFile) {
-			std::filesystem::remove(exe_filename);
-			return false;
-		}
+			// Second validation step, after we obtained the .exe, is magic bytes
+			std::wstring exe_filename = std::wstring(L"" UPDATE_TMP_FILENAME) + L".exe";
+			if (validFile) {
+				std::ifstream executableFile(exe_filename, std::ios::binary);
 
+				unsigned char buf[2];
+				executableFile.read((char*)buf, 2);
+
+				if (buf[0] != 0x4D || buf[1] != 0x5A) {
+					validFile = false;
+				}
+			}
+
+			if (!validFile) {
+				std::filesystem::remove(exe_filename);
+				return false;
+			}
+
+		}
 	}
 
 	return true;
@@ -212,25 +225,25 @@ static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
 }
 
 
-void NavigationMenu::CheckForUpdates(bool programUpdateOnly)
+void NavigationMenu::CheckForUpdates(bool firstTime)
 {
-	DEBUG_LOG("::CheckForUpdates(%d)\n", programUpdateOnly);
+	DEBUG_LOG("::CheckForUpdates(%d)\n", firstTime);
 	bool updatedAnything = false;
 
-	// Now check for new releases
-	if (VerifyProgramUpdate(&m_updateStatus.error, m_addresses)) {
-		m_updateStatus.programUpdateAvailable = true;
-		updatedAnything = true;
+	if (!firstTime || m_addresses->GetValue("global", "startup_update_check") == 1) {
+		// Now check for new releases
+		if (DownloadProgramUpdate(&m_updateStatus, m_addresses, true)) {
+			m_updateStatus.programUpdateAvailable = true;
+			updatedAnything = true;
+		}
 	}
 
-	if (!programUpdateOnly) {
-
+	if (!firstTime || m_addresses->GetValue("global", "startup_addr_update_check") == 1) {
 		// Check for addresses update first
 		if (UpdateAddresses(&m_updateStatus.error, m_addresses)) {
 			m_updateStatus.addrFile = true;
 			updatedAnything = true;
 		}
-
 	}
 
 
@@ -241,7 +254,7 @@ void NavigationMenu::CheckForUpdates(bool programUpdateOnly)
 }
 
 
-void NavigationMenu::RequestCheckForUpdates(bool programUpdateOnly)
+void NavigationMenu::RequestCheckForUpdates()
 {
 	if (m_addresses == nullptr || m_updateStatus.verifying) {
 		return;
@@ -253,19 +266,27 @@ void NavigationMenu::RequestCheckForUpdates(bool programUpdateOnly)
 	// Reload addresses in case the loaded game addresses is not up to date but the local file one is
 	m_addresses->Reload();
 
-	m_updateStatus.verifiedOnce = true;
 	m_updateStatus.error = false;
 	m_updateStatus.addrFile = false;
 	m_updateStatus.up_to_date = false;
 
 	m_updateStatus.verifying = true;
 	// Start thread to avoid HTTP thread hanging the display thread
-	m_updateStatus.thread = std::thread(&NavigationMenu::CheckForUpdates, this, programUpdateOnly);
+	m_updateStatus.thread = std::thread(&NavigationMenu::CheckForUpdates, this, !m_updateStatus.verifiedOnce);
+	m_updateStatus.verifiedOnce = true;
 }
 
 
 void NavigationMenu::SetAddrFile(GameAddressesFile* addresses)
 {
 	m_addresses = addresses;
-	RequestCheckForUpdates(true);
+	RequestCheckForUpdates();
+}
+
+void NavigationMenu::CleanupThread()
+{
+	if (m_updateStatus.verifiedOnce) {
+		m_updateStatus.thread.join();
+		m_updateStatus.verifiedOnce = false;
+	}
 }

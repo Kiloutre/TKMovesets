@@ -77,7 +77,7 @@ navmenu.updated_addr = Updated addresses!
 navmenu.update_check = Checking for updates...
 navmenu.update = Update
 navmenu.update_error = Updating error
-navmenu.update_explanation = An update has been found. Do you want to restart now?
+navmenu.update_explanation = An update has been found.\nDo you want to download it and restart the program now?
 
 ## Submenus ##
 

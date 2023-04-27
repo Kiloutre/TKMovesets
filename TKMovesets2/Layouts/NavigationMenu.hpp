@@ -33,6 +33,9 @@ struct s_updateStatus {
 	bool up_to_date = false; // up_to_date is only used to show 'Up to date' (true) text or nothing
 	bool verifying = false;
 	bool verifiedOnce = false; // Used to properly join the thread.
+	std::string tagName;
+	std::string tagNameSeparatorText;
+	std::string changelog;
 	std::thread thread;
 };
 
@@ -42,7 +45,7 @@ private:
 	// Currently selected lang ID
 	unsigned int m_languageId = 0;
 	// List of translations to display
-	TranslationData* m_translations;
+	const TranslationData* m_translations;
 	// Amount of translations
 	unsigned int m_translations_count;
 	// PTR to addresses file
@@ -51,9 +54,9 @@ private:
 	s_updateStatus m_updateStatus;
 
 	// Start a thread that will check for updates
-	void RequestCheckForUpdates(bool programOnly = false);
+	void RequestCheckForUpdates();
 	// Make a HTTP request to check for a possible new release or more
-	void CheckForUpdates(bool programOnly = false);
+	void CheckForUpdates(bool firstTime);
 	// Render a list of buttons with predetermined size for use in the navbar
 	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width, bool navigationLocked);
 public:
@@ -69,4 +72,6 @@ public:
 	void Render(float width, bool navigationLocked);
 	// Set addr file, used for update checking
 	void SetAddrFile(GameAddressesFile* addresses);
+	// Cleanup the HTTP request-making thread
+	void CleanupThread();
 };

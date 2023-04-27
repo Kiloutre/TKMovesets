@@ -7,7 +7,7 @@ struct TranslationData
 	const char* displayName;
 	const char* locale;
 	const char* data;
-	const size_t* data_size;
+	bool needs_extra_font;
 };
 
 namespace Localization
@@ -25,5 +25,8 @@ namespace Localization
 	void Clear();
 
 	// Sends the array of translation and its size to the passed variables
-	void GetTranslationList(TranslationData** out_list, unsigned int* out_count);
+	void GetTranslationList(const TranslationData** out_list, unsigned int* out_count);
+
+	// Returns true if the currently selected font requires a specific font load to be displayed correctly
+	bool RequiresFontLoad();
 }

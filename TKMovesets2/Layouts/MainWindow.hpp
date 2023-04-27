@@ -21,6 +21,11 @@
 
 class MainWindow {
 private:
+	// If set to true, will rebuild the fonts right before the next NewFrame()
+	bool m_mustRebuildFonts = false;
+
+	// Load the fonts required for the program to work
+	void LoadFonts();
 	// Attempt to load a moveset, open a new editor window on success
 	void LoadMovesetEditor(movesetInfo* movesetInfos);
 public:
