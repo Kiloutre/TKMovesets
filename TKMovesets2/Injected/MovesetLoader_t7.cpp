@@ -220,16 +220,16 @@ void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 	void* player = (void*)(GetPlayerList()[playerid]);
 	Requirement prop = { .condition = propId, .param_unsigned = propValue };
 
-	__ida_int128 a3;
+	__ida_int128 a3 = { 0 };
 	char a4;
 	char a5;
 	float a6;
-	__ida_int128 a7;
-	__ida_int128 a8;
-	__ida_int128 a9;
-	__ida_int128 a10;
-	__ida_int128 a11;
-	uint64_t a12;
+	__ida_int128 a7 = { 0 };
+	__ida_int128 a8 = { 0 };
+	__ida_int128 a9 = { 0 };
+	__ida_int128 a10 = { 0 };
+	__ida_int128 a11 = { 0 };
+	uint64_t a12 = { 0 };
 
 	// Trail vfx
 	/*
