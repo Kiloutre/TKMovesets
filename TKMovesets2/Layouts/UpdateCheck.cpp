@@ -21,16 +21,14 @@ void NavigationMenu::CheckForUpdates()
 
 	std::ostringstream os;
 	std::string content;
-	DEBUG_LOG("aa\n");
 	try {
 		os << curlpp::options::Url(url);
 		content = os.str();
 	}
-	catch (curlpp::LibcurlRuntimeError& e) {
+	catch (curlpp::LibcurlRuntimeError&) {
 		m_updateStatus.error = true;
 		DEBUG_LOG("!! CURL ERROR !!\n");
 	}
-	DEBUG_LOG("bb\n");
 
 	if (!m_updateStatus.error)
 	{
@@ -39,7 +37,7 @@ void NavigationMenu::CheckForUpdates()
 			std::smatch m;
 			std::regex expr("^ *val:global_addr_version *= *(\\d+) *$");
 			int addrVersion = -1;
-			int currVersion = m_addresses->GetValue("global", "addr_version");
+			int currVersion = (int)m_addresses->GetValue("global", "addr_version");
 
 			while (std::regex_search(content, m, expr)) {
 				addrVersion = std::stoi(m[1].str());
@@ -47,7 +45,6 @@ void NavigationMenu::CheckForUpdates()
 			}
 
 			if (addrVersion != -1 && (addrVersion > currVersion)) {
-				DEBUG_LOG("!! writing file... !!\n");
 
 				std::ofstream addrFile(GAME_ADDRESSES_FILE);
 				if (addrFile.fail()) {
@@ -56,6 +53,7 @@ void NavigationMenu::CheckForUpdates()
 				else {
 					addrFile << content;
 					addrFile.close();
+					DEBUG_LOG("Updater: Updated game addresses.\n");
 				}
 
 				m_updateStatus.addrFile = true;
@@ -106,5 +104,4 @@ void NavigationMenu::RequestCheckForUpdates()
 void NavigationMenu::SetAddrFile(GameAddressesFile* addresses)
 {
 	m_addresses = addresses;
-	RequestCheckForUpdates();
 }

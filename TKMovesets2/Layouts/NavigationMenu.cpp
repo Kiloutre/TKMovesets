@@ -90,9 +90,11 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 		}
 		ImGui::EndCombo();
 	}
+	ImGui::PopItemWidth();
 
 	// Updating
-	if (ImGuiExtra::RenderButtonEnabled(_("navmenu.update"), !m_updateStatus.verifying)) {
+	ImGui::Separator();
+	if (ImGuiExtra::RenderButtonEnabled(_("navmenu.update"), !m_updateStatus.verifying, ImVec2(width, 0))) {
 		RequestCheckForUpdates();
 	}
 
@@ -114,5 +116,4 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 		}
 	}
 
-	ImGui::PopItemWidth();
 }
