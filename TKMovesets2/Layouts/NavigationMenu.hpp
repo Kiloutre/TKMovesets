@@ -51,9 +51,9 @@ private:
 	s_updateStatus m_updateStatus;
 
 	// Start a thread that will check for updates
-	void RequestCheckForUpdates();
+	void RequestCheckForUpdates(bool programOnly = false);
 	// Make a HTTP request to check for a possible new release or more
-	void CheckForUpdates();
+	void CheckForUpdates(bool programOnly = false);
 	// Render a list of buttons with predetermined size for use in the navbar
 	void RenderBtnList(const NavMenuBtn* c_btns, size_t count, float width, bool navigationLocked);
 public:

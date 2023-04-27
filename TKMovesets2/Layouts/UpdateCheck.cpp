@@ -49,7 +49,7 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
 		}
-		catch (curlpp::LogicError& e) {
+		catch (curlpp::LogicError&) {
 			*error = true;
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
@@ -120,7 +120,7 @@ static bool VerifyProgramUpdate(bool* error, GameAddressesFile* addresses)
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
 		}
-		catch (curlpp::LogicError& e) {
+		catch (curlpp::LogicError&) {
 			*error = true;
 			DEBUG_LOG("!! CURL ERROR !!\n");
 			return false;
@@ -150,7 +150,7 @@ static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
 		DEBUG_LOG("!! CURL ERROR !!\n");
 		return false;
 	}
-	catch (curlpp::LogicError& e) {
+	catch (curlpp::LogicError&) {
 		*error = true;
 		DEBUG_LOG("!! CURL ERROR !!\n");
 		return false;
@@ -184,17 +184,19 @@ static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
 }
 
 
-void NavigationMenu::CheckForUpdates()
+void NavigationMenu::CheckForUpdates(bool programUpdateOnly)
 {
-	DEBUG_LOG("::CheckForUpdates()\n");
+	DEBUG_LOG("::CheckForUpdates(%d)\n", programUpdateOnly);
 	bool updatedAnything = false;
 
-	// Check for addresses update first
-	if (UpdateAddresses(&m_updateStatus.error, m_addresses)) {
-		m_updateStatus.addrFile = true;
-		updatedAnything = true;
-	}
+	if (!programUpdateOnly) {
 
+		// Check for addresses update first
+		if (UpdateAddresses(&m_updateStatus.error, m_addresses)) {
+			m_updateStatus.addrFile = true;
+			updatedAnything = true;
+		}
+	}
 	// Now check for new releases
 	if (VerifyProgramUpdate(&m_updateStatus.error, m_addresses)) {
 		m_updateStatus.programUpdateAvailable = true;
@@ -208,7 +210,7 @@ void NavigationMenu::CheckForUpdates()
 }
 
 
-void NavigationMenu::RequestCheckForUpdates()
+void NavigationMenu::RequestCheckForUpdates(bool programUpdateOnly)
 {
 	if (m_addresses == nullptr || m_updateStatus.verifying) {
 		return;
@@ -227,11 +229,12 @@ void NavigationMenu::RequestCheckForUpdates()
 
 	m_updateStatus.verifying = true;
 	// Start thread to avoid HTTP thread hanging the display thread
-	m_updateStatus.thread = std::thread(&NavigationMenu::CheckForUpdates, this);
+	m_updateStatus.thread = std::thread(&NavigationMenu::CheckForUpdates, this, programUpdateOnly);
 }
 
 
 void NavigationMenu::SetAddrFile(GameAddressesFile* addresses)
 {
 	m_addresses = addresses;
+	RequestCheckForUpdates(true);
 }
