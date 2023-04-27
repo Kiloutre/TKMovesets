@@ -6,6 +6,8 @@
 #include <regex>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <regex>
 
 #include "NavigationMenu.hpp"
 #include "helpers.hpp"
@@ -85,7 +87,23 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 	updateStatus->tagName = tagName;
 	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("navmenu.changelog"), tagName);
-	updateStatus->changelog = changelog;
+	{
+		std::vector<std::string> changelogLines;
+		std::string delim = "\n";
+
+		changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
+
+		auto start = 0;
+		auto end = changelog.find(delim);
+		while (end != std::string::npos)
+		{
+			changelogLines.push_back(changelog.substr(start, end - start));
+			start = end + delim.length();
+			end = changelog.find(delim, start);
+		}
+		changelogLines.push_back(changelog.substr(start, end));
+		updateStatus->changelog = changelogLines;
+	}
 
 	if (!Helpers::remoteVersionGreater(tagName.c_str())) {
 		return false;
@@ -128,11 +146,11 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 				curlpp::options::WriteStream ws(&ofs);
 				myRequest.setOpt(ws);
 				myRequest.perform();
-				ofs.close();
 
 				// First validation step is filesize
-				auto fileSize = ofs.tellp();
+				size_t fileSize = ofs.tellp();
 				if (fileSize < 1000000) {
+					DEBUG_LOG("File size too small (%d)\n", fileSize);
 					validFile = false;
 				}
 			}
@@ -156,11 +174,14 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 				executableFile.read((char*)buf, 2);
 
 				if (buf[0] != 0x4D || buf[1] != 0x5A) {
+					DEBUG_LOG("Bad magic bytes (%x %x).\n", buf[0], buf[1]);
 					validFile = false;
 				}
 			}
 
 			if (!validFile) {
+				DEBUG_LOG("Invalid file, removing.\n");
+				updateStatus->error = true;
 				std::filesystem::remove(exe_filename);
 				return false;
 			}
@@ -234,6 +255,7 @@ void NavigationMenu::CheckForUpdates(bool firstTime)
 		// Now check for new releases
 		if (DownloadProgramUpdate(&m_updateStatus, m_addresses, true)) {
 			m_updateStatus.programUpdateAvailable = true;
+			m_updateFileInvalid = false;
 			updatedAnything = true;
 		}
 	}

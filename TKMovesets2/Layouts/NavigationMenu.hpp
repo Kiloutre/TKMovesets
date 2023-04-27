@@ -35,7 +35,7 @@ struct s_updateStatus {
 	bool verifiedOnce = false; // Used to properly join the thread.
 	std::string tagName;
 	std::string tagNameSeparatorText;
-	std::string changelog;
+	std::vector<std::string> changelog;
 	std::thread thread;
 };
 
@@ -52,6 +52,8 @@ private:
 	GameAddressesFile* m_addresses = nullptr;
 	// Struct related to updating of addr & program
 	s_updateStatus m_updateStatus;
+	// If true, there has been an error with the update file
+	bool m_updateFileInvalid = false;
 
 	// Start a thread that will check for updates
 	void RequestCheckForUpdates();

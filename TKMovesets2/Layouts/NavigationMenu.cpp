@@ -125,22 +125,37 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
 	{
 		ImGui::TextUnformatted(_("navmenu.update_explanation"));
-
 		ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
-		// Todo: textbox
-		ImGui::TextUnformatted(m_updateStatus.changelog.c_str());
-        //
+
+		if (ImGui::BeginTable("table_row_height", 1, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV))
+		{
+			for (auto& line : m_updateStatus.changelog)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(line.c_str());
+			}
+			ImGui::EndTable();
+		}
 
 		if (ImGui::Button(_("yes"))) {
-			m_updateStatus.thread.join();
-			m_updateStatus.thread = std::thread(&DownloadProgramUpdate, &m_updateStatus, m_addresses, false);
-			*requestedUpdatePtr = true;
+			if (DownloadProgramUpdate(&m_updateStatus, m_addresses, false)) {
+				*requestedUpdatePtr = true;
+			}
+			else {
+				m_updateFileInvalid = true;
+			}
 		}
         ImGui::SameLine();
 		if (ImGui::Button(_("no"))) {
 			ImGui::CloseCurrentPopup();
 			m_updateStatus.programUpdateAvailable = false;
 		}
+
+		if (m_updateFileInvalid) {
+			ImGuiExtra_TextboxError(_("navmenu.update_bad_file"));
+		}
+
 		ImGui::EndPopup();
 	}
 }
