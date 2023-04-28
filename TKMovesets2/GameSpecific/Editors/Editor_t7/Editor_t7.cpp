@@ -265,7 +265,7 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		TKMovesetHeader* header = (TKMovesetHeader*)t_moveset;
 		if (header->moveset_data_size > 0) {
 			// Compressed moveset data, must decompress
-			uint64_t new_size = header->moveset_data_start + header->moveset_data_size;
+			uint64_t new_size = header->moveset_data_start + (uint64_t)header->moveset_data_size;
 			int32_t src_size = (int32_t)(t_movesetSize - header->moveset_data_start);
 
 			Byte* new_moveset = new Byte[new_size];

@@ -160,11 +160,13 @@ public:
 	// Writes [bufSize] amounts of bytes to the game
 	void writeBytes(gameAddr addr, void* buf, size_t bufSize);
 
-	// Injects a DLL inside of the process
+	// Injects a DLL (from a file) inside of the process 
 	bool InjectDll(const wchar_t* fullpath);
+	// (DOES NOT WORK) Injects a DLL (from memory) inside of the process
+	bool ReflectInjectDll(const Byte* dllBytes, uint64_t dllSize);
 
 	// Allocates a certain amount of memory in the game
-	gameAddr allocateMem(size_t amount);
+	gameAddr allocateMem(size_t amount, bool executable=false);
 	// Frees memory that we previously allocated. Address must be the exact same as when it was returned by allocateMem().
 	void freeMem(gameAddr addr);
 	// Create a thread in the remote process. Can wait for the end of the thread and receive the thread exit code

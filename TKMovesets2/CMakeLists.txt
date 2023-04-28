@@ -68,7 +68,7 @@ set(BINARY_SOURCES
                     "GameInteractions/GameImport.cpp"
                     "GameInteractions/GameSharedMem.cpp"
                     "GameInteractions/GameProcess/GameData.cpp"
-                    "GameInteractions/GameProcess/GameProcess.cpp"
+                    "GameInteractions/GameProcess/GameProcess.cpp"  
 
                     "LocalStorage/LocalStorage.cpp"
 

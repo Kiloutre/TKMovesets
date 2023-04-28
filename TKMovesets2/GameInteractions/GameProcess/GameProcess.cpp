@@ -14,25 +14,25 @@ namespace GameProcessUtils
 	std::vector<processEntry> GetRunningProcessList()
 	{
 		HANDLE hProcessSnap;
-		PROCESSENTRY32 pe32{ 0 };
+		PROCESSENTRY32W pe32{ 0 };
 		hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 		std::vector<processEntry> processList;
 
 		if (GetLastError() != ERROR_ACCESS_DENIED)
 		{
-			pe32.dwSize = sizeof(PROCESSENTRY32);
-			if (Process32First(hProcessSnap, &pe32)) {
+			pe32.dwSize = sizeof(PROCESSENTRY32W);
+			if (Process32FirstW(hProcessSnap, &pe32)) {
 				processList.push_back({
-					.name = pe32.szExeFile,
+					.name = Helpers::wstring_to_string(pe32.szExeFile),
 					.pid = pe32.th32ProcessID
-					});
+				});
 
-				while (Process32Next(hProcessSnap, &pe32)) {
+				while (Process32NextW(hProcessSnap, &pe32)) {
 					processList.push_back({
-						.name = pe32.szExeFile,
+						.name = Helpers::wstring_to_string(pe32.szExeFile),
 						.pid = pe32.th32ProcessID
-						});
+					});
 				}
 			}
 
@@ -71,21 +71,23 @@ GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, D
 DWORD GameProcess::GetGamePID(const char* processName)
 {
 	HANDLE hProcessSnap;
-	PROCESSENTRY32 pe32{ 0 };
+	PROCESSENTRY32W pe32{ 0 };
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+	std::wstring w_processName = Helpers::string_to_wstring(processName);
 
 	if (GetLastError() != ERROR_ACCESS_DENIED)
 	{
-		pe32.dwSize = sizeof(PROCESSENTRY32);
-		if (Process32First(hProcessSnap, &pe32)) {
-			if (strcmp(pe32.szExeFile, processName) == 0) {
+		pe32.dwSize = sizeof(PROCESSENTRY32W);
+		if (Process32FirstW(hProcessSnap, &pe32)) {
+			if (wcscmp(pe32.szExeFile, w_processName.c_str()) == 0) {
 				m_pid = pe32.th32ProcessID;
 				CloseHandle(hProcessSnap);
 				return m_pid;
 			}
 
-			while (Process32Next(hProcessSnap, &pe32)) {
-				if (strcmp(pe32.szExeFile, processName) == 0) {
+			while (Process32NextW(hProcessSnap, &pe32)) {
+				if (wcscmp(pe32.szExeFile, w_processName.c_str()) == 0) {
 					m_pid = pe32.th32ProcessID;
 					CloseHandle(hProcessSnap);
 					return m_pid;
@@ -333,9 +335,10 @@ void  GameProcess::writeBytes(gameAddr addr, void* buf, size_t bufSize)
 }
 
 
-gameAddr GameProcess::allocateMem(size_t amount)
+gameAddr GameProcess::allocateMem(size_t amount, bool executable)
 {
-	gameAddr allocatedBlock = (gameAddr)VirtualAllocEx(m_processHandle, nullptr, amount, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	auto allocFlag = executable ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE;
+	gameAddr allocatedBlock = (gameAddr)VirtualAllocEx(m_processHandle, nullptr, amount, MEM_COMMIT | MEM_RESERVE, allocFlag);
 	if (allocatedBlock != 0) {
 		allocatedMemory.push_back(std::pair<gameAddr, uint64_t>(allocatedBlock, amount));
 		DEBUG_LOG("Allocated to game memory from : %llx to %llx\n", allocatedBlock, allocatedBlock + amount);
@@ -387,6 +390,156 @@ GameProcessThreadCreation_ GameProcess::createRemoteThread(gameAddr startAddress
 	return GameProcessThreadCreation_Error;
 }
 
+bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
+{
+	// -- THIS DOESN'T WORK AS OF YET -- //
+
+	DEBUG_LOG("::ReflectInjectDll(, %llu)\n", dllSize);
+
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)orig_dllBytes;
+	PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)(orig_dllBytes + dosHeader->e_lfanew);
+	uint64_t sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
+
+	DEBUG_LOG("Alloc size %llu\n", sizeOfImage);
+	Byte* dllCopy = new Byte[sizeOfImage];
+	gameAddr dllGame = allocateMem(sizeOfImage, true);
+
+	if (dllGame == 0) {
+		DEBUG_LOG("Failed to allocate DLL within the target process.\n");
+		return false;
+	}
+
+	DEBUG_LOG("Allocated at game %llx\n", dllGame);
+
+	// Copy headers
+	memcpy(dllCopy, orig_dllBytes, ntHeaders->OptionalHeader.SizeOfHeaders);
+
+	// Copy each section
+	PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER)((uint64_t)ntHeaders + sizeof(IMAGE_NT_HEADERS));
+	for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; ++i)
+	{
+		auto& section = sections[i];
+		DEBUG_LOG("Copying section %d - %s at +0x%x\n", i, (char*)section.Name, section.VirtualAddress);
+		void* target_section_addr = (void*)(dllCopy + section.VirtualAddress);
+		void* source_section_addr = (void*)(orig_dllBytes + section.PointerToRawData);
+		memcpy(target_section_addr, source_section_addr, section.SizeOfRawData);
+	}
+
+	// Rebuild import table
+	auto& importDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+	if (importDirectory.Size != 0)
+	{
+		PIMAGE_IMPORT_DESCRIPTOR importDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)(dllCopy + importDirectory.VirtualAddress);
+
+		while (importDescriptor->Name != NULL)
+		{
+			LPCSTR libName = (LPCSTR)(dllCopy + importDescriptor->Name);
+			HMODULE libModule = LoadLibraryA(libName);
+			DEBUG_LOG("%s = %p\n", libName, libModule);
+
+			if (libModule == 0) {
+				continue;
+			}
+
+			PIMAGE_THUNK_DATA nameRef = (PIMAGE_THUNK_DATA)(dllCopy + importDescriptor->Characteristics);
+			PIMAGE_THUNK_DATA lpThunk = (PIMAGE_THUNK_DATA)(dllCopy + importDescriptor->FirstThunk);
+
+			for (; nameRef->u1.AddressOfData != 0; nameRef++, lpThunk++)
+			{
+				if (nameRef->u1.AddressOfData & IMAGE_ORDINAL_FLAG) {
+					*(FARPROC*)lpThunk = GetProcAddress(libModule, MAKEINTRESOURCEA(nameRef->u1.AddressOfData));
+					DEBUG_LOG("Import: addr [%x] = %p\n", nameRef->u1.AddressOfData, *(FARPROC*)lpThunk);
+				}
+				else {
+					PIMAGE_IMPORT_BY_NAME thunkData = (PIMAGE_IMPORT_BY_NAME)(dllCopy + nameRef->u1.AddressOfData);
+					*(FARPROC*)lpThunk = GetProcAddress(libModule, (LPCSTR)&thunkData->Name);
+					DEBUG_LOG("Import: str [%s] = %p\n", thunkData->Name, *(FARPROC*)lpThunk);
+				}
+			}
+
+			FreeLibrary(libModule);
+			++importDescriptor;
+		}
+	}
+
+	// Relocate
+	uint64_t deltaImageBase = dllGame - ntHeaders->OptionalHeader.ImageBase;
+	auto& relocDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+	DEBUG_LOG("Delta is %d (%x)\n", deltaImageBase, deltaImageBase);
+
+	typedef struct BASE_RELOCATION_BLOCK {
+		DWORD PageAddress;
+		DWORD BlockSize;
+	} BASE_RELOCATION_BLOCK, * PBASE_RELOCATION_BLOCK;
+
+	typedef struct BASE_RELOCATION_ENTRY {
+		USHORT Offset : 12;
+		USHORT Type : 4;
+	} BASE_RELOCATION_ENTRY, * PBASE_RELOCATION_ENTRY;
+
+	IMAGE_DATA_DIRECTORY relocations = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+	DWORD_PTR relocationTable = relocations.VirtualAddress + (DWORD_PTR)dllCopy;
+	DWORD relocationsProcessed = 0;
+
+	while (relocationsProcessed < relocations.Size)
+	{
+		PBASE_RELOCATION_BLOCK relocationBlock = (PBASE_RELOCATION_BLOCK)(relocationTable + relocationsProcessed);
+		relocationsProcessed += sizeof(BASE_RELOCATION_BLOCK);
+		DWORD relocationsCount = (relocationBlock->BlockSize - sizeof(BASE_RELOCATION_BLOCK)) / sizeof(BASE_RELOCATION_ENTRY);
+		PBASE_RELOCATION_ENTRY relocationEntries = (PBASE_RELOCATION_ENTRY)(relocationTable + relocationsProcessed);
+
+		for (DWORD i = 0; i < relocationsCount; i++)
+		{
+			relocationsProcessed += sizeof(BASE_RELOCATION_ENTRY);
+
+			if (relocationEntries[i].Type == 0)
+			{
+				continue;
+			}
+
+			DWORD_PTR relocationRVA = relocationBlock->PageAddress + relocationEntries[i].Offset;
+			DWORD_PTR addressToPatch = 0;
+			ReadProcessMemory(GetCurrentProcess(), (LPCVOID)((DWORD_PTR)dllCopy + relocationRVA), &addressToPatch, sizeof(DWORD_PTR), NULL);
+			addressToPatch += deltaImageBase;
+			std::memcpy((PVOID)((DWORD_PTR)dllCopy + relocationRVA), &addressToPatch, sizeof(DWORD_PTR));
+		}
+	}
+
+	std::map<std::string, uint64_t> exportedFunctions;
+	// DEBUG: Export table
+	{
+		auto& exportDir = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+		PIMAGE_EXPORT_DIRECTORY exp = (PIMAGE_EXPORT_DIRECTORY)(dllCopy + exportDir.VirtualAddress);
+
+		DEBUG_LOG("Export name - %s -\n", dllCopy + exp->Name);
+		DEBUG_LOG("Name count: %u. Address count: %u.\n", exp->NumberOfNames, exp->NumberOfFunctions);
+
+		DWORD* nameList = (DWORD*)(dllCopy + exp->AddressOfNames);
+		DWORD* addrList = (DWORD*)(dllCopy + exp->AddressOfFunctions);
+		for (int i = 0; i < exp->NumberOfNames; ++i)
+		{
+			char* nameAddr = (char*)(dllCopy + nameList[i]);
+			if (strncmp(nameAddr, "MovesetLoader", sizeof("MovesetLoader") - 1) == 0)
+			{
+				exportedFunctions[nameAddr] = dllGame + addrList[i];
+				printf("EXPORTED FUNC [%s], OFFSET [%x], ABSOLUTE ADDR [%llx]\n", nameAddr, addrList[i], dllGame + addrList[i]);
+			}
+		}
+	}
+
+	DEBUG_LOG("Finished!\n");
+	writeBytes(dllGame, dllCopy, sizeOfImage);
+
+	LPTHREAD_START_ROUTINE entryPoint = (LPTHREAD_START_ROUTINE)(dllGame + ntHeaders->OptionalHeader.AddressOfEntryPoint);
+	entryPoint = (LPTHREAD_START_ROUTINE)exportedFunctions["MovesetLoaderTest"];
+	DEBUG_LOG("CreateRemoteThread at %p ...\n", entryPoint);
+	//createRemoteThread((gameAddr)entryPoint, 0, true);
+
+	delete[] dllCopy;
+	// -- THIS DOESN'T WORK AS OF YET -- //
+	return true;
+}
+
 bool GameProcess::InjectDll(const wchar_t* fullpath)
 {
 	{
@@ -423,7 +576,7 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 	writeBytes(bufferAddr, (void*)fullpath, fullpathSize);
 
 	// Get address of LoadLibraryW
-	auto moduleHandle = GetModuleHandleA(TEXT("Kernel32"));
+	auto moduleHandle = GetModuleHandleA("Kernel32");
 	if (moduleHandle == 0) {
 		DEBUG_LOG("Failed getting the module handle of Kernel32.\n");
 		return false;

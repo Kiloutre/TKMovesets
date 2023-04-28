@@ -124,12 +124,12 @@ bool Online::InjectDllAndWaitEnd()
         if (result) {
             result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
         }
-
+        
         injectedDll = true;
-        isInjecting = false;
-
-        DEBUG_LOG("Online::InjectDll() -> return\n");
     }
 
+    isInjecting = false;
+
+    DEBUG_LOG("Online::InjectDll() -> return\n");
     return result;
 }

@@ -8,6 +8,7 @@
 #define DLLCONTENT __declspec(dllimport)
 #endif
 
+# define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define PROGRAM_TITLE           "TKMovesets - kilo"
 # define PROGRAM_VERSION         "0.6"
 # define PROGRAM_WIN_WIDTH       1280
@@ -18,7 +19,6 @@
 # define INTERFACE_DATA_DIR      "TKMInterface"
 # define GAME_ADDRESSES_FILE     "game_addresses.ini"
 
-# define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define UPDATE_TMP_FILENAME     "TKMovesets2Updater"
 # define UPDATE_MIN_FILESIZE     500000 // Update files smaller than this are most likely invalid (500KB)
 # define HTTP_REQUEST_TIMEOUT    10

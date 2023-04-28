@@ -59,9 +59,11 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	bool busy = extractorHelper.IsBusy();
 
 	ImGuiExtra::RenderTextbox(_("extraction.explanation"));
+	ImGui::SeparatorText(_("extraction.extraction"));
 
 	{
 		ImGui::TextUnformatted(_("extraction.extract_from"));
+		ImGui::SameLine();
 
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		auto currentGame = extractorHelper.currentGame;
