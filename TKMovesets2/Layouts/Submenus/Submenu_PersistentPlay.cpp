@@ -136,6 +136,7 @@ void Submenu_PersistentPlay::RenderGameControls()
 	bool isInjecting = gameHelper->isInjecting;
 	bool sharedMemoryLoaded = gameHelper->isMemoryLoaded;
 	bool isBusy = gameHelper->IsBusy();
+	bool versionMatches = !gameHelper->versionMismatch;
 
 	if (!sharedMemoryLoaded && isAttached) {
 		ImGui::SameLine();
@@ -162,7 +163,7 @@ void Submenu_PersistentPlay::RenderGameControls()
 				ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), gameHelper->progress);
 			}
 		}
-		else if (isAttached && sharedMemoryLoaded) {
+		else if (isAttached && sharedMemoryLoaded && versionMatches) {
 			if (gameHelper->lockedIn) {
 				if (ImGui::Button(_("persistent.unlock"))) {
 					gameHelper->lockedIn = false;
@@ -182,6 +183,7 @@ void Submenu_PersistentPlay::Render()
 	ImGuiExtra::RenderTextbox(_("persistent.explanation"));
 	ImGui::SeparatorText(_("select_game"));
 
+	bool versionMatches = !gameHelper->versionMismatch;
 	bool sharedMemoryLoaded = gameHelper->isMemoryLoaded;
 	bool isBusy = gameHelper->IsBusy();
 
@@ -198,6 +200,11 @@ void Submenu_PersistentPlay::Render()
 
 			switch (gameHelper->process->status)
 			{
+				case GameProcessErrcode_PROC_ATTACHED:
+					if (!versionMatches) {
+						ImGuiExtra_TextboxWarning(_("process.dll_version_mismatch"));
+					}
+					break;
 				case GameProcessErrcode_PROC_NOT_ATTACHED:
 				case GameProcessErrcode_PROC_EXITED:
 				case GameProcessErrcode_PROC_ATTACHING:
@@ -216,7 +223,7 @@ void Submenu_PersistentPlay::Render()
 		}
 
 		// List of players with their associated moveset
-		auto selectedMovesetList_copy = gameHelper->displayedMovesets;
+		std::vector<movesetInfo> selectedMovesetList_copy = gameHelper->displayedMovesets;
 		auto rowWidth = availableSpace.x / 3;
 		bool movesetListNotEmpty = gameHelper->storage->extractedMovesets.size();
 		for (unsigned int playerid = 0; playerid < playerCount; ++playerid)
@@ -248,13 +255,13 @@ void Submenu_PersistentPlay::Render()
 				// Since both players can have buttons of the same name shown at the same time, have to push an ID for the imgui stack to differentiate both
 				ImGui::PushID(playerid);
 				if (m_currentPlayerCursor == -1 || !sharedMemoryLoaded) {
-					if (ImGuiExtra::RenderButtonEnabled(_("persistent.select_moveset"), canClick && m_currentPlayerCursor == -1)) {
+					if (ImGuiExtra::RenderButtonEnabled(_("persistent.select_moveset"), versionMatches && canClick && m_currentPlayerCursor == -1)) {
 						m_currentPlayerCursor = playerid;
 						DEBUG_LOG("m_currentPlayerCursor = %d\n", playerid);
 						// Moveset select mode
 					}
 				} else {
-					if (ImGuiExtra::RenderButtonEnabled(_("persistent.clear_moveset"), canClick && m_currentPlayerCursor == playerid)) {
+					if (ImGuiExtra::RenderButtonEnabled(_("persistent.clear_moveset"), versionMatches && canClick && m_currentPlayerCursor == playerid)) {
 						ClearMoveset();
 					}
 				}
@@ -270,5 +277,5 @@ void Submenu_PersistentPlay::Render()
 
 	// Moveset list
 	bool canSelectMoveset = sharedMemoryLoaded && !isBusy && m_currentPlayerCursor != -1;
-	RenderMovesetList(canSelectMoveset);
+	RenderMovesetList(versionMatches && canSelectMoveset);
 }

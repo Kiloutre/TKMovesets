@@ -149,7 +149,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 				// First validation step is filesize
 				size_t fileSize = ofs.tellp();
-				if (fileSize < 1000000) {
+				if (fileSize < UPDATE_MIN_FILESIZE) {
 					DEBUG_LOG("File size too small (%d)\n", fileSize);
 					validFile = false;
 				}
@@ -167,10 +167,16 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 			// Second validation step, after we obtained the .exe, is magic bytes
 			std::wstring exe_filename = std::wstring(L"" UPDATE_TMP_FILENAME) + L".exe";
+
+			if (!Helpers::fileExists(exe_filename.c_str())) {
+				validFile = false;
+				DEBUG_LOG("Update: .exe file does not exist.\n");
+			}
+
 			if (validFile) {
 				std::ifstream executableFile(exe_filename, std::ios::binary);
 
-				unsigned char buf[2];
+				unsigned char buf[2]{ 0 };
 				executableFile.read((char*)buf, 2);
 
 				if (buf[0] != 0x4D || buf[1] != 0x5A) {
@@ -182,7 +188,9 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 			if (!validFile) {
 				DEBUG_LOG("Invalid file, removing.\n");
 				updateStatus->error = true;
-				std::filesystem::remove(exe_filename);
+				if (Helpers::fileExists(exe_filename.c_str())) {
+					std::filesystem::remove(exe_filename);
+				}
 				return false;
 			}
 

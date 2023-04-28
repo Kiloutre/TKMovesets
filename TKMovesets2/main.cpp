@@ -333,6 +333,29 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	// Load the MovesetLoader in our own process so that we can know its function addresses
 	HMODULE movesetLoaderLib;
 	{
+		{
+			// Get rid of the potentially obsolete old .dll
+			struct _stat dll_buffer;
+			if (_wstat(L"" MOVESET_LOADER_NAME, &dll_buffer) == 0) {
+
+				struct _stat program_buffer;
+				_wstat(L"" PROGRAM_FILENAME, &program_buffer);
+
+				if (dll_buffer.st_mtime < program_buffer.st_mtime) {
+					DEBUG_LOG("- .dll out of date, deleting it -\n");
+					// DLL was created before this .exe, which means it is not up to date
+					try {
+						std::filesystem::remove(MOVESET_LOADER_NAME);
+					}
+					catch (std::filesystem::filesystem_error const&) {
+						DEBUG_LOG("!! ERROR WHILE TRYING TO REMOVE OLD DLL !!\n");
+					}
+				}
+			}
+		}
+
+		// If .dll does not exist, create it
+		// Todo: reflective DLL injection that will not need to create a file
 		if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
 		{
 			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'.");

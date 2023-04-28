@@ -660,7 +660,7 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 			size = it->first - offset;
 			if (size == 0) {
 				// Two animation names referring to the same anim offset. Loop until we find a different offset in order to get the proper size
-				auto it_copy = it;
+				std::map<gameAddr, uint64_t>::iterator it_copy = it;
 				while (it_copy != end && it_copy->first == offset) {
 					std::advance(it_copy, 1);
 				}

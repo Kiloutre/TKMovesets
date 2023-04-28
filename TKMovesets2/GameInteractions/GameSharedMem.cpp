@@ -42,6 +42,7 @@ void GameSharedMem::RunningUpdate()
 		if (isMemoryLoaded) {
 			isInjecting = false;
 			m_requestedInjection = false;
+			versionMismatch = m_sharedMemHandler->versionMismatch;
 		}
 		else if (isInjecting) {
 			// Memory loaded, check if we were requested to inject the DLL in the past
@@ -59,8 +60,13 @@ void GameSharedMem::RunningUpdate()
 			}
 		}
 	}
-	else if (synchronizeLockin) {
-		m_sharedMemHandler->SetLockIn(lockedIn);
+	else {
+		if (synchronizeLockin) {
+			m_sharedMemHandler->SetLockIn(lockedIn);
+		}
+		if (m_sharedMemHandler->versionMismatch) {
+			m_sharedMemHandler->VerifyDllVersionMismatch();
+		}
 	}
 
 

@@ -274,13 +274,13 @@ void MovesetLoaderT7::InitHooks()
 		"TK__ApplyNewMoveset",
 		// Functions
 		"TK__GetPlayerFromID",
-		"TK__NetInterCS::MatchedAsClient"
+		//"TK__NetInterCS::MatchedAsClient"
 	};
 
 	// Crucial functions / hooks
 	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
 	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "f_GetPlayerFromID");
-	RegisterFunction("TK__NetInterCS::MatchedAsClient", m_moduleName, "f_NetInterCS");
+	//RegisterFunction("TK__NetInterCS::MatchedAsClient", m_moduleName, "f_NetInterCS");
 
 	// Other less important things
 	RegisterFunction("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop");

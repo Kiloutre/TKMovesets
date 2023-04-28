@@ -88,8 +88,8 @@ void ApplyUpdate(const std::string& filename)
 			for (auto& process : GameProcessUtils::GetRunningProcessList())
 			{
 				DEBUG_LOG("- %s\n", process.name.c_str());
-				if (process.name == UPDATE_FINAL_FILENAME) {
-					DEBUG_LOG("Found [" UPDATE_FINAL_FILENAME "]\n");
+				if (process.name == PROGRAM_FILENAME) {
+					DEBUG_LOG("Found [" PROGRAM_FILENAME "]\n");
 					found = true;
 					break;
 				}
@@ -108,8 +108,8 @@ void ApplyUpdate(const std::string& filename)
 		}
 	}
 	DEBUG_LOG("ApplyUpdate() - Copying file\n");
-	std::filesystem::remove(UPDATE_FINAL_FILENAME);
-	std::filesystem::copy_file(filename, UPDATE_FINAL_FILENAME);
+	std::filesystem::remove(PROGRAM_FILENAME);
+	std::filesystem::copy_file(filename, PROGRAM_FILENAME);
 
-	StartProcess(".\\" UPDATE_FINAL_FILENAME);
+	StartProcess(".\\" PROGRAM_FILENAME);
 }

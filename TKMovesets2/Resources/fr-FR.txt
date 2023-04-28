@@ -33,11 +33,11 @@ select_game = Sélectionner un jeu
 # Processus #
 
 process.status = Status:
-process.attaching = Attachement...
 process.game_not_attached = Sélectionnez un jeu.
 process.game_not_running = Le jeu n'est pas lancé ou n'a pas pu être trouvé.
 process.game_version_mismatch = La version actuelle du jeu n'est pas compatible avec ce logiciel.
 process.game_attach_err = Jeu trouvé mais impossible de s'y attacher. Cela peut être causé par un manque de droits du processus.
+process.dll_version_mismatch = La version DLL injectée dans le jeu ne correspond pas à la version du programme. Redémarrez le jeu et ce logiciel.
 
 # Moveset #
 moveset.origin = Origine

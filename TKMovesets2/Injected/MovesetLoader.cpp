@@ -89,7 +89,7 @@ bool MovesetLoader::Init()
         return false;
     }
 
-    orig_sharedMemPtr = (void*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    orig_sharedMemPtr = (SharedMemBase*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
     DEBUG_LOG("Shared memory address: %p\n", orig_sharedMemPtr);
     if (orig_sharedMemPtr == nullptr)
     {
@@ -98,6 +98,7 @@ bool MovesetLoader::Init()
         return false;
     }
     memset(orig_sharedMemPtr, 0, SHARED_MEMORY_BUFSIZE);
+    strcpy_s(orig_sharedMemPtr->moveset_loader_version, sizeof(orig_sharedMemPtr->moveset_loader_version), "test");
 
     PostInit();
     return true;

@@ -177,7 +177,7 @@ void Submenu_OnlinePlay::Render()
 			if (sharedMemoryLoaded)
 			{
 				// Purposefuly copy the whole list in case it gets cleared while we iterate on it
-				auto selectedMovesetList_copy = gameHelper->displayedMovesets;
+				std::vector<movesetInfo> selectedMovesetList_copy = gameHelper->displayedMovesets;
 				for (auto& moveset : gameHelper->displayedMovesets) {
 					ImGui::Text("%s %s", _("online.selected_moveset"), moveset.name.c_str());
 				}

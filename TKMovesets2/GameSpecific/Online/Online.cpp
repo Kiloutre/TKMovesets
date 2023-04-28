@@ -39,11 +39,12 @@ bool Online::LoadSharedMemory()
     if (m_memoryHandle == nullptr) {
         return false;
     }
-    m_orig_sharedMemPtr = (void*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
+    m_orig_sharedMemPtr = (SharedMemBase*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_MEMORY_BUFSIZE);
     if (m_orig_sharedMemPtr == nullptr) {
         DEBUG_LOG("Error mapping view of file for shared memory '%s'\n", sharedMemName);
         CloseHandle(m_memoryHandle);
         m_memoryHandle = nullptr;
+        return false;
     }
     DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%p\n", m_orig_sharedMemPtr);
     Init();
@@ -53,6 +54,14 @@ bool Online::LoadSharedMemory()
 bool Online::IsMemoryLoaded()
 {
     return m_memoryHandle != nullptr;
+}
+
+bool Online::VerifyDllVersionMismatch()
+{
+    if (m_orig_sharedMemPtr != nullptr) {
+        versionMismatch = strcmp(m_orig_sharedMemPtr->moveset_loader_version, PROGRAM_VERSION) != 0;
+    }
+    return versionMismatch;
 }
 
 bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)

@@ -9,6 +9,7 @@
 #include "BaseGameSpecificClass.hpp"
 
 #include "constants.h"
+#include "SharedMemory.h"
 
 #ifndef LAST_LOADED_DEFINED
 # define LAST_LOADED_DEFINED
@@ -28,7 +29,7 @@ protected:
 	// Stores a handle to the shared memory
 	HANDLE m_memoryHandle = nullptr;
 	// Ptr to the shared memory
-	void* m_orig_sharedMemPtr = nullptr;
+	SharedMemBase* m_orig_sharedMemPtr = nullptr;
 	// Thread that will run the DLL injection
 	std::thread* m_dllInjectionThread;
 	// True if dllInjection thread has been started at least once and must be joined
@@ -50,10 +51,14 @@ public:
 	// If the shared memory is to be reseted && the injected DLL freed when this instance gets deleted.
 	// If you have multiple instances of sharedMem, it might be good to only have one reset the shared memory & free the dll
 	bool resetMemOnDestroy = false;
+	// Becomes true if the injected DLL version does not match the current program's one
+	bool versionMismatch = false;
 
 	Online(GameProcess* process, GameData* game, const GameInfo* gameInfo);
 	virtual ~Online();
 
+	// Check if the DLL's version does not match the current one, sets .versionMismatch and returns its value
+	bool VerifyDllVersionMismatch();
 	// Load the shared memory handle
 	bool LoadSharedMemory();
 	// Returns true if the shared memory has been found and loaded

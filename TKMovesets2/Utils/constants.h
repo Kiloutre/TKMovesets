@@ -18,8 +18,9 @@
 # define INTERFACE_DATA_DIR      "TKMInterface"
 # define GAME_ADDRESSES_FILE     "game_addresses.ini"
 
+# define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define UPDATE_TMP_FILENAME     "TKMovesets2Updater"
-# define UPDATE_FINAL_FILENAME   "TKMovesets2.exe"
+# define UPDATE_MIN_FILESIZE     500000 // Update files smaller than this are most likely invalid (500KB)
 # define HTTP_REQUEST_TIMEOUT    10
 
 // Arbitrary max block size in case something bad happened during extraction and we get a very invalid block

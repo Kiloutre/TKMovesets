@@ -44,6 +44,8 @@ public:
 	bool lockedIn = false;
 	// If true, will synchronise the .lockedIn variable to the shared memory every RunningUpdate()
 	bool synchronizeLockin = true;
+	// Becomes true if the moveset loader DLL version injected in the game does not match the current program's version
+	bool versionMismatch = false;
 
 	// Default flags are read-only, so the importer needs this
 	GameSharedMem() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD; }

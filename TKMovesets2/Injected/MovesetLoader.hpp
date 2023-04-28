@@ -11,6 +11,7 @@
 #include "InjectionUtils.hpp"
 #include "GameAddressesWrapper.hpp"
 
+#include "SharedMemory.h"
 #include "constants.h"
 #include "GameTypes.h"
 
@@ -49,7 +50,7 @@ public:
 	// Store addresses, pointers path and such from the game_addresses.ini file (or from embedded data if not found, which currently is the case)
 	GameAddressesWrapper addresses;
 	// Ptr to the shared memory, not casted
-	void* orig_sharedMemPtr = nullptr;
+	SharedMemBase* orig_sharedMemPtr = nullptr;
 	// List of important variable addresses that we can cache early on in there
 	std::map<std::string, uint64_t> variables;
 	// If set to true, forces the Mainloop() to stop

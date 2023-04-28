@@ -34,10 +34,10 @@ select_game = Select a game
 
 process.status = Status:
 process.game_not_attached = Currently not trying to attach. Please select a game.
-process.game_attached = Game is running and attached.
 process.game_not_running = Game is not running or could not be found.
 process.game_version_mismatch = The current game version is not supported by game_address.txt.
 process.game_attach_err = Game found but could not attach. This may be caused by underprivileged rights.
+process.dll_version_mismatch = The DLL currently injected does not match the program version. Restart the game and this tool.
 
 # Moveset #
 moveset.origin = Origin
