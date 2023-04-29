@@ -52,7 +52,11 @@ MovesetLoader::~MovesetLoader()
     // Unhook any previously hooked function
     for (auto& [name, hook] : m_hooks)
     {
-        hook.detour->unHook();
+        DEBUG_LOG("Unhook %s\n", name.c_str());
+        if (hook.isHooked) {
+            hook.detour->unHook();
+            hook.isHooked = false;
+        }
         delete hook.detour;
     }
 
@@ -182,8 +186,26 @@ uint64_t MovesetLoader::GetFunctionAddr(const char* functionName)
 void MovesetLoader::HookFunction(const char* functionName)
 {
     auto hook = m_hooks.find(functionName);
-    if (hook != m_hooks.end()) {
+    if (hook != m_hooks.end() && !hook->second.isHooked) {
+        DEBUG_LOG("Hook %s\n", functionName);
         hook->second.detour->hook();
+        hook->second.isHooked = true;
+    }
+    else {
+        DEBUG_LOG("!! MovesetLoader::HookFunction() : Could not find %s !!\n", functionName);
+    }
+}
+
+void MovesetLoader::UnhookFunction(const char* functionName)
+{
+    auto hook = m_hooks.find(functionName);
+    if (hook != m_hooks.end() && hook->second.isHooked) {
+        DEBUG_LOG("Unhook %s\n", functionName);
+        hook->second.detour->hook();
+        hook->second.isHooked = false;
+    }
+    else {
+        DEBUG_LOG("!! MovesetLoader::UnhookFunction() : Could not find %s !!\n", functionName);
     }
 }
 
@@ -238,12 +260,15 @@ static bool Init()
 
 static void Run()
 {
-    DEBUG_LOG("Starting mainloop.\n");
-    g_loader->Mainloop();
-    DEBUG_LOG("Mainloop stopped. Unloading the DLL.\n");
-    // If mainloop is stopped then we have no reason to let the DLL stay loaded
-    delete g_loader;
-    FreeLibraryAndExitThread(hModule, 0);
+    if (g_loader != nullptr)
+    {
+        DEBUG_LOG("Starting mainloop.\n");
+        g_loader->Mainloop();
+        DEBUG_LOG("Mainloop stopped. Unloading the DLL.\n");
+        // If mainloop is stopped then we have no reason to let the DLL stay as loaded
+        delete g_loader;
+        FreeLibraryAndExitThread(hModule, 0);
+    }
 }
 
 

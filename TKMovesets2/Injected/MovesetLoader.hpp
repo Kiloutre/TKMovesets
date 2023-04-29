@@ -21,6 +21,7 @@ typedef unsigned char Byte;
 struct functionHook
 {
 	PLH::x64Detour* detour;
+	bool isHooked = false;
 	uint64_t trampoline;
 };
 
@@ -29,7 +30,7 @@ class MovesetLoader
 protected:
 	// Stores a handle to the shared memory
 	HANDLE m_memoryHandle = nullptr;
-	// List of hooked functions
+	// List of hooked functions. Do not use this directly, use CastTrampoline(), UnhookFunction(), HookFunction()
 	std::map<std::string, functionHook> m_hooks;
 	// Disassembler that must be passed to any hook creation
 	PLH::ZydisDisassembler m_disassembler = PLH::ZydisDisassembler(PLH::Mode::x64);
@@ -77,6 +78,8 @@ public:
 	void RegisterHook(const char* functionName, const std::string& moduleName, const char* c_addressId, uint64_t hookAddr);
 	// Hooks a function if it exists and was successfully registered before, does nothing otherwise
 	void HookFunction(const char* functionName);
+	// Unhooks a function if it exists and was successfully registered before, does nothing otherwise
+	void UnhookFunction(const char* functionName);
 	// Returns the casted address of a previously registered fnction
 	template<class T> T CastFunction(const char* functionName);
 	// Returns the value of a variable, reading sizeof(T)

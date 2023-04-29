@@ -48,6 +48,8 @@ static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 	return ptrPath;
 }
 
+// Calculate the strict minimum size to create a string containing every entry in the game addresses file
+// This takes only what is stricly necessary in order for parsing to still work afterward
 static int GetAddressMapStringSize(const std::map <std::string, GameAddresses_GameEntries>& entries)
 {
 	uint64_t compacted_addr_size = 0;
@@ -77,6 +79,7 @@ static int GetAddressMapStringSize(const std::map <std::string, GameAddresses_Ga
 	return (int)compacted_addr_size;
 }
 
+// Write a compacted from of each entry in the game addresses file into the given string
 static int WriteAddressMapToString(const std::map <std::string, GameAddresses_GameEntries>& entries, char* outBuf)
 {
 	int compacted_addr_size = GetAddressMapStringSize(entries);
@@ -86,6 +89,7 @@ static int WriteAddressMapToString(const std::map <std::string, GameAddresses_Ga
 	inBuf[0] = '\0';
 	inBuf[compacted_addr_size] = '\0';
 
+	// LOL
 	for (auto& [entryKey, entryValue] : entries)
 	{
 		std::string sPrefix = "str:" + entryKey + "_";
@@ -131,7 +135,6 @@ static int WriteAddressMapToString(const std::map <std::string, GameAddresses_Ga
 		}
 	}
 
-	;
 	int compressedSize = LZ4_compress_default(inBuf, outBuf, bufSize, (int)sizeof((s_GameAddressesSharedMem*)0)->compressedData);
 
 	delete[] inBuf;
@@ -169,7 +172,7 @@ GameAddressesFile::~GameAddressesFile()
 
 void GameAddressesFile::Reload()
 {
-	// Always attempt to prioritize file data, but in cases where it can't be found, load from embedded data instead
+	// Always attempt to prioritize file data, but in cases where it can't be found, load from embedded data instead as a fallback
 	if (Helpers::fileExists(GAME_ADDRESSES_FILE)) {
 		std::ifstream infile(GAME_ADDRESSES_FILE);
 		DEBUG_LOG("Found file '" GAME_ADDRESSES_FILE "'\n");
