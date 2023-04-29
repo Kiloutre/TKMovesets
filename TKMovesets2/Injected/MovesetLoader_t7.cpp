@@ -310,7 +310,7 @@ void MovesetLoaderT7::PostInit()
 
 	// Apply the hooks that need to be applied immediately
 	HookFunction("TK__ApplyNewMoveset");
-	HookFunction("TK__ExecuteExtraprop");
+	//HookFunction("TK__ExecuteExtraprop");
 
 	// Other
 	HookFunction("TK__Log");

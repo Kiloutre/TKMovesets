@@ -238,6 +238,7 @@ target_link_libraries(GameSpecific PRIVATE imgui::imgui) # Only used for the col
 find_package(lz4 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE lz4::lz4)
 target_link_libraries(FileEmbedder PRIVATE lz4::lz4)
+target_link_libraries(TKMovesetLoader PRIVATE lz4::lz4)
 
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)

@@ -22,6 +22,10 @@ Online::~Online()
     }
 #endif
 
+    if (m_orig_sharedMemPtr != nullptr) {
+        UnmapViewOfFile(m_orig_sharedMemPtr);
+    }
+
     if (m_memoryHandle != nullptr) {
         CloseHandle(m_memoryHandle);
     }

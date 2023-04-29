@@ -41,6 +41,10 @@ static std::string GetModuleFilenameStr()
 
 MovesetLoader::~MovesetLoader()
 {
+    if (orig_sharedMemPtr) {
+        UnmapViewOfFile(orig_sharedMemPtr);
+    }
+
     if (m_memoryHandle != nullptr) {
         CloseHandle(m_memoryHandle);
     }

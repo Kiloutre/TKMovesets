@@ -90,7 +90,7 @@ static void InitMainClasses(MainWindow& program)
 {
 	program.storage.ReloadMovesetList();
 
-	GameAddressesFile* addrFile = new GameAddressesFile();
+	GameAddressesFile* addrFile = new GameAddressesFile(true);
 	program.addrFile = addrFile;
 
 	program.extractor.Init(addrFile, &program.storage);
@@ -358,7 +358,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		// Todo: reflective DLL injection that will not need to create a file
 		if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
 		{
-			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'.");
+			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'\n");
 			char* buf = new char[TKMovesetLoader_orig_len];
 
 			int decompressed = LZ4_decompress_safe((char*)TKMovesetLoader, buf, (int)TKMovesetLoader_len, (int)TKMovesetLoader_orig_len);
@@ -370,10 +370,10 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 				}
 
 				file.write(buf, TKMovesetLoader_orig_len);
-				DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'.");
+				DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'\n");
 			}
 			else {
-				DEBUG_LOG("Failed to decompress '" MOVESET_LOADER_NAME "'.");
+				DEBUG_LOG("Failed to decompress '" MOVESET_LOADER_NAME "'\n");
 			}
 			delete[] buf;
 		}

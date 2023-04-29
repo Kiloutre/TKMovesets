@@ -4,8 +4,18 @@
 #include <vector>
 #include <fstream>
 #include <format>
+#include <windows.h>
 
+#include "constants.h"
 #include "GameTypes.h"
+
+// Structure used to pass addresses to injected DLL in case the embedded ones are obsolete
+struct s_GameAddressesSharedMem
+{
+	int compressedSize;
+	int originalSize;
+	char compressedData[SHARED_ADDR_MEMORY_BUFSIZE - sizeof(int) * 2];
+};
 
 class GameAddressNotFound : public std::exception {
 	std::string m_reason;
@@ -39,12 +49,21 @@ private:
 	std::map <std::string, GameAddresses_GameEntries> m_entries;
 	// List of keys in the address list file
 	std::vector<std::string> m_keys;
+	// Shared memory where we will load out
+	s_GameAddressesSharedMem* m_sharedMemory = nullptr;
+	// Handle to the shared memory
+	HANDLE m_memoryHandle = nullptr;
 
 	// Load the addresses from a stream
 	void LoadFromStream(std::istream& stream);
 public:
-	GameAddressesFile();
+	GameAddressesFile(bool createSharedMem=false);
+	~GameAddressesFile();
 
+	// Read addresses from shared memory, if it exists. Returns false on failure.
+	bool LoadFromSharedMemory();
+	// Load the currently loaded game addresses into a shared memory
+	void LoadToSharedMemory();
 	// Reload the game addresses file.
 	void Reload();
 	// Returns a list of every game_address.txt entry (key only).
