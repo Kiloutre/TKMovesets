@@ -211,7 +211,7 @@ void EditorLabel::DownloadFromWebsite()
 					if (std::regex_search(currentEntry, m, sizeExpr))
 					{
 						int size = atoi(m[1].str().c_str());
-						DEBUG_LOG("\- Current size: %d. Internet size: %d\n", (int)buffer.st_size, size);
+						DEBUG_LOG("\t- Current size: %d. Internet size: %d\n", (int)buffer.st_size, size);
 
 						if ((int)buffer.st_size != size) {
 							willDownload = true;
@@ -237,14 +237,16 @@ void EditorLabel::DownloadFromWebsite()
 						download_url = m[1].str();
 						if (!downloadFile(download_url.c_str(), fullFilename.c_str())) {
 							errored = true;
+						} else {
+							updated = true;
 						}
 					}
 					else {
-						DEBUG_LOG("Error: could not find download_url.\n");
+						DEBUG_LOG("\t- Error: could not find download_url.\n");
 					}
 				}
 				else {
-					DEBUG_LOG("\tNot downloading.\n");
+					DEBUG_LOG("\t- Not downloading.\n");
 				}
 
 				break;
@@ -256,7 +258,9 @@ void EditorLabel::DownloadFromWebsite()
 		fileList.erase(fileList.begin(), fileList.begin() + separatorPos + 2);
 	}
 
-	updated = true;
+	if (updated) {
+		Reload();
+	}
 	ongoingQuery = false;
 }
 

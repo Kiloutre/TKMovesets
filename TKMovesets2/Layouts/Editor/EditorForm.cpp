@@ -258,7 +258,7 @@ void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 {
 	if (reapplyWindowProperties) return;
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
-	m_windowTitle = std::format("{} {} - {}###{}", windowName, structureId, m_windowTitleBase.c_str(), windowName);
+	m_windowTitle = std::format("{} {} - {}###{}{}", windowName, structureId, m_windowTitleBase.c_str(), windowName, structureId);
 }
 
 // -- Public methods -- //

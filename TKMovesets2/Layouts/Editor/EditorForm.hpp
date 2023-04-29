@@ -88,14 +88,14 @@ public:
 	// If is true, changes were just applied. Read by EditorWindows to signal when to highlight the Save/Import button after modifications.
 	bool justAppliedChanges = false;
 	// If true, we must call SetNextWndowFocus() before creating our window
-	bool setFocus = false;
+	bool setFocus = true;
 	// Contains our ID or list starting ID for lists (they are contiguous)
 	uint32_t structureId = 0;
 	// Type of the widnow, passed to editor functions
 	EditorWindowType_ windowType = EditorWindowType_Invalid;
 	// The dock ID to set during the next render 
 	int nextDockId = -1;
-	// Stores the last viewport the windowwas rendered in. If isn't the main window's, this window won't be closed automatically.
+	// Stores the last viewport the window was rendered in. If isn't the main window's, this window won't be closed automatically.
 	ImGuiViewport* currentViewport = nullptr;
 	// Set to true in a derived constructor to prevent the creation of multiple windows of the derived class
 	bool uniqueType = false;

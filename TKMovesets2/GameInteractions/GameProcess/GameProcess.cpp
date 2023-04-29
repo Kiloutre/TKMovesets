@@ -522,7 +522,7 @@ bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
 			if (strncmp(nameAddr, "MovesetLoader", sizeof("MovesetLoader") - 1) == 0)
 			{
 				exportedFunctions[nameAddr] = dllGame + addrList[i];
-				printf("EXPORTED FUNC [%s], OFFSET [%x], ABSOLUTE ADDR [%llx]\n", nameAddr, addrList[i], dllGame + addrList[i]);
+				DEBUG_LOG("EXPORTED FUNC [%s], OFFSET [%x], ABSOLUTE ADDR [%llx]\n", nameAddr, addrList[i], dllGame + addrList[i]);
 			}
 		}
 	}
