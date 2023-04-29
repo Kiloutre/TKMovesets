@@ -204,6 +204,12 @@ edition.camera_data = Camera data
 edition.mvl_playable = Movelist: Playable
 edition.mvl_inputs = Movelist: Inputs
 
+edition.update_labels = Update labels
+edition.updating_labels = Labels: Updating...
+edition.updating_labels_err = Labels: ERROR
+edition.up_to_date_labels = Labels: Up to date
+edition.updated_labels = Labels: Updated!
+
 edition.open_movelist = Open movelist
 
 edition.move.window_name = Move

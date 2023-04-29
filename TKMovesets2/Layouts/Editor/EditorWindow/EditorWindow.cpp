@@ -313,7 +313,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId);
 
 		m_editor = Games::FactoryGetEditor(gameInfo, m_importerHelper.process, m_importerHelper.game);
-		labels = new EditorLabel(gameInfo);
+		labels = new EditorLabel(gameInfo, addrFile);
 	}
 
 	Byte* moveset;
@@ -367,7 +367,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 	// Attempt to attach to game associated to moveset
 	auto processList = GameProcessUtils::GetRunningProcessList();
-	for (int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
+	for (unsigned int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
 	{
 		auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 		const char* processName = gameInfo->processName;

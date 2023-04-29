@@ -56,7 +56,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 			std::string crc32Str;
 			{
 				char buffer[9];
-				sprintf(buffer, "%08X", movesetInfos.crc32);
+				sprintf_s(buffer, 9, "%08X", movesetInfos.crc32);
 				crc32Str = buffer;
 			}
 
@@ -193,7 +193,7 @@ bool LocalStorage::DeleteMoveset(const wchar_t* filename)
 	try {
 		std::filesystem::remove(filename);
 	}
-	catch (std::filesystem::filesystem_error const& ex) {
+	catch (std::filesystem::filesystem_error const&) {
 		DEBUG_LOG("!! DELETION OF MOVESET '%S' FAILED !!\n", filename);
 		return false;
 	}

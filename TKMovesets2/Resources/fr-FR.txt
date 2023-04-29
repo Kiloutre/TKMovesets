@@ -204,6 +204,12 @@ edition.camera_data = Donnée de caméra
 edition.mvl_playable = Liste de coups: Jouable
 edition.mvl_inputs = Liste de coups: Commandes
 
+edition.update_labels = Mettre à jour les propriétés
+edition.updating_labels = Propriétés: MÀJ...
+edition.updating_labels_err = Propriétés: ERREUR
+edition.up_to_date_labels = Propriétés: À jour
+edition.updated_labels = Propriétés: Mis à jour !
+
 edition.open_movelist = Liste des coups
 
 edition.move.window_name = Move

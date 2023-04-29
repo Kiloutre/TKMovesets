@@ -448,7 +448,7 @@ bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
 			{
 				if (nameRef->u1.AddressOfData & IMAGE_ORDINAL_FLAG) {
 					*(FARPROC*)lpThunk = GetProcAddress(libModule, MAKEINTRESOURCEA(nameRef->u1.AddressOfData));
-					DEBUG_LOG("Import: addr [%x] = %p\n", nameRef->u1.AddressOfData, *(FARPROC*)lpThunk);
+					DEBUG_LOG("Import: addr [%llx] = %p\n", nameRef->u1.AddressOfData, *(FARPROC*)lpThunk);
 				}
 				else {
 					PIMAGE_IMPORT_BY_NAME thunkData = (PIMAGE_IMPORT_BY_NAME)(dllCopy + nameRef->u1.AddressOfData);
@@ -465,7 +465,7 @@ bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
 	// Relocate
 	uint64_t deltaImageBase = dllGame - ntHeaders->OptionalHeader.ImageBase;
 	auto& relocDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
-	DEBUG_LOG("Delta is %d (%x)\n", deltaImageBase, deltaImageBase);
+	DEBUG_LOG("Delta is %lld (%llx)\n", deltaImageBase, deltaImageBase);
 
 	typedef struct BASE_RELOCATION_BLOCK {
 		DWORD PageAddress;
@@ -516,7 +516,7 @@ bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
 
 		DWORD* nameList = (DWORD*)(dllCopy + exp->AddressOfNames);
 		DWORD* addrList = (DWORD*)(dllCopy + exp->AddressOfFunctions);
-		for (int i = 0; i < exp->NumberOfNames; ++i)
+		for (unsigned int i = 0; i < exp->NumberOfNames; ++i)
 		{
 			char* nameAddr = (char*)(dllCopy + nameList[i]);
 			if (strncmp(nameAddr, "MovesetLoader", sizeof("MovesetLoader") - 1) == 0)
@@ -565,7 +565,7 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 
 	DEBUG_LOG("-- Injecting DLL %S --\n", fullpath);
 	// Allocate space for dll path in process memory
-	int fullpathSize = (wcslen(fullpath) + 1) * (int)sizeof(WCHAR);
+	int fullpathSize = ((int)wcslen(fullpath) + 1) * (int)sizeof(WCHAR);
 	gameAddr bufferAddr = allocateMem(fullpathSize);
 
 	if (bufferAddr == 0) {

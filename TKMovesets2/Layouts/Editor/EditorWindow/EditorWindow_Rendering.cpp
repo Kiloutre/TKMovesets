@@ -164,6 +164,32 @@ void EditorWindow::RenderToolBar()
 		OpenFormWindow(EditorWindowType_MovelistDisplayable, 0);
 	}
 
+	ImGui::Separator();
+
+
+	{
+		const char* updateLabelText;
+		if (labels->errored) {
+			updateLabelText = "edition.updating_labels_err";
+		}
+		else if (labels->ongoingQuery) {
+			updateLabelText = "edition.updating_labels";
+		}
+		else if (labels->updated) {
+			updateLabelText = "edition.updated_labels";
+		}
+		else if (labels->startedThread) {
+			updateLabelText = "edition.up_to_date_labels";
+		}
+		else {
+			updateLabelText = "edition.update_labels";
+		}
+
+		if (ImGui::MenuItem(_(updateLabelText), nullptr, false, !labels->ongoingQuery)) {
+			labels->UpdateFromWebsite();
+		}
+	}
+
 	ImGui::EndMenuBar();
 }
 

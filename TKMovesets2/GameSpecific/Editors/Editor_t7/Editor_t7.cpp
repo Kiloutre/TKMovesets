@@ -625,7 +625,7 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 	std::string outputFolder;
 
 	outputFolder = std::format(EDITOR_LIB_DIRECTORY "/{}", characterFilename.c_str());
-	CreateDirectory(EDITOR_LIB_DIRECTORY, nullptr);
+	CreateDirectoryA(EDITOR_LIB_DIRECTORY, nullptr);
 	CreateDirectory(outputFolder.c_str(), nullptr);
 
 	TKMovesetHeader* header = (TKMovesetHeader*)moveset;

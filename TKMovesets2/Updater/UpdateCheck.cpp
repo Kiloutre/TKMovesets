@@ -28,7 +28,6 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 	// Have to set up user agent or github will deny the request
 	std::string releasesContent;
 	{
-		const std::string userAgent = "curl/7.83.1";
 		std::list<std::string> headers;
 		headers.push_back("Host: api.github.com");
 		headers.push_back("Accept: */*");
@@ -93,12 +92,12 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 		changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
 
-		auto start = 0;
-		auto end = changelog.find(delim);
+		size_t start = 0;
+		size_t end = changelog.find(delim);
 		while (end != std::string::npos)
 		{
 			changelogLines.push_back(changelog.substr(start, end - start));
-			start = end + delim.length();
+			start = end + delim.size();
 			end = changelog.find(delim, start);
 		}
 		changelogLines.push_back(changelog.substr(start, end));
@@ -126,7 +125,6 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 		// Finally download the file
 		{
 			bool validFile = true;
-			const std::string userAgent = "curl/7.83.1";
 			std::list<std::string> headers;
 			headers.push_back("Host: github.com");
 			headers.push_back("Accept: */*");
@@ -150,7 +148,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 				// First validation step is filesize
 				size_t fileSize = ofs.tellp();
 				if (fileSize < UPDATE_MIN_FILESIZE) {
-					DEBUG_LOG("File size too small (%d)\n", fileSize);
+					DEBUG_LOG("File size too small (%llu)\n", fileSize);
 					validFile = false;
 				}
 			}
