@@ -212,8 +212,16 @@ namespace ExtractorUtils
 			int realAnimOffset = sourceIsBigEndian ? BYTESWAP_INT32(animOffset) : animOffset;
 
 			SWAP_INT(motaAddr + listOffset);
-			ByteswapAnimation(motaAddr + realAnimOffset);
+
+			// Make sure the animation matches the MOTA's endian
+			Byte animType = *(motaAddr + realAnimOffset);
+			if ((animType == 0 && sourceIsBigEndian) || (animType != 0 && targetIsBigEndian)) {
+				ByteswapAnimation(motaAddr + realAnimOffset);
+			}
 		}
+
+		Byte* mota0x11 = motaAddr + 0x11;
+		*mota0x11 = *mota0x11 == 0;
 	}
 
 	void Byteswap64Animation(Byte* animAddr)

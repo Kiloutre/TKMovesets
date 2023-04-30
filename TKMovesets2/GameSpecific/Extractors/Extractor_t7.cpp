@@ -236,9 +236,11 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 			{
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
 				m_process->readBytes(motaAddr[i], (char*)motaPtr, motaSize);
+
 				if (motaPtr->is_big_endian) {
 					ExtractorUtils::ByteswapMota((Byte*)motaPtr);
 				}
+
 				exportedMotas.insert(motaAddr[i]);
 			}
 			motaAddr[i] = motaOffset;

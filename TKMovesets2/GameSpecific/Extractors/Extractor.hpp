@@ -65,7 +65,7 @@ namespace ExtractorUtils
 	uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
 	// Compress a moveset. Returns false on failure. Modifies header->moveset_data_size automatically.
 	bool CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
-	// Byteswaps a MOTA block and its animations (little endian <-> big endian)
+	// Byteswaps a MOTA block and its animations (little endian <-> big endian). Animations will be made to match the MOTA's endian.
 	void ByteswapMota(Byte* motaAddr); 
 	// Byteswaps an animation (little endian <-> big endian)
 	void ByteswapAnimation(Byte* animAddr);
