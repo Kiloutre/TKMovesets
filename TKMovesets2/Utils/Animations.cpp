@@ -310,8 +310,9 @@ namespace TAnimUtils
 
 			file.read(buf, 8);
 			if (file.gcount() == 8) {
-				Byte animType = buf[0];
-				Byte boneCount = buf[2];
+				Byte isBigEndian = buf[0] == 0;
+				Byte animType = isBigEndian ? buf[1] : buf[0];
+				Byte boneCount = isBigEndian ? buf[3] : buf[2];
 
 				switch (animType)
 				{
@@ -321,12 +322,19 @@ namespace TAnimUtils
 						file.read(buf, 2);
 						if (file.gcount() == 2) {
 							duration = *(uint16_t*)buf;
+							if (isBigEndian) {
+								duration = BYTESWAP_INT16(duration);
+							}
 						}
 
 					}
 					break;
 				case 0xC8:
-					duration = *(uint16_t*)&buf[4];
+					
+					duration = DEREF_INT32(buf + 4);
+					if (isBigEndian) {
+						duration = BYTESWAP_INT32(duration);
+					}
 					break;
 				}
 			}

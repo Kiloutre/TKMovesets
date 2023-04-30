@@ -796,10 +796,10 @@ void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
 		m_process->writeInt32(projectile + offsetof(Projectile, gravity), value_s32);
 	}
 	else if (name == "hit_level") {
-		m_process->writeInt32(projectile + offsetof(Projectile, hit_level), (uint32_t)strtoll(field->buffer, nullptr, 16));
+		m_process->writeInt32(projectile + offsetof(Projectile, hit_level), value_s32);
 	}
 	else if (name == "voiceclip_on_hit") {
-		m_process->writeInt32(projectile + offsetof(Projectile, voiceclip_on_hit), (uint32_t)strtoll(field->buffer, nullptr, 16));
+		m_process->writeInt32(projectile + offsetof(Projectile, voiceclip_on_hit), value_s32);
 	}
 
 	else if (name == "reactions_addr") {

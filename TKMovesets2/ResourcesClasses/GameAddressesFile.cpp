@@ -396,7 +396,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 			shortKey = key.substr(end + start + 1);
 		}
 
-		// Insert value into the appropriate map
+		// Insert value into the appropriate map, auto detect base (int / hex)
 		if (Helpers::startsWith<std::string>(key, "val:")) {
 			entries[gameKey].values[shortKey] = strtoll(value.c_str(), nullptr, 0);
 
