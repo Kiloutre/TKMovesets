@@ -44,6 +44,7 @@ namespace TAnimUtils
 				}
 			}
 
+			// This is the true byte used to determine if the animation is byteswaped or not
 			Byte* mota0x11 = motaAddr + 0x11;
 			*mota0x11 = *mota0x11 == 0;
 		}

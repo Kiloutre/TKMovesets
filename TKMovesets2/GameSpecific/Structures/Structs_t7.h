@@ -341,13 +341,21 @@ namespace StructsT7
 	struct MotaHeader
 	{
 		char mota_string[4];
-		bool is_little_endian;
-		bool is_big_endian;
+		bool _is_little_endian; // The first 2 bytes after the string are always 0x0001 or 0x0100
+		bool _is_big_endian; // So they can be used to determine endian but they shouldn't, they might be used for different purposes somewhere
 		uint16_t unk0x6;
 		uint32_t unk0x8;
 		uint32_t anim_count;
-		char gap0x10[4];
+		char unk0x10;
+		bool is_little_endian; // When the game checks for Mota endian, it checks this byte specifically and not the one above
+		char unk0x13;
+		char unk0x14;
 		unsigned int anim_offset_list[1];
+
+		bool IsBigEndian()
+		{
+			return !is_little_endian;
+		}
 	};
 
 	struct MotaList
