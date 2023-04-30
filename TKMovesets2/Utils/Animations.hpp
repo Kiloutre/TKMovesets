@@ -5,7 +5,6 @@
 #include "GameTypes.h"
 namespace TAnimUtils
 {
-	/*
 	namespace FromMemory
 	{
 		// Byteswaps a MOTA block and its animations (little endian <-> big endian). Animations will be made to match the MOTA's endian.
@@ -25,7 +24,6 @@ namespace TAnimUtils
 		// Returns the size in bytes of a 0x64 animation (big endian anim)
 		uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
 	};
-	*/
 
 	namespace FromFile
 	{

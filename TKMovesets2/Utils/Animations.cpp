@@ -9,7 +9,6 @@ using namespace ByteswapHelpers;
 
 namespace TAnimUtils
 {
-	/*
 	namespace FromMemory
 	{
 		void ByteswapMota(Byte* motaAddr)
@@ -216,7 +215,7 @@ namespace TAnimUtils
 			return isSwapped ? get64AnimSize_BigEndian(process, anim) : get64AnimSize_LittleEndian(process, anim);
 		}
 
-		uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
+		uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim)
 		{
 			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
 
@@ -257,7 +256,7 @@ namespace TAnimUtils
 			return (uint64_t)animPtr_2 - (uint64_t)anim;
 		}
 
-		uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim)
+		uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
 		{
 			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
 
@@ -295,7 +294,6 @@ namespace TAnimUtils
 		}
 
 	};
-	*/
 
 	namespace FromFile
 	{
@@ -317,9 +315,6 @@ namespace TAnimUtils
 
 				switch (animType)
 				{
-				case 0xC8:
-					duration = *(uint16_t*)&buf[4];
-					break;
 				case 0x64:
 					file.seekg(4 + (int)boneCount * 2, std::ios::beg);
 					if (!file.fail() && !file.bad()) {
@@ -329,6 +324,9 @@ namespace TAnimUtils
 						}
 
 					}
+					break;
+				case 0xC8:
+					duration = *(uint16_t*)&buf[4];
 					break;
 				}
 			}
