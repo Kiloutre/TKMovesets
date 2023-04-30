@@ -101,33 +101,30 @@ void Submenu_PersistentPlay::RenderGameControls()
 	auto currentGame = gameHelper->currentGame;
 	bool canChangeGame = m_currentPlayerCursor == -1 && !gameHelper->lockedIn;
 
-	if (!canChangeGame) {
-		ImGui::BeginDisabled();
-	}
 
-	ImGui::PushItemWidth(160);
-	ImGui::PushID(&gameHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-	if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
-	{
-		auto gameListCount = Games::GetGamesCount();
+    {
+        ImGuiExtra::DisableBlockIf __(!canChangeGame);
+
+        ImGui::PushItemWidth(160);
+        ImGui::PushID(&gameHelper); // Have to push an ID here because extraction.select_game would cause a conflict
+        if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
+        {
+            auto gameListCount = Games::GetGamesCount();
 
 
-		for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
-		{
-			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
-			if (gameInfo->onlineHandler != nullptr) {
-				if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(140.0f, 0)) && canChangeGame) {
-					gameHelper->SetTargetProcess(gameInfo);
-				}
-			}
-		}
-		ImGui::EndCombo();
-	}
-	ImGui::PopID();
-
-	if (!canChangeGame) {
-		ImGui::EndDisabled();
-	}
+            for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
+            {
+                auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+                if (gameInfo->onlineHandler != nullptr) {
+                    if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(140.0f, 0)) && canChangeGame) {
+                        gameHelper->SetTargetProcess(gameInfo);
+                    }
+                }
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::PopID();
+    }
 
 
 	// Store whether or not the shared memory was loaded both in the remote and current process

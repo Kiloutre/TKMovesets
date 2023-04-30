@@ -234,7 +234,11 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 			auto& [motaOffset, motaSize] = offsetMap[motaAddr[i]];
 			if (!exportedMotas.contains(motaAddr[i]))
 			{
-				m_process->readBytes(motaAddr[i], customBlock + motaOffset, motaSize);
+				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
+				m_process->readBytes(motaAddr[i], (char*)motaPtr, motaSize);
+				if (motaPtr->is_big_endian) {
+					ExtractorUtils::ByteswapMota((Byte*)motaPtr);
+				}
 				exportedMotas.insert(motaAddr[i]);
 			}
 			motaAddr[i] = motaOffset;
@@ -364,11 +368,9 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 
 	// Prefix we apply to recognize movesets we extracted
 	const char* namePrefix = MOVESET_EXTRACTED_NAME_PREFIX;
-	const size_t toCopy = strlen(namePrefix);
-	const size_t charactersToReplace = 1;
+	size_t toCopy = strlen(namePrefix);
+	size_t charactersToReplace = 1; // Replace the first [
 
-	// There is some stuff before the² move names i want to get (character name, date string and stuff)
-	// So i hardcode the offset 0x2E8 because i know it
 	nameBlockStart = movesetAddr + 0x2E8 - (toCopy - charactersToReplace);
 	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
 	memcpy(nameBlock, namePrefix, toCopy);

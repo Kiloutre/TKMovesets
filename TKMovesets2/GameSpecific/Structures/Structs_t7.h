@@ -343,8 +343,8 @@ namespace StructsT7
 		char mota_string[4];
 		bool is_little_endian;
 		bool is_big_endian;
-		uint16_t unk0xA;
-		uint32_t unk0xC;
+		uint16_t unk0x6;
+		uint32_t unk0x8;
 		uint32_t anim_count;
 		char gap0x10[4];
 		unsigned int anim_offset_list[1];

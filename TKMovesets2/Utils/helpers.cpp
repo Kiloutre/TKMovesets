@@ -10,6 +10,25 @@
 #include "constants.h"
 #include "GameTypes.h"
 
+// -- -- //
+
+
+namespace ByteswapHelpers
+{
+	void SWAP_SHORT(void* x)
+	{
+		auto val = DEREF_INT16(x);
+		DEREF_INT16(x) = BYTESWAP_INT16(val);
+	}
+
+	void SWAP_INT(void* x)
+	{
+		auto val = DEREF_INT32(x);
+		DEREF_INT32(x) = BYTESWAP_INT32(val);
+	}
+}
+
+
 namespace Helpers
 {
 	std::string to_utf8(const std::wstring& ws)

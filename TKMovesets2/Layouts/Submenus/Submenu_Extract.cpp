@@ -68,30 +68,26 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 		auto currentGame = extractorHelper.currentGame;
 
-		if (busy) {
-			ImGui::BeginDisabled();
-		}
+        {
+            ImGuiExtra::DisableBlockIf __(busy);
 
-		ImGui::PushItemWidth(160);
-		ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-		uint8_t gameListCount = Games::GetGamesCount();
-		if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
-		{
-			for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
-			{
-				auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
-				if (gameInfo->extractor != nullptr) {
-					if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(140.0f, 0))) {
-						extractorHelper.SetTargetProcess(gameInfo);
-					}
-				}
-			}
-			ImGui::EndCombo();
-		}
-		ImGui::PopID();
-
-		if (busy) {
-			ImGui::EndDisabled();
+            ImGui::PushItemWidth(160);
+            ImGui::PushID(&extractorHelper); // Have to push an ID here because extraction.select_game would cause a conflict
+            uint8_t gameListCount = Games::GetGamesCount();
+            if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
+            {
+                for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
+                {
+                    auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+                    if (gameInfo->extractor != nullptr) {
+                        if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(140.0f, 0))) {
+                            extractorHelper.SetTargetProcess(gameInfo);
+                        }
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::PopID();
 		}
 
 		// Extraction settings

@@ -38,7 +38,7 @@ const GameInfo cg_gamesInfo[] = {
 		.extractor = nullptr,
 		.importer = nullptr,
 		.editor = nullptr,
-		.onlineHandler = nullptr
+		.onlineHandler = nullptr,
 	},
 	{
 		.name = "Tekken Tag 2",
@@ -54,7 +54,7 @@ const GameInfo cg_gamesInfo[] = {
 		.extractor = nullptr,
 		.importer = nullptr,
 		.editor = nullptr,
-		.onlineHandler = nullptr
+		.onlineHandler = nullptr,
 	},
 };
 

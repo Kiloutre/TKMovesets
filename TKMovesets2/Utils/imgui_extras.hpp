@@ -10,6 +10,29 @@ ImVec2 operator*(const ImVec2& c_self, float value);
 
 namespace ImGuiExtra
 {
+	// Class that can be created in a block, will disable everything inside of that block
+	class DisableBlockIf
+	{
+	private:
+		bool m_disabled;
+
+	public:
+		DisableBlockIf(bool t_disabled)
+		{
+			m_disabled = t_disabled;
+			if (m_disabled) {
+				ImGui::BeginDisabled();
+			}
+		}
+
+		~DisableBlockIf()
+		{
+			if (m_disabled) {
+				ImGui::EndDisabled();
+			}
+		}
+	};
+
 	// Displays a hoverable text that displays a tootip
 	void HelpMarker(const char* desc, bool greyed=true);
 

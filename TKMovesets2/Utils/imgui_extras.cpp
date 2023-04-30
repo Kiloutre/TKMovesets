@@ -16,6 +16,7 @@ ImVec2 operator*(const ImVec2& c_self, float value)
 
 namespace ImGuiExtra
 {
+
 	void HelpMarker(const char* desc, bool greyed)
 	{
 		if (greyed) {

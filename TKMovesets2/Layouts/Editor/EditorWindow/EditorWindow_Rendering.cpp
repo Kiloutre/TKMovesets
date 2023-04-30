@@ -218,36 +218,33 @@ void EditorWindow::RenderStatusBar()
 	ImGui::PushID(&m_importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
 	uint8_t gameListCount = Games::GetGamesCount();
 
-	if (busy) {
-		ImGui::BeginDisabled();
-	}
-
-	if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
 	{
-		for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
+		ImGuiExtra::DisableBlockIf __(busy);
+
+		if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
 		{
-			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
-			if (gameInfo->importer != nullptr) {
-				if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
-					m_importerHelper.SetTargetProcess(gameInfo);
-					if (gameInfo->onlineHandler != nullptr) {
-						m_sharedMemHelper.SetTargetProcess(gameInfo);
+			for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
+			{
+				auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+
+				if (gameInfo->importer != nullptr) {
+					if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
+						m_importerHelper.SetTargetProcess(gameInfo);
+						if (gameInfo->onlineHandler != nullptr) {
+							m_sharedMemHelper.SetTargetProcess(gameInfo);
+						}
+						else {
+							m_sharedMemHelper.ResetTargetProcess();
+						}
+						m_loadedMoveset = 0;
+						m_importNeeded = true;
+						m_editor->live_loadedMoveset = 0;
 					}
-					else {
-						m_sharedMemHelper.ResetTargetProcess();
-					}
-					m_loadedMoveset = 0;
-					m_importNeeded = true;
-					m_editor->live_loadedMoveset = 0;
 				}
 			}
+			ImGui::EndCombo();
 		}
-		ImGui::EndCombo();
-	}
-	ImGui::PopID();
-
-	if (busy) {
-		ImGui::EndDisabled();
+		ImGui::PopID();
 	}
 
 	ImGui::SameLine();
@@ -308,17 +305,15 @@ void EditorWindow::RenderStatusBar()
 	if (m_liveEditable)
 	{
 		bool disabled = m_loadedMoveset == 0;
-		if (disabled) {
-			ImGui::BeginDisabled();
-		}
-		ImGui::SameLine();
-		if (ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition) && !disabled) {
-			m_editor->live_loadedMoveset = m_liveEdition ? m_loadedMoveset : 0;
-		}
-		ImGui::SameLine();
-		if (disabled) {
-			ImGui::EndDisabled();
-		}
+        {
+            ImGuiExtra::DisableBlockIf __(disabled);
+            
+            ImGui::SameLine();
+            if (ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition) && !disabled) {
+                m_editor->live_loadedMoveset = m_liveEdition ? m_loadedMoveset : 0;
+            }
+            ImGui::SameLine();
+        }
 		// Highlight only if live edition is enabled & live_moveset is zero
 		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"), m_liveEdition == false || m_editor->live_loadedMoveset != 0);
 	}

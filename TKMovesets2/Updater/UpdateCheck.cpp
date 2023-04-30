@@ -16,6 +16,7 @@
 
 // -- Private methods -- //
 
+
 bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only)
 {
 	std::string repoUrl = addresses->GetString("global", "repo_url");

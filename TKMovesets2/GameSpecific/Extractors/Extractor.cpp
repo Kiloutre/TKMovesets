@@ -11,6 +11,8 @@
 #include "MovesetStructs.h"
 #include "GameTypes.h"
 
+using namespace ByteswapHelpers;
+
 // -- Helpers -- //
 
 namespace ExtractorUtils
@@ -184,6 +186,168 @@ namespace ExtractorUtils
 		delete[] inbuf;
 		delete[] outbuf;
 		return compressed_size >= 0;
+	}
+
+	void ByteswapMota(Byte* motaAddr)
+	{
+		bool sourceIsBigEndian = motaAddr[5] == 1;
+		bool targetIsBigEndian = !sourceIsBigEndian;
+
+		uint32_t animCount = DEREF_UINT32(motaAddr + 0xC);
+		if (sourceIsBigEndian) {
+			animCount = BYTESWAP_INT32(animCount);
+		}
+
+		SWAP_SHORT(motaAddr + 4); // Swap is_little_endian & is_big_endian values
+		SWAP_SHORT(motaAddr + 6);
+
+		SWAP_INT(motaAddr + 8);
+		SWAP_INT(motaAddr + 0xC); // Swap anim count
+
+		for (unsigned int i = 0; i < animCount; ++i)
+		{
+			int listOffset = 0x14 + (i * sizeof(int));
+
+			uint32_t animOffset = DEREF_UINT32(motaAddr + listOffset);
+			int realAnimOffset = sourceIsBigEndian ? BYTESWAP_INT32(animOffset) : animOffset;
+
+			SWAP_INT(motaAddr + listOffset);
+			ByteswapAnimation(motaAddr + realAnimOffset);
+		}
+	}
+
+	void Byteswap64Animation(Byte* animAddr)
+	{
+		bool isBoneInt16[256]; // Stack indicating whether a specific bone is 3x short or 3x floats
+
+		bool sourceIsBigEndian = animAddr[0] == 0;
+		bool targetIsBigEndian = !sourceIsBigEndian;
+
+		// Get important informations
+		uint16_t boneCount = DEREF_UINT16(animAddr + 2);
+		if (sourceIsBigEndian) {
+			boneCount = BYTESWAP_INT16(boneCount);
+		}
+		uint16_t animLength = DEREF_UINT16(animAddr + 4 + boneCount * 2);
+		if (sourceIsBigEndian) {
+			animLength = BYTESWAP_INT16(animLength);
+		}
+
+		SWAP_SHORT(animAddr); // Byteswap anim type
+		SWAP_SHORT(animAddr + 2); // Byteswap bone count
+
+		// Swap bone descriptor list and fill isBoneInt16;
+		for (unsigned int i = 0; i < boneCount; ++i)
+		{
+			int descriptorOffset = 4 + (i * sizeof(uint16_t));
+			uint16_t descriptor = DEREF_UINT16(animAddr + descriptorOffset);
+			uint16_t realDescriptor = sourceIsBigEndian ? BYTESWAP_INT16(descriptor) : descriptor;
+
+			isBoneInt16[i] = realDescriptor - 4 < 4;
+
+			SWAP_SHORT(animAddr + descriptorOffset);
+		}
+
+
+		uint16_t offset = 4 + boneCount * sizeof(uint16_t);
+
+		uint16_t iterCount = DEREF_UINT16(animAddr + offset + 4);
+		if (sourceIsBigEndian) {
+			iterCount = BYTESWAP_INT16(iterCount);
+		}
+
+		SWAP_SHORT(animAddr + offset); // Swap anim length
+		//SWAP_SHORT(animAddr + boneCount + 2); // This one isn't actually done, not in my old working byteswap scripts and not in T7's code either.
+		SWAP_SHORT(animAddr + offset + 4); // Swap iter count
+
+		offset += 6;
+		for (int i = 0; i < iterCount; ++i) {
+			SWAP_INT(animAddr + offset);
+			offset += sizeof(int);
+		}
+
+		// Swap base position
+		for (unsigned int i = 0; i < boneCount; ++i)
+		{
+			if (isBoneInt16[i])
+			{
+				SWAP_SHORT(animAddr + offset);
+				SWAP_SHORT(animAddr + offset + 2);
+				SWAP_SHORT(animAddr + offset + 4);
+				offset += sizeof(int16_t) * 3;
+			}
+			else
+			{
+				SWAP_INT(animAddr + offset);
+				SWAP_INT(animAddr + offset + 4);
+				SWAP_INT(animAddr + offset + 8);
+				offset += sizeof(float) * 3;
+			}
+		}
+
+		// Byteswap keyframe informations
+		int keyframeCount = (animLength + 0xE) >> 4;
+		while (keyframeCount-- > 0)
+		{
+			SWAP_INT(animAddr + offset);
+			offset += 4;
+		}
+	}
+
+	void ByteswapC8Animation(Byte* animAddr)
+	{
+		bool sourceIsBigEndian = animAddr[0] == 0;
+		bool targetIsBigEndian = !sourceIsBigEndian;
+
+		uint16_t boneCount = DEREF_UINT16(animAddr + 2);
+		uint32_t animLength = DEREF_UINT32(animAddr + 4);
+		if (sourceIsBigEndian) {
+			boneCount = BYTESWAP_INT16(boneCount);
+			animLength = BYTESWAP_INT32(animLength);
+		}
+
+		SWAP_SHORT(animAddr + 0); // Swap anim type
+		SWAP_SHORT(animAddr + 2); // Swap bone count
+
+		SWAP_INT(animAddr + 4); // Swap anim length
+
+		// Swap bone descriptor list
+		for (unsigned int i = 0; i < boneCount; ++i)
+		{
+			int descriptorOffset = 8 + (i * sizeof(int));
+			SWAP_INT(animAddr + descriptorOffset);
+		}
+
+		// Swap every bone value (float)
+		int headerSize = 8 + boneCount * 4;
+		float* bonePtr = (float*)(animAddr + headerSize);
+
+		for (unsigned int frame = 0; frame < animLength; ++frame)
+		{
+			for (unsigned int i = 0; i < boneCount; ++i)
+			{
+				SWAP_INT(bonePtr);
+				++bonePtr;
+			}
+		}
+	}
+
+	void ByteswapAnimation(Byte* animAddr)
+	{
+		Byte animType = animAddr[0] == 0 ? animAddr[1] : animAddr[0];
+		switch (animType)
+		{
+		case 0x64:
+			Byteswap64Animation(animAddr);
+			break;
+		case 0xC8:
+			ByteswapC8Animation(animAddr);
+			break;
+		default:
+			DEBUG_LOG("!! ByteswapAnimation() ERROR: INVALID ANIMATION TYPE '%x' FOR ADDR '%p' !!\n", animType, animAddr);
+			throw;
+			break;
+		}
 	}
 };
 

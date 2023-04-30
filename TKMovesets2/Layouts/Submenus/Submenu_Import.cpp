@@ -42,9 +42,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		// Game list
 		auto currentGame = importerHelper.currentGame;
 
-		if (busy) {
-			ImGui::BeginDisabled();
-		}
+		ImGuiExtra::DisableBlockIf __(busy);
 
 		ImGui::PushItemWidth(160);
 		ImGui::PushID(&importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
@@ -63,10 +61,6 @@ void Submenu_Import::Render(GameImport& importerHelper)
 			ImGui::EndCombo();
 		}
 		ImGui::PopID();
-
-		if (busy) {
-			ImGui::EndDisabled();
-		}
 	}
 
 
