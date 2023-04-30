@@ -8,48 +8,11 @@
 #include "Localization.hpp"
 #include "Helpers.hpp"
 #include "imgui_extras.hpp"
+#include "Animations.hpp"
 
 #include "constants.h"
 
 // -- Static helpers -- //
-
-// Gets the animation duration in frame or -1 if the file is invalid (validation isn't extensive)
-static int GetAnimationDuration(const wchar_t* filename)
-{
-	std::ifstream file(filename, std::ios::binary);
-
-	if (file.fail()) {
-		return -1;
-	}
-
-	char* buf = new char[8];
-	int duration = -1;
-
-	file.read(buf, 8);
-	if (file.gcount() == 8) {
-		Byte animType = buf[0];
-		Byte boneCount = buf[2];
-
-		switch (animType)
-		{
-		case 0xC8:
-			duration = *(uint16_t*)&buf[4];
-			break;
-		case 0x64:
-			file.seekg(4 + (uint16_t)boneCount * 2, std::ios::beg);
-			if (!file.fail() && !file.bad()) {
-				file.read(buf, 2);
-				if (file.gcount() == 2) {
-					duration = *(uint16_t*)buf;
-				}
-
-			}
-			break;
-		}
-	}
-	delete[] buf;
-	return duration;
-}
 
 void EditorMove_Animations::ApplySearchFilter()
 {
@@ -140,7 +103,7 @@ void EditorMove_Animations::LoadAnimationList()
 			std::string lowercaseName = name;
 			std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);
 
-			int duration = GetAnimationDuration(filename.c_str());
+			int duration = TAnimUtils::FromFile::GetAnimationDuration(filename.c_str());
 
 			if (duration == -1) {
 				// Probably an invalid file. todo : show, but prevent import?

@@ -53,6 +53,7 @@ moveset.import = Importer
 moveset.edit = Modifier
 moveset.delete = Suppr.
 moveset.version = Version
+persistent.hash = Hachage
 
 ## Principal ##
 

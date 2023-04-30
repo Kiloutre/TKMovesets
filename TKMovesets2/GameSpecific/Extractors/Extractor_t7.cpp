@@ -9,6 +9,7 @@
 
 #include "helpers.hpp"
 #include "Extractor_t7.hpp"
+#include "Extractor_t7.hpp"
 
 using namespace StructsT7;
 
@@ -239,9 +240,10 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 
 				DEBUG_LOG("Mota %d: little endian %d\n", i, motaPtr->is_little_endian);
 				
-				if (motaPtr->is_big_endian) {
+				if (motaPtr->is_big_endian && motaPtr->anim_count != 0) {
 					// Like the game does when they are big endianed, force every MOTA to be little endianed
 					// This helps provide a more deterministic extraction
+					// Don't byteswap if anim count is zero to imitate the game's behaviour.
 					ExtractorUtils::ByteswapMota((Byte*)motaPtr);
 				}
 

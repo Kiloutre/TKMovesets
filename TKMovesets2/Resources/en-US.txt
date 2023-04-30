@@ -53,6 +53,7 @@ moveset.import = Import
 moveset.edit = Edit
 moveset.delete = Delete
 moveset.version = Version
+moveset.hash = Hash
 
 ## Main ##
 

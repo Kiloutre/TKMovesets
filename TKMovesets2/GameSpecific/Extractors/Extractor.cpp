@@ -227,7 +227,7 @@ namespace ExtractorUtils
 
 	void Byteswap64Animation(Byte* animAddr)
 	{
-		bool isBoneInt16[256]; // Stack indicating whether a specific bone is 3x short or 3x floats
+		bool isBoneFloat[256]; // Stack indicating whether a specific bone is 3x short or 3x floats
 
 		bool sourceIsBigEndian = animAddr[0] == 0;
 		bool targetIsBigEndian = !sourceIsBigEndian;
@@ -253,14 +253,15 @@ namespace ExtractorUtils
 			if (sourceIsBigEndian) {
 				descriptor = BYTESWAP_INT16(descriptor);
 			}
-
-			isBoneInt16[i] = descriptor - 4 < 4;
+			
+			// The overflow here is purposeful (casting the result of the substraction to unsigned)
+			// This makes bone descriptor 0x3 a float, and anything over 0x7 (so 0xB) also a float
+			isBoneFloat[i] = (uint16_t)(descriptor - 4) > 3;
 
 			SWAP_SHORT(animAddr + descriptorOffset);
 		}
 
-
-		uint16_t offset = 4 + boneCount * sizeof(uint16_t);
+		uint32_t offset = 4 + boneCount * sizeof(uint16_t);
 
 		uint16_t iterCount = DEREF_UINT16(animAddr + offset + 4);
 		if (sourceIsBigEndian) {
@@ -280,29 +281,30 @@ namespace ExtractorUtils
 		// Swap base position
 		for (unsigned int i = 0; i < boneCount; ++i)
 		{
-			if (isBoneInt16[i])
-			{
-				SWAP_SHORT(animAddr + offset);
-				SWAP_SHORT(animAddr + offset + 2);
-				SWAP_SHORT(animAddr + offset + 4);
-				offset += sizeof(int16_t) * 3;
-			}
-			else
+			if (isBoneFloat[i])
 			{
 				SWAP_INT(animAddr + offset);
 				SWAP_INT(animAddr + offset + 4);
 				SWAP_INT(animAddr + offset + 8);
 				offset += sizeof(float) * 3;
 			}
+			else
+			{
+				SWAP_SHORT(animAddr + offset);
+				SWAP_SHORT(animAddr + offset + 2);
+				SWAP_SHORT(animAddr + offset + 4);
+				offset += sizeof(int16_t) * 3;
+			}
 		}
 
 		// Byteswap keyframe informations
-		int keyframeCount = (animLength + 0xE) >> 4;
-		while (keyframeCount-- > 0)
+		int keyframeCount = (animLength + 14) >> 4;
+
+		do
 		{
 			SWAP_INT(animAddr + offset);
 			offset += 4;
-		}
+		} while (--keyframeCount);
 	}
 
 	void ByteswapC8Animation(Byte* animAddr)
@@ -341,7 +343,6 @@ namespace ExtractorUtils
 				SWAP_INT(bonePtr + 1);
 				SWAP_INT(bonePtr + 2);
 				bonePtr += 3;
-				headerSize += sizeof(float);
 			}
 		}
 	}

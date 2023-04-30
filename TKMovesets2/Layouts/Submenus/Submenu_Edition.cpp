@@ -12,7 +12,7 @@
 
 void DuplicateMoveset(std::wstring filename)
 {
-	size_t extPos = filename.find_last_of(L".");;
+	size_t extPos = filename.find_last_of(L".");
 	std::wstring name = filename.substr(0, extPos);
 	std::wstring extension = filename.substr(extPos);
 

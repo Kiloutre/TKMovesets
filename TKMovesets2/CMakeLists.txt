@@ -114,6 +114,7 @@ set(BINARY_SOURCES
                     "Layouts/Editor/TStructures/Subwindows/EditorMove_Animations.cpp"
 
                     # Helpers and such
+                    "Utils/Animations.cpp"
                     "Utils/helpers.cpp"
                     "Utils/imgui_extras.cpp"
                     "Utils/ThreadedClass.cpp"
