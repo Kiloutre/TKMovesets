@@ -941,7 +941,7 @@ InputMap EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("move_name", 0, 0, nameBlock + move->name_addr);
 	CREATE_FIELD("anim_name", 0, EditorInput_ClickableAlways, nameBlock + move->anim_name_addr);
-	CREATE_FIELD("vulnerability", 0, EditorInput_U32, move->vuln);
+	CREATE_FIELD("vulnerability", 0, EditorInput_U32_Changeable, move->vuln);
 	CREATE_FIELD("hitlevel", 0, EditorInput_H32, move->hitlevel);
 	CREATE_FIELD("transition", 0, EditorInput_U16 | EditorInput_Clickable, move->transition);
 	CREATE_FIELD("moveId_val1", 0, EditorInput_U16, move->moveId_val1);

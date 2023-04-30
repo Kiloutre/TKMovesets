@@ -83,7 +83,7 @@ navmenu.update_bad_file = La mise à jour n'a pas pu s'effectuer automatiquement
 ## Sous-menus ##
 
 # Extraction #
-extraction.explanation = Les personnages doivent d'abord se faire extraire du jeu pour être utilisés. N'extrait que les animations/mouvements : pas les modèles, effets visuels, audio, etc.\nL'extraction est faite depuis la mémoire avec le jeu lancé, en ayant les personnages chargés et visibles à l'écran (le mode de jeu n'importe pas).
+extraction.explanation = Les personnages doivent d'abord se faire extraire du jeu pour être utilisés. N'extrait que les animations/mouvements : pas les modèles, effets visuels, audio, etc.\nL'extraction est faite depuis la mémoire avec le jeu lancé, en ayant les personnages chargés et visibles à l'écran (le mode de jeu n'importe pas).\nIdéalement, les personnages devraient rester immobile pendant l'extraction (ou jeu en pause).
 extraction.extraction = Extraction
 extraction.extract = Extraire
 extraction.extract_all = Extraire (tout)

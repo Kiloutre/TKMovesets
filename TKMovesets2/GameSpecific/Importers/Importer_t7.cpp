@@ -308,6 +308,7 @@ void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAdd
 
 ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
+	DEBUG_LOG("_Import()\n");
 	// Basic load is tied to online importing where we might want to import the moveset but not populate empty MOTA and apply character-specific fixes just yet
 	const bool BASIC_LOAD = (settings & ImportSettings_BasicLoadOnly) != 0;
 	bool isCompressed = false;
@@ -344,6 +345,8 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 		}
 		isCompressed = true;
 	}
+
+	DEBUG_LOG("\- moveset_data_start = %x\n", header->moveset_data_start);
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()

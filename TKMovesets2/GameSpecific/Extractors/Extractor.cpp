@@ -206,16 +206,17 @@ namespace ExtractorUtils
 
 		for (unsigned int i = 0; i < animCount; ++i)
 		{
-			int listOffset = 0x14 + (i * sizeof(int));
-
+			uint32_t listOffset = 0x14 + (i * sizeof(int));
 			uint32_t animOffset = DEREF_UINT32(motaAddr + listOffset);
-			int realAnimOffset = sourceIsBigEndian ? BYTESWAP_INT32(animOffset) : animOffset;
 
 			SWAP_INT(motaAddr + listOffset);
 
 			// Make sure the animation matches the MOTA's endian
-			Byte animType = *(motaAddr + realAnimOffset);
-			if ((animType == 0 && sourceIsBigEndian) || (animType != 0 && targetIsBigEndian)) {
+			uint32_t realAnimOffset = sourceIsBigEndian ? BYTESWAP_INT32(animOffset) : animOffset;
+
+			bool animIsLittleEndian = *(motaAddr + realAnimOffset) != 0;
+			bool animIsBigEndian = !animIsLittleEndian;
+			if ((animIsBigEndian && sourceIsBigEndian) || (animIsLittleEndian && targetIsBigEndian)) {
 				ByteswapAnimation(motaAddr + realAnimOffset);
 			}
 		}
@@ -249,9 +250,11 @@ namespace ExtractorUtils
 		{
 			int descriptorOffset = 4 + (i * sizeof(uint16_t));
 			uint16_t descriptor = DEREF_UINT16(animAddr + descriptorOffset);
-			uint16_t realDescriptor = sourceIsBigEndian ? BYTESWAP_INT16(descriptor) : descriptor;
+			if (sourceIsBigEndian) {
+				descriptor = BYTESWAP_INT16(descriptor);
+			}
 
-			isBoneInt16[i] = realDescriptor - 4 < 4;
+			isBoneInt16[i] = descriptor - 4 < 4;
 
 			SWAP_SHORT(animAddr + descriptorOffset);
 		}
@@ -327,7 +330,7 @@ namespace ExtractorUtils
 		}
 
 		// Swap every bone value (float)
-		int headerSize = 8 + boneCount * 4;
+		unsigned int headerSize = 8 + boneCount * sizeof(int);
 		float* bonePtr = (float*)(animAddr + headerSize);
 
 		for (unsigned int frame = 0; frame < animLength; ++frame)
@@ -335,7 +338,10 @@ namespace ExtractorUtils
 			for (unsigned int i = 0; i < boneCount; ++i)
 			{
 				SWAP_INT(bonePtr);
-				++bonePtr;
+				SWAP_INT(bonePtr + 1);
+				SWAP_INT(bonePtr + 2);
+				bonePtr += 3;
+				headerSize += sizeof(float);
 			}
 		}
 	}
