@@ -238,7 +238,7 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
 				m_process->readBytes(motaAddr[i], (char*)motaPtr, motaSize);
 
-				DEBUG_LOG("Mota %d: little endian %d\n", i, motaPtr->is_little_endian);
+				DEBUG_LOG("Mota %llu: little endian %d\n", i, motaPtr->is_little_endian);
 				
 				if (motaPtr->IsBigEndian()) {
 					// Like the game does when they are big endianed, force every MOTA to be little endianed

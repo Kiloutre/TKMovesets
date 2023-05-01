@@ -346,7 +346,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 		isCompressed = true;
 	}
 
-	DEBUG_LOG("\- moveset_data_start = %x\n", header->moveset_data_start);
+	DEBUG_LOG("\t- moveset_data_start = %x\n", header->moveset_data_start);
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
