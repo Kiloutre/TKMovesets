@@ -371,7 +371,7 @@ void EditorWindow::RenderMovelist()
 			}
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem(_("edition.moves_ThrowCameras"))) {
+		if (ImGui::BeginTabItem(_("edition.moves_throws"))) {
 			if (m_movelistFilter != EditorMovelistFilter_ThrowCameras) {
 				FilterMovelist(EditorMovelistFilter_ThrowCameras);
 			}

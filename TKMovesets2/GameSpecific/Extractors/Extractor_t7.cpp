@@ -154,7 +154,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		}
 
 		uint32_t animCount = header.anim_count;
-		if (header.is_big_endian) {
+		if (header.IsBigEndian()) {
 			animCount = BYTESWAP_INT32(animCount);
 		}
 
@@ -178,7 +178,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
 		{
 			uint32_t animOffset = animOffsetList[animIdx];
-			if (header.is_big_endian) {
+			if (header.IsBigEndian()) {
 				animOffset = BYTESWAP_INT32(animOffset);
 			}
 			if (animOffset > lastAnimOffset) {
