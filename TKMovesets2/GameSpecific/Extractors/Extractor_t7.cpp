@@ -390,7 +390,8 @@ Byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, Mota
 	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
-
+#pragma warning(push)
+#pragma warning(disable:6385)
 Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings)
 {
 	// Default size if we don't actually extract this block
@@ -453,6 +454,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 			}
 		}
 
+		// Convert relative input sequence offsets to absolute IDs
 		{
 			MvlPlayable* playable = (MvlPlayable*)((uint64_t)mvlBlock + head.playables_offset);
 			uint32_t input_sequence_start = head.inputs_offset;
@@ -460,7 +462,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 			{
 				uint32_t playable_addr = head.playables_offset + (int32_t)(sizeof(MvlPlayable) * i);
 				uint32_t input_sequence_addr = playable_addr + playable->input_sequence_offset;
-				uint32_t input_sequence_id = (input_sequence_addr - input_sequence_start) / sizeof(MvlInput);
+				uint32_t input_sequence_id = ((uint64_t)input_sequence_addr - input_sequence_start) / sizeof(MvlInput);
 				playable->input_sequence_offset = input_sequence_id;
 				++playable;
 			}
@@ -472,6 +474,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 		return (Byte*)calloc(1, size_out);
 	}
 }
+#pragma warning(pop)
 
 void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
 {

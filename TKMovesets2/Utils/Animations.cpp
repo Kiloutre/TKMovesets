@@ -52,7 +52,7 @@ namespace TAnimUtils
 
 		void Byteswap64Animation(Byte* animAddr)
 		{
-			bool isBoneFloat[256]; // Stack indicating whether a specific bone is 3x short or 3x floats
+			bool isBoneInt32[256]; // Stack indicating whether a specific bone is 3x short or 3x floats
 
 			bool sourceIsBigEndian = animAddr[0] == 0;
 			bool targetIsBigEndian = !sourceIsBigEndian;
@@ -81,7 +81,7 @@ namespace TAnimUtils
 
 				// The overflow here is purposeful (casting the result of the substraction to unsigned)
 				// This makes bone descriptor 0x3 a float, and anything over 0x7 (so 0xB) also a float
-				isBoneFloat[i] = (uint16_t)(descriptor - 4) > 3;
+				isBoneInt32[i] = 4 <= descriptor && descriptor <= 7;
 
 				SWAP_SHORT(animAddr + descriptorOffset);
 			}
@@ -106,25 +106,24 @@ namespace TAnimUtils
 			// Swap base position
 			for (unsigned int i = 0; i < boneCount; ++i)
 			{
-				if (isBoneFloat[i])
-				{
-					SWAP_INT(animAddr + offset);
-					SWAP_INT(animAddr + offset + 4);
-					SWAP_INT(animAddr + offset + 8);
-					offset += sizeof(float) * 3;
-				}
-				else
+				if (isBoneInt32[i])
 				{
 					SWAP_SHORT(animAddr + offset);
 					SWAP_SHORT(animAddr + offset + 2);
 					SWAP_SHORT(animAddr + offset + 4);
 					offset += sizeof(int16_t) * 3;
 				}
+				else
+				{
+					SWAP_INT(animAddr + offset);
+					SWAP_INT(animAddr + offset + 4);
+					SWAP_INT(animAddr + offset + 8);
+					offset += sizeof(float) * 3;
+				}
 			}
 
 			// Byteswap keyframe informations
 			int keyframeCount = (animLength + 14) >> 4;
-
 			do
 			{
 				SWAP_INT(animAddr + offset);
@@ -318,7 +317,7 @@ namespace TAnimUtils
 				switch (animType)
 				{
 				case 0x64:
-					file.seekg(4 + (int)boneCount * 2, std::ios::beg);
+					file.seekg((uint64_t)(4 + boneCount * 2), std::ios::beg);
 					if (!file.fail() && !file.bad()) {
 						file.read(buf, 2);
 						if (file.gcount() == 2) {
