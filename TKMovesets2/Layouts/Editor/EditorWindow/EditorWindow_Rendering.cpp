@@ -1,8 +1,5 @@
 #include <ImGui.h>
 
-#include <algorithm>
-#include <format>
-
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"

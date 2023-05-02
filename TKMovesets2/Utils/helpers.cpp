@@ -1,9 +1,8 @@
-#include <map>
-#include <time.h>
-#include <cctype>
 #include <fstream>
+#include <time.h>
 #include <chrono>
 #include <codecvt>
+#include <cctype>
 
 #include "helpers.hpp"
 
@@ -233,23 +232,6 @@ namespace Helpers
 		{
 			uint64_t* structMember = (uint64_t*)listCursor;
 			*structMember -= to_substract;
-			listCursor += struct_size;
-		}
-	}
-
-	void convertPtrsToOffsets(void* listAddr, const std::map<gameAddr, uint64_t>& m, uint64_t struct_size, uint64_t amount)
-	{
-		uint64_t listCursor = (uint64_t)listAddr;
-		while (amount-- > 0)
-		{
-			uint64_t* structMember = (gameAddr*)listCursor;
-			gameAddr addr = (gameAddr)*structMember;
-			if (m.find(addr) != m.end()) {
-				*structMember = m.at(addr);
-			}
-			else {
-				*structMember -= (uint64_t)-1;
-			}
 			listCursor += struct_size;
 		}
 	}

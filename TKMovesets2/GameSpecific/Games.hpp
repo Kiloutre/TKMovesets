@@ -1,8 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-#include <set>
-
 #include "GameData.hpp"
 #include "GameProcess.hpp"
 #include "Importer.hpp"

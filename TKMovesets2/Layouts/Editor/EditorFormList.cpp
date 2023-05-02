@@ -6,24 +6,6 @@
 #include "EditorFormList.hpp"
 #include "Localization.hpp"
 
-// -- Static helpers -- //
-static int GetColumnCount()
-{
-	float windowWidth = ImGui::GetWindowWidth();
-
-	if (windowWidth > 1200) {
-		return 8;
-	}
-	if (windowWidth > 460) {
-		return 4;
-	}
-	if (windowWidth > 230) {
-		return 2;
-	}
-
-	return 1;
-}
-
 // -- Private methods -- //
 
 void EditorFormList::Apply()

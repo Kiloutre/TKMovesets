@@ -2,7 +2,6 @@
 
 #include <map>
 #include <set>
-#include <string>
 
 #include "Editor.hpp"
 #include "EditorWindowBase.hpp"

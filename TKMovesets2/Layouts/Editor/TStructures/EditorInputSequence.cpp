@@ -1,7 +1,3 @@
-#include <ImGui.h>
-#include <format>
-#include <string>
-
 #include "imgui_extras.hpp"
 #include "EditorInputSequence.hpp"
 #include "Localization.hpp"

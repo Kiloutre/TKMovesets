@@ -1,8 +1,6 @@
 #include <ImGui.h>
-#include <algorithm>
 #include <filesystem>
 #include <fstream>
-#include <windows.h>
 
 #include "EditorMove_Animations.hpp"
 #include "Localization.hpp"

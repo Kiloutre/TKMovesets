@@ -1,6 +1,5 @@
 #include <ImGui.h>
 
-#include <algorithm>
 #include <format>
 #include <filesystem>
 

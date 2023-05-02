@@ -6,8 +6,6 @@
 #include <regex>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
-#include <regex>
 
 #include "NavigationMenu.hpp"
 #include "helpers.hpp"

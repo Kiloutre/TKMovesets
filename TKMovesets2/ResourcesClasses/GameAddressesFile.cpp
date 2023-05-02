@@ -1,8 +1,4 @@
-#include <fstream>
 #include <sstream>
-#include <map>
-#include <string>
-#include <vector>
 #include <lz4.h>
 
 #include "GameAddressesFile.hpp"

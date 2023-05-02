@@ -1,5 +1,4 @@
 #include <ImGui.h>
-#include <format>
 
 #include "Submenu_Import.hpp"
 #include "Localization.hpp"

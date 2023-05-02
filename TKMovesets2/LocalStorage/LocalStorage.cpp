@@ -1,9 +1,6 @@
-#include <chrono>
-#include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <sys/stat.h>
-#include <windows.h>
 
 #include "LocalStorage.hpp"
 #include "Localization.hpp"
