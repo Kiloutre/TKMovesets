@@ -1,8 +1,5 @@
 #pragma once
 
-# include <cstdint>
-# include <windef.h>
-
 struct SharedMemBase
 {
 	// Only load custom movesets if locked in

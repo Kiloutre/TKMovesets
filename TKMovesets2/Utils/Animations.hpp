@@ -3,6 +3,7 @@
 #include "GameProcess.hpp"
 
 #include "GameTypes.h"
+
 namespace TAnimUtils
 {
 	namespace FromMemory

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 #include "Extractor.hpp"
 #include "GameInteraction.hpp"
 

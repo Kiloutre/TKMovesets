@@ -15,9 +15,6 @@
 #include "constants.h"
 #include "GameTypes.h"
 
-
-typedef unsigned char Byte;
-
 struct functionHook
 {
 	PLH::x64Detour* detour;

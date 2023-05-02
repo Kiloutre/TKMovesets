@@ -1,9 +1,3 @@
-#include <set>
-#include <thread>
-#include <format>
-#include <iostream>
-#include <filesystem>
-
 #include "GameExtract.hpp"
 #include "Games.hpp"
 #include "Extractor.hpp"

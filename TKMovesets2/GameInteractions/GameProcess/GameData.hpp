@@ -1,12 +1,7 @@
 #pragma once
 
-#include <map>
-#include <string>
-
 #include "GameProcess.hpp"
 #include "GameAddressesWrapper.hpp"
-
-#include "GameTypes.h"
 
 
 // Class that allows you to read from the game using only the address identifier from game_address.txt
