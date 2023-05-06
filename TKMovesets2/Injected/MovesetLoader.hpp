@@ -10,6 +10,7 @@
 
 #include "InjectionUtils.hpp"
 #include "GameAddressesWrapper.hpp"
+#include "steamHelper.hpp"
 
 #include "SharedMemory.h"
 #include "constants.h"
@@ -104,6 +105,9 @@ public:
 	void SetMainModule(const char* name);
 	// Can be called by outside processes to execute an extraproperty within the game
 	virtual void ExecuteExtraprop() = 0;
+
+	// Debug function meant to be called at anytime from other processes, used for dev only
+	virtual void Debug() {};
 };
 
 template<class T> T MovesetLoader::CastTrampoline(const char* hookName)

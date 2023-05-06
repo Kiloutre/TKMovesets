@@ -1,7 +1,7 @@
 {
 
-  "name": "tekkentools",
-  "version": "0.3",
+  "name": "tkmovesets2",
+  "version": "0.6",
   "dependencies": [
     {
       "name": "imgui",

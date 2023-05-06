@@ -53,6 +53,7 @@ set(INCLUDE_FOLDERS
                     "Injected/SharedMemory"
 
                     "${CMAKE_SOURCE_DIR}/Sig/include"
+                    "${CMAKE_SOURCE_DIR}/steamapi sdk/public/steam"
 )
 
 # This will be included in the .exe
@@ -158,6 +159,7 @@ set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
     "Injected/MovesetLoader_t7.cpp"
     "Injected/InjectionUtils.cpp"
+    "Injected/steamHelper.cpp"
 
     "ResourcesClasses/GameAddressesFile.cpp"
     "ResourcesClasses/GameAddressesWrapper.cpp"
@@ -193,7 +195,7 @@ add_custom_command(OUTPUT ${MOVESET_LOADER_EMBEDDED}
 
 # Build lib containing per-game Import/Export movesets functions
 add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES})
-target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS})
+target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS} )
 target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)

@@ -27,4 +27,6 @@ public:
 	void PostInit() override;
 	void Mainloop() override;
 	void ExecuteExtraprop() override;
+
+	void Debug() override;
 };

@@ -73,4 +73,7 @@ public:
 	virtual void ClearMovesetSelection(unsigned int playerid) = 0;
 	// Enable or disable custom moveset loading for the game
 	virtual void SetLockIn(bool locked) = 0;
+
+	// Call MovesetLoaderDebug() in the remote process's injected DLL
+	void CallDebugFunction();
 };

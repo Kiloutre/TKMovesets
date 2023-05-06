@@ -17,6 +17,7 @@ to_ignore
 vcpkg_installed
 enc_temp_folder
 *.psd
+steamapi sdk
 
 ##### Windows
 # Windows thumbnail cache files

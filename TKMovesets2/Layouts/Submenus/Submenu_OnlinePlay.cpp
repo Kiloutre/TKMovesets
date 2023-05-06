@@ -5,25 +5,37 @@
 #include "imgui_extras.hpp"
 #include "Games.hpp"
 
+#include "steam_api.h"
+
 void Submenu_OnlinePlay::SelectMoveset(movesetInfo* moveset)
 {
-	unsigned int playerId = 0;
-	gameHelper->QueueCharacterImportation(moveset, playerId, ImportSettings_BasicLoadOnly);
+	gameHelper->QueueCharacterImportation(moveset, m_currentPlayerCursor, ImportSettings_BasicLoadOnly);
+	m_currentPlayerCursor = -1;
+}
+
+void Submenu_OnlinePlay::ClearMoveset()
+{
+	// Pass a moveset of size 0 to indicate the GameSharedMem class that we want to clear and not import a moveset
+	movesetInfo emptyMoveset{ .size = 0 };
+
+	gameHelper->QueueCharacterImportation(&emptyMoveset, m_currentPlayerCursor, ImportSettings_BasicLoadOnly);
+	m_currentPlayerCursor = -1;
 }
 
 void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 {
 	auto availableSpace = ImGui::GetContentRegionAvail();
-	ImVec2& tableSize = availableSpace;
+	availableSpace.y -= ImGui::GetFrameHeightWithSpacing();
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
-	if (ImGui::BeginTable("MovesetImportationList", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
-		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, tableSize))
+	if (ImGui::BeginTable("MovesetImportationList", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, availableSpace))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.hash"));
 		ImGui::TableSetupColumn(_("moveset.import"));
 		ImGui::TableHeadersRow();
 
@@ -46,7 +58,7 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 
-			bool isImportable = moveset->onlineImportable;
+			bool isImportable = moveset->onlineImportable; // todo: think about how different games will be handled
 			if (!isImportable)
 			{
 				// Draw BG
@@ -68,10 +80,12 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TextUnformatted(moveset->sizeStr.c_str());
 
 			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(moveset->crc32Str.c_str());
+
+			ImGui::TableNextColumn();
 			ImGui::PushID(moveset->filename.c_str());
 
-			bool canImportSpecificMoveset = canSelectMoveset && isImportable && gameHelper->currentGame->SupportsGameImport(moveset->gameId);
-			if (ImGuiExtra::RenderButtonEnabled(_("online.select_moveset"), canImportSpecificMoveset)) {
+			if (ImGuiExtra::RenderButtonEnabled(_("online.select_moveset"), canSelectMoveset && isImportable)) {
 				SelectMoveset(moveset);
 			}
 			ImGui::PopID();
@@ -82,38 +96,46 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 	}
 }
 
-void Submenu_OnlinePlay::Render()
+void Submenu_OnlinePlay::RenderGameControls()
 {
-	ImGuiExtra::RenderTextbox(_("online.explanation"));
-	ImGui::SeparatorText(_("select_game"));
 
 	// Game list. Selecting a game will set the extraction thread to try to attach to it regularly
 	auto currentGame = gameHelper->currentGame;
+	bool canChangeGame = m_currentPlayerCursor == -1 && !gameHelper->lockedIn;
 
-	ImGui::PushItemWidth(160);
-	ImGui::PushID(&gameHelper); // Have to push an ID here because extraction.select_game would cause a conflict
-	auto gameListCount = Games::GetGamesCount();
-	if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
+
 	{
-		for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
+		ImGuiExtra::DisableBlockIf __(!canChangeGame);
+
+		ImGui::PushItemWidth(160);
+		ImGui::PushID(&gameHelper); // Have to push an ID here because extraction.select_game would cause a conflict
+		if (ImGui::BeginCombo("##", currentGame == nullptr ? _("select_game") : currentGame->name))
 		{
-			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
-			if (gameInfo->onlineHandler != nullptr) {
-				if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(140.0f, 0))) {
-					gameHelper->SetTargetProcess(gameInfo);
+			auto gameListCount = Games::GetGamesCount();
+
+
+			for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
+			{
+				auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+				if (gameInfo->onlineHandler != nullptr) {
+					if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(140.0f, 0)) && canChangeGame) {
+						gameHelper->SetTargetProcess(gameInfo);
+					}
 				}
 			}
+			ImGui::EndCombo();
 		}
-		ImGui::EndCombo();
+		ImGui::PopID();
 	}
-	ImGui::PopID();
+
 
 	// Store whether or not the shared memory was loaded both in the remote and current process
 	// If so, the link is established
 	bool isAttached = gameHelper->IsAttached();
+	bool isInjecting = gameHelper->isInjecting;
 	bool sharedMemoryLoaded = gameHelper->isMemoryLoaded;
 	bool isBusy = gameHelper->IsBusy();
-	bool isInjecting = gameHelper->isInjecting;
+	bool versionMatches = !gameHelper->versionMismatch;
 
 	if (!sharedMemoryLoaded && isAttached) {
 		ImGui::SameLine();
@@ -123,67 +145,142 @@ void Submenu_OnlinePlay::Render()
 		else {
 			if (ImGui::Button(_("online.inject_dll"))) {
 				gameHelper->InjectDll();
+				gameHelper->SetSharedMemDestroyBehaviour(true);
 			}
 		}
 		ImGuiExtra_TextboxWarning(_("online.dll_not_loaded"));
 	}
-
-	switch (gameHelper->process->status)
+	else
 	{
-	case GameProcessErrcode_PROC_NOT_ATTACHED:
-	case GameProcessErrcode_PROC_EXITED:
-	case GameProcessErrcode_PROC_ATTACHING:
-		ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
-		break;
-	case GameProcessErrcode_PROC_NOT_FOUND:
-		ImGuiExtra_TextboxWarning(_("process.game_not_running"));
-		break;
-	case GameProcessErrcode_PROC_VERSION_MISMATCH:
-		ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
-		break;
-	case GameProcessErrcode_PROC_ATTACH_ERR:
-		ImGuiExtra_TextboxError(_("process.game_attach_err"));
-		break;
+		// Import progress text.
+		if (0 < gameHelper->progress && gameHelper->progress < 100) {
+			ImGui::SameLine();
+			if (isBusy) {
+				ImGui::Text(_("importation.progress"), gameHelper->progress);
+			}
+			else {
+				ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), gameHelper->progress);
+			}
+		}
+		else if (isAttached && sharedMemoryLoaded && versionMatches) {
+			if (gameHelper->lockedIn) {
+				if (ImGui::Button(_("persistent.unlock"))) {
+					gameHelper->lockedIn = false;
+				}
+			}
+			else {
+				if (ImGuiExtra::RenderButtonEnabled(_("persistent.lock"), m_currentPlayerCursor == -1)) {
+					gameHelper->lockedIn = true;
+				}
+			}
+		}
 	}
+}
 
-	// Moveset list
+void Submenu_OnlinePlay::Render()
+{
+	ImGuiExtra::RenderTextbox(_("online.explanation"));
+	ImGui::SeparatorText(_("select_game"));
+
+	bool versionMatches = !gameHelper->versionMismatch;
+	bool sharedMemoryLoaded = gameHelper->isMemoryLoaded;
+	bool isBusy = gameHelper->IsBusy();
 
 	auto availableSpace = ImGui::GetContentRegionAvail();
-	ImVec2 tableSize = ImVec2(availableSpace.x, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
 
-	if (ImGui::BeginTable("MovesetOnlineSelect", 2, ImGuiTableFlags_NoHostExtendY, tableSize))
+	unsigned int columnCount = 2;
+#ifdef BUILD_TYPE_DEBUG
+	columnCount = 3;
+#endif
+
+	if (ImGui::BeginTable("OnlinePlayCharSelect", columnCount, ImGuiTableFlags_NoHostExtendY, ImVec2(0, 75)))
 	{
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		{
 
-			bool canSelectMoveset = sharedMemoryLoaded && !isBusy;
-			RenderMovesetList(canSelectMoveset);
+		{
+			RenderGameControls();
+
+			switch (gameHelper->process->status)
+			{
+			case GameProcessErrcode_PROC_ATTACHED:
+				if (!versionMatches) {
+					ImGuiExtra_TextboxWarning(_("process.dll_version_mismatch"));
+				}
+				break;
+			case GameProcessErrcode_PROC_NOT_ATTACHED:
+			case GameProcessErrcode_PROC_EXITED:
+			case GameProcessErrcode_PROC_ATTACHING:
+				ImGuiExtra_TextboxWarning(_("process.game_not_attached"));
+				break;
+			case GameProcessErrcode_PROC_NOT_FOUND:
+				ImGuiExtra_TextboxWarning(_("process.game_not_running"));
+				break;
+			case GameProcessErrcode_PROC_VERSION_MISMATCH:
+				ImGuiExtra_TextboxError(_("process.game_version_mismatch"));
+				break;
+			case GameProcessErrcode_PROC_ATTACH_ERR:
+				ImGuiExtra_TextboxError(_("process.game_attach_err"));
+				break;
+			}
 		}
 
+		// Player info
+		std::vector<movesetInfo> selectedMovesetList_copy = gameHelper->displayedMovesets;
+		auto rowWidth = availableSpace.x / 3;
+		bool movesetListNotEmpty = gameHelper->storage->extractedMovesets.size();
+		const unsigned int playerid = 0;
+
+		auto p = ImGui::GetCursorPos();
 		ImGui::TableNextColumn();
 		{
-			// Progress text.
-			if (0 < gameHelper->progress && gameHelper->progress < 100) {
-				if (isBusy) {
-					ImGui::Text(_("importation.progress"), gameHelper->progress);
-				}
-				else {
-					ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("importation.progress_error"), gameHelper->progress);
-				}
+			std::string characterName = _("persistent.none");
+			std::string crc32;
+
+			if (selectedMovesetList_copy.size() > playerid && selectedMovesetList_copy[playerid].size != 0) {
+				characterName = selectedMovesetList_copy[playerid].name;
+				crc32 = selectedMovesetList_copy[playerid].crc32Str;
 			}
 
-			// Show selected moveset info
-			if (sharedMemoryLoaded)
-			{
-				// Purposefuly copy the whole list in case it gets cleared while we iterate on it
-				std::vector<movesetInfo> selectedMovesetList_copy = gameHelper->displayedMovesets;
-				for (auto& moveset : gameHelper->displayedMovesets) {
-					ImGui::Text("%s %s", _("online.selected_moveset"), moveset.name.c_str());
+			ImGui::TextUnformatted(_("persistent.player_1"));
+			ImGui::SameLine();
+			ImGui::TextUnformatted(characterName.c_str());
+
+			ImGui::TextUnformatted(_("persistent.hash"));
+			ImGui::SameLine();
+			ImGui::TextUnformatted(crc32.c_str());
+
+			// Select button becomes clear button if in moveset select mode (either you clear or you pick a moveset)
+			bool canClick = sharedMemoryLoaded && movesetListNotEmpty && !gameHelper->lockedIn;
+
+			// Since both players can have buttons of the same name shown at the same time, have to push an ID for the imgui stack to differentiate both
+			ImGui::PushID(playerid);
+			if (m_currentPlayerCursor == -1 || !sharedMemoryLoaded) {
+				if (ImGuiExtra::RenderButtonEnabled(_("persistent.select_moveset"), versionMatches && canClick && m_currentPlayerCursor == -1)) {
+					m_currentPlayerCursor = playerid;
+					DEBUG_LOG("m_currentPlayerCursor = %d\n", playerid);
+					// Moveset select mode
 				}
 			}
+			else {
+				if (ImGuiExtra::RenderButtonEnabled(_("persistent.clear_moveset"), versionMatches && canClick && m_currentPlayerCursor == playerid)) {
+					ClearMoveset();
+				}
+			}
+			ImGui::PopID();
 		}
+#ifdef BUILD_TYPE_DEBUG
+		ImGui::TableNextColumn();
+
+		if (ImGui::Button("MovesetLoaderDebug()")) {
+			gameHelper->CallDebugFunction();
+		}
+#endif
 
 		ImGui::EndTable();
 	}
+
+	// Moveset list
+	bool canSelectMoveset = sharedMemoryLoaded && !isBusy && m_currentPlayerCursor != -1;
+	RenderMovesetList(versionMatches && canSelectMoveset);
 }

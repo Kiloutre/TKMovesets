@@ -736,6 +736,7 @@ bool ExtractorT7::CanExtract()
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 

@@ -16,7 +16,7 @@ const NavMenuBtn cg_moveset_btns[] = {
 
 const NavMenuBtn cg_play_btns[] = {
 	{NAV__MENU_PERSISTENT_PLAY, "navmenu.persistent_play"},
-	//{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
+	{NAV__MENU_ONLINE_PLAY, "navmenu.online"},
 };
 
 const NavMenuBtn cg_tools_btns[] = {

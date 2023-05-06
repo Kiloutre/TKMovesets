@@ -65,6 +65,9 @@ bool MovesetLoader::Init()
     SetAddressesGameKey();
     addresses.addrFile = new GameAddressesFile;
 
+    // Init steam api functions (if the game does not have this module, this does not matter)
+    SteamHelper::Init(GetModuleHandleA("steam_api64.dll"));
+
     // Initialize the list of hooks and error out if a required one is not found
     {
         InitHooks();
@@ -295,6 +298,11 @@ extern "C"
             g_loader->mustStop = true;
         }
         DEBUG_LOG("MovesetLoaderStop() -> return\n");
+    }
+
+    void __declspec(dllexport) MovesetLoaderDebug()
+    {
+        g_loader->Debug();
     }
 
     void __declspec(dllexport) ExecuteExtraprop()

@@ -246,9 +246,6 @@ void CleanupUpdateFiles(const std::string& filename);
 # define MAIN_NAME WinMain
 #endif
 
-#include "Extractor.hpp"
-
-
 int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 

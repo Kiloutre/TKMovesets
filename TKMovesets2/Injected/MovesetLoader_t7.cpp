@@ -3,6 +3,8 @@
 #include "MovesetLoader_t7.hpp"
 #include "Helpers.hpp"
 
+#include "steam_api.h"
+
 using namespace StructsT7;
 
 // Reference to the MovesetLoader
@@ -29,7 +31,7 @@ static uint64_t* GetPlayerList()
 	uint64_t baseFuncAddr = g_loader->GetFunctionAddr("TK__GetPlayerFromID");
 
 	// Base ourselves on the instructions (lea rcx, ...) to find the address since values are relative form the function start
-	uint64_t offset = (uint64_t)*(uint32_t*)(baseFuncAddr + 11);
+	uint32_t offset = *(uint32_t*)(baseFuncAddr + 11);
 	uint64_t offsetBase = baseFuncAddr + 15;
 
 	return (uint64_t*)(offsetBase + offset);
@@ -69,7 +71,7 @@ static void ApplyStaticMotas(void* player, MovesetInfo* newMoveset)
 
 // -- Other helpers -- //
 
-static void InitializeMoveset(SharedMemT7_Player& player)
+static void InitializeCustomMoveset(SharedMemT7_Player& player)
 {
 	MovesetInfo* moveset = (MovesetInfo*)player.custom_moveset_addr;
 
@@ -88,6 +90,21 @@ static void InitializeMoveset(SharedMemT7_Player& player)
 	player.is_initialized = true;
 }
 
+static unsigned int GetLobbySelfMemberId()
+{
+	CSteamID lobbyID = CSteamID(g_loader->ReadVariable<uint64_t>("gTK_roomId_addr"));
+	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
+
+	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
+	{
+		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
+		if (memberId == mySteamID) {
+			return i;
+		}
+	}
+	return 0;
+}
 
 // -- Hook functions --
 
@@ -123,7 +140,7 @@ namespace T7Hooks
 		DEBUG_LOG("Custom moveset %p\n", customMoveset);
 
 		if (!playerData.is_initialized) {
-			InitializeMoveset(playerData);
+			InitializeCustomMoveset(playerData);
 		}
 
 		// Copy missing MOTA offsets from newMoveset
@@ -231,21 +248,6 @@ void ExecuteInstantExtraprop(int playerid, uint32_t propId, uint32_t propValue)
 	__ida_int128 a11 = { 0 };
 	uint64_t a12 = { 0 };
 
-	// Trail vfx
-	/*
-	SET_INT128(a3, 0, 0x4000000000000000);
-	a4 = 0;
-	a5 = 0;
-	a6 = 0;
-	SET_INT128(a7, 0, 0x4000000000000000);
-	SET_INT128(a8, 0, 0x4000000000000000);
-	SET_INT128(a9, 1, 0x4000000000000000);
-	SET_INT128(a10, 1, 0x4000000000000000);
-	SET_INT128(a11, 0, 0x4000000000000000);
-	a12 = 0;
-	*/
-
-	// Projectile
 	SET_INT128(a3, 0, 0x4000000000000000);
 	a4 = 0;
 	a5 = 0;
@@ -285,6 +287,8 @@ void MovesetLoaderT7::InitHooks()
 	// Other less important things
 	RegisterFunction("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop");
 
+	variables["gTK_roomId_addr"] = addresses.ReadPtrPathInCurrProcess("steamLobbyId_addr", moduleAddr);
+
 	{
 #ifdef BUILD_TYPE_DEBUG
 		// Also hook extraprop to debug print it
@@ -300,7 +304,6 @@ void MovesetLoaderT7::InitHooks()
 #endif
 	}
 }
-
 void MovesetLoaderT7::PostInit()
 {
 	sharedMemPtr = (SharedMemT7*)orig_sharedMemPtr;
@@ -316,25 +319,40 @@ void MovesetLoaderT7::PostInit()
 	HookFunction("TK__Log");
 }
 
+// -- Debug -- //
+
+void MovesetLoaderT7::Debug()
+{
+#ifdef BUILD_TYPE_DEBUG
+	CSteamID lobbyID = CSteamID(ReadVariable<uint64_t>("gTK_roomId_addr"));
+	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
+
+	if (lobbyID == k_steamIDNil) {
+		printf("Invalid lobby ID\n");
+	}
+	
+	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+	printf("Lobby member count = %u\n", lobbyMemberCount);
+	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
+	{
+		printf("4\n");
+		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
+		printf("5\n");
+		const char* name = SteamHelper::SteamFriends()->GetFriendPersonaName(memberId);
+		printf("6\n");
+		printf("%u. [%s] - self = %d\n", i, name, memberId == mySteamID);
+	}
+#endif
+}
+
 // -- Main -- //
 
 void MovesetLoaderT7::Mainloop()
 {
-	//auto& players = sharedMemPtr->players;
 	while (!mustStop)
 	{
 
-		/*
-		for (unsigned int i = 0; i < 2; ++i)
-		{
-			auto& player = players[i];
-			// Detect movesets that have been loaded and initialize them as they aren't ready for import yet
-			if (!player.is_initialized && player.custom_moveset_addr != 0) {
-				DEBUG_LOG("New moveset loaded, initializing moveset of player [%d] in the array\n", i);
-				InitializeMoveset(player);
-			}
-		}
-		*/
+
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}

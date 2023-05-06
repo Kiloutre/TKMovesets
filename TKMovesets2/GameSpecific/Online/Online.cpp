@@ -17,7 +17,6 @@ Online::~Online()
     if (resetMemOnDestroy && injectedDll && m_process->CheckRunning())
     {
         // Tell the DLL to unload itself
-        DEBUG_LOG("~Online(): Calling Remote " MOVESET_LOADER_STOP_FUNC "(); \n");
         CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC);
     }
 #endif
@@ -136,4 +135,11 @@ bool Online::InjectDllAndWaitEnd()
 
     DEBUG_LOG("Online::InjectDll() -> return\n");
     return result;
+}
+
+void Online::CallDebugFunction()
+{
+    if (m_process->IsAttached() && m_process->CheckRunning()) {
+        CallMovesetLoaderFunction("MovesetLoaderDebug", true);
+    }
 }
