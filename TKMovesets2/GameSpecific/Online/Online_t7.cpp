@@ -27,6 +27,7 @@ void OnlineT7::OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playe
     m_sharedMemPtr->players[playerid].crc32 = lastLoadedMoveset.crc32;
     m_sharedMemPtr->players[playerid].custom_moveset_addr = lastLoadedMoveset.address;
     m_sharedMemPtr->players[playerid].moveset_character_id = lastLoadedMoveset.charId;
+    m_sharedMemPtr->players[playerid].custom_moveset_size = lastLoadedMoveset.size;
     m_sharedMemPtr->players[playerid].is_initialized = false;
 }
 
@@ -42,9 +43,10 @@ void OnlineT7::ClearMovesetSelection(unsigned int playerid)
     m_sharedMemPtr->players[playerid].custom_moveset_addr = 0;
 }
 
-void OnlineT7::SetLockIn(bool locked)
+void OnlineT7::SetLockIn(bool locked, MovesetLoaderMode_ movesetLoaderMode)
 {
     m_sharedMemPtr->locked_in = locked;
+    m_sharedMemPtr->moveset_loader_mode = movesetLoaderMode;
 }
 
 void OnlineT7::ExecuteExtraprop(uint32_t playerid, uint32_t id, uint32_t value)

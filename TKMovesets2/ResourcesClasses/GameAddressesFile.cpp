@@ -199,9 +199,9 @@ int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_ad
 	}
 
 #ifdef BUILD_TYPE_DEBUG
-#ifndef DLL_EXPORTING
 	auto ex = GameAddressNotFound("val:", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
+#ifndef DLL_EXPORTING
 	throw ex;
 #endif
 #endif
@@ -218,9 +218,9 @@ const char* GameAddressesFile::GetString(const std::string& gameKey, const char*
 	}
 
 #ifdef BUILD_TYPE_DEBUG
-#ifndef DLL_EXPORTING
 	auto ex = GameAddressNotFound("str:", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
+#ifndef DLL_EXPORTING
 	throw ex;
 #endif
 #endif
@@ -248,10 +248,11 @@ const std::vector<gameAddr>& GameAddressesFile::GetPtrPath(const std::string& ga
 	}
 
 #ifdef BUILD_TYPE_DEBUG
-#ifndef DLL_EXPORTING
 	auto ex = GameAddressNotFound("", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
+#ifndef DLL_EXPORTING
 	throw ex;
+#else
 #endif
 #endif
 	return cg_emptyVector;

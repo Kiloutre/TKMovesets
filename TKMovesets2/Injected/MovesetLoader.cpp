@@ -122,6 +122,7 @@ void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64
     auto& hook = m_hooks[hookName];
 
     // Initialize the original function's hook
+    hook.originalAddress = originalAddr;
     hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline, m_disassembler);
 }
 
@@ -147,8 +148,11 @@ void MovesetLoader::RegisterFunction(const char* functionName, const std::string
     }
 
     const char* functionBytes = addresses.GetString(c_addressId);
-    m_functions[functionName] = (uint64_t)Sig::find((void*)moduleAddr, moduleSize, functionBytes);
-    DEBUG_LOG("RegisterFunction(%s): Found function at %llx (+%llx)\n", functionName, m_functions[functionName], m_functions[functionName] - moduleAddr);
+    uint64_t functionAddr = (uint64_t)Sig::find((void*)moduleAddr, moduleSize, functionBytes);
+    if (functionAddr != 0) {
+        m_functions[functionName] = functionAddr;
+        DEBUG_LOG("RegisterFunction(%s): Found function at %llx (+%llx)\n", functionName, m_functions[functionName], m_functions[functionName] - moduleAddr);
+    }
 }
 
 void MovesetLoader::RegisterHook(const char* functionName, const std::string& moduleName, const char* c_addressId, uint64_t hookAddr)
@@ -168,8 +172,11 @@ void MovesetLoader::RegisterHook(const char* functionName, const std::string& mo
 
     const char* functionBytes = addresses.GetString(c_addressId);
     uint64_t functionAddr = (uint64_t)Sig::find((void*)moduleAddr, moduleSize, functionBytes);
-    InitHook(functionName, functionAddr, hookAddr);
-    DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx)\n", functionName, functionAddr, functionAddr - moduleAddr);
+
+    if (functionAddr != 0) {
+        InitHook(functionName, functionAddr, hookAddr);
+        DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx)\n", functionName, functionAddr, functionAddr - moduleAddr);
+    }
 }
 
 uint64_t MovesetLoader::GetFunctionAddr(const char* functionName)

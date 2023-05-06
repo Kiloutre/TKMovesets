@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "debug.hpp"
+
 # define GAME_ADDR_NULL (0)
 
 // Used for ptr or offsets in movesets that can be set to 0
@@ -23,7 +25,7 @@ typedef char __ida_int128[16]; // todo: turn this into a struct but without cras
 static inline void print_int128(__ida_int128 val) // todo: remove this
 {
 #ifdef BUILD_TYPE_DEBUG
-	printf("%llx|%llx, ", *(uint64_t*)&val, *(uint64_t*)(&val + 8));
+	DEBUG_LOG("%llx|%llx, ", *(uint64_t*)&val, *(uint64_t*)(&val + 8));
 #endif
 }
 

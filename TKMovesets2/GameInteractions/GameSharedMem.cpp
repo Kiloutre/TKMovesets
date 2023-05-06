@@ -62,7 +62,7 @@ void GameSharedMem::RunningUpdate()
 	}
 	else {
 		if (synchronizeLockin) {
-			m_sharedMemHandler->SetLockIn(lockedIn);
+			m_sharedMemHandler->SetLockIn(lockedIn, movesetLoaderMode);
 		}
 		if (m_sharedMemHandler->versionMismatch) {
 			m_sharedMemHandler->VerifyDllVersionMismatch();

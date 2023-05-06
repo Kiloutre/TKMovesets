@@ -10,6 +10,8 @@ using namespace StructsT7;
 // Reference to the MovesetLoader
 MovesetLoaderT7* g_loader = nullptr;
 
+# define GET_HOOK(x) ((uint64_t)&T7Hooks::x)
+
 // -- Game functions -- //
 
 namespace T7Functions
@@ -21,6 +23,18 @@ namespace T7Functions
 	typedef uint64_t(*GetPlayerFromID)(unsigned int playerId);
 
 	typedef void(*ExecuteExtraprop)(void* player, Requirement* prop, __ida_int128 a3, char a4, char a5, float a6, __ida_int128 a7, __ida_int128 a8, __ida_int128 a9, __ida_int128 a10, __ida_int128 a11, uint64_t a12);
+
+	namespace CBattleManagerConsole {
+		// Called everytime a loading screen starts
+		typedef uint64_t(*LoadStart)(uint64_t, uint64_t);
+	};
+
+	namespace NetInterCS {
+		// Called at the start of the loading screen for non-host players
+		typedef void (*MatchedAsClient)(uint64_t, uint64_t);
+		// Called at the start of the loading screen for the host player
+		typedef void (*MatchedAsHost)(uint64_t, char, uint64_t);
+	};
 }
 
 // -- Helpers --
@@ -106,6 +120,43 @@ static unsigned int GetLobbySelfMemberId()
 	return 0;
 }
 
+static unsigned int GetLobbyOpponentMemberId()
+{
+	// Note that this function is highly likely to return the wrong player ID in lobbies with more than two players
+	// This is because the player order here does not match the displayed player order
+	CSteamID lobbyID = CSteamID(g_loader->ReadVariable<uint64_t>("gTK_roomId_addr"));
+	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
+
+	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
+	{
+		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
+		if (memberId != mySteamID) {
+			return i;
+		}
+	}
+	return 0;
+}
+
+static CSteamID GetLobbyOpponentSteamId()
+{
+	// Note that this function is highly likely to return the wrong player ID in lobbies with more than two players
+	// This is because the player order here does not match the displayed player order
+	CSteamID lobbyID = CSteamID(g_loader->ReadVariable<uint64_t>("gTK_roomId_addr"));
+	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
+
+	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
+	{
+		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
+		if (memberId != mySteamID) {
+			return memberId;
+		}
+	}
+	return k_steamIDNil;
+}
+
+
 // -- Hook functions --
 
 namespace T7Hooks
@@ -118,6 +169,12 @@ namespace T7Hooks
 		auto retVal = g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
 
 		if (!g_loader->sharedMemPtr->locked_in) {
+			return retVal;
+		}
+
+		if (g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable()) {
+			// If we're in online play, don't load movesets if syncing isn't done
+			// Todo: Wait some small period (like 10 sec top) 
 			return retVal;
 		}
 
@@ -222,6 +279,22 @@ namespace T7Hooks
 		}
 		g_loader->CastTrampoline<T7Functions::ExecuteExtraprop>("TK__ExecuteExtraprop")(player, prop, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
 	}
+
+
+	namespace NetInterCS
+	{
+		void MatchedAsClient(uint64_t a1, uint64_t a2)
+		{
+			g_loader->CastTrampoline<T7Functions::NetInterCS::MatchedAsClient>("TK__NetInterCS::MatchedAsClient")(a1, a2);
+			g_loader->InitMovesetSyncing();
+		}
+
+		void MatchedAsHost(uint64_t a1, char a2, uint64_t a3)
+		{
+			g_loader->CastTrampoline<T7Functions::NetInterCS::MatchedAsHost>("TK__NetInterCS::MatchedAsHost")(a1, a2, a3);
+			g_loader->InitMovesetSyncing();
+		}
+	};
 }
 
 // -- -- //
@@ -274,15 +347,17 @@ void MovesetLoaderT7::InitHooks()
 	m_requiredSymbols = {
 		// Hooks
 		"TK__ApplyNewMoveset",
+		"TK__NetInterCS::MatchedAsClient",
+		"TK__NetInterCS::MatchedAsHost",
 		// Functions
 		"TK__GetPlayerFromID",
-		//"TK__NetInterCS::MatchedAsClient"
 	};
 
 	// Crucial functions / hooks
-	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", (uint64_t)&T7Hooks::ApplyNewMoveset);
+	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", GET_HOOK(ApplyNewMoveset));
+	RegisterHook("TK__NetInterCS::MatchedAsClient", m_moduleName, "f_NetInterCS::MatchedAsClient", GET_HOOK(NetInterCS::MatchedAsClient));
+	RegisterHook("TK__NetInterCS::MatchedAsHost", m_moduleName, "f_NetInterCS::MatchedAsHost", GET_HOOK(NetInterCS::MatchedAsHost));
 	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "f_GetPlayerFromID");
-	//RegisterFunction("TK__NetInterCS::MatchedAsClient", m_moduleName, "f_NetInterCS");
 
 	// Other less important things
 	RegisterFunction("TK__ExecuteExtraprop", m_moduleName, "f_ExecuteExtraprop");
@@ -311,12 +386,27 @@ void MovesetLoaderT7::PostInit()
 	// Compute important variable addresses
 	variables["gTK_playerList"] = (uint64_t)GetPlayerList();
 
+	// Stucture that leaders to playerid (???, 0, 0, 0x78). ??? = the value we get at the end
+	/*
+	{
+		uint64_t functionAddress = m_hooks["TK__NetInterCS::MatchedAsClient"].originalAddress;
+		uint64_t postInstructionAddress = functionAddress + 0x184;
+		uint64_t offsetAddr = functionAddress + 0x180;
+
+		uint32_t offset = *(uint32_t*)offsetAddr;
+		uint64_t endValue = postInstructionAddress + offset;
+		variables["______"] = endValue;
+	}
+	*/
+
 	// Apply the hooks that need to be applied immediately
 	HookFunction("TK__ApplyNewMoveset");
+	HookFunction("TK__NetInterCS::MatchedAsClient");
+	HookFunction("TK__NetInterCS::MatchedAsHost");
 	//HookFunction("TK__ExecuteExtraprop");
 
 	// Other
-	HookFunction("TK__Log");
+	//HookFunction("TK__Log");
 }
 
 // -- Debug -- //
@@ -328,30 +418,142 @@ void MovesetLoaderT7::Debug()
 	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
 
 	if (lobbyID == k_steamIDNil) {
-		printf("Invalid lobby ID\n");
+		DEBUG_LOG("Invalid lobby ID\n");
 	}
 	
 	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
-	printf("Lobby member count = %u\n", lobbyMemberCount);
 	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
 	{
-		printf("4\n");
 		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
-		printf("5\n");
 		const char* name = SteamHelper::SteamFriends()->GetFriendPersonaName(memberId);
-		printf("6\n");
-		printf("%u. [%s] - self = %d\n", i, name, memberId == mySteamID);
+		DEBUG_LOG("%u. [%s] - self = %d\n", i, name, memberId == mySteamID);
 	}
 #endif
 }
 
 // -- Main -- //
 
+void MovesetLoaderT7::InitMovesetSyncing()
+{
+	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+	incomingMoveset = nullptr;
+	if (sharedMemPtr->locked_in == false) {
+		DEBUG_LOG("MOVESET_SYNC: Not locked in, not sending\n");
+		return;
+	}
+	DEBUG_LOG("MOVESET_SYNC: Sending moveset to opponent\n");
+
+	CSteamID desiredOpponent = GetLobbyOpponentSteamId();
+	opponent = desiredOpponent;
+	if (desiredOpponent == k_steamIDNil) {
+		DEBUG_LOG("MOVESET_SYNC: No valid opponent to send to\n");
+		return;
+	}
+
+	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Syncing;
+	MovesetLoaderT7_IncomingMovesetInfo movesetInfo;
+
+	if (sharedMemPtr->players[0].custom_moveset_addr == 0) {
+		movesetInfo.size = 0;
+		DEBUG_LOG("MOVESET_SYNC: Size of moveset is zero (no moveset to send but will still notify the opponent)\n");
+	}
+	else {
+		movesetInfo.size = sharedMemPtr->players[0].custom_moveset_size;
+		DEBUG_LOG("MOVESET_SYNC: Size of moveset is %llu\n", movesetInfo.size);
+	}
+
+	DEBUG_LOG("MOVESET_SYNC: Sending moveset info\n");
+	if (!SteamHelper::SteamNetworking()->SendP2PPacket(opponent, &movesetInfo, sizeof(movesetInfo), k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL))
+	{
+		DEBUG_LOG("MOVESET_SYNC: Failed to send moveset info packet\n");
+		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+		return;
+	}
+
+	if (movesetInfo.size != 0)
+	{
+		uint64_t leftToSend = movesetInfo.size;
+		Byte* dataToSend = (Byte*)sharedMemPtr->players[0].custom_moveset_addr;
+		while (leftToSend != 0)
+		{
+			uint32_t sendAmount = leftToSend >= 1000000 ? 1000000 : leftToSend;
+			DEBUG_LOG("MOVESET_SYNC: Sending %u bytes\n", sendAmount);
+			if (!SteamHelper::SteamNetworking()->SendP2PPacket(opponent, dataToSend, sendAmount, k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL))
+			{
+				DEBUG_LOG("Moveset_SYNC: Failed to send moveset bytes\n");
+			}
+			dataToSend += sendAmount;
+			leftToSend -= sendAmount;
+		}
+	}
+}
+
+void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32_t packetSize)
+{
+	DEBUG_LOG("PACKET: Received %u bytes\n", packetSize);
+	if (senderId != opponent) {
+		DEBUG_LOG("PACKET: Bad opponent\n");
+		return;
+	}
+
+
+	if (packetSize >= sizeof(MovesetLoaderT7_IncomingMovesetInfo) && strncmp((char*)packetBuf, "TKM2", 4) == 0) {
+		auto movesetInfo = (MovesetLoaderT7_IncomingMovesetInfo*)packetBuf;
+		incomingMovesetSize = movesetInfo->size;
+		DEBUG_LOG("PACKET: Incoming moveset size is %llu\n", incomingMovesetSize);
+		incomingMoveset = new Byte[incomingMovesetSize];
+		incomingMovesetCursor = incomingMoveset;
+		sharedMemPtr->players[1].custom_moveset_addr = 0;
+		return;
+	}
+
+	if (incomingMoveset == nullptr) {
+		DEBUG_LOG("PACKET: Received incoming moveset without receiving the size first.\n");
+		return;
+	}
+
+	if (incomingMovesetSize - packetSize < 0) {
+		// Received too much data
+		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+		DEBUG_LOG("PACKET: Received too much data.\n");
+		return;
+	}
+
+	memcpy(incomingMovesetCursor, packetBuf, packetSize);
+	incomingMovesetSize -= packetSize;
+	incomingMovesetCursor += packetSize;
+
+	if (incomingMovesetSize == 0) {
+		DEBUG_LOG("PACKET: Successfully received entire moveset!\n");
+		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Synced;
+		sharedMemPtr->players[1].is_initialized = false;
+		sharedMemPtr->players[1].custom_moveset_addr = (uint64_t)incomingMoveset;
+	}
+}
+
 void MovesetLoaderT7::Mainloop()
 {
 	while (!mustStop)
 	{
+		if (sharedMemPtr->moveset_sync_status == MovesetSyncStatus_Syncing)
+		{
+			uint32_t packetSize;
+			while (SteamHelper::SteamNetworking()->IsP2PPacketAvailable(&packetSize, MOVESET_LOADER_P2P_CHANNEL))
+			{
+				Byte* packetBuf = new Byte[packetSize];
 
+				CSteamID senderId;
+				if (SteamHelper::SteamNetworking()->ReadP2PPacket(packetBuf, packetSize, &packetSize, &senderId, MOVESET_LOADER_P2P_CHANNEL))
+				{
+					OnPacketReceive(senderId, packetBuf, packetSize);
+				}
+				else {
+					DEBUG_LOG("PACKET: Read failed\n");
+				}
+
+				delete[] packetBuf;
+			}
+		}
 
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));

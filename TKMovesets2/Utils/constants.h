@@ -43,6 +43,8 @@
 # define MOVESET_LOADER_RUN_FUNC         "MovesetLoaderRun"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
 
+# define MOVESET_LOADER_P2P_CHANNEL      (48697987)
+
 # define ANIMATION_EXTENSION             ".tkanim"
 # define ANIMATION_FACE_EXTENSION        ".tkfaceanim"
 # define ANIMATION_HAND_EXTENSION        ".tkhandanim"

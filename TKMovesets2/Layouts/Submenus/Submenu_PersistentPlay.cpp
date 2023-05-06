@@ -169,6 +169,7 @@ void Submenu_PersistentPlay::RenderGameControls()
 			else {
 				if (ImGuiExtra::RenderButtonEnabled(_("persistent.lock"), m_currentPlayerCursor == -1)) {
 					gameHelper->lockedIn = true;
+					gameHelper->movesetLoaderMode = MovesetLoaderMode_PersistentPlay;
 				}
 			}
 		}

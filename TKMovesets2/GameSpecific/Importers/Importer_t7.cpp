@@ -429,6 +429,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 	lastLoaded.crc32 = header->crc32;
 	lastLoaded.charId = header->characterId;
 	lastLoaded.address = gameMoveset;
+	lastLoaded.size = s_moveset;
 
 	if (isCompressed) {
 		delete[] moveset;

@@ -42,6 +42,8 @@ public:
 	bool isInjected = false;
 	// True if we are locked in
 	bool lockedIn = false;
+	// moveset loader mode (persistent / online)
+	MovesetLoaderMode_ movesetLoaderMode = MovesetLoaderMode_Invalid;
 	// If true, will synchronise the .lockedIn variable to the shared memory every RunningUpdate()
 	bool synchronizeLockin = true;
 	// Becomes true if the moveset loader DLL version injected in the game does not match the current program's version

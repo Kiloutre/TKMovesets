@@ -10,18 +10,7 @@
 
 #include "constants.h"
 #include "SharedMemory.h"
-
-#ifndef LAST_LOADED_DEFINED
-# define LAST_LOADED_DEFINED
-struct s_lastLoaded {
-	// Last loaded moveset's CRC32 ID, used right after import by online importer
-	uint8_t charId = 0;
-	// Last loaded moveset's character ID, used right after import by online importer
-	uint32_t crc32 = 0;
-	// Stores the in-game address of the moveset successfully loaded by the last Import() call
-	gameAddr address = 0;
-};
-#endif
+#include "lastLoadedMoveset.h"
 
 class DLLCONTENT Online : public BaseGameSpecificClass
 {
@@ -72,7 +61,7 @@ public:
 	// Called when the user wants to de-select a moveset for a given player
 	virtual void ClearMovesetSelection(unsigned int playerid) = 0;
 	// Enable or disable custom moveset loading for the game
-	virtual void SetLockIn(bool locked) = 0;
+	virtual void SetLockIn(bool locked, MovesetLoaderMode_ movesetLoaderMode) = 0;
 
 	// Call MovesetLoaderDebug() in the remote process's injected DLL
 	void CallDebugFunction();

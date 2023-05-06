@@ -19,8 +19,9 @@
 struct functionHook
 {
 	PLH::x64Detour* detour;
-	bool isHooked = false;
+	uint64_t originalAddress;
 	uint64_t trampoline;
+	bool isHooked = false;
 };
 
 class MovesetLoader
