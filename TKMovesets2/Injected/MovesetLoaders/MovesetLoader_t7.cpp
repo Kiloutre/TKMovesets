@@ -286,13 +286,19 @@ namespace T7Hooks
 		void MatchedAsClient(uint64_t a1, uint64_t a2)
 		{
 			g_loader->CastTrampoline<T7Functions::NetInterCS::MatchedAsClient>("TK__NetInterCS::MatchedAsClient")(a1, a2);
-			g_loader->InitMovesetSyncing();
+
+			if (g_loader->sharedMemPtr->moveset_loader_mode == MovesetLoaderMode_OnlineMode) {
+				g_loader->InitMovesetSyncing();
+			}
 		}
 
 		void MatchedAsHost(uint64_t a1, char a2, uint64_t a3)
 		{
 			g_loader->CastTrampoline<T7Functions::NetInterCS::MatchedAsHost>("TK__NetInterCS::MatchedAsHost")(a1, a2, a3);
-			g_loader->InitMovesetSyncing();
+
+			if (g_loader->sharedMemPtr->moveset_loader_mode == MovesetLoaderMode_OnlineMode) {
+				g_loader->InitMovesetSyncing();
+			}
 		}
 	};
 }
@@ -458,7 +464,7 @@ void MovesetLoaderT7::InitMovesetSyncing()
 		DEBUG_LOG("MOVESET_SYNC: Size of moveset is zero (no moveset to send but will still notify the opponent)\n");
 	}
 	else {
-		movesetInfo.size = sharedMemPtr->players[0].custom_moveset_size;
+		movesetInfo.size = sharedMemPtr->players[0].custom_moveset_original_data_size;
 		DEBUG_LOG("MOVESET_SYNC: Size of moveset is %llu\n", movesetInfo.size);
 	}
 
@@ -473,14 +479,16 @@ void MovesetLoaderT7::InitMovesetSyncing()
 	if (movesetInfo.size != 0)
 	{
 		uint64_t leftToSend = movesetInfo.size;
-		Byte* dataToSend = (Byte*)sharedMemPtr->players[0].custom_moveset_addr;
+		Byte* dataToSend = (Byte*)sharedMemPtr->players[0].custom_moveset_original_data_addr;
 		while (leftToSend != 0)
 		{
 			uint32_t sendAmount = leftToSend >= 1000000 ? 1000000 : leftToSend;
 			DEBUG_LOG("MOVESET_SYNC: Sending %u bytes\n", sendAmount);
 			if (!SteamHelper::SteamNetworking()->SendP2PPacket(opponent, dataToSend, sendAmount, k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL))
 			{
-				DEBUG_LOG("Moveset_SYNC: Failed to send moveset bytes\n");
+				DEBUG_LOG("MOVESET_SYNC: Failed to send moveset bytes\n");
+				sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+				return;
 			}
 			dataToSend += sendAmount;
 			leftToSend -= sendAmount;
@@ -497,7 +505,7 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32
 	}
 
 
-	if (packetSize >= sizeof(MovesetLoaderT7_IncomingMovesetInfo) && strncmp((char*)packetBuf, "TKM2", 4) == 0) {
+	if (packetSize == sizeof(MovesetLoaderT7_IncomingMovesetInfo) && strncmp((char*)packetBuf, "TKM2", 4) == 0) {
 		auto movesetInfo = (MovesetLoaderT7_IncomingMovesetInfo*)packetBuf;
 		incomingMovesetSize = movesetInfo->size;
 		DEBUG_LOG("PACKET: Incoming moveset size is %llu\n", incomingMovesetSize);
@@ -512,7 +520,8 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32
 		return;
 	}
 
-	if (incomingMovesetSize - packetSize < 0) {
+	uint64_t remainingBytes = incomingMovesetSize - (incomingMovesetCursor - incomingMoveset);
+	if (remainingBytes < packetSize) {
 		// Received too much data
 		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 		DEBUG_LOG("PACKET: Received too much data.\n");
@@ -520,14 +529,32 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32
 	}
 
 	memcpy(incomingMovesetCursor, packetBuf, packetSize);
-	incomingMovesetSize -= packetSize;
 	incomingMovesetCursor += packetSize;
 
-	if (incomingMovesetSize == 0) {
+	if (remainingBytes == packetSize) {
 		DEBUG_LOG("PACKET: Successfully received entire moveset!\n");
+
+		auto& player = sharedMemPtr->players[1];
+		
+		{
+			// The header will not be accessible after ImportForOnline, so read its informations now
+			TKMovesetHeader* header = (TKMovesetHeader*)incomingMoveset;
+			player.crc32 = header->crc32;
+			player.moveset_character_id = header->characterId;
+			player.previous_character_id = header->characterId;
+		}
+
+		Byte* newMoveset = ImportForOnline_t7(sharedMemPtr->players[1], incomingMoveset, incomingMovesetSize);
+		if (newMoveset != incomingMoveset) {
+			// In case decompression occured, delete the old moveset
+			delete[] incomingMoveset;
+			incomingMoveset = newMoveset;
+		}
+
+		player.custom_moveset_addr = (uint64_t)incomingMoveset;
+		player.is_initialized = false;
+
 		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Synced;
-		sharedMemPtr->players[1].is_initialized = false;
-		sharedMemPtr->players[1].custom_moveset_addr = (uint64_t)incomingMoveset;
 	}
 }
 
@@ -535,7 +562,7 @@ void MovesetLoaderT7::Mainloop()
 {
 	while (!mustStop)
 	{
-		if (sharedMemPtr->moveset_sync_status == MovesetSyncStatus_Syncing)
+		if (sharedMemPtr->AcceptingPackets())
 		{
 			uint32_t packetSize;
 			while (SteamHelper::SteamNetworking()->IsP2PPacketAvailable(&packetSize, MOVESET_LOADER_P2P_CHANNEL))
@@ -545,7 +572,9 @@ void MovesetLoaderT7::Mainloop()
 				CSteamID senderId;
 				if (SteamHelper::SteamNetworking()->ReadP2PPacket(packetBuf, packetSize, &packetSize, &senderId, MOVESET_LOADER_P2P_CHANNEL))
 				{
-					OnPacketReceive(senderId, packetBuf, packetSize);
+					if (sharedMemPtr->moveset_sync_status != MovesetSyncStatus_Discard) {
+						OnPacketReceive(senderId, packetBuf, packetSize);
+					}
 				}
 				else {
 					DEBUG_LOG("PACKET: Read failed\n");

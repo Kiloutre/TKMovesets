@@ -10,6 +10,10 @@ struct SharedMemT7_Player
 	uint64_t custom_moveset_addr;
 	// Size of the uncompressed moveset. Todo: send the compressed moveset.
 	uint64_t custom_moveset_size = 0;
+	//
+	uint64_t custom_moveset_original_data_addr;
+	// 
+	uint64_t custom_moveset_original_data_size = 0;
 	// Nth bit set = Nth bit mota missing
 	uint16_t missingMotas;
 	// True if moveset is ready to apply, false if moveset needs initialization

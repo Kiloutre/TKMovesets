@@ -26,8 +26,10 @@ void OnlineT7::OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playe
 
     m_sharedMemPtr->players[playerid].crc32 = lastLoadedMoveset.crc32;
     m_sharedMemPtr->players[playerid].custom_moveset_addr = lastLoadedMoveset.address;
-    m_sharedMemPtr->players[playerid].moveset_character_id = lastLoadedMoveset.charId;
     m_sharedMemPtr->players[playerid].custom_moveset_size = lastLoadedMoveset.size;
+    m_sharedMemPtr->players[playerid].custom_moveset_original_data_addr = lastLoadedMoveset.originalDataAddress;
+    m_sharedMemPtr->players[playerid].custom_moveset_original_data_size = lastLoadedMoveset.originalDataSize;
+    m_sharedMemPtr->players[playerid].moveset_character_id = lastLoadedMoveset.charId;
     m_sharedMemPtr->players[playerid].is_initialized = false;
 }
 

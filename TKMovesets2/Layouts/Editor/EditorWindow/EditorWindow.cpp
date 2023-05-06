@@ -3,6 +3,7 @@
 #include <format>
 #include <filesystem>
 
+#include "Compression.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
@@ -254,7 +255,7 @@ void EditorWindow::Save()
 		bool success = true;
 
 		if (m_compressOnSave) {
-			success = ExtractorUtils::CompressFile(header->moveset_data_start, dst_filename, tmp_filename);
+			success = CompressionUtils::CompressFile(header->moveset_data_start, dst_filename, tmp_filename);
 		}
 		else {
 			std::filesystem::rename(tmp_filename, dst_filename);

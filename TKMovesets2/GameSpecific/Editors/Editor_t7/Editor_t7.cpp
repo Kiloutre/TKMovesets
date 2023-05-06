@@ -2,9 +2,10 @@
 #include <format>
 #include <fstream>
 
-# include "Editor_t7.hpp"
-# include "Helpers.hpp"
+# include "Compression.hpp"
+# include "helpers.hpp"
 # include "Importer.hpp"
+# include "Editor_t7.hpp"
 
 using namespace EditorUtils;
 
@@ -274,7 +275,7 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 			Byte* old_moveset_data_start = t_moveset + header->moveset_data_start;
 			Byte* new_moveset_data_start = new_moveset + header->moveset_data_start;
 
-			if (!ImporterUtils::DecompressMoveset(new_moveset_data_start, old_moveset_data_start, src_size, header->moveset_data_size)) {
+			if (!CompressionUtils::DecompressMoveset(new_moveset_data_start, old_moveset_data_start, src_size, header->moveset_data_size)) {
 				DEBUG_LOG("Decompression error\n");
 				return false;
 			}

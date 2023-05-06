@@ -9,7 +9,7 @@
 
 void Submenu_OnlinePlay::SelectMoveset(movesetInfo* moveset)
 {
-	gameHelper->QueueCharacterImportation(moveset, m_currentPlayerCursor, ImportSettings_BasicLoadOnly);
+	gameHelper->QueueCharacterImportation(moveset, m_currentPlayerCursor, ImportSettings_BasicLoadOnly | ImportSettings_ImportOriginalData);
 	m_currentPlayerCursor = -1;
 }
 
@@ -18,7 +18,7 @@ void Submenu_OnlinePlay::ClearMoveset()
 	// Pass a moveset of size 0 to indicate the GameSharedMem class that we want to clear and not import a moveset
 	movesetInfo emptyMoveset{ .size = 0 };
 
-	gameHelper->QueueCharacterImportation(&emptyMoveset, m_currentPlayerCursor, ImportSettings_BasicLoadOnly);
+	gameHelper->QueueCharacterImportation(&emptyMoveset, m_currentPlayerCursor, 0);
 	m_currentPlayerCursor = -1;
 }
 

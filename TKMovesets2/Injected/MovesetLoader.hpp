@@ -15,6 +15,7 @@
 #include "SharedMemory.h"
 #include "constants.h"
 #include "GameTypes.h"
+#include "MovesetStructs.h"
 
 struct functionHook
 {

@@ -23,6 +23,8 @@ enum ImportSettings_
 	ImportSettings_FreeUnusedMovesets = (1 << 2),
 	// Don't write the new moveset address to the current player
 	ImportSettings_BasicLoadOnly = (1 << 3),
+	// The original moveset data will also be loaded, used by for online moveset syncing
+	ImportSettings_ImportOriginalData = (1 << 4),
 
 	ImportSettings_DEFAULT = ImportSettings_ApplyInstantly | ImportSettings_FreeUnusedMovesets,
 };
@@ -35,12 +37,6 @@ enum ImportationErrcode_
 	ImportationErrcode_FileReadErr,
 	ImportationErrcode_DecompressionError,
 };
-
-namespace ImporterUtils
-{
-	// Return an allocated copy of the decompressed moveset data (moveset_data_start and on)
-	bool DecompressMoveset(Byte* outputDest, const Byte* moveset_data_start, uint64_t src_size, int32_t original_size);
-}
 
 // Base class for extracting from a game
 class DLLCONTENT Importer : public BaseGameSpecificClass

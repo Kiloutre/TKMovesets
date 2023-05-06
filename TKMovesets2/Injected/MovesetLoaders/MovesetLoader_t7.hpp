@@ -33,10 +33,10 @@ public:
 
 	// Online opponent to send moveset to / receive moveset from. Only used in OnlinePlay mode.
 	CSteamID opponent;
-	// Size in bytes expected of the coming moveset
-	uint64_t incomingMovesetSize;
 	// Ptr to the incoming moveset
 	Byte* incomingMoveset;
+	// Size in bytes expected of the coming moveset
+	uint64_t incomingMovesetSize;
 	// Ptr to the next area to write to in the incoming moveset
 	Byte* incomingMovesetCursor;
 
@@ -49,6 +49,8 @@ public:
 	void OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32_t packetSize);
 	// Inits the variable that tell that a moveset is expected (if locked in, opponent valid etc), and send our own moveset to the opponent
 	void InitMovesetSyncing();
+
+	Byte* ImportForOnline_t7(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
 
 	void Debug() override;
 };

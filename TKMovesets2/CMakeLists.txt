@@ -51,6 +51,7 @@ set(INCLUDE_FOLDERS
 
                     "Injected"
                     "Injected/SharedMemory"
+                    "Injected/MovesetLoaders"
 
                     "${CMAKE_SOURCE_DIR}/Sig/include"
                     "${CMAKE_SOURCE_DIR}/steamapi sdk/public/steam"
@@ -119,6 +120,7 @@ set(BINARY_SOURCES
                     "Utils/helpers.cpp"
                     "Utils/imgui_extras.cpp"
                     "Utils/ThreadedClass.cpp"
+                    "Utils/Compression.cpp"
 
                     # Resources-accessing
                     "ResourcesClasses/Localization.cpp"
@@ -157,13 +159,15 @@ set(GAMESPECIFIC_SOURCES
 # This will be included in the .dll and should only be related to the injected DLL
 set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
-    "Injected/MovesetLoader_t7.cpp"
+    "Injected/MovesetLoaders/MovesetLoader_t7.cpp"
+    "Injected/MovesetLoaders/MovesetLoader_t7_Importer.cpp"
     "Injected/InjectionUtils.cpp"
     "Injected/steamHelper.cpp"
 
     "ResourcesClasses/GameAddressesFile.cpp"
     "ResourcesClasses/GameAddressesWrapper.cpp"
     "Utils/helpers.cpp"
+    "Utils/Compression.cpp"
 )
 
 ## Setup embedded resources ##

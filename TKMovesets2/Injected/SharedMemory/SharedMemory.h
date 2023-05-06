@@ -11,6 +11,7 @@ enum MovesetSyncStatus_
 {
 	MovesetSyncStatus_NotStarted,
 	MovesetSyncStatus_Syncing,
+	MovesetSyncStatus_Discard,
 	MovesetSyncStatus_Synced,
 };
 
@@ -28,5 +29,10 @@ struct SharedMemBase
 	bool OnlinePlayMovesetsNotUseable()
 	{
 		return moveset_loader_mode == MovesetLoaderMode_OnlineMode && moveset_sync_status != MovesetSyncStatus_Synced;
+	}
+
+	bool AcceptingPackets()
+	{
+		return moveset_sync_status == MovesetSyncStatus_Discard || moveset_sync_status == MovesetSyncStatus_Syncing;
 	}
 };

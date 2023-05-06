@@ -55,9 +55,6 @@ namespace ExtractorUtils
 {
 	// Write a list of blocks, each aligned on a 8 bytes basis
 	void WriteFileData(std::ofstream& file, const std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t& progress, uint8_t progress_max);
-	// Compress a moveset. Returns false on failure. Modifies header->moveset_data_size automatically.
-	bool CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
-
 };
 
 // Base class for extracting from a game

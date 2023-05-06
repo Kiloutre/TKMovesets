@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#ifndef MODULE_ENTRY_DEF
+#define MODULE_ENTRY_DEF
 struct moduleEntry
 {
 	uint64_t address;
@@ -10,6 +12,7 @@ struct moduleEntry
 	std::wstring path;
 	uint64_t size;
 };
+#endif
 
 namespace InjectionUtils
 {

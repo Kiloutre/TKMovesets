@@ -14,13 +14,16 @@ struct processEntry
 	DWORD pid;
 };
 
+#ifndef MODULE_ENTRY_DEF
+#define MODULE_ENTRY_DEF
 struct moduleEntry
 {
-	gameAddr address;
+	uint64_t address;
 	std::string name;
 	std::wstring path;
 	uint64_t size;
 };
+#endif
 
 namespace GameProcessUtils
 {

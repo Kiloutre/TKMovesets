@@ -1,6 +1,7 @@
 #include <string>
 
 #include "helpers.hpp"
+#include "Compression.hpp"
 #include "Importer_t7.hpp"
 
 #include "Structs_t7.h"
@@ -322,6 +323,20 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
 
+	if (settings & ImportSettings_ImportOriginalData) {
+		const gameAddr gameOriginalMoveset = m_process->allocateMem(s_moveset);
+		if (gameOriginalMoveset == 0) {
+			return ImportationErrcode_GameAllocationErr;
+		}
+		m_process->writeBytes(gameOriginalMoveset, moveset, s_moveset);
+		lastLoaded.originalDataAddress = gameOriginalMoveset;
+		lastLoaded.originalDataSize = s_moveset;
+	}
+	else {
+		lastLoaded.originalDataAddress = 0;
+		lastLoaded.originalDataSize = 0;
+	}
+
 	// -- Basic reading & allocations -- //
 
 	progress = 20;
@@ -339,7 +354,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 		moveset = new Byte[header->moveset_data_size];
 		s_moveset = header->moveset_data_size;
 
-		if (!ImporterUtils::DecompressMoveset(moveset, moveset_data_start, src_size, header->moveset_data_size)) {
+		if (!CompressionUtils::DecompressMoveset(moveset, moveset_data_start, src_size, header->moveset_data_size)) {
 			delete[] moveset;
 			return ImportationErrcode_DecompressionError;
 		}
