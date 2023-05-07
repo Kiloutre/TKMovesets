@@ -103,10 +103,12 @@ public:
 
 		bool opponent_ready = false;
 		bool loaded_remote_moveset = false;
+		uint64_t battle_start_call_time = 0;
 
 		void Reset() {
 			opponent_ready = false;
 			loaded_remote_moveset = false;
+			battle_start_call_time = 0;
 		}
 
 		bool CanStart() const {
@@ -124,7 +126,7 @@ public:
 	// Consume packets to send them to the appropriate channel
 	void ConsumePackets();
 	// Send a packet to the opponent set up by InitMovesetSyncing()
-	bool SendPacket(void* packetBuffer, uint32_t packetSize);
+	bool SendPacket(void* packetBuffer, uint32_t packetSize, bool sendUnreliable=false);
 	// Called whenever a packet is received
 	void OnPacketReceive(CSteamID senderId, const Byte* packetBuf, uint32_t packetSize);
 	// Called whenever a communication packet is received

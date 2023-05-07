@@ -40,10 +40,10 @@ CSteamID MovesetLoaderT7::GetLobbyOpponentSteamId() const
 
 // -- -- //
 
-bool MovesetLoaderT7::SendPacket(void* packetBuffer, uint32_t packetSize)
+bool MovesetLoaderT7::SendPacket(void* packetBuffer, uint32_t packetSize, bool sendUnreliable)
 {
 	DEBUG_LOG("SendPacket(%u)\n", packetSize);
-	return SteamHelper::SteamNetworking()->SendP2PPacket(opponentId, packetBuffer, packetSize, k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL);
+	return SteamHelper::SteamNetworking()->SendP2PPacket(opponentId, packetBuffer, packetSize, sendUnreliable ? k_EP2PSendUnreliable : k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL);
 }
 
 void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
@@ -179,7 +179,7 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 		{
 			auto _packet = (PacketT7_AnswerMovesetSync*)packet;
 			if (_packet->requesting_download && sharedMemPtr->players[0].custom_moveset_addr != 0) {
-				DEBUG_LOG("COMMUNICATION: ANSWER_MOVESET_SYNC , sending moveset\n");
+				DEBUG_LOG("COMMUNICATION: ANSWER_MOVESET_SYNC, sending our moveset\n");
 				SendMoveset();
 			}
 			else {
@@ -286,11 +286,12 @@ void MovesetLoaderT7::SendMoveset()
 
 	if (player.custom_moveset_addr != 0)
 	{
+		const unsigned int bufSize = 1000000;
 		uint64_t leftToSend = player.custom_moveset_original_data_size;
 		Byte* dataToSend = (Byte*)player.custom_moveset_original_data_addr;
 		while (leftToSend != 0)
 		{
-			uint32_t sendAmount = leftToSend >= 1000000 ? 1000000 : (uint32_t)leftToSend;
+			uint32_t sendAmount = leftToSend >= bufSize ? bufSize : (uint32_t)leftToSend;
 			DEBUG_LOG("MOVESET_SYNC: Sending %u bytes\n", sendAmount);
 			if (!SendPacket(dataToSend, sendAmount))
 			{
@@ -306,7 +307,6 @@ void MovesetLoaderT7::SendMoveset()
 
 void MovesetLoaderT7::InitMovesetSyncing()
 {
-	DiscardIncomingPackets();
 	DEBUG_LOG("-- InitMovesetSyncing --\n");
 	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 
@@ -365,11 +365,9 @@ void MovesetLoaderT7::DiscardIncomingPackets()
 
 void MovesetLoaderT7::ConsumePackets()
 {
-	DEBUG_LOG("ConsumePackets\n");
 	uint32_t packetSize;
 	while (SteamHelper::SteamNetworking()->IsP2PPacketAvailable(&packetSize, MOVESET_LOADER_P2P_CHANNEL))
 	{
-		DEBUG_LOG("%u\n", packetSize);
 		Byte* packetBuf = new Byte[packetSize];
 
 		CSteamID senderId;

@@ -35,8 +35,11 @@ struct SharedMemBase
 	// Depending on the mode (persistent / online play), files might be sent over, movesets might be applied to different players, etc
 	MovesetLoaderMode_ moveset_loader_mode;
 
+	bool IsAttemptingOnlinePlay() const {
+		return locked_in && moveset_loader_mode && (moveset_sync_status != MovesetSyncStatus_NotStarted && moveset_sync_status != MovesetSyncStatus_AcceptPackets);
+	}
 	bool OnlinePlayMovesetsNotUseable() const
 	{
-		return moveset_loader_mode == MovesetLoaderMode_OnlineMode && (moveset_sync_status != MovesetSyncStatus_Ready && moveset_sync_status != MovesetSyncStatus_AcceptPackets);
+		return locked_in && moveset_loader_mode == MovesetLoaderMode_OnlineMode && (moveset_sync_status != MovesetSyncStatus_Ready && moveset_sync_status != MovesetSyncStatus_AcceptPackets);
 	}
 };

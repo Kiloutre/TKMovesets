@@ -30,6 +30,10 @@ namespace T7Functions
 		typedef uint64_t(*LoadStart)(uint64_t, uint64_t);
 	};
 
+	namespace NetManager {
+		typedef uint64_t(*GetSyncBattleStart)(uint64_t);
+	};
+
 	namespace NetInterCS {
 		// Called at the start of the loading screen for non-host players
 		typedef void (*MatchedAsClient)(uint64_t, uint64_t);
@@ -146,6 +150,8 @@ namespace T7Hooks
 {
 	uint64_t ApplyNewMoveset(void* player, MovesetInfo* newMoveset)
 	{
+		g_loader->DiscardIncomingPackets();
+
 		DEBUG_LOG("\n- ApplyNewMoveset on player %llx, moveset is %llx -\n", (uint64_t)player, (uint64_t)newMoveset);
 
 		// First, call the original function to let the game initialize all the important values in their new moveset
@@ -157,34 +163,12 @@ namespace T7Hooks
 
 		// If we're in online play, don't load movesets if syncing isn't achieved
 		if (g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable()) {
-			DEBUG_LOG("ApplyNewMoveset: Online mode is on, but status is not ready.\n");
-			if (g_loader->sharedMemPtr->moveset_sync_status != MovesetSyncStatus_NotStarted)
-			{
-				bool isSynced = false;
-				// A too high number (like 10 seconds) will timeout
-				unsigned int maxWaitDuration = 5;
+			DEBUG_LOG("ApplyNewMoveset: Online mode is on, but status is not ready. (%u)\n", g_loader->sharedMemPtr->moveset_sync_status);
 
-				DEBUG_LOG("Awaiting %u seconds max...\n", maxWaitDuration);
-				for (unsigned int i = 0; i < maxWaitDuration && !isSynced; ++i)
-				{
-					Sleep(1000);
-					isSynced = !g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable();
-					DEBUG_LOG("%u/%u...\n", i + 1, maxWaitDuration);
-				}
-
-				if (!isSynced) {
-					delete[] g_loader->incoming_moveset.data;
-					g_loader->incoming_moveset.data = 0;
-					g_loader->sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-					DEBUG_LOG("ApplyNewMoveset: Online mode is still not useable after 10 seconds. Not using custom movesets.\n");
-					return retVal;
-				}
-			}
-			else {
-				delete[] g_loader->incoming_moveset.data;
-				g_loader->incoming_moveset.data = 0;
-				return retVal;
-			}
+			auto incomingMoveset = g_loader->incoming_moveset.data;
+			g_loader->incoming_moveset.data = 0;
+			delete[] incomingMoveset;
+			return retVal;
 		}
 
 		// Determine if we, the user, are the main player or if we are p2
@@ -312,6 +296,41 @@ namespace T7Hooks
 			}
 		}
 	};
+
+
+	namespace NetManager
+	{
+		uint64_t GetSyncBattleStart(uint64_t a1)
+		{
+			uint64_t result = g_loader->CastTrampoline<T7Functions::NetManager::GetSyncBattleStart>("TK__NetManager::GetSyncBattleStart")(a1);
+			DEBUG_LOG("-- GetSyncBattleStart = 0x%llx --\n", result);
+			if (result != 1 || !g_loader->sharedMemPtr->IsAttemptingOnlinePlay()) {
+				return result;
+			}
+
+			// Loading is finished no need to hold this up any longer
+			if (g_loader->sharedMemPtr->moveset_sync_status == MovesetSyncStatus_Ready) {
+				return 1;
+			}
+
+			if (g_loader->syncStatus.battle_start_call_time == 0) {
+				// Get timestamp of first time 1 was returned
+				g_loader->syncStatus.battle_start_call_time = Helpers::getCurrentTimestamp();
+			}
+			else {
+				// Wait up to X seconds before finally giving up on loading
+				uint64_t diff = Helpers::getCurrentTimestamp() - g_loader->syncStatus.battle_start_call_time;
+				unsigned int maxWaitTime = 60;
+				DEBUG_LOG("GetSyncBattleStart: %llu / %u\n", diff + 1, maxWaitTime);
+				if (diff >= maxWaitTime) {
+					g_loader->sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+					DEBUG_LOG("GetSyncBattleStart: Moveset still wasn't received after %u seconds\n", maxWaitTime);
+					return 1;
+				}
+			}
+			return (uint32_t)0;
+		}
+	};
 }
 
 // -- -- //
@@ -366,6 +385,7 @@ void MovesetLoaderT7::InitHooks()
 		"TK__ApplyNewMoveset",
 		"TK__NetInterCS::MatchedAsClient",
 		"TK__NetInterCS::MatchedAsHost",
+		"TK__NetManager::GetSyncBattleStart",
 		// Functions
 		"TK__GetPlayerFromID",
 	};
@@ -374,6 +394,7 @@ void MovesetLoaderT7::InitHooks()
 	RegisterHook("TK__ApplyNewMoveset", m_moduleName, "f_ApplyNewMoveset", GET_HOOK(ApplyNewMoveset));
 	RegisterHook("TK__NetInterCS::MatchedAsClient", m_moduleName, "f_NetInterCS::MatchedAsClient", GET_HOOK(NetInterCS::MatchedAsClient));
 	RegisterHook("TK__NetInterCS::MatchedAsHost", m_moduleName, "f_NetInterCS::MatchedAsHost", GET_HOOK(NetInterCS::MatchedAsHost));
+	RegisterHook("TK__NetManager::GetSyncBattleStart", m_moduleName, "f_NetManager::GetSyncBattleStart", GET_HOOK(NetManager::GetSyncBattleStart));
 	RegisterFunction("TK__GetPlayerFromID", m_moduleName, "f_GetPlayerFromID");
 
 	// Other less important things
@@ -403,7 +424,7 @@ void MovesetLoaderT7::PostInit()
 	// Compute important variable addresses
 	variables["gTK_playerList"] = (uint64_t)GetPlayerList();
 
-	// Stucture that leaders to playerid (???, 0, 0, 0x78). ??? = the value we get at the end
+	// Structure that leaders to playerid (???, 0, 0, 0x78). ??? = the value we get at the end
 	/*
 	{
 		uint64_t functionAddress = m_hooks["TK__NetInterCS::MatchedAsClient"].originalAddress;
@@ -420,6 +441,7 @@ void MovesetLoaderT7::PostInit()
 	HookFunction("TK__ApplyNewMoveset");
 	HookFunction("TK__NetInterCS::MatchedAsClient");
 	HookFunction("TK__NetInterCS::MatchedAsHost");
+	HookFunction("TK__NetManager::GetSyncBattleStart");
 	//HookFunction("TK__ExecuteExtraprop");
 
 	// Other
