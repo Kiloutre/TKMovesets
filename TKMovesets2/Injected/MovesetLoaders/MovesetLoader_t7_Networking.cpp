@@ -306,6 +306,7 @@ void MovesetLoaderT7::SendMoveset()
 
 void MovesetLoaderT7::InitMovesetSyncing()
 {
+	DiscardIncomingPackets();
 	DEBUG_LOG("-- InitMovesetSyncing --\n");
 	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 

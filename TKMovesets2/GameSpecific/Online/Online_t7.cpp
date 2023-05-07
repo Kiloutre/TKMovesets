@@ -9,7 +9,7 @@ OnlineT7::~OnlineT7()
 
 void OnlineT7::Init()
 {
-    m_sharedMemPtr = (SharedMemT7*)m_orig_sharedMemPtr;
+    m_sharedMemPtr = (decltype(m_sharedMemPtr))m_orig_sharedMemPtr;
     if (sizeof(decltype(m_sharedMemPtr)) > SHARED_MEMORY_BUFSIZE) {
         DEBUG_LOG("! Size too big or buffer too small for derived Online::m_sharedMemPtr structure type !\n");
         throw;
