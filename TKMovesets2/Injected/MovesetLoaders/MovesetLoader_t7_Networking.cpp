@@ -97,6 +97,7 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 			if (_packet->local_moveset.size == 0)
 			{
 				sharedMemPtr->players[1].custom_moveset_addr = 0;
+				sharedMemPtr->moveset_sync_status = MovesetSyncStatus_AwaitingReady;
 
 				DEBUG_LOG("COMMUNICATION: Remote moveset is empty. Sending ready packet.\n");
 				// Remote moveset is empty so no need to load it, we are ready
@@ -105,6 +106,8 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 				PacketT7_Ready newPacket;
 				if (!SendPacket(&newPacket, sizeof(PacketT7_Ready))) {
 					DEBUG_LOG("COMMUNICATION: Failed to Ready in RequestSync\n");
+					sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+					return;
 				} else {
 					DEBUG_LOG("COMMUNICATION: Sending READY.\n");
 				}
@@ -151,6 +154,10 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 						PacketT7_Ready newPacket;
 						if (!SendPacket(&newPacket, sizeof(PacketT7_Ready))) {
 							DEBUG_LOG("COMMUNICATION: Failed to Ready in AnswerSync\n");
+							sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+							delete[] incoming_moveset.data;
+							incoming_moveset.data = 0;
+							return;
 						} else {
 							DEBUG_LOG("COMMUNICATION: Sending READY.\n");
 						}
@@ -221,6 +228,10 @@ void MovesetLoaderT7::OnMovesetBytesReceive(const Byte* buf, uint32_t bufSize)
 			PacketT7_Ready newPacket;
 			if (!SendPacket(&newPacket, sizeof(PacketT7_Ready))) {
 				DEBUG_LOG("COMMUNICATION: Failed to Ready in MovesetReception\n");
+				player.custom_moveset_addr = 0;
+				sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+				delete[] incoming_moveset.data;
+				return;
 			}
 			else {
 				DEBUG_LOG("COMMUNICATION: Sending READY.\n");

@@ -44,7 +44,7 @@ public:
 	// Set the steam_api DLL module in order to make the SteamHelper function work
 	bool Init(HMODULE module);
 	// Returns true if the steam module has been set and the helpers functions are usable
-	bool IsInitialized() { return m_isInitialized; }
+	bool IsInitialized() const{ return m_isInitialized; }
 
 	ISteamClient* pSteamClient;
 	ISteamUser* pSteamUser;

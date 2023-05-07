@@ -10,9 +10,9 @@ struct SharedMemT7_Player
 	uint64_t custom_moveset_addr;
 	// Size of the uncompressed moveset. Todo: send the compressed moveset.
 	uint64_t custom_moveset_size = 0;
-	//
+	// Original moveset data in full (including header & compression), will be sent to the opponent
 	uint64_t custom_moveset_original_data_addr;
-	// 
+	// Original moveset data size
 	uint64_t custom_moveset_original_data_size = 0;
 	// Nth bit set = Nth bit mota missing
 	uint16_t missingMotas;
@@ -26,7 +26,7 @@ struct SharedMemT7_Player
 	void SetMotaMissing(int id) {
 		missingMotas |= (1 << id);
 	}
-	bool isMotaMissing(int id) {
+	bool isMotaMissing(int id) const {
 		return missingMotas & (1 << id);
 	}
 };
