@@ -58,14 +58,15 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 
-			bool isImportable = moveset->onlineImportable; // todo: think about how different games will be handled
-			if (!isImportable)
+			bool isImportable = moveset->onlineImportable && gameHelper->currentGame->SupportsGameImport(moveset->gameId);
+			int color = !isImportable ? MOVESET_INVALID : moveset->color;
+			if (moveset->color != 0)
 			{
 				// Draw BG
 				ImVec2 drawStart = windowPos + ImGui::GetCursorPos();
 				drawStart.y -= ImGui::GetScrollY();
 				ImVec2 drawArea = ImVec2(availableSpace.x, ImGui::GetFrameHeight());
-				drawlist->AddRectFilled(drawStart, drawStart + drawArea, MOVESET_INVALID);
+				drawlist->AddRectFilled(drawStart, drawStart + drawArea, moveset->color);
 			}
 
 			ImGui::TextUnformatted(moveset->name.c_str());
@@ -164,15 +165,21 @@ void Submenu_OnlinePlay::RenderGameControls()
 		}
 		else if (isAttached && sharedMemoryLoaded && versionMatches) {
 			if (gameHelper->lockedIn) {
-				if (ImGui::Button(_("persistent.unlock"))) {
+				ImGui::PushStyleColor(ImGuiCol_Button, GREEN_BTN);
+				if (ImGui::Button(_("persistent.unlock"), ImVec2(0, ImGui::GetFrameHeightWithSpacing()))) {
 					gameHelper->lockedIn = false;
 				}
+				ImGui::PopStyleColor();
+
 			}
 			else {
-				if (ImGuiExtra::RenderButtonEnabled(_("persistent.lock"), m_currentPlayerCursor == -1)) {
+				ImGui::PushStyleColor(ImGuiCol_Button, RED_BTN);
+				if (ImGuiExtra::RenderButtonEnabled(_("persistent.lock"), m_currentPlayerCursor == -1, ImVec2(0, ImGui::GetFrameHeightWithSpacing()))) {
 					gameHelper->lockedIn = true;
 					gameHelper->movesetLoaderMode = MovesetLoaderMode_OnlineMode;
 				}
+				ImGui::PopStyleColor();
+				ImGui::TextUnformatted(_("online.lock_to_play"));
 			}
 		}
 	}

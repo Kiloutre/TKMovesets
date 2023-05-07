@@ -53,6 +53,8 @@ protected:
 	} m_winInfo;
 	// Used for alignment calculations
 	float m_labelWidthHalf = 0.0f;
+	// Used with changing data types to prevent .unsavedChanges from being set to true
+	bool m_ignoreNextChange = false;
 
 	virtual void PostRender() {};
 	// Actual rendering function

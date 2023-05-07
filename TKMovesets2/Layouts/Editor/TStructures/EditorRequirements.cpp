@@ -54,7 +54,7 @@ void EditorRequirements::BuildItemDetails(int listIdx)
 	}
 
 	if (idLabel == nullptr) {
-		label = std::format("{} = {}", id, valueText);
+		label = std::format("{} / 0x{:x} = {}", id, id, valueText);
 	}
 	else {
 		label = std::format("{} = {}", idLabel, valueText);

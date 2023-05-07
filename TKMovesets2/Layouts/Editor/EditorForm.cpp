@@ -202,14 +202,20 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 
 	ImGui::PushID(field);
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+
 	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags) ||
 		field->nextValue.size() != 0)
 	{
 		field->nextValue.clear();
-		unsavedChanges = true;
-		field->errored = m_editor->ValidateField(windowType, field) == false;
-		if (!field->errored) {
-			OnUpdate(listIdx, field);
+		if (m_ignoreNextChange) {
+			m_ignoreNextChange = false;
+		}
+		else {
+			unsavedChanges = true;
+			field->errored = m_editor->ValidateField(windowType, field) == false;
+			if (!field->errored) {
+				OnUpdate(listIdx, field);
+			}
 		}
 	}
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
@@ -224,9 +230,14 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 			// Force focus on the next widget
 			// This is because ImGUI prevents from writing on a focused input's buffer
 			ImGui::SetKeyboardFocusHere();
+			ImGui::Dummy(ImVec2(20, 20));
 		}
 		else if ((field->flags & EditorInput_DataChangeable) && ImGui::IsKeyPressed(ImGuiKey_B, false))
 		{
+			if (!unsavedChanges) {
+				m_ignoreNextChange = true;
+			}
+
 			EditorUtils::ChangeFieldDataType(field);
 			// Force focus on the next widget
 			// This is because ImGUI prevents from writing on a focused input's buffer

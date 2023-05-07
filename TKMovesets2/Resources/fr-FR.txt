@@ -145,6 +145,7 @@ online.inject_dll = Injecter
 online.injecting_dll = Injection...
 online.select_moveset = Sélectionner
 online.selected_moveset = Sélectionné:
+online.lock_to_play = Verrouillez pour jouer !
 
 # Modification de moveset : Renommage #
 edition.rename.new_moveset_name = Nouveau nom

@@ -145,6 +145,7 @@ online.inject_dll = Inject
 online.injecting_dll = Injecting...
 online.select_moveset = Select
 online.selected_moveset = Selected:
+online.lock_to_play = Lock to play!
 
 # Movest Edition : rename #
 edition.rename.new_moveset_name = New moveset name

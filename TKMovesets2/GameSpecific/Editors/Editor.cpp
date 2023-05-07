@@ -187,60 +187,74 @@ namespace EditorUtils
 		{
 			if (flags & EditorInput_U64) {
 				field->flags = (flags ^ EditorInput_U64) | EditorInput_S64;
+				DEBUG_LOG("Setting field as S64\n");
 			}
 			else if (flags & EditorInput_S64) {
 				field->flags = (flags ^ EditorInput_S64) | EditorInput_H64;
+				DEBUG_LOG("Setting field as H64\n");
 			}
 			else {
 				field->flags = (flags ^ EditorInput_H64) | EditorInput_U64;
+				DEBUG_LOG("Setting field as U64\n");
 			}
 		}
 		else if (flags & EditorInput_32b)
 		{
 			if (flags & EditorInput_U32) {
 				field->flags = (flags ^ EditorInput_U32) | EditorInput_S32;
+				DEBUG_LOG("Setting field as S32\n");
 			}
 			else if (flags & EditorInput_S32) {
 				field->flags = (flags ^ EditorInput_S32) | EditorInput_H32;
+				DEBUG_LOG("Setting field as H32\n");
 			}
 			else {
 				field->flags = (flags ^ EditorInput_H32) | EditorInput_U32;
+				DEBUG_LOG("Setting field as U32\n");
 			}
 		}
 		else if (flags & EditorInput_16b)
 		{
 			if (flags & EditorInput_U16) {
 				field->flags = (flags ^ EditorInput_U16) | EditorInput_S16;
+				DEBUG_LOG("Setting field as S16\n");
 			}
 			else if (flags & EditorInput_S16) {
 				field->flags = (flags ^ EditorInput_S16) | EditorInput_H16;
+				DEBUG_LOG("Setting field as H16\n");
 			}
 			else {
 				field->flags = (flags ^ EditorInput_H16) | EditorInput_U16;
+				DEBUG_LOG("Setting field as U16\n");
 			}
 		}
 		else if (flags & EditorInput_8b)
 		{
 			if (flags & EditorInput_U8) {
 				field->flags = (flags ^ EditorInput_U8) | EditorInput_S8;
+				DEBUG_LOG("Setting field as S8\n");
 			}
 			else if (flags & EditorInput_S8) {
 				field->flags = (flags ^ EditorInput_S8) | EditorInput_H8;
+				DEBUG_LOG("Setting field as H8\n");
 			}
 			else {
 				field->flags = (flags ^ EditorInput_H8) | EditorInput_U8;
+				DEBUG_LOG("Setting field as U8\n");
 			}
 		}
 		else {
 			return;
 		}
 
-		const unsigned int bufSize = 20;
-		char* buf = new char[bufSize];
+		const unsigned int bufSize = 32;
+		char buf[bufSize];
+
 		sprintf_s(buf, bufSize, GetFieldFormat(field->flags), value);
 
+		DEBUG_LOG("Format is '%s', value is %llu, result is '%s'\n", GetFieldFormat(field->flags), value, buf);
+
 		field->nextValue = std::string(buf);
-		delete[] buf;
 
 		SetInputfieldColor(field);
 	}

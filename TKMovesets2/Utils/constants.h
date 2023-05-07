@@ -70,6 +70,9 @@
 # define FORM_SPECIAL_BTN        IM_COL32(156, 104, 33, 255)
 # define FORM_LIST_NEW_ITEM      IM_COL32(156, 104, 33, 50)
 
+# define GREEN_BTN               IM_COL32(19, 96, 18, 255)
+# define RED_BTN                 IM_COL32(158, 47, 25, 255)
+
 # define MOVE_GENERIC            IM_COL32(77, 131, 219, 50)
 # define MOVE_CURRENT_GENERIC    IM_COL32(77, 131, 219, 5)
 # define MOVE_CUSTOM             IM_COL32(119, 175, 58, 50)
