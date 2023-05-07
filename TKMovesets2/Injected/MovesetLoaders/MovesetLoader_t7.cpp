@@ -174,6 +174,7 @@ namespace T7Hooks
 
 				if (!isSynced) {
 					delete[] g_loader->incoming_moveset.data;
+					g_loader->incoming_moveset.data = 0;
 					g_loader->sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 					DEBUG_LOG("ApplyNewMoveset: Online mode is still not useable after 10 seconds. Not using custom movesets.\n");
 					return retVal;
@@ -181,6 +182,7 @@ namespace T7Hooks
 			}
 			else {
 				delete[] g_loader->incoming_moveset.data;
+				g_loader->incoming_moveset.data = 0;
 				return retVal;
 			}
 		}
