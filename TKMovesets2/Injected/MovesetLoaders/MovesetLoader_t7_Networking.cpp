@@ -120,6 +120,12 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 				PacketT7_AnswerMovesetSync newPacket;
 				newPacket.requesting_download = _packet->local_moveset.crc32 != sharedMemPtr->players[1].crc32;
 
+				if (_packet->local_moveset.size >= ONLINE_MOVESET_MAX_SIZE_BYTES) {
+					DEBUG_LOG("- Not downloading : Moveset way too big. -\n");
+					sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+					return;
+				}
+
 				if (newPacket.requesting_download) {
 					incoming_moveset.size = _packet->local_moveset.size;
 					incoming_moveset.remaining_bytes = incoming_moveset.size;
