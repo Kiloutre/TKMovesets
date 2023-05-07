@@ -161,6 +161,7 @@ set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
     "Injected/MovesetLoaders/MovesetLoader_t7.cpp"
     "Injected/MovesetLoaders/MovesetLoader_t7_Importer.cpp"
+    "Injected/MovesetLoaders/MovesetLoader_t7_Network.cpp"
     "Injected/InjectionUtils.cpp"
     "Injected/steamHelper.cpp"
 

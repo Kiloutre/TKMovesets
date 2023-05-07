@@ -430,7 +430,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 
 				if ((m_mvlHead->playables_offset > relativeOffset) || (listStart != 0 && m_mvlHead->playables_offset == relativeOffset)) {
 					m_mvlHead->playables_offset += structSizeDiff;
-					DEBUG_LOG("MVTL: Shifted mvl_playable block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
+					DEBUG_LOG("MVLT: Shifted mvl_playable block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
 
 					if ((m_mvlHead->displayables_offset > relativeOffset) || (listStart != 0 && m_mvlHead->displayables_offset == relativeOffset)) {
 						m_mvlHead->displayables_offset += structSizeDiff;

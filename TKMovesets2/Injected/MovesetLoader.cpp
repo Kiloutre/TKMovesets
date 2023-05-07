@@ -180,7 +180,7 @@ void MovesetLoader::RegisterHook(const char* functionName, const std::string& mo
     }
 }
 
-uint64_t MovesetLoader::GetFunctionAddr(const char* functionName)
+uint64_t MovesetLoader::GetFunctionAddr(const char* functionName) const
 {
     auto func = m_functions.find(functionName);
     if (func != m_functions.end()) {

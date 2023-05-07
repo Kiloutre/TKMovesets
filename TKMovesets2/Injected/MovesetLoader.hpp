@@ -69,7 +69,7 @@ public:
 	~MovesetLoader();
 
 	// Cast a trampoline function and returns it
-	template<class T> T CastTrampoline(const char* hookName);
+	template<class T> T CastTrampoline(const char* hookName) const;
 	// Initializes a hook for a game function. Does not actually trigger it
 	void InitHook(const char* hookName, uint64_t originalAddr, uint64_t newAddr);
 	// Registers a function in the m_functions map, searching in a specific module for the bytes in game_addresses.ini
@@ -80,18 +80,18 @@ public:
 	void HookFunction(const char* functionName);
 	// Unhooks a function if it exists and was successfully registered before, does nothing otherwise
 	void UnhookFunction(const char* functionName);
-	// Returns the casted address of a previously registered fnction
-	template<class T> T CastFunction(const char* functionName);
+	// Returns the casted address of a previously registered function
+	template<class T> T CastFunction(const char* functionName) const;
 	// Returns the value of a variable, reading sizeof(T)
-	template<typename T> T ReadVariable(const char* variableName);
+	template<typename T> T ReadVariable(const char* variableName) const;
 	// Returns the address of the function
-	uint64_t GetFunctionAddr(const char* functionName);
+	uint64_t GetFunctionAddr(const char* functionName) const;
 	// Returns true if a function name was registered and is callable
-	bool HasFunction(const char* funcName) {
+	bool HasFunction(const char* funcName) const {
 		return m_functions.contains(funcName);
 	}
 	// Returns true if a hook name was registered and is callable
-	bool HasHook(const char* funcName) {
+	bool HasHook(const char* funcName) const {
 		return m_hooks.contains(funcName);
 	}
 
@@ -102,7 +102,7 @@ public:
 	// Main loop of the loader
 	virtual void Mainloop() = 0;
 	// Returns true if shared memory file has been successfully initialized
-	bool isInitialized() { return m_memoryHandle != nullptr; }
+	bool isInitialized() const { return m_memoryHandle != nullptr; }
 	// Sets the main module name and address
 	void SetMainModule(const char* name);
 	// Can be called by outside processes to execute an extraproperty within the game
@@ -112,28 +112,31 @@ public:
 	virtual void Debug() {};
 };
 
-template<class T> T MovesetLoader::CastTrampoline(const char* hookName)
+template<class T> T MovesetLoader::CastTrampoline(const char* hookName) const
 {
-	if (m_hooks.contains(hookName)) {
-		return (T)m_hooks[hookName].trampoline;
+	auto item = m_hooks.find(hookName);
+	if (item != m_hooks.end()) {
+		return (T)item->second.trampoline;
 	}
 	DEBUG_LOG("CastTrampoline(): Hook '%s' not found\n", hookName);
 	return nullptr;
 }
 
-template<class T> T MovesetLoader::CastFunction(const char* functionName)
+template<class T> T MovesetLoader::CastFunction(const char* functionName) const
 {
-	if (m_functions.contains(functionName)) {
-		return (T)m_functions[functionName];
+	auto item = m_functions.find(functionName);
+	if (item != m_functions.end()) {
+		return (T)item->second;
 	}
 	DEBUG_LOG("CastFunction(): Function '%s' not found\n", functionName);
 	return nullptr;
 }
 
-template<class T> T MovesetLoader::ReadVariable(const char* functionName)
+template<class T> T MovesetLoader::ReadVariable(const char* functionName) const
 {
-	if (variables.contains(functionName)) {
-		return *(T*)variables[functionName];
+	auto item = variables.find(functionName);
+	if (item != variables.end()) {
+		return *(T*)item->second;
 	}
 	DEBUG_LOG("CastVariable(): Function '%s' not found\n", functionName);
 	return (T)0;

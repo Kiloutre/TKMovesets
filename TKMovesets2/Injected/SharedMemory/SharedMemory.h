@@ -9,10 +9,19 @@ enum MovesetLoaderMode_
 
 enum MovesetSyncStatus_
 {
+	// Packets will not be received (and be buffered) as long as the NotStarted state is on
 	MovesetSyncStatus_NotStarted,
-	MovesetSyncStatus_Syncing,
-	MovesetSyncStatus_Discard,
-	MovesetSyncStatus_Synced,
+
+	// Packets will be received
+	MovesetSyncStatus_AcceptPackets,
+
+	// Stage 1
+	MovesetSyncStatus_RequestSync,
+	// Stage 2
+	MovesetSyncStatus_DownloadingMoveset,
+	MovesetSyncStatus_AwaitingReady,
+	// Stage 3
+	MovesetSyncStatus_Ready,
 };
 
 struct SharedMemBase
@@ -28,11 +37,6 @@ struct SharedMemBase
 
 	bool OnlinePlayMovesetsNotUseable()
 	{
-		return moveset_loader_mode == MovesetLoaderMode_OnlineMode && moveset_sync_status != MovesetSyncStatus_Synced;
-	}
-
-	bool AcceptingPackets()
-	{
-		return moveset_sync_status == MovesetSyncStatus_Discard || moveset_sync_status == MovesetSyncStatus_Syncing;
+		return moveset_loader_mode == MovesetLoaderMode_OnlineMode && (moveset_sync_status != MovesetSyncStatus_Ready && moveset_sync_status != MovesetSyncStatus_AcceptPackets);
 	}
 };

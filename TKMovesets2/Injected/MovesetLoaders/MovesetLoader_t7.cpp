@@ -139,24 +139,6 @@ static unsigned int GetLobbyOpponentMemberId()
 	return 0;
 }
 
-static CSteamID GetLobbyOpponentSteamId()
-{
-	// Note that this function is highly likely to return the wrong player ID in lobbies with more than two players
-	// This is because the player order here does not match the displayed player order
-	CSteamID lobbyID = CSteamID(g_loader->ReadVariable<uint64_t>("gTK_roomId_addr"));
-	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
-
-	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
-	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
-	{
-		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
-		if (memberId != mySteamID) {
-			return memberId;
-		}
-	}
-	return k_steamIDNil;
-}
-
 
 // -- Hook functions --
 
@@ -173,10 +155,34 @@ namespace T7Hooks
 			return retVal;
 		}
 
+		// If we're in online play, don't load movesets if syncing isn't achieved
 		if (g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable()) {
-			// If we're in online play, don't load movesets if syncing isn't done
-			// Todo: Wait some small period (like 10 sec top) 
-			return retVal;
+			DEBUG_LOG("ApplyNewMoveset: Online mode is on, but status is not ready.\n");
+			if (g_loader->sharedMemPtr->moveset_sync_status != MovesetSyncStatus_NotStarted)
+			{
+				bool isSynced = false;
+				// A too high number (like 10 seconds) will timeout
+				unsigned int maxWaitDuration = 5;
+
+				DEBUG_LOG("Awaiting %u seconds max...\n", maxWaitDuration);
+				for (unsigned int i = 0; i < maxWaitDuration && !isSynced; ++i)
+				{
+					Sleep(1000);
+					isSynced = !g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable();
+					DEBUG_LOG("%u/%u...\n", i, maxWaitDuration);
+				}
+
+				if (!isSynced) {
+					delete[] g_loader->incoming_moveset.data;
+					g_loader->sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+					DEBUG_LOG("ApplyNewMoveset: Online mode is still not useable after 10 seconds. Not using custom movesets.\n");
+					return retVal;
+				}
+			}
+			else {
+				delete[] g_loader->incoming_moveset.data;
+				return retVal;
+			}
 		}
 
 		// Determine if we, the user, are the main player or if we are p2
@@ -420,145 +426,13 @@ void MovesetLoaderT7::PostInit()
 
 // -- Main -- //
 
-void MovesetLoaderT7::InitMovesetSyncing()
-{
-	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-	incomingMoveset = nullptr;
-	if (sharedMemPtr->locked_in == false) {
-		DEBUG_LOG("MOVESET_SYNC: Not locked in, not sending\n");
-		return;
-	}
-	DEBUG_LOG("MOVESET_SYNC: Sending moveset to opponent\n");
-
-	CSteamID desiredOpponent = GetLobbyOpponentSteamId();
-	opponent = desiredOpponent;
-	if (desiredOpponent == k_steamIDNil) {
-		DEBUG_LOG("MOVESET_SYNC: No valid opponent to send to\n");
-		return;
-	}
-
-	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Syncing;
-	MovesetLoaderT7_IncomingMovesetInfo movesetInfo;
-
-	if (sharedMemPtr->players[0].custom_moveset_addr == 0) {
-		movesetInfo.size = 0;
-		DEBUG_LOG("MOVESET_SYNC: Size of moveset is zero (no moveset to send but will still notify the opponent)\n");
-	}
-	else {
-		movesetInfo.size = sharedMemPtr->players[0].custom_moveset_original_data_size;
-		DEBUG_LOG("MOVESET_SYNC: Size of moveset is %llu\n", movesetInfo.size);
-	}
-
-	DEBUG_LOG("MOVESET_SYNC: Sending moveset info\n");
-	if (!SteamHelper::SteamNetworking()->SendP2PPacket(opponent, &movesetInfo, sizeof(movesetInfo), k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL))
-	{
-		DEBUG_LOG("MOVESET_SYNC: Failed to send moveset info packet\n");
-		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-		return;
-	}
-
-	if (movesetInfo.size != 0)
-	{
-		uint64_t leftToSend = movesetInfo.size;
-		Byte* dataToSend = (Byte*)sharedMemPtr->players[0].custom_moveset_original_data_addr;
-		while (leftToSend != 0)
-		{
-			uint32_t sendAmount = leftToSend >= 1000000 ? 1000000 : (uint32_t)leftToSend;
-			DEBUG_LOG("MOVESET_SYNC: Sending %u bytes\n", sendAmount);
-			if (!SteamHelper::SteamNetworking()->SendP2PPacket(opponent, dataToSend, sendAmount, k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL))
-			{
-				DEBUG_LOG("MOVESET_SYNC: Failed to send moveset bytes\n");
-				sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-				return;
-			}
-			dataToSend += sendAmount;
-			leftToSend -= sendAmount;
-		}
-	}
-}
-
-void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32_t packetSize)
-{
-	DEBUG_LOG("PACKET: Received %u bytes\n", packetSize);
-	if (senderId != opponent) {
-		DEBUG_LOG("PACKET: Bad opponent\n");
-		return;
-	}
-
-
-	if (packetSize == sizeof(MovesetLoaderT7_IncomingMovesetInfo) && strncmp((char*)packetBuf, "TKM2", 4) == 0) {
-		auto movesetInfo = (MovesetLoaderT7_IncomingMovesetInfo*)packetBuf;
-		incomingMovesetSize = movesetInfo->size;
-		DEBUG_LOG("PACKET: Incoming moveset size is %llu\n", incomingMovesetSize);
-		incomingMoveset = new Byte[incomingMovesetSize];
-		incomingMovesetCursor = incomingMoveset;
-		sharedMemPtr->players[1].custom_moveset_addr = 0;
-		return;
-	}
-
-	if (incomingMoveset == nullptr) {
-		DEBUG_LOG("PACKET: Received incoming moveset without receiving the size first.\n");
-		return;
-	}
-
-	uint64_t remainingBytes = incomingMovesetSize - (incomingMovesetCursor - incomingMoveset);
-	if (remainingBytes < packetSize) {
-		// Received too much data
-		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-		DEBUG_LOG("PACKET: Received too much data.\n");
-		return;
-	}
-
-	memcpy(incomingMovesetCursor, packetBuf, packetSize);
-	incomingMovesetCursor += packetSize;
-
-	if (remainingBytes == packetSize) {
-		DEBUG_LOG("PACKET: Successfully received entire moveset!\n");
-
-		auto& player = sharedMemPtr->players[1];
-
-		incomingMoveset = ImportForOnline(sharedMemPtr->players[1], incomingMoveset, incomingMovesetSize);
-
-		if (incomingMoveset != nullptr)
-		{
-			player.custom_moveset_addr = (uint64_t)incomingMoveset;
-			player.is_initialized = false;
-			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Synced;
-		}
-		else {
-			DEBUG_LOG("ImportForOnline() returned nullptr: not using received moveset. (badly formated?)\n");
-			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-			player.custom_moveset_addr = 0;
-		}
-	}
-}
-
 void MovesetLoaderT7::Mainloop()
 {
 	while (!mustStop)
 	{
-		if (sharedMemPtr->AcceptingPackets())
-		{
-			uint32_t packetSize;
-			while (SteamHelper::SteamNetworking()->IsP2PPacketAvailable(&packetSize, MOVESET_LOADER_P2P_CHANNEL))
-			{
-				Byte* packetBuf = new Byte[packetSize];
-
-				CSteamID senderId;
-				if (SteamHelper::SteamNetworking()->ReadP2PPacket(packetBuf, packetSize, &packetSize, &senderId, MOVESET_LOADER_P2P_CHANNEL))
-				{
-					if (sharedMemPtr->moveset_sync_status != MovesetSyncStatus_Discard) {
-						OnPacketReceive(senderId, packetBuf, packetSize);
-					}
-				}
-				else {
-					DEBUG_LOG("PACKET: Read failed\n");
-				}
-
-				delete[] packetBuf;
-			}
+		if (CanConsumePackets()) {
+			ConsumePackets();
 		}
-
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
