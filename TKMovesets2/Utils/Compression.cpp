@@ -37,6 +37,7 @@ namespace CompressionUtils
 			moveset_data_size = (int32_t)orig_file.tellg() - moveset_data_start;
 
 			// Mark moveset as compressed
+			((TKMovesetHeader*)buf)->compressionType = TKMovesetCompressonType_LZ4;
 			((TKMovesetHeader*)buf)->moveset_data_size = moveset_data_size;
 
 			// Write header

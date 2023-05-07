@@ -16,7 +16,6 @@
 #include <locale>
 #include <filesystem>
 #include <fstream>
-#include <Sig/Sig.hpp>
 #include <lz4.h>
 
 #include "MainWindow.hpp"
@@ -248,7 +247,6 @@ void CleanupUpdateFiles(const std::string& filename);
 
 int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
 

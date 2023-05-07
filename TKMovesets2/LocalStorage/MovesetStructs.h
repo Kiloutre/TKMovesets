@@ -2,10 +2,18 @@
 
 #include <stdint.h>
 
+typedef uint8_t TKMovesetCompressionType;
+enum TKMovesetCompressionType_
+{
+	TKMovesetCompressonType_None,
+	TKMovesetCompressonType_LZ4
+};
+
 enum TKMovesetProperty_
 {
 	TKMovesetProperty_END = 0x0
 };
+
 // Custom moveset properties used when loading into a game
 struct TKMovesetProperty
 {
@@ -46,6 +54,8 @@ struct TKMovesetHeader
 	uint32_t moveset_data_start = (uint32_t)-1;
 	// Size of the moveset data. Purposefully a int32_t. 0 if not compressed.
 	int32_t moveset_data_size = 0;
+	// Type of the compression
+	TKMovesetCompressionType compressionType = TKMovesetCompressonType_None;
 	// Stores a hash of the moveset data 
 	uint32_t crc32 = (uint32_t)-1;
 	// Original crc32 of the moveset data at the time of extraction

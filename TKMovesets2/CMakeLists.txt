@@ -242,7 +242,7 @@ find_package(imgui CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
 target_link_libraries(GameSpecific PRIVATE imgui::imgui) # Only used for the color-defining includes
 
-# Compression
+# Compression. I tried LZMA but it was too slow even on the fastest preset, so we're using LZ4 for now
 find_package(lz4 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE lz4::lz4)
 target_link_libraries(FileEmbedder PRIVATE lz4::lz4)
