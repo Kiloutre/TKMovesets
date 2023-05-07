@@ -18,12 +18,13 @@ private:
 	void OnApply() override;
 	void ApplyWindowName(bool reapplyWindowProperties = true) override;
 	void OnUpdate(int listIdx, EditorInput* field) override;
+	void OnInitEnd() override;
 	void PostRender() override;
 	void RenderExtraContextMenuItems() override;
 
 	// Loads the list of animation available in our library and allows to import one of them
 	void OpenAnimationList();
 public:
-	EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow);
+	using EditorForm::EditorForm;
 	void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) override;
 };

@@ -5,14 +5,8 @@
 #include "Localization.hpp"
 #include "Helpers.hpp"
 
-// -- Public methods -- //
-
-EditorMove::EditorMove(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
+void EditorMove::OnInitEnd()
 {
-	windowType = EditorWindowType_Move;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-
 	// Build initial transition label
 	{
 		auto& field = m_fieldIdentifierMap["transition"];

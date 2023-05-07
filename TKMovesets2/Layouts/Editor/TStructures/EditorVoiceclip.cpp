@@ -4,15 +4,6 @@
 #include "EditorVoiceclip.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorVoiceclip::EditorVoiceclip(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_Voiceclip;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);

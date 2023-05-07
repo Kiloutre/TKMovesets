@@ -2,15 +2,6 @@
 #include "EditorMoveStartProperty.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorMoveStartProperty::EditorMoveStartProperty(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_MoveBeginProperty;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);

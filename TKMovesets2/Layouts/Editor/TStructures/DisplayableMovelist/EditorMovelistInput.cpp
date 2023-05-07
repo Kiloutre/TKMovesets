@@ -5,18 +5,6 @@
 #include "EditorMovelistInput.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorMovelistInput::EditorMovelistInput(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow, int listSize)
-{
-	windowType = EditorWindowType_MovelistInput;
-	m_baseWindow = baseWindow;
-	m_listSize = listSize;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
-// -- Private methods-- //
-
 void EditorMovelistInput::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);

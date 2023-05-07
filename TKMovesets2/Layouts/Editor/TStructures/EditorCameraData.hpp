@@ -6,5 +6,5 @@
 class EditorCameraData : public EditorForm
 {
 public:
-	EditorCameraData(std::string windowTitleBase, uint32_t t_id, Editor* editor);
+	using EditorForm::EditorForm;
 };

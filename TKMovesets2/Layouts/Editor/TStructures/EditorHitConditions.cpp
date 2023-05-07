@@ -2,15 +2,6 @@
 #include "EditorHitConditions.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorHitConditions::EditorHitConditions(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_HitCondition;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);

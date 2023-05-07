@@ -56,7 +56,7 @@ protected:
 	// Used with changing data types to prevent .unsavedChanges from being set to true
 	bool m_ignoreNextChange = false;
 
-	virtual size_t GetOriginalStructureListSize() { return 0; };
+	virtual int GetOriginalStructureListSize() { return 0; };
 	virtual void PostRender() {};
 	// Actual rendering function
 	virtual void RenderInternal();
@@ -81,7 +81,7 @@ protected:
 	// Returns false if any field has an error state
 	virtual bool IsFormValid();
 	// Inits the form
-	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
+	virtual void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
 	// Returns true if the current form window has been right clicked
 	bool IsWindowRightClicked() const;
 	// Overrideable to render extra items in the form's context menu
@@ -105,8 +105,13 @@ public:
 	ImGuiViewport* currentViewport = nullptr;
 	// Set to true in a derived constructor to prevent the creation of multiple windows of the derived class
 	bool uniqueType = false;
+
+	EditorForm() {};
+	EditorForm(const std::string& parentWindowName, EditorWindowType_ windowType, uint16_t t_structureId, Editor* editor, EditorWindowBase* baseWindow, int listSize);
 	virtual ~EditorForm();
 
+	// Called after the constructor
+	virtual void OnInitEnd() {};
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
 	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) {};
 	void Render();

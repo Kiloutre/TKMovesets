@@ -40,6 +40,20 @@ public:
 		return "Error while loading moveset";
 	}
 };
+class EditorWindowFactory_Base
+{
+public:
+	virtual ~EditorWindowFactory_Base() {}
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorWindowBase* e, int f) const = 0;
+	virtual void* cast(void* obj) const = 0;
+};
+
+template<typename T> class EditorWindowFactory : public EditorWindowFactory_Base
+{
+public:
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorWindowBase* e, int f) const { return new T(a, b, c, d, e, f); }
+	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
+};
 
 class EditorWindow : public EditorWindowBase {
 private:
@@ -85,6 +99,8 @@ private:
 	GameSharedMem m_sharedMemHelper;
 	// If true, will compress the moveset file when saving
 	bool m_compressOnSave = false;
+	// Map that will determine which window type to allocate depending on the given type
+	std::map<EditorWindowType_, EditorWindowFactory_Base*> m_windowCreatorMap;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -96,6 +112,8 @@ private:
 	// Render the list of moves
 	void RenderMovelist();
 
+	// Populate .m_windowCreatorMap so that windows may get created by type. Can have different contents depending on what the gmae allows.
+	void PopulateWindowCreatorMap();
 	// Factory instantiating the right class for the right identifier.
 	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize = 0);
 

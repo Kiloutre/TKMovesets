@@ -19,10 +19,10 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "t7",
 		.minorDataString = "t7",
 		.supportedImports = {},
-		.extractor = new FactoryType<ExtractorT7>,
-		.importer = new FactoryType<ImporterT7>,
-		.editor = new FactoryType<EditorT7>,
-		.onlineHandler = new FactoryType<OnlineT7>
+		.extractor = new GameFactory<ExtractorT7>,
+		.importer = new GameFactory<ImporterT7>,
+		.editor = new GameFactory<EditorT7>,
+		.onlineHandler = new GameFactory<OnlineT7>
 	},
 	{
 		.name = "Tekken 8",

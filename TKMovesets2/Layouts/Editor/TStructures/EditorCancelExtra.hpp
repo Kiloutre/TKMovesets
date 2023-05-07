@@ -6,5 +6,5 @@
 class EditorCancelExtra : public EditorForm
 {
 public:
-	EditorCancelExtra(std::string windowTitleBase, uint32_t t_id, Editor* editor);
+	using EditorForm::EditorForm;
 };

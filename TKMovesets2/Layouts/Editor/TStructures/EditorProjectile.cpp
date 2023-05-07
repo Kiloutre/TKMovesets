@@ -4,15 +4,6 @@
 #include "EditorProjectile.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorProjectile::EditorProjectile(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_Projectile;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);

@@ -5,15 +5,11 @@
 #include "EditorMovelistDisplayable.hpp"
 #include "Localization.hpp"
 
+
 // -- Public methods -- //
 
-EditorMovelistDisplayable::EditorMovelistDisplayable(std::string windowTitleBase, Editor* editor, EditorWindowBase* baseWindow)
+void EditorMovelistDisplayable::OnInitEnd()
 {
-	windowType = EditorWindowType_MovelistDisplayable;
-	m_baseWindow = baseWindow;
-	uniqueType = true;
-	InitForm(windowTitleBase, 0, editor);
-	// Trigger update to build all the item details
 	BuidAllLabels();
 }
 

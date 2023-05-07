@@ -6,6 +6,23 @@
 #include "EditorFormList.hpp"
 #include "Localization.hpp"
 
+// -- Public methods -- //
+
+EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorWindowBase* baseWindow, int listSize)
+{
+	windowType = t_windowType;
+	m_baseWindow = baseWindow;
+	m_listSize = listSize;
+	InitForm(parentWindowName, t_structureId, editor);
+}
+
+void EditorFormList::OnInitEnd()
+{
+	for (unsigned int i = 0; i < m_listSize; ++i) {
+		BuildItemDetails(i);
+	}
+}
+
 // -- Private methods -- //
 
 void EditorFormList::Apply()
@@ -18,7 +35,7 @@ void EditorFormList::Apply()
 	{
 		// If items were added/removed, reallocate entire moveset
 		int newSize = (int)m_listSize;
-		int oldSize = GetOriginalStructureListSize();
+		int oldSize = (int)GetOriginalStructureListSize();
 		std::vector<int> itemIndexes;
 		for (auto& item : m_items) {
 			itemIndexes.push_back(item->id);
@@ -234,8 +251,6 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	ImGui::PopID();
 	ImGui::SetCursorPos(cursor);
 }
-
-// -- Public methods -- //
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
 {

@@ -9,5 +9,5 @@ class EditorReactions: public EditorForm
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 public:
-	EditorReactions(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow);
+	using EditorForm::EditorForm;
 };

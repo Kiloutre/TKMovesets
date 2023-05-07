@@ -4,15 +4,6 @@
 #include "EditorGroupedCancels.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorGroupedCancels::EditorGroupedCancels(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_GroupedCancel;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 // -- Private methods -- //
 
 void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)

@@ -108,7 +108,7 @@ bool MovesetLoader::Init()
     memset(orig_sharedMemPtr, 0, SHARED_MEMORY_BUFSIZE);
     strcpy_s(orig_sharedMemPtr->moveset_loader_version, sizeof(orig_sharedMemPtr->moveset_loader_version), "test");
 
-    PostInit();
+    OnInitEnd();
     return true;
 }
 

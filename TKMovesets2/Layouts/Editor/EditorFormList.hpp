@@ -46,7 +46,8 @@ protected:
 	// Absolute structure IDs of the deleted items sicne the last Apply()
 	std::set<int> m_deletedItemIds;
 
-	virtual size_t GetOriginalStructureListSize() { return m_listSize - m_listSizeChange; };
+	// Get the size of the structure before we made unsaved changes to it
+	virtual int GetOriginalStructureListSize() { return (int)m_listSize - (int)m_listSizeChange; };
 	// Called before an item's treenode is rendered, use to display stuff on the item treenode. Called before RenderListControlButtons();
 	virtual void PreItemRender(int listIdx) {};
 	// Called whenver the list is reordered, used to  update field labels when index is important
@@ -66,10 +67,14 @@ protected:
 	// Notify fields in other windows to be updated
 	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) override;
 
+	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor) override;
 	// Called whenever a field changes (and is valid).
 	virtual void OnUpdate(int listIdx, EditorInput* field) override;
 public:
+	EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorWindowBase* baseWindow, int listSize);
 	virtual ~EditorFormList() override;
-	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
+
+	// Called after the constructor
+	virtual void OnInitEnd() override;
 	void RenderInternal() override;
 };

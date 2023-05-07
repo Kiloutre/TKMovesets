@@ -33,83 +33,51 @@
 
 // -- Private methods -- //
 
+void EditorWindow::PopulateWindowCreatorMap()
+{
+	m_windowCreatorMap = {
+		{EditorWindowType_Move, new EditorWindowFactory<EditorMove> },
+		{EditorWindowType_Voiceclip, new EditorWindowFactory<EditorVoiceclip> },
+
+		{EditorWindowType_Extraproperty, new EditorWindowFactory<EditorExtraproperties> },
+		{EditorWindowType_MoveBeginProperty, new EditorWindowFactory<EditorMoveStartProperty> },
+		{EditorWindowType_MoveEndProperty, new EditorWindowFactory<EditorMoveEndProperty> },
+
+		{EditorWindowType_Requirement, new EditorWindowFactory<EditorRequirements> },
+
+		{EditorWindowType_HitCondition, new EditorWindowFactory<EditorHitConditions> },
+		{EditorWindowType_Reactions, new EditorWindowFactory<EditorReactions> },
+		{EditorWindowType_Pushback, new EditorWindowFactory<EditorPushback> },
+		{EditorWindowType_PushbackExtradata, new EditorWindowFactory<EditorPushbackExtra> },
+
+		{EditorWindowType_Cancel, new EditorWindowFactory<EditorCancels> },
+		{EditorWindowType_CancelExtradata, new EditorWindowFactory<EditorCancelExtra> },
+		{EditorWindowType_GroupedCancel, new EditorWindowFactory<EditorGroupedCancels> },
+
+		{EditorWindowType_InputSequence, new EditorWindowFactory<EditorInputSequence> },
+		{EditorWindowType_Input, new EditorWindowFactory<EditorInputStruct> },
+
+		{EditorWindowType_Projectile, new EditorWindowFactory<EditorProjectile> },
+
+		{EditorWindowType_CameraData, new EditorWindowFactory<EditorCameraData> },
+		{EditorWindowType_ThrowCamera, new EditorWindowFactory<EditorThrowCamera> },
+
+		{EditorWindowType_MovelistDisplayable, new EditorWindowFactory<EditorMovelistDisplayable> },
+		{EditorWindowType_MovelistPlayable, new EditorWindowFactory<EditorMovelistPlayable> },
+		{EditorWindowType_MovelistInput, new EditorWindowFactory<EditorMovelistInput> }
+	};
+}
+
 EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize)
 {
-	switch (windowType)
-	{
-	case EditorWindowType_Move:
-		return new EditorMove(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Voiceclip:
-		return new EditorVoiceclip(m_windowTitle, id, m_editor, this);
-		break;
-
-	case EditorWindowType_Extraproperty:
-		return new EditorExtraproperties(m_windowTitle, id, m_editor, this);
-		break;
-
-	case EditorWindowType_Cancel:
-		return new EditorCancels(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_GroupedCancel:
-		return new EditorGroupedCancels(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_CancelExtradata:
-		return new EditorCancelExtra(m_windowTitle, id, m_editor);
-		break;
-
-	case EditorWindowType_Requirement:
-		return new EditorRequirements(m_windowTitle, id, m_editor, this);
-		break;
-
-	case EditorWindowType_HitCondition:
-		return new EditorHitConditions(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Reactions:
-		return new EditorReactions(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Pushback:
-		return new EditorPushback(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_PushbackExtradata:
-		return new EditorPushbackExtra(m_windowTitle, id, m_editor, this, listSize);
-		break;
-
-	case EditorWindowType_MoveBeginProperty:
-		return new EditorMoveStartProperty(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_MoveEndProperty:
-		return new EditorMoveEndProperty(m_windowTitle, id, m_editor, this);
-		break;
-
-	case EditorWindowType_InputSequence:
-		return new EditorInputSequence(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_Input:
-		return new EditorInputStruct(m_windowTitle, id, m_editor, this, listSize);
-		break;
-
-	case EditorWindowType_Projectile:
-		return new EditorProjectile(m_windowTitle, id, m_editor, this);
-		break;
-
-	case EditorWindowType_ThrowCamera:
-		return new EditorThrowCamera(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_CameraData:
-		return new EditorCameraData(m_windowTitle, id, m_editor);
-		break;
-
-	case EditorWindowType_MovelistDisplayable:
-		return new EditorMovelistDisplayable(m_windowTitle, m_editor, this);
-		break;
-	case EditorWindowType_MovelistPlayable:
-		return new EditorMovelistPlayable(m_windowTitle, id, m_editor, this);
-		break;
-	case EditorWindowType_MovelistInput:
-		return new EditorMovelistInput(m_windowTitle, id, m_editor, this, listSize);
-		break;
+	auto windowCreator = m_windowCreatorMap.find(windowType);
+	if (windowCreator != m_windowCreatorMap.end()) {
+		auto newWin = (EditorForm*)windowCreator->second->allocate(m_windowTitle, windowType, id, m_editor, this, listSize);
+		newWin->OnInitEnd();
+		return newWin;
 	}
+
+	DEBUG_LOG("ERROR: NO WINDOW FOUND FOR WINDOW TYPE %u\n", windowType);
 
 	return nullptr;
 }
@@ -139,15 +107,18 @@ void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structI
 
 	bool openNew = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 	EditorForm* newWin = AllocateFormWindow(windowType, structId, listSize);
-	newWin->nextDockId = m_dockId;
+	if (newWin != nullptr)
+	{
+		newWin->nextDockId = m_dockId;
 
-	if (!openNew && availableOverwriteIndex != -1) {
-		// Can't delete here because OpenFormWindow can be called by EditorForm classes
-		// Close the window and let deletion occur during next rendering
-		m_structWindows[availableOverwriteIndex]->popen = false;
+		if (!openNew && availableOverwriteIndex != -1) {
+			// Can't delete here because OpenFormWindow can be called by EditorForm classes
+			// Close the window and let deletion occur during next rendering
+			m_structWindows[availableOverwriteIndex]->popen = false;
+		}
+
+		m_structWindows.push_back(newWin);
 	}
-
-	m_structWindows.push_back(newWin);
 }
 
 void EditorWindow::FilterMovelist(EditorMovelistFilter_ filter)
@@ -352,6 +323,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 	filename = m_loadedCharacter.filename.c_str();
 	m_loadedCharacter.gameId = movesetInfo->gameId;
 
+	PopulateWindowCreatorMap();
 
 	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
 

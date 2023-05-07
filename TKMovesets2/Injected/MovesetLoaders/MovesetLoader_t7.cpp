@@ -417,7 +417,7 @@ void MovesetLoaderT7::InitHooks()
 #endif
 	}
 }
-void MovesetLoaderT7::PostInit()
+void MovesetLoaderT7::OnInitEnd()
 {
 	sharedMemPtr = (SharedMemT7*)orig_sharedMemPtr;
 

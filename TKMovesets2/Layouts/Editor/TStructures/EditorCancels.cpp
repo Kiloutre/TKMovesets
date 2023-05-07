@@ -4,15 +4,6 @@
 #include "EditorCancels.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorCancels::EditorCancels(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_Cancel;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 // -- Private methods -- //
 
 void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)

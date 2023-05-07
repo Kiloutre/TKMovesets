@@ -2,15 +2,6 @@
 #include "EditorInputSequence.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorInputSequence::EditorInputSequence(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_InputSequence;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);

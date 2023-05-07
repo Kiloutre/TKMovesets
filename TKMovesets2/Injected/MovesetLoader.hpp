@@ -98,7 +98,7 @@ public:
 	// Initializes the list of hook
 	virtual void InitHooks() = 0;
 	// Called upon a successful Init()
-	virtual void PostInit() = 0;
+	virtual void OnInitEnd() = 0;
 	// Main loop of the loader
 	virtual void Mainloop() = 0;
 	// Returns true if shared memory file has been successfully initialized

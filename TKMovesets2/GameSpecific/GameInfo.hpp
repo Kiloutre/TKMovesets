@@ -10,15 +10,15 @@
 
 struct GameInfo;
 
-class FactoryType_Base
+class GameFactory_Base
 {
 public:
-	virtual ~FactoryType_Base() {}
+	virtual ~GameFactory_Base() {}
 	virtual void* allocate(GameProcess* process, GameData* game, const GameInfo* gameInfo) const = 0;
 	virtual void* cast(void* obj) const = 0;
 };
 
-template<typename T> class FactoryType : public FactoryType_Base
+template<typename T> class GameFactory : public GameFactory_Base
 {
 public:
 	virtual void* allocate(GameProcess* process, GameData* game, const GameInfo* gameInfo) const { return new T(process, game, gameInfo); }
@@ -56,13 +56,13 @@ public:
 	// List of movesets' games we can import from, doesn't have to include ourselves
 	std::set<uint16_t> supportedImports;
 	// Dynamic type allocator to store the game's extractor. Can be nullptr for no available extractor.
-	FactoryType_Base* extractor;
+	GameFactory_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.
-	FactoryType_Base* importer;
+	GameFactory_Base* importer;
 	// Dynamic type allocator to store the game's editor. Can be nullptr for no available editor.
-	FactoryType_Base* editor;
+	GameFactory_Base* editor;
 	// Dynamic type allocator to store the game's online handler. Can be nullptr for no available handler.
-	FactoryType_Base* onlineHandler;
+	GameFactory_Base* onlineHandler;
 	// If set, creates a "ImGui::SeparatorText()" entry in the game list, right before the game
 	const char* groupName = nullptr;
 

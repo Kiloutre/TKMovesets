@@ -4,15 +4,6 @@
 #include "EditorRequirements.hpp"
 #include "Localization.hpp"
 
-// -- Public methods -- //
-
-EditorRequirements::EditorRequirements(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_Requirement;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;

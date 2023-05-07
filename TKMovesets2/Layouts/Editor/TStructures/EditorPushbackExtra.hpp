@@ -9,5 +9,5 @@ private:
 	void OnUpdate(int listIdx, EditorInput* field) override;
 	void BuildItemDetails(int listIdx) override;
 public:
-	EditorPushbackExtra(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow, int listSize);
+	using EditorFormList::EditorFormList;
 };

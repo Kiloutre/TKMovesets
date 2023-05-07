@@ -12,5 +12,5 @@ private:
 	void OnResize() override;
 	void OnReorder() override;
 public:
-	EditorVoiceclip(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow);
+	using EditorFormList::EditorFormList;
 };

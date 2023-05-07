@@ -3,15 +3,6 @@
 #include "Localization.hpp"
 #include "helpers.hpp"
 
-// -- Public methods -- //
-
-EditorReactions::EditorReactions(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow)
-{
-	windowType = EditorWindowType_Reactions;
-	m_baseWindow = baseWindow;
-	InitForm(windowTitleBase, t_id, editor);
-}
-
 void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);

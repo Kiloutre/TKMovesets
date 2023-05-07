@@ -9,5 +9,6 @@ private:
 	void BuildItemDetails(int listIdx) override;
 	void OnUpdate(int listIdx, EditorInput* field) override;
 public:
+	using EditorFormList::EditorFormList;
 	EditorMovelistInput(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow, int listSize);
 };

@@ -117,7 +117,7 @@ public:
 	} syncStatus;
 
 	void InitHooks() override;
-	void PostInit() override;
+	void OnInitEnd() override;
 	void Mainloop() override;
 	void ExecuteExtraprop() override;
 
