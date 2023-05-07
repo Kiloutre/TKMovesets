@@ -23,6 +23,8 @@ This project uses CMake, so if you're new to this, your best way to get started 
 This project requires external libraries to be downloaded & built to function.
 
 ### [vcpkg](https://vcpkg.io/en/getting-started.html)-obtainable dependencies
+Some libraries can be quickly obtained by simply using vcpkg, a package manager that can be tied to Visual Studio and download & build vcpkg dependencies automatically for you.
+This is the recommended way of building this project.
 - Download vcpkg by running `git clone https://github.com/Microsoft/vcpkg.git`, or simply [downloading the .zip file](https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip)
 - Place the folder anywhere you want in your system, decide on a good place now because moving it later will break things.
 - Run `bootstrap-vcpkg.bat` off the vcpkg folder
@@ -37,6 +39,8 @@ This project requires external libraries to be downloaded & built to function.
 vcpkg is now installed.
 
 ### Submodules dependencies
+
+Some dependencies have to be obtained from other git repos. To get them, make sure to also clone the submodules contained within this project.
 
 If cloning with git from the command line, use this command to also download the required submodules:
 
@@ -55,6 +59,8 @@ You may obtain the steamworks files using two possible ways:
 
 - From the official steamworks website (that will require craeting a steamworks account): https://partner.steamgames.com/downloads/list . Do make sure to download the version that came right before the Tekken build you'll be using the software on, for minimum problems.
 - From this link which may go down at any time (v1.56) : https://mega.nz/folder/htpVHSCa#O24Zz0PfxcyejV5ChqDAgw
+
+Make sure the folder is extracted at the root of the project (inside the TKMovesets folder), and that it is named `steam api`
 
 ## Building
 - **If you have visual studio installed**: Make sure to close Visual Studio and delete the folders `.vs` and `out` before trying your first build, they may contain bad cache if you attempted building the project with an incomplete environment
