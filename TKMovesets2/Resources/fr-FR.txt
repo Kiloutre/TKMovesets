@@ -137,7 +137,7 @@ persistent.select_moveset = Sélectionner personnage
 persistent.clear_moveset = Enlever personnage
 
 # Jeu en ligne #
-online.explanation = Le jeu en ligne nécessite que les deux joueurs possèdent cet outil en train de tourner.\nVous devez chacun de vôtre côté selectionner un personnage à charger (ou aucun) avant le chargement du match, cet outil se chargera de synchroniser les personnages que vous avez modifié.\nLes moveset personnalisés ne seront pas chargés si vous ou l'adversaire n'avez pas cet outil de lancé.
+online.explanation = Le jeu en ligne nécessite que les deux joueurs possèdent cet outil de lancé.\nVous devez chacun de vôtre côté selectionner un personnage à charger (ou aucun) avant le chargement du match, cet outil se chargera de synchroniser les personnages que vous avez modifié.\nLes moveset personnalisés ne seront pas chargés si vous ou l'adversaire n'avez pas cet outil de lancé, ou si un de vous deux n'a pas verrouillé sa selection dans cet outil.
 online.select_moveset = Sélectionner un personnage
 online.no_selected_moveset = Pas de personnage selectionné
 online.dll_not_loaded = DLL non-chargée, injectez la

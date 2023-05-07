@@ -85,11 +85,11 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 	case PacketT7Type_RequestSync:
 		{
 			if (sharedMemPtr->moveset_sync_status != MovesetSyncStatus_RequestSync) {
-				DEBUG_LOG("COMMUNICATION(): PACKET REQUEST_SYNC received but was not expected. Ignoring.\n");
+				DEBUG_LOG("COMMUNICATION: PACKET REQUEST_SYNC received but was not expected. Ignoring.\n");
 				return;
 			}
 
-			DEBUG_LOG("COMMUNICATION(): PACKET REQUEST_SYNC RECEIVED\n");
+			DEBUG_LOG("COMMUNICATION: PACKET REQUEST_SYNC RECEIVED\n");
 			// Received a packet from the opponent providing us with informations about what he wants
 
 			auto _packet = (PacketT7_RequestMovesetSync*)packet;
@@ -313,7 +313,7 @@ void MovesetLoaderT7::InitMovesetSyncing()
 	incoming_moveset.data = nullptr;
 
 	if (sharedMemPtr->locked_in == false) {
-		DEBUG_LOG("MOVESET_SYNC: Not locked in, not sending\n");
+		DEBUG_LOG("MOVESET_SYNC: Not locked in.\n");
 		return;
 	}
 
@@ -348,6 +348,19 @@ void MovesetLoaderT7::InitMovesetSyncing()
 }
 
 // -- Packet consumption -- //
+
+
+void MovesetLoaderT7::DiscardIncomingPackets()
+{
+	char buf[8];
+	uint32_t packetSize;
+	while (SteamHelper::SteamNetworking()->IsP2PPacketAvailable(&packetSize, MOVESET_LOADER_P2P_CHANNEL))
+	{
+		DEBUG_LOG("DiscardIncomingPackets - %u\n", packetSize);
+		CSteamID senderId;
+		SteamHelper::SteamNetworking()->ReadP2PPacket(buf, sizeof(buf), &packetSize, &senderId, MOVESET_LOADER_P2P_CHANNEL);
+	}
+}
 
 void MovesetLoaderT7::ConsumePackets()
 {

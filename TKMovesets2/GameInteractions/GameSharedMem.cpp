@@ -77,6 +77,7 @@ void GameSharedMem::RunningUpdate()
 		// The only case where .size can be 0 is if a Submenu purposefully set it that way, to indicate that we want to clear the selection
 		if (moveset.size == 0) {
 			m_sharedMemHandler->ClearMovesetSelection(playerId);
+			m_plannedImportations.erase(m_plannedImportations.begin());
 		}
 		else
 		{

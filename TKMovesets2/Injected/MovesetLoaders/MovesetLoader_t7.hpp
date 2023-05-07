@@ -135,6 +135,8 @@ public:
 	void InitMovesetSyncing();
 	// Send our moveset to the opponent
 	void SendMoveset();
+	// Discard any incoming packet until there is no more to discard
+	void DiscardIncomingPackets();
 
 	// Moveset importing function
 	Byte* ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
