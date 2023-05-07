@@ -203,6 +203,7 @@ void MovesetLoaderT7::OnMovesetBytesReceive(const Byte* buf, uint32_t bufSize)
 		if (incoming_moveset.data != nullptr)
 		{
 			if (incoming_moveset.prev_moveset != 0) {
+				DEBUG_LOG("Freeing old moveset.\n");
 				delete[] incoming_moveset.prev_moveset;
 			}
 			incoming_moveset.prev_moveset = incoming_moveset.data;

@@ -91,18 +91,18 @@ public:
 
 	// Informations about the coming movesets are stored here
 	struct {
-		Byte* prev_moveset;
-		Byte* data;
-		Byte* cursor;
-		uint64_t size;
-		uint64_t remaining_bytes;
+		Byte* prev_moveset = nullptr;
+		Byte* data = nullptr;
+		Byte* cursor = nullptr;
+		uint64_t size = 0;
+		uint64_t remaining_bytes = 0;
 	} incoming_moveset;
 
 	// Informations about the syncing status is stored here
 	struct {
 
-		bool opponent_ready;
-		bool loaded_remote_moveset;
+		bool opponent_ready = false;
+		bool loaded_remote_moveset = false;
 
 		void Reset() {
 			opponent_ready = false;

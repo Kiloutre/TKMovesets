@@ -69,9 +69,9 @@ public:
 	// Returns a list of every game_address.txt entry (key only).
 	const std::vector<std::string>& GetAllKeys();
 	// Returns a single numerical value from the file
-	int64_t GetValue(const std::string& gameKey, const char* c_addressId);
+	int64_t GetValue(const std::string& gameKey, const char* c_addressId) const;
 	// Returns a string from the file
-	const char* GetString(const std::string& gameKey, const char* c_addressId);
+	const char* GetString(const std::string& gameKey, const char* c_addressId) const;
 	// Returns a pointer path, that may rely on the base address or not.
-	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative);
+	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
 };

@@ -190,12 +190,16 @@ const std::vector<std::string>& GameAddressesFile::GetAllKeys()
 }
 
 
-int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_addressId)
+int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_addressId) const
 {
-	auto& values = m_entries[gameKey].values;
-	auto entry = values.find(c_addressId);
-	if (entry != values.end()) {
-		return entry->second;
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
+	{
+		auto& values = gameEntry->second.values;
+		auto entry = values.find(c_addressId);
+		if (entry != values.end()) {
+			return entry->second;
+		}
 	}
 
 #ifdef BUILD_TYPE_DEBUG
@@ -209,12 +213,16 @@ int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_ad
 }
 
 
-const char* GameAddressesFile::GetString(const std::string& gameKey, const char* c_addressId)
+const char* GameAddressesFile::GetString(const std::string& gameKey, const char* c_addressId) const
 {
-	auto& strings = m_entries[gameKey].strings;
-	auto entry = strings.find(c_addressId);
-	if (entry != strings.end()) {
-		return entry->second.c_str();
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
+	{
+		auto& strings = gameEntry->second.strings;
+		auto entry = strings.find(c_addressId);
+		if (entry != strings.end()) {
+			return entry->second.c_str();
+		}
 	}
 
 #ifdef BUILD_TYPE_DEBUG
@@ -228,22 +236,26 @@ const char* GameAddressesFile::GetString(const std::string& gameKey, const char*
 }
 
 std::vector<gameAddr> cg_emptyVector;
-const std::vector<gameAddr>& GameAddressesFile::GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative)
+const std::vector<gameAddr>& GameAddressesFile::GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative) const
 {
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
 	{
-		auto& relative_pointer_paths = m_entries[gameKey].relative_pointer_paths;
-		auto entry = relative_pointer_paths.find(c_addressId);
-		if (entry != relative_pointer_paths.end()) {
-			isRelative = true;
-			return entry->second;
+		{
+			auto& relative_pointer_paths = gameEntry->second.relative_pointer_paths;
+			auto entry = relative_pointer_paths.find(c_addressId);
+			if (entry != relative_pointer_paths.end()) {
+				isRelative = true;
+				return entry->second;
+			}
 		}
-	}
-	{
-		auto& absolute_pointer_paths = m_entries[gameKey].absolute_pointer_paths;
-		auto entry = absolute_pointer_paths.find(c_addressId);
-		isRelative = false;
-		if (entry != absolute_pointer_paths.end()) {
-			return entry->second;
+		{
+			auto& absolute_pointer_paths = gameEntry->second.absolute_pointer_paths;
+			auto entry = absolute_pointer_paths.find(c_addressId);
+			isRelative = false;
+			if (entry != absolute_pointer_paths.end()) {
+				return entry->second;
+			}
 		}
 	}
 
