@@ -194,3 +194,14 @@ void EditorMove::PostRender()
 
 	ImGui::PopID();
 }
+
+void EditorMove::RenderExtraContextMenuItems()
+{
+	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
+
+	ImGuiExtra::DisableBlockIf __(true);
+	if (ImGui::Selectable(_("edition.form_popup.what_cancels_into_this_move"), false, 0, selectableSize))
+	{
+		//todo
+	}
+}

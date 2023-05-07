@@ -184,6 +184,11 @@ edition.window_controls_explanation = Click on a move in the movelist to open it
 edition.extract_animations = Extract animations
 edition.extract_animations_finished = Animation extraction finished!
 
+edition.form_popup.duplicate_structure = Duplicate structure
+edition.form_popup.delete_structure = Delete structure
+edition.form_popup.what_cancels_into_this_move = What cancels into this move?
+edition.form_popup.what_moves_use_this_cancel_list = What move use this cancel list?
+
 edition.create_new = Create new
 edition.requirement = Requirement list
 edition.move = Move

@@ -213,3 +213,14 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 		break;
 	}
 }
+
+void EditorCancels::RenderExtraContextMenuItems()
+{
+	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
+
+	ImGuiExtra::DisableBlockIf __(true);
+	if (ImGui::Selectable(_("edition.form_popup.edition.form_popup.what_moves_use_this_cancel_list "), false, 0, selectableSize))
+	{
+		//todo
+	}
+}

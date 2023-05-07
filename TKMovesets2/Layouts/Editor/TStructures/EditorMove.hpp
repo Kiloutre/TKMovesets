@@ -19,6 +19,7 @@ private:
 	void ApplyWindowName(bool reapplyWindowProperties = true) override;
 	void OnUpdate(int listIdx, EditorInput* field) override;
 	void PostRender() override;
+	void RenderExtraContextMenuItems() override;
 
 	// Loads the list of animation available in our library and allows to import one of them
 	void OpenAnimationList();

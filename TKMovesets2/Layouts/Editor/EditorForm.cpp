@@ -402,6 +402,35 @@ void EditorForm::Render()
 				}
 			}
 
+			// Open popup on right click
+			if (IsWindowRightClicked()) {
+				ImGui::OpenPopup("ContextMenuPopup");
+			}
+
+			// Context menu popup
+			if (ImGui::BeginPopup("ContextMenuPopup"))
+			{
+				ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
+
+				{
+					ImGuiExtra::DisableBlockIf __(uniqueType);
+					if (ImGui::Selectable(_("edition.form_popup.duplicate_structure"), false, 0, selectableSize))
+					{
+						//todo
+					}
+				}
+
+				{
+					ImGuiExtra::DisableBlockIf __(uniqueType);
+					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize))
+					{
+						//todo
+					}
+				}
+
+				RenderExtraContextMenuItems();
+				ImGui::EndPopup();
+			}
 		}
 	}
 	ImGui::End();
@@ -417,6 +446,28 @@ void EditorForm::Render()
 	}
 
 	PostRender();
+}
+
+bool EditorForm::IsWindowRightClicked() const
+{
+	if (!ImGui::GetIO().MouseClicked[1]) return false;
+
+	auto cursorPos = ImGui::GetMousePos();
+	auto& boundStart = m_winInfo.pos;
+
+	DEBUG_LOG("Cursor: %f %f \n", cursorPos.x, cursorPos.y);
+	DEBUG_LOG("Bound start: %f %f \n", boundStart.x, boundStart.y);
+
+	if (cursorPos.x < boundStart.x) return false;
+	if (cursorPos.y < boundStart.y) return false;
+
+	auto boundEnd = m_winInfo.pos + m_winInfo.size;
+	DEBUG_LOG("Bound end: %f %f \n", boundEnd.x, boundEnd.y);
+
+	if (cursorPos.x >= boundEnd.x) return false;
+	if (cursorPos.y >= boundEnd.y) return false;
+
+	return true;
 }
 
 void EditorForm::OnUpdate(int listIdx, EditorInput* field)

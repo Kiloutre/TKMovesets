@@ -81,6 +81,10 @@ protected:
 	virtual bool IsFormValid();
 	// Inits the form
 	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
+	// Returns true if the current form window has been right clicked
+	bool IsWindowRightClicked() const;
+	// Overrideable to render extra items in the form's context menu
+	virtual void RenderExtraContextMenuItems() {};
 public:
 	// Stores the state of the window. If close, this class will be destroyed soon
 	bool popen = true;
