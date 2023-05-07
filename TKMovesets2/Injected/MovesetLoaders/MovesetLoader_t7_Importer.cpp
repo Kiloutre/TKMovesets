@@ -195,14 +195,15 @@ static void ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, Byte* m
 
 Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset)
 {
-	Byte* finalMoveset = nullptr;
 	bool result = false;
+	Byte* orig_moveset = moveset;
 
 	// Header of the moveset that will contain our own information about it
 	const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
 	if (s_moveset < sizeof(header) || !header->ValidateHeader()) {
 		DEBUG_LOG("Failed to validate header of incoming online moveset.\n");
+		delete[] moveset;
 		return nullptr;
 	}
 
@@ -217,7 +218,9 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 		s_moveset = header->moveset_data_size;
 
 		if (!CompressionUtils::DecompressMoveset(moveset, moveset_data_start, src_size, header->moveset_data_size)) {
+			DEBUG_LOG("Decompression of moveset failed!\n");
 			delete[] moveset;
+			delete[] orig_moveset;
 			return nullptr;
 		}
 	}
@@ -237,12 +240,23 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 	case GameId_T7:
 		result = ImportForOnline_FromT7(header, moveset, s_moveset);
 		break;
+	default:
+		DEBUG_LOG("No game found for given game id '%u'\n", gameId);
+		break;
 	}
 
 	if (isCompressed) {
-		delete[] moveset;
+		delete[] orig_moveset;
 	}
-	return result ? nullptr : finalMoveset;
+
+	if (result == false) {
+		DEBUG_LOG("ImportForOnline: Result was zero.\n");
+		delete[] moveset;
+		return nullptr;
+
+	}
+
+	return moveset;
 }
 
 
@@ -253,7 +267,7 @@ bool MovesetLoaderT7::ImportForOnline_FromT7(const TKMovesetHeader* header, Byte
 	bool isCompressed = false;
 
 	// List of data blocks within the moveset
-	const TKMovesetHeaderBlocks* offsets = (const TKMovesetHeaderBlocks*)((char*)moveset + header->block_list);
+	const TKMovesetHeaderBlocks* offsets = (const TKMovesetHeaderBlocks*)((char*)header + header->block_list);
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;

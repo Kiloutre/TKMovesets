@@ -286,6 +286,7 @@ namespace T7Hooks
 	{
 		void MatchedAsClient(uint64_t a1, uint64_t a2)
 		{
+			DEBUG_LOG("-- NetInterCS::MatchedAsHost --\n");
 			g_loader->CastTrampoline<T7Functions::NetInterCS::MatchedAsClient>("TK__NetInterCS::MatchedAsClient")(a1, a2);
 
 			if (g_loader->sharedMemPtr->moveset_loader_mode == MovesetLoaderMode_OnlineMode) {
@@ -295,6 +296,7 @@ namespace T7Hooks
 
 		void MatchedAsHost(uint64_t a1, char a2, uint64_t a3)
 		{
+			DEBUG_LOG("-- NetInterCS::MatchedAsHost --\n");
 			g_loader->CastTrampoline<T7Functions::NetInterCS::MatchedAsHost>("TK__NetInterCS::MatchedAsHost")(a1, a2, a3);
 
 			if (g_loader->sharedMemPtr->moveset_loader_mode == MovesetLoaderMode_OnlineMode) {
@@ -515,28 +517,16 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32
 
 		auto& player = sharedMemPtr->players[1];
 
-		Byte* newMoveset = ImportForOnline(sharedMemPtr->players[1], incomingMoveset, incomingMovesetSize);
-		if (newMoveset != incomingMoveset) {
-			// In case decompression occured, delete the old compressed moveset
-			delete[] incomingMoveset;
-			incomingMoveset = newMoveset;
-
-			if (newMoveset == nullptr)
-			{
-				DEBUG_LOG("ImportForOnline() returned nullptr: not using received moveset. (badly formated?)\n");
-				delete[] incomingMoveset;
-				incomingMoveset = nullptr;
-			}
-		}
+		incomingMoveset = ImportForOnline(sharedMemPtr->players[1], incomingMoveset, incomingMovesetSize);
 
 		if (incomingMoveset != nullptr)
 		{
 			player.custom_moveset_addr = (uint64_t)incomingMoveset;
 			player.is_initialized = false;
-
 			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Synced;
 		}
 		else {
+			DEBUG_LOG("ImportForOnline() returned nullptr: not using received moveset. (badly formated?)\n");
 			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 			player.custom_moveset_addr = 0;
 		}

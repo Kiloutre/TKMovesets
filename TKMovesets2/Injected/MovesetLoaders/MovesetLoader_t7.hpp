@@ -81,11 +81,11 @@ public:
 	// Online opponent to send moveset to / receive moveset from. Only used in OnlinePlay mode.
 	CSteamID opponent;
 	// Ptr to the incoming moveset
-	Byte* incomingMoveset;
+	Byte* incomingMoveset = nullptr;
 	// Size in bytes expected of the coming moveset
-	uint64_t incomingMovesetSize;
+	uint64_t incomingMovesetSize = 0;
 	// Ptr to the next area to write to in the incoming moveset
-	Byte* incomingMovesetCursor;
+	Byte* incomingMovesetCursor = nullptr;
 
 	void InitHooks() override;
 	void PostInit() override;
