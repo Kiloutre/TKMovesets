@@ -36,6 +36,7 @@ enum ImportationErrcode_
 	ImportationErrcode_GameAllocationErr,
 	ImportationErrcode_FileReadErr,
 	ImportationErrcode_DecompressionError,
+	ImportationErrcode_UnsupportedGameVersion,
 };
 
 // Base class for extracting from a game

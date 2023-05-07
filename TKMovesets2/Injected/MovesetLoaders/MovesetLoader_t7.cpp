@@ -2,6 +2,7 @@
 
 #include "MovesetLoader_t7.hpp"
 #include "Helpers.hpp"
+#include "steamHelper.hpp"
 
 #include "steam_api.h"
 
@@ -415,28 +416,6 @@ void MovesetLoaderT7::PostInit()
 	//HookFunction("TK__Log");
 }
 
-// -- Debug -- //
-
-void MovesetLoaderT7::Debug()
-{
-#ifdef BUILD_TYPE_DEBUG
-	CSteamID lobbyID = CSteamID(ReadVariable<uint64_t>("gTK_roomId_addr"));
-	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
-
-	if (lobbyID == k_steamIDNil) {
-		DEBUG_LOG("Invalid lobby ID\n");
-	}
-	
-	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
-	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
-	{
-		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
-		const char* name = SteamHelper::SteamFriends()->GetFriendPersonaName(memberId);
-		DEBUG_LOG("%u. [%s] - self = %d\n", i, name, memberId == mySteamID);
-	}
-#endif
-}
-
 // -- Main -- //
 
 void MovesetLoaderT7::InitMovesetSyncing()
@@ -482,7 +461,7 @@ void MovesetLoaderT7::InitMovesetSyncing()
 		Byte* dataToSend = (Byte*)sharedMemPtr->players[0].custom_moveset_original_data_addr;
 		while (leftToSend != 0)
 		{
-			uint32_t sendAmount = leftToSend >= 1000000 ? 1000000 : leftToSend;
+			uint32_t sendAmount = leftToSend >= 1000000 ? 1000000 : (uint32_t)leftToSend;
 			DEBUG_LOG("MOVESET_SYNC: Sending %u bytes\n", sendAmount);
 			if (!SteamHelper::SteamNetworking()->SendP2PPacket(opponent, dataToSend, sendAmount, k_EP2PSendReliable, MOVESET_LOADER_P2P_CHANNEL))
 			{
@@ -535,26 +514,32 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, Byte* packetBuf, uint32
 		DEBUG_LOG("PACKET: Successfully received entire moveset!\n");
 
 		auto& player = sharedMemPtr->players[1];
-		
-		{
-			// The header will not be accessible after ImportForOnline, so read its informations now
-			TKMovesetHeader* header = (TKMovesetHeader*)incomingMoveset;
-			player.crc32 = header->crc32;
-			player.moveset_character_id = header->characterId;
-			player.previous_character_id = header->characterId;
-		}
 
-		Byte* newMoveset = ImportForOnline_t7(sharedMemPtr->players[1], incomingMoveset, incomingMovesetSize);
+		Byte* newMoveset = ImportForOnline(sharedMemPtr->players[1], incomingMoveset, incomingMovesetSize);
 		if (newMoveset != incomingMoveset) {
-			// In case decompression occured, delete the old moveset
+			// In case decompression occured, delete the old compressed moveset
 			delete[] incomingMoveset;
 			incomingMoveset = newMoveset;
+
+			if (newMoveset == nullptr)
+			{
+				DEBUG_LOG("ImportForOnline() returned nullptr: not using received moveset. (badly formated?)\n");
+				delete[] incomingMoveset;
+				incomingMoveset = nullptr;
+			}
 		}
 
-		player.custom_moveset_addr = (uint64_t)incomingMoveset;
-		player.is_initialized = false;
+		if (incomingMoveset != nullptr)
+		{
+			player.custom_moveset_addr = (uint64_t)incomingMoveset;
+			player.is_initialized = false;
 
-		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Synced;
+			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_Synced;
+		}
+		else {
+			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+			player.custom_moveset_addr = 0;
+		}
 	}
 }
 
@@ -595,4 +580,26 @@ void MovesetLoaderT7::ExecuteExtraprop()
 {
 	auto& propData = sharedMemPtr->propToPlay;
 	ExecuteInstantExtraprop(propData.playerid, propData.id, propData.value);
+}
+
+// -- Debug -- //
+
+void MovesetLoaderT7::Debug()
+{
+#ifdef BUILD_TYPE_DEBUG
+	CSteamID lobbyID = CSteamID(ReadVariable<uint64_t>("gTK_roomId_addr"));
+	CSteamID mySteamID = SteamHelper::SteamUser()->GetSteamID();
+
+	if (lobbyID == k_steamIDNil) {
+		DEBUG_LOG("Invalid lobby ID\n");
+	}
+
+	unsigned int lobbyMemberCount = SteamHelper::SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+	for (unsigned int i = 0; i < lobbyMemberCount; ++i)
+	{
+		CSteamID memberId = SteamHelper::SteamMatchmaking()->GetLobbyMemberByIndex(lobbyID, i);
+		const char* name = SteamHelper::SteamFriends()->GetFriendPersonaName(memberId);
+		DEBUG_LOG("%u. [%s] - self = %d\n", i, name, memberId == mySteamID);
+	}
+#endif
 }

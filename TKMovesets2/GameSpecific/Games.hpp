@@ -9,13 +9,7 @@
 #include "GameInfo.hpp"
 
 #include "constants.h"
-
-enum GameId_
-{
-	GameId_T7,
-	GameId_T8,
-	GameId_TTT2,
-};
+#include "GameIDs.h"
 
 namespace Games
 {

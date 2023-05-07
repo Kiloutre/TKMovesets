@@ -10,12 +10,12 @@
 
 #include "InjectionUtils.hpp"
 #include "GameAddressesWrapper.hpp"
-#include "steamHelper.hpp"
 
 #include "SharedMemory.h"
 #include "constants.h"
 #include "GameTypes.h"
 #include "MovesetStructs.h"
+
 
 struct functionHook
 {

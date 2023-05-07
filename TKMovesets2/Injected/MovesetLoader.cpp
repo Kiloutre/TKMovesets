@@ -1,5 +1,6 @@
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
+#include "steamHelper.hpp"
 
 #include "constants.h"
 

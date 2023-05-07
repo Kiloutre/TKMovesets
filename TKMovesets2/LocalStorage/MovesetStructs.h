@@ -62,4 +62,20 @@ struct TKMovesetHeader
 	char origin[32] = "";
 	// Target character to play on
 	char target_character[32] = "";
+
+	// Function to validate some of the header content, first step to ensuring the file isn't badly formated
+	bool ValidateHeader() const
+	{
+		if (strncmp(_signature, "TKM2", 4) != 0) return false;
+
+		if (block_list_size == 0) return false;
+		if (block_list < header_size) return false;
+		if (moveset_data_start <= block_list) return false;
+		if (moveset_data_size < 0) return false;
+
+		return true;
+	}
+
+
+	bool isCompressed() const { return moveset_data_size > 0; }
 };

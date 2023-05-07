@@ -4,6 +4,51 @@
 
 #include "Structs_t7.h"
 #include "SharedMemory_t7.h"
+#include "steam_api.h"
+
+// -- Packet -- //
+
+enum PacketT7Type_
+{
+	PacketT7Type_INVALID,
+	PacketT7Type_SyncMoveset,
+	PacketT7Type_AnswerMovesetSync,
+};
+
+struct PacketT7
+{
+	const char packetMagicBytes[11] = "TKM2PACKET";
+	// Type of the packet, will determine the size of the structure
+	PacketT7Type_ packetType = PacketT7Type_INVALID;
+};
+
+struct PacketT7_SyncMoveset : PacketT7
+{
+	struct {
+		// Size of the moveset to send (0 if no moveset to send)
+		uint64_t size;
+	} local_moveset;
+
+	struct {
+		// CRC32 of the previously received moveset
+		uint32_t crc32;
+	} remote_moveset;
+
+	PacketT7_SyncMoveset() {
+		packetType = PacketT7Type_SyncMoveset;
+	};
+};
+
+struct PacketT7_AnswerMovesetSync: PacketT7
+{
+	// If true, request the opponent to send their moveset to us
+	// If false, tell the opponent that we already have his moveset
+	bool requesting_download;
+
+	PacketT7_AnswerMovesetSync() {
+		packetType = PacketT7Type_AnswerMovesetSync;
+	};
+};
 
 struct MovesetLoaderT7_IncomingMovesetInfo
 {
@@ -12,6 +57,8 @@ struct MovesetLoaderT7_IncomingMovesetInfo
 	// If size is zero, that means the opponent has purposefully not chosen a moveset
 	uint64_t size = 0;
 };
+
+// -- Other -- //
 
 class MovesetLoaderT7 : public MovesetLoader
 {
@@ -50,7 +97,10 @@ public:
 	// Inits the variable that tell that a moveset is expected (if locked in, opponent valid etc), and send our own moveset to the opponent
 	void InitMovesetSyncing();
 
-	Byte* ImportForOnline_t7(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
+	// Moveset importing function
+	Byte* ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
+	// Game-specific Moveset importing functions, returns false on failure
+	bool ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
 
 	void Debug() override;
 };

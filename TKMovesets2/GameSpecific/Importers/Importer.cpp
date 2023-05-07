@@ -1,5 +1,6 @@
 #include "Importer.hpp"
 
+#include "MovesetStructs.h"
 
 // -- Static helpers -- //
 
@@ -57,7 +58,7 @@ ImportationErrcode_ Importer::Import(const Byte* orig_moveset, uint64_t s_movese
 	memcpy(moveset, orig_moveset, s_moveset);
 
 	ImportationErrcode_ errcode = _Import(moveset, s_moveset, playerAddress, settings, progress);
-	free(moveset);
 
+	free(moveset);
 	return errcode;
 }

@@ -36,7 +36,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 		size_t totalSize = file.tellg();
 		file.close();
 
-		if (readBytes != sizeof(TKMovesetHeader) ||
+		if (readBytes != sizeof(TKMovesetHeader) || !movesetInfos.ValidateHeader() ||
 			Helpers::isHeaderStringMalformated(movesetInfos.version_string, sizeof(movesetInfos.version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.origin, sizeof(movesetInfos.origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.target_character, sizeof(movesetInfos.target_character))) {
