@@ -111,7 +111,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 			m_items.insert(m_items.begin() + listIndex, new FieldItem);
 			auto& item = m_items[listIndex];
 
-			item->identifierMap = m_editor->GetListSingleForm(windowType, 0, drawOrder);
+			item->identifierMap = m_editor->GetListSingleForm(windowType, structureId + listIndex, drawOrder);
 			item->openStatus = EditorFormTreeview_ForceOpen;
 
 			for (uint8_t category : m_categories)
