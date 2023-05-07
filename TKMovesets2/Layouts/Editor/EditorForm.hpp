@@ -56,6 +56,7 @@ protected:
 	// Used with changing data types to prevent .unsavedChanges from being set to true
 	bool m_ignoreNextChange = false;
 
+	virtual size_t GetOriginalStructureListSize() { return 0; };
 	virtual void PostRender() {};
 	// Actual rendering function
 	virtual void RenderInternal();

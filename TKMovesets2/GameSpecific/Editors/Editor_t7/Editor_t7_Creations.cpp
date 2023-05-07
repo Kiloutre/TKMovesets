@@ -282,3 +282,15 @@ uint32_t EditorT7::CreateNew(EditorWindowType_ type)
 	}
 	return -1;
 }
+
+
+uint32_t EditorT7::DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize)
+{
+	// todo
+	return 0;
+}
+
+void EditorT7::DeleteStructure(EditorWindowType_ type, uint32_t id)
+{
+	// todo
+}

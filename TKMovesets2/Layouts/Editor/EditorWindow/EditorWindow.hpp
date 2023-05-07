@@ -121,7 +121,7 @@ public:
 	void Render(int dockid);
 
 	// Create a new window containing data about the given move. Can be called by subwidnows.
-	void OpenFormWindow(EditorWindowType_ windowType, uint16_t moveId, int listSize = 0) override;
+	void OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize = 0) override;
 	// Validates the move ID against the movelist size and alias list
 	int32_t ValidateMoveId(const char* buf) override;
 	// Reloads the movelist filter, used mostly when a move is renamed

@@ -416,15 +416,20 @@ void EditorForm::Render()
 					ImGuiExtra::DisableBlockIf __(uniqueType);
 					if (ImGui::Selectable(_("edition.form_popup.duplicate_structure"), false, 0, selectableSize))
 					{
-						//todo
+						auto structureListSize = GetOriginalStructureListSize();
+						uint32_t newStructure = m_editor->DuplicateStructure(windowType, structureId, structureListSize);
+						m_baseWindow->OpenFormWindow(windowType, newStructure, structureListSize);
 					}
 				}
 
 				{
-					ImGuiExtra::DisableBlockIf __(uniqueType);
+					ImGuiExtra::DisableBlockIf __(uniqueType || structureId == 0);
 					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize))
 					{
-						//todo
+						m_editor->DeleteStructure(windowType, structureId);
+						popen = false;
+						unsavedChanges = false;
+						//todo: validation popup
 					}
 				}
 

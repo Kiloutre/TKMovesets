@@ -18,7 +18,7 @@ void EditorFormList::Apply()
 	{
 		// If items were added/removed, reallocate entire moveset
 		int newSize = (int)m_listSize;
-		int oldSize = newSize - m_listSizeChange;
+		int oldSize = GetOriginalStructureListSize();
 		std::vector<int> itemIndexes;
 		for (auto& item : m_items) {
 			itemIndexes.push_back(item->id);

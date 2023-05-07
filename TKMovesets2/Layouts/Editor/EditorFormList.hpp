@@ -46,6 +46,7 @@ protected:
 	// Absolute structure IDs of the deleted items sicne the last Apply()
 	std::set<int> m_deletedItemIds;
 
+	virtual size_t GetOriginalStructureListSize() { return m_listSize - m_listSizeChange; };
 	// Called before an item's treenode is rendered, use to display stuff on the item treenode. Called before RenderListControlButtons();
 	virtual void PreItemRender(int listIdx) {};
 	// Called whenver the list is reordered, used to  update field labels when index is important

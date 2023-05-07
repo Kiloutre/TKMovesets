@@ -300,10 +300,14 @@ public:
 	std::string GetMovelistDisplayableLabel(InputMap& fieldMap) override;
 	unsigned int GetMovelistDisplayableInputCount() override;
 
-	// -- Creation / Deletion -- //
+	// -- Creation  -- //
 	uint32_t CreateNew(EditorWindowType_ type) override;
 
-	// -- List Creation / Deletion -- //
+	// -- Copying / Deletion -- //
+	uint32_t DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize) override;
+	void DeleteStructure(EditorWindowType_ type, uint32_t id) override;
+
+	// -- List Creation / List Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
 
 	// -- Live edition -- //

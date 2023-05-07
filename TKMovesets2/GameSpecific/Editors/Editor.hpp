@@ -353,6 +353,10 @@ public:
 	// Modifies an existing list's size
 	virtual void ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) = 0;
 
+	// -- Copying / Deletion -- //
+	virtual uint32_t DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize) = 0;
+	virtual void DeleteStructure(EditorWindowType_ type, uint32_t id) = 0;
+
 	// -- Command Utils -- //
 	// Returns a command string from two seperate direction & button fields
 	virtual std::string GetCommandStr(const char* direction, const char* button) = 0;
