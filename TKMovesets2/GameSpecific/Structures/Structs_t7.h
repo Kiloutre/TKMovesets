@@ -84,7 +84,6 @@ namespace StructsT7
 
 	struct Reactions
 	{
-		// 0 = 0 when writing 
 		Pushback* front_pushback;
 		Pushback* backturned_pushback;
 		Pushback* left_side_pushback;
@@ -229,7 +228,6 @@ namespace StructsT7
 
 	struct Move
 	{
-		// 0 = 0 when writing (might be a ptr)
 		char* name_addr;
 		char* anim_name_addr;
 		void* anim_addr;
@@ -249,7 +247,7 @@ namespace StructsT7
 		uint16_t moveId_val1; // Clearly related to move ID
 		uint16_t moveId_val2; // Clearly related to current character ID
 		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short; // 0
+		int16_t _0x5E_short;
 		HitCondition* hit_condition_addr;
 		int32_t anim_len;
 		uint32_t airborne_start;
@@ -631,7 +629,6 @@ namespace StructsT7_gameAddr
 
 	struct Reactions
 	{
-		// 0 = 0 when writing (might be a ptr)
 		gameAddr front_pushback;
 		gameAddr backturned_pushback;
 		gameAddr left_side_pushback;
@@ -732,7 +729,6 @@ namespace StructsT7_gameAddr
 
 	struct Move
 	{
-		// 0 = 0 when writing
 		gameAddr name_addr;
 		gameAddr anim_name_addr;
 		gameAddr anim_addr;
@@ -752,7 +748,7 @@ namespace StructsT7_gameAddr
 		uint16_t moveId_val1; // Clearly related to move ID
 		uint16_t moveId_val2; // Clearly related to current character ID
 		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short; // 0
+		int16_t _0x5E_short;
 		gameAddr hit_condition_addr;
 		uint32_t anim_len;
 		uint32_t airborne_start;
