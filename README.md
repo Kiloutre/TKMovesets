@@ -57,7 +57,7 @@ If using a GUI program to download this project, there will most likely be an op
 The steamworks API's headers, which i do use in various parts of this software, does not have a license that would allow me to package it with my own code.
 You may obtain the steamworks files using two possible ways:
 
-- From the official steamworks website (that will require craeting a steamworks account): https://partner.steamgames.com/downloads/list . Do make sure to download the version that came right before the Tekken build you'll be using the software on, for minimum problems.
+- From the official steamworks website (that will require creating a steamworks account): https://partner.steamgames.com/downloads/list . Do make sure to download the version that came right before the Tekken build you'll be using the software on, for minimum problems.
 - From this link which may go down at any time (v1.56) : https://mega.nz/folder/htpVHSCa#O24Zz0PfxcyejV5ChqDAgw
 
 Make sure the folder is extracted at the root of the project (inside the TKMovesets folder), and that it is named `steam api`

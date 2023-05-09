@@ -84,11 +84,10 @@ void EditorMove::OnApply()
 
 void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
-
 	if ((winType & (EditorWindowType_HitCondition | EditorWindowType_Extraproperty | EditorWindowType_Cancel
 		| EditorWindowType_MoveBeginProperty | EditorWindowType_MoveEndProperty | EditorWindowType_Voiceclip)) == 0) {
 		return;
-}
+	}
 	std::string fieldName;
 
 	switch (winType)
@@ -117,11 +116,14 @@ void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, 
 	}
 
 	if (!m_fieldIdentifierMap[fieldName]->errored) {
-		int value = atoi(m_fieldIdentifierMap[fieldName]->buffer);
-		if (MUST_SHIFT_ID(value, valueChange, listStart, listEnd)) {
+		int currentId = atoi(m_fieldIdentifierMap[fieldName]->buffer);
+		DEBUG_LOG("EditorMove::RequestFieldUpdate %u 22 - curr val is %d\n", winType, currentId);
+		DEBUG_LOG("%d %d %d %d\n", currentId, valueChange, listStart, listEnd);
+		if (MUST_SHIFT_ID(currentId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
             auto& field = m_fieldIdentifierMap[fieldName];
-			sprintf_s(field->buffer, field->bufsize, "%d", value + valueChange);
+			sprintf_s(field->buffer, field->bufsize, "%d", currentId + valueChange);
+			DEBUG_LOG("Move: Shifting [%s] by %d\n", fieldName.c_str(), valueChange);
 		}
 	}
 }

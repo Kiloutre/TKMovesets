@@ -46,6 +46,8 @@ protected:
 	// Absolute structure IDs of the deleted items sicne the last Apply()
 	std::set<int> m_deletedItemIds;
 
+	// Delete this entire structure from the moveset and close the window
+	void DeleteStructure() override;
 	// Get the size of the structure before we made unsaved changes to it
 	virtual int GetOriginalStructureListSize() { return (int)m_listSize - (int)m_listSizeChange; };
 	// Called before an item's treenode is rendered, use to display stuff on the item treenode. Called before RenderListControlButtons();

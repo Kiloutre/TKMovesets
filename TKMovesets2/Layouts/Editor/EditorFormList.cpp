@@ -41,9 +41,7 @@ void EditorFormList::Apply()
 			itemIndexes.push_back(item->id);
 		}
 		m_editor->ModifyListSize(windowType, structureId, itemIndexes, m_deletedItemIds);
-		if (m_listSize != 0) {
-			OnApplyResize(m_listSizeChange, oldSize);
-		}
+		OnApplyResize(m_listSizeChange, oldSize);
 		m_listSizeChange = 0;
 	}
 	else {
@@ -228,18 +226,14 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 				m_deletedItemIds.insert(m_items[listIndex]->id);
 			}
 
-			// Only delete if we're not at the list end, to avoid destructing the fields before using them
-			// Reducing list size will make things invisible on the next render anyway
-			if (listIndex < m_listSize) {
-				// Shift following items up
-				for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMap) {
-					delete[] fieldPtr->buffer;
-					delete fieldPtr;
-				}
-				delete m_items[listIndex];
-				m_items.erase(m_items.begin() + listIndex);
-				unsavedChanges = true;
+			for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMap) {
+				delete[] fieldPtr->buffer;
+				delete fieldPtr;
 			}
+			delete m_items[listIndex];
+			m_items.erase(m_items.begin() + listIndex);
+			unsavedChanges = true;
+
 			OnResize();
 		}
 		ImGui::PopStyleColor();
@@ -250,6 +244,15 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	ImGui::PopID();
 	ImGui::PopID();
 	ImGui::SetCursorPos(cursor);
+}
+
+void EditorFormList::DeleteStructure()
+{
+	auto origSize = GetOriginalStructureListSize();
+	m_editor->DeleteStructures(windowType, structureId, origSize);
+	popen = false;
+	unsavedChanges = false;
+	OnApplyResize(-origSize, origSize);
 }
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
@@ -340,6 +343,7 @@ void EditorFormList::RenderInternal()
 		PreItemRender(listIndex);
 		RenderListControlButtons(listIndex);
 
+		if (listIndex >= m_listSize) break;
 		auto& item = m_items[listIndex];
 
 		// This allows us to force some treenode to open at certain times, without forcing them to be closed
@@ -415,13 +419,14 @@ void EditorFormList::OnReorder()
 
 void EditorFormList::OnApplyResize(int sizeChange, int oldSize)
 {
+	DEBUG_LOG("EditorFormList::OnApplyResize\n");
 	m_baseWindow->IssueFieldUpdate(windowType, sizeChange, structureId, structureId + oldSize);
 }
 
 void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
 	if (winType == windowType){
-		// If a struct was created before this one, we must shfit our own ID
+		// If a struct was created before this one, we must shift our own ID
 		if (MUST_SHIFT_ID((int)structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
 			structureId += valueChange;

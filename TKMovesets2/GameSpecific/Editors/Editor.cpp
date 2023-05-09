@@ -28,6 +28,33 @@ typedef unsigned int ImU32;
 
 namespace EditorUtils
 {
+	bool MustShiftId(int structureId, int valueChange, int listStart, int old_listEnd)
+	{
+		// If ID comes before list then there is no shifting to be done
+		if (structureId < listStart) return false;
+		// If ID comes after current list end then shifting is guaranteed to be needed
+		if (structureId >= old_listEnd) return true;
+
+		// From this point on, structureId is guaranteed to be listStart <= structureId < old_listEnd
+
+		int new_listEnd = old_listEnd + valueChange;
+
+		// An item was deleted from the list
+		if (valueChange < 0)
+		{
+			// Item is situated between the new list end and the old one, we want to keep it in the current list, shift ID down
+			if (valueChange >= new_listEnd) return true;
+		}
+		// An item was added to the list
+		else if (valueChange > 0)
+		{
+			// At the current time, appending to a list does not shift any of the list's IDs up
+			return false;
+		}
+
+		return false;
+	}
+
 	void SetInputfieldColor(EditorInput* field)
 	{
 		if (field->flags & EditorInput_Hex) {

@@ -381,6 +381,7 @@ void EditorWindow::ReloadMovelistFilter()
 
 void EditorWindow::IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
+	DEBUG_LOG("EditorWindow::IssueFieldUpdate(type: %u, change: %d, list start: %d, list end: %d)\n", winType, valueChange, listStart, listEnd);
 	for (auto& window : m_structWindows)
 	{
 		if (window->popen) {

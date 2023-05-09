@@ -8,7 +8,7 @@ void EditorT7::ModifyRequirementListSize(unsigned int listStart, const std::vect
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
 	int listSizeDiff = ModifyGenericMovelistListSize<Requirement>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
@@ -54,7 +54,7 @@ void EditorT7::ModifyHitConditionListSize(unsigned int listStart, const std::vec
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
 	int listSizeDiff = ModifyGenericMovelistListSize<HitCondition>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.hit_condition_addr != MOVESET_ADDR_MISSING) {
@@ -77,7 +77,7 @@ void EditorT7::ModifyInputListSize(unsigned int listStart, const std::vector<int
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
 	int listSizeDiff = ModifyGenericMovelistListSize<Input>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	// Input sequences
 	for (auto& sequence : m_iterators.input_sequences)
 	{
@@ -95,7 +95,7 @@ void EditorT7::ModifyPushbackExtraListSize(unsigned int listStart, const std::ve
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 	int listSizeDiff = ModifyGenericMovelistListSize<PushbackExtradata>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	// Input sequences
 	for (auto& pushback : m_iterators.pushbacks)
 	{
@@ -113,7 +113,7 @@ void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::ve
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
 	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (cancel.command == constants->at(EditorConstants_GroupedCancelCommand)) {
@@ -129,7 +129,7 @@ void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<in
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
 	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.cancel_addr != MOVESET_ADDR_MISSING) {
@@ -153,7 +153,7 @@ void EditorT7::ModifyExtraPropertyListSize(unsigned int listStart, const std::ve
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 	int listSizeDiff = ModifyGenericMovelistListSize<ExtraMoveProperty>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.extra_move_property_addr != MOVESET_ADDR_MISSING) {
@@ -169,7 +169,7 @@ void EditorT7::ModifyStartPropertyListSize(unsigned int listStart, const std::ve
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningPropCount;
 	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_start_extraprop_addr != MOVESET_ADDR_MISSING) {
@@ -185,7 +185,7 @@ void EditorT7::ModifyEndPropertyListSize(unsigned int listStart, const std::vect
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_end_extraprop_addr != MOVESET_ADDR_MISSING) {
@@ -201,7 +201,7 @@ void EditorT7::ModifyVoiceclipListSize(unsigned int listStart, const std::vector
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
 	int listSizeDiff = ModifyGenericMovelistListSize<Voiceclip>(listStart, ids, deletedIds, listHead);
 
-	int oldSize = (int)ids.size() + listSizeDiff;
+	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.voicelip_addr != MOVESET_ADDR_MISSING) {

@@ -56,7 +56,11 @@ protected:
 	// Used with changing data types to prevent .unsavedChanges from being set to true
 	bool m_ignoreNextChange = false;
 
+	// Delete the current structure from the moveset and close the structure window
+	virtual void DeleteStructure();
+	// Returns the size of the current structure list or 0 for non-list structures
 	virtual int GetOriginalStructureListSize() { return 0; };
+	// Called after rendering the form, useful to implement extra-logic code such as subwindows in derived classes
 	virtual void PostRender() {};
 	// Actual rendering function
 	virtual void RenderInternal();

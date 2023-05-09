@@ -305,7 +305,7 @@ public:
 
 	// -- Copying / Deletion -- //
 	uint32_t DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize) override;
-	void DeleteStructure(EditorWindowType_ type, uint32_t id) override;
+	void DeleteStructures(EditorWindowType_ type, uint32_t id, size_t listSize) override;
 
 	// -- List Creation / List Deletion -- //
 	void ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
@@ -411,7 +411,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 
 					if (isPartOfCurrentList) {
 						currentEntry.listCount += sizeDiff;
-						DEBUG_LOG("Adding movelist entry %llu count += %d\n", i, sizeDiff);
+						DEBUG_LOG("Table: Adding movelist entry %llu count += %d\n", i, sizeDiff);
 					}
 				}
 			}

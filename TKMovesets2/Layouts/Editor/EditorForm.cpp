@@ -432,11 +432,8 @@ void EditorForm::Render()
 
 				{
 					ImGuiExtra::DisableBlockIf __(uniqueType || structureId == 0);
-					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize))
-					{
-						m_editor->DeleteStructure(windowType, structureId);
-						popen = false;
-						unsavedChanges = false;
+					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize)) {
+						DeleteStructure();
 						//todo: validation popup
 					}
 				}
@@ -459,6 +456,13 @@ void EditorForm::Render()
 	}
 
 	PostRender();
+}
+
+void EditorForm::DeleteStructure()
+{
+	m_editor->DeleteStructures(windowType, structureId, 0);
+	popen = false;
+	unsavedChanges = false;
 }
 
 bool EditorForm::IsWindowRightClicked() const

@@ -24,7 +24,7 @@
 # define MAX_INPUT_SEQUENCE_SHORT_LEN (15)
 
 // Shifting logic for list resizing
-# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) (((int)id >= (int)listOldEnd) || (valueChange < 0 && ((int)id - valueChange) >= (int)listOldEnd))
+# define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) EditorUtils::MustShiftId(id, valueChange, listStart, listOldEnd)
 
 // Animation extraction status
 enum AnimExtractionStatus_
@@ -215,6 +215,8 @@ typedef std::map<FasterStringComp, EditorInput*> InputMap;
 
 namespace EditorUtils
 {
+	// Define structure ID shifting logic
+	bool MustShiftId(int structureId, int valueChange, int listStart, int old_listEnd);
 	// Used for color coding input fields
 	void SetInputfieldColor(EditorInput* field);
 	// Used for color-coding the movelist
@@ -355,7 +357,7 @@ public:
 
 	// -- Copying / Deletion -- //
 	virtual uint32_t DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize) = 0;
-	virtual void DeleteStructure(EditorWindowType_ type, uint32_t id) = 0;
+	virtual void DeleteStructures(EditorWindowType_ type, uint32_t id, size_t listSize) = 0;
 
 	// -- Command Utils -- //
 	// Returns a command string from two seperate direction & button fields
