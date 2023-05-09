@@ -150,6 +150,8 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Creations_DisplayableMovelist.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Commands.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Creations.cpp"
+                    "GameSpecific/Editors/Editor_t7/Editor_t7_Deletion.cpp"
+                    "GameSpecific/Editors/Editor_t7/Editor_t7_Duplication.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_ListCreations.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"

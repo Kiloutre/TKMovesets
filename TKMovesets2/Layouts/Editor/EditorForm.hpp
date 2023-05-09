@@ -60,6 +60,8 @@ protected:
 	// Marks if deletion is possible on this structure
 	bool m_isDeletable = true;
 
+	// Callde when the structure is duplicated
+	virtual void OnDuplication(unsigned int newId, unsigned int listSize) {};
 	// Delete the current structure from the moveset and close the structure window
 	virtual void DeleteStructure();
 	// Returns the size of the current structure list or 0 for non-list structures

@@ -429,6 +429,7 @@ void EditorForm::Render()
 						auto structureListSize = GetOriginalStructureListSize();
 						uint32_t newStructure = m_editor->DuplicateStructure(windowType, structureId, structureListSize);
 						m_baseWindow->OpenFormWindow(windowType, newStructure, structureListSize);
+						OnDuplication(newStructure, structureListSize);
 					}
 				}
 

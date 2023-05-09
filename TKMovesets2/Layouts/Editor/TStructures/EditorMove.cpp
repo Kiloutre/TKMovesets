@@ -27,6 +27,11 @@ void EditorMove::OnInitEnd()
 	*/
 }
 
+void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
+{
+	m_baseWindow->OnMoveCreate(moveId);
+}
+
 void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 {
 	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());

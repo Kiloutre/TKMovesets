@@ -193,6 +193,14 @@ int32_t EditorWindow::ValidateMoveId(const char* buf)
 	return moveId;
 }
 
+void EditorWindow::OnMoveCreate(unsigned int moveId)
+{
+	m_editor->ReloadDisplayableMoveList();
+	ReloadMovelistFilter();
+	m_moveToScrollTo = moveId;
+	m_highlightedMoveId = moveId;
+}
+
 bool EditorWindow::MovesetStillLoaded()
 {
 	gameAddr movesetAddress = m_importerHelper.GetCurrentPlayerMovesetAddr();

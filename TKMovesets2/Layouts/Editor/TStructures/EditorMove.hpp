@@ -21,6 +21,7 @@ private:
 	void OnInitEnd() override;
 	void PostRender() override;
 	void RenderExtraContextMenuItems() override;
+	void OnDuplication(unsigned int moveId, unsigned int listSize) override;
 
 	// Loads the list of animation available in our library and allows to import one of them
 	void OpenAnimationList();

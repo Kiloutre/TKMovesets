@@ -224,6 +224,29 @@ private:
 	void ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize);
 
+	// Duplication
+	uint32_t DuplicateMove(uint32_t id, size_t listSize);
+	uint32_t DuplicateCancelExtradata(uint32_t id, size_t listSize);
+	uint32_t DuplicateReactions(uint32_t id, size_t listSize);
+	uint32_t DuplicatePushback(uint32_t id, size_t listSize);
+	uint32_t DuplicateInputSequence(uint32_t id, size_t listSize);
+	uint32_t DuplicateProjectile(uint32_t id, size_t listSize);
+	uint32_t DuplicateThrowCamera(uint32_t id, size_t listSize);
+	uint32_t DuplicateCameraData(uint32_t id, size_t listSize);
+	uint32_t DuplicateMovelistPlayable(uint32_t id, size_t listSize);
+
+	uint32_t DuplicateRequirement(uint32_t id, size_t listSize);
+	uint32_t DuplicateVoiceclip(uint32_t id, size_t listSize);
+	uint32_t DuplicateCancel(uint32_t id, size_t listSize);
+	uint32_t DuplicateGroupedCancel(uint32_t id, size_t listSize);
+	uint32_t DuplicateExtraproperty(uint32_t id, size_t listSize);
+	uint32_t DuplicateMoveBeginProperty(uint32_t id, size_t listSize);
+	uint32_t DuplicateMoveEndProperty(uint32_t id, size_t listSize);
+	uint32_t DuplicateHitCondition(uint32_t id, size_t listSize);
+	uint32_t DuplicatePushbackExtradata(uint32_t id, size_t listSize);
+	uint32_t DuplicateInput(uint32_t id, size_t listSize);
+	uint32_t DuplicateMovelistInput(uint32_t id, size_t listSize);
+
 	// -- Live edition -- //
 	//
 	void Live_OnMoveEdit(int id, EditorInput* field);

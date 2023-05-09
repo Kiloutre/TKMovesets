@@ -138,6 +138,8 @@ public:
 	// Render the window
 	void Render(int dockid);
 
+	// Called when a move is created, is used in order to refresh the movelist and scroll to the move inside of it
+	void OnMoveCreate(unsigned int moveId) override;
 	// Create a new window containing data about the given move. Can be called by subwidnows.
 	void OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize = 0) override;
 	// Validates the move ID against the movelist size and alias list
