@@ -98,7 +98,7 @@ private:
 	// Copy of the shared mem helper, used to play extra propreties
 	GameSharedMem m_sharedMemHelper;
 	// If true, will compress the moveset file when saving
-	bool m_compressOnSave = false;
+	bool m_compressOnSave = true;
 	// Map that will determine which window type to allocate depending on the given type
 	std::map<EditorWindowType_, EditorWindowFactory_Base*> m_windowCreatorMap;
 

@@ -460,7 +460,7 @@ void EditorForm::Render()
 				ImGui::SameLine();
 				if (ImGui::Button(_("no"))) {
 					ImGui::CloseCurrentPopup();
-					m_deletionPopupOpen = false
+					m_deletionPopupOpen = false;
 				}
 				ImGui::EndPopup();
 			}
