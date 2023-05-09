@@ -433,12 +433,35 @@ void EditorForm::Render()
 				{
 					ImGuiExtra::DisableBlockIf __(uniqueType || structureId == 0);
 					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize)) {
-						DeleteStructure();
-						//todo: validation popup
+						ImGui::CloseCurrentPopup();
+						m_deletionPopupOpen = true;
 					}
 				}
 
 				RenderExtraContextMenuItems();
+				ImGui::EndPopup();
+			}
+
+			if (m_deletionPopupOpen) {
+				ImGui::OpenPopup("StructureDeletionPopup");
+			}
+
+			if (ImGui::BeginPopupModal("StructureDeletionPopup", &m_deletionPopupOpen))
+			{
+				ImGui::TextUnformatted(_("edition.form_popup.deletion_are_you_sure"));
+
+				ImGui::PushStyleColor(ImGuiCol_Button, RED_BTN);
+				if (ImGui::Button(_("yes"))) {
+					DeleteStructure();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::PopStyleColor();
+
+				ImGui::SameLine();
+				if (ImGui::Button(_("no"))) {
+					ImGui::CloseCurrentPopup();
+					m_deletionPopupOpen = false
+				}
 				ImGui::EndPopup();
 			}
 		}

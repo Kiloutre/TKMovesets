@@ -55,6 +55,8 @@ protected:
 	float m_labelWidthHalf = 0.0f;
 	// Used with changing data types to prevent .unsavedChanges from being set to true
 	bool m_ignoreNextChange = false;
+	// True if the deletion popup is open
+	bool m_deletionPopupOpen = false;
 
 	// Delete the current structure from the moveset and close the structure window
 	virtual void DeleteStructure();

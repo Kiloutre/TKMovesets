@@ -42,6 +42,10 @@ void RenderSubmenu_About()
 		ImGui::TextWrapped(_("about.dennis_stanistan_explanation"));
 		ImGui::NewLine();
 
+		ImGui::TextWrapped("- dantarion -");
+		ImGui::TextWrapped(_("about.dantarion_explanation"));
+		ImGui::NewLine();
+
 
 		ImGui::EndGroup();
 	}
