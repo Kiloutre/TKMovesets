@@ -160,7 +160,7 @@ private:
 	std::vector<InputMap> GetMovelistInputListInputs(uint16_t id, int listSize, VectorSet<std::string>& drawOrder);
 	void SaveMovelistInput(uint16_t id, InputMap& inputs);
 
-	// -- Creation / Deletion -- //
+	// -- Creation -- //
 	// Create a new structure or structure list
 	//
 	uint32_t CreateInputSequence();
@@ -190,6 +190,16 @@ private:
 	//
 	uint32_t CreateNewMvlPlayable();
 	uint32_t CreateNewMvlInputs();
+	// -- Single structure Deletion -- 
+	void DeleteMove(int id);
+	void DeleteCancelExtradata(int id);
+	void DeleteReactions(int id);
+	void DeletePushback(int id);
+	void DeleteInputSequence(int id);
+	void DeleteProjectile(int id);
+	void DeleteThrowCamera(int id);
+	void DeleteCameraData(int id);
+	void DeleteMovelistPlayable(int id);
 
 	// -- List Creation / Deletion -- //
 	void DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset);
@@ -289,10 +299,13 @@ public:
 	bool IsMovelistDisplayableEntryCategory(EditorInput* field) override;
 	// -- Utils --//
 	bool IsCommandInputSequence(const char* buffer) override;
+	bool IsCommandInputSequence(uint64_t command);
 	bool IsCommandGroupedCancelReference(const char* buffer) override;
 	int GetCommandInputSequenceID(const char* buffer) override;
 	bool IsPropertyThrowCameraRef(const char* buffer) override;
+	bool IsPropertyThrowCameraRef(uint32_t id);
 	bool IsPropertyProjectileRef(const char* buffer) override;
+	bool IsPropertyProjectileRef(uint32_t id);
 	bool IsVoicelipValueEnd(const char* buffer) override;
 	unsigned int GetStructureCount(EditorWindowType_ type) override;
 	unsigned int GetMotaAnimCount(int motaId) override;

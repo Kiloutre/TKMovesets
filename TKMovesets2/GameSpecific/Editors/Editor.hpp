@@ -50,7 +50,9 @@ enum EditorConstants_
 	// Marks the end of an extra property list
 	EditorConstants_ExtraPropertyEnd,
 	// Marks that the cancel command refers to an input sequence
-	EditorConstants_InputSequenceCommandStart
+	EditorConstants_InputSequenceCommandStart,
+	// Marks a projectile in the extraprop list
+	EditorConstants_ProjectileProperty,
 };
 
 enum EditorWindowType_
@@ -216,6 +218,8 @@ typedef std::map<FasterStringComp, EditorInput*> InputMap;
 namespace EditorUtils
 {
 	// Define structure ID shifting logic
+	bool MustShiftId(gameAddr32 structureId, int valueChange, int listStart, int old_listEnd);
+	bool MustShiftId(gameAddr structureId, int valueChange, int listStart, int old_listEnd);
 	bool MustShiftId(int structureId, int valueChange, int listStart, int old_listEnd);
 	// Used for color coding input fields
 	void SetInputfieldColor(EditorInput* field);

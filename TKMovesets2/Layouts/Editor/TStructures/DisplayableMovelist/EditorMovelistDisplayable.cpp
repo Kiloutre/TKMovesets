@@ -10,6 +10,7 @@
 
 void EditorMovelistDisplayable::OnInitEnd()
 {
+	uniqueType = true;
 	BuidAllLabels();
 }
 

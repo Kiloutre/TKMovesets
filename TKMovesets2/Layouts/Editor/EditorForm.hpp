@@ -57,6 +57,8 @@ protected:
 	bool m_ignoreNextChange = false;
 	// True if the deletion popup is open
 	bool m_deletionPopupOpen = false;
+	// Marks if deletion is possible on this structure
+	bool m_isDeletable = true;
 
 	// Delete the current structure from the moveset and close the structure window
 	virtual void DeleteStructure();

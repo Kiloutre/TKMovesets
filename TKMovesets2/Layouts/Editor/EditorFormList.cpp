@@ -253,6 +253,7 @@ void EditorFormList::DeleteStructure()
 	popen = false;
 	unsavedChanges = false;
 	OnApplyResize(-origSize, origSize);
+	m_isDeletable = true;
 }
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)

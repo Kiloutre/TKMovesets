@@ -302,9 +302,9 @@ void EditorT7::DeleteStructures(EditorWindowType_ type, uint32_t id, size_t list
 		itemsToDelete.insert(id + i);
 	}
 
-	// At the current time, this does not work and deletes too much.
 	switch (type)
 	{
+	// Structure lists
 	case EditorWindowType_Requirement:
 		ModifyRequirementListSize(id, {}, itemsToDelete);
 		break;
@@ -343,56 +343,17 @@ void EditorT7::DeleteStructures(EditorWindowType_ type, uint32_t id, size_t list
 	case EditorWindowType_MovelistInput:
 		ModifyMovelistInputSize(id, {}, itemsToDelete);
 		break;
-	}
 
-	// POC but in reality we also will need shifting
-
-	/*
-	switch (type)
-	{
-	case EditorWindowType_Requirement:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
-		ModifyGenericMovelistListSize<Requirement>(id, {}, itemsToDelete, listHead);
-		break;
-
+	// Structures
 	case EditorWindowType_Move:
 		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 		ModifyGenericMovelistListSize<Move>(id, {}, itemsToDelete, listHead);
-		break;
-	case EditorWindowType_Voiceclip:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
-		ModifyGenericMovelistListSize<Voiceclip>(id, {}, itemsToDelete, listHead);
-		break;
-	case EditorWindowType_Cancel:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
-		ModifyGenericMovelistListSize<Cancel>(id, {}, itemsToDelete, listHead);
-		break;
-	case EditorWindowType_GroupedCancel:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
-		ModifyGenericMovelistListSize<Cancel>(id, {}, itemsToDelete, listHead);
 		break;
 	case EditorWindowType_CancelExtradata:
 		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
 		ModifyGenericMovelistListSize<CancelExtradata>(id, {}, itemsToDelete, listHead);
 		break;
 
-	case EditorWindowType_Extraproperty:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-		ModifyGenericMovelistListSize<ExtraMoveProperty>(id, {}, itemsToDelete, listHead);
-		break;
-	case EditorWindowType_MoveBeginProperty:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
-		ModifyGenericMovelistListSize<OtherMoveProperty>(id, {}, itemsToDelete, listHead);
-		break;
-	case EditorWindowType_MoveEndProperty:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
-		ModifyGenericMovelistListSize<OtherMoveProperty>(id, {}, itemsToDelete, listHead);
-		break;
-
-	case EditorWindowType_HitCondition:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
-		ModifyGenericMovelistListSize<HitCondition>(id, {}, itemsToDelete, listHead);
-		break;
 	case EditorWindowType_Reactions:
 		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.reactions;
 		ModifyGenericMovelistListSize<Reactions>(id, {}, itemsToDelete, listHead);
@@ -401,18 +362,10 @@ void EditorT7::DeleteStructures(EditorWindowType_ type, uint32_t id, size_t list
 		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.pushback;
 		ModifyGenericMovelistListSize<Pushback>(id, {}, itemsToDelete, listHead);
 		break;
-	case EditorWindowType_PushbackExtradata:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
-		ModifyGenericMovelistListSize<PushbackExtradata>(id, {}, itemsToDelete, listHead);
-		break;
 
 	case EditorWindowType_InputSequence:
 		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.inputSequence;
 		ModifyGenericMovelistListSize<InputSequence>(id, {}, itemsToDelete, listHead);
-		break;
-	case EditorWindowType_Input:
-		listHead += m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
-		ModifyGenericMovelistListSize<Input>(id, {}, itemsToDelete, listHead);
 		break;
 
 	case EditorWindowType_Projectile:
@@ -434,10 +387,6 @@ void EditorT7::DeleteStructures(EditorWindowType_ type, uint32_t id, size_t list
 		listHead += m_offsets->movelistBlock + (uint64_t)m_mvlHead->playables_offset;
 		ModifyGenericMovelistListSize<MvlPlayable>(id, {}, itemsToDelete, listHead);
 		break;
-	case EditorWindowType_MovelistInput:
-		listHead += m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset;
-		ModifyGenericMovelistListSize<MvlInput>(id, {}, itemsToDelete, listHead);
-		break;
+
 	}
-	*/
 }

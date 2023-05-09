@@ -28,6 +28,18 @@ typedef unsigned int ImU32;
 
 namespace EditorUtils
 {
+	bool MustShiftId(gameAddr32 structureId, int valueChange, int listStart, int old_listEnd)
+	{
+		if (structureId == (gameAddr32)-1) return false;
+		return MustShiftId((int)structureId, valueChange, listStart, old_listEnd);
+	}
+
+	bool MustShiftId(gameAddr structureId, int valueChange, int listStart, int old_listEnd)
+	{
+		if (structureId == (gameAddr)-1) return false;
+		return MustShiftId((int)structureId, valueChange, listStart, old_listEnd);
+	}
+
 	bool MustShiftId(int structureId, int valueChange, int listStart, int old_listEnd)
 	{
 		// If ID comes before list then there is no shifting to be done

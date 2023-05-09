@@ -99,6 +99,8 @@ EditorForm::EditorForm(const std::string& parentWindowName, EditorWindowType_ t_
 	windowType = t_windowType;
 	m_baseWindow = baseWindow;
 	InitForm(parentWindowName, t_structureId, editor);
+	// Disable single-structure deletion for now.
+	m_isDeletable = false;
 }
 
 // -- Private methods -- //
@@ -431,7 +433,7 @@ void EditorForm::Render()
 				}
 
 				{
-					ImGuiExtra::DisableBlockIf __(uniqueType || structureId == 0);
+					ImGuiExtra::DisableBlockIf __(!m_isDeletable || uniqueType || structureId == 0);
 					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize)) {
 						ImGui::CloseCurrentPopup();
 						m_deletionPopupOpen = true;

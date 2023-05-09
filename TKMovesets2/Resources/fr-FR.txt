@@ -188,7 +188,7 @@ edition.form_popup.duplicate_structure = Dupliquer la structure
 edition.form_popup.delete_structure = Supprimer la structure
 edition.form_popup.what_cancels_into_this_move = Quels Cancels utilisent ce Move ?
 edition.form_popup.what_moves_use_this_cancel_list = Quels Moves utilise cette liste de cancel ?
-edition.form_popup.deletion_are_you_sure = Êtes-vous sûr de vouloir supprimer cette structure ?
+edition.form_popup.deletion_are_you_sure = Êtes-vous sûr de vouloir supprimer cette structure ?\nIl est recommandé d'éviter de supprimer une structure en cas où elle possède de nombreuses références ailleurs.
 edition.form_popup.yes_delete = Oui, supprimez.
 
 edition.create_new = Créer 

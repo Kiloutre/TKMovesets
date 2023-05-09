@@ -84,13 +84,18 @@ namespace StructsT7
 
 	struct Reactions
 	{
-		Pushback* front_pushback;
-		Pushback* backturned_pushback;
-		Pushback* left_side_pushback;
-		Pushback* right_side_pushback;
-		Pushback* front_counterhit_pushback; // If you ever wondered why your CH launcher didn't launch after a sidestep, that's why
-		Pushback* downed_pushback;
-		Pushback* block_pushback;
+		union {
+			struct {
+				Pushback* front_pushback;
+				Pushback* backturned_pushback;
+				Pushback* left_side_pushback;
+				Pushback* right_side_pushback;
+				Pushback* front_counterhit_pushback; // If you ever wondered why your CH launcher didn't launch after a sidestep, that's why
+				Pushback* downed_pushback;
+				Pushback* block_pushback;
+			};
+			Pushback* pushbacks[7];
+		};
 
 		uint16_t front_direction;
 		uint16_t back_direction;
@@ -102,22 +107,27 @@ namespace StructsT7
 		uint32_t _0x44_int; 
 		uint32_t _0x48_int; 
 
-		uint16_t vertical_pushback;
-		uint16_t standing_moveid;
-		uint16_t default_moveid;
-		uint16_t crouch_moveid;
-		uint16_t counterhit_moveid;
-		uint16_t crouch_counterhit_moveid;
-		uint16_t left_side_moveid;
-		uint16_t crouch_left_side_moveid;
-		uint16_t right_side_moveid;
-		uint16_t crouch_right_side_moveid;
-		uint16_t backturned_moveid;
-		uint16_t crouch_backturned_moveid;
-		uint16_t block_moveid;
-		uint16_t crouch_block_moveid;
-		uint16_t wallslump_moveid;
-		uint16_t downed_moveid;
+		union {
+			struct {
+				uint16_t vertical_pushback;
+				uint16_t standing_moveid;
+				uint16_t default_moveid;
+				uint16_t crouch_moveid;
+				uint16_t counterhit_moveid;
+				uint16_t crouch_counterhit_moveid;
+				uint16_t left_side_moveid;
+				uint16_t crouch_left_side_moveid;
+				uint16_t right_side_moveid;
+				uint16_t crouch_right_side_moveid;
+				uint16_t backturned_moveid;
+				uint16_t crouch_backturned_moveid;
+				uint16_t block_moveid;
+				uint16_t crouch_block_moveid;
+				uint16_t wallslump_moveid;
+				uint16_t downed_moveid;
+			};
+			uint16_t moveids[16];
+		};
 	};
 
 	struct HitCondition
@@ -629,13 +639,18 @@ namespace StructsT7_gameAddr
 
 	struct Reactions
 	{
-		gameAddr front_pushback;
-		gameAddr backturned_pushback;
-		gameAddr left_side_pushback;
-		gameAddr right_side_pushback;
-		gameAddr front_counterhit_pushback; // If you ever wondered why your CH launcher didn't launch after a sidestep, that's why
-		gameAddr downed_pushback;
-		gameAddr block_pushback;
+		union {
+			struct {
+				gameAddr front_pushback;
+				gameAddr backturned_pushback;
+				gameAddr left_side_pushback;
+				gameAddr right_side_pushback;
+				gameAddr front_counterhit_pushback; // If you ever wondered why your CH launcher didn't launch after a sidestep, that's why
+				gameAddr downed_pushback;
+				gameAddr block_pushback;
+			};
+			gameAddr pushbacks[7];
+		};
 
 		uint16_t front_direction;
 		uint16_t back_direction;
@@ -647,22 +662,27 @@ namespace StructsT7_gameAddr
 		uint32_t _0x44_int;
 		uint32_t _0x48_int;
 
-		uint16_t vertical_pushback;
-		uint16_t standing_moveid;
-		uint16_t default_moveid;
-		uint16_t crouch_moveid;
-		uint16_t counterhit_moveid;
-		uint16_t crouch_counterhit_moveid;
-		uint16_t left_side_moveid;
-		uint16_t crouch_left_side_moveid;
-		uint16_t right_side_moveid;
-		uint16_t crouch_right_side_moveid;
-		uint16_t backturned_moveid;
-		uint16_t crouch_backturned_moveid;
-		uint16_t block_moveid;
-		uint16_t crouch_block_moveid;
-		uint16_t wallslump_moveid;
-		uint16_t downed_moveid;
+		union {
+			struct {
+				uint16_t vertical_pushback;
+				uint16_t standing_moveid;
+				uint16_t default_moveid;
+				uint16_t crouch_moveid;
+				uint16_t counterhit_moveid;
+				uint16_t crouch_counterhit_moveid;
+				uint16_t left_side_moveid;
+				uint16_t crouch_left_side_moveid;
+				uint16_t right_side_moveid;
+				uint16_t crouch_right_side_moveid;
+				uint16_t backturned_moveid;
+				uint16_t crouch_backturned_moveid;
+				uint16_t block_moveid;
+				uint16_t crouch_block_moveid;
+				uint16_t wallslump_moveid;
+				uint16_t downed_moveid;
+			};
+			uint16_t moveids[16];
+		};
 	};
 
 	struct HitCondition
