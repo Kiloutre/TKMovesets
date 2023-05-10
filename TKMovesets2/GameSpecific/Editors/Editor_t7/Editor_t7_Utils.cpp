@@ -16,10 +16,11 @@ bool EditorT7::IsCommandInputSequence(uint64_t command)
 {
 	const uint32_t sequenceId = (command & 0xFFFFFFFF);
 	const uint32_t inputSequenceStart = (int)constants->at(EditorConstants_InputSequenceCommandStart);
-	if (sequenceId >= inputSequenceStart && sequenceId < 0x9000) {
-		// Arbitrary 0x9000 number here. Todo: find actual limit
+	const uint32_t inputSequenceEnd = 0x10000; // Arbitrary number here. Todo: find actual limit
+	if (inputSequenceStart <= sequenceId && sequenceId < inputSequenceEnd) {
 		return true;
 	}
+	return false;
 }
 
 bool EditorT7::IsCommandInputSequence(const char* buffer)

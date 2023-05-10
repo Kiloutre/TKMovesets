@@ -428,6 +428,7 @@ void EditorForm::Render()
 					{
 						auto structureListSize = GetOriginalStructureListSize();
 						uint32_t newStructure = m_editor->DuplicateStructure(windowType, structureId, structureListSize);
+						m_baseWindow->SetChangesUnsaved();
 						m_baseWindow->OpenFormWindow(windowType, newStructure, structureListSize);
 						OnDuplication(newStructure, structureListSize);
 					}
@@ -456,6 +457,7 @@ void EditorForm::Render()
 				ImGui::PushStyleColor(ImGuiCol_Button, RED_BTN);
 				if (ImGui::Button(_("yes"))) {
 					DeleteStructure();
+					m_baseWindow->SetChangesUnsaved();
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::PopStyleColor();

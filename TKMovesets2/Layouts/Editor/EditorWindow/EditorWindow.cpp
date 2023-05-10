@@ -397,3 +397,8 @@ void EditorWindow::IssueFieldUpdate(EditorWindowType_ winType, int valueChange, 
 		}
 	}
 }
+
+void EditorWindow::SetChangesUnsaved()
+{
+	m_savedLastChange = false;
+}

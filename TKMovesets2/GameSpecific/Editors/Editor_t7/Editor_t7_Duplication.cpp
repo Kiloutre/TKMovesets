@@ -72,134 +72,134 @@ uint32_t EditorT7::DuplicateMovelistPlayable(uint32_t id, size_t listSize)
 
 uint32_t EditorT7::DuplicateRequirement(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.requirementCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement + sizeof(Requirement) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.requirementCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
 
-	ModifyGenericMovelistListSize<Requirement>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<Requirement>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.requirements;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(Requirement));
+	memcpy(list[listCount], list[id], listSize * sizeof(Requirement));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateVoiceclip(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.voiceclipCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip + sizeof(Voiceclip) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.voiceclipCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
 
-	ModifyGenericMovelistListSize<Voiceclip>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<Voiceclip>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.voiceclips;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(Voiceclip));
+	memcpy(list[listCount], list[id], listSize * sizeof(Voiceclip));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateCancel(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.cancelCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel + sizeof(Cancel) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.cancelCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
 
-	ModifyGenericMovelistListSize<Cancel>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<Cancel>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.cancels;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(Cancel));
+	memcpy(list[listCount], list[id], listSize * sizeof(Cancel));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateGroupedCancel(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.groupCancelCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel + sizeof(Cancel) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.groupCancelCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
 
-	ModifyGenericMovelistListSize<Cancel>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<Cancel>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.grouped_cancels;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(Cancel));
+	memcpy(list[listCount], list[id], listSize * sizeof(Cancel));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateExtraproperty(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.extraMovePropertyCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty + sizeof(ExtraMoveProperty) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.extraMovePropertyCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 
-	ModifyGenericMovelistListSize<ExtraMoveProperty>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<ExtraMoveProperty>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.extra_move_properties;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(ExtraMoveProperty));
+	memcpy(list[listCount], list[id], listSize * sizeof(ExtraMoveProperty));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateMoveBeginProperty(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.moveBeginningPropCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp + sizeof(OtherMoveProperty) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.moveBeginningPropCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
 
-	ModifyGenericMovelistListSize<OtherMoveProperty>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.move_start_properties;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(OtherMoveProperty));
+	memcpy(list[listCount], list[id], listSize * sizeof(OtherMoveProperty));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateMoveEndProperty(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.moveEndingPropCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp + sizeof(OtherMoveProperty) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.moveEndingPropCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 
-	ModifyGenericMovelistListSize<OtherMoveProperty>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.move_end_properties;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(OtherMoveProperty));
+	memcpy(list[listCount], list[id], listSize * sizeof(OtherMoveProperty));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateHitCondition(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.hitConditionCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition + sizeof(HitCondition) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.hitConditionCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
 
-	ModifyGenericMovelistListSize<HitCondition>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<HitCondition>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.hit_conditions;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(HitCondition));
+	memcpy(list[listCount], list[id], listSize * sizeof(HitCondition));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicatePushbackExtradata(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.pushbackExtradataCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata + sizeof(PushbackExtradata) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.pushbackExtradataCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 
-	ModifyGenericMovelistListSize<PushbackExtradata>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<PushbackExtradata>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.pushback_extras;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(PushbackExtradata));
+	memcpy(list[listCount], list[id], listSize * sizeof(PushbackExtradata));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateInput(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_infos->table.inputCount;
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input + sizeof(Input) * listCount;
+	unsigned int listCount = (unsigned int)m_infos->table.inputCount;
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
 
-	ModifyGenericMovelistListSize<Input>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<Input>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.inputs;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(Input));
+	memcpy(list[listCount], list[id], listSize * sizeof(Input));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateMovelistInput(uint32_t id, size_t listSize)
 {
-	uint64_t listCount = m_iterators.mvl_inputs.size();
-	uint64_t listEnd = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset + sizeof(MvlInput) * listCount;
+	unsigned int listCount = (unsigned int)m_iterators.mvl_inputs.size();
+	uint64_t listStart = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset;
 
-	ModifyGenericMovelistListSize<MvlInput>(id, std::vector(listSize, -1), {}, listEnd);
+	ModifyGenericMovelistListSize<MvlInput>(listCount, std::vector(listSize, -1), {}, listStart);
 	auto& list = m_iterators.mvl_inputs;
-	memcpy(list[(unsigned int)listEnd], list[id], listSize * sizeof(MvlInput));
+	memcpy(list[listCount], list[id], listSize * sizeof(MvlInput));
 
-	return (uint32_t)listEnd;
+	return (uint32_t)listCount;
 }
 
 uint32_t EditorT7::DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize)
@@ -270,5 +270,6 @@ uint32_t EditorT7::DuplicateStructure(EditorWindowType_ type, uint32_t id, size_
 	}
 
 	DEBUG_LOG("EditorT7::DuplicateStructure(): Unknown type %u\n", type);
+	throw;
 	return 0;
 }

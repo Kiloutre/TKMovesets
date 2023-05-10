@@ -138,6 +138,8 @@ public:
 	// Render the window
 	void Render(int dockid);
 
+	// Makes the save button available
+	void SetChangesUnsaved() override;
 	// Called when a move is created, is used in order to refresh the movelist and scroll to the move inside of it
 	void OnMoveCreate(unsigned int moveId) override;
 	// Create a new window containing data about the given move. Can be called by subwidnows.
