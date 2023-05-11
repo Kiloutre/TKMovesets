@@ -56,7 +56,7 @@ static void WriteToLogFile(const std::string& content, bool append=true)
 
 static void glfw_error_callback(int error, const char* description)
 {
-	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+	DEBUG_LOG("!! GLFW Error %d: '%s' !!\n", error, description);
 }
 
 // Tries to find a translation file for the current system locale, return false on failure

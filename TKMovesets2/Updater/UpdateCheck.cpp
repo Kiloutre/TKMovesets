@@ -290,7 +290,7 @@ void NavigationMenu::RequestCheckForUpdates()
 		m_updateStatus.thread.join();
 	}
 
-	// Reload addresses in case the loaded game addresses is not up to date but the local file one is
+	// Reload addresses before updating, in case the loaded game addresses is not up to date but the local file one is
 	m_addresses->Reload();
 
 	m_updateStatus.error = false;
