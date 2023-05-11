@@ -32,11 +32,6 @@
 # define MAIN_ERR_NO_MOVESET_LOADER (5)
 # define MAIN_ERR_NO_ERR            (0)
 
-// Embedded moveset loader .dll
-extern "C" const char TKMovesetLoader[];
-extern "C" const size_t TKMovesetLoader_len;
-extern "C" const size_t TKMovesetLoader_orig_len;
-
 // -- Static helpers -- //
 
 static void WriteToLogFile(const std::string& content, bool append=true)
@@ -329,61 +324,6 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
 	}
 
-	// Load the MovesetLoader in our own process so that we can know its function addresses
-	HMODULE movesetLoaderLib;
-	{
-		{
-			// Get rid of the potentially obsolete old .dll
-			struct _stat dll_buffer;
-			if (_wstat(L"" MOVESET_LOADER_NAME, &dll_buffer) == 0) {
-
-				struct _stat program_buffer;
-				_wstat(L"" PROGRAM_FILENAME, &program_buffer);
-
-				if (dll_buffer.st_mtime < program_buffer.st_mtime) {
-					DEBUG_LOG("- .dll out of date, deleting it -\n");
-					// DLL was created before this .exe, which means it is not up to date
-					try {
-						std::filesystem::remove(MOVESET_LOADER_NAME);
-					}
-					catch (std::filesystem::filesystem_error const&) {
-						DEBUG_LOG("!! ERROR WHILE TRYING TO REMOVE OLD DLL !!\n");
-					}
-				}
-			}
-		}
-
-		// If .dll does not exist, create it
-		// Todo: reflective DLL injection that will not need to create a file
-		if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
-		{
-			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'\n");
-			char* buf = new char[TKMovesetLoader_orig_len];
-
-			int decompressed = LZ4_decompress_safe((char*)TKMovesetLoader, buf, (int)TKMovesetLoader_len, (int)TKMovesetLoader_orig_len);
-
-			if (decompressed > 0) {
-				std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
-				if (file.fail()) {
-					return MAIN_ERR_NO_MOVESET_LOADER;
-				}
-
-				file.write(buf, TKMovesetLoader_orig_len);
-				DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'\n");
-			}
-			else {
-				DEBUG_LOG("Failed to decompress '" MOVESET_LOADER_NAME "'\n");
-			}
-			delete[] buf;
-		}
-
-		movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
-		if (movesetLoaderLib == nullptr) {
-			DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
-			return MAIN_ERR_MOVESET_LOADER;
-		}
-	}
-
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program(window, c_glsl_version);
@@ -420,6 +360,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 				ImGui::RenderPlatformWindowsDefault();
 				glfwMakeContextCurrent(backup_current_context);
 			}
+
 			glfwSwapBuffers(window);
 		}
 
@@ -439,7 +380,6 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
-	FreeLibrary(movesetLoaderLib);
 	Localization::Clear();
 
 
