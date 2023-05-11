@@ -4,11 +4,14 @@
 #include <stdlib.h>
 #endif
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdlrenderer.h>
+#define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
 
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#if !SDL_VERSION_ATLEAST(2,0,17)
+#error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
+#endif
 
 #include <stdio.h>
 #include <format>
@@ -173,6 +176,7 @@ static void DestroyMainClasses(MainWindow& program)
 	program.storage.StopThreadAndCleanup();
 }
 
+/*
 static bool LoadEmbeddedIcon(GLFWwindow* window)
 {
 	HMODULE hInstance = GetModuleHandle(NULL);
@@ -225,6 +229,7 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	DestroyIcon(hIcon);
 	return true;
 }
+*/
 
 void StartProcess(const std::string& file);
 void ApplyUpdate(const std::string& filename);
@@ -232,18 +237,10 @@ void CleanupUpdateFiles(const std::string& filename);
 
 // -- main -- //
 
-// I'd like to avoid declaring bad arguments for the main() but visual studio hates it
-// Just make sure not to actually use any of those arguments unless in release mode
-#ifdef BUILD_TYPE_DEBUG
-# define MAIN_NAME main
-#else
-# define MAIN_NAME WinMain
-#endif
-
-int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 #ifdef BUILD_TYPE_DEBUG
-	//AllocConsole();
+	AllocConsole();
 #endif
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
@@ -274,53 +271,45 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		}
 	}
 
-	// Initialize GLFW library
-	glfwSetErrorCallback(glfw_error_callback);
-	if (!glfwInit()) {
-		return MAIN_ERR_GLFW_INIT;
-	}
-	WriteToLogFile("Initiated GLFW");
-
-	// GL 3.0 + GLSL 130
-	// Set the window hint. Not really that important to be honest.
-	const char* c_glsl_version = "#version 130";
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-
-	// Setup window title and create window
-	GLFWwindow* window;
+	SDL_SetMainReady();
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
 	{
-		std::string windowTitle = std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION);
-		window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle.c_str(), nullptr, nullptr);
+		return -1;
 	}
-	WriteToLogFile("GLFW window created");
+	WriteToLogFile("Initiated");
 
-	if (window == nullptr) {
+	// From 2.0.18: Enable native IME.
+#ifdef SDL_HINT_IME_SHOW_UI
+	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+#endif
+
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+	SDL_Window* window = SDL_CreateWindow(PROGRAM_TITLE " " PROGRAM_VERSION, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, window_flags);
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+	WriteToLogFile("window created");
+
+	if (renderer == nullptr ||window == nullptr) {
 		return MAIN_ERR_WINDOW_CREATION;
 	}
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGuiIO& io = ImGui::GetIO();
+
+	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+
+
+	ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+	ImGui_ImplSDLRenderer_Init(renderer);
+
+	/*
 	if (!LoadEmbeddedIcon(window)) {
 		DEBUG_LOG("Failed to load icon\n");
 	}
-	// Set window for current thread
-	glfwMakeContextCurrent(window);
-	// Enable vsync
-	glfwSwapInterval(1);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		DEBUG_LOG("Unable to context to OpenGL");
-		return MAIN_ERR_OPENGL_CONTEXT;
-	}
-	WriteToLogFile("GLL Loader done");
-
-	{
-		// Set viewport for OpenGL
-		int screen_width, screen_height;
-		glfwGetFramebufferSize(window, &screen_width, &screen_height);
-		glViewport(0, 0, screen_width, screen_height);
-	}
+	*/
 
 	// Load translation
 	if (!LoadLocaleTranslation()) {
@@ -329,15 +318,25 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 
 	{
 		// Init main program. This will get most things going and create the important threads
-		MainWindow program(window, c_glsl_version);
-		ImGuiIO& io = ImGui::GetIO();
+		MainWindow program;
 		InitMainClasses(program);
 
 		WriteToLogFile("Initiated main classes");
-		while (!glfwWindowShouldClose(window) && !program.requestedUpdate)
+		bool done = false;
+		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+		while (!done && !program.requestedUpdate)
 		{
 			// Poll and handle events such as MKB inputs, window resize. Required
-			glfwPollEvents();
+			SDL_Event event;
+			while (SDL_PollEvent(&event))
+			{
+				ImGui_ImplSDL2_ProcessEvent(&event);
+				if (event.type == SDL_QUIT)
+					done = true;
+				if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+					done = true;
+			}
 
 			// Probably framebuffer related? Required
 			program.NewFrame();
@@ -347,24 +346,11 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 
 			// Let imgui do its stuff
 			ImGui::Render();
-			{
-				int display_w, display_h;
-				glfwGetFramebufferSize(window, &display_w, &display_h);
-				glViewport(0, 0, display_w, display_h);
-			}
-			glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-			{
-				GLFWwindow* backup_current_context = glfwGetCurrentContext();
-				ImGui::UpdatePlatformWindows();
-				ImGui::RenderPlatformWindowsDefault();
-				glfwMakeContextCurrent(backup_current_context);
-			}
-
-			glfwSwapBuffers(window);
+			SDL_RenderSetScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+			SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
+			SDL_RenderClear(renderer);
+			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+			SDL_RenderPresent(renderer);
 		}
 
 
@@ -380,8 +366,9 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		}
 	}
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 
 	Localization::Clear();
 

@@ -210,13 +210,9 @@ endif()
 
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
+add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    # With console mode
-    add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
     target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
-else()
-    # GUI-only mode
-    add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
@@ -231,11 +227,11 @@ add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 ## Extra dependencies ##
 # Link the other libraries that we use #
 
-# OpenGL (Renderer)
+# SDL (Bindings & Renderer)
 find_package(SDL2 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-shared>
 )
 
 # ImGUI (Interface)

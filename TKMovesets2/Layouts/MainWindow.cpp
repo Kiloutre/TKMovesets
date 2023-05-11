@@ -1,6 +1,6 @@
 ﻿#include <ImGui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdlrenderer.h>
 
 #include "MainWindow.hpp"
 #include "GameData.hpp"
@@ -85,21 +85,11 @@ void MainWindow::LoadFonts()
 
 // -- Public methods -- //
 
-MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
+MainWindow::MainWindow()
 {
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-
 	// Setup ImGui config. This had to be done before initializing the backends
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-	// Initialize backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
 	if (Localization::RequiresFontLoad()) {
 		LoadFonts();
@@ -120,8 +110,8 @@ void MainWindow::NewFrame()
 		m_mustRebuildFonts = false;
 	}
 	// I believe this inits the current frame buffer
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
+	ImGui_ImplSDLRenderer_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 }
 
@@ -232,7 +222,7 @@ void MainWindow::Update()
 
 void MainWindow::Shutdown()
 {
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplSDLRenderer_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 }
