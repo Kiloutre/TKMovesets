@@ -85,26 +85,13 @@ void MainWindow::LoadFonts()
 
 // -- Public methods -- //
 
-MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
+MainWindow::MainWindow()
 {
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-
-	// Setup ImGui config. This had to be done before initializing the backends
-	ImGuiIO& io = ImGui::GetIO();
-	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-	// Initialize backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(c_glsl_version);
-
 	if (Localization::RequiresFontLoad()) {
 		LoadFonts();
 	}
 	else {
+		auto& io = ImGui::GetIO();
 		// Load in another thread if the fonts don't need to be loaded right away
 		ImFont* font = io.Fonts->AddFontDefault();
 		io.Fonts->Build();

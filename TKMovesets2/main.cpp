@@ -232,16 +232,12 @@ void CleanupUpdateFiles(const std::string& filename);
 
 // -- main -- //
 
-// I'd like to avoid declaring bad arguments for the main() but visual studio hates it
-// Just make sure not to actually use any of those arguments unless in release mode
+int WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
 #ifdef BUILD_TYPE_DEBUG
-# define MAIN_NAME main
-#else
-# define MAIN_NAME WinMain
+	AllocConsole();
 #endif
 
-int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
 
@@ -306,6 +302,19 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	// Enable vsync
 	glfwSwapInterval(1);
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		DEBUG_LOG("Unable to context to OpenGL");
 		return MAIN_ERR_OPENGL_CONTEXT;
@@ -326,8 +335,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 
 	{
 		// Init main program. This will get most things going and create the important threads
-		MainWindow program(window, c_glsl_version);
-		ImGuiIO& io = ImGui::GetIO();
+		MainWindow program;
 		InitMainClasses(program);
 
 		WriteToLogFile("Initiated main classes");
@@ -353,7 +361,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 			glClear(GL_COLOR_BUFFER_BIT);
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				GLFWwindow* backup_current_context = glfwGetCurrentContext();
 				ImGui::UpdatePlatformWindows();

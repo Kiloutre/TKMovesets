@@ -210,13 +210,9 @@ endif()
 
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
+add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    # With console mode
-    add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
     target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
-else()
-    # GUI-only mode
-    add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
 endif()
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
