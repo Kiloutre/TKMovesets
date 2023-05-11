@@ -242,6 +242,9 @@ void CleanupUpdateFiles(const std::string& filename);
 
 int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+#ifdef BUILD_TYPE_DEBUG
+	//AllocConsole();
+#endif
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
 
