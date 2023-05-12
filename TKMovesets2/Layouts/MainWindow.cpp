@@ -98,6 +98,7 @@ MainWindow::MainWindow()
 		LoadFonts();
 	}
 	else {
+		auto& io = ImGui::GetIO();
 		// Load in another thread if the fonts don't need to be loaded right away
 		std::thread t(&MainWindow::LoadFonts, this);
 		t.detach();
