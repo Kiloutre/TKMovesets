@@ -5,10 +5,10 @@
   "dependencies": [
     {
       "name": "imgui",
-      "features": [ "glfw-binding", "opengl3-binding", "docking-experimental" ]
+      "features": [ "opengl3-binding", "sdl2-binding", "docking-experimental" ]
     },
-    "glfw3",
-    "glad",
+    "sdl2",
+    "opengl",
     "polyhook2",
     "lz4",
     "curlpp"

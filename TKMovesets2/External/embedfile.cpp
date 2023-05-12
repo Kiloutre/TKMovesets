@@ -64,7 +64,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    printf("Compressed size is %d. Writing...\n", compressedSize);
+    printf("Compressed size is %d, old size is %d, ratio is %.2f%% . Writing...\n", compressedSize, file_size, (float)compressedSize / (float)file_size);
     for (int i = 0; i < compressedSize; ++i)  {
 #pragma warning(suppress:)
         output_file << std::to_string(outbuf[i]) << ",";

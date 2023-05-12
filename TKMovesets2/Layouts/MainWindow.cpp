@@ -1,6 +1,6 @@
 ﻿#include <ImGui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 
 #include "MainWindow.hpp"
 #include "GameData.hpp"
@@ -87,14 +87,19 @@ void MainWindow::LoadFonts()
 
 MainWindow::MainWindow()
 {
+	// Setup ImGui config. This had to be done before initializing the backends
+	ImGuiIO& io = ImGui::GetIO();
+	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
+
+	ImFont* font = io.Fonts->AddFontDefault();
+	io.Fonts->Build();
+
 	if (Localization::RequiresFontLoad()) {
 		LoadFonts();
 	}
 	else {
 		auto& io = ImGui::GetIO();
 		// Load in another thread if the fonts don't need to be loaded right away
-		ImFont* font = io.Fonts->AddFontDefault();
-		io.Fonts->Build();
 		std::thread t(&MainWindow::LoadFonts, this);
 		t.detach();
 	}
@@ -108,7 +113,7 @@ void MainWindow::NewFrame()
 	}
 	// I believe this inits the current frame buffer
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 }
 
@@ -220,6 +225,6 @@ void MainWindow::Update()
 void MainWindow::Shutdown()
 {
 	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 }
