@@ -192,6 +192,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 {
 #ifdef BUILD_TYPE_DEBUG
 	AllocConsole();
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
 #endif
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
