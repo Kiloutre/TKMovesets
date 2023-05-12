@@ -94,7 +94,7 @@ MainWindow::MainWindow()
 	ImFont* font = io.Fonts->AddFontDefault();
 	io.Fonts->Build();
 
-	if (Localization::RequiresFontLoad() || true) {
+	if (Localization::RequiresFontLoad()) {
 		LoadFonts();
 	}
 	else {

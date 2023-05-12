@@ -40,26 +40,6 @@
 
 // -- Static helpers -- //
 
-static void WriteToLogFile(const std::string& content, bool append=true)
-{
-	DEBUG_LOG("%s\n", content.c_str());
-	/*
-	std::ofstream file;
-
-	if (append) {
-		file.open(PROGRAM_DEBUG_LOG_FILE, std::ios_base::app);
-	}
-	else {
-		file.open(PROGRAM_DEBUG_LOG_FILE);
-	}
-
-	if (!file.fail()) {
-		file.write(content.c_str(), content.size());
-		file.write("\n", 1);
-	}
-	*/
-}
-
 static void glfw_error_callback(int error, const char* description)
 {
 	DEBUG_LOG("!! GLFW Error %d: '%s' !!\n", error, description);
@@ -81,7 +61,7 @@ static bool LoadLocaleTranslation()
 		}
 	}
 
-	WriteToLogFile(std::format("Attempting to load locale {}", name));
+	DEBUG_LOG("Attempting to load locale %s\n", name);
 	return Localization::LoadFile(name);
 }
 
@@ -179,8 +159,7 @@ static void DestroyMainClasses(MainWindow& program)
 	program.storage.StopThreadAndCleanup();
 }
 
-/*
-static bool LoadEmbeddedIcon(GLFWwindow* window)
+static bool LoadEmbeddedIcon(SDL_Window* window)
 {
 	HMODULE hInstance = GetModuleHandle(NULL);
 
@@ -196,43 +175,12 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	DWORD iconSize = SizeofResource(hInstance, hResource);
 	LPVOID iconData = LockResource(hResourceData);
 
-	// Create an HICON object from the resource data
-	HICON hIcon = CreateIconFromResourceEx((PBYTE)iconData, iconSize, TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
+	SDL_RWops* rwOps = SDL_RWFromConstMem(iconData, iconSize);
+	auto iconSurface  = SDL_CreateRGBSurfaceFrom(iconData, 256, -256, 32, 256 * 4, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
-	// Convert the HICON object to a GLFWimage structure
-	ICONINFO iconInfo;
-	GetIconInfo(hIcon, &iconInfo);
-
-	BITMAPINFO bitmapInfo;
-	ZeroMemory(&bitmapInfo, sizeof(BITMAPINFO));
-	bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bitmapInfo.bmiHeader.biWidth = iconInfo.xHotspot * 2;
-	bitmapInfo.bmiHeader.biHeight = -((signed)iconInfo.yHotspot * 2);
-	bitmapInfo.bmiHeader.biPlanes = 1;
-	bitmapInfo.bmiHeader.biBitCount = 32;
-
-	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * (uint64_t) abs(bitmapInfo.bmiHeader.biHeight) * 4;
-	BYTE* bitmapData = new BYTE[allocSize];
-	ZeroMemory(bitmapData, allocSize);
-
-	GetDIBits(GetDC(NULL), iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
-
-	GLFWimage image{
-		.width = (int)(iconInfo.xHotspot * 2),
-		.height = (int)(iconInfo.yHotspot * 2),
-		.pixels = bitmapData
-	};
-
-	// Set the window icon
-	glfwSetWindowIcon(window, 1, &image);
-
-	// Clean up
-	DeleteObject(iconInfo.hbmColor);
-	DeleteObject(iconInfo.hbmMask);
-	DestroyIcon(hIcon);
+	SDL_SetWindowIcon(window, iconSurface);
 	return true;
 }
-*/
 
 void StartProcess(const std::string& file);
 void ApplyUpdate(const std::string& filename);
@@ -257,11 +205,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		if (ws != std::filesystem::current_path()) {
 			std::filesystem::current_path(ws);
-			WriteToLogFile(std::format("OLD CWD is {}", Helpers::wstring_to_string(oldWorkingDir)));
-			WriteToLogFile(std::format("Set CWD to {}", Helpers::wstring_to_string(ws)));
 		}
-
-		WriteToLogFile("Started TKMovesets " PROGRAM_VERSION, false);
 
 		std::string update_file_name = std::string(UPDATE_TMP_FILENAME) + ".exe";
 		if (filename == update_file_name) {
@@ -326,11 +270,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-	/*
 	if (!LoadEmbeddedIcon(window)) {
 		DEBUG_LOG("Failed to load icon\n");
 	}
-	*/
 
 	// Load translation
 	if (!LoadLocaleTranslation()) {
@@ -346,7 +288,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		ImGui_ImplOpenGL3_Init(glsl_version);
 
 		bool done = false;
-		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
 
 		while (!done && !program.requestedUpdate)
 		{
@@ -391,10 +333,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 
 		DestroyMainClasses(program);
-		WriteToLogFile("Destroyed main classes");
 		// Cleanup what needs to be cleaned up
 		program.Shutdown();
-		WriteToLogFile("Shut down");
 
 		if (program.requestedUpdate) {
 			program.navMenu.CleanupThread();
