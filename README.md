@@ -60,7 +60,7 @@ You may obtain the steamworks files using two possible ways:
 - From the official steamworks website (that will require creating a steamworks account): https://partner.steamgames.com/downloads/list . Do make sure to download the version that came right before the Tekken build you'll be using the software on, for minimum problems.
 - From this link which may go down at any time (v1.56) : https://mega.nz/folder/htpVHSCa#O24Zz0PfxcyejV5ChqDAgw
 
-Make sure the folder is extracted at the root of the project (inside the TKMovesets folder), and that it is named `steam api`
+Make sure the folder is extracted at the root of the project (inside the TKMovesets folder), and that it is named `steamapi sdk`
 
 ## Building
 - **If you have visual studio installed**: Make sure to close Visual Studio and delete the folders `.vs` and `out` before trying your first build, they may contain bad cache if you attempted building the project with an incomplete environment
