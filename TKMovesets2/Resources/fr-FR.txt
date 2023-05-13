@@ -104,6 +104,8 @@ extraction.settings = Paramètres
 extraction.settings.other = Autre
 extraction.settings.compress_moveset = Compresser le fichier
 extraction.settings.displayable_movelist = Liste des coups
+extraction.settings.compression_type = Type de compression
+extraction.settings.compression_type.none = Aucune
 
 # Importation #
 importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.

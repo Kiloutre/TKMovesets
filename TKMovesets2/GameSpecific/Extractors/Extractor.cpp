@@ -33,6 +33,13 @@ namespace ExtractorUtils
 			progress += step;
 		}
 	}
+
+	TKMovesetCompressionType_ GetCompressionAlgorithm(ExtractSettings settings)
+	{
+		if (settings & ExtractSettings_CompressLZMA) return TKMovesetCompressionType_LZMA;
+		if (settings & ExtractSettings_CompressLZ4) return TKMovesetCompressionType_LZ4;
+		return TKMovesetCompressionType_None;
+	}
 };
 
 // Private methods //

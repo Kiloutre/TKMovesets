@@ -8,6 +8,7 @@
 
 #include "constants.h"
 #include "GameTypes.h"
+#include "MovesetStructs.h"
 
 // Converts a ptr to an index, -1 if the address is null
 # define TO_INDEX(field, listStartAddr, type) (field = (field == 0 ? -1 : (field - listStartAddr) / sizeof(type)))
@@ -40,7 +41,11 @@ enum ExtractSettings_
 
 	ExtractSettings_OVERWRITE_SAME_FILENAME = (1 << 12),
 	ExtractSettings_DisplayableMovelist = (1 << 13),
-	ExtractSettings_Compress = (1 << 14),
+
+	ExtractSettings_CompressLZMA = (1 << 14),
+	ExtractSettings_CompressLZ4 = (1 << 15),
+
+	ExtractSettings_Compress = ExtractSettings_CompressLZMA | ExtractSettings_CompressLZ4,
 };
 
 enum ExtractionErrcode_
@@ -55,6 +60,8 @@ namespace ExtractorUtils
 {
 	// Write a list of blocks, each aligned on a 8 bytes basis
 	void WriteFileData(std::ofstream& file, const std::vector<std::pair<Byte*, uint64_t>>& blocks, uint8_t& progress, uint8_t progress_max);
+	// Returns the compression algorithm depending on extraction settings
+	TKMovesetCompressionType_ GetCompressionAlgorithm(ExtractSettings settings);
 };
 
 // Base class for extracting from a game

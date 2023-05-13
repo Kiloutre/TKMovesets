@@ -9,7 +9,7 @@ namespace CompressionUtils
 {
 	namespace FILE {
 		namespace Moveset {
-			bool Compress(const std::wstring& dest_filename, const std::wstring& src_filename, TKMovesetCompressionType_ compressionType = TKMovesetCompressonType_LZMA);
+			bool Compress(const std::wstring& dest_filename, const std::wstring& src_filename, TKMovesetCompressionType_ compressionType);
 		};
 	};
 

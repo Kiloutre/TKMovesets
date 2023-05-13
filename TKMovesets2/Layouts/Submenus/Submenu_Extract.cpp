@@ -9,6 +9,28 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 
+// -- Data -- //
+
+struct s_compressionTypes {
+	const char* name;
+	ExtractSettings_ compressionSetting;
+};
+
+s_compressionTypes g_compressionTypes[] = {
+	{ 
+		"None",
+		(ExtractSettings_)0
+	},
+	{
+		"LZMA",
+		ExtractSettings_CompressLZMA
+	},
+	{
+		"LZ4",
+		ExtractSettings_CompressLZ4
+	}
+};
+
 // -- Private methods -- //
 
 Submenu_Extract::Submenu_Extract()
@@ -25,15 +47,21 @@ Submenu_Extract::Submenu_Extract()
 
 	m_overwriteSameFilename = false;
 	m_extractDisplayableMovelist = true;
+
+
+	for (int i = 0; i < _countof(g_compressionTypes); ++i) {
+		if (g_compressionTypes[i].compressionSetting == ExtractSettings_CompressLZMA) {
+			m_compressionIndex = i;
+			break;
+		}
+	}
 }
 
 ExtractSettings Submenu_Extract::GetExtractionSettings()
 {
 	ExtractSettings settings = 0;
 
-	if (m_compressMoveset) {
-		settings |= ExtractSettings_Compress;
-	}
+	settings |= g_compressionTypes[m_compressionIndex].compressionSetting;
 
 	if (m_overwriteSameFilename) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
@@ -122,7 +150,16 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 		ImGui::SeparatorText(_("extraction.settings.other"));
 		ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
-		ImGui::Checkbox(_("extraction.settings.compress_moveset"), &m_compressMoveset);
+
+		if (ImGui::BeginCombo(_("extraction.settings.compress_moveset"), g_compressionTypes[m_compressionIndex].name))
+		{
+			for (unsigned int i = 0; i < _countof(g_compressionTypes); ++i) {
+				if (ImGui::Selectable(g_compressionTypes[i].name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
+					m_compressionIndex = i;
+				}
+			}
+			ImGui::EndCombo();
+		}
 
 		ImGui::Separator();
 		if (ImGui::Button(_("close"))) {

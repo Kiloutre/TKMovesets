@@ -130,11 +130,11 @@ static bool lzma_compress(lzma_stream* strm, Byte* input_data, uint64_t uncompre
 
 			size_out += (int)write_size;
 
+			output_data += strm->avail_out;
+
 			// Reset next_out and avail_out.
 			strm->next_out = output_data;
-			strm->avail_out = uncompressed_size;
-
-			output_data += strm->avail_out;
+			strm->avail_out = 0;
 		}
 
 		// Normally the return value of lzma_code() will be LZMA_OK
@@ -451,10 +451,10 @@ namespace CompressionUtils
 
 				switch (compressionType)
 				{
-				case TKMovesetCompressonType_LZ4:
+				case TKMovesetCompressionType_LZ4:
 					outbuf = CompressionUtils::RAW::LZ4::Compress(inbuf, moveset_data_size, compressed_size);
 					break;
-				case TKMovesetCompressonType_LZMA:
+				case TKMovesetCompressionType_LZMA:
 					outbuf = CompressionUtils::RAW::LZMA::Compress(inbuf, moveset_data_size, compressed_size, 0);
 					break;
 
@@ -490,7 +490,7 @@ namespace CompressionUtils
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
-				if (header->compressionType == TKMovesetCompressonType_None || header->moveset_data_size <= 0) {
+				if (header->compressionType == TKMovesetCompressionType_None || header->moveset_data_size <= 0) {
 					return nullptr;
 				}
 
@@ -499,10 +499,10 @@ namespace CompressionUtils
 
 				switch (header->compressionType)
 				{
-				case TKMovesetCompressonType_LZ4:
+				case TKMovesetCompressionType_LZ4:
 					result = CompressionUtils::RAW::LZ4::Decompress(moveset_data_start, compressed_size, header->moveset_data_size);
 					break;
-				case TKMovesetCompressonType_LZMA:
+				case TKMovesetCompressionType_LZMA:
 					result = CompressionUtils::RAW::LZMA::Decompress(moveset_data_start, compressed_size, header->moveset_data_size);
 					break;
 				default:
@@ -546,6 +546,8 @@ namespace CompressionUtils
 					size_out = 0;
 				}
 
+				lzma_end(&strm);
+
 				return result;
 			}
 
@@ -567,6 +569,8 @@ namespace CompressionUtils
 					delete[] result;
 					result = nullptr;
 				}
+
+				lzma_end(&strm);
 
 				return result;
 			}
