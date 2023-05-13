@@ -442,7 +442,7 @@ namespace CompressionUtils
 	unsigned int GetDefaultCompressionSetting()
 	{
 		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
-			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZMA) {
+			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZ4) {
 				return i;
 			}
 		}
@@ -510,9 +510,11 @@ namespace CompressionUtils
 				switch (compressionType)
 				{
 				case TKMovesetCompressionType_LZ4:
+					DEBUG_LOG("Using LZ4 compression type...\n");
 					outbuf = CompressionUtils::RAW::LZ4::Compress(inbuf, moveset_data_size, compressed_size);
 					break;
 				case TKMovesetCompressionType_LZMA:
+					DEBUG_LOG("Using LZMA compression type...\n");
 					outbuf = CompressionUtils::RAW::LZMA::Compress(inbuf, moveset_data_size, compressed_size, 0);
 					break;
 

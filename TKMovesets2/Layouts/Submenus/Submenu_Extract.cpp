@@ -34,7 +34,7 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 {
 	ExtractSettings settings = 0;
 
-	settings |= CompressionUtils::GetCompressionSetting(m_compressionIndex).compressionSetting;
+	settings |= CompressionUtils::GetCompressionSetting(m_compressionIndex).extractSetting;
 
 	if (m_overwriteSameFilename) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
