@@ -154,11 +154,13 @@ namespace T7Hooks
 
 		// First, call the original function to let the game initialize all the important values in their new moveset
 		auto retVal = g_loader->CastTrampoline<T7Functions::ApplyNewMoveset>("TK__ApplyNewMoveset")(player, newMoveset);
+		DEBUG_LOG("(orig moveset initialized\n");
 
 		if (!g_loader->sharedMemPtr->locked_in) {
 			return retVal;
 		}
 
+		DEBUG_LOG("(checking if online moveset useable...\n");
 		// If we're in online play, don't load movesets if syncing isn't achieved
 		if (g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable()) {
 			DEBUG_LOG("ApplyNewMoveset: Online mode is on, but status is not ready. (%u)\n", g_loader->sharedMemPtr->moveset_sync_status);
@@ -170,6 +172,7 @@ namespace T7Hooks
 		}
 		g_loader->DiscardIncomingPackets();
 
+		DEBUG_LOG("(checking if local player p1...\n");
 		// Determine if we, the user, are the main player or if we are p2
 		bool isLocalP1 = IsLocalPlayerP1();
 

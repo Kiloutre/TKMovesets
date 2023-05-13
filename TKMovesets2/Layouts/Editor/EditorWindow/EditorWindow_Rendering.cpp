@@ -318,7 +318,8 @@ void EditorWindow::RenderStatusBar()
 
 	ImGui::SameLine();
 
-	if (ImGui::BeginCombo(_("extraction.settings.compress_moveset"), m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
+	ImGui::PushID(&CompressionUtils::GetCompressionSetting(0));
+	if (ImGui::BeginCombo("##", m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
 	{
 		for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
 			if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
@@ -327,6 +328,7 @@ void EditorWindow::RenderStatusBar()
 		}
 		ImGui::EndCombo();
 	}
+	ImGui::PopID();
 }
 
 void EditorWindow::RenderMovesetData()

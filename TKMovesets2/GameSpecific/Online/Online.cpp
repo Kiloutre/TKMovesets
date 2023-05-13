@@ -23,7 +23,7 @@ static bool ExtractMovesetLoaderIfNeeded()
             struct _stat program_buffer;
             _wstat(L"" PROGRAM_FILENAME, &program_buffer);
 
-            if (dll_buffer.st_mtime < program_buffer.st_mtime) {
+            if (dll_buffer.st_mtime < program_buffer.st_mtime || dll_buffer.st_size != TKMovesetLoader_orig_len) {
                 DEBUG_LOG("- .dll out of date, deleting it -\n");
                 // DLL was created before this .exe, which means it is not up to date
                 try {

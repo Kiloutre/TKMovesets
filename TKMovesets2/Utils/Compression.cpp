@@ -476,6 +476,7 @@ namespace CompressionUtils
 				{
 					// Read header data
 					TKMovesetHeader header;
+					orig_file.seekg(0, std::ios::beg);
 					orig_file.read((char*)&header, sizeof(header));
 
 					uint32_t moveset_data_start = header.moveset_data_start;
@@ -526,7 +527,7 @@ namespace CompressionUtils
 					break;
 				}
 
-				DEBUG_LOG("Compression: Old size was %d, compressed size is %d\n", moveset_data_size, compressed_size);
+				DEBUG_LOG("Compression: Old size was %d, compressed size is %d, ratio is %.2f%%\n", moveset_data_size, compressed_size, (float)compressed_size / (float)moveset_data_size);
 
 				if (outbuf == nullptr)
 				{
@@ -579,6 +580,7 @@ namespace CompressionUtils
 				}
 
 				Byte* moveset_data_start = moveset + header->moveset_data_start;
+				size_out = header->moveset_data_size;
 				Byte* result = nullptr;
 
 				switch (header->compressionType)
@@ -590,6 +592,7 @@ namespace CompressionUtils
 					result = CompressionUtils::RAW::LZMA::Decompress(moveset_data_start, compressed_size, header->moveset_data_size);
 					break;
 				default:
+					size_out = 0;
 					DEBUG_LOG("!! Moveset decompression: unhandled compression type '%u' !!\n", header->compressionType);
 					return nullptr;
 					break;
@@ -598,6 +601,8 @@ namespace CompressionUtils
 				if (result == nullptr) {
 					DEBUG_LOG("!! Error during decompression !!\n");
 				}
+
+				DEBUG_LOG("Decompressed moveset, compressed size was %d, size_out is %llu\n", compressed_size, size_out);
 
 				return result;
 			}
