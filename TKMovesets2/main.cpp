@@ -79,7 +79,6 @@ static void InitMainClasses(MainWindow& program)
 
 	{
 		// Detect running games and latch on to them if possible
-
 		bool attachedExtractor = false;
 		bool attachedImporter = false;
 		bool attachedOnline = false;
@@ -114,7 +113,7 @@ static void InitMainClasses(MainWindow& program)
 				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
 			}
 
-			if (!attachedImporter && gameInfo->extractor != nullptr) {
+			if (!attachedImporter && gameInfo->importer != nullptr) {
 				program.importer.SetTargetProcess(gameInfo);
 				attachedImporter = true;
 				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
@@ -203,6 +202,9 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	DeleteObject(iconInfo.hbmColor);
 	DeleteObject(iconInfo.hbmMask);
 	DestroyIcon(hIcon);
+	UnlockResource(iconData);
+	FreeResource(hResourceData);
+
 	return true;
 }
 
@@ -317,7 +319,6 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
 	}
 
-
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program;
@@ -362,8 +363,8 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		if (program.requestedUpdate) {
 			program.navMenu.CleanupThread();
 			StartProcess(std::string(UPDATE_TMP_FILENAME) + ".exe");
+		}
 	}
-}
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
