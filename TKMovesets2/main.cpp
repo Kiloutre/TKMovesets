@@ -188,7 +188,7 @@ void CleanupUpdateFiles(const std::string& filename);
 
 // -- main -- //
 
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LPSTR lpCmdLine, _In_  int nShowCmd)
 {
 #ifdef BUILD_TYPE_DEBUG
 	AllocConsole();
@@ -262,6 +262,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+#ifdef BUILD_TYPE_DEBUG
+	const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION " - DEBUG";
+#else
+	const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION;
+#endif
 	SDL_Window* window = SDL_CreateWindow(PROGRAM_TITLE " " PROGRAM_VERSION, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, window_flags);
 	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
 	SDL_GL_MakeCurrent(window, gl_context);
