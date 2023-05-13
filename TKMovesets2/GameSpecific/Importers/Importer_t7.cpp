@@ -5,7 +5,7 @@
 #include "Importer_t7.hpp"
 
 #include "Structs_t7.h"
-#include "GameIDs.h"
+#include "GameIDs.hpp"
 
 using namespace StructsT7;
 

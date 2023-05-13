@@ -253,7 +253,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
 	*constants = {
-		{EditorConstants_RequirementEnd, 881},
+		{EditorConstants_RequirementEnd, m_game->GetValue("req_end")},
 		{EditorConstants_CancelCommandEnd, 0x8000},
 		{EditorConstants_ExtraProperty_Instant, 32769}, // 0x8001
 		{EditorConstants_ExtraPropertyEnd, 0},
