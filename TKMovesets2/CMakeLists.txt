@@ -177,7 +177,8 @@ set(MOVESETLOADER_SOURCES
 set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
 create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
 # Build file embedder .EXE. This file embedder applies lz4 compression and can be used on files generated at compile them
-add_executable (FileEmbedder "External/embedfile.cpp")
+add_executable (FileEmbedder "External/embedfile.cpp" "Utils/Compression.cpp")
+target_include_directories(FileEmbedder PRIVATE ${INCLUDE_FOLDERS})
 
 # Build injected TKTKMovesetLoader.dll
 add_library(TKMovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})

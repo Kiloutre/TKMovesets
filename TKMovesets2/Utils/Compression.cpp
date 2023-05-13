@@ -549,11 +549,32 @@ namespace CompressionUtils
 	{
 		namespace Moveset
 		{
+			Byte* DecompressWithHeader(Byte* moveset, int32_t compressed_size, uint64_t& size_out)
+			{
+				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
+				Byte* moveset_data_start = moveset + header->moveset_data_start;
+				uint64_t full_moveset_size = header->moveset_data_start + header->moveset_data_size;
+
+				Byte* new_moveset = Decompress(moveset, compressed_size, size_out);
+				if (new_moveset == nullptr) {
+					return nullptr;
+				}
+
+				Byte* buffer = new Byte[full_moveset_size];
+
+				memcpy(buffer, header, header->moveset_data_start);
+				memcpy(buffer + header->moveset_data_start, new_moveset, size_out);
+				size_out = full_moveset_size;
+
+				delete[] new_moveset;
+				return buffer;
+			}
+
 			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out)
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
-				if (header->compressionType == TKMovesetCompressionType_None || header->moveset_data_size <= 0) {
+				if (!header->isCompressed()) {
 					return nullptr;
 				}
 

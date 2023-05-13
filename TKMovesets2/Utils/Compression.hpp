@@ -32,6 +32,9 @@ namespace CompressionUtils
 
 	namespace RAW {
 		namespace Moveset {
+			// Decompress moveset (keeps header in the final allocated memory area)
+			Byte* DecompressWithHeader(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
+			// Decompress moveset (without keeping header)
 			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
 		};
 

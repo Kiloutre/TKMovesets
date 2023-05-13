@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "Online.hpp"
+#include "Compression.hpp"
 
 // Embedded moveset loader .dll
 extern "C" const char TKMovesetLoader[];
@@ -48,24 +49,23 @@ static bool ExtractMovesetLoaderIfNeeded()
     if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
     {
         DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'\n");
-        char* buf = new char[TKMovesetLoader_orig_len];
 
-        int decompressed = LZ4_decompress_safe((char*)TKMovesetLoader, buf, (int)TKMovesetLoader_len, (int)TKMovesetLoader_orig_len);
+        Byte* dllContent = CompressionUtils::RAW::LZMA::Decompress((Byte*)TKMovesetLoader, (int)TKMovesetLoader_len, (int)TKMovesetLoader_orig_len);
 
-        if (decompressed > 0) {
+        if (dllContent != nullptr) {
             std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
             if (file.fail()) {
                 DEBUG_LOG("Failed to open DLL for writing!\n");
                 return false;
             }
 
-            file.write(buf, TKMovesetLoader_orig_len);
+            file.write((char*)dllContent, TKMovesetLoader_orig_len);
             DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'\n");
+            delete[] dllContent;
         }
         else {
             DEBUG_LOG("Failed to decompress '" MOVESET_LOADER_NAME "'\n");
         }
-        delete[] buf;
     }
 
     if (GetModuleHandleA(MOVESET_LOADER_NAME) == nullptr) {

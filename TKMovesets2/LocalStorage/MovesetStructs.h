@@ -89,5 +89,5 @@ struct TKMovesetHeader
 	}
 
 
-	bool isCompressed() const { return moveset_data_size > 0; }
+	bool isCompressed() const { return compressionType != TKMovesetCompressionType_None; }
 };

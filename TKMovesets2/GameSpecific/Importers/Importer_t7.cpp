@@ -310,6 +310,7 @@ void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAdd
 
 ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
+	progress = 15;
 	ImportationErrcode_ errCode = ImportationErrcode_UnsupportedGameVersion;
 
 	// Header of the moveset that will contain our own information about it
@@ -347,6 +348,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 		s_moveset -= header->moveset_data_start;
 		moveset += header->moveset_data_start;
 	}
+	progress = 20;
 
 	switch (gameId)
 	{

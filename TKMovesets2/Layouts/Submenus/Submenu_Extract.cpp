@@ -125,7 +125,8 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::SeparatorText(_("extraction.settings.other"));
 		ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
 
-		if (ImGui::BeginCombo(_("extraction.settings.compress_moveset"), m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
+		ImGui::TextUnformatted(_("extraction.settings.compress_moveset"));
+		if (ImGui::BeginCombo("##", m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
 		{
 			for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
 				if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {

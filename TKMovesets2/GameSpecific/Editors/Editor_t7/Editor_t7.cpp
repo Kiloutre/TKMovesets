@@ -264,13 +264,14 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	};
 
 	{
+		// Uncompress if needed
 		TKMovesetHeader* header = (TKMovesetHeader*)t_moveset;
-		if (header->moveset_data_size > 0) {
+		if (header->isCompressed()) {
 			// Compressed moveset data, must decompress
-			uint64_t new_size;
+			Byte* new_moveset = t_moveset;
 			int32_t src_size = (int32_t)(t_movesetSize - header->moveset_data_start);
 
-			Byte* new_moveset = CompressionUtils::RAW::Moveset::Decompress(t_moveset, src_size, t_movesetSize);
+			new_moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(new_moveset, src_size, t_movesetSize);
 			delete[] t_moveset;
 
 			if (new_moveset == nullptr) {
