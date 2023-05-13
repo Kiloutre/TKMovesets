@@ -419,6 +419,7 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 		else if (Helpers::startsWith<std::string>(key, "str:")) {
 			std::string filteredString;
 			unsigned int idx = 0;
+			value[value.size()] = '\0'; // Remove 13 (0xD, carriage return) char at the end of each strings. Don't know why it's there but now it isn't.
 			for (unsigned char c : value)
 			{
 				if (!isprint(c)) {

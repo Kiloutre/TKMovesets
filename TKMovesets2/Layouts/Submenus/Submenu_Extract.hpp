@@ -13,8 +13,8 @@ private:
 	bool m_overwriteSameFilename;
 	// Whether to export the displayable movelist shown in training mode or not
 	bool m_extractDisplayableMovelist;
-	// Whether to compress the moveset or not
-	bool m_compressMoveset = true;
+	// Type of compression to apply to the moveset
+	unsigned int m_compressionIndex = 0;
 
 	// Returns an int64 containing flags we set through checkboxes in the settings menu
 	ExtractSettings GetExtractionSettings();

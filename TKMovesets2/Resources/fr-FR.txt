@@ -104,6 +104,8 @@ extraction.settings = Paramètres
 extraction.settings.other = Autre
 extraction.settings.compress_moveset = Compresser le fichier
 extraction.settings.displayable_movelist = Liste des coups
+extraction.settings.compression_type = Type de compression
+extraction.settings.compression_type.none = Pas de compression
 
 # Importation #
 importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
@@ -121,7 +123,7 @@ importation.free_unused_movesets_explanation = Si activé, les personnages ancie
 importation.error_file_reading = Il y a eu une erreur lors de la création du fichier du personnage
 importation.error_allocation = Il y a eu une erreur d'allocation lors de lecture des données du personnage
 importation.error_game_allocation = Il y a eu une erreur d'allocation dans le jeu lors de l'écriture des données du personnage
-importation.error_decompression = Il y a eu une erreur d'allocation lors de la decompression
+importation.error_decompression = Il y a eu une erreur lors de la decompression
 
 # Jeu persistant #
 persistent.explanation = Le mode persistant permet de sélectionner deux moveset et de les garder appliqués à travers les écrans de chargement et différents modes de jeu.\nSi le joueur distant possède aussi ce programme, ce menu peut être utilisé pour jouer en ligne: il faudra alors que vous et le joueur disant possédiez tous les deux les movesets à appliquer sur l'un et l'autre. Appliquez ensuite votre moveset (ou aucun) sur 'Joueur 1', et son moveset (ou aucun) sur 'Joueur 2', puis verrouillez.
@@ -145,7 +147,7 @@ online.inject_dll = Injecter
 online.injecting_dll = Injection...
 online.select_moveset = Sélectionner
 online.selected_moveset = Sélectionné:
-online.lock_to_play = Verrouillez pour jouer !
+online.lock_to_play = Verrouillez votre sélection pour jouer.
 
 # Modification de moveset : Renommage #
 edition.rename.new_moveset_name = Nouveau nom
@@ -163,7 +165,6 @@ edition.discard_changes = Abandonner les changements ?\nSi l'édition en direct 
 edition.process_err = Erreur
 edition.live_edition = Édition en direct
 edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.\nAjouter/supprimer des éléments d'une liste ou toute action agrandissant le moveset nécessitera une ré-importation.
-edition.compress_moveset = Compresser
 edition.move_name = Nom
 edition.move_generic_id = Alias
 edition.moves_all = Tout

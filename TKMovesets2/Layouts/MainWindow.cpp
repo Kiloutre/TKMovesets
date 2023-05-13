@@ -70,7 +70,7 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 
 // -- Public methods -- //
 
-MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
+MainWindow::MainWindow()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -84,14 +84,6 @@ MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
 
 	io.Fonts->Build();
-}
-
-void MainWindow::NewFrame()
-{
-	// I believe this inits the current frame buffer
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
 }
 
 // Actual rendering function
@@ -197,6 +189,14 @@ void MainWindow::Update()
 		importer.FreeExpiredFactoryClasses();
 		sharedMem.FreeExpiredFactoryClasses();
 	}
+}
+
+void MainWindow::NewFrame()
+{
+	// I believe this inits the current frame buffer
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 }
 
 void MainWindow::Shutdown()

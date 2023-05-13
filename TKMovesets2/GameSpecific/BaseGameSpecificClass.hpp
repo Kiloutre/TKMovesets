@@ -19,5 +19,9 @@ protected:
 	const GameInfo m_gameInfo;
 
 public:
-	BaseGameSpecificClass(GameProcess* process, GameData* game, const GameInfo* gameInfo) : m_process(process), m_game(game), m_gameInfo(*gameInfo) {}
+	BaseGameSpecificClass(GameProcess* process, GameData* game, const GameInfo* gameInfo) : m_process(process), m_game(game), m_gameInfo(*gameInfo)
+	{
+		m_game->gameKey = m_gameInfo.dataString;
+		m_game->minorGameKey = m_gameInfo.minorDataString;
+	}
 };

@@ -5,7 +5,7 @@
 #include "Importer_t7.hpp"
 
 #include "Structs_t7.h"
-#include "GameIDs.h"
+#include "GameIDs.hpp"
 
 using namespace StructsT7;
 
@@ -310,6 +310,7 @@ void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAdd
 
 ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
+	progress = 15;
 	ImportationErrcode_ errCode = ImportationErrcode_UnsupportedGameVersion;
 
 	// Header of the moveset that will contain our own information about it
@@ -334,13 +335,10 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 
 	if (isCompressed) {
 		uint64_t src_size = s_moveset - header->moveset_data_start;
-		Byte* moveset_data_start = moveset + header->moveset_data_start;
 
-		moveset = new Byte[header->moveset_data_size];
-		s_moveset = header->moveset_data_size;
+		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
 
-		if (!CompressionUtils::DecompressMoveset(moveset, moveset_data_start, src_size, header->moveset_data_size)) {
-			delete[] moveset;
+		if (moveset == nullptr) {
 			return ImportationErrcode_DecompressionError;
 		}
 	}
@@ -350,6 +348,7 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 		s_moveset -= header->moveset_data_start;
 		moveset += header->moveset_data_start;
 	}
+	progress = 20;
 
 	switch (gameId)
 	{

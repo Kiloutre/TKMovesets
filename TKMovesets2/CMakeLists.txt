@@ -150,6 +150,8 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Creations_DisplayableMovelist.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Commands.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Creations.cpp"
+                    "GameSpecific/Editors/Editor_t7/Editor_t7_Deletion.cpp"
+                    "GameSpecific/Editors/Editor_t7/Editor_t7_Duplication.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_ListCreations.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"
@@ -175,7 +177,8 @@ set(MOVESETLOADER_SOURCES
 set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
 create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
 # Build file embedder .EXE. This file embedder applies lz4 compression and can be used on files generated at compile them
-add_executable (FileEmbedder "External/embedfile.cpp")
+add_executable (FileEmbedder "External/embedfile.cpp" "Utils/Compression.cpp")
+target_include_directories(FileEmbedder PRIVATE ${INCLUDE_FOLDERS})
 
 # Build injected TKTKMovesetLoader.dll
 add_library(TKMovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES})
@@ -209,13 +212,15 @@ endif()
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    # With console mode
-    add_executable (TKMovesets2 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
-    target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
+    set(RC_FILE "app_debug.rc")
 else()
-    # GUI-only mode
-    add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} "app.rc")
+    set(RC_FILE "app.rc")
 endif()
+add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} ${RC_FILE})
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
+endif()
+
 target_include_directories(TKMovesets2 PRIVATE ${INCLUDE_FOLDERS})
 add_dependencies(TKMovesets2 GameSpecific)
 add_dependencies(TKMovesets2 TKMovesetLoader)
@@ -229,13 +234,15 @@ add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 ## Extra dependencies ##
 # Link the other libraries that we use #
 
-# OpenGL (Renderer)
-find_package(glad CONFIG REQUIRED)
-target_link_libraries(TKMovesets2 PRIVATE glad::glad)
+ find_package(OpenGL REQUIRED)
+ target_link_libraries(TKMovesets2 PRIVATE OpenGL::GL)
 
-# GLFW (Renderer)
-find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(TKMovesets2 PRIVATE glfw)
+# SDL (Bindings & Renderer)
+find_package(SDL2 CONFIG REQUIRED)
+target_link_libraries(TKMovesets2 PRIVATE
+    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+)
 
 # ImGUI (Interface)
 find_package(imgui CONFIG REQUIRED)
@@ -243,10 +250,16 @@ target_link_libraries(TKMovesets2 PRIVATE imgui::imgui)
 target_link_libraries(GameSpecific PRIVATE imgui::imgui) # Only used for the color-defining includes
 
 # Compression. I tried LZMA but it was too slow even on the fastest preset, so we're using LZ4 for now
+## LZ4
 find_package(lz4 CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE lz4::lz4)
 target_link_libraries(FileEmbedder PRIVATE lz4::lz4)
 target_link_libraries(TKMovesetLoader PRIVATE lz4::lz4)
+## LZMA
+find_package(liblzma CONFIG REQUIRED)
+target_link_libraries(TKMovesets2 PRIVATE liblzma::liblzma)
+target_link_libraries(FileEmbedder PRIVATE liblzma::liblzma)
+target_link_libraries(TKMovesetLoader PRIVATE liblzma::liblzma)
 
 # Hook (Polyhook)
 find_package(PolyHook_2 CONFIG REQUIRED)

@@ -20,11 +20,16 @@ void EditorMove::OnInitEnd()
 
 	// Only allow deletion of custom moves to avoid people breaking movesets by accident
 	// Deletion of moves is hardly an important thing anyway
-	/*
+	/* -- Removed for now --
 	if (strncmp(m_fieldIdentifierMap["move_name"]->buffer, "c_", 2) != 0) {
 		m_isDeletable = false;
 	}
 	*/
+}
+
+void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
+{
+	m_baseWindow->OnMoveCreate(moveId);
 }
 
 void EditorMove::ApplyWindowName(bool reapplyWindowProperties)

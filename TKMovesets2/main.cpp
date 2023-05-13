@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #endif
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-
+#include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
@@ -16,7 +14,6 @@
 #include <locale>
 #include <filesystem>
 #include <fstream>
-#include <lz4.h>
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
@@ -32,36 +29,11 @@
 # define MAIN_ERR_NO_MOVESET_LOADER (5)
 # define MAIN_ERR_NO_ERR            (0)
 
-// Embedded moveset loader .dll
-extern "C" const char TKMovesetLoader[];
-extern "C" const size_t TKMovesetLoader_len;
-extern "C" const size_t TKMovesetLoader_orig_len;
-
 // -- Static helpers -- //
-
-static void WriteToLogFile(const std::string& content, bool append=true)
-{
-	DEBUG_LOG("%s\n", content.c_str());
-	/*
-	std::ofstream file;
-
-	if (append) {
-		file.open(PROGRAM_DEBUG_LOG_FILE, std::ios_base::app);
-	}
-	else {
-		file.open(PROGRAM_DEBUG_LOG_FILE);
-	}
-
-	if (!file.fail()) {
-		file.write(content.c_str(), content.size());
-		file.write("\n", 1);
-	}
-	*/
-}
 
 static void glfw_error_callback(int error, const char* description)
 {
-	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+	DEBUG_LOG("!! GLFW Error %d: '%s' !!\n", error, description);
 }
 
 // Tries to find a translation file for the current system locale, return false on failure
@@ -80,7 +52,7 @@ static bool LoadLocaleTranslation()
 		}
 	}
 
-	WriteToLogFile(std::format("Attempting to load locale {}", name));
+	DEBUG_LOG("Attempting to load locale %s\n", name);
 	return Localization::LoadFile(name);
 }
 
@@ -209,7 +181,7 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	bitmapInfo.bmiHeader.biPlanes = 1;
 	bitmapInfo.bmiHeader.biBitCount = 32;
 
-	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * (uint64_t) abs(bitmapInfo.bmiHeader.biHeight) * 4;
+	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * (uint64_t)abs(bitmapInfo.bmiHeader.biHeight) * 4;
 	BYTE* bitmapData = new BYTE[allocSize];
 	ZeroMemory(bitmapData, allocSize);
 
@@ -231,22 +203,24 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	return true;
 }
 
+
 void StartProcess(const std::string& file);
 void ApplyUpdate(const std::string& filename);
 void CleanupUpdateFiles(const std::string& filename);
 
 // -- main -- //
 
-// I'd like to avoid declaring bad arguments for the main() but visual studio hates it
-// Just make sure not to actually use any of those arguments unless in release mode
+int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LPSTR lpCmdLine, _In_  int nShowCmd)
+{
 #ifdef BUILD_TYPE_DEBUG
-# define MAIN_NAME main
-#else
-# define MAIN_NAME WinMain
+	AllocConsole();
+#pragma warning(push)
+#pragma warning(disable:4996)
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+#pragma warning(pop)
 #endif
 
-int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
 
@@ -259,11 +233,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 
 		if (ws != std::filesystem::current_path()) {
 			std::filesystem::current_path(ws);
-			WriteToLogFile(std::format("OLD CWD is {}", Helpers::wstring_to_string(oldWorkingDir)));
-			WriteToLogFile(std::format("Set CWD to {}", Helpers::wstring_to_string(ws)));
 		}
-
-		WriteToLogFile("Started TKMovesets " PROGRAM_VERSION, false);
 
 		std::string update_file_name = std::string(UPDATE_TMP_FILENAME) + ".exe";
 		if (filename == update_file_name) {
@@ -275,6 +245,7 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 			CleanupUpdateFiles(update_file_name);
 		}
 	}
+
 
 	// Initialize GLFW library
 	glfwSetErrorCallback(glfw_error_callback);
@@ -294,18 +265,18 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	// Setup window title and create window
 	GLFWwindow* window;
 	{
-		std::string windowTitle = std::format("{} {}", PROGRAM_TITLE, PROGRAM_VERSION);
-		window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle.c_str(), nullptr, nullptr);
+#ifdef BUILD_TYPE_DEBUG
+		const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION " - DEBUG";
+#else
+		const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION;
+#endif
+		window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle, nullptr, nullptr);
 	}
-	WriteToLogFile("GLFW window created");
 
 	if (window == nullptr) {
 		return MAIN_ERR_WINDOW_CREATION;
 	}
 
-	if (!LoadEmbeddedIcon(window)) {
-		DEBUG_LOG("Failed to load icon\n");
-	}
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
 	// Enable vsync
@@ -327,7 +298,10 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		DEBUG_LOG("Unable to context to OpenGL");
 		return MAIN_ERR_OPENGL_CONTEXT;
 	}
-	WriteToLogFile("GLL Loader done");
+
+	if (!LoadEmbeddedIcon(window)) {
+		DEBUG_LOG("Failed to load icon\n");
+	}
 
 	{
 		// Set viewport for OpenGL
@@ -341,60 +315,6 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
 	}
 
-	// Load the MovesetLoader in our own process so that we can know its function addresses
-	HMODULE movesetLoaderLib;
-	{
-		{
-			// Get rid of the potentially obsolete old .dll
-			struct _stat dll_buffer;
-			if (_wstat(L"" MOVESET_LOADER_NAME, &dll_buffer) == 0) {
-
-				struct _stat program_buffer;
-				_wstat(L"" PROGRAM_FILENAME, &program_buffer);
-
-				if (dll_buffer.st_mtime < program_buffer.st_mtime) {
-					DEBUG_LOG("- .dll out of date, deleting it -\n");
-					// DLL was created before this .exe, which means it is not up to date
-					try {
-						std::filesystem::remove(MOVESET_LOADER_NAME);
-					}
-					catch (std::filesystem::filesystem_error const&) {
-						DEBUG_LOG("!! ERROR WHILE TRYING TO REMOVE OLD DLL !!\n");
-					}
-				}
-			}
-		}
-
-		// If .dll does not exist, create it
-		// Todo: reflective DLL injection that will not need to create a file
-		if (!Helpers::fileExists(L"" MOVESET_LOADER_NAME))
-		{
-			DEBUG_LOG("Did not find '" MOVESET_LOADER_NAME "'\n");
-			char* buf = new char[TKMovesetLoader_orig_len];
-
-			int decompressed = LZ4_decompress_safe((char*)TKMovesetLoader, buf, (int)TKMovesetLoader_len, (int)TKMovesetLoader_orig_len);
-
-			if (decompressed > 0) {
-				std::ofstream file(L"" MOVESET_LOADER_NAME, std::ios::binary);
-				if (file.fail()) {
-					return MAIN_ERR_NO_MOVESET_LOADER;
-				}
-
-				file.write(buf, TKMovesetLoader_orig_len);
-				DEBUG_LOG("Created file '" MOVESET_LOADER_NAME "'\n");
-			}
-			else {
-				DEBUG_LOG("Failed to decompress '" MOVESET_LOADER_NAME "'\n");
-			}
-			delete[] buf;
-		}
-
-		movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
-		if (movesetLoaderLib == nullptr) {
-			DEBUG_LOG("Error while calling LoadLibraryW(L\"" MOVESET_LOADER_NAME "\");");
-			return MAIN_ERR_MOVESET_LOADER;
-		}
-	}
 
 	{
 		// Init main program. This will get most things going and create the important threads
@@ -444,15 +364,13 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 		if (program.requestedUpdate) {
 			program.navMenu.CleanupThread();
 			StartProcess(std::string(UPDATE_TMP_FILENAME) + ".exe");
-		}
 	}
+}
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
-	FreeLibrary(movesetLoaderLib);
 	Localization::Clear();
-
 
 #ifdef BUILD_TYPE_DEBUG
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

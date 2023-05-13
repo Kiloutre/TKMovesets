@@ -9,7 +9,7 @@
 #include "GameInfo.hpp"
 
 #include "constants.h"
-#include "GameIDs.h"
+#include "GameIDs.hpp"
 
 namespace Games
 {

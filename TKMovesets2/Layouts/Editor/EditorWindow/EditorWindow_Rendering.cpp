@@ -4,6 +4,7 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "EditorWindow.hpp"
+#include "Compression.hpp"
 
 // -- Private methods -- //
 
@@ -316,7 +317,18 @@ void EditorWindow::RenderStatusBar()
 	}
 
 	ImGui::SameLine();
-	ImGui::Checkbox(_("edition.compress_moveset"), &m_compressOnSave);
+
+	ImGui::PushID(&CompressionUtils::GetCompressionSetting(0));
+	if (ImGui::BeginCombo("##", m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
+	{
+		for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
+			if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
+				m_compressionIndex = i;
+			}
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::PopID();
 }
 
 void EditorWindow::RenderMovesetData()

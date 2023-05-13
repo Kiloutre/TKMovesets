@@ -18,16 +18,9 @@ void GameSharedMem::OnProcessDetach()
 void GameSharedMem::InstantiateFactory()
 {
 	// Delete old instances if needed
-	if (m_importer != nullptr) {
-		m_toFree_importer = m_importer;
-	}
+	m_toFree_importer = m_importer;
+	m_toFree_sharedMemHandler = m_sharedMemHandler;
 
-	if (m_sharedMemHandler != nullptr) {
-		m_toFree_sharedMemHandler = m_sharedMemHandler;
-	}
-
-	game->gameKey = currentGame->dataString;
-	game->minorGameKey = currentGame->minorDataString;
 	// Every game has its own subtleties so we use polymorphism to manage that
 	m_importer = Games::FactoryGetImporter(currentGame, process, game);
 	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);

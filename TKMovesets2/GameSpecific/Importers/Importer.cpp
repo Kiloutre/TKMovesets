@@ -26,6 +26,7 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 	// Read file data
 
 	DEBUG_LOG("Loading file '%S'\n", filename);
+	progress = 5;
 	std::ifstream file(filename, std::ios::binary);
 
 	if (file.fail()) {
@@ -35,9 +36,10 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 	// Variables that will store the moveset size & the moveset itself in our own memory
 	uint64_t s_moveset;
 	Byte* moveset;
-
+;
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
 	moveset = getMovesetInfos(file, s_moveset);
+	progress = 10;
 	if (moveset == nullptr) {
 		return ImportationErrcode_AllocationErr;
 	}
@@ -51,11 +53,13 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 ImportationErrcode_ Importer::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
 	Byte* moveset = (Byte*)malloc(s_moveset);
+	progress = 5;
 	if (moveset == nullptr) {
 		return ImportationErrcode_AllocationErr;
 	}
 
 	memcpy(moveset, orig_moveset, s_moveset);
+	progress = 10;
 
 	ImportationErrcode_ errcode = _Import(moveset, s_moveset, playerAddress, settings, progress);
 

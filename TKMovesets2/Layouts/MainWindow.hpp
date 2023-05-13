@@ -1,5 +1,4 @@
 #pragma once
-#include <imgui_impl_glfw.h>
 
 // Toplevel menus
 #include "NavigationMenu.hpp"
@@ -58,7 +57,7 @@ public:
 	// Edition windows
 	std::vector<EditorWindow*> editorWindows;
 
-	MainWindow(GLFWwindow* window, const char* c_glsl_version);
+	MainWindow();
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
 	virtual void NewFrame();
 	// Main layout rendering function

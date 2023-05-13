@@ -17,9 +17,11 @@ void InitConsole()
     // Create console
     AllocConsole();
     // Redirect stdout to console
+#pragma warning(push)
+#pragma warning(disable:4996)
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
-
+#pragma warning(pop)
     DEBUG_LOG("-- Console started --\n");
 }
 

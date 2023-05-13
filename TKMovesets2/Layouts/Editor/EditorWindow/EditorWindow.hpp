@@ -97,10 +97,10 @@ private:
 	GameImport m_importerHelper;
 	// Copy of the shared mem helper, used to play extra propreties
 	GameSharedMem m_sharedMemHelper;
-	// If true, will compress the moveset file when saving
-	bool m_compressOnSave = true;
 	// Map that will determine which window type to allocate depending on the given type
 	std::map<EditorWindowType_, EditorWindowFactory_Base*> m_windowCreatorMap;
+	// Index of the compression setting to use when saving
+	unsigned int m_compressionIndex = 0;
 
 
 	// Render the top toolbar containing useful moveset editing tools
@@ -138,6 +138,10 @@ public:
 	// Render the window
 	void Render(int dockid);
 
+	// Makes the save button available
+	void SetChangesUnsaved() override;
+	// Called when a move is created, is used in order to refresh the movelist and scroll to the move inside of it
+	void OnMoveCreate(unsigned int moveId) override;
 	// Create a new window containing data about the given move. Can be called by subwidnows.
 	void OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize = 0) override;
 	// Validates the move ID against the movelist size and alias list

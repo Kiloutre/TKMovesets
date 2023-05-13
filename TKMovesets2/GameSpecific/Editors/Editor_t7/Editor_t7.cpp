@@ -253,7 +253,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
 	*constants = {
-		{EditorConstants_RequirementEnd, 881},
+		{EditorConstants_RequirementEnd, m_game->GetValue("req_end")},
 		{EditorConstants_CancelCommandEnd, 0x8000},
 		{EditorConstants_ExtraProperty_Instant, 32769}, // 0x8001
 		{EditorConstants_ExtraPropertyEnd, 0},
@@ -264,30 +264,26 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	};
 
 	{
+		// Uncompress if needed
 		TKMovesetHeader* header = (TKMovesetHeader*)t_moveset;
-		if (header->moveset_data_size > 0) {
+		if (header->isCompressed()) {
 			// Compressed moveset data, must decompress
-			uint64_t new_size = header->moveset_data_start + (uint64_t)header->moveset_data_size;
+			Byte* new_moveset = t_moveset;
 			int32_t src_size = (int32_t)(t_movesetSize - header->moveset_data_start);
 
-			Byte* new_moveset = new Byte[new_size];
-			memcpy(new_moveset, t_moveset, header->moveset_data_start);
+			new_moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(new_moveset, src_size, t_movesetSize);
+			delete[] t_moveset;
 
-			Byte* old_moveset_data_start = t_moveset + header->moveset_data_start;
-			Byte* new_moveset_data_start = new_moveset + header->moveset_data_start;
-
-			if (!CompressionUtils::DecompressMoveset(new_moveset_data_start, old_moveset_data_start, src_size, header->moveset_data_size)) {
-				DEBUG_LOG("Decompression error\n");
+			if (new_moveset == nullptr) {
 				return false;
 			}
 
-			delete[] t_moveset;
 			t_moveset = new_moveset;
-			t_movesetSize = new_size;
 
 			// Mark the moveset as decompressed while it's in the editor
 			// Compressor should mark it on its own if compressing, when saving
 			((TKMovesetHeader*)t_moveset)->moveset_data_size = 0;
+			((TKMovesetHeader*)t_moveset)->compressionType = 0;
 		}
 	}
 

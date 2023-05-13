@@ -4,6 +4,8 @@
 #include <fstream>
 #include <regex>
 
+#include "Compression.hpp"
+
 int main(int argc, char** argv)
 {
     if (argc < 3) {
@@ -50,7 +52,6 @@ int main(int argc, char** argv)
 
     // Create buffers
     inbuf = new char[file_size];
-    outbuf = new char[file_size];
 
     // Go back to the start of the file and fill input buffer
     input_file.seekg(0, std::ios::beg);
@@ -58,22 +59,28 @@ int main(int argc, char** argv)
 
     // Copress
     printf("Compressing...\n");
-    int compressedSize = LZ4_compress_default(inbuf, outbuf, file_size, file_size);
-    if (compressedSize <= 0) {
+
+    int32_t compressedSize;
+    outbuf = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inbuf, file_size, compressedSize);
+
+    if (outbuf == nullptr) {
         printf("Compression failure\n");
         return EXIT_FAILURE;
     }
 
-    printf("Compressed size is %d. Writing...\n", compressedSize);
+    printf("Compressed size is %d, old size is %d, ratio is %.2f%% . Writing...\n", compressedSize, file_size, (float)compressedSize / (float)file_size);
     for (int i = 0; i < compressedSize; ++i)  {
 #pragma warning(suppress:)
         output_file << std::to_string(outbuf[i]) << ",";
     }
+
+    delete[] outbuf;
+
     output_file << "};\n";
     output_file << "const size_t " << filtered_name << "_len = sizeof(" << filtered_name << "); \n";
     output_file << "const size_t " << filtered_name << "_orig_len = " << file_size << "; \n";
-
     printf("Embedder: Finished.\n");
+
 
     return EXIT_SUCCESS;
 }

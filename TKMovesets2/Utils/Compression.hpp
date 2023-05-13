@@ -2,13 +2,50 @@
 
 #include <string>
 
+#include "ExtractorSettings.hpp"
+
 #include "GameTypes.h"
+#include "MovesetStructs.h"
+
+struct s_compressionTypes {
+	const char* name;
+	TKMovesetCompressionType_ compressionSetting;
+	ExtractSettings_ extractSetting;
+};
 
 namespace CompressionUtils
 {
-	// Return an allocated copy of the decompressed moveset data (moveset_data_start and on)
-	bool DecompressMoveset(Byte* outputDest, const Byte* moveset_data_start, uint64_t src_size, int32_t original_size);
+	// Returns a compression setting & its name
+	const s_compressionTypes& GetCompressionSetting(uint8_t idx);
+	// Returns the list of useable compressions
+	size_t GetCompressionSettingCount();
+	// This sets the default compression setting across the software
+	unsigned int GetDefaultCompressionSetting();
+	// Get the index of a compression type
+	unsigned int GetCompressionSettingIndex(TKMovesetCompressionType_ compressionType);
 
-	// Compress a moveset. Returns false on failure. Modifies header->moveset_data_size automatically.
-	bool CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
+	namespace FILE {
+		namespace Moveset {
+			bool Compress(const std::wstring& dest_filename, const std::wstring& src_filename, TKMovesetCompressionType_ compressionType);
+		};
+	};
+
+	namespace RAW {
+		namespace Moveset {
+			// Decompress moveset (keeps header in the final allocated memory area)
+			Byte* DecompressWithHeader(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
+			// Decompress moveset (without keeping header)
+			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
+		};
+
+		namespace LZMA {
+			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out, uint8_t preset=0);
+			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
+		};
+
+		namespace LZ4 {
+			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out);
+			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
+		};
+	};
 };
