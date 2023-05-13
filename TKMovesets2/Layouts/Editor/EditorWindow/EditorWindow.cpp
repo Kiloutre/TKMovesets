@@ -233,8 +233,8 @@ void EditorWindow::Save()
 
 		bool success = true;
 
-		if (m_compressOnSave) {
-			success = CompressionUtils::FILE::Moveset::Compress(dst_filename, tmp_filename, TKMovesetCompressionType_LZMA);
+		if (m_compressionIndex != 0) {
+			success = CompressionUtils::FILE::Moveset::Compress(dst_filename, tmp_filename, CompressionUtils::GetCompressionSetting(m_compressionIndex).compressionSetting);
 		}
 		else {
 			std::filesystem::rename(tmp_filename, dst_filename);
@@ -319,6 +319,12 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 		file.close();
 	}
 
+	TKMovesetCompressionType_ compressionType = TKMovesetCompressionType_None;
+	
+	if (movesetSize >= sizeof(TKMovesetHeader)) {
+		compressionType = (TKMovesetCompressionType_)((TKMovesetHeader*)moveset)->compressionType;
+	}
+
 	if (!m_editor->LoadMoveset(moveset, movesetSize)) {
 		this->popen = false;
 	}
@@ -344,6 +350,9 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 	// Set the shared mem handler
 	m_editor->SetSharedMemHandler(m_sharedMemHelper.GetSharedMemHandler());
+	
+	// Set compression setting as the pre-configured default one
+	m_compressionIndex = CompressionUtils::GetCompressionSettingIndex(compressionType);
 
 	// Attempt to attach to game associated to moveset
 	auto processList = GameProcessUtils::GetRunningProcessList();

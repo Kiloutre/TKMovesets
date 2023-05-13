@@ -7,6 +7,29 @@
 
 #include "MovesetStructs.h"
 
+// -- Available compression settings across the software -- //
+
+const s_compressionTypes g_compressionTypes[] = {
+	{
+		.name = "", // None. Should be the first element in the array, always.
+		.compressionSetting = TKMovesetCompressionType_None,
+		.extractSetting = (ExtractSettings_)0
+	},
+
+	{
+		.name = "LZMA",
+		.compressionSetting = TKMovesetCompressionType_LZMA,
+		.extractSetting = ExtractSettings_CompressLZMA
+	},
+
+	{
+		.name = "LZ4",
+		.compressionSetting = TKMovesetCompressionType_LZ4,
+		.extractSetting = ExtractSettings_CompressLZ4
+	}
+};
+const size_t g_compressionTypes_len = _countof(g_compressionTypes);
+
 // -- Lzma utils -- //
 
 static bool lzma_init_encoder(lzma_stream* strm, uint32_t preset)
@@ -401,6 +424,41 @@ static bool lzma_decompress(lzma_stream* strm, Byte* compressed_data, int32_t co
 
 namespace CompressionUtils
 {
+	const s_compressionTypes& GetCompressionSetting(uint8_t idx)
+	{
+		if (idx >= g_compressionTypes_len) {
+			DEBUG_LOG("Bad compression setting: %u\n", idx);
+			throw;
+		}
+
+		return g_compressionTypes[idx];
+	}
+
+	size_t GetCompressionSettingCount()
+	{
+		return g_compressionTypes_len;
+	}
+
+	unsigned int GetDefaultCompressionSetting()
+	{
+		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
+			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZMA) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
+	unsigned int GetCompressionSettingIndex(TKMovesetCompressionType_ compressionType)
+	{
+		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
+			if (g_compressionTypes[i].compressionSetting == compressionType) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
 	namespace FILE
 	{
 		namespace Moveset

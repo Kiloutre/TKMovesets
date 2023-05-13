@@ -8,28 +8,7 @@
 #include "GameProcess.hpp"
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
-
-// -- Data -- //
-
-struct s_compressionTypes {
-	const char* name;
-	ExtractSettings_ compressionSetting;
-};
-
-s_compressionTypes g_compressionTypes[] = {
-	{ 
-		"None",
-		(ExtractSettings_)0
-	},
-	{
-		"LZMA",
-		ExtractSettings_CompressLZMA
-	},
-	{
-		"LZ4",
-		ExtractSettings_CompressLZ4
-	}
-};
+#include "Compression.hpp"
 
 // -- Private methods -- //
 
@@ -48,20 +27,14 @@ Submenu_Extract::Submenu_Extract()
 	m_overwriteSameFilename = false;
 	m_extractDisplayableMovelist = true;
 
-
-	for (int i = 0; i < _countof(g_compressionTypes); ++i) {
-		if (g_compressionTypes[i].compressionSetting == ExtractSettings_CompressLZMA) {
-			m_compressionIndex = i;
-			break;
-		}
-	}
+	m_compressionIndex = CompressionUtils::GetDefaultCompressionSetting();
 }
 
 ExtractSettings Submenu_Extract::GetExtractionSettings()
 {
 	ExtractSettings settings = 0;
 
-	settings |= g_compressionTypes[m_compressionIndex].compressionSetting;
+	settings |= CompressionUtils::GetCompressionSetting(m_compressionIndex).compressionSetting;
 
 	if (m_overwriteSameFilename) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
@@ -129,15 +102,16 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::OpenPopup("ExtractionSettingsPopup");
 	}
 
+	// Extraction settings
 	if (ImGui::BeginPopupModal("ExtractionSettingsPopup"))
 	{
 		ImGui::SeparatorText("MOTA");
 		ImGui::TextUnformatted(_("extraction.mota_explanation"));
 
+		char buf[8] = { "mota_00" };
 		for (uint8_t motaId = 0; motaId < 12; ++motaId) {
-			char buf[8] = {"mota_00"};
-			buf[5] += motaId / 10;
-			buf[6] += motaId % 10;
+			buf[5] = '0' + motaId / 10;
+			buf[6] = '0' + motaId % 10;
 			ImGui::Checkbox(_(buf), &m_motaExport[motaId]);
 
 			if ((motaId & 1) == 0) {
@@ -151,10 +125,10 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::SeparatorText(_("extraction.settings.other"));
 		ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
 
-		if (ImGui::BeginCombo(_("extraction.settings.compress_moveset"), g_compressionTypes[m_compressionIndex].name))
+		if (ImGui::BeginCombo(_("extraction.settings.compress_moveset"), m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
 		{
-			for (unsigned int i = 0; i < _countof(g_compressionTypes); ++i) {
-				if (ImGui::Selectable(g_compressionTypes[i].name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
+			for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
+				if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
 					m_compressionIndex = i;
 				}
 			}

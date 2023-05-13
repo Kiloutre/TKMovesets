@@ -105,7 +105,7 @@ extraction.settings.other = Other
 extraction.settings.displayable_movelist = Displayable movelist
 extraction.settings.compress_moveset = Compress moveset
 extraction.settings.compression_type = Compression type
-extraction.settings.compression_type.none = None
+extraction.settings.compression_type.none = No compression
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
@@ -165,7 +165,6 @@ edition.discard_changes = Discard changes?\nIf live edition is enabled, this wil
 edition.process_err = Error
 edition.live_edition = Live edition
 edition.live_edition_explanation = Turn on so that trivial changes such as simple value modifications can be applied directory in the game memory, without requing a new moveset importation.\nAdding or removing items from a list, or anything requiring extra moveset size will require a new importation.
-edition.compress_moveset = Compress moveset
 edition.move_name = Name
 edition.move_generic_id = Alias
 edition.moves_all = All

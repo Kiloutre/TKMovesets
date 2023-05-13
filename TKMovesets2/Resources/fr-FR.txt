@@ -105,7 +105,7 @@ extraction.settings.other = Autre
 extraction.settings.compress_moveset = Compresser le fichier
 extraction.settings.displayable_movelist = Liste des coups
 extraction.settings.compression_type = Type de compression
-extraction.settings.compression_type.none = Aucune
+extraction.settings.compression_type.none = Pas de compression
 
 # Importation #
 importation.explanation = Après que les personnages aient été extraits, ils peuvent être chargés dans une partie en cours (ne doit pas être en ligne) à l'aide de ce sous-menu. Les personnages chargés ici seront dé-chargés dès le passage par un écran de chargement, alors préférez utiliser ce sous-menu dans le mode entraînement.\nPour le jeu en ligne, allez dans la section appropriée.
@@ -165,7 +165,6 @@ edition.discard_changes = Abandonner les changements ?\nSi l'édition en direct 
 edition.process_err = Erreur
 edition.live_edition = Édition en direct
 edition.live_edition_explanation = Les petites modifications telles que les simples changements de valeur peuvent être appliquées directement en jeu, sans nécéssiter une nouvelle importation.\nAjouter/supprimer des éléments d'une liste ou toute action agrandissant le moveset nécessitera une ré-importation.
-edition.compress_moveset = Compresser
 edition.move_name = Nom
 edition.move_generic_id = Alias
 edition.moves_all = Tout
