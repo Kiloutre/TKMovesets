@@ -18,6 +18,7 @@ void InitConsole()
     AllocConsole();
     // Redirect stdout to console
     freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
 
     DEBUG_LOG("-- Console started --\n");
 }

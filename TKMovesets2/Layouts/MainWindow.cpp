@@ -68,57 +68,26 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 	}
 }
 
-void MainWindow::LoadFonts()
-{
-	ImGuiIO& io = ImGui::GetIO();
-	// Font import
-	ImFontConfig config;
-	config.MergeMode = true;
-
-	// Attempt to load fonts for specific glyph ranges, loading the first foond that is found in the provided lists
-	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
-	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
-	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
-
-	m_mustRebuildFonts = true;
-}
-
 // -- Public methods -- //
 
 MainWindow::MainWindow(GLFWwindow* window, const char* c_glsl_version)
 {
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-
-	// Setup ImGui config. This had to be done before initializing the backends
 	ImGuiIO& io = ImGui::GetIO();
-	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-	// Initialize backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(c_glsl_version);
+	ImFont* font = io.Fonts->AddFontDefault();
 
-	if (Localization::RequiresFontLoad()) {
-		LoadFonts();
-	}
-	else {
-		// Load in another thread if the fonts don't need to be loaded right away
-		ImFont* font = io.Fonts->AddFontDefault();
-		io.Fonts->Build();
-		std::thread t(&MainWindow::LoadFonts, this);
-		t.detach();
-	}
+	ImFontConfig config;
+	config.MergeMode = true;
+
+	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
+	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
+	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
+
+	io.Fonts->Build();
 }
 
 void MainWindow::NewFrame()
 {
-	if (m_mustRebuildFonts) {
-		ImGui::GetIO().Fonts->Build();
-		m_mustRebuildFonts = false;
-	}
 	// I believe this inits the current frame buffer
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();

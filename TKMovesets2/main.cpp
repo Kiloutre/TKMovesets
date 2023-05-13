@@ -311,6 +311,18 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	// Enable vsync
 	glfwSwapInterval(1);
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGuiIO& io = ImGui::GetIO();
+	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	// Initialize backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(c_glsl_version);
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		DEBUG_LOG("Unable to context to OpenGL");
 		return MAIN_ERR_OPENGL_CONTEXT;
@@ -387,7 +399,6 @@ int MAIN_NAME (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program(window, c_glsl_version);
-		ImGuiIO& io = ImGui::GetIO();
 		InitMainClasses(program);
 
 		WriteToLogFile("Initiated main classes");
