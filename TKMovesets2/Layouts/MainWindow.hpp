@@ -20,8 +20,6 @@
 
 class MainWindow {
 private:
-	// Load the fonts required for the program to work
-	void LoadFonts();
 	// Attempt to load a moveset, open a new editor window on success
 	void LoadMovesetEditor(movesetInfo* movesetInfos);
 public:

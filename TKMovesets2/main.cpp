@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #endif
 
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -252,7 +255,6 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	if (!glfwInit()) {
 		return MAIN_ERR_GLFW_INIT;
 	}
-	WriteToLogFile("Initiated GLFW");
 
 	// GL 3.0 + GLSL 130
 	// Set the window hint. Not really that important to be honest.
@@ -318,10 +320,9 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 
 	{
 		// Init main program. This will get most things going and create the important threads
-		MainWindow program(window, c_glsl_version);
+		MainWindow program;
 		InitMainClasses(program);
 
-		WriteToLogFile("Initiated main classes");
 		while (!glfwWindowShouldClose(window) && !program.requestedUpdate)
 		{
 			// Poll and handle events such as MKB inputs, window resize. Required
@@ -344,7 +345,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 			glClear(GL_COLOR_BUFFER_BIT);
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				GLFWwindow* backup_current_context = glfwGetCurrentContext();
 				ImGui::UpdatePlatformWindows();
@@ -354,12 +355,9 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 			glfwSwapBuffers(window);
 		}
 
-
 		DestroyMainClasses(program);
-		WriteToLogFile("Destroyed main classes");
 		// Cleanup what needs to be cleaned up
 		program.Shutdown();
-		WriteToLogFile("Shut down");
 
 		if (program.requestedUpdate) {
 			program.navMenu.CleanupThread();
