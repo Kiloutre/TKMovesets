@@ -144,12 +144,10 @@ void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings
 
 uint8_t GameImport::GetCharacterCount()
 {
-	// todo: If the importer gets deallocated while we do this, things can go bad
-	if (m_importer != nullptr) {
-		return m_importer->characterCount;
+	if (currentGame != nullptr) {
+		return currentGame->characterCount;
 	}
-	// Return 1 by default on purpose, easier to debug stuff that way
-	return 1;
+	return 2;
 }
 
 gameAddr GameImport::GetCurrentPlayerMovesetAddr()

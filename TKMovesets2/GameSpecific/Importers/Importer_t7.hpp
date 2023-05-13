@@ -4,9 +4,7 @@
 
 #include "Importer.hpp"
 
-#include "constants.h"
 #include "Structs_t7.h"
-#include "MovesetStructs.h"
 
 // This class has no storage and i would like to keep it that way.
 // You should be passing values through method calls and no other way.
@@ -25,7 +23,8 @@ private:
 	// Import the displayable movelist
 	void ImportMovelist(StructsT7::MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
 
-	ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) override;
+	ImportationErrcode_ ImportMovesetData(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) override;
+
 	ImportationErrcode_ _Import_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 public:
 	using Importer::Importer; // Inherit constructor too

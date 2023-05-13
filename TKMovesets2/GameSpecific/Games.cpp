@@ -139,14 +139,12 @@ namespace Games
 	Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
 		Extractor* ex = (Extractor*)gameInfo->extractor->allocate(process, game, gameInfo);
-		ex->characterCount = gameInfo->characterCount;
 		return ex;
 	}
 
 	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
 		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo);
-		im->characterCount = gameInfo->characterCount;
 		return im;
 	}
 

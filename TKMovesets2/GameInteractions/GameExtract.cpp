@@ -120,8 +120,8 @@ void GameExtract::QueueCharacterExtraction(int playerId, ExtractSettings setting
 
 uint8_t GameExtract::GetCharacterCount()
 {
-	if (m_extractor != nullptr) {
-		return m_extractor->characterCount;
+	if (currentGame != nullptr) {
+		return currentGame->characterCount;
 	}
 	return 2;
 }

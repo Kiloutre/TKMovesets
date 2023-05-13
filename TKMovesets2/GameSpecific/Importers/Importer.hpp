@@ -7,6 +7,7 @@
 #include "BaseGameSpecificClass.hpp"
 
 #include "constants.h"
+#include "MovesetStructs.h"
 #include "lastLoadedMoveset.h"
 
 // Turns an index into an absolute address, or NULL (0) if index is -1
@@ -43,13 +44,11 @@ enum ImportationErrcode_
 class DLLCONTENT Importer : public BaseGameSpecificClass
 {
 protected:
-	// Actual importation method, will modify the moveset passed to it
-	virtual ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
+	// Internal import method that will decompress the moveset (if needed) and get a ptr to the moveset data before calling ImportMOvesetData
+	ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 
+	virtual ImportationErrcode_ ImportMovesetData(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
 public:
-	// Stores the number of character we are expected be able to import to
-	// You shouldn't set this here but in the game list file (Games.cpp). The 1 here should get overwritten or something has gone wrong.
-	uint8_t characterCount = 1;
 	// Store informations about the last loaded moveset such as its address, crc32, character ID. Used by online shared memory.
 	s_lastLoaded lastLoaded;
 
