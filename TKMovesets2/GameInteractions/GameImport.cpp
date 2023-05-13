@@ -76,6 +76,7 @@ ImportationErrcode_ GameImport::GetLastError()
 	if (m_errors.size() > 0) {
 		ImportationErrcode_ err = m_errors[0];
 		m_errors.erase(m_errors.begin());
+		return err;
 	}
 	return ImportationErrcode_Successful;
 }

@@ -334,16 +334,12 @@ ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameA
 
 	if (isCompressed) {
 		uint64_t src_size = s_moveset - header->moveset_data_start;
-		Byte* moveset_data_start = moveset + header->moveset_data_start;
 
-		Byte* decompressed_moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
+		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
 
-		if (decompressed_moveset == nullptr) {
-			delete[] moveset;
+		if (moveset == nullptr) {
 			return ImportationErrcode_DecompressionError;
 		}
-
-		moveset = decompressed_moveset;
 	}
 	else {
 		// Not compressed
