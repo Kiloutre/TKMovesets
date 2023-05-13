@@ -289,7 +289,7 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 	{
 		// Init editor logic class
-		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId);
+		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId, movesetInfo->minorVersion);
 
 		m_editor = Games::FactoryGetEditor(gameInfo, m_importerHelper.process, m_importerHelper.game);
 		labels = new EditorLabel(gameInfo, addrFile);

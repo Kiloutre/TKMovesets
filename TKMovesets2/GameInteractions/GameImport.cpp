@@ -24,12 +24,8 @@ void GameImport::OnProcessDetach()
 
 void GameImport::InstantiateFactory()
 {
-	if (m_importer != nullptr) {
-		m_toFree_importer = m_importer;
-	}
+	m_toFree_importer = m_importer;
 
-	game->gameKey = currentGame->dataString;
-	game->minorGameKey = currentGame->minorDataString;
 	// Every game has its own importation subtleties so we use polymorphism to manage that
 	m_importer = Games::FactoryGetImporter(currentGame, process, game);
 }
