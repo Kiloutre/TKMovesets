@@ -1,6 +1,5 @@
 #include <format>
 #include <windows.h>
-#include <lz4.h>
 #include <filesystem>
 
 #include "Online.hpp"

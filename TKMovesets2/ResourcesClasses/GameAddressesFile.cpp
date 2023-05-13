@@ -1,7 +1,7 @@
 #include <sstream>
-#include <lz4.h>
 
 #include "GameAddressesFile.hpp"
+#include "Compression.hpp"
 #include "Helpers.hpp"
 
 #include "constants.h"
@@ -12,6 +12,7 @@ extern "C" const size_t game_addresses_ini_size;
 
 // -- Static helpers -- //
 
+#define MAX_COMPRESSED_GAME_ADDRESSES_SIZE (sizeof(((s_GameAddressesSharedMem*)0)->compressedData))
 
 static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 {
@@ -76,7 +77,7 @@ static int GetAddressMapStringSize(const std::map <std::string, GameAddresses_Ga
 }
 
 // Write a compacted from of each entry in the game addresses file into the given string
-static int WriteAddressMapToString(const std::map <std::string, GameAddresses_GameEntries>& entries, char* outBuf)
+static char* WriteAddressMapToString(const std::map <std::string, GameAddresses_GameEntries>& entries, int& out_size)
 {
 	int compacted_addr_size = GetAddressMapStringSize(entries);
 	int bufSize = compacted_addr_size + 1;
@@ -88,7 +89,7 @@ static int WriteAddressMapToString(const std::map <std::string, GameAddresses_Ga
 	// LOL
 	for (auto& [entryKey, entryValue] : entries)
 	{
-		std::string sPrefix = "str:" + entryKey + "_";
+		std::string sPrefix = "s:" + entryKey + "_";
 		for (auto& [stringKey, stringValue] : entryValue.strings) {
 			strcat_s(inBuf, bufSize, sPrefix.c_str());
 			strcat_s(inBuf, bufSize, stringKey.c_str());
@@ -97,7 +98,7 @@ static int WriteAddressMapToString(const std::map <std::string, GameAddresses_Ga
 			strcat_s(inBuf, bufSize, "\n");
 		}
 
-		std::string valPrefix = "val:" + entryKey + "_";
+		std::string valPrefix = "v:" + entryKey + "_";
 		for (auto& [valKey, valValue] : entryValue.values) {
 			strcat_s(inBuf, bufSize, valPrefix.c_str());
 			strcat_s(inBuf, bufSize, valKey.c_str());
@@ -131,10 +132,9 @@ static int WriteAddressMapToString(const std::map <std::string, GameAddresses_Ga
 		}
 	}
 
-	int compressedSize = LZ4_compress_default(inBuf, outBuf, bufSize, (int)sizeof((s_GameAddressesSharedMem*)0)->compressedData);
-
+	char* output = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inBuf, compacted_addr_size, out_size, 9);
 	delete[] inBuf;
-	return compressedSize;
+	return output;
 }
 
 
@@ -293,24 +293,19 @@ bool GameAddressesFile::LoadFromSharedMemory()
 
 	DEBUG_LOG("Orig size: %d, compressed size: %d\n", m_sharedMemory->originalSize, m_sharedMemory->compressedSize);
 
-	int bufSize = m_sharedMemory->originalSize + 1;
-	char* outBuf = new char[bufSize];
-	outBuf[m_sharedMemory->originalSize] = '\0';
+	char* decompressed_data = (char*)CompressionUtils::RAW::LZMA::Decompress((Byte*)m_sharedMemory->compressedData, m_sharedMemory->compressedSize, m_sharedMemory->originalSize);
 
-	int decompressedSize = LZ4_decompress_safe(m_sharedMemory->compressedData, outBuf, m_sharedMemory->compressedSize, bufSize);
-	DEBUG_LOG("GameAddressesFile::LoadFromSharedMemory() - Decompressed: %d vs %d\n", decompressedSize, m_sharedMemory->originalSize);
-
-	if (decompressedSize <= 0) {
+	if (decompressed_data == nullptr) {
 		DEBUG_LOG("!! Not loading addresses from shared mem !! \n");
 		return false;
 	}
 
 	{
-		std::stringstream indata(outBuf);
+		std::stringstream indata(decompressed_data);
 		LoadFromStream(indata);
 	}
 
-	delete[] outBuf;
+	delete[] decompressed_data;
 	DEBUG_LOG("GameAddressesFile::LoadFromSharedMemory() -- Success!\n");
 
 	return true;
@@ -336,19 +331,23 @@ void GameAddressesFile::LoadToSharedMemory()
 		return;
 	}
 
-	int compressedSize = WriteAddressMapToString(m_entries, m_sharedMemory->compressedData);
-	DEBUG_LOG("GameAddressesFile::LoadToSharedMemory(), compressed = %d\n", compressedSize);
+	int compressed_size;
+	char* compressed_data = WriteAddressMapToString(m_entries, compressed_size);
+	DEBUG_LOG("GameAddressesFile::LoadToSharedMemory(), compressed = %d\n", compressed_size);
 
-	if (compacted_addr_size <= 0) {
+	if (compacted_addr_size <= 0 || compressed_data == nullptr || compressed_size > MAX_COMPRESSED_GAME_ADDRESSES_SIZE) {
 		UnmapViewOfFile(m_sharedMemory);
 		CloseHandle(m_memoryHandle);
 		m_sharedMemory = nullptr;
 		m_memoryHandle = nullptr;
 	}
 	else {
-		m_sharedMemory->compressedSize = compressedSize;
+		memcpy(m_sharedMemory->compressedData, compressed_data, compressed_size);
+		m_sharedMemory->compressedSize = compressed_size;
 		m_sharedMemory->originalSize = compacted_addr_size;
 	}
+
+	delete[] compressed_data;
 }
 
 
@@ -412,11 +411,11 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 		}
 
 		// Insert value into the appropriate map, auto detect base (int / hex)
-		if (Helpers::startsWith<std::string>(key, "val:")) {
+		if (Helpers::startsWith<std::string>(key, "val:") || Helpers::startsWith<std::string>(key, "v:")) {
 			entries[gameKey].values[shortKey] = strtoll(value.c_str(), nullptr, 0);
 
 		}
-		else if (Helpers::startsWith<std::string>(key, "str:")) {
+		else if (Helpers::startsWith<std::string>(key, "str:") || Helpers::startsWith<std::string>(key, "s:")) {
 			std::string filteredString;
 			unsigned int idx = 0;
 			value[value.size()] = '\0'; // Remove 13 (0xD, carriage return) char at the end of each strings. Don't know why it's there but now it isn't.

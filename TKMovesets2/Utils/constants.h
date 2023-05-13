@@ -100,5 +100,5 @@
 # define MOVESET_LIST_MODIFIED   IM_COL32(19, 96, 18, 30)
 # define MOVESET_INVALID         IM_COL32(186, 54, 54, 5)
 
-# define SHARED_MEMORY_BUFSIZE      (4096)
-# define SHARED_ADDR_MEMORY_BUFSIZE (4096)
+# define SHARED_MEMORY_BUFSIZE      (4096) // Shared memory containing basic values for moveset loader (addr of moveset, character ID)
+# define SHARED_ADDR_MEMORY_BUFSIZE (8192) // Shared memory containing compacted & compressed game_addresses.txt file

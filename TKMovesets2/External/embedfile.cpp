@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <lz4.h>
 #include <fstream>
 #include <regex>
 
@@ -61,7 +60,7 @@ int main(int argc, char** argv)
     printf("Compressing...\n");
 
     int32_t compressedSize;
-    outbuf = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inbuf, file_size, compressedSize);
+    outbuf = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inbuf, file_size, compressedSize, 9);
 
     if (outbuf == nullptr) {
         printf("Compression failure\n");
