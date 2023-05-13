@@ -34,6 +34,8 @@ struct SharedMemBase
 	MovesetSyncStatus_ moveset_sync_status;
 	// Depending on the mode (persistent / online play), files might be sent over, movesets might be applied to different players, etc
 	MovesetLoaderMode_ moveset_loader_mode;
+	// Stores the path to the program, used in order to tell the moveset loader where to look for movesets if needed
+	wchar_t program_path[MAX_PATH];
 
 	bool IsAttemptingOnlinePlay() const {
 		return locked_in && moveset_loader_mode && (moveset_sync_status != MovesetSyncStatus_NotStarted && moveset_sync_status != MovesetSyncStatus_AcceptPackets);
