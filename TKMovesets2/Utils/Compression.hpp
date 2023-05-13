@@ -38,11 +38,15 @@ namespace CompressionUtils
 			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
 		};
 
+		// Lzma, slow but very good compression (about 50% for T movesets)
 		namespace LZMA {
+			// Preset can be between 0 and 9 included. Higher number compresses more
+			// But the ratio is not that much better for higher preset, and speed & ram usage is SIGNIFICANTLY worse
 			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out, uint8_t preset=0);
 			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
 		};
 
+		// Lzma, very quick with viable compression (about 33% for T movesets)
 		namespace LZ4 {
 			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out);
 			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);

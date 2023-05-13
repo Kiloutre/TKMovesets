@@ -132,7 +132,7 @@ static char* WriteAddressMapToString(const std::map <std::string, GameAddresses_
 		}
 	}
 
-	char* output = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inBuf, compacted_addr_size, out_size, 9);
+	char* output = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inBuf, compacted_addr_size, out_size);
 	delete[] inBuf;
 	return output;
 }
