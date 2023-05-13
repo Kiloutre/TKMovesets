@@ -36,12 +36,12 @@ namespace CompressionUtils
 		};
 
 		namespace LZMA {
-			Byte* Compress(Byte* decompressed_data, int32_t decompressed_size, int32_t& size_out, uint8_t preset=0);
+			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out, uint8_t preset=0);
 			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
 		};
 
 		namespace LZ4 {
-			Byte* Compress(Byte* decompressed_data, int32_t decompressed_size, int32_t& size_out);
+			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out);
 			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
 		};
 	};

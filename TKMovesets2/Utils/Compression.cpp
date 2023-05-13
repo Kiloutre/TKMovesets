@@ -79,7 +79,7 @@ static bool lzma_init_encoder(lzma_stream* strm, uint32_t preset)
 }
 
 
-static bool lzma_compress(lzma_stream* strm, Byte* input_data, uint64_t uncompressed_size, Byte* output_data, int32_t& size_out)
+static bool lzma_compress(lzma_stream* strm, Byte* input_data, uint64_t input_size, Byte* output_data, int32_t& size_out)
 {
 	// This will be LZMA_RUN until the end of the input file is reached.
 	// This tells lzma_code() when there will be no more input.
@@ -96,22 +96,26 @@ static bool lzma_compress(lzma_stream* strm, Byte* input_data, uint64_t uncompre
 	// always reset total_in and total_out to zero. But the encoder
 	// initialization doesn't touch next_in, avail_in, next_out, or
 	// avail_out.
+
+	uint64_t output_buffer_size = input_size;
+
 	strm->next_in = NULL;
 	strm->avail_in = 0;
 	strm->next_out = output_data;
-	strm->avail_out = uncompressed_size;
+	strm->avail_out = output_buffer_size;
 
 	// Loop until the file has been successfully compressed or until
 	// an error occurs.
 
 	size_out = 0;
-	uint64_t remainingBytes = uncompressed_size;
+
+	uint64_t remainingBytes = input_size;
 
 	while (true) {
 		// Fill the input buffer if it is empty.
 		if (strm->avail_in == 0 && remainingBytes > 0) {
 			strm->next_in = input_data;
-			strm->avail_in = remainingBytes;
+			strm->avail_in = BUFSIZ < remainingBytes ? BUFSIZ : remainingBytes;
 
 			remainingBytes -= strm->avail_in;
 			input_data += strm->avail_in;
@@ -149,15 +153,14 @@ static bool lzma_compress(lzma_stream* strm, Byte* input_data, uint64_t uncompre
 			// the output buffer is likely to be only partially
 			// full. Calculate how much new data there is to
 			// be written to the output file.
-			size_t write_size = strm->avail_out;
+			size_t write_size = output_buffer_size - strm->avail_out;
 
 			size_out += (int)write_size;
-
-			output_data += strm->avail_out;
+			output_data += write_size;
 
 			// Reset next_out and avail_out.
 			strm->next_out = output_data;
-			strm->avail_out = 0;
+			strm->avail_out = output_buffer_size;
 		}
 
 		// Normally the return value of lzma_code() will be LZMA_OK
@@ -322,7 +325,7 @@ static bool lzma_decompress(lzma_stream* strm, Byte* compressed_data, int32_t co
 	while (true) {
 		if (strm->avail_in == 0 && remainingBytes > 0) {
 			strm->next_in = compressed_data;
-			strm->avail_in = BUFSIZ < remainingBytes ? BUFSIZ : remainingBytes;
+			strm->avail_in = remainingBytes;// BUFSIZ < remainingBytes ? BUFSIZ : remainingBytes;
 
 			compressed_data += strm->avail_in;
 			remainingBytes -= strm->avail_in;
@@ -442,7 +445,7 @@ namespace CompressionUtils
 	unsigned int GetDefaultCompressionSetting()
 	{
 		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
-			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZ4) {
+			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZMA) {
 				return i;
 			}
 		}
@@ -581,7 +584,7 @@ namespace CompressionUtils
 
 		namespace LZMA
 		{
-			Byte* Compress(Byte* decompressed_data, int32_t decompressed_size, int32_t& size_out, uint8_t preset)
+			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out, uint8_t preset)
 			{
 				Byte* result;
 				size_out = 0;
@@ -597,8 +600,8 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
-				result = new Byte[decompressed_size];
-				if (!lzma_compress(&strm, decompressed_data, decompressed_size, result, size_out))
+				result = new Byte[input_size];
+				if (!lzma_compress(&strm, input_data, input_size, result, size_out))
 				{
 					DEBUG_LOG("LZMA Compression failure\n");
 					delete[] result;

@@ -198,6 +198,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	freopen("CONOUT$", "w", stderr);
 #pragma warning(pop)
 #endif
+
 	{
 		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
 
