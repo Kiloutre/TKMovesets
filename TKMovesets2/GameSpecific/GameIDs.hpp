@@ -11,7 +11,7 @@ namespace GameVersions
 {
 	enum TK
 	{
-		NONE,
+		NONE = 0,
 
 		// Examples (to change)
 		SEASON_1,

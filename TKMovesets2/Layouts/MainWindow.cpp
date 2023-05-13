@@ -79,8 +79,6 @@ void MainWindow::LoadFonts()
 	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
 	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
 	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
-
-	m_mustRebuildFonts = true;
 }
 
 // -- Public methods -- //
