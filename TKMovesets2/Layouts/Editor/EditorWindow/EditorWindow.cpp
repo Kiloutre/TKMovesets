@@ -234,7 +234,7 @@ void EditorWindow::Save()
 		bool success = true;
 
 		if (m_compressOnSave) {
-			success = CompressionUtils::CompressFile(header->moveset_data_start, dst_filename, tmp_filename);
+			success = CompressionUtils::FILE::Moveset::Compress(dst_filename, tmp_filename);
 		}
 		else {
 			std::filesystem::rename(tmp_filename, dst_filename);

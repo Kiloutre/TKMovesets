@@ -5,8 +5,10 @@
 typedef uint8_t TKMovesetCompressionType;
 enum TKMovesetCompressionType_
 {
-	TKMovesetCompressonType_None,
-	TKMovesetCompressonType_LZ4
+	TKMovesetCompressonType_None = 0,
+
+	TKMovesetCompressonType_LZ4,
+	TKMovesetCompressonType_LZMA,
 };
 
 enum TKMovesetProperty_

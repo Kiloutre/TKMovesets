@@ -11,6 +11,7 @@
     "opengl",
     "polyhook2",
     "lz4",
+    "liblzma",
     "curlpp"
   ]
 }

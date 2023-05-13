@@ -212,14 +212,11 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 
 	if (isCompressed) {
 		uint64_t src_size = s_moveset - header->moveset_data_start;
-		Byte* moveset_data_start = moveset + header->moveset_data_start;
 
-		moveset = new Byte[header->moveset_data_size];
-		s_moveset = header->moveset_data_size;
+		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
 
-		if (!CompressionUtils::DecompressMoveset(moveset, moveset_data_start, src_size, header->moveset_data_size)) {
+		if (moveset == nullptr) {
 			DEBUG_LOG("Decompression of moveset failed!\n");
-			delete[] moveset;
 			delete[] orig_moveset;
 			return nullptr;
 		}

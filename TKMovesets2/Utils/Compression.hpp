@@ -3,12 +3,29 @@
 #include <string>
 
 #include "GameTypes.h"
+#include "MovesetStructs.h"
 
 namespace CompressionUtils
 {
-	// Return an allocated copy of the decompressed moveset data (moveset_data_start and on)
-	bool DecompressMoveset(Byte* outputDest, const Byte* moveset_data_start, uint64_t src_size, int32_t original_size);
+	namespace FILE {
+		namespace Moveset {
+			bool Compress(const std::wstring& dest_filename, const std::wstring& src_filename, TKMovesetCompressionType_ compressionType = TKMovesetCompressonType_LZ4);
+		};
+	};
 
-	// Compress a moveset. Returns false on failure. Modifies header->moveset_data_size automatically.
-	bool CompressFile(int32_t moveset_data_start, const std::wstring& dest_filename, const std::wstring& src_filename);
+	namespace RAW {
+		namespace Moveset {
+			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
+		};
+
+		namespace LZMA {
+			Byte* Compress(Byte* decompressed_data, int32_t decompressed_size, int32_t& size_out, uint8_t preset=0);
+			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
+		};
+
+		namespace LZ4 {
+			Byte* Compress(Byte* decompressed_data, int32_t decompressed_size, int32_t& size_out);
+			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
+		};
+	};
 };

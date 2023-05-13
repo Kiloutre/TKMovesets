@@ -697,7 +697,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 
 			if (settings & ExtractSettings_Compress) {
 				DEBUG_LOG("Saved temp moveset, compressing...\n");
-				if (!CompressionUtils::CompressFile(customHeader.moveset_data_start, filepath, tmp_filepath)) {
+				if (!CompressionUtils::FILE::Moveset::Compress(filepath, tmp_filepath)) {
 					errcode = ExtractionErrcode_CompressionFailure;
 				}
 			}
