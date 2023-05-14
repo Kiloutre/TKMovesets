@@ -3,26 +3,56 @@
 Tekken mods page:
 https://tekkenmods.com/mod/2429/tkmovesets2
 
-
-# WIP
+# TKMovesets2 0.6 - Moveset export / import /edit
 
 This project is a work in progress and is still lacking critical features.
 
-If you have any contribution to bring, feel free, there is room for improvement in many places
 
-# (Developer) Todo lists:
+Tool aimed at replacing and surpassing the old TekkenMovesetExtractor. Extract movesets, edit them to your liking and re-import them on the characters you want.
+The importation is memory based: it does not modify the game files, does not stay after closing the game, and **causes desyncs online if the opponent does not have this tool also running.**
+
+Because this is an early version, so far only Tekken 7 is supported. Online play is supported, but requires the opponent to have this tool.
+The tool is tailored for the latest Tekken 7 version. It can be modified to work with older versions, but won't support them right out of the box.
+
+# Feature set:
+## - Extractor
+- Extract movesets from memory (game running, characters loaded) (Tekken 7)
+- Chose whether or not to carry over camera animations, face animations, hands animations...
+- Movesets are compressed on disk in order for them not to take too much space
+
+## - Importer
+- Import moveset to any character in memory (game running, characters loaded) (Tekken 7)
+- Unused movesets are automatically freed from memory, but advanced users may disable that option to play with multiple movesets at once
+
+## - Online play
+- 'Persistent play' submenu that allows to choose one/two movesets to apply on the players and to keep even after loading screens
+- 'Online play' menu that allows playing with custom movesets without syncing moveset files with the opponent : The moveset files are automatically sent through the steam networking API to the other player. You only need to select your own moveset. Only works if the opponent also has the tool running. Maximum moveset size to be sent/received is 50MB.
+
+## - Editor
+- Access movelist, change frame data, create new transitions
+- Modify displayed move list in training mode
+- Import animations from other characters
+- Import a moveset and edit it live: small changes made to the moveset are instantly mirrored in-game
+
+#### Other
+- Support for multiple translations (help wanted!), for now English & French are supported
+
+
+# Developer readme
+
+##Todo lists:
 
 https://github.com/Kiloutre/TKMovesets/projects?query=is%3Aopen
 
-# (Developer) Setting up the project locally
+## (Developer) Setting up the project locally
 
-## Infos
+### Infos
 This project uses CMake, so if you're new to this, your best way to get started is to install **Visual Studio Community**, and making sure to install the **C++CMake modules**. If you already have Visual Studio but without those modules, you can still install them.
 
-## Dependencies
+### Dependencies
 This project requires external libraries to be downloaded & built to function.
 
-### [vcpkg](https://vcpkg.io/en/getting-started.html)-obtainable dependencies
+#### [vcpkg](https://vcpkg.io/en/getting-started.html)-obtainable dependencies
 Some libraries can be quickly obtained by simply using vcpkg, a package manager that can be tied to Visual Studio and download & build vcpkg dependencies automatically for you.
 This is the recommended way of building this project.
 - Download vcpkg by running `git clone https://github.com/Microsoft/vcpkg.git`, or simply [downloading the .zip file](https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip)
@@ -38,7 +68,7 @@ This is the recommended way of building this project.
 
 vcpkg is now installed.
 
-### Submodules dependencies
+#### Submodules dependencies
 
 Some dependencies have to be obtained from other git repos. To get them, make sure to also clone the submodules contained within this project.
 
@@ -53,7 +83,7 @@ If you already have the repository cloned and want to bring the submodules over,
 If downloading the project manually (.zip or such), you will also have to manually download the dependencies.
 If using a GUI program to download this project, there will most likely be an option to bring the submodules over.
 
-### Steamworks dependency
+#### Steamworks dependency
 The steamworks API's headers, which i do use in various parts of this software, does not have a license that would allow me to package it with my own code.
 You may obtain the steamworks files using two possible ways:
 
@@ -62,7 +92,7 @@ You may obtain the steamworks files using two possible ways:
 
 Make sure the folder is extracted at the root of the project (inside the TKMovesets folder), and that it is named `steam api`
 
-## Building
+### Building
 - **If you have visual studio installed**: Make sure to close Visual Studio and delete the folders `.vs` and `out` before trying your first build, they may contain bad cache if you attempted building the project with an incomplete environment
 - Open the project in visual studio, and if prompted to **Generate** the cmake config, say yes. It probably already started doing it on its own.
 - In the list of targets at the top of Visual Studio (next to the green arrow icon), select `TKMovesets2.exe` to build the main tool
