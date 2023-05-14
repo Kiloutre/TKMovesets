@@ -81,6 +81,9 @@ navmenu.update_error = MÀJ Erreur
 navmenu.update_explanation = Une mise à jour a été trouvée.\nVoulez-vous la télécharger et relancer le programme maintenant ?
 navmenu.update_bad_file = La mise à jour n'a pas pu s'effectuer automatiquement.\nMettez à jour manuellement.
 
+navmenu.vsync = Synchro verticale
+navmenu.vsync_0 = Aucune
+
 ## Sous-menus ##
 
 # Extraction #

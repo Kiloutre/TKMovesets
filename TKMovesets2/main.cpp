@@ -284,7 +284,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
 	// Enable vsync
-	glfwSwapInterval(1);
+	glfwSwapInterval(VSYNC_BUFFER);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -354,6 +354,10 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 				glfwMakeContextCurrent(backup_current_context);
 			}
 			glfwSwapBuffers(window);
+
+			if (io.DeltaTime < (1.0f / MAX_FPS)) {
+				Sleep(((1.0f / MAX_FPS) - io.DeltaTime) * 1000);
+			}
 		}
 
 		DestroyMainClasses(program);

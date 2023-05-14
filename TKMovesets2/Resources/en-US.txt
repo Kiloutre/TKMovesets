@@ -81,6 +81,8 @@ navmenu.update_error = Updating error
 navmenu.update_explanation = An update has been found.\nDo you want to download it and restart the program now?
 navmenu.update_bad_file = The update could not be applied.\nPlease update manually.
 
+navmenu.vsync = Vertical Sync
+
 ## Submenus ##
 
 # Extraction #

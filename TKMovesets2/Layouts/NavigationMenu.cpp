@@ -1,4 +1,5 @@
 #include <ImGui.h>
+#include "GLFW/glfw3.h"
 
 #include "NavigationMenu.hpp"
 #include "Localization.hpp"
@@ -116,6 +117,25 @@ void NavigationMenu::Render(float width, bool navigationLocked)
 		}
 
 	}
+
+	ImGui::TextUnformatted(_("navmenu.vsync"));
+	char buf[2] = { '0' + m_vsync_setting , 0 };
+	ImGui::PushID(&m_vsync_setting);
+	if (ImGui::BeginCombo("##", buf))
+	{
+		for (unsigned int i = 0; i < 5; ++i)
+		{
+			ImGui::PushID(i);
+			buf[0] = '0' + i;
+			if (ImGui::Selectable(buf, i == m_vsync_setting)) {
+				m_vsync_setting = i;
+				glfwSwapInterval(i);
+			}
+			ImGui::PopID();
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::PopID();
 
 	// Update popup
 	if (m_updateStatus.programUpdateAvailable) {

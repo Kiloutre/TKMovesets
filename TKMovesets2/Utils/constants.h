@@ -10,7 +10,7 @@
 
 # define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define PROGRAM_TITLE           "TKMovesets - kilo"
-# define PROGRAM_VERSION         "0.6"
+# define PROGRAM_VERSION         "0.6.1"
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LOCALE  "en-US"
@@ -55,6 +55,9 @@
 
 # define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
+
+# define MAX_FPS                 (60.0f)
+# define VSYNC_BUFFER            (2) // 0 is no vsync, 1 is one screen refresh, etc
 
 # define TEXTBOX_HORIZ_PADDING   15
 # define TEXTBOX_VERT_PADDING    10

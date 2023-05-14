@@ -54,6 +54,8 @@ private:
 	s_updateStatus m_updateStatus;
 	// If true, there has been an error with the update file
 	bool m_updateFileInvalid = false;
+	// Vsync dropdown index
+	uint8_t m_vsync_setting = VSYNC_BUFFER;
 
 	// Start a thread that will check for updates
 	void RequestCheckForUpdates();
