@@ -122,7 +122,14 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 			else {
 				DEBUG_LOG("COMMUNICATION: Remote moveset is %llu bytes big.\n", _packet->local_moveset.size);
 				PacketT7_AnswerMovesetSync newPacket;
-				newPacket.requesting_download = _packet->local_moveset.crc32 != sharedMemPtr->players[1].crc32;
+				newPacket.requesting_download = true;
+				
+				if (_packet->local_moveset.crc32 == sharedMemPtr->players[1].crc32) {
+					newPacket.requesting_download = false;
+				}
+				else if (false) {
+					// todo: list movesets in sharedMemPtr->program_path, check their crc32, load them if needed
+				}
 
 				if (_packet->local_moveset.size >= ONLINE_MOVESET_MAX_SIZE_BYTES) {
 					DEBUG_LOG("- Not downloading : Moveset way too big. -\n");
@@ -287,8 +294,10 @@ static bool CompressMovesetLzma(Byte*& moveset_out, uint64_t& size_out)
 {
 	const TKMovesetHeader* current_header = (TKMovesetHeader*)moveset_out;
 	if (current_header->compressionType == TKMovesetCompressionType_LZMA) {
+		DEBUG_LOG("Local moveset is already LZMA, sending as is.\n");
 		return false;
-	}
+
+		DEBUG_LOG("Local moveset is not LZMA (%llu bytes), compressing.\n", size_out);
 
 	Byte* moveset = moveset_out;
 	uint64_t moveset_size = size_out;
@@ -298,24 +307,26 @@ static bool CompressMovesetLzma(Byte*& moveset_out, uint64_t& size_out)
 		// Create temp uncompressed copy
 		uint64_t compressed_data_size = size_out - current_header->moveset_data_start;
 		moveset_size = current_header->moveset_data_start + current_header->moveset_data_size;
-		CompressionUtils::RAW::Moveset::DecompressWithHeader(moveset, compressed_data_size, moveset_size);
+		moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(moveset, compressed_data_size, moveset_size);
+
+		DEBUG_LOG("Local moveset was compressed, its decompressed size is %llu bytes.\n", moveset_size);
 	}
 
 	// Compress to LZMA
 	Byte* new_moveset = CompressionUtils::RAW::Moveset::Compress(moveset, moveset_size, TKMovesetCompressionType_LZMA, moveset_size);
+	DEBUG_LOG("Local moveset now compressed to LZMA is %llu bytes.\n", moveset_size);
 
 	if (current_header->isCompressed()) {
 		// Delete the temp uncompressed copy we made
 		delete[] moveset;
 	}
 
-	if (new_moveset != nullptr)
-	{
-		moveset_out = new_moveset;
-		size_out = moveset_size;
-		return true;
+	if (new_moveset == nullptr) {
+		return false;
 	}
 
+	moveset_out = new_moveset;
+	size_out = moveset_size;
 	return true;
 }
 
@@ -325,8 +336,8 @@ void MovesetLoaderT7::SendMoveset()
 
 	if (player.custom_moveset_addr != 0)
 	{
-		uint64_t leftToSend = player.custom_moveset_original_data_size;
 		Byte* dataToSend = (Byte*)player.custom_moveset_original_data_addr;
+		uint64_t leftToSend = player.custom_moveset_original_data_size;
 
 		bool using_intermediate_moveset = CompressMovesetLzma(dataToSend, leftToSend);
 
