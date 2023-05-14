@@ -296,8 +296,8 @@ static bool CompressMovesetLzma(Byte*& moveset_out, uint64_t& size_out)
 	if (current_header->compressionType == TKMovesetCompressionType_LZMA) {
 		DEBUG_LOG("Local moveset is already LZMA, sending as is.\n");
 		return false;
-
-		DEBUG_LOG("Local moveset is not LZMA (%llu bytes), compressing.\n", size_out);
+	}
+	DEBUG_LOG("Local moveset is not LZMA (%llu bytes), compressing.\n", size_out);
 
 	Byte* moveset = moveset_out;
 	uint64_t moveset_size = size_out;
