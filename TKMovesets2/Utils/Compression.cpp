@@ -551,8 +551,7 @@ namespace CompressionUtils
 	{
 		namespace Moveset
 		{
-
-			Byte* Decompress(const Byte* moveset, uint64_t compressed_size, uint64_t& size_out)
+			Byte* Decompress(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out)
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
@@ -567,10 +566,10 @@ namespace CompressionUtils
 				switch (header->compressionType)
 				{
 				case TKMovesetCompressionType_LZ4:
-					result = CompressionUtils::RAW::LZ4::Decompress(moveset_data_start, compressed_size, header->moveset_data_size);
+					result = CompressionUtils::RAW::LZ4::Decompress(moveset_data_start, compressed_data_size, header->moveset_data_size);
 					break;
 				case TKMovesetCompressionType_LZMA:
-					result = CompressionUtils::RAW::LZMA::Decompress(moveset_data_start, compressed_size, header->moveset_data_size);
+					result = CompressionUtils::RAW::LZMA::Decompress(moveset_data_start, compressed_data_size, header->moveset_data_size);
 					break;
 				default:
 					size_out = 0;
@@ -583,12 +582,12 @@ namespace CompressionUtils
 					DEBUG_LOG("!! Error during decompression !!\n");
 				}
 
-				DEBUG_LOG("Decompressed moveset, compressed size was %llu, size_out is %llu\n", compressed_size, size_out);
+				DEBUG_LOG("Decompressed moveset, compressed size was %llu, size_out is %llu\n", compressed_data_size, size_out);
 
 				return result;
 			}
 
-			bool DecompressToBuffer(const Byte* moveset, uint64_t compressed_size, Byte* output_buffer)
+			bool DecompressToBuffer(const Byte* moveset, uint64_t compressed_data_size, Byte* output_buffer)
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
@@ -602,10 +601,10 @@ namespace CompressionUtils
 				switch (header->compressionType)
 				{
 				case TKMovesetCompressionType_LZ4:
-					result = CompressionUtils::RAW::LZ4::DecompressToBuffer(moveset_data_start, compressed_size, output_buffer, header->moveset_data_size);
+					result = CompressionUtils::RAW::LZ4::DecompressToBuffer(moveset_data_start, compressed_data_size, output_buffer, header->moveset_data_size);
 					break;
 				case TKMovesetCompressionType_LZMA:
-					result = CompressionUtils::RAW::LZMA::DecompressToBuffer(moveset_data_start, compressed_size, output_buffer, header->moveset_data_size);
+					result = CompressionUtils::RAW::LZMA::DecompressToBuffer(moveset_data_start, compressed_data_size, output_buffer, header->moveset_data_size);
 					break;
 				default:
 					DEBUG_LOG("!! Moveset decompression: unhandled compression type '%u' !!\n", header->compressionType);
@@ -617,12 +616,12 @@ namespace CompressionUtils
 					DEBUG_LOG("!! Error during decompression !!\n");
 				}
 
-				DEBUG_LOG("Decompressed moveset, compressed size was %llu, result was %llu\n", compressed_size, header->moveset_data_size);
+				DEBUG_LOG("Decompressed moveset, compressed size was %llu, result was %llu\n", compressed_data_size, header->moveset_data_size);
 
 				return result;
 			}
 
-			Byte* DecompressWithHeader(const Byte* moveset, uint64_t compressed_size, uint64_t& size_out)
+			Byte* DecompressWithHeader(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out)
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 				const Byte* moveset_data_start = moveset + header->moveset_data_start;
@@ -631,13 +630,55 @@ namespace CompressionUtils
 				Byte* new_moveset = new Byte[full_moveset_size];
 				memcpy(new_moveset, header, header->moveset_data_start);
 
-				if (!DecompressToBuffer(moveset, compressed_size, new_moveset + header->moveset_data_start)) {
+				if (!CompressionUtils::RAW::Moveset::DecompressToBuffer(moveset, compressed_data_size, new_moveset + header->moveset_data_start)) {
 					delete[] new_moveset;
 					size_out = 0;
 					return nullptr;
 				}
 
 				size_out = full_moveset_size;
+				return new_moveset;
+			}
+
+			Byte* Compress(const Byte* moveset, uint64_t full_size, TKMovesetCompressionType_ compressionType, uint64_t& size_out)
+			{
+				size_out = 0;
+				if (full_size < sizeof(TKMovesetHeader)) return nullptr;
+
+				const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
+
+				if (header->isCompressed()) {
+					return nullptr;
+				}
+
+				const Byte* moveset_data_start = moveset + header->moveset_data_start;
+				uint64_t moveset_data_size = full_size - header->moveset_data_start;
+
+				Byte* new_moveset = new Byte[full_size];
+				Byte* new_moveset_data_start = new_moveset + header->moveset_data_start;
+				memcpy(new_moveset, header, sizeof(TKMovesetHeader));
+
+				uint64_t compressionSize = 0;
+				switch (compressionType)
+				{
+				case TKMovesetCompressionType_LZ4:
+					compressionSize = CompressionUtils::RAW::LZ4::CompressToBuffer(moveset_data_start, moveset_data_size, new_moveset_data_start, moveset_data_size);
+					break;
+				case TKMovesetCompressionType_LZMA:
+					compressionSize = CompressionUtils::RAW::LZMA::CompressToBuffer(moveset_data_start, moveset_data_size, new_moveset_data_start, moveset_data_size);
+					break;
+				}
+
+				if (compressionSize == 0) {
+					delete[] new_moveset;
+					return nullptr;
+				}
+
+				TKMovesetHeader* new_header = (TKMovesetHeader*)new_moveset;
+				new_header->compressionType = compressionType;
+				new_header->moveset_data_size = moveset_data_size;
+
+				size_out = compressionSize;
 				return new_moveset;
 			}
 		};

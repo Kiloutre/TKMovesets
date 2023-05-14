@@ -92,9 +92,9 @@ ImportationErrcode_ Importer::_Import(Byte* moveset, uint64_t s_moveset, gameAdd
 	}
 
 	if (isCompressed) {
-		uint64_t src_size = s_moveset - header->moveset_data_start;
+		uint64_t compressed_data_size = s_moveset - header->moveset_data_start;
 
-		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
+		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, compressed_data_size, s_moveset);
 
 		if (moveset == nullptr) {
 			return ImportationErrcode_DecompressionError;

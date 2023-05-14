@@ -1,5 +1,6 @@
 #include "MovesetLoader_t7.hpp"
 #include "steamHelper.hpp"
+#include "Compression.hpp"
 
 #include "steam_api.h"
 
@@ -280,15 +281,56 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, const Byte* packetBuf, 
 	}
 }
 
+// Compress moveset to LZMA before sending
+// Sending packets can be so slow at this, this becomes worth it
+static bool CompressMovesetLzma(Byte*& moveset_out, uint64_t& size_out)
+{
+	const TKMovesetHeader* current_header = (TKMovesetHeader*)moveset_out;
+	if (current_header->compressionType == TKMovesetCompressionType_LZMA) {
+		return false;
+	}
+
+	Byte* moveset = moveset_out;
+	uint64_t moveset_size = size_out;
+
+	if (current_header->isCompressed())
+	{
+		// Create temp uncompressed copy
+		uint64_t compressed_data_size = size_out - current_header->moveset_data_start;
+		moveset_size = current_header->moveset_data_start + current_header->moveset_data_size;
+		CompressionUtils::RAW::Moveset::DecompressWithHeader(moveset, compressed_data_size, moveset_size);
+	}
+
+	// Compress to LZMA
+	Byte* new_moveset = CompressionUtils::RAW::Moveset::Compress(moveset, moveset_size, TKMovesetCompressionType_LZMA, moveset_size);
+
+	if (current_header->isCompressed()) {
+		// Delete the temp uncompressed copy we made
+		delete[] moveset;
+	}
+
+	if (new_moveset != nullptr)
+	{
+		moveset_out = new_moveset;
+		size_out = moveset_size;
+		return true;
+	}
+
+	return true;
+}
+
 void MovesetLoaderT7::SendMoveset()
 {
 	auto& player = sharedMemPtr->players[0];
 
 	if (player.custom_moveset_addr != 0)
 	{
-		const unsigned int bufSize = 1000000;
 		uint64_t leftToSend = player.custom_moveset_original_data_size;
 		Byte* dataToSend = (Byte*)player.custom_moveset_original_data_addr;
+
+		bool using_intermediate_moveset = CompressMovesetLzma(dataToSend, leftToSend);
+
+		const unsigned int bufSize = 1000000;
 		while (leftToSend != 0)
 		{
 			uint32_t sendAmount = leftToSend >= bufSize ? bufSize : (uint32_t)leftToSend;
@@ -301,6 +343,10 @@ void MovesetLoaderT7::SendMoveset()
 			}
 			dataToSend += sendAmount;
 			leftToSend -= sendAmount;
+		}
+
+		if (using_intermediate_moveset) {
+			delete[] dataToSend;
 		}
 	}
 }
