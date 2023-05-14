@@ -5,7 +5,7 @@ https://tekkenmods.com/mod/2429/tkmovesets2
 
 # TKMovesets2 0.6 - Moveset export / import /edit
 
-This project is a work in progress and is still lacking critical features.
+This project is a work in progress and is still lacking many features.
 
 
 Tool aimed at replacing and surpassing the old TekkenMovesetExtractor. Extract movesets, edit them to your liking and re-import them on the characters you want.
