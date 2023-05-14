@@ -372,6 +372,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	Localization::Clear();
 
 #ifdef BUILD_TYPE_DEBUG
+	FreeConsole();
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif

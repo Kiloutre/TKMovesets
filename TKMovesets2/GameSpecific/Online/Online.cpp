@@ -131,7 +131,7 @@ bool Online::LoadSharedMemory()
 
     {
         // Write program path to shared memory
-        // todo: test
+        // todo: use this in moveset loader
         wchar_t currPath[MAX_PATH] = { 0 };
         GetModuleFileNameW(nullptr, currPath, MAX_PATH);
         std::wstring ws(currPath);

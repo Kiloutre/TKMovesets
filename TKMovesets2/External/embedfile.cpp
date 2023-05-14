@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     // Copress
     printf("Compressing...\n");
 
-    int32_t compressedSize;
+    uint64_t compressedSize;
     outbuf = (char*)CompressionUtils::RAW::LZMA::Compress((Byte*)inbuf, file_size, compressedSize, 9);
 
     if (outbuf == nullptr) {
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    printf("Compressed size is %d, old size is %d, ratio is %.2f%% . Writing...\n", compressedSize, file_size, (float)compressedSize / (float)file_size);
+    printf("Compressed size is %llu, old size is %d, ratio is %.2f%% . Writing...\n", compressedSize, file_size, (float)compressedSize / (float)file_size);
     for (int i = 0; i < compressedSize; ++i)  {
 #pragma warning(suppress:)
         output_file << std::to_string(outbuf[i]) << ",";

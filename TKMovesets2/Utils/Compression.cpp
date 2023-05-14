@@ -79,7 +79,7 @@ static bool lzma_init_encoder(lzma_stream* strm, uint32_t preset)
 }
 
 
-static bool lzma_compress(lzma_stream* strm, Byte* input_data, uint64_t input_size, Byte* output_data, int32_t& size_out)
+static bool lzma_compress(lzma_stream* strm, const Byte* input_data, uint64_t input_size, Byte* output_data, uint64_t& size_out)
 {
 	// This will be LZMA_RUN until the end of the input file is reached.
 	// This tells lzma_code() when there will be no more input.
@@ -301,7 +301,7 @@ static bool lzma_init_decoder(lzma_stream* strm)
 }
 
 
-static bool lzma_decompress(lzma_stream* strm, Byte* compressed_data, int32_t compressed_size, Byte* output, uint64_t decompressed_size)
+static bool lzma_decompress(lzma_stream* strm, const Byte* compressed_data, uint64_t compressed_size, Byte* output, uint64_t decompressed_size)
 {
 	// When LZMA_CONCATENATED flag was used when initializing the decoder,
 	// we need to tell lzma_code() when there will be no more input.
@@ -444,8 +444,9 @@ namespace CompressionUtils
 
 	unsigned int GetDefaultCompressionSetting()
 	{
+		// Returns LZ4 by default, purposeful because it's the quickest while still keeping good compression
 		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
-			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZMA) {
+			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZ4) {
 				return i;
 			}
 		}
@@ -472,7 +473,7 @@ namespace CompressionUtils
 				std::ofstream new_file(dest_filename, std::ios::binary);
 
 				// Copy up to moveset_data_start, get size of moveset data
-				int32_t moveset_data_size;
+				uint64_t moveset_data_size;
 				{
 					// Read header data
 					TKMovesetHeader header;
@@ -488,7 +489,7 @@ namespace CompressionUtils
 
 					// Calculate moveset data size
 					orig_file.seekg(0, std::ios::end);
-					moveset_data_size = (uint32_t)orig_file.tellg() - moveset_data_start;
+					moveset_data_size = (uint64_t)orig_file.tellg() - moveset_data_start;
 
 					// Mark moveset as compressed
 					((TKMovesetHeader*)buf)->compressionType = compressionType;
@@ -509,7 +510,7 @@ namespace CompressionUtils
 				orig_file.close();
 
 				std::filesystem::remove(src_filename);
-				int32_t compressed_size = 0;
+				uint64_t compressed_size = 0;
 
 				switch (compressionType)
 				{
@@ -527,7 +528,7 @@ namespace CompressionUtils
 					break;
 				}
 
-				DEBUG_LOG("Compression: Old size was %d, compressed size is %d, ratio is %.2f%%\n", moveset_data_size, compressed_size, (float)compressed_size / (float)moveset_data_size);
+				DEBUG_LOG("Compression: Old size was %llu, compressed size is %llu, ratio is %.2f%%\n", moveset_data_size, compressed_size, (float)compressed_size / (float)moveset_data_size);
 
 				if (outbuf == nullptr)
 				{
@@ -550,28 +551,8 @@ namespace CompressionUtils
 	{
 		namespace Moveset
 		{
-			Byte* DecompressWithHeader(Byte* moveset, int32_t compressed_size, uint64_t& size_out)
-			{
-				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
-				Byte* moveset_data_start = moveset + header->moveset_data_start;
-				uint64_t full_moveset_size = header->moveset_data_start + header->moveset_data_size;
 
-				Byte* new_moveset = Decompress(moveset, compressed_size, size_out);
-				if (new_moveset == nullptr) {
-					return nullptr;
-				}
-
-				Byte* buffer = new Byte[full_moveset_size];
-
-				memcpy(buffer, header, header->moveset_data_start);
-				memcpy(buffer + header->moveset_data_start, new_moveset, size_out);
-				size_out = full_moveset_size;
-
-				delete[] new_moveset;
-				return buffer;
-			}
-
-			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out)
+			Byte* Decompress(const Byte* moveset, uint64_t compressed_size, uint64_t& size_out)
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
@@ -579,7 +560,7 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
-				Byte* moveset_data_start = moveset + header->moveset_data_start;
+				const Byte* moveset_data_start = moveset + header->moveset_data_start;
 				size_out = header->moveset_data_size;
 				Byte* result = nullptr;
 
@@ -602,15 +583,124 @@ namespace CompressionUtils
 					DEBUG_LOG("!! Error during decompression !!\n");
 				}
 
-				DEBUG_LOG("Decompressed moveset, compressed size was %d, size_out is %llu\n", compressed_size, size_out);
+				DEBUG_LOG("Decompressed moveset, compressed size was %llu, size_out is %llu\n", compressed_size, size_out);
 
 				return result;
+			}
+
+			bool DecompressToBuffer(const Byte* moveset, uint64_t compressed_size, Byte* output_buffer)
+			{
+				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
+
+				if (!header->isCompressed()) {
+					return false;
+				}
+
+				const Byte* moveset_data_start = moveset + header->moveset_data_start;
+				bool result = false;
+
+				switch (header->compressionType)
+				{
+				case TKMovesetCompressionType_LZ4:
+					result = CompressionUtils::RAW::LZ4::DecompressToBuffer(moveset_data_start, compressed_size, output_buffer, header->moveset_data_size);
+					break;
+				case TKMovesetCompressionType_LZMA:
+					result = CompressionUtils::RAW::LZMA::DecompressToBuffer(moveset_data_start, compressed_size, output_buffer, header->moveset_data_size);
+					break;
+				default:
+					DEBUG_LOG("!! Moveset decompression: unhandled compression type '%u' !!\n", header->compressionType);
+					return false;
+					break;
+				}
+
+				if (result == false) {
+					DEBUG_LOG("!! Error during decompression !!\n");
+				}
+
+				DEBUG_LOG("Decompressed moveset, compressed size was %llu, result was %llu\n", compressed_size, header->moveset_data_size);
+
+				return result;
+			}
+
+			Byte* DecompressWithHeader(const Byte* moveset, uint64_t compressed_size, uint64_t& size_out)
+			{
+				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
+				const Byte* moveset_data_start = moveset + header->moveset_data_start;
+				uint64_t full_moveset_size = header->moveset_data_start + header->moveset_data_size;
+
+				Byte* new_moveset = new Byte[full_moveset_size];
+				memcpy(new_moveset, header, header->moveset_data_start);
+
+				if (!DecompressToBuffer(moveset, compressed_size, new_moveset + header->moveset_data_start)) {
+					delete[] new_moveset;
+					size_out = 0;
+					return nullptr;
+				}
+
+				size_out = full_moveset_size;
+				return new_moveset;
 			}
 		};
 
 		namespace LZMA
 		{
-			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out, uint8_t preset)
+			uint64_t CompressToBuffer(const Byte* input_data, uint64_t input_size, Byte* output_buffer, uint64_t output_bufsize, uint8_t preset)
+			{
+				if (input_size > INT_MAX) {
+					// lz4 only supports up to INT_MAX size
+					return 0;
+				}
+
+				if (output_bufsize > INT_MAX) {
+					output_bufsize = INT_MAX;
+				}
+
+
+				if (preset > 9) {
+					DEBUG_LOG("CompressDataLzma: Preset %u is above the maximum preset (9)\n", preset);
+					preset = 9;
+				}
+
+				lzma_stream strm = LZMA_STREAM_INIT;
+				if (!lzma_init_encoder(&strm, preset)) {
+					DEBUG_LOG("LZMA encoder init failure\n");
+					return 0;
+				}
+
+				uint64_t size_out = 0;
+				if (!lzma_compress(&strm, input_data, input_size, output_buffer, size_out))
+				{
+					DEBUG_LOG("LZMA Compression failure\n");
+					size_out = 0;
+				}
+
+				lzma_end(&strm);
+
+				return size_out;
+			}
+
+			bool DecompressToBuffer(const Byte* compressed_data, uint64_t compressed_size, Byte* output_buffer, uint64_t decompressed_size)
+			{
+				lzma_stream strm = LZMA_STREAM_INIT;
+
+				if (!lzma_init_decoder(&strm)) {
+					DEBUG_LOG("LZMA decoder init failure\n");
+					return false;
+				}
+
+				bool result = true;
+				if (!lzma_decompress(&strm, compressed_data, compressed_size, output_buffer, decompressed_size))
+				{
+					DEBUG_LOG("LZMA Decompression failure\n");
+					result = false;
+				}
+
+				lzma_end(&strm);
+
+				return result;
+			}
+
+			Byte* Compress(const Byte* input_data, uint64_t input_size, uint64_t& size_out, uint8_t preset)
 			{
 				Byte* result;
 				size_out = 0;
@@ -640,7 +730,7 @@ namespace CompressionUtils
 				return result;
 			}
 
-			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size)
+			Byte* Decompress(const Byte* compressed_data, uint64_t compressed_size, uint64_t decompressed_size)
 			{
 				Byte* result = nullptr;
 
@@ -667,9 +757,50 @@ namespace CompressionUtils
 
 		namespace LZ4
 		{
-			Byte* Compress(Byte* decompressed_data, int32_t decompressed_size, int32_t& size_out)
+			uint64_t CompressToBuffer(const Byte* input_data, uint64_t input_size, Byte* output_buffer, uint64_t output_bufsize)
+			{
+				if (input_size > INT_MAX) {
+					// lz4 only supports up to INT_MAX size in both input and output
+					return 0;
+				}
+
+				if (output_bufsize > INT_MAX) {
+					// cap max output size at int max (to avoid overflow when making the function call)
+					output_bufsize = INT_MAX;
+				}
+
+				int compressed_size = LZ4_compress_default((char*)input_data, (char*)output_buffer, (int)input_size, (int)output_bufsize);
+				return compressed_size >= 0 ? compressed_size : 0;
+			}
+
+			bool DecompressToBuffer(const Byte* compressed_data, uint64_t compressed_size, Byte* output_buffer, uint64_t decompressed_size)
+			{
+				if (compressed_size > INT_MAX || decompressed_size > INT_MAX) {
+					// lz4 only supports up to INT_MAX size in both input and output
+					return false;
+				}
+
+				int decompressedSize;
+				decompressedSize = LZ4_decompress_safe((char*)compressed_data, (char*)output_buffer, (int)compressed_size, (int)decompressed_size);
+
+				if (decompressedSize <= 0)
+				{
+					DEBUG_LOG("LZ4 Decompression failure\n");
+					return false;
+				}
+
+				return true;
+			}
+
+			Byte* Compress(const Byte* decompressed_data, uint64_t decompressed_size, uint64_t& size_out)
 			{
 				size_out = 0;
+
+				if (decompressed_size > INT_MAX) {
+					// lz4 only supports up to INT_MAX size
+					return nullptr;
+				}
+
 				Byte* result = new Byte[decompressed_size];
 
 				int compressed_size = LZ4_compress_default((char*)decompressed_data, (char*)result, (int)decompressed_size, (int)decompressed_size);
@@ -688,12 +819,17 @@ namespace CompressionUtils
 				return result;
 			}
 
-			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size)
+			Byte* Decompress(const Byte* compressed_data, uint64_t compressed_size, uint64_t decompressed_size)
 			{
+				if (decompressed_size > INT_MAX || compressed_size > INT_MAX) {
+					// lz4 only supports up to INT_MAX size
+					return nullptr;
+				}
+
 				Byte* result = new Byte[decompressed_size];
 
 				int decompressedSize;
-				decompressedSize = LZ4_decompress_safe((char*)compressed_data, (char*)result, compressed_size, decompressed_size);
+				decompressedSize = LZ4_decompress_safe((char*)compressed_data, (char*)result, (int)compressed_size, (int)decompressed_size);
 
 				if (decompressedSize <= 0)
 				{

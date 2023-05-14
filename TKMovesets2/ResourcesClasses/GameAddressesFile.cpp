@@ -77,7 +77,7 @@ static int GetAddressMapStringSize(const std::map <std::string, GameAddresses_Ga
 }
 
 // Write a compacted from of each entry in the game addresses file into the given string
-static char* WriteAddressMapToString(const std::map <std::string, GameAddresses_GameEntries>& entries, int& out_size)
+static char* WriteAddressMapToString(const std::map <std::string, GameAddresses_GameEntries>& entries, uint64_t& out_size)
 {
 	int compacted_addr_size = GetAddressMapStringSize(entries);
 	int bufSize = compacted_addr_size + 1;
@@ -291,7 +291,7 @@ bool GameAddressesFile::LoadFromSharedMemory()
 		return false;
 	}
 
-	DEBUG_LOG("Orig size: %d, compressed size: %d\n", m_sharedMemory->originalSize, m_sharedMemory->compressedSize);
+	DEBUG_LOG("Orig size: %llu, compressed size: %llu\n", m_sharedMemory->originalSize, m_sharedMemory->compressedSize);
 
 	char* decompressed_data = (char*)CompressionUtils::RAW::LZMA::Decompress((Byte*)m_sharedMemory->compressedData, m_sharedMemory->compressedSize, m_sharedMemory->originalSize);
 
@@ -331,9 +331,9 @@ void GameAddressesFile::LoadToSharedMemory()
 		return;
 	}
 
-	int compressed_size;
+	uint64_t compressed_size;
 	char* compressed_data = WriteAddressMapToString(m_entries, compressed_size);
-	DEBUG_LOG("GameAddressesFile::LoadToSharedMemory(), compressed = %d\n", compressed_size);
+	DEBUG_LOG("GameAddressesFile::LoadToSharedMemory(), compressed = %llu\n", compressed_size);
 
 	if (compacted_addr_size <= 0 || compressed_data == nullptr || compressed_size > MAX_COMPRESSED_GAME_ADDRESSES_SIZE) {
 		UnmapViewOfFile(m_sharedMemory);
