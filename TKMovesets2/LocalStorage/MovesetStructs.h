@@ -54,8 +54,8 @@ struct TKMovesetHeader
 	uint32_t block_list_size = (uint32_t)-1;
 	// Absolute offset of the block offset list
 	uint32_t moveset_data_start = (uint32_t)-1;
-	// Size of the moveset data. Purposefully a int32_t. 0 if not compressed.
-	int32_t moveset_data_size = 0;
+	// Size of the moveset data. 0 if not compressed.
+	uint64_t moveset_data_size = 0;
 	// Type of the compression
 	TKMovesetCompressionType compressionType = TKMovesetCompressionType_None;
 	// Stores a hash of the moveset data 

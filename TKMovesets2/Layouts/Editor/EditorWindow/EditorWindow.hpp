@@ -77,8 +77,10 @@ private:
 	EditorMovelistFilter_ m_movelistFilter = EditorMovelistFilter_All;
 	// The move to scroll to in the next frame
 	int32_t m_moveToScrollTo = -1;
-	// Contains the window title, used to prefix any window created by this editor
+	// Contains the window title, contains the build version of the program and more info
 	std::string m_windowTitle;
+	// Contains the window title send to build the subwindows title on
+	std::string m_subwindowsTitle;
 	// id of the highlithed move in the movelist
 	int16_t m_highlightedMoveId = -1;
 	// Store the list of move windows to render

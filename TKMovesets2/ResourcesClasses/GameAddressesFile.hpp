@@ -12,8 +12,8 @@
 // Structure used to pass addresses to injected DLL in case the embedded ones are obsolete
 struct s_GameAddressesSharedMem
 {
-	int compressedSize;
-	int originalSize;
+	uint64_t compressedSize;
+	uint64_t originalSize;
 	char compressedData[SHARED_ADDR_MEMORY_BUFSIZE - sizeof(int) * 2];
 };
 

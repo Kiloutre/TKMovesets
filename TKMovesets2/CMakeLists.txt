@@ -234,15 +234,13 @@ add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 ## Extra dependencies ##
 # Link the other libraries that we use #
 
- find_package(OpenGL REQUIRED)
- target_link_libraries(TKMovesets2 PRIVATE OpenGL::GL)
+# OpenGL (Renderer)
+find_package(glad CONFIG REQUIRED)
+target_link_libraries(TKMovesets2 PRIVATE glad::glad)
 
-# SDL (Bindings & Renderer)
-find_package(SDL2 CONFIG REQUIRED)
-target_link_libraries(TKMovesets2 PRIVATE
-    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-)
+# GLFW (Renderer)
+find_package(glfw3 CONFIG REQUIRED)
+target_link_libraries(TKMovesets2 PRIVATE glfw)
 
 # ImGUI (Interface)
 find_package(imgui CONFIG REQUIRED)

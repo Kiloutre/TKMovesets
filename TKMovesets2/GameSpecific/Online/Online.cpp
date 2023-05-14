@@ -1,6 +1,5 @@
 #include <format>
 #include <windows.h>
-#include <lz4.h>
 #include <filesystem>
 
 #include "Online.hpp"
@@ -129,6 +128,17 @@ bool Online::LoadSharedMemory()
         return false;
     }
     DEBUG_LOG("LoadSharedMemory(): success, ptr is 0x%p\n", m_orig_sharedMemPtr);
+
+    {
+        // Write program path to shared memory
+        // todo: use this in moveset loader
+        wchar_t currPath[MAX_PATH] = { 0 };
+        GetModuleFileNameW(nullptr, currPath, MAX_PATH);
+        std::wstring ws(currPath);
+        ws.erase(ws.find_last_of(L"\\"));
+        memcpy(m_orig_sharedMemPtr->program_path, ws.c_str(), ws.size() * sizeof(wchar_t));
+    }
+
     Init();
     return true;
 }

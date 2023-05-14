@@ -22,7 +22,6 @@ void InitConsole()
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
 #pragma warning(pop)
-
     DEBUG_LOG("-- Console started --\n");
 }
 

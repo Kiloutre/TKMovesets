@@ -864,7 +864,7 @@ std::vector<gameAddr> ExtractorT7::GetCharacterAddresses()
 	uint64_t playerstructSize = m_game->GetValue("playerstruct_size");
 	std::vector<gameAddr> addresses;
 
-	for (uint8_t i = 0; i < characterCount; ++i) {
+	for (uint8_t i = 0; i < m_gameInfo.characterCount; ++i) {
 		addresses.push_back(playerAddress + i * playerstructSize);
 	}
 

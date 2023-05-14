@@ -1,11 +1,10 @@
 #include <string>
 
 #include "helpers.hpp"
-#include "Compression.hpp"
 #include "Importer_t7.hpp"
+#include "GameIDs.hpp"
 
 #include "Structs_t7.h"
-#include "GameIDs.hpp"
 
 using namespace StructsT7;
 
@@ -308,62 +307,6 @@ void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAdd
 }
 
 
-ImportationErrcode_ ImporterT7::_Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
-{
-	progress = 15;
-	ImportationErrcode_ errCode = ImportationErrcode_UnsupportedGameVersion;
-
-	// Header of the moveset that will contain our own information about it
-	const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
-
-	bool isCompressed = header->isCompressed();
-	auto gameId = header->gameId;
-
-	if (settings & ImportSettings_ImportOriginalData) {
-		const gameAddr gameOriginalMoveset = m_process->allocateMem(s_moveset);
-		if (gameOriginalMoveset == 0) {
-			return ImportationErrcode_GameAllocationErr;
-		}
-		m_process->writeBytes(gameOriginalMoveset, moveset, s_moveset);
-		lastLoaded.originalDataAddress = gameOriginalMoveset;
-		lastLoaded.originalDataSize = s_moveset;
-	}
-	else {
-		lastLoaded.originalDataAddress = 0;
-		lastLoaded.originalDataSize = 0;
-	}
-
-	if (isCompressed) {
-		uint64_t src_size = s_moveset - header->moveset_data_start;
-
-		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
-
-		if (moveset == nullptr) {
-			return ImportationErrcode_DecompressionError;
-		}
-	}
-	else {
-		// Not compressed
-		// Go past the header now that we have a ptr to the header. This will be what is sent to the game.
-		s_moveset -= header->moveset_data_start;
-		moveset += header->moveset_data_start;
-	}
-	progress = 20;
-
-	switch (gameId)
-	{
-	case GameId_T7:
-		errCode = _Import_FromT7(header, moveset, s_moveset, playerAddress, settings, progress);
-		break;
-	}
-
-	if (isCompressed) {
-		delete[] moveset;
-	}
-
-	return errCode;
-}
-
 ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
 	DEBUG_LOG("_Import_FromT7()\n");
@@ -612,4 +555,21 @@ gameAddr ImporterT7::GetMovesetAddress(uint8_t playerId)
 		return m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
 	}
 	return 0;
+}
+
+ImportationErrcode_ ImporterT7::ImportMovesetData(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
+{
+	ImportationErrcode_ errCode = ImportationErrcode_UnsupportedGameVersion;
+
+	auto gameId = header->gameId;
+	auto minorVersion = header->minorVersion;
+
+	switch (gameId)
+	{
+	case GameId_T7:
+		errCode = _Import_FromT7(header, moveset, s_moveset, playerAddress, settings, progress);
+		break;
+	}
+
+	return errCode;
 }

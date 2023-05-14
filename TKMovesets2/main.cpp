@@ -4,17 +4,12 @@
 #include <stdlib.h>
 #endif
 
-#include "imgui.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_opengl3.h"
-#define SDL_MAIN_HANDLED
-#include <stdio.h>
-#include <SDL.h>
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
-#else
-#include <SDL_opengl.h>
-#endif
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <stdio.h>
 #include <format>
@@ -22,7 +17,6 @@
 #include <locale>
 #include <filesystem>
 #include <fstream>
-#include <lz4.h>
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
@@ -85,7 +79,6 @@ static void InitMainClasses(MainWindow& program)
 
 	{
 		// Detect running games and latch on to them if possible
-
 		bool attachedExtractor = false;
 		bool attachedImporter = false;
 		bool attachedOnline = false;
@@ -120,7 +113,7 @@ static void InitMainClasses(MainWindow& program)
 				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
 			}
 
-			if (!attachedImporter && gameInfo->extractor != nullptr) {
+			if (!attachedImporter && gameInfo->importer != nullptr) {
 				program.importer.SetTargetProcess(gameInfo);
 				attachedImporter = true;
 				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
@@ -159,7 +152,7 @@ static void DestroyMainClasses(MainWindow& program)
 	program.storage.StopThreadAndCleanup();
 }
 
-static bool LoadEmbeddedIcon(SDL_Window* window)
+static bool LoadEmbeddedIcon(GLFWwindow* window)
 {
 	HMODULE hInstance = GetModuleHandle(NULL);
 
@@ -175,12 +168,46 @@ static bool LoadEmbeddedIcon(SDL_Window* window)
 	DWORD iconSize = SizeofResource(hInstance, hResource);
 	LPVOID iconData = LockResource(hResourceData);
 
-	SDL_RWops* rwOps = SDL_RWFromConstMem(iconData, iconSize);
-	auto iconSurface  = SDL_CreateRGBSurfaceFrom(iconData, 256, -256, 32, 256 * 4, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+	// Create an HICON object from the resource data
+	HICON hIcon = CreateIconFromResourceEx((PBYTE)iconData, iconSize, TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
 
-	SDL_SetWindowIcon(window, iconSurface);
+	// Convert the HICON object to a GLFWimage structure
+	ICONINFO iconInfo;
+	GetIconInfo(hIcon, &iconInfo);
+
+	BITMAPINFO bitmapInfo;
+	ZeroMemory(&bitmapInfo, sizeof(BITMAPINFO));
+	bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmapInfo.bmiHeader.biWidth = iconInfo.xHotspot * 2;
+	bitmapInfo.bmiHeader.biHeight = -((signed)iconInfo.yHotspot * 2);
+	bitmapInfo.bmiHeader.biPlanes = 1;
+	bitmapInfo.bmiHeader.biBitCount = 32;
+
+	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * (uint64_t)abs(bitmapInfo.bmiHeader.biHeight) * 4;
+	BYTE* bitmapData = new BYTE[allocSize];
+	ZeroMemory(bitmapData, allocSize);
+
+	GetDIBits(GetDC(NULL), iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
+
+	GLFWimage image{
+		.width = (int)(iconInfo.xHotspot * 2),
+		.height = (int)(iconInfo.yHotspot * 2),
+		.pixels = bitmapData
+	};
+
+	// Set the window icon
+	glfwSetWindowIcon(window, 1, &image);
+
+	// Clean up
+	DeleteObject(iconInfo.hbmColor);
+	DeleteObject(iconInfo.hbmMask);
+	DestroyIcon(hIcon);
+	UnlockResource(iconData);
+	FreeResource(hResourceData);
+
 	return true;
 }
+
 
 void StartProcess(const std::string& file);
 void ApplyUpdate(const std::string& filename);
@@ -224,65 +251,67 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		}
 	}
 
-	SDL_SetMainReady();
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
-	{
-		printf("Error: %s\n", SDL_GetError());
-		return -1;
+
+	// Initialize GLFW library
+	glfwSetErrorCallback(glfw_error_callback);
+	if (!glfwInit()) {
+		return MAIN_ERR_GLFW_INIT;
 	}
 
-	// Decide GL+GLSL versions
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-	// GL ES 2.0 + GLSL 100
-	const char* glsl_version = "#version 100";
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(__APPLE__)
-	// GL 3.2 Core + GLSL 150
-	const char* glsl_version = "#version 150";
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#else
 	// GL 3.0 + GLSL 130
-	const char* glsl_version = "#version 130";
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#endif
-	// From 2.0.18: Enable native IME.
-#ifdef SDL_HINT_IME_SHOW_UI
-	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
+	// Set the window hint. Not really that important to be honest.
+	const char* c_glsl_version = "#version 130";
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+	// Setup window title and create window
+	GLFWwindow* window;
+	{
 #ifdef BUILD_TYPE_DEBUG
-	const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION " - DEBUG";
+		const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION " - DEBUG";
 #else
-	const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION;
+		const char* windowTitle = PROGRAM_TITLE " " PROGRAM_VERSION;
 #endif
-	SDL_Window* window = SDL_CreateWindow(PROGRAM_TITLE " " PROGRAM_VERSION, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, window_flags);
-	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-	SDL_GL_MakeCurrent(window, gl_context);
-	SDL_GL_SetSwapInterval(1); // Enable vsync
+		window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle, nullptr, nullptr);
+	}
+
+	if (window == nullptr) {
+		return MAIN_ERR_WINDOW_CREATION;
+	}
+
+	// Set window for current thread
+	glfwMakeContextCurrent(window);
+	// Enable vsync
+	glfwSwapInterval(1);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO();
-
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	// Initialize backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(c_glsl_version);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		DEBUG_LOG("Unable to context to OpenGL");
+		return MAIN_ERR_OPENGL_CONTEXT;
+	}
 
 	if (!LoadEmbeddedIcon(window)) {
 		DEBUG_LOG("Failed to load icon\n");
+	}
+
+	{
+		// Set viewport for OpenGL
+		int screen_width, screen_height;
+		glfwGetFramebufferSize(window, &screen_width, &screen_height);
+		glViewport(0, 0, screen_width, screen_height);
 	}
 
 	// Load translation
@@ -295,24 +324,10 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		MainWindow program;
 		InitMainClasses(program);
 
-		ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-		ImGui_ImplOpenGL3_Init(glsl_version);
-
-		bool done = false;
-		ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
-
-		while (!done && !program.requestedUpdate)
+		while (!glfwWindowShouldClose(window) && !program.requestedUpdate)
 		{
 			// Poll and handle events such as MKB inputs, window resize. Required
-			SDL_Event event;
-			while (SDL_PollEvent(&event))
-			{
-				ImGui_ImplSDL2_ProcessEvent(&event);
-				if (event.type == SDL_QUIT)
-					done = true;
-				if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-					done = true;
-			}
+			glfwPollEvents();
 
 			// Probably framebuffer related? Required
 			program.NewFrame();
@@ -322,26 +337,24 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 
 			// Let imgui do its stuff
 			ImGui::Render();
-			glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-			glClearColor(clear_color.x* clear_color.w, clear_color.y* clear_color.w, clear_color.z* clear_color.w, clear_color.w);
+			{
+				int display_w, display_h;
+				glfwGetFramebufferSize(window, &display_w, &display_h);
+				glViewport(0, 0, display_w, display_h);
+			}
+			glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-			// Update and Render additional Platform Windows
-			// (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
-			//  For this specific demo app we could also call SDL_GL_MakeCurrent(window, gl_context) directly)
 			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
-				SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
-				SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+				GLFWwindow* backup_current_context = glfwGetCurrentContext();
 				ImGui::UpdatePlatformWindows();
 				ImGui::RenderPlatformWindowsDefault();
-				SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+				glfwMakeContextCurrent(backup_current_context);
 			}
-
-			SDL_GL_SwapWindow(window);
+			glfwSwapBuffers(window);
 		}
-
 
 		DestroyMainClasses(program);
 		// Cleanup what needs to be cleaned up
@@ -353,14 +366,13 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		}
 	}
 
-	SDL_GL_DeleteContext(gl_context);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	glfwDestroyWindow(window);
+	glfwTerminate();
 
 	Localization::Clear();
 
-
 #ifdef BUILD_TYPE_DEBUG
+	FreeConsole();
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif

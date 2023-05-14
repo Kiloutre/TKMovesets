@@ -15,7 +15,7 @@ protected:
 	GameProcess* m_process;
 	// Stores a helper class to read the game's memory from strings in game_addresses.txt
 	GameData* m_game;
-	// Structure containing ID of the game, minor version, an dmore
+	// Structure containing ID of the game, minor version, and more
 	const GameInfo m_gameInfo;
 
 public:

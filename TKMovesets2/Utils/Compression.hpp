@@ -26,26 +26,51 @@ namespace CompressionUtils
 
 	namespace FILE {
 		namespace Moveset {
+			// Compress the moveset from file to file
 			bool Compress(const std::wstring& dest_filename, const std::wstring& src_filename, TKMovesetCompressionType_ compressionType);
 		};
 	};
 
 	namespace RAW {
+		// Tools to decompress moveset specifically, will adapt to the moveset's compression algorithm indicated in the header
 		namespace Moveset {
 			// Decompress moveset (keeps header in the final allocated memory area)
-			Byte* DecompressWithHeader(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
+			Byte* DecompressWithHeader(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out);
 			// Decompress moveset (without keeping header)
-			Byte* Decompress(Byte* moveset, int32_t compressed_size, uint64_t& size_out);
+			Byte* Decompress(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out);
+			// Decompress a moveset (without keeping header) to a previously allocated buffer
+			bool DecompressToBuffer(const Byte* moveset, uint64_t compressed_data_size, Byte* output_buffer);
+			
+			// Compress the moveset from memory to memory
+			Byte* Compress(const Byte* moveset, uint64_t full_size, TKMovesetCompressionType_ compressionType, uint64_t& size_out);
 		};
 
+		// Lzma, slow but very good compression (about 50% for T movesets, at preset 0, which is the default)
+		// Preset can be between 0 and 9 included. Higher number compresses more
+		// But the ratio is not that much better for higher preset, and speed & ram usage is SIGNIFICANTLY worse
 		namespace LZMA {
-			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out, uint8_t preset=0);
-			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
+			// Compress without allocation
+			uint64_t CompressToBuffer(const Byte* input_data, uint64_t input_size, Byte* output_buffer, uint64_t output_bufsize, uint8_t preset=0);
+			// Compress with allocation
+			Byte* Compress(const Byte* input_data, uint64_t input_size, uint64_t& size_out, uint8_t preset = 0);
+
+			// Decompress without allocation
+			bool DecompressToBuffer(const Byte* compressed_data, uint64_t compressed_size, Byte* output_buffer, uint64_t decompressed_size);
+			// Decompress with allocation
+			Byte* Decompress(const Byte* compressed_data, uint64_t compressed_size, uint64_t decompressed_size);
 		};
 
+		// LZ4, very quick with viable compression (about 33% for T movesets)
 		namespace LZ4 {
-			Byte* Compress(Byte* input_data, int32_t input_size, int32_t& size_out);
-			Byte* Decompress(Byte* compressed_data, int32_t compressed_size, int32_t decompressed_size);
+			// Compress without allocation
+			uint64_t CompressToBuffer(const Byte* input_data, uint64_t input_size, Byte* output_buffer, uint64_t output_bufsize);
+			// Compress with allocation
+			Byte* Compress(const Byte* input_data, uint64_t input_size, uint64_t& size_out);
+
+			// Decompress without allocation
+			bool DecompressToBuffer(const Byte* compressed_data, uint64_t compressed_size, Byte* output_buffer, uint64_t decompressed_size);
+			// Decompress with allocation
+			Byte* Decompress(const Byte* compressed_data, uint64_t compressed_size, uint64_t decompressed_size);
 		};
 	};
 };
