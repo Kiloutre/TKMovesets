@@ -256,11 +256,11 @@ namespace StructsTTT2
 		gameAddr32 extra_move_property_addr; // Can be NULL
 		gameAddr32 move_start_extraprop_addr; // Can be NULL
 		gameAddr32 move_end_extraprop_addr; // Can be NULL
-		int32_t _0x98_int;
+		int32_t _0x98_int; // facing/extras
 		uint32_t hitbox_location;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _0xA8_short; // facing/extras
+		int16_t _0xA8_short;
 		uint16_t distance;
 		int16_t _0xAC_short;
 	};

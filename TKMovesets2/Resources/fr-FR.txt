@@ -251,7 +251,7 @@ edition.move.cancel_addr_3 = ID de cancel 3
 edition.move.cancel_related_id_3 = ID de cancel 3 (lié)
 edition.move.cancel_addr_4 = ID de cancel 4
 edition.move.cancel_related_id_4 = ID de cancel 4 (lié)
-edition.move._0xA8_short = "Facing/Extras?"
+edition.move._0x98_int = "Facing/Extras?"
 
 edition.voiceclip.window_name = Voix
 edition.voiceclip.id = ID
