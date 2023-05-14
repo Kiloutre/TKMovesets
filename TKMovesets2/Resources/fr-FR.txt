@@ -84,6 +84,8 @@ navmenu.update_bad_file = La mise à jour n'a pas pu s'effectuer automatiquement
 navmenu.vsync = Synchro verticale
 navmenu.vsync_0 = Aucune
 
+navmenu.changelog = Changements
+
 ## Sous-menus ##
 
 # Extraction #

@@ -83,6 +83,8 @@ navmenu.update_bad_file = The update could not be applied.\nPlease update manual
 
 navmenu.vsync = Vertical Sync
 
+navmenu.changelog = Changelog
+
 ## Submenus ##
 
 # Extraction #
