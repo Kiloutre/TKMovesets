@@ -444,9 +444,8 @@ namespace CompressionUtils
 
 	unsigned int GetDefaultCompressionSetting()
 	{
-		// Returns LZ4 by default, purposeful because it's the quickest while still keeping good compression
 		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
-			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZ4) {
+			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZMA) {
 				return i;
 			}
 		}
