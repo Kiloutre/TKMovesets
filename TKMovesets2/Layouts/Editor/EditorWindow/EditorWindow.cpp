@@ -72,7 +72,7 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 {
 	auto windowCreator = m_windowCreatorMap.find(windowType);
 	if (windowCreator != m_windowCreatorMap.end()) {
-		auto newWin = (EditorForm*)windowCreator->second->allocate(m_windowTitle, windowType, id, m_editor, this, listSize);
+		auto newWin = (EditorForm*)windowCreator->second->allocate(m_subwindowsTitle, windowType, id, m_editor, this, listSize);
 		newWin->OnInitEnd();
 		return newWin;
 	}
@@ -339,7 +339,8 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 
 	PopulateWindowCreatorMap();
 
-	m_windowTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
+	m_subwindowsTitle = std::format("{}: {}", m_loadedCharacter.name.c_str(), _("edition.window_title"));
+	m_windowTitle = std::format("{} {} - Moveset v{}", m_subwindowsTitle, PROGRAM_VERSION, movesetInfo->version_string);
 
 	// Read what needs to be read and potentially displayed right away
 	m_editor->ReloadDisplayableMoveList();

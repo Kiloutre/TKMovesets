@@ -624,7 +624,6 @@ namespace CompressionUtils
 			Byte* DecompressWithHeader(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out)
 			{
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
-				const Byte* moveset_data_start = moveset + header->moveset_data_start;
 				uint64_t full_moveset_size = header->moveset_data_start + header->moveset_data_size;
 
 				Byte* new_moveset = new Byte[full_moveset_size];
@@ -636,6 +635,9 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
+				((TKMovesetHeader*)new_moveset)->moveset_data_size = 0;
+				((TKMovesetHeader*)new_moveset)->compressionType = 0;
+
 				size_out = full_moveset_size;
 				return new_moveset;
 			}
@@ -643,11 +645,14 @@ namespace CompressionUtils
 			Byte* Compress(const Byte* moveset, uint64_t full_size, TKMovesetCompressionType_ compressionType, uint64_t& size_out)
 			{
 				size_out = 0;
-				if (full_size < sizeof(TKMovesetHeader)) return nullptr;
+				if (full_size < sizeof(TKMovesetHeader)) {
+					return nullptr;
+				}
 
 				const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
 				if (header->isCompressed()) {
+					DEBUG_LOG("Can't compress already compressed movesets.\n");
 					return nullptr;
 				}
 

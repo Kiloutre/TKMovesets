@@ -290,6 +290,7 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, const Byte* packetBuf, 
 
 // Compress moveset to LZMA before sending
 // Sending packets can be so slow at this, this becomes worth it
+// to use when a moveset is loaded for online use
 static bool CompressMovesetLzma(Byte*& moveset_out, uint64_t& size_out)
 {
 	const TKMovesetHeader* current_header = (TKMovesetHeader*)moveset_out;
@@ -339,8 +340,6 @@ void MovesetLoaderT7::SendMoveset()
 		Byte* dataToSend = (Byte*)player.custom_moveset_original_data_addr;
 		uint64_t leftToSend = player.custom_moveset_original_data_size;
 
-		bool using_intermediate_moveset = CompressMovesetLzma(dataToSend, leftToSend);
-
 		const unsigned int bufSize = 1000000;
 		while (leftToSend != 0)
 		{
@@ -354,10 +353,6 @@ void MovesetLoaderT7::SendMoveset()
 			}
 			dataToSend += sendAmount;
 			leftToSend -= sendAmount;
-		}
-
-		if (using_intermediate_moveset) {
-			delete[] dataToSend;
 		}
 	}
 }
