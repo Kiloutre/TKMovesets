@@ -298,10 +298,11 @@ void EditorLabel::Reload()
 }
 
 
-const char* EditorLabel::GetText(int id)
+const char* EditorLabel::GetText(int id) const
 {
-	if (m_labels.find(id) != m_labels.end()) {
-		return m_labels[id].c_str();
+	auto item = m_labels.find(id);
+	if (item != m_labels.end()) {
+		return item->second.c_str();
 	}
 	return nullptr;
 }

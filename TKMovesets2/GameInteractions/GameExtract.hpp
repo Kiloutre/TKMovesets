@@ -26,7 +26,7 @@ private:
 	// Function ran in the parallel thread, executed only if latched on and if CanStart() returned true
 	void RunningUpdate() override;
 public:
-	// Contains the character names
+	// Contains the characters to extract's names 
 	std::string characterNames[4];
 
 	// Stops the thread started above

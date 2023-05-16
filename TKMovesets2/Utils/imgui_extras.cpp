@@ -51,9 +51,7 @@ namespace ImGuiExtra
 		return false;
 	}
 
-	// This is a mess, does not work properly  and needs to be re-done entirely, to be honest.
 	// Todo: min / max size, allow centering of text
-
 	void RenderTextbox(const char* c_text, ImU32 borderColor, ImU32 fillColor, float padding)
 	{
 		float HORIZ_PADDING = (padding < 0.0f ) ? TEXTBOX_HORIZ_PADDING : padding;

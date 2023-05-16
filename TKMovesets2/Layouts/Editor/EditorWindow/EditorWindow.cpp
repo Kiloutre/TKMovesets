@@ -84,7 +84,6 @@ EditorForm* EditorWindow::AllocateFormWindow(EditorWindowType_ windowType, uint1
 
 void EditorWindow::OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize)
 {
-	// todo: template this function?
 	int availableOverwriteIndex = -1;
 	for (int i = 0; i < m_structWindows.size(); ++i) {
 		EditorForm* structWin = m_structWindows[i];

@@ -120,7 +120,6 @@ void LocalStorage::ReloadMovesetList()
 	{
 		for (const auto& entry : std::filesystem::directory_iterator(L"" MOVESET_DIRECTORY))
 		{
-			// Todo: Unicode .name support
 			std::wstring filename = entry.path().wstring();
 		
 
