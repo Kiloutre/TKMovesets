@@ -51,7 +51,6 @@ enum GameFlag_
 
 struct GameInfo
 {
-public:
 	// Displayed name of the game
 	const char* name;
 	// Process that will be opened and main module name

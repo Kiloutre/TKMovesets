@@ -3,6 +3,7 @@
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
 #include "Editor_t7.hpp"
+#include "EditorVisuals_t7.hpp"
 #include "Online_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
@@ -21,8 +22,8 @@ const GameInfo cg_gamesInfo[] = {
 		.supportedImports = {},
 		.extractor = new GameFactory<ExtractorT7>,
 		.importer = new GameFactory<ImporterT7>,
-		.editor = new GameFactory<EditorT7>,
-		.editor2 = nullptr, //new EditorFactory<EditorT7_Visuals>
+		.editorLogic = new GameFactory<EditorT7>,
+		.editorVisuals = new EditorFactory<EditorVisualsT7>
 		.onlineHandler = new GameFactory<OnlineT7>
 	},
 	{
@@ -38,8 +39,8 @@ const GameInfo cg_gamesInfo[] = {
 		.supportedImports = { GameId_T7 },
 		.extractor = nullptr,
 		.importer = nullptr,
-		.editor = nullptr,
-		.editor2 = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 	},
 	{
@@ -55,8 +56,8 @@ const GameInfo cg_gamesInfo[] = {
 		.supportedImports = {},
 		.extractor = nullptr,
 		.importer = nullptr,
-		.editor = nullptr,
-		.editor2 = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 	},
 };

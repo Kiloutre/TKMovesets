@@ -1,12 +1,7 @@
 #pragma once
 
-#include "GameSharedMem.hpp"
-#include "LocalStorage.hpp"
-#include "Editor_t7.hpp"
-#include "EditorForm.hpp"
 #include "EditorVisuals.hpp"
-
-#include "GameTypes.h"
+#include "Editor_t7.hpp"
 
 namespace EditorVisualsT7
 {

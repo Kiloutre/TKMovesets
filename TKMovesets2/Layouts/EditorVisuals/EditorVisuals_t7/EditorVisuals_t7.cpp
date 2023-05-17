@@ -1,8 +1,3 @@
-#include <ImGui.h>
-
-#include <format>
-#include <filesystem>
-
 #include "EditorVisuals_t7.hpp"
 // Structures
 #include "Structures/EditorMove.hpp"
