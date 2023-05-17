@@ -4,7 +4,8 @@
 #include <set>
 
 #include "Editor.hpp"
-#include "EditorVisualsBase.hpp"
+
+class EditorVisualsBase;
 
 namespace EditorFormUtils
 {

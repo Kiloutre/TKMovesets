@@ -1,6 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorInputSequence.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

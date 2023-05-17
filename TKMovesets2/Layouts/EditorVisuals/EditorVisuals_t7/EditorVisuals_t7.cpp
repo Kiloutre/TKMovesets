@@ -1,4 +1,5 @@
 #include "EditorVisuals_t7.hpp"
+#include "GameSharedMem.hpp"
 // Structures
 #include "Structures/EditorMove.hpp"
 #include "Structures/EditorVoiceclip.hpp"
@@ -144,7 +145,7 @@ void EditorVisuals_T7::OnMoveCreate(unsigned int moveId)
 
 bool EditorVisuals_T7::MovesetStillLoaded()
 {
-	gameAddr movesetAddress = m_importerHelper.GetCurrentPlayerMovesetAddr();
+	gameAddr movesetAddress = m_importerHelper->GetCurrentPlayerMovesetAddr();
 #ifdef BUILD_TYPE_DEBUG
 	if (movesetAddress != m_loadedMoveset) {
 		DEBUG_LOG("MovesetStillLoaded = false, current is %llx, old was %llx\n", movesetAddress, m_loadedMoveset);
@@ -166,6 +167,8 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 		std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
 
 		if (file.fail()) {
+			delete m_importerHelper;
+			delete m_sharedMemHelper;
 			throw EditorWindow_MovesetLoadFail();
 		}
 
@@ -174,6 +177,8 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 
 		moveset = (Byte*)malloc(movesetSize);
 		if (moveset == nullptr) {
+			delete m_importerHelper;
+			delete m_sharedMemHelper;
 			throw EditorWindow_MovesetLoadFail();
 		}
 

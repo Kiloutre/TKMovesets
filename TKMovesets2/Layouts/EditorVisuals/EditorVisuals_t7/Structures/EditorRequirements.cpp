@@ -3,6 +3,7 @@
 #include "imgui_extras.hpp"
 #include "EditorRequirements.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {

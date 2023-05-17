@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GameSharedMem.hpp"
 #include "LocalStorage.hpp"
 #include "Editor.hpp"
 #include "EditorForm.hpp"
@@ -8,6 +7,9 @@
 #include "EditorVisualsBase.hpp"
 
 #include "GameTypes.h"
+
+class GameImport;
+class GameSharedMem;
 
 struct EditorInfos
 {
@@ -70,9 +72,9 @@ protected:
 	// Access moveset data through this variable. Uses polymorphism.
 	Editor* m_editor = nullptr;
 	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
-	GameImport m_importerHelper;
+	GameImport* m_importerHelper;
 	// Copy of the shared mem helper, used to play extra propreties
-	GameSharedMem m_sharedMemHelper;
+	GameSharedMem* m_sharedMemHelper;
 	// Map that will determine which window type to allocate depending on the given type
 	std::map<EditorWindowType_, EditorWindowFactory_Base*> m_windowCreatorMap;
 	// Index of the compression setting to use when saving

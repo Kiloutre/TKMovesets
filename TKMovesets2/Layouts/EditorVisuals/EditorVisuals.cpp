@@ -8,6 +8,7 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "EditorVisuals.hpp"
+#include "GameSharedMem.hpp"
 // Structures
 
 // -- Private methods -- //
@@ -112,8 +113,11 @@ void EditorVisuals::Save()
 
 EditorVisuals::~EditorVisuals()
 {
-	m_importerHelper.StopThreadAndCleanup();
-	m_sharedMemHelper.StopThreadAndCleanup();
+	m_importerHelper->StopThreadAndCleanup();
+	m_sharedMemHelper->StopThreadAndCleanup();
+
+	delete m_importerHelper;
+	delete m_sharedMemHelper;
 
 	for (auto& win : m_structWindows) {
 		delete win;
@@ -131,19 +135,22 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 {
 	{
 		// Init classes that interact with game process
-		m_importerHelper.Init(addrFile, storage);
-		m_sharedMemHelper.Init(addrFile, storage);
+		m_importerHelper = new GameImport;
+		m_sharedMemHelper = new GameSharedMem;
 
-		m_importerHelper.StartThread();
-		m_sharedMemHelper.synchronizeLockin = false;
-		m_sharedMemHelper.StartThread();
+		m_importerHelper->Init(addrFile, storage);
+		m_sharedMemHelper->Init(addrFile, storage);
+
+		m_importerHelper->StartThread();
+		m_sharedMemHelper->synchronizeLockin = false;
+		m_sharedMemHelper->StartThread();
 	}
 
 	{
 		// Init editor logic class
 		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId, movesetInfo->minorVersion);
 
-		m_abstractEditor = Games::FactoryGetEditorLogic(gameInfo, m_importerHelper.process, m_importerHelper.game);
+		m_abstractEditor = Games::FactoryGetEditorLogic(gameInfo, m_importerHelper->process, m_importerHelper->game);
 		labels = new EditorLabel(gameInfo, addrFile);
 	}
 
@@ -159,7 +166,7 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 	m_windowTitle = std::format("{} {} - Moveset v{}", m_subwindowsTitle, PROGRAM_VERSION, movesetInfo->version_string);
 
 	// Set the shared mem handler
-	m_abstractEditor->SetSharedMemHandler(m_sharedMemHelper.GetSharedMemHandler());
+	m_abstractEditor->SetSharedMemHandler(m_sharedMemHelper->GetSharedMemHandler());
 
 	// Attempt to attach to game associated to moveset
 	auto processList = GameProcessUtils::GetRunningProcessList();
@@ -185,13 +192,13 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 		}
 
 		if (gameInfo->SupportsGameImport(movesetInfo->gameId))
-        {
-			m_importerHelper.SetTargetProcess(gameInfo);
+		{
+			m_importerHelper->SetTargetProcess(gameInfo);
 			if (gameInfo->onlineHandler != nullptr) {
-				m_sharedMemHelper.SetTargetProcess(gameInfo);
+				m_sharedMemHelper->SetTargetProcess(gameInfo);
 			}
 			else {
-				m_sharedMemHelper.ResetTargetProcess();
+				m_sharedMemHelper->ResetTargetProcess();
 			}
 			DEBUG_LOG("Editor-compatible game '%s' already running: attaching.\n", processName);
 			break;

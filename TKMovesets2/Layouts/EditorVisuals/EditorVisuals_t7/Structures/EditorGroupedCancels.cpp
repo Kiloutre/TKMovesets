@@ -3,6 +3,7 @@
 #include "imgui_extras.hpp"
 #include "EditorGroupedCancels.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 // -- Private methods -- //
 

@@ -39,7 +39,6 @@ set(INCLUDE_FOLDERS
                     
                     "Layouts"
                     "Layouts/Submenus"
-                    "Layouts/Editor"
                     "Layouts/EditorVisuals"
                     "Layouts/EditorVisuals/EditorVisuals_t7"
 

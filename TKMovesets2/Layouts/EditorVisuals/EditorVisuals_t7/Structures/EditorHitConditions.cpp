@@ -1,6 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorHitConditions.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

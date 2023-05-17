@@ -1,9 +1,8 @@
-#include <ImGui.h>
 #include <format>
 
-#include "imgui_extras.hpp"
 #include "EditorMovelistDisplayable.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 
 // -- Public methods -- //

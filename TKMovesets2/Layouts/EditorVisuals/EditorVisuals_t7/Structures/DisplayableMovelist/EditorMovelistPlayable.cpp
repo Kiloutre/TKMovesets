@@ -1,8 +1,7 @@
-#include <ImGui.h>
-
 #include "imgui_extras.hpp"
 #include "EditorMovelistPlayable.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

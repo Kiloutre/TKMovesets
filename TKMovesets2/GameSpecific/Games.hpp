@@ -5,7 +5,7 @@
 #include "Importer.hpp"
 #include "Extractor.hpp"
 #include "Editor.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals/EditorVisuals.hpp"
 #include "Online.hpp"
 #include "GameInfo.hpp"
 

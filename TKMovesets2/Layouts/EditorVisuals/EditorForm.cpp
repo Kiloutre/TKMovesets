@@ -4,6 +4,7 @@
 #include "imgui_extras.hpp"
 #include "EditorForm.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 // -- Helpers -- //
 

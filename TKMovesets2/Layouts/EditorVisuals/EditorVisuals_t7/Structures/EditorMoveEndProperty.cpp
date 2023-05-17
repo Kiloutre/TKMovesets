@@ -1,6 +1,6 @@
-#include "imgui_extras.hpp"
 #include "EditorMoveEndProperty.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorMoveEndProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

@@ -152,7 +152,7 @@ namespace Games
 		return im;
 	}
 
-	Editor* FactoryGetEditor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	Editor* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
 		Editor* ed = (Editor*)gameInfo->editorLogic->allocate(process, game, gameInfo);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already

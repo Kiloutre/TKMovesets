@@ -5,6 +5,7 @@
 #include "helpers.hpp"
 #include "EditorVisuals_t7.hpp"
 #include "Compression.hpp"
+#include "GameSharedMem.hpp"
 
 using namespace EditorVisualsT7;
 
@@ -42,7 +43,7 @@ void EditorVisuals_T7::RenderToolBar()
 
 
 	ImGui::Separator();
-	
+
 	if (ImGui::BeginMenu(_("edition.create_new")))
 	{
 		EditorWindowType_ structType = EditorWindowType_Invalid;
@@ -132,21 +133,21 @@ void EditorVisuals_T7::RenderToolBar()
 		if (structType != EditorWindowType_Invalid) {
 			uint32_t structId = m_editor->CreateNew(structType);
 
-            m_savedLastChange = false;
-            m_importNeeded = true;
-            OpenFormWindow(structType, structId, listSize);
+			m_savedLastChange = false;
+			m_importNeeded = true;
+			OpenFormWindow(structType, structId, listSize);
 
-            // Custom pre-creation behaviour implementations
-            switch (structType)
-            {
-            case EditorWindowType_Move:
-                m_editor->ReloadDisplayableMoveList();
+			// Custom pre-creation behaviour implementations
+			switch (structType)
+			{
+			case EditorWindowType_Move:
+				m_editor->ReloadDisplayableMoveList();
 				ReloadMovelistFilter();
-                m_moveToScrollTo = structId;
-                m_highlightedMoveId = structId;
-                break;
-            }
-    }
+				m_moveToScrollTo = structId;
+				m_highlightedMoveId = structId;
+				break;
+			}
+		}
 
 		ImGui::EndMenu();
 	}
@@ -200,7 +201,7 @@ void EditorVisuals_T7::RenderStatusBar()
 	}
 
 	ImGui::SameLine();
-	
+
 	ImGui::TextUnformatted(_("edition.last_saved"));
 	ImGui::SameLine();
 	ImGui::TextUnformatted(m_loadedCharacter.lastSavedDate.c_str());
@@ -211,8 +212,8 @@ void EditorVisuals_T7::RenderStatusBar()
 	ImGui::SameLine();
 
 	// Game list
-	bool busy = m_importerHelper.IsBusy();
-	auto currentGame = m_importerHelper.currentGame;
+	bool busy = m_importerHelper->IsBusy();
+	auto currentGame = m_importerHelper->currentGame;
 
 	ImGui::PushItemWidth(100.0f);
 	ImGui::PushID(&m_importerHelper); // Have to push an ID here because extraction.select_game would cause a conflict
@@ -229,12 +230,12 @@ void EditorVisuals_T7::RenderStatusBar()
 
 				if (gameInfo->importer != nullptr) {
 					if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
-						m_importerHelper.SetTargetProcess(gameInfo);
+						m_importerHelper->SetTargetProcess(gameInfo);
 						if (gameInfo->onlineHandler != nullptr) {
-							m_sharedMemHelper.SetTargetProcess(gameInfo);
+							m_sharedMemHelper->SetTargetProcess(gameInfo);
 						}
 						else {
-							m_sharedMemHelper.ResetTargetProcess();
+							m_sharedMemHelper->ResetTargetProcess();
 						}
 						m_loadedMoveset = 0;
 						m_importNeeded = true;
@@ -249,7 +250,7 @@ void EditorVisuals_T7::RenderStatusBar()
 
 	ImGui::SameLine();
 	// Process error
-	bool isAttached = m_importerHelper.process->IsAttached();
+	bool isAttached = m_importerHelper->process->IsAttached();
 	if (currentGame != nullptr && !isAttached)
 	{
 		// Short process error message
@@ -264,38 +265,38 @@ void EditorVisuals_T7::RenderStatusBar()
 	// Player list
 	{
 		ImGui::SameLine();
-		char buf[3] = { '1' + m_importerHelper.currentPlayerId, 'p', '\0' };
+		char buf[3] = { '1' + m_importerHelper->currentPlayerId, 'p', '\0' };
 		ImGui::PushItemWidth(100.0f);
 
-		uint8_t playerCount = min(2, m_importerHelper.GetCharacterCount());
+		uint8_t playerCount = min(2, m_importerHelper->GetCharacterCount());
 		if (ImGui::BeginCombo("##", _(buf)))
 		{
-			size_t currentPlayerId = m_importerHelper.currentPlayerId;
+			size_t currentPlayerId = m_importerHelper->currentPlayerId;
 			for (int8_t i = 0; i < playerCount; ++i)
 			{
 				buf[0] = '1' + i;
 				if (ImGui::Selectable(_(buf), currentPlayerId == i, 0, ImVec2(100.0f, 0))) {
 					m_editor->currentPlayerId = i;
-					m_importerHelper.currentPlayerId = i;
-					m_sharedMemHelper.currentPlayerId = i;
-					m_importerHelper.lastLoadedMoveset = 0;
+					m_importerHelper->currentPlayerId = i;
+					m_sharedMemHelper->currentPlayerId = i;
+					m_importerHelper->lastLoadedMoveset = 0;
 				}
 			}
 			ImGui::EndCombo();
 		}
 	}
-	
+
 	// Import button
 	ImGui::SameLine();
-	bool canImport = isAttached && !m_importerHelper.IsBusy() && m_canInteractWithGame && m_importNeeded;
-	bool isMovesetCompatible = m_importerHelper.currentGame->SupportsGameImport(m_loadedCharacter.gameId);
+	bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && m_importNeeded;
+	bool isMovesetCompatible = m_importerHelper->currentGame->SupportsGameImport(m_loadedCharacter.gameId);
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
-		m_importerHelper.lastLoadedMoveset = 0;
+		m_importerHelper->lastLoadedMoveset = 0;
 
 		uint64_t movesetSize;
 		const Byte* moveset = m_editor->GetMoveset(movesetSize);
 
-		m_importerHelper.QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT);
+		m_importerHelper->QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT);
 		m_editor->live_loadedMoveset = 0;
 		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
 		m_importNeeded = false;
@@ -305,15 +306,15 @@ void EditorVisuals_T7::RenderStatusBar()
 	if (m_liveEditable)
 	{
 		bool disabled = m_loadedMoveset == 0;
-        {
-            ImGuiExtra::DisableBlockIf __(disabled);
-            
-            ImGui::SameLine();
-            if (ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition) && !disabled) {
-                m_editor->live_loadedMoveset = m_liveEdition ? m_loadedMoveset : 0;
-            }
-            ImGui::SameLine();
-        }
+		{
+			ImGuiExtra::DisableBlockIf __(disabled);
+
+			ImGui::SameLine();
+			if (ImGui::Checkbox(_("edition.live_edition"), &m_liveEdition) && !disabled) {
+				m_editor->live_loadedMoveset = m_liveEdition ? m_loadedMoveset : 0;
+			}
+			ImGui::SameLine();
+		}
 		// Highlight only if live edition is enabled & live_moveset is zero
 		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"), m_liveEdition == false || m_editor->live_loadedMoveset != 0);
 	}
@@ -474,7 +475,7 @@ void EditorVisuals_T7::RenderMovelist()
 
 	ImGui::SameLine();
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.move_current"), m_loadedMoveset != 0, buttonSize)) {
-		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(m_importerHelper.currentPlayerId);
+		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(m_importerHelper->currentPlayerId);
 		m_moveToPlay = m_moveToScrollTo;
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
 		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
@@ -501,7 +502,7 @@ void EditorVisuals_T7::Render(int dockid)
 	}
 
 	// Check for important changes here
-	m_canInteractWithGame = m_importerHelper.CanStart();
+	m_canInteractWithGame = m_importerHelper->CanStart();
 
 	if (m_loadedMoveset != 0) {
 		if (!m_canInteractWithGame || !MovesetStillLoaded())
@@ -510,12 +511,12 @@ void EditorVisuals_T7::Render(int dockid)
 			m_importNeeded = true;
 			m_loadedMoveset = 0;
 			m_editor->live_loadedMoveset = 0;
-			m_importerHelper.lastLoadedMoveset = 0;
+			m_importerHelper->lastLoadedMoveset = 0;
 		}
 	}
 	else {
 		// If the moveset was successfully imported, this will be filled with a nonzero value
-		m_loadedMoveset = m_importerHelper.lastLoadedMoveset;
+		m_loadedMoveset = m_importerHelper->lastLoadedMoveset;
 		if (m_liveEdition) {
 			m_editor->live_loadedMoveset = m_loadedMoveset;
 		}
@@ -546,7 +547,7 @@ void EditorVisuals_T7::Render(int dockid)
 		Size.y -= ImGui::GetFrameHeightWithSpacing();
 
 		if (ImGui::BeginTable("MovesetMainTable", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders
-		| ImGuiTableFlags_NoHostExtendY, Size))
+			| ImGuiTableFlags_NoHostExtendY, Size))
 		{
 			ImGui::TableSetupColumn("##", ImGuiTableColumnFlags_WidthFixed, 300.0f);
 			ImGui::TableSetupColumn("##");
@@ -576,6 +577,6 @@ void EditorVisuals_T7::Render(int dockid)
 	}
 
 	// -- Now that rendering is done, we can clean up what needs to be cleaned up -- //
-	m_importerHelper.FreeExpiredFactoryClasses();
-	m_sharedMemHelper.FreeExpiredFactoryClasses();
+	m_importerHelper->FreeExpiredFactoryClasses();
+	m_sharedMemHelper->FreeExpiredFactoryClasses();
 }

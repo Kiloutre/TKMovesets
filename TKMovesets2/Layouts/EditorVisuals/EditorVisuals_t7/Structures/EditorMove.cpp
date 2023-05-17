@@ -4,6 +4,7 @@
 #include "EditorMove.hpp"
 #include "Localization.hpp"
 #include "Helpers.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorMove::OnInitEnd()
 {

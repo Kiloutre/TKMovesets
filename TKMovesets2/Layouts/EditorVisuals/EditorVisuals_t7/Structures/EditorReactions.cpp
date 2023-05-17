@@ -2,6 +2,7 @@
 #include "EditorReactions.hpp"
 #include "Localization.hpp"
 #include "helpers.hpp"
+#include "EditorVisualsBase.hpp"
 
 void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

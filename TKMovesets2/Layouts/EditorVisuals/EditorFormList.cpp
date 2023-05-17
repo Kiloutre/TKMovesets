@@ -5,6 +5,7 @@
 #include "imgui_extras.hpp"
 #include "EditorFormList.hpp"
 #include "Localization.hpp"
+#include "EditorVisualsBase.hpp"
 
 // -- Public methods -- //
 
