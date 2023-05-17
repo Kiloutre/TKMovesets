@@ -16,7 +16,7 @@ namespace EditorVisualsT7
 	};
 };
 
-class EditorVisualsT7 : public EditorVisuals
+class EditorVisuals_T7 : public EditorVisuals
 {
 private:
 	// Buffer containing the move to play text
@@ -47,7 +47,7 @@ private:
 	void PopulateWindowCreatorMap() override;
 
 	// Filters and sort the movelist according to the given argument
-	void FilterMovelist(EditorMovelistFilter_ filter);
+	void FilterMovelist(EditorVisualsT7::EditorMovelistFilter_ filter);
 	// Returns true if our allocated moveset is still loaded on our character, in-game
 	bool MovesetStillLoaded();
 public:
@@ -57,13 +57,12 @@ public:
 	std::vector<DisplayableMove*>* movelist = nullptr;
 
 	// Constructor that loads the moveset and starts its own importer
-	EditorVisualsT7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage) :
-		EditorVisuals(movesetInfo, addrFile, storage);
+	EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
 	// Render the window
 	void Render(int dockid) override;
 
 	// Called when a move is created, is used in order to refresh the movelist and scroll to the move inside of it
-	void OnMoveCreate(unsigned int moveId) override;
+	void OnMoveCreate(unsigned int moveId);
 	// Validates the move ID against the movelist size and alias list
 	int32_t ValidateMoveId(const char* buf);
 	// Reloads the movelist filter, used mostly when a move is renamed

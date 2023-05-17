@@ -11,5 +11,4 @@ private:
 	void OnUpdate(int listIdx, EditorInput* field) override;
 public:
 	using EditorForm::EditorForm;
-	EditorMovelistPlayable(std::string windowTitleBase, uint32_t t_id, Editor* editor, EditorWindowBase* baseWindow);
 };

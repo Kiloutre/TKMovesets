@@ -47,7 +47,7 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 
 	try {
 		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
-		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
+		EditorVisuals* newWin = nullptr;//Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
@@ -153,7 +153,7 @@ void MainWindow::Update()
 		// Editor windows
 		for (unsigned int i = 0; i < editorWindows.size();)
 		{
-			EditorWindow* w = editorWindows[i];
+			auto& w = editorWindows[i];
 
 			if (w->popen) {
 				const ImU32 colorCount = _countof(editorTitleColors);

@@ -2,7 +2,7 @@
 
 #include "Editor.hpp"
 #include "EditorForm.hpp"
-#include "EditorMove_Animations.hpp"
+#include "Structures/Subwindows/EditorMove_Animations.hpp"
 
 class EditorMove : public EditorForm
 {

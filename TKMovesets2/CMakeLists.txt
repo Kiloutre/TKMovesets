@@ -84,7 +84,6 @@ set(BINARY_SOURCES
                     "Layouts/Submenus/Submenu_About.cpp"
                     # Layout: editor window
                     "Layouts/EditorVisuals/EditorVisuals.cpp"
-                    "Layouts/EditorVisuals/EditorVisuals.cpp"
                     "Layouts/EditorVisuals/EditorForm.cpp"
                     "Layouts/EditorVisuals/EditorFormList.cpp"
                     # Layout: Structures

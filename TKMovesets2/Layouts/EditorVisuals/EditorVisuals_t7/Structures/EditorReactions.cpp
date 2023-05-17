@@ -12,7 +12,7 @@ void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 		m_baseWindow->OpenFormWindow(EditorWindowType_Pushback, id);
 	}
 	else if (name.endsWith("_moveid")) {
-		id = m_baseWindow->ValidateMoveId(field->buffer);
+		id = 0;//m_baseWindow->ValidateMoveId(field->buffer);
 		if (id >= 0) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_Move, id);
 		}

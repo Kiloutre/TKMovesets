@@ -26,7 +26,7 @@ using namespace EditorVisualsT7;
 
 // -- Private methods -- //
 
-void EditorVisualsT7::PopulateWindowCreatorMap()
+void EditorVisuals_T7::PopulateWindowCreatorMap()
 {
 	m_windowCreatorMap = {
 		{EditorWindowType_Move, new EditorWindowFactory<EditorMove> },
@@ -62,7 +62,7 @@ void EditorVisualsT7::PopulateWindowCreatorMap()
 	};
 }
 
-void EditorVisualsT7::FilterMovelist(EditorMovelistFilter_ filter)
+void EditorVisuals_T7::FilterMovelist(EditorMovelistFilter_ filter)
 {
 	m_filteredMovelist.clear();
 
@@ -117,7 +117,7 @@ void EditorVisualsT7::FilterMovelist(EditorMovelistFilter_ filter)
 	}
 }
 
-int32_t EditorVisualsT7::ValidateMoveId(const char* buf)
+int32_t EditorVisuals_T7::ValidateMoveId(const char* buf)
 {
 	int32_t moveId = atoi(buf);
 
@@ -134,7 +134,7 @@ int32_t EditorVisualsT7::ValidateMoveId(const char* buf)
 	return moveId;
 }
 
-void EditorVisualsT7::OnMoveCreate(unsigned int moveId)
+void EditorVisuals_T7::OnMoveCreate(unsigned int moveId)
 {
 	m_editor->ReloadDisplayableMoveList();
 	ReloadMovelistFilter();
@@ -142,7 +142,7 @@ void EditorVisualsT7::OnMoveCreate(unsigned int moveId)
 	m_highlightedMoveId = moveId;
 }
 
-bool EditorVisualsT7::MovesetStillLoaded()
+bool EditorVisuals_T7::MovesetStillLoaded()
 {
 	gameAddr movesetAddress = m_importerHelper.GetCurrentPlayerMovesetAddr();
 #ifdef BUILD_TYPE_DEBUG
@@ -155,7 +155,7 @@ bool EditorVisualsT7::MovesetStillLoaded()
 
 // -- Public methods -- //
 
-EditorVisualsT7::EditorVisualsT7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
+EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage) : EditorVisuals(movesetInfo, addrFile, storage)
 {
 	m_editor = (EditorT7*)m_abstractEditor;
 
@@ -184,7 +184,7 @@ EditorVisualsT7::EditorVisualsT7(const movesetInfo* movesetInfo, GameAddressesFi
 	}
 
 	TKMovesetCompressionType_ compressionType = TKMovesetCompressionType_None;
-	
+
 	if (movesetSize >= sizeof(TKMovesetHeader)) {
 		compressionType = (TKMovesetCompressionType_)((TKMovesetHeader*)moveset)->compressionType;
 	}
@@ -205,7 +205,7 @@ EditorVisualsT7::EditorVisualsT7(const movesetInfo* movesetInfo, GameAddressesFi
 	m_compressionIndex = CompressionUtils::GetCompressionSettingIndex(compressionType);
 }
 
-void EditorVisualsT7::ReloadMovelistFilter()
+void EditorVisuals_T7::ReloadMovelistFilter()
 {
 	FilterMovelist(m_movelistFilter);
 }

@@ -3,7 +3,7 @@
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
 #include "Editor_t7.hpp"
-#include "EditorVisuals_t7.hpp"
+//#include "EditorVisuals_t7.hpp"
 #include "Online_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
@@ -23,7 +23,7 @@ const GameInfo cg_gamesInfo[] = {
 		.extractor = new GameFactory<ExtractorT7>,
 		.importer = new GameFactory<ImporterT7>,
 		.editorLogic = new GameFactory<EditorT7>,
-		.editorVisuals = new EditorFactory<EditorVisualsT7>
+		.editorVisuals = nullptr,//new EditorFactory<EditorVisuals_T7>
 		.onlineHandler = new GameFactory<OnlineT7>
 	},
 	{

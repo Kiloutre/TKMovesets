@@ -10,10 +10,10 @@ void EditorMove::OnInitEnd()
 	// Build initial transition label
 	{
 		auto& field = m_fieldIdentifierMap["transition"];
-		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
+		int moveId = 0;//m_baseWindow->ValidateMoveId(field->buffer);
 		if (moveId != -1)
 		{
-			const char* moveName = m_baseWindow->movelist->at(moveId)->name.c_str();
+			const char* moveName = "";//m_baseWindow->movelist->at(moveId)->name.c_str();
 			EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 		}
 	}
@@ -29,7 +29,7 @@ void EditorMove::OnInitEnd()
 
 void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
 {
-	m_baseWindow->OnMoveCreate(moveId);
+	//m_baseWindow->OnMoveCreate(moveId);
 }
 
 void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
@@ -51,7 +51,7 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 	else if (name == "transition") {
 		// Validation is only needed here for alias conversion
-		m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
+		//m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
 	}
 	else if (name == "voiceclip_addr") {
 		if (id >= 0) {
@@ -87,7 +87,7 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 void EditorMove::OnApply()
 {
 	m_editor->RecomputeDisplayableMoveFlags(structureId);
-	m_baseWindow->ReloadMovelistFilter();
+	//m_baseWindow->ReloadMovelistFilter();
 	if (m_renamed) {
 		// todo: re-compute displayable color of this move according ot its new properties
 		ApplyWindowName();
@@ -145,8 +145,8 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 {
 	if (field->name == "transition")
 	{
-		int moveId = m_baseWindow->ValidateMoveId(field->buffer);
-		const char* moveName = m_baseWindow->movelist->at(moveId)->name.c_str();
+		int moveId = 0;//m_baseWindow->ValidateMoveId(field->buffer);
+		const char* moveName = "";//m_baseWindow->movelist->at(moveId)->name.c_str();
 		EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 	}
 	else if (field->name == "move_name") {

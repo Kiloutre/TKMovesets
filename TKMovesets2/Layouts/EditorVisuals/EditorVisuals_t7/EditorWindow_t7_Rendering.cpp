@@ -10,7 +10,7 @@ using namespace EditorVisualsT7;
 
 // -- Private methods -- //
 
-void EditorVisualsT7::RenderToolBar()
+void EditorVisuals_T7::RenderToolBar()
 {
 	// todo: ImGuiWindowFlags_MenuBar ?
 	ImGui::BeginMenuBar();
@@ -193,7 +193,7 @@ void EditorVisualsT7::RenderToolBar()
 	ImGui::EndMenuBar();
 }
 
-void EditorVisualsT7::RenderStatusBar()
+void EditorVisuals_T7::RenderStatusBar()
 {
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.save"), !m_savedLastChange)) {
 		Save();
@@ -333,7 +333,7 @@ void EditorVisualsT7::RenderStatusBar()
 	ImGui::PopID();
 }
 
-void EditorVisualsT7::RenderMovesetData()
+void EditorVisuals_T7::RenderMovesetData()
 {
 	for (size_t i = 0; i < m_structWindows.size();)
 	{
@@ -358,7 +358,7 @@ void EditorVisualsT7::RenderMovesetData()
 	}
 }
 
-void EditorVisualsT7::RenderMovelist()
+void EditorVisuals_T7::RenderMovelist()
 {
 	// Filter / Sorting
 	if (ImGui::BeginTabBar("MovelistTabs"))
@@ -492,7 +492,7 @@ void EditorVisualsT7::RenderMovelist()
 	}
 }
 
-void EditorVisualsT7::Render(int dockid)
+void EditorVisuals_T7::Render(int dockid)
 {
 	// Many windows rely on movelist data : need to update it early on
 	if (m_editor->mustReloadMovelist) {

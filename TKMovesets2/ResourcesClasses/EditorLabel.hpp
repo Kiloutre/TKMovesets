@@ -2,7 +2,7 @@
 
 #include <thread>
 
-#include "Games.hpp"
+#include "GameInfo.hpp"
 #include "GameAddressesFile.hpp"
 
 class EditorLabel

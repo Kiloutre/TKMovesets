@@ -8,7 +8,7 @@
 
 // -- Public methods -- //
 
-EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorWindowBase* baseWindow, int listSize)
+EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorVisualsBase* baseWindow, int listSize)
 {
 	windowType = t_windowType;
 	m_baseWindow = baseWindow;
