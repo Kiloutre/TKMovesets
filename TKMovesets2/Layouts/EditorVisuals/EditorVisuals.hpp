@@ -1,11 +1,10 @@
-/*
 #pragma once
 
 #include "GameSharedMem.hpp"
 #include "LocalStorage.hpp"
 #include "Editor.hpp"
 #include "EditorForm.hpp"
-#include "EditorWindowBase.hpp"
+#include "EditorLabel.hpp"
 
 #include "GameTypes.h"
 
@@ -25,8 +24,24 @@ public:
 	}
 };
 
-class EditorWindow {
-private:
+class EditorWindowFactory_Base
+{
+public:
+	virtual ~EditorWindowFactory_Base() {}
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorWindowBase* e, int f) const = 0;
+	virtual void* cast(void* obj) const = 0;
+};
+
+template<typename T> class EditorWindowFactory : public EditorWindowFactory_Base
+{
+public:
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorWindowBase* e, int f) const { return new T(a, b, c, d, e, f); }
+	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
+};
+
+class EditorVisuals
+{
+protected:
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
@@ -61,9 +76,11 @@ private:
 	std::map<EditorWindowType_, EditorWindowFactory_Base*> m_windowCreatorMap;
 	// Index of the compression setting to use when saving
 	unsigned int m_compressionIndex = 0;
+	// Contains a ptr to the editor logic class
+	Editor* m_abstractEditor = nullptr;
 
 	// Populate .m_windowCreatorMap so that windows may get created by type. Can have different contents depending on what the gmae allows.
-	void PopulateWindowCreatorMap();
+	virtual void PopulateWindowCreatorMap() = 0;
 	// Factory instantiating the right class for the right identifier.
 	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize = 0);
 
@@ -76,11 +93,13 @@ public:
 	bool setFocus = false;
 	// Expose filename specifically and not the full editorInfos. Used to avoid editing the same moveset twice.
 	const wchar_t* filename;
+	// Contains the labels to display in the editor
+	EditorLabel* labels = nullptr;
 
 	// Constructor that loads the moveset and starts its own importer
-	EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
+	EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
 	// Destructor that deallocates the resources we allocated
-	~EditorWindow();
+	virtual ~EditorVisuals();
 	// Render the window
 	virtual void Render(int dockid) = 0;
 
@@ -89,4 +108,3 @@ public:
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
 	void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart=-1, int listEnd = -1);
 };
-*/

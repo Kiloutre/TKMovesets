@@ -2,7 +2,6 @@
 
 #include "Editor.hpp"
 #include "EditorFormList.hpp"
-#include "EditorWindowBase.hpp"
 
 class EditorCancels : public EditorFormList
 {

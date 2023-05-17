@@ -2,7 +2,6 @@
 
 #include "Editor.hpp"
 #include "EditorForm.hpp"
-#include "EditorWindowBase.hpp"
 
 class EditorPushback : public EditorForm
 {

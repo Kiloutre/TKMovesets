@@ -22,6 +22,7 @@ const GameInfo cg_gamesInfo[] = {
 		.extractor = new GameFactory<ExtractorT7>,
 		.importer = new GameFactory<ImporterT7>,
 		.editor = new GameFactory<EditorT7>,
+		.editor2 = nullptr, //new EditorFactory<EditorT7_Visuals>
 		.onlineHandler = new GameFactory<OnlineT7>
 	},
 	{
@@ -38,6 +39,7 @@ const GameInfo cg_gamesInfo[] = {
 		.extractor = nullptr,
 		.importer = nullptr,
 		.editor = nullptr,
+		.editor2 = nullptr,
 		.onlineHandler = nullptr,
 	},
 	{
@@ -54,6 +56,7 @@ const GameInfo cg_gamesInfo[] = {
 		.extractor = nullptr,
 		.importer = nullptr,
 		.editor = nullptr,
+		.editor2 = nullptr,
 		.onlineHandler = nullptr,
 	},
 };
@@ -125,7 +128,7 @@ namespace Games
 	bool IsGameEditable(uint16_t gameId, uint16_t minorVersion)
 	{
 		auto game = GetGameInfoFromIdentifier(gameId, minorVersion);
-		return game && game->editor != nullptr;
+		return game->IsEditable();
 	}
 
 	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion)
@@ -150,7 +153,14 @@ namespace Games
 
 	Editor* FactoryGetEditor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Editor* ed = (Editor*)gameInfo->editor->allocate(process, game, gameInfo);
+		Editor* ed = (Editor*)gameInfo->editorLogic->allocate(process, game, gameInfo);
+		// No need to store character count here because the editor is used alongside the importer which stores that information already
+		return ed;
+	}
+
+	EditorVisuals* FactoryGetEditorVisuals(const GameInfo* gameInfo, const movesetInfo* movesetInfos, GameAddressesFile* addrFile, LocalStorage* storage)
+	{
+		EditorVisuals* ed = (EditorVisuals*)gameInfo->editorVisuals->allocate(movesetInfos, addrFile, storage);
 		// No need to store character count here because the editor is used alongside the importer which stores that information already
 		return ed;
 	}

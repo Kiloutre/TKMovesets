@@ -5,6 +5,7 @@
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
+#include "LocalStorage.hpp"
 
 #include "constants.h"
 
@@ -22,6 +23,22 @@ template<typename T> class GameFactory : public GameFactory_Base
 {
 public:
 	virtual void* allocate(GameProcess* process, GameData* game, const GameInfo* gameInfo) const { return new T(process, game, gameInfo); }
+	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
+};
+
+
+class EditorFactory_Base
+{
+public:
+	virtual ~EditorFactory_Base() {}
+	virtual void* allocate(const movesetInfo* movesetInfos, GameAddressesFile* addrFile, LocalStorage* storage) const = 0;
+	virtual void* cast(void* obj) const = 0;
+};
+
+template<typename T> class EditorFactory : public EditorFactory_Base
+{
+public:
+	virtual void* allocate(const movesetInfo* movesetInfos, GameAddressesFile* addrFile, LocalStorage* storage) const { return new T(movesetInfos, addrFile, storage); }
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
 };
 
@@ -60,7 +77,9 @@ public:
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.
 	GameFactory_Base* importer;
 	// Dynamic type allocator to store the game's editor. Can be nullptr for no available editor.
-	GameFactory_Base* editor;
+	GameFactory_Base* editorLogic;
+	// Dynamic type allocator to store the game's editor visuals. Can be nullptr for no available editor.
+	EditorFactory_Base* editorVisuals;
 	// Dynamic type allocator to store the game's online handler. Can be nullptr for no available handler.
 	GameFactory_Base* onlineHandler;
 	// If set, creates a "ImGui::SeparatorText()" entry in the game list, right before the game
@@ -70,5 +89,10 @@ public:
 	bool SupportsGameImport(uint16_t t_gameId) const
 	{
 		return this != nullptr && (gameId == t_gameId || supportedImports.contains(t_gameId));
+	}
+
+	bool IsEditable() const
+	{
+		return editorLogic != nullptr && editorVisuals != nullptr;
 	}
 };

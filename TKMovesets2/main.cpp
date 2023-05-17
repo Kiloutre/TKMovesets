@@ -141,7 +141,7 @@ static void DestroyMainClasses(MainWindow& program)
 	program.importer.StopThreadAndCleanup();
 	program.sharedMem.StopThreadAndCleanup();
 
-	for (EditorWindow* win : program.editorWindows) {
+	for (auto& win : program.editorWindows) {
 		delete win;
 	}
 

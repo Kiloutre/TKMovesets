@@ -274,7 +274,7 @@ EditorWindow::~EditorWindow()
 	delete labels;
 }
 
-EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
+EditorWindow::EditorWindow(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
 {
 	{
 		// Init classes that interact with game process
@@ -377,7 +377,8 @@ EditorWindow::EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile
 			}
 		}
 
-		if (gameInfo->editor != nullptr) {
+		if (gameInfo->SupportsGameImport(movesetInfo->gameId))
+        {
 			m_importerHelper.SetTargetProcess(gameInfo);
 			if (gameInfo->onlineHandler != nullptr) {
 				m_sharedMemHelper.SetTargetProcess(gameInfo);
@@ -405,9 +406,4 @@ void EditorWindow::IssueFieldUpdate(EditorWindowType_ winType, int valueChange, 
 			window->RequestFieldUpdate(winType, valueChange, listStart, listEnd);
 		}
 	}
-}
-
-void EditorWindow::SetChangesUnsaved()
-{
-	m_savedLastChange = false;
 }

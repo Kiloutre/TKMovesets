@@ -134,14 +134,12 @@ public:
 	const wchar_t* filename;
 
 	// Constructor that loads the moveset and starts its own importer
-	EditorWindow(movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
+	EditorWindow(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
 	// Destructor that deallocates the resources we allocated
 	~EditorWindow();
 	// Render the window
 	void Render(int dockid);
 
-	// Makes the save button available
-	void SetChangesUnsaved() override;
 	// Called when a move is created, is used in order to refresh the movelist and scroll to the move inside of it
 	void OnMoveCreate(unsigned int moveId) override;
 	// Create a new window containing data about the given move. Can be called by subwidnows.
