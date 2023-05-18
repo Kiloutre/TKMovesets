@@ -32,7 +32,7 @@ private:
 	// id of the highlithed move in the movelist
 	int16_t m_highlightedMoveId = -1;
 	// Access moveset data through this variable. Uses polymorphism.
-	EditorT7* m_editor = nullptr;
+	TEditor* m_editor = nullptr;
 
 	// Render the top toolbar containing useful moveset editing tools
 	void RenderToolBar();
