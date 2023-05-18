@@ -23,26 +23,22 @@ namespace TEditorUtils
 {
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
 };
-
 class TEditor : public EditorLogic
 {
 protected:
-	// Store move ID aliases
-	std::vector<uint16_t>* m_aliases = nullptr;
-
 	// Stores a <name, offset> animation map
 	std::map<std::string, gameAddr>* m_animNameToOffsetMap = nullptr;
 	// Stores a <offset, offset> animation map
 	std::map<gameAddr, gameAddr>* m_animOffsetToNameOffset = nullptr;
 public:
-	// Contains quick data that is made to be accessed outside of this class
-	EditorTable movesetTable;
 	// If moveset posses movelist data
 	bool hasDisplayableMovelist = false;
 	// Contains every move, in a displayable format. Not tied to training mode movelist.
 	std::vector<DisplayableMove*>* displayableMovelist;
 	// Set to true when updating displayableMovelist
 	bool mustReloadMovelist = false;
+	// Store move ID aliases
+	std::vector<uint16_t> aliases;
 
 	TEditor(GameProcess* process, GameData* game, const GameInfo* gameInfo);
 	virtual ~TEditor();

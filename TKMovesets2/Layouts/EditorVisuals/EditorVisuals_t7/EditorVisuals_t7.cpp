@@ -76,7 +76,7 @@ void EditorVisuals_T7::FilterMovelist(EditorMovelistFilter_ filter)
 
 	if (filter == EditorMovelistFilter_PostIdle) {
 		// Get idle move ID, only list moves beyond it
-		size_t startingIndex = editorTable->aliases[1];
+		size_t startingIndex = m_editor->aliases[1];
 		for (; startingIndex < movelist->size(); ++startingIndex) {
 			m_filteredMovelist.push_back(movelist->at(startingIndex));
 		}
@@ -126,11 +126,11 @@ int32_t EditorVisuals_T7::ValidateMoveId(const char* buf)
 	const size_t movelistSize = movelist->size();
 	if (moveId >= movelistSize)
 	{
-		const size_t aliasesCount = editorTable->aliases.size();
+		const size_t aliasesCount = m_editor->aliases.size();
 		if (moveId < 0x8000 || moveId >= (0x8000 + aliasesCount)) {
 			return -1;
 		}
-		moveId = editorTable->aliases[(uint16_t)moveId - (uint16_t)0x8000];
+		moveId = m_editor->aliases[(uint16_t)moveId - (uint16_t)0x8000];
 	}
 
 	return moveId;
@@ -157,7 +157,8 @@ bool EditorVisuals_T7::MovesetStillLoaded()
 
 // -- Public methods -- //
 
-EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage) : EditorVisuals(movesetInfo, addrFile, storage)
+EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
+	: EditorVisuals(movesetInfo, addrFile, storage)
 {
 	m_editor = (EditorT7*)m_abstractEditor;
 
@@ -204,8 +205,6 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 	m_editor->ReloadDisplayableMoveList();
 	movelist = m_editor->displayableMovelist;
 	ReloadMovelistFilter();
-
-	editorTable = &m_editor->movesetTable;
 
 	// Set compression setting as the pre-configured default one
 	m_compressionIndex = CompressionUtils::GetCompressionSettingIndex(compressionType);

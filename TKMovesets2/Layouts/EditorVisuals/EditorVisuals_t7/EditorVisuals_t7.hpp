@@ -51,10 +51,6 @@ private:
 	// Returns true if our allocated moveset is still loaded on our character, in-game
 	bool MovesetStillLoaded();
 public:
-	// Stores important moveset informations such as aliases, etc...
-	EditorTable* editorTable = nullptr;
-	// Stores moveid aliases
-	std::vector<uint16_t> aliases;
 	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*>* movelist = nullptr;
 

@@ -298,7 +298,7 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	// Get aliases as a vector
 	uint16_t* aliasesPtr = m_infos->orig_aliases;
 	for (uint16_t i = 0; i < _countof(m_infos->orig_aliases); ++i) {
-		m_aliases->push_back(aliasesPtr[i]);
+		aliases.push_back(aliasesPtr[i]);
 	}
 
 	if ((m_offsets->movelistBlock + 4) < m_movesetDataSize && \
@@ -348,7 +348,6 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		(*m_animOffsetToNameOffset)[animOffset] = movePtr[i].anim_name_addr;
 	}
 
-	movesetTable.aliases = *m_aliases;
 	return true;
 }
 
@@ -548,7 +547,7 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 	uint16_t moveId = m_process->readInt16(playerAddress + m_game->GetValue("currmove_id"));
 	if (moveId >= 0x8000) {
-		moveId = m_aliases->at((size_t)(moveId - (uint16_t)0x8000));
+		moveId = aliases[(size_t)(moveId - (uint16_t)0x8000)];
 	}
 
 	return moveId;

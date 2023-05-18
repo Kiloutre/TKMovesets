@@ -208,11 +208,6 @@ struct DisplayableMove
 	EditorMoveFlags flags;
 };
 
-struct EditorTable
-{
-	std::vector<uint16_t> aliases;
-};
-
 typedef std::map<FasterStringComp, EditorInput*> InputMap;
 
 namespace EditorUtils

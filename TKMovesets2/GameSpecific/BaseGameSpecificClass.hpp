@@ -8,7 +8,7 @@
 #include "GameTypes.h"
 
 // Base class for interacting with a game
-class DLLCONTENT BaseGameSpecificClass
+class BaseGameSpecificClass
 {
 protected:
 	// Stores the process to read on
