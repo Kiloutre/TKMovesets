@@ -207,7 +207,55 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 	}
 }
 
-bool EditorForm::IsFormValid()
+void EditorForm::CopyFormToClipboard() const
+{
+	std::string clipboardText = m_windowTypeName + "\n";
+	for (auto& [fieldName, field] : m_fieldIdentifierMap)
+	{
+		clipboardText += field->buffer;
+		clipboardText += "\n";
+	}
+	ImGui::SetClipboardText(clipboardText.c_str());
+}
+
+void EditorForm::PasteFormFromClipboard()
+{
+	moveFocusAway = true;
+	const char* clipboardText = ImGui::GetClipboardText();
+	while (*clipboardText != '\n') ++clipboardText;
+	++clipboardText;
+
+	for (auto& [fieldName, field] : m_fieldIdentifierMap)
+	{
+		const char* newlinePos = strstr(clipboardText, "\n");
+
+		if (newlinePos == nullptr) {
+			newlinePos = (clipboardText + strlen(clipboardText));
+			return;
+		}
+
+		field->nextValue = std::string(clipboardText, newlinePos - clipboardText);
+		clipboardText = newlinePos + 1;
+
+		if (*newlinePos == '\0') {
+			break;
+		}
+	}
+}
+
+bool EditorForm::CanPasteFormFromClipboard() const
+{
+	const char* clipboardText = ImGui::GetClipboardText();
+
+	auto newlinePos = strstr(clipboardText, "\n");
+	if (newlinePos == NULL) {
+		return false;
+	}
+
+	return strncmp(m_windowTypeName.c_str(), clipboardText, newlinePos - clipboardText) == 0;
+}
+
+bool EditorForm::IsFormValid() const
 {
 	for (auto& [category, fields] : m_fieldsCategoryMap) {
 		for (auto& field : fields) {
@@ -365,6 +413,24 @@ void EditorForm::Render()
 			{
 				ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 
+				// Copy / Pasting
+				if (ImGui::Selectable(_("edition.form_popup.copy_structure_clipboard"), false, 0, selectableSize))
+				{
+					ImGui::CloseCurrentPopup();
+					CopyFormToClipboard();
+				}
+
+				{
+					ImGuiExtra::DisableBlockIf __(!CanPasteFormFromClipboard());
+					if (ImGui::Selectable(_("edition.form_popup.paste_structure_clipboard"), false, 0, selectableSize))
+					{
+						PasteFormFromClipboard();
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				// Duplication
+				ImGui::Separator();
 				{
 					ImGuiExtra::DisableBlockIf __(uniqueType);
 					if (ImGui::Selectable(_("edition.form_popup.duplicate_structure"), false, 0, selectableSize))
@@ -377,6 +443,8 @@ void EditorForm::Render()
 					}
 				}
 
+				// Deletion
+				ImGui::Separator();
 				{
 					ImGuiExtra::DisableBlockIf __(!m_isDeletable || uniqueType || structureId == 0);
 					if (ImGui::Selectable(_("edition.form_popup.delete_structure"), false, 0, selectableSize)) {
@@ -385,6 +453,8 @@ void EditorForm::Render()
 					}
 				}
 
+				// Extras
+				ImGui::Separator();
 				RenderExtraContextMenuItems();
 				ImGui::EndPopup();
 			}

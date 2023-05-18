@@ -73,7 +73,72 @@ void EditorFormList::Apply()
 	OnApply();
 }
 
-bool EditorFormList::IsFormValid()
+void EditorFormList::CopyFormToClipboard() const
+{
+	std::string clipboardText = m_windowTypeName + "\n";
+
+	for (auto& item : m_items)
+	{
+		for (auto& [fieldName, field] : item->identifierMap)
+		{
+			clipboardText += field->buffer;
+			clipboardText += "\n";
+		}
+	}
+	ImGui::SetClipboardText(clipboardText.c_str());
+}
+
+void EditorFormList::PasteFormFromClipboard()
+{
+	moveFocusAway = true;
+	const char* clipboardText = ImGui::GetClipboardText();
+	while (*clipboardText != '\n') ++clipboardText;
+	++clipboardText;
+
+	{
+		// Count the amount of fields, if there are too many fields to fit in the current list, make its size grow
+		unsigned int expectedFieldAmount = 0;
+		const char* cursor = clipboardText;
+		while (*cursor != '\0')
+		{
+			if (*cursor == '\n') {
+				++expectedFieldAmount;
+			}
+			++cursor;
+		}
+
+		unsigned int fieldAmountPerItem = m_items[0]->identifierMap.size();
+		unsigned int fieldAmount = fieldAmountPerItem * m_items.size();
+
+		while (fieldAmount < expectedFieldAmount) {
+			auto newId = CreateNewItem(-1);
+			m_items[newId]->openStatus = EditorFormTreeview_ForceClose;
+			fieldAmount += fieldAmountPerItem;
+		}
+	}
+
+	for (auto& item : m_items)
+	{
+		for (auto& [fieldName, field] : item->identifierMap)
+		{
+			const char* newlinePos = strstr(clipboardText, "\n");
+
+			if (newlinePos == nullptr) {
+				newlinePos = (clipboardText + strlen(clipboardText));
+				return;
+			}
+
+			field->nextValue = std::string(clipboardText, newlinePos - clipboardText);
+			clipboardText = newlinePos + 1;
+
+			if (*newlinePos == '\0') {
+				break;
+			}
+		}
+	}
+}
+
+bool EditorFormList::IsFormValid() const
 {
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
@@ -123,33 +188,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	if (listIndex + 1 != m_listSize || m_listSize == 1) {
 		ImGui::SetCursorPosX(pos_x);
 		if (ImGui::Button("+", buttonSize)) {
-			VectorSet<std::string> drawOrder;
-
-			m_items.insert(m_items.begin() + listIndex, new FieldItem);
-			auto& item = m_items[listIndex];
-
-			item->identifierMap = m_editor->GetListSingleForm(windowType, structureId + listIndex, drawOrder);
-			item->openStatus = EditorFormTreeview_ForceOpen;
-
-			for (uint8_t category : m_categories)
-			{
-				std::vector<EditorInput*> inputs;
-				for (const std::string& fieldName : drawOrder) {
-					EditorInput* field = item->identifierMap[fieldName];
-					EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
-					if (field->category == category) {
-						inputs.push_back(field);
-					}
-				}
-				item->categoryMap[category] = inputs;
-			}
-			BuildItemDetails(listIndex);
-
-			++m_listSizeChange;
-			++m_listSize;
-
-			unsavedChanges = true;
-			OnResize();
+			CreateNewItem(listIndex);
 		}
 		ImGui::SameLine();
 	}
@@ -246,6 +285,42 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	ImGui::PopID();
 	ImGui::PopID();
 	ImGui::SetCursorPos(cursor);
+}
+
+unsigned int EditorFormList::CreateNewItem(int insertionPosition)
+{
+	if (insertionPosition == -1) {
+		insertionPosition = m_items.size() - 1;
+	}
+
+	VectorSet<std::string> drawOrder;
+
+	m_items.insert(m_items.begin() + insertionPosition, new FieldItem);
+	auto& item = m_items[insertionPosition];
+
+	item->identifierMap = m_editor->GetListSingleForm(windowType, structureId + insertionPosition, drawOrder);
+	item->openStatus = EditorFormTreeview_ForceOpen;
+
+	for (uint8_t category : m_categories)
+	{
+		std::vector<EditorInput*> inputs;
+		for (const std::string& fieldName : drawOrder) {
+			EditorInput* field = item->identifierMap[fieldName];
+			EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
+			if (field->category == category) {
+				inputs.push_back(field);
+			}
+		}
+		item->categoryMap[category] = inputs;
+	}
+	BuildItemDetails(insertionPosition);
+
+	++m_listSizeChange;
+	++m_listSize;
+
+	unsavedChanges = true;
+	OnResize();
+	return (unsigned int)insertionPosition;
 }
 
 void EditorFormList::DeleteStructure()

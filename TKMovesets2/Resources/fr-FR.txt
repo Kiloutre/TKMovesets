@@ -190,6 +190,8 @@ edition.window_controls_explanation = Cliquez sur un Move dans la liste des move
 edition.extract_animations = Extraire animations
 edition.extract_animations_finished = Extraction d'animation terminée !
 
+edition.form_popup.copy_structure_clipboard = Copier la structure
+edition.form_popup.paste_structure_clipboard = Coller la structure
 edition.form_popup.duplicate_structure = Dupliquer la structure
 edition.form_popup.delete_structure = Supprimer la structure
 edition.form_popup.what_cancels_into_this_move = Quels Cancels utilisent ce Move ?

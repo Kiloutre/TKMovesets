@@ -57,6 +57,13 @@ protected:
 	// Marks if deletion is possible on this structure
 	bool m_isDeletable = true;
 
+	// Copy the entire form, evrey field of every tiem, to the clipboard
+	virtual void CopyFormToClipboard() const;
+	// Pastes the content of the clipboard to the current form.
+	// Content of the form must be returned by "CopyFormToClipboard" and match the current window type.
+	virtual void PasteFormFromClipboard();
+	// Returns true if the current clipboard content can be pasted into this form
+	bool CanPasteFormFromClipboard() const;
 	// Returns the casted base window for when wanting to call non-generic methods
 	template <class T> T* BaseWindow() {
 		return (T*)m_baseWindow;
@@ -94,7 +101,7 @@ protected:
 	// Called when clicking the apply button, will check for field errors, set variables and then save the data
 	virtual void Apply();
 	// Returns false if any field has an error state
-	virtual bool IsFormValid();
+	virtual bool IsFormValid() const;
 	// Inits the form
 	virtual void InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor);
 	// Returns true if the current form window has been right clicked

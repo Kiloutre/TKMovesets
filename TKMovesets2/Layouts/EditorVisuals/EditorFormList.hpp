@@ -43,6 +43,14 @@ protected:
 	// Absolute structure IDs of the deleted items sicne the last Apply()
 	std::set<int> m_deletedItemIds;
 
+	// Create a new item to the list, set position to -1 for appending to the end.
+	// Will copy the data at the inserted index. Returns the final insertion position.
+	unsigned int CreateNewItem(int insertionPosition=-1);
+	// Copy the entire form, evrey field of every tiem, to the clipboard
+	void CopyFormToClipboard() const override;
+	// Pastes the content of the clipboard to the current form.
+	// Content of the form must be returned by "CopyFormToClipboard" and match the current window type.
+	void PasteFormFromClipboard() override;
 	// Delete this entire structure from the moveset and close the window
 	void DeleteStructure() override;
 	// Get the size of the structure before we made unsaved changes to it
@@ -60,7 +68,7 @@ protected:
 	// Save every list item individually
 	virtual void Apply() override;
 	// Returns false if any field has an error state
-	bool IsFormValid() override;
+	bool IsFormValid() const override;
 	// Displays buttons to move, create or delete individual list items
 	void RenderListControlButtons(int listIdx);
 	// Notify fields in other windows to be updated
