@@ -2,7 +2,7 @@
 
 #include "EditorMovelistDisplayable.hpp"
 #include "Localization.hpp"
-#include "EditorVisualsBase.hpp"
+#include "EditorVisuals.hpp"
 
 
 // -- Public methods -- //

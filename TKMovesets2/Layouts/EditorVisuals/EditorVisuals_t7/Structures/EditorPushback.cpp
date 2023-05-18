@@ -1,7 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorPushback.hpp"
 #include "Localization.hpp"
-#include "EditorVisualsBase.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

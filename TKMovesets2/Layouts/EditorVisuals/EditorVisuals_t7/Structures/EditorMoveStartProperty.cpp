@@ -1,7 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorMoveStartProperty.hpp"
 #include "Localization.hpp"
-#include "EditorVisualsBase.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

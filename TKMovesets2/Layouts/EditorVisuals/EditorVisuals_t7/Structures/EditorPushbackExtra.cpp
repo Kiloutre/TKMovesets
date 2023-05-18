@@ -3,6 +3,7 @@
 #include "imgui_extras.hpp"
 #include "EditorPushbackExtra.hpp"
 #include "Localization.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorPushbackExtra::OnUpdate(int listIdx, EditorInput* field)
 {

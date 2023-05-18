@@ -3,7 +3,7 @@
 #include "imgui_extras.hpp"
 #include "EditorExtraproperties.hpp"
 #include "Localization.hpp"
-#include "EditorVisualsBase.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 {

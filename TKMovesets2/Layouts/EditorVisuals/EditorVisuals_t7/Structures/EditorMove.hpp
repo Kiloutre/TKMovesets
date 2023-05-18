@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Editor.hpp"
 #include "EditorForm.hpp"
 #include "Structures/Subwindows/EditorMove_Animations.hpp"
 

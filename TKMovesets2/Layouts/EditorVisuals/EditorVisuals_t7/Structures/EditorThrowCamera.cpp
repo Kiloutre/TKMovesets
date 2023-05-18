@@ -1,7 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorThrowCamera.hpp"
 #include "Localization.hpp"
-#include "EditorVisualsBase.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorThrowCamera::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

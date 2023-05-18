@@ -5,7 +5,7 @@
 
 #include "Editor.hpp"
 
-class EditorVisualsBase;
+class EditorVisuals;
 
 namespace EditorFormUtils
 {
@@ -38,7 +38,7 @@ protected:
 	// Contains the identifier with which to prefix translation strings
 	std::string m_identifierPrefix;
 	// Contains a reference to the main editor window, used for event handling
-	EditorVisualsBase* m_baseWindow = nullptr;
+	EditorVisuals* m_baseWindow = nullptr;
 	// Become true if there were unsaved changes but the user attempted to close the window anyway. Confirmation will be required.
 	bool m_requestedClosure = false;
 	// Contains the string identifiers to avoid having to compute them at every individual Render() call
@@ -117,7 +117,7 @@ public:
 	bool uniqueType = false;
 
 	EditorForm() {};
-	EditorForm(const std::string& parentWindowName, EditorWindowType_ windowType, uint16_t t_structureId, Editor* editor, EditorVisualsBase* baseWindow, int listSize);
+	EditorForm(const std::string& parentWindowName, EditorWindowType_ windowType, uint16_t t_structureId, Editor* editor, EditorVisuals* baseWindow, int listSize);
 	virtual ~EditorForm();
 
 	// Called after the constructor

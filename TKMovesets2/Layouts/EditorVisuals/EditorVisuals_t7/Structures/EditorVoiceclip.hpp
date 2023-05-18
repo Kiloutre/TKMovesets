@@ -1,9 +1,7 @@
 #pragma once
 
-#include "Editor.hpp"
 #include "EditorFormList.hpp"
 
-// Windowed class managing a single struct
 class EditorVoiceclip : public EditorFormList
 {
 private:

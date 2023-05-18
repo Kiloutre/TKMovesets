@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Editor.hpp"
 #include "EditorFormList.hpp"
 
 class EditorPushbackExtra : public EditorFormList

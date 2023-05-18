@@ -1,8 +1,5 @@
-#include "imgui_extras.hpp"
 #include "EditorReactions.hpp"
-#include "Localization.hpp"
-#include "helpers.hpp"
-#include "EditorVisualsBase.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {

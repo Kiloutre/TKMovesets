@@ -4,7 +4,6 @@
 #include "Editor.hpp"
 #include "EditorForm.hpp"
 #include "EditorLabel.hpp"
-#include "EditorVisualsBase.hpp"
 
 #include "GameTypes.h"
 
@@ -31,18 +30,18 @@ class EditorWindowFactory_Base
 {
 public:
 	virtual ~EditorWindowFactory_Base() {}
-	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorVisualsBase* e, int f) const = 0;
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorVisuals* e, int f) const = 0;
 	virtual void* cast(void* obj) const = 0;
 };
 
 template<typename T> class EditorWindowFactory : public EditorWindowFactory_Base
 {
 public:
-	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorVisualsBase* e, int f) const { return new T(a, b, c, d, e, f); }
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorVisuals* e, int f) const { return new T(a, b, c, d, e, f); }
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
 };
 
-class EditorVisuals : public EditorVisualsBase
+class EditorVisuals
 {
 protected:
 	// True if the game and characters are loaded and we can start interacting with it
@@ -96,6 +95,8 @@ public:
 	bool setFocus = false;
 	// Expose filename specifically and not the full editorInfos. Used to avoid editing the same moveset twice.
 	const wchar_t* filename;
+	// Contains the labels to display in the editor
+	EditorLabel* labels = nullptr;
 
 	// Constructor that loads the moveset and starts its own importer
 	EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
@@ -105,7 +106,7 @@ public:
 	virtual void Render(int dockid) = 0;
 
 	// Create a new window containing data about the given move. Can be called by subwidnows.
-	void OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize = 0) override;
+	void OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize = 0);
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
-	void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart=-1, int listEnd = -1) override;
+	void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart=-1, int listEnd = -1);
 };

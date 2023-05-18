@@ -1,6 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorInputStruct.hpp"
 #include "Localization.hpp"
+#include "EditorVisuals.hpp"
 
 void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
 {

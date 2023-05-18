@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Editor.hpp"
 #include "EditorForm.hpp"
 
 class EditorProjectile : public EditorForm
