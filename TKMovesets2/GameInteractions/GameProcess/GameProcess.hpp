@@ -93,37 +93,37 @@ public:
 	// Detach from the game,
 	void Detach();
 	// Returns true if .status = PROC_NOT_ATTACHED. Use CheckRunning() for an actual proper check.
-	bool IsAttached();
+	bool IsAttached() const;
 	// Checks if pid still used by process & attempts a read. Updates .status & returns false if it fails.
 	bool CheckRunning();
 	// Frees previous allocated memory. Set [instant] to false (default) if you want to only free memory older than 10 seconds.
 	void FreeOldGameMemory(bool instant = false);
 	// Returns a list of module currently loaded in the target remote process
-	std::vector<moduleEntry> GetModuleList();
+	std::vector<moduleEntry> GetModuleList() const;
 
 
 	// Reads an unsigned byte from the game in little endian
-	int8_t  readInt8(gameAddr addr);
+	int8_t  readInt8(gameAddr addr) const;
 	// Reads a short (2B) from the game in little endian
-	int16_t readInt16(gameAddr addr);
+	int16_t readInt16(gameAddr addr) const;
 	// Reads an int (4B) from the game in little endian
-	int32_t readInt32(gameAddr addr);
+	int32_t readInt32(gameAddr addr) const;
 	// Reads an int (8B) from the game in little endian
-	int64_t readInt64(gameAddr addr);
+	int64_t readInt64(gameAddr addr) const;
 
 	// Reads a byte from the game in little endian
-	uint8_t  readUInt8(gameAddr addr);
+	uint8_t  readUInt8(gameAddr addr) const;
 	// Reads a ushort (2B) from the game in little endian
-	uint16_t readUInt16(gameAddr addr);
+	uint16_t readUInt16(gameAddr addr) const;
 	// Reads an uint (4B) from the game in little endian
-	uint32_t readUInt32(gameAddr addr);
+	uint32_t readUInt32(gameAddr addr) const;
 	// Reads an uint (8B) from the game in little endian
-	uint64_t readUInt64(gameAddr addr);
+	uint64_t readUInt64(gameAddr addr) const;
 
 	// Reads a floating point number (4b) from the game in little endian
-	float   readFloat(gameAddr addr);
+	float   readFloat(gameAddr addr) const;
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
-	void    readBytes(gameAddr addr, void* buf, size_t readSize);
+	void    readBytes(gameAddr addr, void* buf, size_t readSize) const;
 
 	// Writes a value to the remote process's memory, adapting to the value type's size
 	template<typename T>
@@ -133,7 +133,7 @@ public:
 	};
 	// Reads a value in the remote process's memory, adapting to the expected return value type's size
 	template<typename T>
-	T read(gameAddr addr)
+	T read(gameAddr addr) const
 	{
 		T value{ (T)-1 };
 		ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, sizeof(T), nullptr);

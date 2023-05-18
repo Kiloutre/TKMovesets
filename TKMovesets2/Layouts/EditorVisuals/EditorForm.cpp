@@ -208,14 +208,16 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		// Have to implement pasting manually
 		strcpy_s(field->buffer, field->bufsize, field->nextValue.c_str());
 		// Put the focus back on the input as it should
+		ImGui::Dummy(ImVec2(20, 20));
 		ImGui::SetKeyboardFocusHere();
+		ImGui::Dummy(ImVec2(20, 20));
 	}
 
 	ImGui::PushID(field);
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
-	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags) ||
-		field->nextValue.size() != 0)
+	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags)
+		|| field->nextValue.size() != 0)
 	{
 		field->nextValue.clear();
 		if (m_ignoreNextChange) {
@@ -239,6 +241,7 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		{
 			field->nextValue = ImGui::GetClipboardText();
 			// Force focus on the next widget
+			ImGui::Dummy(ImVec2(20, 20));
 			// This is because ImGUI prevents from writing on a focused input's buffer
 			ImGui::SetKeyboardFocusHere();
 			ImGui::Dummy(ImVec2(20, 20));

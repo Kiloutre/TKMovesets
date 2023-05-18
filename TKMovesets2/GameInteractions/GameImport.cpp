@@ -98,7 +98,7 @@ void GameImport::StopThreadAndCleanup()
 	delete game;
 }
 
-bool GameImport::CanStart(bool cached)
+bool GameImport::CanStart(bool cached) const
 {
 	if (m_importer == nullptr) {
 		return false;
@@ -110,7 +110,7 @@ bool GameImport::CanStart(bool cached)
 	return m_importer->CanImport();
 }
 
-bool GameImport::IsBusy()
+bool GameImport::IsBusy() const
 {
 	// There are still movesets to import
 	return m_plannedImportations.size() > 0;
@@ -142,15 +142,7 @@ void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings
 	});
 }
 
-uint8_t GameImport::GetCharacterCount()
-{
-	if (currentGame != nullptr) {
-		return currentGame->characterCount;
-	}
-	return 2;
-}
-
-gameAddr GameImport::GetCurrentPlayerMovesetAddr()
+gameAddr GameImport::GetCurrentPlayerMovesetAddr() const
 {
 	// todo: If the importer gets deallocated while we do this, things can go bad
 	if (m_importer != nullptr) {

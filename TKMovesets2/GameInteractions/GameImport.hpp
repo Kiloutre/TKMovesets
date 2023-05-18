@@ -50,19 +50,17 @@ public:
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the importer  will allow an importation (false if it won't, like if characters aren't loaded)
-	virtual bool CanStart(bool cached=true) override;
+	virtual bool CanStart(bool cached=true) const override;
 	// Is currently busy with an importation
-	virtual bool IsBusy() override;
+	virtual bool IsBusy() const override;
 	// Queue a character importation from file
 	virtual void QueueCharacterImportation(std::wstring filename, ImportSettings settings=0);
 	// Queue a character importation from moveset data.
 	virtual void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
-	// Returns the amount of characters we are able to import to
-	uint8_t GetCharacterCount() override;
 	// Returns the moveset address of the currently selected player
-	gameAddr GetCurrentPlayerMovesetAddr();
+	gameAddr GetCurrentPlayerMovesetAddr() const;
 	// Frees the factory-obtained class we allocated earlier
 	void FreeExpiredFactoryClasses() override;
 };

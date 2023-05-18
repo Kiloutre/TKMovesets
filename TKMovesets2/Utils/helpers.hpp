@@ -52,9 +52,9 @@ public:
 		T* m_ptr;
 	};
 
-	Iterator begin() { return Iterator(&m_ptr[0]); }
-	Iterator end() { return Iterator(&m_ptr[m_size]); }
-	uint64_t size() { return m_size; }
+	Iterator begin() const { return Iterator(&m_ptr[0]); }
+	Iterator end() const { return Iterator(&m_ptr[m_size]); }
+	uint64_t size() const { return m_size; }
 	void set_size(uint64_t new_size) { m_size = new_size; }
 	T* operator[](int n) const { return &m_ptr[n]; }
 

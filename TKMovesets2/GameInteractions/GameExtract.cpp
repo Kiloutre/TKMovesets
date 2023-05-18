@@ -83,7 +83,7 @@ void GameExtract::StopThreadAndCleanup()
 	delete game;
 }
 
-bool GameExtract::CanStart(bool cached)
+bool GameExtract::CanStart(bool cached) const
 {
 	if (m_extractor == nullptr) {
 		return false;
@@ -95,7 +95,7 @@ bool GameExtract::CanStart(bool cached)
 	return m_extractor->CanExtract();
 }
 
-bool GameExtract::IsBusy()
+bool GameExtract::IsBusy() const
 {
 	// There are still playerAddresss to extract from
 	return m_extractionQueue.size() > 0;
@@ -116,14 +116,6 @@ void GameExtract::QueueCharacterExtraction(int playerId, ExtractSettings setting
 		gameAddr playerAddress = m_extractor->GetCharacterAddress(playerId);
 		m_extractionQueue.push_back(std::pair<gameAddr, ExtractSettings>(playerAddress, settings));
 	}
-}
-
-uint8_t GameExtract::GetCharacterCount()
-{
-	if (currentGame != nullptr) {
-		return currentGame->characterCount;
-	}
-	return 2;
 }
 
 void GameExtract::FreeExpiredFactoryClasses()

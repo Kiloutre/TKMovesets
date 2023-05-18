@@ -99,7 +99,7 @@ DWORD GameProcess::GetGamePID(const char* processName)
 	return (DWORD)-1;
 }
 
-std::vector<moduleEntry> GameProcess::GetModuleList()
+std::vector<moduleEntry> GameProcess::GetModuleList() const
 {
 	HANDLE moduleSnap;
 	MODULEENTRY32W me32{ 0 };
@@ -174,7 +174,7 @@ void GameProcess::Detach()
 	status = GameProcessErrcode_PROC_NOT_ATTACHED;
 }
 
-bool GameProcess::IsAttached()
+bool GameProcess::IsAttached() const
 {
 	return status == GameProcessErrcode_PROC_ATTACHED;
 }
@@ -214,70 +214,70 @@ void GameProcess::FreeOldGameMemory(bool instant)
 	}
 }
 
-int8_t GameProcess::readInt8(gameAddr addr)
+int8_t GameProcess::readInt8(gameAddr addr) const
 {
 	int8_t value{ -1 };
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
 	return value;
 }
 
-int16_t GameProcess::readInt16(gameAddr addr)
+int16_t GameProcess::readInt16(gameAddr addr) const
 {
 	int16_t value{ -1 };
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
 	return value;
 }
 
-int32_t GameProcess::readInt32(gameAddr addr)
+int32_t GameProcess::readInt32(gameAddr addr) const
 {
 	int32_t value{ -1 };
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
-int64_t GameProcess::readInt64(gameAddr addr)
+int64_t GameProcess::readInt64(gameAddr addr) const
 {
 	int64_t value{ -1 };
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
 	return value;
 }
 
-uint8_t GameProcess::readUInt8(gameAddr addr)
+uint8_t GameProcess::readUInt8(gameAddr addr) const
 {
 	uint8_t value{ (uint8_t)-1};
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
 	return value;
 }
 
-uint16_t GameProcess::readUInt16(gameAddr addr)
+uint16_t GameProcess::readUInt16(gameAddr addr) const
 {
 	uint16_t value{ (uint16_t)-1};
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
 	return value;
 }
 
-uint32_t GameProcess::readUInt32(gameAddr addr)
+uint32_t GameProcess::readUInt32(gameAddr addr) const
 {
 	uint32_t value{ (uint32_t)-1};
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
-uint64_t GameProcess::readUInt64(gameAddr addr)
+uint64_t GameProcess::readUInt64(gameAddr addr) const
 {
 	uint64_t value{ (uint64_t)- 1};
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
 	return value;
 }
 
-float GameProcess::readFloat(gameAddr addr)
+float GameProcess::readFloat(gameAddr addr) const
 {
 	float value{ -1 };
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
 	return value;
 }
 
-void GameProcess::readBytes(gameAddr addr, void* buf, size_t readSize)
+void GameProcess::readBytes(gameAddr addr, void* buf, size_t readSize) const
 {
 	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)buf, readSize, nullptr);
 }

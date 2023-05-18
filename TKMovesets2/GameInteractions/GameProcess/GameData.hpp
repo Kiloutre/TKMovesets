@@ -16,22 +16,22 @@ private:
 	GameProcess* m_process;
 	
 	// Reads a ptr path from an address identifier and return its last pointer
-	gameAddr ReadPtrPath(const char* c_addressId);
+	gameAddr ReadPtrPath(const char* c_addressId) const;
 public:
 	// Reads a char (1b) from the game in little endian
-	int8_t ReadInt8(const char* c_addressId);
+	int8_t ReadInt8(const char* c_addressId) const;
 	// Reads a short (2b) from the game in little endian
-	int16_t ReadInt16(const char* c_addressId);
+	int16_t ReadInt16(const char* c_addressId) const;
 	// Reads an int (4b) from the game in little endian
-	int32_t ReadInt32(const char* c_addressId);
+	int32_t ReadInt32(const char* c_addressId) const;
 	// Reads an int (8b) from the game in little endian
-	int64_t ReadInt64(const char* c_addressId);
+	int64_t ReadInt64(const char* c_addressId) const;
 	// Reads a 8b value from the game to be interpreted as a pointer
-	gameAddr ReadPtr(const char* c_addressId);
+	gameAddr ReadPtr(const char* c_addressId) const;
 	// Reads a floating point number (4b) from the game in little endian
-	float ReadFloat(const char* c_addressId);
+	float ReadFloat(const char* c_addressId) const;
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
-	void ReadBytes(const char* c_addressId, void* buf, size_t readSize);
+	void ReadBytes(const char* c_addressId, void* buf, size_t readSize) const;
 	// Todo: writing functions
 
 	GameData(GameProcess* process, GameAddressesFile* t_addrFile)

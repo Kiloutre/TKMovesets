@@ -52,9 +52,9 @@ public:
 	// Default flags are read-only, so the importer needs this
 	GameSharedMem() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD; }
 	// Always true because SharedMem can function as long as the process is started. Condition used to trigger RunningUpdate()
-	bool CanStart(bool cached=true) override { return true; };
+	bool CanStart(bool cached=true) const override { return true; };
 	// Is currently busy with an importation
-	bool IsBusy() override;
+	bool IsBusy() const override;
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Frees the factory-obtained class we allocated earlier
@@ -82,6 +82,8 @@ public:
 
 	void CallDebugFunction()
 	{
-		if (m_sharedMemHandler) m_sharedMemHandler->CallDebugFunction();
+		if (m_sharedMemHandler) {
+			m_sharedMemHandler->CallDebugFunction();
+		}
 	}
 };

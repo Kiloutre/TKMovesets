@@ -49,13 +49,13 @@ public:
 	uint64_t actionStartDate = 0;
 
 	// Returns true if process is attached
-	bool IsAttached();
+	bool IsAttached() const;
 	// Returns the amount of characters we are able to interact with
-	virtual uint8_t GetCharacterCount() = 0;
+	uint8_t GetCharacterCount() const;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
-	virtual bool CanStart(bool cached=true) = 0;
+	virtual bool CanStart(bool cached=true) const = 0;
 	// Is currently busy
-	virtual bool IsBusy() = 0;
+	virtual bool IsBusy() const = 0;
 	// Set the process to open
 	void SetTargetProcess(const GameInfo* gameInfo);
 	// Inits the member that needs to be created (.process, .game). Those Must be deleted afterward.

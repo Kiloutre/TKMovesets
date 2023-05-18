@@ -32,15 +32,13 @@ public:
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Returns true if the extractor will allow an extraction (false if it won't, like if characters aren't loaded)
-	bool CanStart(bool cached=true) override;
+	bool CanStart(bool cached=true) const override;
 	// Is currently busy with an extraction
-	bool IsBusy() override;
+	bool IsBusy() const override;
 	// Queue a character extraction. -1 of all characters
 	void QueueCharacterExtraction(int playerId, ExtractSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ExtractionErrcode_ GetLastError();
-	// Returns the amount of characters we are able to import to
-	uint8_t GetCharacterCount() override;
 	// Frees the factory-obtained class we allocated earlier
 	void FreeExpiredFactoryClasses() override;
 };

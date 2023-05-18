@@ -70,7 +70,7 @@ void GameInteraction::Init(GameAddressesFile* addrFile, LocalStorage* t_storage)
 	storage = t_storage;
 }
 
-bool GameInteraction::IsAttached()
+bool GameInteraction::IsAttached() const
 {
 	return process != nullptr && process->IsAttached();
 }
@@ -83,4 +83,12 @@ void GameInteraction::StopThreadAndCleanup()
 
 	delete process;
 	delete game;
+}
+
+uint8_t GameInteraction::GetCharacterCount() const
+{
+	if (currentGame != nullptr) {
+		return currentGame->characterCount;
+	}
+	return 2;
 }

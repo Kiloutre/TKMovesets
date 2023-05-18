@@ -113,7 +113,7 @@ void GameSharedMem::QueueCharacterImportation(movesetInfo* moveset, unsigned int
 	});
 }
 
-bool GameSharedMem::IsBusy()
+bool GameSharedMem::IsBusy() const
 {
 	return m_plannedImportations.size() > 0;
 }
