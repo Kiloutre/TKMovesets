@@ -47,7 +47,7 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 
 	try {
 		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
-		EditorVisuals* newWin = nullptr;//Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
+		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {

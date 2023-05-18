@@ -1,5 +1,6 @@
 #include "EditorVisuals_t7.hpp"
 #include "GameSharedMem.hpp"
+#include "Compression.hpp"
 // Structures
 #include "Structures/EditorMove.hpp"
 #include "Structures/EditorVoiceclip.hpp"
@@ -19,9 +20,9 @@
 #include "Structures/EditorProjectile.hpp"
 #include "Structures/EditorThrowCamera.hpp"
 #include "Structures/EditorCameraData.hpp"
-#include "Structures/EditorMovelistDisplayable.hpp"
-#include "Structures/EditorMovelistPlayable.hpp"
-#include "Structures/EditorMovelistInput.hpp"
+#include "Structures/DisplayableMovelist/EditorMovelistDisplayable.hpp"
+#include "Structures/DisplayableMovelist/EditorMovelistPlayable.hpp"
+#include "Structures/DisplayableMovelist/EditorMovelistInput.hpp"
 
 using namespace EditorVisualsT7;
 

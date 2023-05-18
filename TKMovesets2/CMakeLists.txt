@@ -86,6 +86,8 @@ set(BINARY_SOURCES
                     "Layouts/EditorVisuals/EditorForm.cpp"
                     "Layouts/EditorVisuals/EditorFormList.cpp"
                     # Layout: Structures
+                    "Layouts/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
                     "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorMove.cpp"
                     "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorVoiceclip.cpp"
                     "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorExtraproperties.cpp"
