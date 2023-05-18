@@ -81,6 +81,7 @@ void EditorFormList::CopyFormToClipboard() const
 	{
 		for (auto& [fieldName, field] : item->identifierMap)
 		{
+			DEBUG_LOG("C: [%s] = [%s]\n", fieldName.c_str(), field->buffer);
 			clipboardText += field->buffer;
 			clipboardText += "\n";
 		}
@@ -94,6 +95,7 @@ void EditorFormList::PasteFormFromClipboard()
 	const char* clipboardText = ImGui::GetClipboardText();
 	while (*clipboardText != '\n') ++clipboardText;
 	++clipboardText;
+
 
 	{
 		// Count the amount of fields, if there are too many fields to fit in the current list, make its size grow
@@ -112,7 +114,7 @@ void EditorFormList::PasteFormFromClipboard()
 
 		while (fieldAmount < expectedFieldAmount) {
 			auto newId = CreateNewItem(-1);
-			m_items[newId]->openStatus = EditorFormTreeview_ForceClose;
+			m_items[newId]->openStatus = EditorFormTreeview_ForceOpen;
 			fieldAmount += fieldAmountPerItem;
 		}
 	}
@@ -128,11 +130,14 @@ void EditorFormList::PasteFormFromClipboard()
 				return;
 			}
 
+			item->openStatus = EditorFormTreeview_ForceOpen;
 			field->nextValue = std::string(clipboardText, newlinePos - clipboardText);
+			DEBUG_LOG("P: [%s] -> [%s]\n", fieldName.c_str(), field->nextValue.c_str());
 			clipboardText = newlinePos + 1;
 
+
 			if (*newlinePos == '\0') {
-				break;
+				return;
 			}
 		}
 	}

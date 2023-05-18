@@ -146,10 +146,11 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		appliedBg = true;
 	}
 
-	if (field->nextValue.size() != 0) {
+	bool pastingToField = field->nextValue.size() != 0;
+	if (pastingToField) {
 		// Have to implement pasting manually
 		strcpy_s(field->buffer, field->bufsize, field->nextValue.c_str());
-		// Put the focus back on the input as it should
+		// Put the focus back on the input as it should be after pasting
 		ImGui::SetKeyboardFocusHere();
 	}
 
@@ -157,9 +158,12 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
 	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags)
-		|| field->nextValue.size() != 0)
+		|| pastingToField)
 	{
-		field->nextValue.clear();
+		if (pastingToField) {
+			field->nextValue.clear();
+		}
+
 		if (m_ignoreNextChange) {
 			m_ignoreNextChange = false;
 		}
