@@ -298,6 +298,8 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 			std::vector<EditorInput*> inputs;
 			for (const std::string& fieldName : drawOrder) {
 				EditorInput* field = fieldIdentifierMaps[listIndex][fieldName];
+				std::string descriptionKey = field->fullName + ".description";
+				field->hoverDescription = Localization::HasText(descriptionKey) ? _(descriptionKey.c_str()) : _(field->fullName.c_str());
 				EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
 				if (field->category == category) {
 					inputs.push_back(field);
