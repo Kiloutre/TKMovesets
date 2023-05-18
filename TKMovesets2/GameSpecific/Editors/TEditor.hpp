@@ -35,7 +35,7 @@ public:
 	bool hasDisplayableMovelist = false;
 	// Contains every move, in a displayable format. Not tied to training mode movelist.
 	std::vector<DisplayableMove*>* displayableMovelist;
-	// Set to true when updating displayableMovelist
+	// Set to true when updating displayableMovelist in order to tell EditorVisuals to refresh its movelist
 	bool mustReloadMovelist = false;
 	// Store move ID aliases
 	std::vector<uint16_t> aliases;
