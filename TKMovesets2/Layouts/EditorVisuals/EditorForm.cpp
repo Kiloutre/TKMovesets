@@ -249,14 +249,17 @@ void EditorForm::PasteFormFromClipboard()
 
 bool EditorForm::CanPasteFormFromClipboard() const
 {
+	DEBUG_LOG("CanPasteFormFromClipboard\n");
 	const char* clipboardText = ImGui::GetClipboardText();
 
 	auto newlinePos = strstr(clipboardText, "\n");
-	if (newlinePos == NULL) {
+	if (newlinePos == NULL || newlinePos == clipboardText) {
 		return false;
 	}
 
-	return strncmp(m_windowTypeName.c_str(), clipboardText, newlinePos - clipboardText) == 0;
+	bool typeMatches = strncmp(m_windowTypeName.c_str(), clipboardText, newlinePos - clipboardText) == 0;
+	DEBUG_LOG("CanPasteFormFromClipboard - %u\n", typeMatches);
+	return typeMatches;
 }
 
 bool EditorForm::IsFormValid() const
