@@ -31,36 +31,36 @@ using namespace EditorVisualsT7;
 void EditorVisuals_T7::PopulateWindowCreatorMap()
 {
 	m_windowCreatorMap = {
-		{EditorWindowType_Move, new EditorWindowFactory<EditorMove> },
-		{EditorWindowType_Move, new EditorWindowFactory<EditorMove> },
-		{EditorWindowType_Voiceclip, new EditorWindowFactory<EditorVoiceclip> },
+		{TEditorWindowType_Move, { new EditorWindowFactory<EditorMove>, "move" }},
 
-		{EditorWindowType_Extraproperty, new EditorWindowFactory<EditorExtraproperties> },
-		{EditorWindowType_MoveBeginProperty, new EditorWindowFactory<EditorMoveStartProperty> },
-		{EditorWindowType_MoveEndProperty, new EditorWindowFactory<EditorMoveEndProperty> },
+		{TEditorWindowType_Voiceclip, { new EditorWindowFactory<EditorVoiceclip>, "voiceclip" }},
 
-		{EditorWindowType_Requirement, new EditorWindowFactory<EditorRequirements> },
+		{TEditorWindowType_Extraproperty, { new EditorWindowFactory<EditorExtraproperties>, "extraproperty" }},
+		{TEditorWindowType_MoveBeginProperty, { new EditorWindowFactory<EditorMoveStartProperty>, "move_start_extraprop" }},
+		{TEditorWindowType_MoveEndProperty, { new EditorWindowFactory<EditorMoveEndProperty>, "move_end_extraprop" }},
 
-		{EditorWindowType_HitCondition, new EditorWindowFactory<EditorHitConditions> },
-		{EditorWindowType_Reactions, new EditorWindowFactory<EditorReactions> },
-		{EditorWindowType_Pushback, new EditorWindowFactory<EditorPushback> },
-		{EditorWindowType_PushbackExtradata, new EditorWindowFactory<EditorPushbackExtra> },
+		{TEditorWindowType_Requirement, { new EditorWindowFactory<EditorRequirements>, "requirement" }},
 
-		{EditorWindowType_Cancel, new EditorWindowFactory<EditorCancels> },
-		{EditorWindowType_CancelExtradata, new EditorWindowFactory<EditorCancelExtra> },
-		{EditorWindowType_GroupedCancel, new EditorWindowFactory<EditorGroupedCancels> },
+		{TEditorWindowType_HitCondition, { new EditorWindowFactory<EditorHitConditions>, "hit_condition" }},
+		{TEditorWindowType_Reactions, { new EditorWindowFactory<EditorReactions>, "reactions" }},
+		{TEditorWindowType_Pushback, { new EditorWindowFactory<EditorPushback>, "pushback" }},
+		{TEditorWindowType_PushbackExtradata, { new EditorWindowFactory<EditorPushbackExtra>, "pushback_extradata" }},
 
-		{EditorWindowType_InputSequence, new EditorWindowFactory<EditorInputSequence> },
-		{EditorWindowType_Input, new EditorWindowFactory<EditorInputStruct> },
+		{TEditorWindowType_Cancel, { new EditorWindowFactory<EditorCancels>, "cancel" }},
+		{TEditorWindowType_CancelExtradata, { new EditorWindowFactory<EditorCancelExtra>, "cancel_extra" }},
+		{TEditorWindowType_GroupedCancel, { new EditorWindowFactory<EditorGroupedCancels>, "grouped_cancel" }},
 
-		{EditorWindowType_Projectile, new EditorWindowFactory<EditorProjectile> },
+		{TEditorWindowType_InputSequence, { new EditorWindowFactory<EditorInputSequence>, "input_sequence" }},
+		{TEditorWindowType_Input, { new EditorWindowFactory<EditorInputStruct>, "input" }},
 
-		{EditorWindowType_CameraData, new EditorWindowFactory<EditorCameraData> },
-		{EditorWindowType_ThrowCamera, new EditorWindowFactory<EditorThrowCamera> },
+		{TEditorWindowType_Projectile, { new EditorWindowFactory<EditorProjectile>, "projectile" }},
 
-		{EditorWindowType_MovelistDisplayable, new EditorWindowFactory<EditorMovelistDisplayable> },
-		{EditorWindowType_MovelistPlayable, new EditorWindowFactory<EditorMovelistPlayable> },
-		{EditorWindowType_MovelistInput, new EditorWindowFactory<EditorMovelistInput> }
+		{TEditorWindowType_CameraData, { new EditorWindowFactory<EditorCameraData>, "camera_data" }},
+		{TEditorWindowType_ThrowCamera, { new EditorWindowFactory<EditorThrowCamera>, "throw_camera" }},
+
+		{TEditorWindowType_MovelistDisplayable, { new EditorWindowFactory<EditorMovelistDisplayable>, "mvl_displayable" }},
+		{TEditorWindowType_MovelistPlayable, { new EditorWindowFactory<EditorMovelistPlayable>, "mvl_playable" }},
+		{TEditorWindowType_MovelistInput, { new EditorWindowFactory<EditorMovelistInput>, "mvl_input"}}
 	};
 }
 

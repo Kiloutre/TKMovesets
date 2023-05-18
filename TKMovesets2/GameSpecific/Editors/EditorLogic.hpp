@@ -55,42 +55,11 @@ enum EditorConstants_
 	EditorConstants_ProjectileProperty,
 };
 
+typedef unsigned int EditorWindowType;
 enum EditorWindowType_
 {
-	EditorWindowType_Move,
-
-	EditorWindowType_Voiceclip,
-
-	EditorWindowType_HitCondition,
-	EditorWindowType_Reactions,
-	EditorWindowType_Pushback,
-	EditorWindowType_PushbackExtradata,
-
-	EditorWindowType_Requirement,
-
-	EditorWindowType_Cancel,
-	EditorWindowType_GroupedCancel,
-	EditorWindowType_CancelExtradata,
-
-	EditorWindowType_InputSequence,
-	EditorWindowType_Input,
-
-	EditorWindowType_Extraproperty,
-	EditorWindowType_MoveBeginProperty,
-	EditorWindowType_MoveEndProperty,
-
-	EditorWindowType_Projectile,
-
-	EditorWindowType_CameraData,
-	EditorWindowType_ThrowCamera,
-
-
-	EditorWindowType_MovelistDisplayable,
-	EditorWindowType_MovelistPlayable,
-	EditorWindowType_MovelistInput,
-
-
-	EditorWindowType_Invalid,
+	// Invalid must always be 0
+	EditorWindowType_INVALID = 0
 };
 
 typedef uint32_t EditorInputFlag;
@@ -308,15 +277,15 @@ public:
 
 	// Forms
 	// Returns the fields to display to build a single form of a certain type (move, voiceclip, cancel extradata, etc...)
-	virtual InputMap GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual InputMap GetFormFields(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns the fields to display to build a list of forms of a certain type (extraproperties, requirements, cancels, etc...)
-	virtual std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
-	virtual std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
-	virtual InputMap GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual std::vector<InputMap> GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
+	virtual std::vector<InputMap> GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) = 0;
+	virtual InputMap GetListSingleForm(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
 	// Returns true if the given field is valid
-	virtual bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) = 0;
+	virtual bool ValidateField(EditorWindowType fieldType, EditorInput* field) = 0;
 	// Save a single struct in the moveset
-	virtual void SaveItem(EditorWindowType_ type, uint16_t id, InputMap& inputs) = 0;
+	virtual void SaveItem(EditorWindowType type, uint16_t id, InputMap& inputs) = 0;
 
 	// -- Iteractions -- //
 	// Saves all the moveset animations in our library
@@ -326,17 +295,17 @@ public:
 
 	// -- Creation -- //
 	// Create a new structure or structure list
-	virtual uint32_t CreateNew(EditorWindowType_ type) = 0;
+	virtual uint32_t CreateNew(EditorWindowType type) = 0;
 	// Modifies an existing list's size
-	virtual void ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) = 0;
+	virtual void ModifyListSize(EditorWindowType type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) = 0;
 
 	// -- Copying / Deletion -- //
-	virtual uint32_t DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize) = 0;
-	virtual void DeleteStructures(EditorWindowType_ type, uint32_t id, size_t listSize) = 0;
+	virtual uint32_t DuplicateStructure(EditorWindowType type, uint32_t id, size_t listSize) = 0;
+	virtual void DeleteStructures(EditorWindowType type, uint32_t id, size_t listSize) = 0;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
-	virtual void Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field) { };
+	virtual void Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* field) { };
 
 	// CRC32 calculation
 	virtual uint32_t CalculateCRC32() = 0;

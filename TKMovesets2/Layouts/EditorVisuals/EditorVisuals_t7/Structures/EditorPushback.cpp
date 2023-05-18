@@ -1,7 +1,5 @@
-#include "imgui_extras.hpp"
 #include "EditorPushback.hpp"
-#include "Localization.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
@@ -14,14 +12,14 @@ void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 		if (!amountField->errored) {
 			int pushbackExtraAmount = atoi(amountField->buffer);
-			m_baseWindow->OpenFormWindow(EditorWindowType_PushbackExtradata, id, pushbackExtraAmount);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_PushbackExtradata, id, pushbackExtraAmount);
 		}
 	}
 }
 
-void EditorPushback::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorPushback::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
-	if (winType & EditorWindowType_PushbackExtradata)
+	if (winType & TEditorWindowType_PushbackExtradata)
 	{
 		auto& extradataIdField = m_fieldIdentifierMap["extradata_addr"];
 		if (extradataIdField->errored) {

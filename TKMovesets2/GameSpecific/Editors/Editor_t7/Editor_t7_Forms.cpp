@@ -1183,163 +1183,163 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 
 // ===== Generic =====
 
-void EditorT7::SaveItem(EditorWindowType_ type, uint16_t id, InputMap& inputs)
+void EditorT7::SaveItem(EditorWindowType type, uint16_t id, InputMap& inputs)
 {
 	// Saving is one on an individual item basis, even for lists
 	switch (type)
 	{
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		SaveMove(id, inputs);
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		SaveVoiceclip(id, inputs);
 		break;
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		SaveExtraproperty(id, inputs);
 		break;
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		SaveCancel(id, inputs);
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		SaveCancelExtra(id, inputs);
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		SaveGroupedCancel(id, inputs);
 		break;
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		SaveRequirement(id, inputs);
 		break;
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		SaveHitCondition(id, inputs);
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		SaveReactions(id, inputs);
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		SavePushback(id, inputs);
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		SavePushbackExtra(id, inputs);
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		SaveMoveStartProperty(id, inputs);
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		SaveMoveEndProperty(id, inputs);
 		break;
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		SaveInputSequence(id, inputs);
 		break;
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		SaveInput(id, inputs);
 		break;
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		SaveProjectile(id, inputs);
 		break;
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		SaveThrowCamera(id, inputs);
 		break;
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		SaveCameraData(id, inputs);
 		break;
-	case EditorWindowType_MovelistDisplayable:
+	case TEditorWindowType_MovelistDisplayable:
 		SaveMovelistDisplayable(id, inputs);
 		break;
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		SaveMovelistPlayable(id, inputs);
 		break;
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		SaveMovelistInput(id, inputs);
 		break;
 	}
 }
 
-InputMap EditorT7::GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetFormFields(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	// Builds an input list for a specific window type (single struct) and fill default values according to the given ID
 	switch (type)
 	{
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		return GetMoveInputs(id, drawOrder);
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		return GetCancelExtraInput(id, drawOrder);
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		return GetReactionsInputs(id, drawOrder);
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		return GetPushbackInputs(id, drawOrder);
 		break;
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		return GetInputSequenceInputs(id, drawOrder);
 		break;
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		return GetProjectileInputs(id, drawOrder);
 		break;
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		return GetThrowCameraInputs(id, drawOrder);
 		break;
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		return GetCameraDataInputs(id, drawOrder);
 		break;
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		return GetMovelistPlayableInputs(id, drawOrder);
 		break;
 	}
 	return InputMap();
 }
 
-std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	// Builds an input list for a specific window type (list of structs) and fill default values according to the given ID
 	switch (type)
 	{
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		return GetExtrapropListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		return GetMoveStartPropertyListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		return GetMoveEndPropertyListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		return GetCancelListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		return GetGroupedCancelListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		return GetRequirementListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		return GetHitConditionListInputs(id, drawOrder);
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		return GetVoiceclipListInputs(id, drawOrder);
 		break;
 
-	case EditorWindowType_MovelistDisplayable:
+	case TEditorWindowType_MovelistDisplayable:
 		return GetMovelistDisplayablesInputs(0, drawOrder);
 		break;
 	}
 	return std::vector<InputMap>();
 }
 
-std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize)
+std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize)
 {
 	// Specific to lists with unguessable sizes : we provide the size as an argument
 	switch (type)
 	{
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		return GetInputListInputs(id, listSize, drawOrder);
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		return GetPushbackExtraListInputs(id, listSize, drawOrder);
 		break;
 
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		return GetMovelistInputListInputs(id, listSize, drawOrder);
 		break;
 	}
@@ -1347,13 +1347,13 @@ std::vector<InputMap> EditorT7::GetFormFieldsList(EditorWindowType_ type, uint16
 }
 
 
-InputMap EditorT7::GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder)
+InputMap EditorT7::GetListSingleForm(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder)
 {
 	std::vector<InputMap> list;
 
 	switch (type)
 	{
-	case EditorWindowType_MovelistDisplayable:
+	case TEditorWindowType_MovelistDisplayable:
 		list = GetMovelistDisplayablesInputs(-1, drawOrder);
 		break;
 	default:
@@ -1371,7 +1371,7 @@ InputMap EditorT7::GetListSingleForm(EditorWindowType_ type, uint16_t id, Vector
 	return list[0];
 }
 
-bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
+bool EditorT7::ValidateField(EditorWindowType fieldType, EditorInput* field)
 {
 	if (!ValidateFieldType(field)) {
 		return false;
@@ -1379,42 +1379,42 @@ bool EditorT7::ValidateField(EditorWindowType_ fieldType, EditorInput* field)
 
 	switch (fieldType)
 	{
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		return ValidateMoveField(field);
 		break;
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		return ValidateCancelField(field);
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		return ValidateGroupedCancelField(field);
 		break;
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		return ValidateHitConditionField(field);
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		return ValidateReactionsField(field);
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		return ValidatePushbackField(field);
 		break;
-	case EditorWindowType_MoveBeginProperty:
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveEndProperty:
 		return ValidateOtherMoveProperty(field);
 		break;
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		return ValidateInputSequenceField(field);
 		break;
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		return ValidateProjectileField(field);
 		break;
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		return ValidateThrowCameraField(field);
 		break;
 
-	case EditorWindowType_MovelistDisplayable:
+	case TEditorWindowType_MovelistDisplayable:
 		return ValidateMovelistDisplayableField(field);
 		break;
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		return ValidateMovelistPlayableField(field);
 		break;
 

@@ -9,8 +9,9 @@
 
 // -- Public methods -- //
 
-EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize)
+EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName)
 {
+	m_windowTypeName = typeName;
 	windowType = t_windowType;
 	m_baseWindow = baseWindow;
 	m_listSize = listSize;
@@ -89,7 +90,7 @@ bool EditorFormList::IsFormValid()
 
 void EditorFormList::BuildItemDetails(int listIdx)
 {
-	std::string label = std::format("{} {} ({})", _(std::format("{}.window_name", m_identifierPrefix).c_str()), listIdx, listIdx + structureId);
+	std::string label = std::format("{} {} ({})", _(std::format("edition.{}.window_name", m_windowTypeName).c_str()), listIdx, listIdx + structureId);
 
 	m_items[listIdx]->itemLabel = label;
 }
@@ -262,9 +263,6 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	structureId = t_id;
 	m_editor = editor;
 
-	m_identifier = EditorFormUtils::GetWindowTypeName(windowType);
-	m_identifierPrefix = "edition." + m_identifier;
-
 	VectorSet<std::string> drawOrder;
 
 	std::vector<InputMap> fieldIdentifierMaps;
@@ -313,7 +311,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 
 	// Build category names
 	for (uint8_t category : m_categories) {
-		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
+		m_categoryStringIdentifiers[category] = std::format("edition.{}.category_{}", m_windowTypeName, category);
 	}
 
 	m_windowTitleBase = windowTitleBase;
@@ -425,7 +423,7 @@ void EditorFormList::OnApplyResize(int sizeChange, int oldSize)
 	m_baseWindow->IssueFieldUpdate(windowType, sizeChange, structureId, structureId + oldSize);
 }
 
-void EditorFormList::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorFormList::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	if (winType == windowType){
 		// If a struct was created before this one, we must shift our own ID

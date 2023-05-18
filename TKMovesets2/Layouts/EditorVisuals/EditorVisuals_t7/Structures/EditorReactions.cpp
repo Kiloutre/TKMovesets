@@ -10,12 +10,12 @@ void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 	auto& name = field->name;
 
 	if (name.endsWith("_pushback")) {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Pushback, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Pushback, id);
 	}
 	else if (name.endsWith("_moveid")) {
 		id = baseWindow->ValidateMoveId(field->buffer);
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_Move, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_Move, id);
 		}
 	}
 }

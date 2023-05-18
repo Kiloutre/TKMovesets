@@ -13,15 +13,15 @@ void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 			if (!inputCount->errored)
 			{
 				int listSize = (int)EditorUtils::GetFieldValue(inputCount);
-				m_baseWindow->OpenFormWindow(EditorWindowType_MovelistInput, referenceId, listSize);
+				m_baseWindow->OpenFormWindow(TEditorWindowType_MovelistInput, referenceId, listSize);
 			}
 		}
 	}
 }
 
-void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
-	if (winType & EditorWindowType_MovelistInput)
+	if (winType & TEditorWindowType_MovelistInput)
 	{
 		auto& sequenceIdField = m_fieldIdentifierMap["input_sequence_id"];
 		if (sequenceIdField->errored) {

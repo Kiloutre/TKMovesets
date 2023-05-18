@@ -1,7 +1,7 @@
 #include "imgui_extras.hpp"
 #include "EditorHitConditions.hpp"
 #include "Localization.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
@@ -9,18 +9,18 @@ void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 	auto& name = field->name;
 
 	if (name == "requirements_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Requirement, id);
 	}
 	else if (name == "reactions_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Reactions, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Reactions, id);
 	}
 }
 
-void EditorHitConditions::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorHitConditions::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	switch (winType)
 	{
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		// If a struct was created before this one, we must shfit our own ID
 		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
@@ -29,7 +29,7 @@ void EditorHitConditions::RequestFieldUpdate(EditorWindowType_ winType, int valu
 		}
 		break;
 
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		{
 			int listIdx = 0;
 			for (auto& item : m_items)

@@ -156,7 +156,7 @@ void EditorT7::DeleteMovelistPlayable(int id)
 	}
 }
 
-void EditorT7::DeleteStructures(EditorWindowType_ type, uint32_t id, size_t listSize)
+void EditorT7::DeleteStructures(EditorWindowType type, uint32_t id, size_t listSize)
 {
 	if (listSize == 0) {
 		listSize = 1;
@@ -170,77 +170,77 @@ void EditorT7::DeleteStructures(EditorWindowType_ type, uint32_t id, size_t list
 	switch (type)
 	{
 		// Structure lists
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		ModifyRequirementListSize(id, {}, itemsToDelete);
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		ModifyVoiceclipListSize(id, {}, itemsToDelete);
 		break;
 
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		ModifyCancelListSize(id, {}, itemsToDelete);
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		ModifyGroupedCancelListSize(id, {}, itemsToDelete);
 		break;
 
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		ModifyExtraPropertyListSize(id, {}, itemsToDelete);
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		ModifyStartPropertyListSize(id, {}, itemsToDelete);
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		ModifyEndPropertyListSize(id, {}, itemsToDelete);
 		break;
 
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		ModifyHitConditionListSize(id, {}, itemsToDelete);
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		ModifyPushbackExtraListSize(id, {}, itemsToDelete);
 		break;
 
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		ModifyInputListSize(id, {}, itemsToDelete);
 		break;
 
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		ModifyMovelistInputSize(id, {}, itemsToDelete);
 		break;
 
 		// Structures
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		DeleteMove(id);
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		DeleteCancelExtradata(id);
 		break;
 
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		DeleteReactions(id);
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		DeletePushback(id);
 		break;
 
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		DeleteInputSequence(id);
 		break;
 
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		DeleteProjectile(id);
 		break;
 
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		DeleteThrowCamera(id);
 		break;
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		DeleteCameraData(id);
 		break;
 
 
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		DeleteMovelistPlayable(id);
 		break;
 

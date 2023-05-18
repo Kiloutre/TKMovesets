@@ -891,7 +891,7 @@ void EditorT7::Live_OnProjectileEdit(int id, EditorInput* field)
 	}
 }
 
-void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field)
+void EditorT7::Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* field)
 {
 	if (live_loadedMoveset == 0) {
 		return;
@@ -900,75 +900,75 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* fie
 
 	switch (type)
 	{
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		Live_OnMoveEdit(id, field);
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		Live_OnVoiceclipEdit(id, field);
 		break;
 
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		Live_OnCancelEdit(id, field);
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		Live_OnCancelExtraEdit(id, field);
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		Live_OnGroupedCancelEdit(id, field);
 		break;
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		Live_OnExtrapropertyEdit(id, field);
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		Live_OnMoveBeginPropEdit(id, field);
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		Live_OnMoveEndPropEdit(id, field);
 		break;
 
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		Live_OnRequirementEdit(id, field);
 		break;
 
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		Live_OnHitConditionPropEdit(id, field);
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		Live_OnReactionsEdit(id, field);
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		Live_OnPushbackEdit(id, field);
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		Live_OnPushbackExtraEdit(id, field);
 		break;
 
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		Live_OnInputSequenceEdit(id, field);
 		break;
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		Live_OnInputEdit(id, field);
 		break;
 
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		Live_OnProjectileEdit(id, field);
 		break;
 
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		Live_OnCameraDataEdit(id, field);
 		break;
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		Live_OnThrowCameraEdit(id, field);
 		break;
 
 
-	case EditorWindowType_MovelistDisplayable:
+	case TEditorWindowType_MovelistDisplayable:
 		Live_OnMovelistDisplayableEdit(id, field);
 		break;
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		Live_OnMovelistPlayableEdit(id, field);
 		break;
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		Live_OnMovelistInputEdit(id, field);
 		break;
 	}

@@ -39,7 +39,7 @@ void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
 
 void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 {
-	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
+	std::string windowName = _(std::format("edition.{}.window_name", m_windowTypeName).c_str());
 	const char* moveName = m_fieldIdentifierMap["move_name"]->buffer;
 	m_windowTitle = std::format("{} {} {} - {}###{}{}{}", windowName, structureId, moveName, m_windowTitleBase.c_str(), windowName, structureId,m_windowTitleBase.c_str());
 }
@@ -53,36 +53,36 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 	if (name.startsWith("cancel_addr")) {
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_Cancel, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_Cancel, id);
 		}
 	}
 	else if (name == "transition") {
 		// Validation is only needed here for alias conversion
-		baseWindow->OpenFormWindow(EditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
+		baseWindow->OpenFormWindow(TEditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
 	}
 	else if (name == "voiceclip_addr") {
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_Voiceclip, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_Voiceclip, id);
 		}
 	}
 	else if (name == "hit_condition_addr") {
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_HitCondition, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_HitCondition, id);
 		}
 	}
 	else if (name == "extra_properties_addr") {
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_Extraproperty, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_Extraproperty, id);
 		}
 	}
 	else if (name == "move_start_extraprop_addr") {
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_MoveBeginProperty, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_MoveBeginProperty, id);
 		}
 	}
 	else if (name == "move_end_extraprop_addr") {
 		if (id >= 0) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_MoveEndProperty, id);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_MoveEndProperty, id);
 		}
 	}
 	else if (name == "anim_name")
@@ -105,32 +105,32 @@ void EditorMove::OnApply()
 	}
 }
 
-void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorMove::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
-	if ((winType & (EditorWindowType_HitCondition | EditorWindowType_Extraproperty | EditorWindowType_Cancel
-		| EditorWindowType_MoveBeginProperty | EditorWindowType_MoveEndProperty | EditorWindowType_Voiceclip)) == 0) {
+	if ((winType & (TEditorWindowType_HitCondition | TEditorWindowType_Extraproperty | TEditorWindowType_Cancel
+		| TEditorWindowType_MoveBeginProperty | TEditorWindowType_MoveEndProperty | TEditorWindowType_Voiceclip)) == 0) {
 		return;
 	}
 	std::string fieldName;
 
 	switch (winType)
 	{
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		fieldName = "hit_condition_addr";
 		break;
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		fieldName = "extra_properties_addr";
 		break;
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		fieldName = "cancel_addr";
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		fieldName = "move_start_extraprop_addr";
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		fieldName = "move_end_extraprop_addr";
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		fieldName = "voiceclip_addr";
 		break;
 	default:

@@ -74,70 +74,70 @@ unsigned int EditorT7::GetMovelistDisplayableInputCount()
 	return (unsigned int)m_iterators.mvl_inputs.size();
 }
 
-unsigned int EditorT7::GetStructureCount(EditorWindowType_ type)
+unsigned int EditorT7::GetStructureCount(EditorWindowType type)
 {
 	switch (type)
 	{
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		return (unsigned int)m_infos->table.moveCount;
 		break;
 
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		return (unsigned int)m_infos->table.voiceclipCount;
 		break;
 
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		return (unsigned int)m_infos->table.hitConditionCount;
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		return (unsigned int)m_infos->table.reactionsCount;
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		return (unsigned int)m_infos->table.pushbackCount;
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		return (unsigned int)m_infos->table.pushbackExtradataCount;
 		break;
 
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		return (unsigned int)m_infos->table.requirementCount;
 		break;
 
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		return (unsigned int)m_infos->table.cancelCount;
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		return (unsigned int)m_infos->table.groupCancelCount;
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		return (unsigned int)m_infos->table.cancelExtradataCount;
 		break;
 
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		return (unsigned int)m_infos->table.inputSequenceCount;
 		break;
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		return (unsigned int)m_infos->table.inputCount;
 		break;
 
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		return (unsigned int)m_infos->table.extraMovePropertyCount;
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		return (unsigned int)m_infos->table.moveBeginningPropCount;
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		return (unsigned int)m_infos->table.moveEndingPropCount;
 		break;
 
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		return (unsigned int)m_infos->table.projectileCount;
 		break;
 
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		return (unsigned int)m_infos->table.cameraDataCount;
 		break;
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		return (unsigned int)m_infos->table.throwCamerasCount;
 		break;
 	}

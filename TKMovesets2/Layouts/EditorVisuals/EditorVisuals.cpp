@@ -12,11 +12,12 @@
 // Structures
 
 // -- Private methods -- //
-EditorForm* EditorVisuals::AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize)
+EditorForm* EditorVisuals::AllocateFormWindow(EditorWindowType windowType, uint16_t id, int listSize)
 {
 	auto windowCreator = m_windowCreatorMap.find(windowType);
 	if (windowCreator != m_windowCreatorMap.end()) {
-		auto newWin = (EditorForm*)windowCreator->second->allocate(m_subwindowsTitle, windowType, id, m_abstractEditor, this, listSize);
+		auto typeName = windowCreator->second.typeName;
+		auto newWin = (EditorForm*)windowCreator->second.allocator->allocate(m_subwindowsTitle, windowType, id, m_abstractEditor, this, listSize, typeName);
 		newWin->OnInitEnd();
 		return newWin;
 	}
@@ -26,7 +27,7 @@ EditorForm* EditorVisuals::AllocateFormWindow(EditorWindowType_ windowType, uint
 	return nullptr;
 }
 
-void EditorVisuals::OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize)
+void EditorVisuals::OpenFormWindow(EditorWindowType windowType, uint16_t structId, int listSize)
 {
 	int availableOverwriteIndex = -1;
 	for (int i = 0; i < m_structWindows.size(); ++i) {
@@ -206,7 +207,7 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 	}
 }
 
-void EditorVisuals::IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	DEBUG_LOG("EditorVisuals::IssueFieldUpdate(type: %u, change: %d, list start: %d, list end: %d)\n", winType, valueChange, listStart, listEnd);
 	for (auto& window : m_structWindows)

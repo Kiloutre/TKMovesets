@@ -207,75 +207,75 @@ uint32_t EditorT7::CreateNewMove()
 	return newStructId;
 }
 
-uint32_t EditorT7::CreateNew(EditorWindowType_ type)
+uint32_t EditorT7::CreateNew(EditorWindowType type)
 {
 	switch (type)
 	{
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		return CreateNewRequirements();
 		break;
 
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		return CreateNewMove();
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		return CreateNewVoiceclipList();
 		break;
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		return CreateNewCancelList();
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		return CreateNewGroupedCancelList();
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		return CreateNewCancelExtra();
 		break;
 
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		return CreateNewExtraProperties();
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		return CreateNewMoveBeginProperties();
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		return CreateNewMoveEndProperties();
 		break;
 
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		return CreateNewHitConditions();
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		return CreateNewReactions();
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		return CreateNewPushback();
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		return CreateNewPushbackExtra();
 		break;
 
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		return CreateInputSequence();
 		break;
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		return CreateInputList();
 		break;
 
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		return CreateNewProjectile();
 		break;
 
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		return CreateNewThrowCamera();
 		break;
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		return CreateNewCameraData();
 		break;
 
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		return CreateNewMvlPlayable();
 		break;
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		return CreateNewMvlInputs();
 		break;
 	}

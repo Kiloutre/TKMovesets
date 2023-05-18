@@ -17,21 +17,21 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	if (name == "move_id") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
 	}
 	else if (name == "extradata_addr") {
 		int id = atoi(field->buffer);
-		m_baseWindow->OpenFormWindow(EditorWindowType_CancelExtradata, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_CancelExtradata, id);
 	}
 	else if (name == "requirements_addr") {
 		int id = atoi(field->buffer);
-		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Requirement, id);
 	}
 	else if (name == "command") {
 		// Command is only clickable
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
 		int inputSequenceId = editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
-		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_InputSequence, inputSequenceId);
 	}
 }
 
@@ -61,7 +61,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 		std::string inputs;
 
-		if (inputSequenceId >= (int)editor->GetStructureCount(EditorWindowType_InputSequence))
+		if (inputSequenceId >= (int)editor->GetStructureCount(TEditorWindowType_InputSequence))
 		{
 			commandField->errored = true;
 			inputs = _("edition.cancel.invalid_sequence_id");
@@ -114,11 +114,11 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 }
 
 
-void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	switch (winType)
 	{
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		// If a struct was created before this one, we must shfit our own ID
 		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
@@ -126,7 +126,7 @@ void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType_ winType, int val
 			ApplyWindowName();
 		}
 		break;
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 	{
 		int listIdx = 0;
 		for (auto& item : m_items)

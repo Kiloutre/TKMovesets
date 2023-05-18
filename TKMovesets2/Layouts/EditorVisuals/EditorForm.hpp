@@ -14,9 +14,6 @@ namespace EditorFormUtils
 
 	// Helps calculate the amount of drawable columns for forms
 	int GetColumnCount();
-	
-	// Returns a string used to build translation strings depending on the window type (move, cancel, etc...)
-	std::string GetWindowTypeName(EditorWindowType_ type);
 }
 
 // Windowed class managing a single struct
@@ -36,7 +33,7 @@ protected:
 	// Used when saving
 	EditorLogic* m_editor = nullptr;
 	// Contains the identifier with which to prefix translation strings
-	std::string m_identifierPrefix;
+	std::string m_windowTypeName;
 	// Contains a reference to the main editor window, used for event handling
 	EditorVisuals* m_baseWindow = nullptr;
 	// Become true if there were unsaved changes but the user attempted to close the window anyway. Confirmation will be required.
@@ -115,8 +112,8 @@ public:
 	bool setFocus = true;
 	// Contains our ID or list starting ID for lists (they are contiguous)
 	uint32_t structureId = 0;
-	// Type of the widnow, passed to editor functions
-	EditorWindowType_ windowType = EditorWindowType_Invalid;
+	// Type of the window, passed to editor functions
+	EditorWindowType windowType = EditorWindowType_INVALID;
 	// The dock ID to set during the next render 
 	int nextDockId = -1;
 	// Stores the last viewport the window was rendered in. If isn't the main window's, this window won't be closed automatically.
@@ -125,12 +122,12 @@ public:
 	bool uniqueType = false;
 
 	EditorForm() {};
-	EditorForm(const std::string& parentWindowName, EditorWindowType_ windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize);
+	EditorForm(const std::string& parentWindowName, EditorWindowType windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName);
 	virtual ~EditorForm();
 
 	// Called after the constructor
 	virtual void OnInitEnd() {};
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
-	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) {};
+	virtual void RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd) {};
 	void Render();
 };

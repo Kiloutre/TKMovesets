@@ -18,32 +18,6 @@ namespace EditorT7Utils
 	std::string ConvertMovelistDisplayableTextToGameText(const char* str);
 };
 
-struct StructIterators
-{
-	StructIterator<StructsT7_gameAddr::Move> moves;
-	StructIterator<Requirement> requirements;
-	StructIterator<StructsT7_gameAddr::HitCondition> hit_conditions;
-	StructIterator<StructsT7_gameAddr::Cancel> cancels;
-	StructIterator<StructsT7_gameAddr::Cancel> grouped_cancels;
-	StructIterator<StructsT7_gameAddr::Reactions> reactions;
-	StructIterator<StructsT7_gameAddr::Pushback> pushbacks;
-	StructIterator<PushbackExtradata> pushback_extras;
-	StructIterator<CancelExtradata> cancel_extras;
-	StructIterator<ExtraMoveProperty> extra_move_properties;
-	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_start_properties;
-	StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
-	StructIterator<StructsT7_gameAddr::Projectile> projectiles;
-	StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
-	StructIterator<StructsT7_gameAddr::ThrowCamera> throw_datas;
-	StructIterator<Input> inputs;
-	StructIterator<Voiceclip> voiceclips;
-	StructIterator<CameraData> camera_datas;
-
-	StructIterator<MvlDisplayable> mvl_displayables;
-	StructIterator<MvlPlayable> mvl_playables;
-	StructIterator<MvlInput> mvl_inputs;
-};
-
 class EditorT7 : public TEditor
 {
 private:
@@ -54,7 +28,31 @@ private:
 	// Contains a ptr to the head of the displayable movelist
 	MvlHead* m_mvlHead = nullptr;
 	// Contains iterators for the various structure lists
-	StructIterators m_iterators;
+	struct
+	{
+		StructIterator<StructsT7_gameAddr::Move> moves;
+		StructIterator<Requirement> requirements;
+		StructIterator<StructsT7_gameAddr::HitCondition> hit_conditions;
+		StructIterator<StructsT7_gameAddr::Cancel> cancels;
+		StructIterator<StructsT7_gameAddr::Cancel> grouped_cancels;
+		StructIterator<StructsT7_gameAddr::Reactions> reactions;
+		StructIterator<StructsT7_gameAddr::Pushback> pushbacks;
+		StructIterator<PushbackExtradata> pushback_extras;
+		StructIterator<CancelExtradata> cancel_extras;
+		StructIterator<ExtraMoveProperty> extra_move_properties;
+		StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_start_properties;
+		StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
+		StructIterator<StructsT7_gameAddr::Projectile> projectiles;
+		StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
+		StructIterator<StructsT7_gameAddr::ThrowCamera> throw_datas;
+		StructIterator<Input> inputs;
+		StructIterator<Voiceclip> voiceclips;
+		StructIterator<CameraData> camera_datas;
+
+		StructIterator<MvlDisplayable> mvl_displayables;
+		StructIterator<MvlPlayable> mvl_playables;
+		StructIterator<MvlInput> mvl_inputs;
+	} m_iterators;
 	// Used to execute extra properties if handled by the game
 	OnlineT7** m_sharedMemHandler = nullptr;
 
@@ -295,12 +293,12 @@ public:
 	void ReloadDisplayableMoveList() override;
 	void RecomputeDisplayableMoveFlags(uint16_t moveId) override;
 	uint16_t GetCurrentMoveID(uint8_t playerId) override;
-	InputMap GetFormFields(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	std::vector<InputMap> GetFormFieldsList(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
-	InputMap GetListSingleForm(EditorWindowType_ type, uint16_t id, VectorSet<std::string>& drawOrder) override;
-	bool ValidateField(EditorWindowType_ fieldType, EditorInput* field) override;
-	void SaveItem(EditorWindowType_ type, uint16_t id, InputMap& inputs) override;
+	InputMap GetFormFields(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<InputMap> GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	std::vector<InputMap> GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
+	InputMap GetListSingleForm(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) override;
+	bool ValidateField(EditorWindowType fieldType, EditorInput* field) override;
+	void SaveItem(EditorWindowType type, uint16_t id, InputMap& inputs) override;
 
 	// -- Interactions -- //
 	// Sets the current move of a player
@@ -330,25 +328,25 @@ public:
 	bool IsPropertyProjectileRef(const char* buffer) override;
 	bool IsPropertyProjectileRef(uint32_t id);
 	bool IsVoicelipValueEnd(const char* buffer) override;
-	unsigned int GetStructureCount(EditorWindowType_ type) override;
+	unsigned int GetStructureCount(EditorWindowType type) override;
 	unsigned int GetMotaAnimCount(int motaId) override;
 	// Movelist
 	std::string GetMovelistDisplayableLabel(InputMap& fieldMap) override;
 	unsigned int GetMovelistDisplayableInputCount() override;
 
 	// -- Creation  -- //
-	uint32_t CreateNew(EditorWindowType_ type) override;
+	uint32_t CreateNew(EditorWindowType type) override;
 
 	// -- Copying / Deletion -- //
-	uint32_t DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize) override;
-	void DeleteStructures(EditorWindowType_ type, uint32_t id, size_t listSize) override;
+	uint32_t DuplicateStructure(EditorWindowType type, uint32_t id, size_t listSize) override;
+	void DeleteStructures(EditorWindowType type, uint32_t id, size_t listSize) override;
 
 	// -- List Creation / List Deletion -- //
-	void ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
+	void ModifyListSize(EditorWindowType type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds) override;
 
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
-	void Live_OnFieldEdit(EditorWindowType_ type, int id, EditorInput* field) override;
+	void Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* field) override;
 
 	// CRC32 calculation
 	uint32_t CalculateCRC32() override;

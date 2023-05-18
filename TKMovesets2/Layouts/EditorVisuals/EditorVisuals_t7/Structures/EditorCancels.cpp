@@ -18,23 +18,23 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 	if (name == "move_id") {
 		if (editor->IsCommandGroupedCancelReference(item->identifierMap["command"]->buffer)) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, referenceId);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_GroupedCancel, referenceId);
 		}
 		else {
 			auto moveId = BaseWindow<EditorVisuals_T7>()->ValidateMoveId(field->buffer);
-			m_baseWindow->OpenFormWindow(EditorWindowType_Move, moveId);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_Move, moveId);
 		}
 	}
 	else if (name == "extradata_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_CancelExtradata, referenceId);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_CancelExtradata, referenceId);
 	}
 	else if (name == "requirements_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Requirement, referenceId);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Requirement, referenceId);
 	}
 	else if (name == "command") {
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
 		int inputSequenceId = editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
-		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_InputSequence, inputSequenceId);
 	}
 }
 
@@ -53,7 +53,7 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 		if (editor->IsCommandGroupedCancelReference(commandField->buffer))
 		{
 			int groupId = atoi(moveIdField->buffer);
-			moveIdField->errored = groupId >= (int)editor->GetStructureCount(EditorWindowType_GroupedCancel);
+			moveIdField->errored = groupId >= (int)editor->GetStructureCount(TEditorWindowType_GroupedCancel);
 		}
 		else
 		{
@@ -92,7 +92,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 
 		std::string inputs;
 
-		if (inputSequenceId >= (int)editor->GetStructureCount(EditorWindowType_InputSequence))
+		if (inputSequenceId >= (int)editor->GetStructureCount(TEditorWindowType_InputSequence))
 		{
 			commandField->errored = true;
 			inputs = _("edition.cancel.invalid_sequence_id");
@@ -150,13 +150,13 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	item->itemLabel = label;
 }
 
-void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	auto editor = Editor<EditorT7>();
 
 	switch (winType)
 	{
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		// If a struct was created before this one, we must shfit our own ID
 		if (MUST_SHIFT_ID(structureId, valueChange, listStart, listEnd)) {
 			// Same shifting logic as in ListCreations
@@ -164,7 +164,7 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 			ApplyWindowName();
 		}
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		{
 			int listIdx = 0;
 			for (auto& item : m_items)
@@ -191,7 +191,7 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 
 		}
 		break;
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		{
 			int listIdx = 0;
 			for (auto& item : m_items)

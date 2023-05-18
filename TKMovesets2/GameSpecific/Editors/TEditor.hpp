@@ -23,6 +23,48 @@ namespace TEditorUtils
 {
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
 };
+
+enum TEditorWindowType_
+{
+	// Invalid must always be zero
+	TEditorWindowType_INVALID = 0,
+
+	TEditorWindowType_Move,
+
+	TEditorWindowType_Voiceclip,
+
+	TEditorWindowType_HitCondition,
+	TEditorWindowType_Reactions,
+	TEditorWindowType_Pushback,
+	TEditorWindowType_PushbackExtradata,
+
+	TEditorWindowType_Requirement,
+
+	TEditorWindowType_Cancel,
+	TEditorWindowType_GroupedCancel,
+	TEditorWindowType_CancelExtradata,
+
+	TEditorWindowType_InputSequence,
+	TEditorWindowType_Input,
+
+	TEditorWindowType_Extraproperty,
+	TEditorWindowType_MoveBeginProperty,
+	TEditorWindowType_MoveEndProperty,
+
+	TEditorWindowType_Projectile,
+
+	TEditorWindowType_CameraData,
+	TEditorWindowType_ThrowCamera,
+
+
+	TEditorWindowType_MovelistDisplayable,
+	TEditorWindowType_MovelistPlayable,
+	TEditorWindowType_MovelistInput,
+
+
+	TEditorWindowType_Invalid,
+};
+
 class TEditor : public EditorLogic
 {
 protected:
@@ -86,7 +128,7 @@ public:
 	// Returns true if the voiceclip value indicates the end of the voiceclip list
 	virtual bool IsVoicelipValueEnd(const char* buffer) = 0;
 	// Returns the amount of structure in the given structure list type (move, cancel etc)
-	virtual unsigned int GetStructureCount(EditorWindowType_ type) = 0;
+	virtual unsigned int GetStructureCount(EditorWindowType type) = 0;
 	// Returns the amount of MOTA animations inside of a specific MOTA
 	virtual unsigned int GetMotaAnimCount(int motaId) = 0;
 	// Returns a string computed based on a movelist displayable's icons value and more

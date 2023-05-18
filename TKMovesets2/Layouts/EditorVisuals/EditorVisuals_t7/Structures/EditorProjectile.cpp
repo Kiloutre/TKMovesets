@@ -1,9 +1,5 @@
-#include <ImGui.h>
-
-#include "imgui_extras.hpp"
 #include "EditorProjectile.hpp"
-#include "Localization.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
@@ -11,19 +7,19 @@ void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 	auto& name = field->name;
 
 	if (name == "cancel_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Cancel, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Cancel, id);
 	}
 	else if (name == "hit_condition_addr") {
-		m_baseWindow->OpenFormWindow(EditorWindowType_HitCondition, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_HitCondition, id);
 	}
 }
 
-void EditorProjectile::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorProjectile::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	
-	if (winType & (EditorWindowType_Cancel | EditorWindowType_HitCondition))
+	if (winType & (TEditorWindowType_Cancel | TEditorWindowType_HitCondition))
 {
-		std::string fieldName = (winType & EditorWindowType_Cancel) ? "cancel_addr" : "hit_condition_addr";
+		std::string fieldName = (winType & TEditorWindowType_Cancel) ? "cancel_addr" : "hit_condition_addr";
 		EditorInput* field = m_fieldIdentifierMap[fieldName];
 
 		if (field->errored) {

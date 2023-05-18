@@ -32,71 +32,13 @@ namespace EditorFormUtils
 
 		return 1;
 	}
-
-	std::string GetWindowTypeName(EditorWindowType_ type)
-	{
-		switch (type)
-		{
-		case EditorWindowType_Requirement:
-			return "requirement";
-
-		case EditorWindowType_Move:
-			return "move";
-		case EditorWindowType_Voiceclip:
-			return "voiceclip";
-
-		case EditorWindowType_Cancel:
-			return "cancel";
-		case EditorWindowType_CancelExtradata:
-			return "cancel_extra";
-		case EditorWindowType_GroupedCancel:
-			return "grouped_cancel";
-
-		case EditorWindowType_HitCondition:
-			return "hit_condition";
-		case EditorWindowType_Reactions:
-			return "reactions";
-		case EditorWindowType_Pushback:
-			return "pushback";
-		case EditorWindowType_PushbackExtradata:
-			return "pushback_extradata";
-
-		case EditorWindowType_Extraproperty:
-			return "extraproperty";
-		case EditorWindowType_MoveBeginProperty:
-			return "move_start_extraprop";
-		case EditorWindowType_MoveEndProperty:
-			return "move_end_extraprop";
-
-		case EditorWindowType_Input:
-			return "input";
-		case EditorWindowType_InputSequence:
-			return "input_sequence";
-
-		case EditorWindowType_Projectile:
-			return "projectile";
-
-		case EditorWindowType_CameraData:
-			return "camera_data";
-
-		case EditorWindowType_ThrowCamera:
-			return "throw_camera";
-
-		case EditorWindowType_MovelistDisplayable:
-			return "mvl_displayable";
-		case EditorWindowType_MovelistPlayable:
-			return "mvl_playable";
-		case EditorWindowType_MovelistInput:
-			return "mvl_input";
-		}
-		return "UNKNOWN";
-	}
 }
 
 // -- Public methods -- //
 
-EditorForm::EditorForm(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize)
+EditorForm::EditorForm(const std::string& parentWindowName, EditorWindowType t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName)
 {
+	m_windowTypeName = typeName;
 	windowType = t_windowType;
 	m_baseWindow = baseWindow;
 	InitForm(parentWindowName, t_structureId, editor);
@@ -281,7 +223,7 @@ bool EditorForm::IsFormValid()
 void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 {
 	if (reapplyWindowProperties) return;
-	std::string windowName = _(std::format("{}.window_name", m_identifierPrefix).c_str());
+	std::string windowName = _(std::format("edition.{}.window_name", m_windowTypeName).c_str());
 	m_windowTitle = std::format("{} {} - {}###{}{}", windowName, structureId, m_windowTitleBase.c_str(), windowName, structureId);
 }
 
@@ -291,8 +233,6 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogi
 {
 	structureId = t_id;
 	m_editor = editor;
-
-	m_identifierPrefix = "edition." + EditorFormUtils::GetWindowTypeName(windowType);
 
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMap = editor->GetFormFields(windowType, t_id, drawOrder);
@@ -317,7 +257,7 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogi
 			}
 		}
 		m_fieldsCategoryMap[category] = inputs;
-		m_categoryStringIdentifiers[category] = std::format("{}.category_{}", m_identifierPrefix, category);
+		m_categoryStringIdentifiers[category] = std::format("edition.{}.category_{}", m_windowTypeName, category);
 	}
 
 	m_windowTitleBase = windowTitleBase;

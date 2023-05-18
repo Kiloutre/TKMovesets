@@ -202,69 +202,69 @@ uint32_t EditorT7::DuplicateMovelistInput(uint32_t id, size_t listSize)
 	return (uint32_t)listCount;
 }
 
-uint32_t EditorT7::DuplicateStructure(EditorWindowType_ type, uint32_t id, size_t listSize)
+uint32_t EditorT7::DuplicateStructure(EditorWindowType type, uint32_t id, size_t listSize)
 {
 	switch (type)
 	{
-	case EditorWindowType_Move:
+	case TEditorWindowType_Move:
 		return DuplicateMove(id, 1);
 		break;
-	case EditorWindowType_CancelExtradata:
+	case TEditorWindowType_CancelExtradata:
 		return DuplicateCancelExtradata(id, 1);
 		break;
-	case EditorWindowType_Reactions:
+	case TEditorWindowType_Reactions:
 		return DuplicateReactions(id, 1);
 		break;
-	case EditorWindowType_Pushback:
+	case TEditorWindowType_Pushback:
 		return DuplicatePushback(id, 1);
 		break;
-	case EditorWindowType_InputSequence:
+	case TEditorWindowType_InputSequence:
 		return DuplicateInputSequence(id, 1);
 		break;
-	case EditorWindowType_Projectile:
+	case TEditorWindowType_Projectile:
 		return DuplicateProjectile(id, 1);
 		break;
-	case EditorWindowType_ThrowCamera:
+	case TEditorWindowType_ThrowCamera:
 		return DuplicateThrowCamera(id, 1);
 		break;
-	case EditorWindowType_CameraData:
+	case TEditorWindowType_CameraData:
 		return DuplicateCameraData(id, 1);
 		break;
-	case EditorWindowType_MovelistPlayable:
+	case TEditorWindowType_MovelistPlayable:
 		return DuplicateMovelistPlayable(id, 1);
 		break;
 
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		return DuplicateRequirement(id, listSize);
 		break;
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		return DuplicateVoiceclip(id, listSize);
 		break;
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		return DuplicateCancel(id, listSize);
 		break;
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		return DuplicateGroupedCancel(id, listSize);
 		break;
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		return DuplicateExtraproperty(id, listSize);
 		break;
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		return DuplicateMoveBeginProperty(id, listSize);
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		return DuplicateMoveEndProperty(id, listSize);
 		break;
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		return DuplicateHitCondition(id, listSize);
 		break;
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		return DuplicatePushbackExtradata(id, listSize);
 		break;
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		return DuplicateInput(id, listSize);
 		break;
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		return DuplicateMovelistInput(id, listSize);
 		break;
 	}

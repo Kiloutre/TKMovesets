@@ -1,7 +1,5 @@
-#include "imgui_extras.hpp"
 #include "EditorInputSequence.hpp"
-#include "Localization.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
@@ -12,14 +10,14 @@ void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 	{
 		auto& inputAmountField = m_fieldIdentifierMap["input_amount"];
 		if (!inputAmountField->errored) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_Input, id, atoi(inputAmountField->buffer));
+			m_baseWindow->OpenFormWindow(TEditorWindowType_Input, id, atoi(inputAmountField->buffer));
 		}
 	}
 }
 
-void EditorInputSequence::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
+void EditorInputSequence::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
-	if (winType == EditorWindowType_Input) {
+	if (winType == TEditorWindowType_Input) {
 		if (m_fieldIdentifierMap["input_addr"]->errored) {
 			return;
 		}

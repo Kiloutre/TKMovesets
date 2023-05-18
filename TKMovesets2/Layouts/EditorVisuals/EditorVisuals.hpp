@@ -30,15 +30,21 @@ class EditorWindowFactory_Base
 {
 public:
 	virtual ~EditorWindowFactory_Base() {}
-	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, EditorLogic* d, EditorVisuals* e, int f) const = 0;
+	virtual void* allocate(const std::string& a, EditorWindowType b, uint16_t c, EditorLogic* d, EditorVisuals* e, int f, const char* g) const = 0;
 	virtual void* cast(void* obj) const = 0;
 };
 
 template<typename T> class EditorWindowFactory : public EditorWindowFactory_Base
 {
 public:
-	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, EditorLogic* d, EditorVisuals* e, int f) const { return new T(a, b, c, d, e, f); }
+	virtual void* allocate(const std::string& a, EditorWindowType b, uint16_t c, EditorLogic* d, EditorVisuals* e, int f, const char* g) const { return new T(a, b, c, d, e, f, g); }
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
+};
+
+struct WindowCreator
+{
+	EditorWindowFactory_Base* allocator;
+	const char* typeName;
 };
 
 class EditorVisuals
@@ -75,7 +81,7 @@ protected:
 	// Copy of the shared mem helper, used to play extra propreties
 	GameSharedMem* m_sharedMemHelper;
 	// Map that will determine which window type to allocate depending on the given type
-	std::map<EditorWindowType_, EditorWindowFactory_Base*> m_windowCreatorMap;
+	std::map<EditorWindowType, WindowCreator> m_windowCreatorMap;
 	// Index of the compression setting to use when saving
 	unsigned int m_compressionIndex = 0;
 	// Contains a ptr to the editor logic class
@@ -84,7 +90,7 @@ protected:
 	// Populate .m_windowCreatorMap so that windows may get created by type. Can have different contents depending on what the gmae allows.
 	virtual void PopulateWindowCreatorMap() = 0;
 	// Factory instantiating the right class for the right identifier.
-	EditorForm* AllocateFormWindow(EditorWindowType_ windowType, uint16_t id, int listSize = 0);
+	EditorForm* AllocateFormWindow(EditorWindowType windowType, uint16_t id, int listSize = 0);
 
 	// Save the loaded moveset to a file
 	void Save();
@@ -106,7 +112,7 @@ public:
 	virtual void Render(int dockid) = 0;
 
 	// Create a new window containing data about the given move. Can be called by subwidnows.
-	void OpenFormWindow(EditorWindowType_ windowType, uint16_t structId, int listSize = 0);
+	void OpenFormWindow(EditorWindowType windowType, uint16_t structId, int listSize = 0);
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
-	void IssueFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart=-1, int listEnd = -1);
+	void IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart=-1, int listEnd = -1);
 };

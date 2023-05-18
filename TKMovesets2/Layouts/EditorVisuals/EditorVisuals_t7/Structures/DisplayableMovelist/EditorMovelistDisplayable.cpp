@@ -76,7 +76,7 @@ void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* fiel
 
 	if (name == "playable_id") {
 		if (referenceId != -1) {
-			m_baseWindow->OpenFormWindow(EditorWindowType_MovelistPlayable, referenceId);
+			m_baseWindow->OpenFormWindow(TEditorWindowType_MovelistPlayable, referenceId);
 		}
 	}
 }

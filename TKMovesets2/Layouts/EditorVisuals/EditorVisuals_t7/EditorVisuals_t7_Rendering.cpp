@@ -36,7 +36,7 @@ void EditorVisuals_T7::RenderToolBar()
 		{
 			m_moveToPlay = moveToSet;
 			sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", moveToSet);
-			OpenFormWindow(EditorWindowType_Move, moveToSet);
+			OpenFormWindow(TEditorWindowType_Move, moveToSet);
 			m_highlightedMoveId = moveToSet;
 		}
 	}
@@ -46,91 +46,91 @@ void EditorVisuals_T7::RenderToolBar()
 
 	if (ImGui::BeginMenu(_("edition.create_new")))
 	{
-		EditorWindowType_ structType = EditorWindowType_Invalid;
+		EditorWindowType structType = EditorWindowType_INVALID;
 		int listSize = 0;
 
 		if (ImGui::MenuItem(_("edition.requirement"))) {
-			structType = EditorWindowType_Requirement;
+			structType = TEditorWindowType_Requirement;
 		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.move"))) {
-			structType = EditorWindowType_Move;
+			structType = TEditorWindowType_Move;
 		}
 		if (ImGui::MenuItem(_("edition.voiceclips"))) {
-			structType = EditorWindowType_Voiceclip;
+			structType = TEditorWindowType_Voiceclip;
 		}
 		if (ImGui::MenuItem(_("edition.cancel_list"))) {
-			structType = EditorWindowType_Cancel;
+			structType = TEditorWindowType_Cancel;
 		}
 		if (ImGui::MenuItem(_("edition.grouped_cancel_list"))) {
-			structType = EditorWindowType_GroupedCancel;
+			structType = TEditorWindowType_GroupedCancel;
 		}
 		if (ImGui::MenuItem(_("edition.cancel_extradata"))) {
-			structType = EditorWindowType_CancelExtradata;
+			structType = TEditorWindowType_CancelExtradata;
 		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.extra_properties"))) {
-			structType = EditorWindowType_Extraproperty;
+			structType = TEditorWindowType_Extraproperty;
 		}
 		if (ImGui::MenuItem(_("edition.move_begin_properties"))) {
-			structType = EditorWindowType_MoveBeginProperty;
+			structType = TEditorWindowType_MoveBeginProperty;
 		}
 		if (ImGui::MenuItem(_("edition.move_end_properties"))) {
-			structType = EditorWindowType_MoveEndProperty;
+			structType = TEditorWindowType_MoveEndProperty;
 		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.hit_conditions"))) {
-			structType = EditorWindowType_HitCondition;
+			structType = TEditorWindowType_HitCondition;
 		}
 		if (ImGui::MenuItem(_("edition.reactions"))) {
-			structType = EditorWindowType_Reactions;
+			structType = TEditorWindowType_Reactions;
 		}
 		if (ImGui::MenuItem(_("edition.pushback"))) {
-			structType = EditorWindowType_Pushback;
+			structType = TEditorWindowType_Pushback;
 		}
 		if (ImGui::MenuItem(_("edition.pushback_extra"))) {
 			// Pushback extra list sizes must be known ahead of time when opening a window
 			listSize = 1;
-			structType = EditorWindowType_PushbackExtradata;
+			structType = TEditorWindowType_PushbackExtradata;
 		}
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.projectile"))) {
-			structType = EditorWindowType_Projectile;
+			structType = TEditorWindowType_Projectile;
 		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.input_sequence"))) {
-			structType = EditorWindowType_InputSequence;
+			structType = TEditorWindowType_InputSequence;
 		}
 		if (ImGui::MenuItem(_("edition.inputs"))) {
 			// Input list sizes must be known ahead of time when opening a window
 			listSize = 2;
-			structType = EditorWindowType_Input;
+			structType = TEditorWindowType_Input;
 		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.throw_camera"))) {
-			structType = EditorWindowType_ThrowCamera;
+			structType = TEditorWindowType_ThrowCamera;
 		}
 		if (ImGui::MenuItem(_("edition.camera_data"))) {
-			structType = EditorWindowType_CameraData;
+			structType = TEditorWindowType_CameraData;
 		}
 
 		ImGui::Separator();
 		if (ImGui::MenuItem(_("edition.mvl_playable"))) {
-			structType = EditorWindowType_MovelistPlayable;
+			structType = TEditorWindowType_MovelistPlayable;
 		}
 		if (ImGui::MenuItem(_("edition.mvl_inputs"))) {
 			// MVL Input list sizes must be known ahead of time when opening a window
 			listSize = 2;
-			structType = EditorWindowType_MovelistInput;
+			structType = TEditorWindowType_MovelistInput;
 		}
 
 
-		if (structType != EditorWindowType_Invalid) {
+		if (structType != EditorWindowType_INVALID) {
 			uint32_t structId = m_editor->CreateNew(structType);
 
 			m_savedLastChange = false;
@@ -140,7 +140,7 @@ void EditorVisuals_T7::RenderToolBar()
 			// Custom pre-creation behaviour implementations
 			switch (structType)
 			{
-			case EditorWindowType_Move:
+			case TEditorWindowType_Move:
 				m_editor->ReloadDisplayableMoveList();
 				ReloadMovelistFilter();
 				m_moveToScrollTo = structId;
@@ -162,7 +162,7 @@ void EditorVisuals_T7::RenderToolBar()
 
 	ImGui::Separator();
 	if (ImGui::MenuItem(_("edition.open_movelist"), nullptr, false, m_editor->hasDisplayableMovelist)) {
-		OpenFormWindow(EditorWindowType_MovelistDisplayable, 0);
+		OpenFormWindow(TEditorWindowType_MovelistDisplayable, 0);
 	}
 
 	ImGui::Separator();
@@ -443,7 +443,7 @@ void EditorVisuals_T7::RenderMovelist()
 					m_highlightedMoveId = move->moveId;
 					m_moveToPlay = move->moveId;
 					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
-					OpenFormWindow(EditorWindowType_Move, move->moveId);
+					OpenFormWindow(TEditorWindowType_Move, move->moveId);
 				}
 				ImGui::PopID();
 
@@ -478,7 +478,7 @@ void EditorVisuals_T7::RenderMovelist()
 		m_moveToScrollTo = (int16_t)m_editor->GetCurrentMoveID(m_importerHelper->currentPlayerId);
 		m_moveToPlay = m_moveToScrollTo;
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
-		OpenFormWindow(EditorWindowType_Move, m_moveToScrollTo);
+		OpenFormWindow(TEditorWindowType_Move, m_moveToScrollTo);
 		m_highlightedMoveId = m_moveToScrollTo;
 	}
 	ImGui::PopItemWidth();

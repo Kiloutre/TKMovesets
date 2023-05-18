@@ -146,13 +146,13 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 			m_items[listIdx]->color = PROPID_THROW_CAM;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
 			int throwId = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = throwId < 0 || throwId >= (int)editor->GetStructureCount(EditorWindowType_ThrowCamera);
+			map["value_unsigned"]->errored = throwId < 0 || throwId >= (int)editor->GetStructureCount(TEditorWindowType_ThrowCamera);
 		}
 		else if (isProjectileRef) {
 			m_items[listIdx]->color = PROPID_PROJECTILE;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
 			int projectileId = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= (int)editor->GetStructureCount(EditorWindowType_Projectile);
+			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= (int)editor->GetStructureCount(TEditorWindowType_Projectile);
 		}
 
 		map["value_signed"]->visible = false;
@@ -180,10 +180,10 @@ void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 	bool isProjectileRef = editor->IsPropertyProjectileRef(map["id"]->buffer);
 	if (editor->IsPropertyThrowCameraRef(map["id"]->buffer)) {
-		m_baseWindow->OpenFormWindow(EditorWindowType_ThrowCamera, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_ThrowCamera, id);
 	}
 	else {
-		m_baseWindow->OpenFormWindow(EditorWindowType_Projectile, id);
+		m_baseWindow->OpenFormWindow(TEditorWindowType_Projectile, id);
 	}
 }
 

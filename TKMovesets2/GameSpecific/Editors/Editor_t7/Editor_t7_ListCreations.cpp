@@ -212,53 +212,53 @@ void EditorT7::ModifyVoiceclipListSize(unsigned int listStart, const std::vector
 	}
 }
 
-void EditorT7::ModifyListSize(EditorWindowType_ type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
+void EditorT7::ModifyListSize(EditorWindowType type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	switch (type)
 	{
-	case EditorWindowType_Requirement:
+	case TEditorWindowType_Requirement:
 		ModifyRequirementListSize(listStart, ids, deletedIds);
 		break;
-	case EditorWindowType_Extraproperty:
+	case TEditorWindowType_Extraproperty:
 		ModifyExtraPropertyListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_GroupedCancel:
+	case TEditorWindowType_GroupedCancel:
 		ModifyGroupedCancelListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_MoveBeginProperty:
+	case TEditorWindowType_MoveBeginProperty:
 		ModifyStartPropertyListSize(listStart, ids, deletedIds);
 		break;
-	case EditorWindowType_MoveEndProperty:
+	case TEditorWindowType_MoveEndProperty:
 		ModifyEndPropertyListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_HitCondition:
+	case TEditorWindowType_HitCondition:
 		ModifyHitConditionListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_Input:
+	case TEditorWindowType_Input:
 		ModifyInputListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_PushbackExtradata:
+	case TEditorWindowType_PushbackExtradata:
 		ModifyPushbackExtraListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_Voiceclip:
+	case TEditorWindowType_Voiceclip:
 		ModifyVoiceclipListSize(listStart, ids, deletedIds);
 		break;
 
-	case EditorWindowType_Cancel:
+	case TEditorWindowType_Cancel:
 		ModifyCancelListSize(listStart, ids, deletedIds);
 		break;
 
 
-	case EditorWindowType_MovelistDisplayable:
+	case TEditorWindowType_MovelistDisplayable:
 		ModifyMovelistDisplayableSize(listStart, ids, deletedIds);
 		break;
-	case EditorWindowType_MovelistInput:
+	case TEditorWindowType_MovelistInput:
 		ModifyMovelistInputSize(listStart, ids, deletedIds);
 		break;
 	}
