@@ -150,9 +150,7 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		// Have to implement pasting manually
 		strcpy_s(field->buffer, field->bufsize, field->nextValue.c_str());
 		// Put the focus back on the input as it should
-		ImGui::Dummy(ImVec2(20, 20));
 		ImGui::SetKeyboardFocusHere();
-		ImGui::Dummy(ImVec2(20, 20));
 	}
 
 	ImGui::PushID(field);
@@ -176,28 +174,29 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 	{
 		// Have to manually implement copying
-		if (ImGui::IsKeyPressed(ImGuiKey_C, false) || ImGui::IsKeyPressed(ImGuiKey_X, false)) {
+		if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
+			ImGui::SetClipboardText(field->buffer);
+		}
+		else if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
+			moveFocusAway = true;
+			field->nextValue = "0";
+			field->nextValue[0] = '\0';
 			ImGui::SetClipboardText(field->buffer);
 		}
 		else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
 		{
 			field->nextValue = ImGui::GetClipboardText();
-			// Force focus on the next widget
-			ImGui::Dummy(ImVec2(20, 20));
-			// This is because ImGUI prevents from writing on a focused input's buffer
-			ImGui::SetKeyboardFocusHere();
-			ImGui::Dummy(ImVec2(20, 20));
+			moveFocusAway = true;
 		}
 		else if ((field->flags & EditorInput_DataChangeable) && ImGui::IsKeyPressed(ImGuiKey_B, false))
 		{
 			if (!unsavedChanges) {
+				// If no changes have been made, changing data type should not trigger the "unsaved changes" flag
 				m_ignoreNextChange = true;
 			}
 
 			EditorUtils::ChangeFieldDataType(field);
-			// Force focus on the next widget
-			// This is because ImGUI prevents from writing on a focused input's buffer
-			ImGui::SetKeyboardFocusHere();
+			moveFocusAway = true;
 		}
 	}
 	ImGui::PopID();

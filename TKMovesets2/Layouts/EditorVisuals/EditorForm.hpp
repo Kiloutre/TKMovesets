@@ -120,6 +120,8 @@ public:
 	ImGuiViewport* currentViewport = nullptr;
 	// Set to true in a derived constructor to prevent the creation of multiple windows of the derived class
 	bool uniqueType = false;
+	// Set to true before pasting in order for the field's visual to be updated
+	bool moveFocusAway = false;
 
 	EditorForm() {};
 	EditorForm(const std::string& parentWindowName, EditorWindowType windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName);

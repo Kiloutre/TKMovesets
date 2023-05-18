@@ -234,6 +234,12 @@ void EditorVisuals::RenderSubwindows()
 		if (moveWin->popen)
 		{
 			moveWin->Render();
+
+			if (moveWin->moveFocusAway) {
+				moveWin->moveFocusAway = false;
+				ImGui::SetKeyboardFocusHere();
+			}
+
 			++i;
 		}
 		else {
