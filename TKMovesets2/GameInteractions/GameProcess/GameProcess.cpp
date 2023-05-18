@@ -204,9 +204,12 @@ void GameProcess::FreeOldGameMemory(bool instant)
 		auto& [date, targetAddr] = m_toFree[i];
 		if (instant || ((currentDate - date) >= GAME_FREEING_DELAY_SEC))
 		{
+#pragma warning(push)
+#pragma warning(disable:6001)
+			DEBUG_LOG("Freeing game memory %llx after delay\n", targetAddr);
 			VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
 			m_toFree.erase(m_toFree.begin() + i, m_toFree.begin() + i + 1);
-			DEBUG_LOG("Freeing game memory %llx after delay\n", targetAddr);
+#pragma warning(pop)
 		}
 		else {
 			++i;
