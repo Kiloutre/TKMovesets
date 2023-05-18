@@ -231,6 +231,7 @@ edition.move.category_2 = References
 edition.move.category_3 = Extras
 edition.move.category_5 = Unnamed fields
 edition.move.move_name = Name
+edition.move.move_name.description = Name of the move, does not affect gameplay.
 edition.move.anim_name = Animation
 edition.move.vulnerability = Vuln
 edition.move.hitlevel = Hit level

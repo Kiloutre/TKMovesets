@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #define _(...) Localization::GetText(__VA_ARGS__)
 
 struct TranslationData
@@ -7,13 +9,15 @@ struct TranslationData
 	const char* displayName;
 	const char* locale;
 	const char* data;
-	bool needs_extra_font;
 };
 
 namespace Localization
 {
 	// Load a translation file for use with Localization::GetText(). Returns false if locale not found.
 	bool LoadFile(const char* c_langId, bool unloadPrevious = true);
+
+	// Returns true if the specified translation exists
+	bool HasText(const std::string& c_stringId);
 
 	// Returns a translated string from its corresponding string identifier. To be used only in the main thread.
 	const char* GetText(const char* c_stringId);
@@ -26,7 +30,4 @@ namespace Localization
 
 	// Sends the array of translation and its size to the passed variables
 	void GetTranslationList(const TranslationData** out_list, unsigned int* out_count);
-
-	// Returns true if the currently selected font requires a specific font load to be displayed correctly
-	bool RequiresFontLoad();
 }

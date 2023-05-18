@@ -49,7 +49,7 @@ const GameInfo cg_gamesInfo[] = {
 		.movesetNamePrefix = "TTT2_",
 		.gameId = GameId_TTT2,
 		.minorVersion = 0,
-		.characterCount = 2,
+		.characterCount = 4,
 		.flags = 0,
 		.dataString = "tag2",
 		.minorDataString = "tag2",
@@ -135,7 +135,7 @@ namespace Games
 	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion)
 	{
 		auto game = GetGameInfoFromIdentifier(gameId, minorVersion);
-		return game && (game->flags & GameFlag_MovesetLiveEditable) > 0;
+		return game && (game->flags & GameFlag_MovesetLiveEditable) != 0;
 	}
 
 	//

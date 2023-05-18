@@ -19,14 +19,12 @@ const TranslationData g_translation_datas[] = {
 	{
 		.displayName = "English",
 		.locale = "en-US",
-		.data = en_US_txt,
-		.needs_extra_font = false
+		.data = en_US_txt
 	},
 	{
 		.displayName = (const char*)u8"Français",
 		.locale = "fr-FR",
-		.data = fr_FR_txt,
-		.needs_extra_font = false
+		.data = fr_FR_txt
 	},
 };
 //
@@ -123,12 +121,18 @@ namespace Localization
 		return g_langId;
 	}
 
+	bool HasText(const std::string& c_stringId)
+	{
+		return g_translations.find(c_stringId) != g_translations.end();
+	}
+
 	const char* GetText(const char* c_stringId)
 	{
 		auto item = g_translations.find(c_stringId);
 		if (item != g_translations.end()) {
 			return item->second.c_str();
 		}
+		// If a c_stringId gets freed before being used, this will cause problems
 		return c_stringId;
 	}
 
@@ -142,10 +146,5 @@ namespace Localization
 	{
 		*out_list = g_translation_datas;
 		*out_count = (int)_countof(g_translation_datas);
-	}
-
-	bool RequiresFontLoad()
-	{
-		return g_translation_datas[g_langId].needs_extra_font;
 	}
 }

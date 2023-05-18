@@ -182,11 +182,11 @@ void EditorForm::RenderLabel(int listIdx, EditorInput* field)
 	}
 
 
-	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-		// todo: maybe use this for a full-on description
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+	{
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(fieldLabel);
+		ImGui::TextUnformatted(field->hoverDescription.c_str());
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}
@@ -294,11 +294,11 @@ void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogi
 	VectorSet<std::string> drawOrder;
 	m_fieldIdentifierMap = editor->GetFormFields(windowType, t_id, drawOrder);
 
-	// Tries to find a name to show in the window title
-	// Also figure out the categories
+	// Figure out the categories
 	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = m_fieldIdentifierMap[fieldName];
-
+		std::string descriptionKey = field->fullName + ".description";
+		field->hoverDescription = Localization::HasText(descriptionKey) ? _(descriptionKey.c_str()) : _(field->fullName.c_str());
 		m_categories.insert(field->category);
 	}
 
