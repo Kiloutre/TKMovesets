@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Editor.hpp"
+#include "TEditor.hpp"
 #include "Helpers.hpp"
 #include "Online_t7.hpp"
 
@@ -44,7 +44,7 @@ struct StructIterators
 	StructIterator<MvlInput> mvl_inputs;
 };
 
-class DLLCONTENT EditorT7 : public Editor
+class EditorT7 : public TEditor
 {
 private:
 	// Contains a ptr to the offset list
@@ -287,7 +287,7 @@ private:
 	template<typename T> int ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset);
 
 public:
-	using Editor::Editor;
+	using TEditor::TEditor;
 	~EditorT7();
 
 	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;

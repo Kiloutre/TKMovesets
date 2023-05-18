@@ -41,7 +41,7 @@ enum ImportationErrcode_
 };
 
 // Base class for extracting from a game
-class DLLCONTENT Importer : public BaseGameSpecificClass
+class Importer : public BaseGameSpecificClass
 {
 protected:
 	// Internal import method that will decompress the moveset (if needed) and get a ptr to the moveset data before calling ImportMOvesetData

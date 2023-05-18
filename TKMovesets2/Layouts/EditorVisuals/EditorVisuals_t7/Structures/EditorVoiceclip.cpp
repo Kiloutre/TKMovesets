@@ -2,6 +2,7 @@
 
 #include "EditorVoiceclip.hpp"
 #include "Localization.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
 {
@@ -33,8 +34,10 @@ void EditorVoiceclip::OnReorder()
 
 void EditorVoiceclip::BuildItemDetails(int listIdx)
 {
+	auto editor = Editor<EditorT7>();
+
 	const char* buffer = m_items[listIdx]->identifierMap["id"]->buffer;
-	const bool isEnd = m_editor->IsVoicelipValueEnd(buffer);
+	const bool isEnd = editor->IsVoicelipValueEnd(buffer);
 	std::string label;
 
 	if (!isEnd) {

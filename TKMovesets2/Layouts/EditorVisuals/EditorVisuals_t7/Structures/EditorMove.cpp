@@ -93,9 +93,10 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 void EditorMove::OnApply()
 {
+	auto editor = Editor<EditorT7>();
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
-	m_editor->RecomputeDisplayableMoveFlags(structureId);
+	editor->RecomputeDisplayableMoveFlags(structureId);
 	baseWindow->ReloadMovelistFilter();
 	if (m_renamed) {
 		// todo: re-compute displayable color of this move according ot its new properties

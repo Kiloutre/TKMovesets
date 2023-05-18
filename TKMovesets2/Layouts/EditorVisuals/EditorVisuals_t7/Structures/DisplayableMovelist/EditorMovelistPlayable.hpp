@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Editor.hpp"
 #include "EditorForm.hpp"
 
 class EditorMovelistPlayable : public EditorForm

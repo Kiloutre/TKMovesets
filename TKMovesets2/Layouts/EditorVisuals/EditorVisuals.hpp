@@ -1,7 +1,7 @@
 #pragma once
 
 #include "LocalStorage.hpp"
-#include "Editor.hpp"
+#include "EditorLogic.hpp"
 #include "EditorForm.hpp"
 #include "EditorLabel.hpp"
 
@@ -30,14 +30,14 @@ class EditorWindowFactory_Base
 {
 public:
 	virtual ~EditorWindowFactory_Base() {}
-	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorVisuals* e, int f) const = 0;
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, EditorLogic* d, EditorVisuals* e, int f) const = 0;
 	virtual void* cast(void* obj) const = 0;
 };
 
 template<typename T> class EditorWindowFactory : public EditorWindowFactory_Base
 {
 public:
-	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, Editor* d, EditorVisuals* e, int f) const { return new T(a, b, c, d, e, f); }
+	virtual void* allocate(const std::string& a, EditorWindowType_ b, uint16_t c, EditorLogic* d, EditorVisuals* e, int f) const { return new T(a, b, c, d, e, f); }
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
 };
 
@@ -69,7 +69,7 @@ protected:
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
 	// Access moveset data through this variable. Uses polymorphism.
-	Editor* m_editor = nullptr;
+	EditorLogic* m_editor = nullptr;
 	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
 	GameImport* m_importerHelper;
 	// Copy of the shared mem helper, used to play extra propreties
@@ -79,7 +79,7 @@ protected:
 	// Index of the compression setting to use when saving
 	unsigned int m_compressionIndex = 0;
 	// Contains a ptr to the editor logic class
-	Editor* m_abstractEditor = nullptr;
+	EditorLogic* m_abstractEditor = nullptr;
 
 	// Populate .m_windowCreatorMap so that windows may get created by type. Can have different contents depending on what the gmae allows.
 	virtual void PopulateWindowCreatorMap() = 0;

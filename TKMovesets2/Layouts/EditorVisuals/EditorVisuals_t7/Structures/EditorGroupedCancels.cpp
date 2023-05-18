@@ -10,6 +10,8 @@
 
 void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
+	auto editor = Editor<EditorT7>();
+
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
@@ -28,13 +30,15 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	else if (name == "command") {
 		// Command is only clickable
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
-		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
+		int inputSequenceId = editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
 		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
 	}
 }
 
 void EditorGroupedCancels::BuildItemDetails(int listIdx)
 {
+	auto editor = Editor<EditorT7>();
+
 	std::string label;
 
 	auto& item = m_items[listIdx];
@@ -43,10 +47,10 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 	EditorInput* commandField = item->identifierMap["command"];
 	EditorInput* moveIdField = item->identifierMap["move_id"];
 
-	if (m_editor->IsCommandInputSequence(commandField->buffer))
+	if (editor->IsCommandInputSequence(commandField->buffer))
 	{
 		commandField->flags |= EditorInput_Clickable;
-		int inputSequenceId = m_editor->GetCommandInputSequenceID(commandField->buffer);
+		int inputSequenceId = editor->GetCommandInputSequenceID(commandField->buffer);
 
 		item->color = MOVEID_INPUT_SEQUENCE;
 		EditorFormUtils::SetFieldDisplayText(commandField, _("edition.cancel.sequence_id"));
@@ -57,7 +61,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 		std::string inputs;
 
-		if (inputSequenceId >= (int)m_editor->GetStructureCount(EditorWindowType_InputSequence))
+		if (inputSequenceId >= (int)editor->GetStructureCount(EditorWindowType_InputSequence))
 		{
 			commandField->errored = true;
 			inputs = _("edition.cancel.invalid_sequence_id");
@@ -65,7 +69,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		else
 		{
 			int inputAmount = 0;
-			m_editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
+			editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
 
 			if (inputAmount > 0) {
 				inputs = std::format("{} {}", inputAmount, _("edition.input.inputs"));
@@ -94,7 +98,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 		item->color = 0;
 		EditorFormUtils::SetFieldDisplayText(moveIdField, _("edition.cancel.move_id"));
-		std::string commandStr = m_editor->GetCommandStr(commandField->buffer);
+		std::string commandStr = editor->GetCommandStr(commandField->buffer);
 
 		if (validated_move_id == -1) {
 			label = std::format("{} ({}) / [ {} ]", _("edition.form_list.invalid"), move_id, commandStr);

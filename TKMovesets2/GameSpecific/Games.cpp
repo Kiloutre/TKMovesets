@@ -152,9 +152,9 @@ namespace Games
 		return im;
 	}
 
-	Editor* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Editor* ed = (Editor*)gameInfo->editorLogic->allocate(process, game, gameInfo);
+		EditorLogic* ed = (EditorLogic*)gameInfo->editorLogic->allocate(process, game, gameInfo);
 		return ed;
 	}
 

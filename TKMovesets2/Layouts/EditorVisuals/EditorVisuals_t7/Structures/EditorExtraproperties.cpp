@@ -1,9 +1,8 @@
 #include <format>
 
-#include "imgui_extras.hpp"
 #include "EditorExtraproperties.hpp"
 #include "Localization.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 {
@@ -74,6 +73,8 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 
 void EditorExtraproperties::BuildItemDetails(int listIdx)
 {
+	auto editor = Editor<EditorT7>();
+
 	std::string label;
 
 	auto& map = m_items[listIdx]->identifierMap;
@@ -136,8 +137,8 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 	m_items[listIdx]->itemLabel = label;
 
-	bool isCameraRef = m_editor->IsPropertyThrowCameraRef(map["id"]->buffer);
-	bool isProjectileRef = m_editor->IsPropertyProjectileRef(map["id"]->buffer);
+	bool isCameraRef = editor->IsPropertyThrowCameraRef(map["id"]->buffer);
+	bool isProjectileRef = editor->IsPropertyProjectileRef(map["id"]->buffer);
 	if (isCameraRef || isProjectileRef)
 	{
 		map["value_unsigned"]->flags |= EditorInput_Clickable;
@@ -145,13 +146,13 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 			m_items[listIdx]->color = PROPID_THROW_CAM;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.throw_camera_id"));
 			int throwId = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = throwId < 0 || throwId >= (int)m_editor->GetStructureCount(EditorWindowType_ThrowCamera);
+			map["value_unsigned"]->errored = throwId < 0 || throwId >= (int)editor->GetStructureCount(EditorWindowType_ThrowCamera);
 		}
 		else if (isProjectileRef) {
 			m_items[listIdx]->color = PROPID_PROJECTILE;
 			EditorFormUtils::SetFieldDisplayText(map["value_unsigned"], _("edition.extraproperty.projectile_id"));
 			int projectileId = atoi(map["value_unsigned"]->buffer);
-			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= (int)m_editor->GetStructureCount(EditorWindowType_Projectile);
+			map["value_unsigned"]->errored = projectileId < 0 || projectileId >= (int)editor->GetStructureCount(EditorWindowType_Projectile);
 		}
 
 		map["value_signed"]->visible = false;
@@ -172,11 +173,13 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 
 void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
+	auto editor = Editor<EditorT7>();
+
 	auto& map = m_items[listIdx]->identifierMap;
 	int id = atoi(field->buffer);
 
-	bool isProjectileRef = m_editor->IsPropertyProjectileRef(map["id"]->buffer);
-	if (m_editor->IsPropertyThrowCameraRef(map["id"]->buffer)) {
+	bool isProjectileRef = editor->IsPropertyProjectileRef(map["id"]->buffer);
+	if (editor->IsPropertyThrowCameraRef(map["id"]->buffer)) {
 		m_baseWindow->OpenFormWindow(EditorWindowType_ThrowCamera, id);
 	}
 	else {

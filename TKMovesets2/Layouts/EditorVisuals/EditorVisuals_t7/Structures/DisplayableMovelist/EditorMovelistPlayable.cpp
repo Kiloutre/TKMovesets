@@ -1,7 +1,5 @@
-#include "imgui_extras.hpp"
 #include "EditorMovelistPlayable.hpp"
-#include "Localization.hpp"
-#include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
@@ -46,11 +44,13 @@ void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType_ winType, int v
 
 void EditorMovelistPlayable::OnUpdate(int listIdx, EditorInput* field)
 {
+	auto editor = Editor<EditorT7>();
+
 	if (field->name == "input_sequence_id" || field->name == "input_count")
 	{
 		unsigned int list_end = (unsigned int)EditorUtils::GetFieldValue(m_fieldIdentifierMap["input_count"])
 								+ (unsigned int)EditorUtils::GetFieldValue(m_fieldIdentifierMap["input_sequence_id"]);
-		unsigned int inputCount = m_editor->GetMovelistDisplayableInputCount();
+		unsigned int inputCount = editor->GetMovelistDisplayableInputCount();
 		m_fieldIdentifierMap["input_count"]->errored = list_end > inputCount;
 	}
 }

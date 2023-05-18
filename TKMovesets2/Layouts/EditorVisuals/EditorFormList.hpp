@@ -4,7 +4,6 @@
 #include <set>
 #include <string>
 
-#include "Editor.hpp"
 #include "EditorForm.hpp"
 
 enum EditorFormTreeview_
@@ -69,11 +68,11 @@ protected:
 	// Notify fields in other windows to be updated
 	virtual void RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd) override;
 
-	void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor) override;
+	void InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor) override;
 	// Called whenever a field changes (and is valid).
 	virtual void OnUpdate(int listIdx, EditorInput* field) override;
 public:
-	EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorVisuals* baseWindow, int listSize);
+	EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize);
 	virtual ~EditorFormList() override;
 
 	// Called after the constructor

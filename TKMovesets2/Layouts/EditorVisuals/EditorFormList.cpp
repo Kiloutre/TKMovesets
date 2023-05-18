@@ -9,7 +9,7 @@
 
 // -- Public methods -- //
 
-EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorVisuals* baseWindow, int listSize)
+EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize)
 {
 	windowType = t_windowType;
 	m_baseWindow = baseWindow;
@@ -257,7 +257,7 @@ void EditorFormList::DeleteStructure()
 	m_isDeletable = true;
 }
 
-void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
+void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor)
 {
 	structureId = t_id;
 	m_editor = editor;

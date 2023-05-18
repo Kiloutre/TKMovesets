@@ -269,7 +269,7 @@ namespace EditorUtils
 	}
 }
 
-class DLLCONTENT EditorLogic : public BaseGameSpecificClass
+class EditorLogic : public BaseGameSpecificClass
 {
 protected:
 	// Contains our header data

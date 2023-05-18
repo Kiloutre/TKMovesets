@@ -10,7 +10,7 @@
 // You should be passing values through method calls and no other way.
 // It should be able to call Import() while another Import() is going on in another thread and this without breaking anything
 
-class DLLCONTENT ImporterT7 : public Importer
+class ImporterT7 : public Importer
 {
 private:
 	// In our locally allocated moveset, correct the mota lists offsets or copy the motas from the currently loaded character if we can't provide them

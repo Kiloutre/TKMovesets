@@ -1,4 +1,4 @@
-#include "Editor.hpp"
+#include "EditorLogic.hpp"
 
 #include <format>
 

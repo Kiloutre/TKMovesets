@@ -10,12 +10,14 @@
 
 void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
+	auto editor = Editor<EditorT7>();
+
 	int referenceId = atoi(field->buffer);
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
 
 	if (name == "move_id") {
-		if (m_editor->IsCommandGroupedCancelReference(item->identifierMap["command"]->buffer)) {
+		if (editor->IsCommandGroupedCancelReference(item->identifierMap["command"]->buffer)) {
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, referenceId);
 		}
 		else {
@@ -31,7 +33,7 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 	else if (name == "command") {
 		// Command is only clickable if we detected that it was an input sequence reference in OnUpdate()
-		int inputSequenceId = m_editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
+		int inputSequenceId = editor->GetCommandInputSequenceID(item->identifierMap["command"]->buffer);
 		m_baseWindow->OpenFormWindow(EditorWindowType_InputSequence, inputSequenceId);
 	}
 }
@@ -41,16 +43,17 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
+	auto editor = Editor<EditorT7>();
 
 	if (name == "command" || name == "move_id") {
 		// More complex validation than what is shown in the editors.cpp (cross-field validation)
 		EditorInput* commandField = item->identifierMap["command"];
 		EditorInput* moveIdField = item->identifierMap["move_id"];
 
-		if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
+		if (editor->IsCommandGroupedCancelReference(commandField->buffer))
 		{
 			int groupId = atoi(moveIdField->buffer);
-			moveIdField->errored = groupId >= (int)m_editor->GetStructureCount(EditorWindowType_GroupedCancel);
+			moveIdField->errored = groupId >= (int)editor->GetStructureCount(EditorWindowType_GroupedCancel);
 		}
 		else
 		{
@@ -66,18 +69,19 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 
 void EditorCancels::BuildItemDetails(int listIdx)
 {
-	std::string label;
-
-	auto& item = m_items[listIdx];
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
+	auto editor = Editor<EditorT7>();
+
+	std::string label;
+	auto& item = m_items[listIdx];
 
 	EditorInput* commandField = item->identifierMap["command"];
 	EditorInput* moveIdField = item->identifierMap["move_id"];
 
-	if (m_editor->IsCommandInputSequence(commandField->buffer))
+	if (editor->IsCommandInputSequence(commandField->buffer))
 	{
 		commandField->flags |= EditorInput_Clickable;
-		int inputSequenceId = m_editor->GetCommandInputSequenceID(commandField->buffer);
+		int inputSequenceId = editor->GetCommandInputSequenceID(commandField->buffer);
 
 
 		item->color = MOVEID_INPUT_SEQUENCE;
@@ -88,7 +92,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 
 		std::string inputs;
 
-		if (inputSequenceId >= (int)m_editor->GetStructureCount(EditorWindowType_InputSequence))
+		if (inputSequenceId >= (int)editor->GetStructureCount(EditorWindowType_InputSequence))
 		{
 			commandField->errored = true;
 			inputs = _("edition.cancel.invalid_sequence_id");
@@ -96,7 +100,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		else
 		{
 			int inputAmount = 0;
-			m_editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
+			editor->GetInputSequenceString(inputSequenceId, inputs, inputAmount);
 
 			if (inputAmount > 0) {
 				inputs = std::format("{} {}", inputAmount, _("edition.input.inputs"));
@@ -120,7 +124,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 		}
 
 		int move_id = atoi(moveIdField->buffer);
-		if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
+		if (editor->IsCommandGroupedCancelReference(commandField->buffer))
 		{
 			EditorFormUtils::SetFieldDisplayText(moveIdField, _("edition.cancel.group_id"));
 			label = std::format("{}: {}", _("edition.grouped_cancel.window_name"), move_id);
@@ -131,7 +135,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 			item->color = 0;
 			EditorFormUtils::SetFieldDisplayText(moveIdField, _("edition.cancel.move_id"));
 			int validated_move_id = baseWindow->ValidateMoveId(moveIdField->buffer);
-			std::string commandStr = m_editor->GetCommandStr(commandField->buffer);
+			std::string commandStr = editor->GetCommandStr(commandField->buffer);
 			if (validated_move_id == -1) {
 				label = std::format("{} ({}) / [ {} ]", _("edition.form_list.invalid"), move_id, commandStr);
 			}
@@ -148,6 +152,8 @@ void EditorCancels::BuildItemDetails(int listIdx)
 
 void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, int listStart, int listEnd)
 {
+	auto editor = Editor<EditorT7>();
+
 	switch (winType)
 	{
 	case EditorWindowType_Cancel:
@@ -170,7 +176,7 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType_ winType, int valueChang
 					continue;
 				}
 
-				if (m_editor->IsCommandGroupedCancelReference(commandField->buffer))
+				if (editor->IsCommandGroupedCancelReference(commandField->buffer))
 				{
 					int group_id = atoi(moveIdField->buffer);
 					if (MUST_SHIFT_ID(group_id, valueChange, listStart, listEnd)) {

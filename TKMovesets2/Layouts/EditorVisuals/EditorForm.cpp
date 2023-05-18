@@ -95,7 +95,7 @@ namespace EditorFormUtils
 
 // -- Public methods -- //
 
-EditorForm::EditorForm(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, Editor* editor, EditorVisuals* baseWindow, int listSize)
+EditorForm::EditorForm(const std::string& parentWindowName, EditorWindowType_ t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize)
 {
 	windowType = t_windowType;
 	m_baseWindow = baseWindow;
@@ -284,7 +284,7 @@ void EditorForm::ApplyWindowName(bool reapplyWindowProperties)
 
 // -- Public methods -- //
 
-void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor)
+void EditorForm::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor)
 {
 	structureId = t_id;
 	m_editor = editor;

@@ -24,12 +24,11 @@ namespace TEditorUtils
 	unsigned int GetMoveColorFromFlag(EditorMoveFlags flags);
 };
 
-class DLLCONTENT Editor : public EditorLogic
+class TEditor : public EditorLogic
 {
 protected:
 	// Store move ID aliases
 	std::vector<uint16_t>* m_aliases = nullptr;
-
 
 	// Stores a <name, offset> animation map
 	std::map<std::string, gameAddr>* m_animNameToOffsetMap = nullptr;
@@ -45,8 +44,8 @@ public:
 	// Set to true when updating displayableMovelist
 	bool mustReloadMovelist = false;
 
-	Editor(GameProcess* process, GameData* game, const GameInfo* gameInfo);
-	virtual ~Editor();
+	TEditor(GameProcess* process, GameData* game, const GameInfo* gameInfo);
+	virtual ~TEditor();
 
 
 	// Return the movelist in a quickly displayable format

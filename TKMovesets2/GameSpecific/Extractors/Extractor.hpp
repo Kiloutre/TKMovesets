@@ -31,7 +31,7 @@ namespace ExtractorUtils
 };
 
 // Base class for extracting from a game
-class DLLCONTENT Extractor : public BaseGameSpecificClass
+class Extractor : public BaseGameSpecificClass
 {
 private:
 	// Generates the filename to write, with a suffix (or not if [suffixId] is 0)

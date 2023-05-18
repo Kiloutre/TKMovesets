@@ -4,7 +4,7 @@
 #include "GameProcess.hpp"
 #include "Importer.hpp"
 #include "Extractor.hpp"
-#include "Editor.hpp"
+#include "EditorLogic.hpp"
 #include "EditorVisuals/EditorVisuals.hpp"
 #include "Online.hpp"
 #include "GameInfo.hpp"
@@ -38,7 +38,7 @@ namespace Games
 	DLLCONTENT Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess* process, GameData* game);
 
 	// Instantiate a new game-specific editor
-	DLLCONTENT Editor* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game);
+	DLLCONTENT EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game);
 	DLLCONTENT EditorVisuals* FactoryGetEditorVisuals(const GameInfo* gameInfo, const movesetInfo* movesetInfos, GameAddressesFile* addrFile, LocalStorage* storage);
 
 	// Instantiate a new game-specific online handler

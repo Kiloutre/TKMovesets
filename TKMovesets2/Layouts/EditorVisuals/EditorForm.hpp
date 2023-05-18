@@ -3,7 +3,7 @@
 #include <map>
 #include <set>
 
-#include "Editor.hpp"
+#include "EditorLogic.hpp"
 
 class EditorVisuals;
 
@@ -34,7 +34,7 @@ protected:
 	// Contains false if we need to send the event to the next GetFormClickEvent() call
 	bool m_consumedEvent = true;
 	// Used when saving
-	Editor* m_editor = nullptr;
+	EditorLogic* m_editor = nullptr;
 	// Contains the identifier with which to prefix translation strings
 	std::string m_identifierPrefix;
 	// Contains a reference to the main editor window, used for event handling
@@ -65,7 +65,7 @@ protected:
 		return (T*)m_baseWindow;
 	};
 	// Returns the casted editor for when wanting to call non-generic methods
-	template <class T> T* EditorLogic() {
+	template <class T> T* Editor() {
 		return (T*)m_editor;
 	};
 	// Callde when the structure is duplicated
@@ -99,7 +99,7 @@ protected:
 	// Returns false if any field has an error state
 	virtual bool IsFormValid();
 	// Inits the form
-	virtual void InitForm(std::string windowTitleBase, uint32_t t_id, Editor* editor);
+	virtual void InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor);
 	// Returns true if the current form window has been right clicked
 	bool IsWindowRightClicked() const;
 	// Overrideable to render extra items in the form's context menu
@@ -125,7 +125,7 @@ public:
 	bool uniqueType = false;
 
 	EditorForm() {};
-	EditorForm(const std::string& parentWindowName, EditorWindowType_ windowType, uint16_t t_structureId, Editor* editor, EditorVisuals* baseWindow, int listSize);
+	EditorForm(const std::string& parentWindowName, EditorWindowType_ windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize);
 	virtual ~EditorForm();
 
 	// Called after the constructor
