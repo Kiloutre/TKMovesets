@@ -217,3 +217,28 @@ void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, 
 		}
 	}
 }
+
+void EditorVisuals::RenderSubwindows()
+{
+	for (size_t i = 0; i < m_structWindows.size();)
+	{
+		EditorForm* moveWin = m_structWindows[i];
+
+		if (moveWin->justAppliedChanges)
+		{
+			moveWin->justAppliedChanges = false;
+			m_savedLastChange = false;
+			m_importNeeded = true;
+		}
+
+		if (moveWin->popen)
+		{
+			moveWin->Render();
+			++i;
+		}
+		else {
+			m_structWindows.erase(m_structWindows.begin() + i);
+			delete moveWin;
+		}
+	}
+}

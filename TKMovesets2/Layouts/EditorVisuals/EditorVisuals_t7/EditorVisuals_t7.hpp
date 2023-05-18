@@ -36,8 +36,6 @@ private:
 
 	// Render the top toolbar containing useful moveset editing tools
 	void RenderToolBar();
-	// Render the moveset data in the main dockspace of the window
-	void RenderMovesetData();
 	// Render the bottom statusbar that shows the save button and more
 	void RenderStatusBar();
 	// Render the list of moves

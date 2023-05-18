@@ -334,31 +334,6 @@ void EditorVisuals_T7::RenderStatusBar()
 	ImGui::PopID();
 }
 
-void EditorVisuals_T7::RenderMovesetData()
-{
-	for (size_t i = 0; i < m_structWindows.size();)
-	{
-		EditorForm* moveWin = m_structWindows[i];
-
-		if (moveWin->justAppliedChanges)
-		{
-			moveWin->justAppliedChanges = false;
-			m_savedLastChange = false;
-			m_importNeeded = true;
-		}
-
-		if (moveWin->popen)
-		{
-			moveWin->Render();
-			++i;
-		}
-		else {
-			m_structWindows.erase(m_structWindows.begin() + i);
-			delete moveWin;
-		}
-	}
-}
-
 void EditorVisuals_T7::RenderMovelist()
 {
 	// Filter / Sorting
@@ -560,7 +535,7 @@ void EditorVisuals_T7::Render(int dockid)
 			ImGui::TableNextColumn();
 			// The dockspace loves to overflow past the table end for some reason so we have to re-substract FrameHeight.
 			m_dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - ImGui::GetFrameHeightWithSpacing()));
-			RenderMovesetData();
+			RenderSubwindows();
 
 			ImGui::EndTable();
 		}

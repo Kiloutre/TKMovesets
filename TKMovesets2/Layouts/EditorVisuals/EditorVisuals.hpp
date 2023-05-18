@@ -87,6 +87,8 @@ protected:
 	// Contains a ptr to the editor logic class
 	EditorLogic* m_abstractEditor = nullptr;
 
+	// Render each created subwindows
+	void RenderSubwindows();
 	// Populate .m_windowCreatorMap so that windows may get created by type. Can have different contents depending on what the gmae allows.
 	virtual void PopulateWindowCreatorMap() = 0;
 	// Factory instantiating the right class for the right identifier.
