@@ -39,11 +39,8 @@ set(INCLUDE_FOLDERS
                     
                     "Layouts"
                     "Layouts/Submenus"
-                    "Layouts/Editor"
-                    "Layouts/Editor/EditorWindow"
-                    "Layouts/Editor/TStructures"
-                    "Layouts/Editor/TStructures/Subwindows"
-                    "Layouts/Editor/TStructures/DisplayableMovelist"
+                    "Layouts/EditorVisuals"
+                    "Layouts/EditorVisuals/EditorVisuals_t7"
 
                     "LocalStorage"
                     "ResourcesClasses"
@@ -85,35 +82,9 @@ set(BINARY_SOURCES
                     "Layouts/Submenus/Submenu_PersistentPlay.cpp"
                     "Layouts/Submenus/Submenu_About.cpp"
                     # Layout: editor window
-                    "Layouts/Editor/EditorWindow/EditorWindow.cpp"
-                    "Layouts/Editor/EditorWindow/EditorWindow_Rendering.cpp"
-                    "Layouts/Editor/EditorForm.cpp"
-                    "Layouts/Editor/EditorFormList.cpp"
-                    # Layout: Structures
-                    "Layouts/Editor/TStructures/EditorMove.cpp"
-                    "Layouts/Editor/TStructures/EditorVoiceclip.cpp"
-                    "Layouts/Editor/TStructures/EditorExtraproperties.cpp"
-                    "Layouts/Editor/TStructures/EditorCancels.cpp"
-                    "Layouts/Editor/TStructures/EditorCancelExtra.cpp"
-                    "Layouts/Editor/TStructures/EditorGroupedCancels.cpp"
-                    "Layouts/Editor/TStructures/EditorRequirements.cpp"
-                    "Layouts/Editor/TStructures/EditorHitConditions.cpp"
-                    "Layouts/Editor/TStructures/EditorReactions.cpp"
-                    "Layouts/Editor/TStructures/EditorPushback.cpp"
-                    "Layouts/Editor/TStructures/EditorPushbackExtra.cpp"
-                    "Layouts/Editor/TStructures/EditorMoveStartProperty.cpp"
-                    "Layouts/Editor/TStructures/EditorMoveEndProperty.cpp"
-                    "Layouts/Editor/TStructures/EditorInputSequence.cpp"
-                    "Layouts/Editor/TStructures/EditorInputStruct.cpp"
-                    "Layouts/Editor/TStructures/EditorProjectile.cpp"
-                    "Layouts/Editor/TStructures/EditorThrowCamera.cpp"
-                    "Layouts/Editor/TStructures/EditorCameraData.cpp"
-                    # Layout: editor window: displayable movelist
-                    "Layouts/Editor/TStructures/DisplayableMovelist/EditorMovelistDisplayable.cpp"
-                    "Layouts/Editor/TStructures/DisplayableMovelist/EditorMovelistPlayable.cpp"
-                    "Layouts/Editor/TStructures/DisplayableMovelist/EditorMovelistInput.cpp"
-                    # Layout: editor subwindows
-                    "Layouts/Editor/TStructures/Subwindows/EditorMove_Animations.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals.cpp"
+                    "Layouts/EditorVisuals/EditorForm.cpp"
+                    "Layouts/EditorVisuals/EditorFormList.cpp"
 
                     # Helpers and such
                     "Utils/Animations.cpp"
@@ -136,7 +107,8 @@ set(GAMESPECIFIC_SOURCES
                     # Base classes for our game-specific stuff
                     "GameSpecific/Extractors/Extractor.cpp"
                     "GameSpecific/Importers/Importer.cpp"
-                    "GameSpecific/Editors/Editor.cpp"
+                    "GameSpecific/Editors/TEditor.cpp"
+                    "GameSpecific/Editors/EditorLogic.cpp"
                     "GameSpecific/Online/Online.cpp"
                     
                     # Game-specific
@@ -156,6 +128,31 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Utils.cpp"
+                    ### Editor layout
+                    "Layouts/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorMove.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorVoiceclip.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorExtraproperties.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorCancels.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorCancelExtra.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorGroupedCancels.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorRequirements.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorHitConditions.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorReactions.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorPushback.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorPushbackExtra.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorMoveStartProperty.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorMoveEndProperty.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorInputSequence.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorInputStruct.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorProjectile.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorThrowCamera.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/EditorCameraData.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/EditorMovelistDisplayable.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/EditorMovelistPlayable.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/EditorMovelistInput.cpp"
+                    "Layouts/EditorVisuals/EditorVisuals_t7/Structures/Subwindows/EditorMove_Animations.cpp"
 )
 
 # This will be included in the .dll and should only be related to the injected DLL

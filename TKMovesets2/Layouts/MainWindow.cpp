@@ -33,9 +33,9 @@ const ImU32 editorTitleInactiveColors[] = {
 // -- Private methods -- //
 
 //
-void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
+void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 {
-	for (EditorWindow* win : editorWindows)
+	for (EditorVisuals* win : editorWindows)
 	{
 		if (win->filename == movesetInfos->filename)
 		{
@@ -46,11 +46,12 @@ void MainWindow::LoadMovesetEditor(movesetInfo* movesetInfos)
 	}
 
 	try {
-		EditorWindow* newWin = new EditorWindow(movesetInfos, addrFile, &storage);
+		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
+		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
-		// Memory was freed so no need to do anything
+		// A throw in a constructor frees its memory so no need to do anything
 	}
 }
 
@@ -152,7 +153,7 @@ void MainWindow::Update()
 		// Editor windows
 		for (unsigned int i = 0; i < editorWindows.size();)
 		{
-			EditorWindow* w = editorWindows[i];
+			auto& w = editorWindows[i];
 
 			if (w->popen) {
 				const ImU32 colorCount = _countof(editorTitleColors);

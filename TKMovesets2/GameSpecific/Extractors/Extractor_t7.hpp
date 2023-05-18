@@ -12,7 +12,7 @@
 // You should be passing values through method calls and no other way.
 // It should be able to call Export() while another Export() is going on in another thread and this without breaking anything
 
-class DLLCONTENT ExtractorT7 : public Extractor
+class ExtractorT7 : public Extractor
 {
 private:
 	/// Main functions

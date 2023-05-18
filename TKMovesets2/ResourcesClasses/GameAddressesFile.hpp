@@ -66,8 +66,11 @@ public:
 	void LoadToSharedMemory();
 	// Reload the game addresses file.
 	void Reload();
+
+	// Returns true if such a key exists (looks at values, strings and ptr paths)
+	bool HasKey(const std::string& gameKey, const char* key) const;
 	// Returns a list of every game_address.txt entry (key only).
-	const std::vector<std::string>& GetAllKeys();
+	const std::vector<std::string>& GetAllKeys() const;
 	// Returns a single numerical value from the file
 	int64_t GetValue(const std::string& gameKey, const char* c_addressId) const;
 	// Returns a string from the file

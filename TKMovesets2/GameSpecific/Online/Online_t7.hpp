@@ -5,7 +5,7 @@
 #include "Online.hpp"
 #include "SharedMemory_t7.h"
 
-class DLLCONTENT OnlineT7 : public Online
+class OnlineT7 : public Online
 {
 private:
 	// Ptr to the shared memory

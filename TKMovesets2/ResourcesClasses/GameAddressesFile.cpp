@@ -183,7 +183,22 @@ void GameAddressesFile::Reload()
 }
 
 
-const std::vector<std::string>& GameAddressesFile::GetAllKeys()
+bool GameAddressesFile::HasKey(const std::string& gameKey, const char* key) const
+{
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
+	{
+		auto& g = gameEntry->second;
+		return g.absolute_pointer_paths.contains(key) ||
+			g.relative_pointer_paths.contains(key) ||
+			g.values.contains(key) ||
+			g.strings.contains(key);
+	}
+	return false;
+}
+
+
+const std::vector<std::string>& GameAddressesFile::GetAllKeys() const
 {
 	// Really not used and doesn't seem ever useful
 	return m_keys;

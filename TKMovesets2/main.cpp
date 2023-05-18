@@ -141,7 +141,7 @@ static void DestroyMainClasses(MainWindow& program)
 	program.importer.StopThreadAndCleanup();
 	program.sharedMem.StopThreadAndCleanup();
 
-	for (EditorWindow* win : program.editorWindows) {
+	for (auto& win : program.editorWindows) {
 		delete win;
 	}
 
@@ -356,7 +356,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 			glfwSwapBuffers(window);
 
 			if (io.DeltaTime < (1.0f / MAX_FPS)) {
-				Sleep(((1.0f / MAX_FPS) - io.DeltaTime) * 1000);
+				Sleep((DWORD)(((1.0f / MAX_FPS) - io.DeltaTime) * 1000));
 			}
 		}
 

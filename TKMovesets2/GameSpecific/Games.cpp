@@ -3,6 +3,7 @@
 #include "Extractor_t7.hpp"
 #include "Importer_t7.hpp"
 #include "Editor_t7.hpp"
+#include "EditorVisuals_t7.hpp"
 #include "Online_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
@@ -21,7 +22,8 @@ const GameInfo cg_gamesInfo[] = {
 		.supportedImports = {},
 		.extractor = new GameFactory<ExtractorT7>,
 		.importer = new GameFactory<ImporterT7>,
-		.editor = new GameFactory<EditorT7>,
+		.editorLogic = new GameFactory<EditorT7>,
+		.editorVisuals = new EditorFactory<EditorVisuals_T7>,
 		.onlineHandler = new GameFactory<OnlineT7>
 	},
 	{
@@ -37,7 +39,8 @@ const GameInfo cg_gamesInfo[] = {
 		.supportedImports = { GameId_T7 },
 		.extractor = nullptr,
 		.importer = nullptr,
-		.editor = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 	},
 	{
@@ -53,7 +56,8 @@ const GameInfo cg_gamesInfo[] = {
 		.supportedImports = {},
 		.extractor = nullptr,
 		.importer = nullptr,
-		.editor = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 	},
 };
@@ -125,7 +129,7 @@ namespace Games
 	bool IsGameEditable(uint16_t gameId, uint16_t minorVersion)
 	{
 		auto game = GetGameInfoFromIdentifier(gameId, minorVersion);
-		return game && game->editor != nullptr;
+		return game->IsEditable();
 	}
 
 	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion)
@@ -148,10 +152,15 @@ namespace Games
 		return im;
 	}
 
-	Editor* FactoryGetEditor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game)
 	{
-		Editor* ed = (Editor*)gameInfo->editor->allocate(process, game, gameInfo);
-		// No need to store character count here because the editor is used alongside the importer which stores that information already
+		EditorLogic* ed = (EditorLogic*)gameInfo->editorLogic->allocate(process, game, gameInfo);
+		return ed;
+	}
+
+	EditorVisuals* FactoryGetEditorVisuals(const GameInfo* gameInfo, const movesetInfo* movesetInfos, GameAddressesFile* addrFile, LocalStorage* storage)
+	{
+		EditorVisuals* ed = (EditorVisuals*)gameInfo->editorVisuals->allocate(movesetInfos, addrFile, storage);
 		return ed;
 	}
 

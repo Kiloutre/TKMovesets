@@ -12,7 +12,7 @@
 #include "SharedMemory.h"
 #include "lastLoadedMoveset.h"
 
-class DLLCONTENT Online : public BaseGameSpecificClass
+class Online : public BaseGameSpecificClass
 {
 protected:
 	// Stores a handle to the shared memory

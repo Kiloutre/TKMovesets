@@ -2,7 +2,7 @@
 
 #include <thread>
 
-#include "Games.hpp"
+#include "GameInfo.hpp"
 #include "GameAddressesFile.hpp"
 
 class EditorLabel
@@ -39,7 +39,7 @@ public:
 	// Reload the dictionary for the files, without clearing the old values already inserted in previous loads
 	void Reload();
 	// Returns a string for the given requirement/property ID
-	const char* GetText(int id);
+	const char* GetText(int id) const;
 	// Request for the downloading of editor labels
 	void UpdateFromWebsite();
 };

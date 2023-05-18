@@ -428,7 +428,7 @@ bool EditorT7::ValidateReactionsField(EditorInput* field)
 			if (moveId < 0x8000) {
 				return false;
 			}
-			if (moveId >= (0x8000 + m_aliases->size())) {
+			if (moveId >= (0x8000 + aliases.size())) {
 				return false;
 			}
 		}
@@ -741,7 +741,7 @@ bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
 			if (moveId < 0x8000) {
 				return false;
 			}
-			if (moveId >= (0x8000 + m_aliases->size())) {
+			if (moveId >= (0x8000 + aliases.size())) {
 				return false;
 			}
 		}
@@ -1169,7 +1169,7 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 			if (moveId < 0x8000) {
 				return false;
 			}
-			if (moveId >= (0x8000 + m_aliases->size())) {
+			if (moveId >= (0x8000 + aliases.size())) {
 				return false;
 			}
 		}

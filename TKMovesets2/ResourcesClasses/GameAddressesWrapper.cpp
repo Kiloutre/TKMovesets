@@ -2,7 +2,7 @@
 
 // -- Game addresses interface -- //
 
-int64_t GameAddressesWrapper::GetValue(const char* c_addressId)
+int64_t GameAddressesWrapper::GetValue(const char* c_addressId) const
 {
 	try {
 		return addrFile->GetValue(minorGameKey, c_addressId);
@@ -12,7 +12,7 @@ int64_t GameAddressesWrapper::GetValue(const char* c_addressId)
 	}
 }
 
-const char* GameAddressesWrapper::GetString(const char* c_addressId)
+const char* GameAddressesWrapper::GetString(const char* c_addressId) const
 {
 	try {
 		return addrFile->GetString(minorGameKey, c_addressId);
@@ -22,7 +22,7 @@ const char* GameAddressesWrapper::GetString(const char* c_addressId)
 	}
 }
 
-const std::vector<gameAddr>& GameAddressesWrapper::GetPtrPath(const char* c_addressId, bool& isRelative)
+const std::vector<gameAddr>& GameAddressesWrapper::GetPtrPath(const char* c_addressId, bool& isRelative) const
 {
 	try {
 		return addrFile->GetPtrPath(minorGameKey, c_addressId, isRelative);
@@ -32,7 +32,7 @@ const std::vector<gameAddr>& GameAddressesWrapper::GetPtrPath(const char* c_addr
 	}
 }
 
-uint64_t GameAddressesWrapper::ReadPtrPathInCurrProcess(const char* c_addressId, uint64_t moduleAddress)
+uint64_t GameAddressesWrapper::ReadPtrPathInCurrProcess(const char* c_addressId, uint64_t moduleAddress) const
 {
 	bool isRelative;
 	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
@@ -63,4 +63,13 @@ uint64_t GameAddressesWrapper::ReadPtrPathInCurrProcess(const char* c_addressId,
 	}
 
 	return addr;
+}
+
+bool GameAddressesWrapper::HasKey(const char* key) const
+{
+	bool result = addrFile->HasKey(minorGameKey, key);
+	if (!result && minorGameKey != gameKey) {
+		return addrFile->HasKey(gameKey, key);
+	}
+	return result;
 }

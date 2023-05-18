@@ -3,7 +3,7 @@
 // Toplevel menus
 #include "NavigationMenu.hpp"
 // Editor window
-#include "EditorWindow.hpp"
+#include "EditorVisuals.hpp"
 // Submenus
 #include "Submenu_Import.hpp"
 #include "Submenu_Extract.hpp"
@@ -21,7 +21,7 @@
 class MainWindow {
 private:
 	// Attempt to load a moveset, open a new editor window on success
-	void LoadMovesetEditor(movesetInfo* movesetInfos);
+	void LoadMovesetEditor(const movesetInfo* movesetInfos);
 public:
 	// If true, program will exit
 	bool requestedUpdate = false;
@@ -53,7 +53,7 @@ public:
 	Submenu_PersistentPlay persistentPlayMenu;
 
 	// Edition windows
-	std::vector<EditorWindow*> editorWindows;
+	std::vector<EditorVisuals*> editorWindows;
 
 	MainWindow();
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
