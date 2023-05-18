@@ -12,7 +12,7 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	if (name == "move_id") {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
@@ -38,7 +38,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 	std::string label;
 
 	auto& item = m_items[listIdx];
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	EditorInput* commandField = item->identifierMap["command"];
 	EditorInput* moveIdField = item->identifierMap["move_id"];

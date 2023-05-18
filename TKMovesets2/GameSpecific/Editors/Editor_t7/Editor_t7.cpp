@@ -402,7 +402,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 
 			if (displayedMove->aliasId == 0)
 			{
-				displayedMove->color |= EditorUtils::GetMoveColorFromFlag(displayedMove->flags);
+				displayedMove->color |= TEditorUtils::GetMoveColorFromFlag(displayedMove->flags);
 				aliasId = aliasId;
 			}
 		}
@@ -426,7 +426,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 
 			if (displayedMove->aliasId == 0)
 			{
-				displayedMove->color |= EditorUtils::GetMoveColorFromFlag(displayedMove->flags);
+				displayedMove->color |= TEditorUtils::GetMoveColorFromFlag(displayedMove->flags);
 				aliasId = aliasId;
 			}
 		}
@@ -435,7 +435,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 	displayedMove->moveId_str = std::to_string(moveId);
 	displayedMove->name = moveName;
 	displayedMove->alias_str = aliasId == 0 ? std::string() : std::to_string(aliasId);
-	displayedMove->color = EditorUtils::GetMoveColorFromFlag(flags);
+	displayedMove->color = TEditorUtils::GetMoveColorFromFlag(flags);
 	displayedMove->aliasId = aliasId;
 	displayedMove->flags = flags;
 }
@@ -485,7 +485,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			.moveId_str = std::to_string(moveId),
 			.name = moveName,
 			.alias_str = std::string(),
-			.color = EditorUtils::GetMoveColorFromFlag(flags),
+			.color = TEditorUtils::GetMoveColorFromFlag(flags),
 			.moveId = moveId,
 			.aliasId = 0,
 			.flags = flags,
@@ -507,7 +507,7 @@ void EditorT7::ReloadDisplayableMoveList()
 
 			if (move->aliasId == 0)
 			{
-				move->color |= EditorUtils::GetMoveColorFromFlag(move->flags);
+				move->color |= TEditorUtils::GetMoveColorFromFlag(move->flags);
 				move->aliasId = aliasId;
 				move->alias_str = std::to_string(aliasId);
 			}
@@ -529,7 +529,7 @@ void EditorT7::ReloadDisplayableMoveList()
 
 			if (move->aliasId == 0)
 			{
-				move->color |= EditorUtils::GetMoveColorFromFlag(move->flags);
+				move->color |= TEditorUtils::GetMoveColorFromFlag(move->flags);
 				move->aliasId = aliasId;
 				move->alias_str = std::to_string(aliasId);
 			}

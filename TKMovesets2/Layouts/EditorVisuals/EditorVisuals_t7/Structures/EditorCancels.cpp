@@ -19,7 +19,7 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 			m_baseWindow->OpenFormWindow(EditorWindowType_GroupedCancel, referenceId);
 		}
 		else {
-			auto moveId = static_cast<EditorVisuals_T7*>(m_baseWindow)->ValidateMoveId(field->buffer);
+			auto moveId = BaseWindow<EditorVisuals_T7>()->ValidateMoveId(field->buffer);
 			m_baseWindow->OpenFormWindow(EditorWindowType_Move, moveId);
 		}
 	}
@@ -40,6 +40,7 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	if (name == "command" || name == "move_id") {
 		// More complex validation than what is shown in the editors.cpp (cross-field validation)
@@ -53,7 +54,7 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 		}
 		else
 		{
-			auto moveId = static_cast<EditorVisuals_T7*>(m_baseWindow)->ValidateMoveId(moveIdField->buffer);
+			auto moveId = baseWindow->ValidateMoveId(moveIdField->buffer);
 			moveIdField->errored = moveId == -1;
 		}
 	}
@@ -68,7 +69,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	std::string label;
 
 	auto& item = m_items[listIdx];
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	EditorInput* commandField = item->identifierMap["command"];
 	EditorInput* moveIdField = item->identifierMap["move_id"];

@@ -135,6 +135,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Extractors/Extractor.cpp"
                     "GameSpecific/Importers/Importer.cpp"
                     "GameSpecific/Editors/Editor.cpp"
+                    "GameSpecific/Editors/EditorLogic.cpp"
                     "GameSpecific/Online/Online.cpp"
                     
                     # Game-specific

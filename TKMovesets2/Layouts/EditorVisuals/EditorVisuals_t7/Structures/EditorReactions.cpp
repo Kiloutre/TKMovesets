@@ -4,9 +4,10 @@
 
 void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
+
 	int id = atoi(field->buffer);
 	auto& name = field->name;
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
 
 	if (name.endsWith("_pushback")) {
 		m_baseWindow->OpenFormWindow(EditorWindowType_Pushback, id);

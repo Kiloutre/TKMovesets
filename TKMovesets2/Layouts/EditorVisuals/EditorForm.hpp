@@ -60,6 +60,14 @@ protected:
 	// Marks if deletion is possible on this structure
 	bool m_isDeletable = true;
 
+	// Returns the casted base window for when wanting to call non-generic methods
+	template <class T> T* BaseWindow() {
+		return (T*)m_baseWindow;
+	};
+	// Returns the casted editor for when wanting to call non-generic methods
+	template <class T> T* EditorLogic() {
+		return (T*)m_editor;
+	};
 	// Callde when the structure is duplicated
 	virtual void OnDuplication(unsigned int newId, unsigned int listSize) {};
 	// Delete the current structure from the moveset and close the structure window

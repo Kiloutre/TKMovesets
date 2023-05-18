@@ -58,7 +58,7 @@ public:
 	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*>* movelist = nullptr;
 
-	// Constructor that loads the moveset and starts its own importer
+	// Constructor that loads the moveset
 	EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
 	// Render the window
 	void Render(int dockid) override;

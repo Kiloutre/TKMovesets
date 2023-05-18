@@ -9,7 +9,7 @@
 
 void EditorMove::OnInitEnd()
 {
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	// Build initial transition label
 	{
@@ -33,8 +33,7 @@ void EditorMove::OnInitEnd()
 
 void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
 {
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
-    
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 	baseWindow->OnMoveCreate(moveId);
 }
 
@@ -47,7 +46,7 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 
 void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	int id = atoi(field->buffer);
 	auto& name = field->name;
@@ -94,7 +93,7 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 void EditorMove::OnApply()
 {
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	m_editor->RecomputeDisplayableMoveFlags(structureId);
 	baseWindow->ReloadMovelistFilter();
@@ -153,7 +152,7 @@ void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, 
 
 void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 {
-	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	if (field->name == "transition")
 	{
