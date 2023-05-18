@@ -5,16 +5,19 @@
 #include "Localization.hpp"
 #include "Helpers.hpp"
 #include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 void EditorMove::OnInitEnd()
 {
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+
 	// Build initial transition label
 	{
 		auto& field = m_fieldIdentifierMap["transition"];
-		int moveId = 0;//m_baseWindow->ValidateMoveId(field->buffer);
+		int moveId = baseWindow->ValidateMoveId(field->buffer);
 		if (moveId != -1)
 		{
-			const char* moveName = "";//m_baseWindow->movelist->at(moveId)->name.c_str();
+			const char* moveName = baseWindow->movelist->at(moveId)->name.c_str();
 			EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 		}
 	}
@@ -30,7 +33,9 @@ void EditorMove::OnInitEnd()
 
 void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
 {
-	//m_baseWindow->OnMoveCreate(moveId);
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+    
+	baseWindow->OnMoveCreate(moveId);
 }
 
 void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
@@ -42,6 +47,8 @@ void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
 
 void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+
 	int id = atoi(field->buffer);
 	auto& name = field->name;
 
@@ -52,7 +59,7 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 	else if (name == "transition") {
 		// Validation is only needed here for alias conversion
-		//m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
+		baseWindow->OpenFormWindow(EditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
 	}
 	else if (name == "voiceclip_addr") {
 		if (id >= 0) {
@@ -87,8 +94,10 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 void EditorMove::OnApply()
 {
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+
 	m_editor->RecomputeDisplayableMoveFlags(structureId);
-	//m_baseWindow->ReloadMovelistFilter();
+	baseWindow->ReloadMovelistFilter();
 	if (m_renamed) {
 		// todo: re-compute displayable color of this move according ot its new properties
 		ApplyWindowName();
@@ -144,10 +153,12 @@ void EditorMove::RequestFieldUpdate(EditorWindowType_ winType, int valueChange, 
 
 void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 {
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
+
 	if (field->name == "transition")
 	{
-		int moveId = 0;//m_baseWindow->ValidateMoveId(field->buffer);
-		const char* moveName = "";//m_baseWindow->movelist->at(moveId)->name.c_str();
+		int moveId = baseWindow->ValidateMoveId(field->buffer);
+		const char* moveName = baseWindow->movelist->at(moveId)->name.c_str();
 		EditorFormUtils::SetFieldDisplayText(field, std::format("{} : {}", _(field->fullName.c_str()), moveName));
 	}
 	else if (field->name == "move_name") {

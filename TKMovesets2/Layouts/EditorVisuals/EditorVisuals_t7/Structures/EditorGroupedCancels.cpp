@@ -4,6 +4,7 @@
 #include "EditorGroupedCancels.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals.hpp"
+#include "EditorVisuals_t7.hpp"
 
 // -- Private methods -- //
 
@@ -11,9 +12,10 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
 
 	if (name == "move_id") {
-		//m_baseWindow->OpenFormWindow(EditorWindowType_Move, m_baseWindow->ValidateMoveId(field->buffer));
+		m_baseWindow->OpenFormWindow(EditorWindowType_Move, baseWindow->ValidateMoveId(field->buffer));
 	}
 	else if (name == "extradata_addr") {
 		int id = atoi(field->buffer);
@@ -36,6 +38,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 	std::string label;
 
 	auto& item = m_items[listIdx];
+	auto baseWindow = static_cast<EditorVisuals_T7*>(m_baseWindow);
 
 	EditorInput* commandField = item->identifierMap["command"];
 	EditorInput* moveIdField = item->identifierMap["move_id"];
@@ -49,7 +52,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		EditorFormUtils::SetFieldDisplayText(commandField, _("edition.cancel.sequence_id"));
 
 		int move_id = atoi(moveIdField->buffer);
-		int validated_move_id = 0;// m_baseWindow->ValidateMoveId(moveIdField->buffer);
+		int validated_move_id = baseWindow->ValidateMoveId(moveIdField->buffer);
 
 
 		std::string inputs;
@@ -69,15 +72,15 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 			}
 		}
 
-/*
-		if (m_baseWindow->ValidateMoveId(moveIdField->buffer) == -1) {
+
+		if (validated_move_id == -1) {
 			label = std::format("{} / {} / {}: {}, [ {} ]", move_id, _("edition.form_list.invalid"), _("edition.input_sequence.window_name"), inputSequenceId, inputs);
 		}
 		else {
-			const char* moveName = m_baseWindow->movelist->at(validated_move_id)->name.c_str();
+			const char* moveName = baseWindow->movelist->at(validated_move_id)->name.c_str();
 			label = std::format("{} / {} / {}: {}, [ {} ]", move_id, moveName, _("edition.input_sequence.window_name"), inputSequenceId, inputs);
 		}
-        */
+        
 	}
 	else {
 		EditorFormUtils::SetFieldDisplayText(commandField, _("edition.cancel.command"));
@@ -87,7 +90,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 
 
 		int move_id = atoi(moveIdField->buffer);
-		int validated_move_id = 0;//m_baseWindow->ValidateMoveId(moveIdField->buffer);
+		int validated_move_id = baseWindow->ValidateMoveId(moveIdField->buffer);
 
 		item->color = 0;
 		EditorFormUtils::SetFieldDisplayText(moveIdField, _("edition.cancel.move_id"));
@@ -98,7 +101,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 		}
 		else
 		{
-			const char* moveName = "";//m_baseWindow->movelist->at(validated_move_id)->name.c_str();
+			const char* moveName = baseWindow->movelist->at(validated_move_id)->name.c_str();
 			label = std::format("{} / {} / [ {} ]", move_id, moveName, commandStr);
 		}
 	}
