@@ -72,7 +72,7 @@ protected:
 	template <class T> T* Editor() {
 		return (T*)m_editor;
 	};
-	// Callde when the structure is duplicated
+	// Called when the structure is duplicated
 	virtual void OnDuplication(unsigned int newId, unsigned int listSize) {};
 	// Delete the current structure from the moveset and close the structure window
 	virtual void DeleteStructure();
