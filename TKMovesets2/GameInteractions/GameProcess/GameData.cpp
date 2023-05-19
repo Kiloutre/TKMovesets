@@ -1,3 +1,4 @@
+#include "GameInfo.hpp"
 #include "GameData.hpp"
 
 #include "GameTypes.h"
@@ -102,4 +103,13 @@ void GameData::ReadBytes(const char* c_addressId, void* buf, size_t readSize) co
 	gameAddr addr = (addrEntry == m_cachedAddresses.end())
 		? ReadPtrPath(c_addressId) : addrEntry->second;
 	return m_process->readBytes(addr, buf, readSize);
+}
+
+void GameData::SetCurrentGame(const GameInfo* game)
+{
+	// Resets base addr for every game change
+	baseAddr = 0;
+
+	currentGame = game;
+	m_ptrSize = game->ptrSize;
 }

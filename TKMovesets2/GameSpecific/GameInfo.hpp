@@ -63,6 +63,8 @@ struct GameInfo
 	uint16_t minorVersion;
 	// Amount of characters at once the game is able to load
 	uint8_t characterCount;
+	// Size of PTRs in the game
+	uint8_t ptrSize;
 	// Determines what can be done with the game. See GameFlag enum for more details
 	GameFlag flags;
 	// Used to build path for label files and game addresses, lower priority than .minorDataString

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "GameTypes.h"
 
 namespace StructsTTT2
 {
@@ -144,7 +144,7 @@ namespace StructsTTT2
 		};
 	};
 
-	struct Input
+	struct Input //todo
 	{
 		union
 		{
@@ -165,7 +165,7 @@ namespace StructsTTT2
 		gameAddr32 input_addr;
 	};
 
-	struct Projectile // todo
+	struct Projectile // todo, not good
 	{
 		uint32_t vfx_id;
 		int32_t _0x4_int;
@@ -208,7 +208,7 @@ namespace StructsTTT2
 
 	struct ThrowCamera // todo
 	{
-		uint64_t _0x0_llong;
+		uint32_t _0x0_uint;
 		gameAddr32 cameradata_addr;
 	};
 

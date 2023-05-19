@@ -32,6 +32,7 @@ void GameExtract::InstantiateFactory()
 {
 	m_toFree_extractor = m_extractor;
 
+	game->SetCurrentGame(currentGame);
 	m_extractor = Games::FactoryGetExtractor(currentGame, process, game);
 }
 

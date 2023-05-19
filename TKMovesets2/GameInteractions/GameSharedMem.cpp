@@ -21,6 +21,7 @@ void GameSharedMem::InstantiateFactory()
 	m_toFree_importer = m_importer;
 	m_toFree_sharedMemHandler = m_sharedMemHandler;
 
+	game->SetCurrentGame(currentGame);
 	// Every game has its own subtleties so we use polymorphism to manage that
 	m_importer = Games::FactoryGetImporter(currentGame, process, game);
 	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);

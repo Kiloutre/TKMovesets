@@ -26,6 +26,7 @@ void GameImport::InstantiateFactory()
 {
 	m_toFree_importer = m_importer;
 
+	game->SetCurrentGame(currentGame);
 	// Every game has its own importation subtleties so we use polymorphism to manage that
 	m_importer = Games::FactoryGetImporter(currentGame, process, game);
 }
