@@ -27,8 +27,9 @@ typedef uint64_t MovesetFlags;
 enum MovesetFlags_
 {
 	// Used to show which movesets the user has modified (knowing if it's an original or not can be useful)
-	MovesetFlags_MOVESET_MODIFIED = (1 << 0),
-	MovesetFlags_Compressed = (1 << 1),
+	MovesetFlags_MovesetModified = (1 << 0),
+	// Moveset was extracted in debug mode
+	MovesetFlags_Debug           = (1 << 1),
 };
 
 // This structure should really not change or it would break compatibility with all previous movesets

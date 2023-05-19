@@ -442,10 +442,20 @@ namespace CompressionUtils
 		return g_compressionTypes_len;
 	}
 
+	TKMovesetCompressionType GetDefaultCompression()
+	{
+#ifdef BUILD_TYPE_DEBUG
+		return TKMovesetCompressionType_None;
+#else
+		return TKMovesetCompressionType_LZMA;
+#endif
+	}
+
 	unsigned int GetDefaultCompressionSetting()
 	{
+		auto defaultCompression = GetDefaultCompression();
 		for (unsigned int i = 0; i < g_compressionTypes_len; ++i) {
-			if (g_compressionTypes[i].compressionSetting == TKMovesetCompressionType_LZMA) {
+			if (g_compressionTypes[i].compressionSetting == defaultCompression) {
 				return i;
 			}
 		}

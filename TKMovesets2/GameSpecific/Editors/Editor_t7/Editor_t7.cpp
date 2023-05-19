@@ -289,10 +289,10 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 
 	LoadMovesetPtr(t_moveset, t_movesetSize);
 
-	if ((m_header->flags & MovesetFlags_MOVESET_MODIFIED) == 0) {
+	if ((m_header->flags & MovesetFlags_MovesetModified) == 0) {
 		// First time this moveset is edited
 		strcat_s(m_header->origin, sizeof(m_header->origin), " (M)");
-		m_header->flags |= MovesetFlags_MOVESET_MODIFIED;
+		m_header->flags |= MovesetFlags_MovesetModified;
 	}
 
 	// Get aliases as a vector

@@ -14,7 +14,7 @@
 
 static int getMovesetColor(MovesetFlags flags)
 {
-	if (flags & MovesetFlags_MOVESET_MODIFIED) {
+	if (flags & MovesetFlags_MovesetModified) {
 		return MOVESET_LIST_MODIFIED;
 	}
 	return 0;

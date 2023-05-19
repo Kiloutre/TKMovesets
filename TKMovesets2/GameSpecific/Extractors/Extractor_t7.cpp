@@ -490,6 +490,13 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 	infos.date = Helpers::getCurrentTimestamp();
 	infos.extraction_date = infos.date;
 
+#ifdef BUILD_TYPE_DEBUG
+	// Mark that the moveset was extracted under debug mode
+	infos.flags |= MovesetFlags_Debug;
+	auto p = strlen(infos.version_string);
+	infos.version_string[p == 0 ? 0 : p - 1] = 'd';
+#endif
+
 	uint64_t propertyListSize = customPropertyCount * sizeof(TKMovesetProperty);
 
 	infos.header_size = (uint32_t)Helpers::align8Bytes(sizeof(TKMovesetHeader));

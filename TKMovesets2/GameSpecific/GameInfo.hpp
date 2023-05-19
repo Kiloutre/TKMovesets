@@ -83,8 +83,6 @@ struct GameInfo
 	EditorFactory_Base* editorVisuals;
 	// Dynamic type allocator to store the game's online handler. Can be nullptr for no available handler.
 	GameFactory_Base* onlineHandler;
-	// If set, creates a "ImGui::SeparatorText()" entry in the game list, right before the game
-	const char* groupName = nullptr;
 
 
 	bool SupportsGameImport(uint16_t t_gameId) const

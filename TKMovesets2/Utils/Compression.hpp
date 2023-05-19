@@ -19,6 +19,8 @@ namespace CompressionUtils
 	const s_compressionTypes& GetCompressionSetting(uint8_t idx);
 	// Returns the list of useable compressions
 	size_t GetCompressionSettingCount();
+	// Returns the default compression type
+	TKMovesetCompressionType GetDefaultCompression();
 	// This sets the default compression setting across the software
 	unsigned int GetDefaultCompressionSetting();
 	// Get the index of a compression type
