@@ -3,7 +3,7 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals.hpp"
 
-void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
+void TEditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 	auto& fields = m_items[listIdx]->identifierMap;
@@ -24,7 +24,7 @@ void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorRequirements::BuildItemDetails(int listIdx)
+void TEditorRequirements::BuildItemDetails(int listIdx)
 {
 	std::string label;
 

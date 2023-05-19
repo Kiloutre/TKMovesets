@@ -1,13 +1,12 @@
 #include <format>
 
-#include "EditorMovelistDisplayable.hpp"
-#include "Localization.hpp"
+#include "TEditorMovelist.hpp"
 #include "EditorVisuals_t7.hpp"
 
 
 // -- Public methods -- //
 
-void EditorMovelistDisplayable::OnInitEnd()
+void TEditorMovelistDisplayable::OnInitEnd()
 {
 	uniqueType = true;
 	BuidAllLabels();
@@ -15,7 +14,7 @@ void EditorMovelistDisplayable::OnInitEnd()
 
 // -- Private methods-- //
 
-void EditorMovelistDisplayable::BuidAllLabels()
+void TEditorMovelistDisplayable::BuidAllLabels()
 {
 	auto editor = Editor<EditorT7>();
 
@@ -61,7 +60,7 @@ void EditorMovelistDisplayable::BuidAllLabels()
 	}
 }
 
-void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
+void TEditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -69,7 +68,7 @@ void EditorMovelistDisplayable::OnUpdate(int listIdx, EditorInput* field)
 	BuidAllLabels();
 }
 
-void EditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int referenceId = atoi(field->buffer);
 	auto& name = field->name;

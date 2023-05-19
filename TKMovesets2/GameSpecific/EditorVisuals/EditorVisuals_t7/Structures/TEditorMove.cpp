@@ -5,7 +5,7 @@
 #include "EditorVisuals_t7.hpp"
 #include "imgui_extras.hpp"
 
-void EditorMove::OnInitEnd()
+void TEditorMove::OnInitEnd()
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
@@ -29,20 +29,20 @@ void EditorMove::OnInitEnd()
 	*/
 }
 
-void EditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
+void TEditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 	baseWindow->OnMoveCreate(moveId);
 }
 
-void EditorMove::ApplyWindowName(bool reapplyWindowProperties)
+void TEditorMove::ApplyWindowName(bool reapplyWindowProperties)
 {
 	std::string windowName = _(std::format("edition.{}.window_name", m_windowTypeName).c_str());
 	const char* moveName = m_fieldIdentifierMap["move_name"]->buffer;
 	m_windowTitle = std::format("{} {} {} - {}###{}{}{}", windowName, structureId, moveName, m_windowTitleBase.c_str(), windowName, structureId,m_windowTitleBase.c_str());
 }
 
-void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
@@ -89,7 +89,7 @@ void EditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorMove::OnApply()
+void TEditorMove::OnApply()
 {
 	auto editor = Editor<EditorT7>();
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
@@ -103,7 +103,7 @@ void EditorMove::OnApply()
 	}
 }
 
-void EditorMove::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorMove::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	if ((winType & (TEditorWindowType_HitCondition | TEditorWindowType_Extraproperty | TEditorWindowType_Cancel
 		| TEditorWindowType_MoveBeginProperty | TEditorWindowType_MoveEndProperty | TEditorWindowType_Voiceclip)) == 0) {
@@ -149,7 +149,7 @@ void EditorMove::RequestFieldUpdate(EditorWindowType winType, int valueChange, i
 	}
 }
 
-void EditorMove::OnUpdate(int listIdx, EditorInput* field)
+void TEditorMove::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
@@ -166,13 +166,13 @@ void EditorMove::OnUpdate(int listIdx, EditorInput* field)
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorMove::OpenAnimationList()
+void TEditorMove::OpenAnimationList()
 {
 	m_animationListOpen = true;
-	m_animationList = new EditorMove_Animations;
+	m_animationList = new TEditorMove_Animations;
 }
 
-void EditorMove::PostRender()
+void TEditorMove::PostRender()
 {
 	ImGui::PushID(structureId);
 
@@ -214,7 +214,7 @@ void EditorMove::PostRender()
 	ImGui::PopID();
 }
 
-void EditorMove::RenderExtraContextMenuItems()
+void TEditorMove::RenderExtraContextMenuItems()
 {
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 

@@ -1,7 +1,7 @@
-#include "EditorMovelistPlayable.hpp"
+#include "TEditorMovelist.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int referenceId = atoi(field->buffer);
 	auto& name = field->name;
@@ -19,7 +19,7 @@ void EditorMovelistPlayable::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorMovelistPlayable::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	if (winType & TEditorWindowType_MovelistInput)
 	{
@@ -42,7 +42,7 @@ void EditorMovelistPlayable::RequestFieldUpdate(EditorWindowType winType, int va
 	}
 }
 
-void EditorMovelistPlayable::OnUpdate(int listIdx, EditorInput* field)
+void TEditorMovelistPlayable::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto editor = Editor<EditorT7>();
 

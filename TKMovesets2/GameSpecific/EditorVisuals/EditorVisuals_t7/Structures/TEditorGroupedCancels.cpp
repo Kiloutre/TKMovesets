@@ -7,7 +7,7 @@
 
 // -- Private methods -- //
 
-void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -34,7 +34,7 @@ void EditorGroupedCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorGroupedCancels::BuildItemDetails(int listIdx)
+void TEditorGroupedCancels::BuildItemDetails(int listIdx)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -113,7 +113,7 @@ void EditorGroupedCancels::BuildItemDetails(int listIdx)
 }
 
 
-void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorGroupedCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	switch (winType)
 	{
@@ -151,7 +151,7 @@ void EditorGroupedCancels::RequestFieldUpdate(EditorWindowType winType, int valu
 	}
 }
 
-void EditorGroupedCancels::RenderExtraContextMenuItems()
+void TEditorGroupedCancels::RenderExtraContextMenuItems()
 {
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 

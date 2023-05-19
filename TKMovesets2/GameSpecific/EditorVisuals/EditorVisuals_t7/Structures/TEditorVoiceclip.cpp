@@ -4,13 +4,13 @@
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
+void TEditorVoiceclip::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorVoiceclip::OnResize()
+void TEditorVoiceclip::OnResize()
 {
 	m_editor->live_loadedMoveset = 0;
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
@@ -18,7 +18,7 @@ void EditorVoiceclip::OnResize()
 	}
 }
 
-void EditorVoiceclip::OnReorder()
+void TEditorVoiceclip::OnReorder()
 {
 	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
 		BuildItemDetails(listIdx);
@@ -32,7 +32,7 @@ void EditorVoiceclip::OnReorder()
 
 }
 
-void EditorVoiceclip::BuildItemDetails(int listIdx)
+void TEditorVoiceclip::BuildItemDetails(int listIdx)
 {
 	auto editor = Editor<EditorT7>();
 

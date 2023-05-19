@@ -4,7 +4,7 @@
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
+void TEditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 	auto& fields = m_items[listIdx]->identifierMap;
@@ -71,7 +71,7 @@ void EditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorExtraproperties::BuildItemDetails(int listIdx)
+void TEditorExtraproperties::BuildItemDetails(int listIdx)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -171,7 +171,7 @@ void EditorExtraproperties::BuildItemDetails(int listIdx)
 	}
 }
 
-void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -188,7 +188,7 @@ void EditorExtraproperties::OnFieldLabelClick(int listIdx, EditorInput* field)
 }
 
 
-void EditorExtraproperties::PreItemRender(int listIdx)
+void TEditorExtraproperties::PreItemRender(int listIdx)
 {
 	// play extraprop button
 

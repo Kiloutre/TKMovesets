@@ -1,7 +1,7 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	auto& name = field->name;
@@ -15,7 +15,7 @@ void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorInputSequence::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorInputSequence::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	if (winType == TEditorWindowType_Input) {
 		if (m_fieldIdentifierMap["input_addr"]->errored) {

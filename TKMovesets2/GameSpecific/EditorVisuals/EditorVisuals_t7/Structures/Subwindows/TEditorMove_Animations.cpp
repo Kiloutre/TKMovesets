@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "EditorMove_Animations.hpp"
+#include "tEditorMove_Animations.hpp"
 #include "Localization.hpp"
 #include "Helpers.hpp"
 #include "imgui_extras.hpp"
@@ -12,7 +12,7 @@
 
 // -- Static helpers -- //
 
-void EditorMove_Animations::ApplySearchFilter()
+void TEditorMove_Animations::ApplySearchFilter()
 {
 	for (unsigned int j = 0; j < m_characters.size(); ++j)
 	{
@@ -41,12 +41,12 @@ void EditorMove_Animations::ApplySearchFilter()
 
 }
 
-EditorMove_Animations::EditorMove_Animations()
+TEditorMove_Animations::TEditorMove_Animations()
 {
-	m_loadingThread = std::thread(&EditorMove_Animations::LoadAnimationList, this);
+	m_loadingThread = std::thread(&TEditorMove_Animations::LoadAnimationList, this);
 }
 
-EditorMove_Animations::~EditorMove_Animations()
+TEditorMove_Animations::~TEditorMove_Animations()
 {
 	if (!loadedList) {
 		m_destructionRequested = true;
@@ -60,7 +60,7 @@ EditorMove_Animations::~EditorMove_Animations()
 	}
 }
 
-void EditorMove_Animations::LoadAnimationList()
+void TEditorMove_Animations::LoadAnimationList()
 {
 	CreateDirectory(EDITOR_LIB_DIRECTORY, nullptr);
 
@@ -138,7 +138,7 @@ void EditorMove_Animations::LoadAnimationList()
 	loadedList = true;
 }
 
-bool EditorMove_Animations::Render()
+bool TEditorMove_Animations::Render()
 {
 	ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(9999, 9999));
 	if (ImGui::BeginPopupModal("AnimListPopup", &popen))

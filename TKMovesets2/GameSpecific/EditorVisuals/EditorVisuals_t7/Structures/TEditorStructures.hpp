@@ -1,9 +1,9 @@
 #pragma once
 
 #include "EditorFormList.hpp"
-#include "Structures/Subwindows/EditorMove_Animations.hpp"
+#include "Structures/Subwindows/TEditorMove_Animations.hpp"
 
-class EditorCancels : public EditorFormList
+class TEditorCancels : public EditorFormList
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -16,7 +16,7 @@ public:
 };
 
 
-class EditorGroupedCancels : public EditorFormList
+class TEditorGroupedCancels : public EditorFormList
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -28,7 +28,7 @@ public:
 };
 
 
-class EditorExtraproperties : public EditorFormList
+class TEditorExtraproperties : public EditorFormList
 {
 private:
 	void OnUpdate(int listIdx, EditorInput* field) override;
@@ -40,7 +40,7 @@ public:
 };
 
 
-class EditorHitConditions : public EditorFormList
+class TEditorHitConditions : public EditorFormList
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -50,7 +50,7 @@ public:
 };
 
 
-class EditorInputSequence : public EditorForm
+class TEditorInputSequence : public EditorForm
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -60,7 +60,7 @@ public:
 };
 
 
-class EditorInputStruct : public EditorFormList
+class TEditorInputStruct : public EditorFormList
 {
 private:
 	void BuildItemDetails(int listIdx) override;
@@ -70,7 +70,7 @@ public:
 };
 
 
-class EditorMove : public EditorForm
+class TEditorMove : public EditorForm
 {
 private:
 	// Stores whether to display the animation list 
@@ -78,7 +78,7 @@ private:
 	// If the move name was changed. Used to re-apply window name.
 	bool m_renamed = false;
 	// Window containing the animation list to choose from
-	EditorMove_Animations* m_animationList = nullptr;
+	TEditorMove_Animations* m_animationList = nullptr;
 
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 	void OnApply() override;
@@ -97,7 +97,7 @@ public:
 };
 
 
-class EditorMoveEndProperty : public EditorFormList
+class TEditorMoveEndProperty : public EditorFormList
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -107,7 +107,7 @@ public:
 };
 
 
-class EditorMoveStartProperty : public EditorFormList
+class TEditorMoveStartProperty : public EditorFormList
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -117,7 +117,7 @@ public:
 };
 
 
-class EditorProjectile : public EditorForm
+class TEditorProjectile : public EditorForm
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -127,7 +127,7 @@ public:
 };
 
 
-class EditorPushback : public EditorForm
+class TEditorPushback : public EditorForm
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -137,7 +137,7 @@ public:
 };
 
 
-class EditorPushbackExtra : public EditorFormList
+class TEditorPushbackExtra : public EditorFormList
 {
 private:
 	void OnUpdate(int listIdx, EditorInput* field) override;
@@ -147,7 +147,7 @@ public:
 };
 
 
-class EditorReactions : public EditorForm
+class TEditorReactions : public EditorForm
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -156,7 +156,7 @@ public:
 };
 
 
-class EditorRequirements : public EditorFormList
+class TEditorRequirements : public EditorFormList
 {
 private:
 	void BuildItemDetails(int listIdx) override;
@@ -166,7 +166,7 @@ public:
 };
 
 
-class EditorThrowCamera : public EditorForm
+class TEditorThrowCamera : public EditorForm
 {
 private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
@@ -175,7 +175,7 @@ public:
 };
 
 
-class EditorVoiceclip : public EditorFormList
+class TEditorVoiceclip : public EditorFormList
 {
 private:
 	void BuildItemDetails(int listIdx) override;

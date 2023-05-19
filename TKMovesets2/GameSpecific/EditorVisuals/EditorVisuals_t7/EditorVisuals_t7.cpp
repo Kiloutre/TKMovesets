@@ -3,9 +3,7 @@
 #include "Compression.hpp"
 // Structures
 #include "Structures/TEditorStructures.hpp"
-#include "Structures/DisplayableMovelist/EditorMovelistDisplayable.hpp"
-#include "Structures/DisplayableMovelist/EditorMovelistPlayable.hpp"
-#include "Structures/DisplayableMovelist/EditorMovelistInput.hpp"
+#include "Structures/DisplayableMovelist/TEditorMovelist.hpp"
 
 using namespace EditorVisualsT7;
 
@@ -14,36 +12,36 @@ using namespace EditorVisualsT7;
 void EditorVisuals_T7::PopulateWindowCreatorMap()
 {
 	m_windowCreatorMap = {
-		{TEditorWindowType_Move, { new EditorWindowFactory<EditorMove>, "move" }},
+		{TEditorWindowType_Move, { new EditorWindowFactory<TEditorMove>, "move" }},
 
-		{TEditorWindowType_Voiceclip, { new EditorWindowFactory<EditorVoiceclip>, "voiceclip" }},
+		{TEditorWindowType_Voiceclip, { new EditorWindowFactory<TEditorVoiceclip>, "voiceclip" }},
 
-		{TEditorWindowType_Extraproperty, { new EditorWindowFactory<EditorExtraproperties>, "extraproperty" }},
-		{TEditorWindowType_MoveBeginProperty, { new EditorWindowFactory<EditorMoveStartProperty>, "move_start_extraprop" }},
-		{TEditorWindowType_MoveEndProperty, { new EditorWindowFactory<EditorMoveEndProperty>, "move_end_extraprop" }},
+		{TEditorWindowType_Extraproperty, { new EditorWindowFactory<TEditorExtraproperties>, "extraproperty" }},
+		{TEditorWindowType_MoveBeginProperty, { new EditorWindowFactory<TEditorMoveStartProperty>, "move_start_extraprop" }},
+		{TEditorWindowType_MoveEndProperty, { new EditorWindowFactory<TEditorMoveEndProperty>, "move_end_extraprop" }},
 
-		{TEditorWindowType_Requirement, { new EditorWindowFactory<EditorRequirements>, "requirement" }},
+		{TEditorWindowType_Requirement, { new EditorWindowFactory<TEditorRequirements>, "requirement" }},
 
-		{TEditorWindowType_HitCondition, { new EditorWindowFactory<EditorHitConditions>, "hit_condition" }},
-		{TEditorWindowType_Reactions, { new EditorWindowFactory<EditorReactions>, "reactions" }},
-		{TEditorWindowType_Pushback, { new EditorWindowFactory<EditorPushback>, "pushback" }},
-		{TEditorWindowType_PushbackExtradata, { new EditorWindowFactory<EditorPushbackExtra>, "pushback_extradata" }},
+		{TEditorWindowType_HitCondition, { new EditorWindowFactory<TEditorHitConditions>, "hit_condition" }},
+		{TEditorWindowType_Reactions, { new EditorWindowFactory<TEditorReactions>, "reactions" }},
+		{TEditorWindowType_Pushback, { new EditorWindowFactory<TEditorPushback>, "pushback" }},
+		{TEditorWindowType_PushbackExtradata, { new EditorWindowFactory<TEditorPushbackExtra>, "pushback_extradata" }},
 
-		{TEditorWindowType_Cancel, { new EditorWindowFactory<EditorCancels>, "cancel" }},
+		{TEditorWindowType_Cancel, { new EditorWindowFactory<TEditorCancels>, "cancel" }},
 		{TEditorWindowType_CancelExtradata, { new EditorWindowFactory<EditorForm>, "cancel_extra" }},
-		{TEditorWindowType_GroupedCancel, { new EditorWindowFactory<EditorGroupedCancels>, "grouped_cancel" }},
+		{TEditorWindowType_GroupedCancel, { new EditorWindowFactory<TEditorGroupedCancels>, "grouped_cancel" }},
 
-		{TEditorWindowType_InputSequence, { new EditorWindowFactory<EditorInputSequence>, "input_sequence" }},
-		{TEditorWindowType_Input, { new EditorWindowFactory<EditorInputStruct>, "input" }},
+		{TEditorWindowType_InputSequence, { new EditorWindowFactory<TEditorInputSequence>, "input_sequence" }},
+		{TEditorWindowType_Input, { new EditorWindowFactory<TEditorInputStruct>, "input" }},
 
-		{TEditorWindowType_Projectile, { new EditorWindowFactory<EditorProjectile>, "projectile" }},
+		{TEditorWindowType_Projectile, { new EditorWindowFactory<TEditorProjectile>, "projectile" }},
 
 		{TEditorWindowType_CameraData, { new EditorWindowFactory<EditorForm>, "camera_data" }},
-		{TEditorWindowType_ThrowCamera, { new EditorWindowFactory<EditorThrowCamera>, "throw_camera" }},
+		{TEditorWindowType_ThrowCamera, { new EditorWindowFactory<TEditorThrowCamera>, "throw_camera" }},
 
-		{TEditorWindowType_MovelistDisplayable, { new EditorWindowFactory<EditorMovelistDisplayable>, "mvl_displayable" }},
-		{TEditorWindowType_MovelistPlayable, { new EditorWindowFactory<EditorMovelistPlayable>, "mvl_playable" }},
-		{TEditorWindowType_MovelistInput, { new EditorWindowFactory<EditorMovelistInput>, "mvl_input"}}
+		{TEditorWindowType_MovelistDisplayable, { new EditorWindowFactory<TEditorMovelistDisplayable>, "mvl_displayable" }},
+		{TEditorWindowType_MovelistPlayable, { new EditorWindowFactory<TEditorMovelistPlayable>, "mvl_playable" }},
+		{TEditorWindowType_MovelistInput, { new EditorWindowFactory<TEditorMovelistInput>, "mvl_input"}}
 	};
 }
 

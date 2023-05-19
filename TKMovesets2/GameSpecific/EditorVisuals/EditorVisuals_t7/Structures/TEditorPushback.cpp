@@ -1,7 +1,7 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 
@@ -17,7 +17,7 @@ void EditorPushback::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorPushback::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorPushback::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	if (winType & TEditorWindowType_PushbackExtradata)
 	{

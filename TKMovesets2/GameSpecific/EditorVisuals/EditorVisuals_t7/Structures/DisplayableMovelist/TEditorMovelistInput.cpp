@@ -1,16 +1,16 @@
 #include <format>
 
-#include "EditorMovelistInput.hpp"
+#include "TEditorMovelist.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorMovelistInput::OnUpdate(int listIdx, EditorInput* field)
+void TEditorMovelistInput::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorMovelistInput::BuildItemDetails(int listIdx)
+void TEditorMovelistInput::BuildItemDetails(int listIdx)
 {
 	auto editor = Editor<EditorT7>();
 

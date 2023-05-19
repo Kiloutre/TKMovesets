@@ -2,7 +2,7 @@
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	auto& name = field->name;
@@ -15,7 +15,7 @@ void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorHitConditions::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorHitConditions::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	
 	switch (winType)

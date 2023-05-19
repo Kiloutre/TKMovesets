@@ -2,7 +2,7 @@
 #include "EditorVisuals.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorReactions::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 

@@ -1,7 +1,7 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	auto& name = field->name;
@@ -14,7 +14,7 @@ void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorProjectile::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorProjectile::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	
 	if (winType & (TEditorWindowType_Cancel | TEditorWindowType_HitCondition))

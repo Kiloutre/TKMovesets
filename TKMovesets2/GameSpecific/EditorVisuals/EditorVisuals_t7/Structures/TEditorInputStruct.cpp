@@ -1,13 +1,13 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
+void TEditorInputStruct::OnUpdate(int listIdx, EditorInput* field)
 {
 	BuildItemDetails(listIdx);
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorInputStruct::BuildItemDetails(int listIdx)
+void TEditorInputStruct::BuildItemDetails(int listIdx)
 {
 	auto editor = Editor<EditorT7>();
 	auto& identifierMap = m_items[listIdx]->identifierMap;

@@ -4,28 +4,27 @@
 #include <thread>
 #include <vector>
 
-struct AnimationLibFile
-{
-	std::string name;
-	std::string lowercaseName;
-	std::wstring filepath;
-	std::string duration;
-	std::string size_megabytes;
-};
-
-struct AnimationLibChar
-{
-	std::string name;
-	std::vector<AnimationLibFile*> files;
-	std::vector<AnimationLibFile*> filteredFiles;
-	bool forceOpen = false;
-	bool forceClose = false;
-};
-
-
-class EditorMove_Animations
+class TEditorMove_Animations
 {
 private:
+	struct AnimationLibFile
+	{
+		std::string name;
+		std::string lowercaseName;
+		std::wstring filepath;
+		std::string duration;
+		std::string size_megabytes;
+	};
+
+	struct AnimationLibChar
+	{
+		std::string name;
+		std::vector<AnimationLibFile*> files;
+		std::vector<AnimationLibFile*> filteredFiles;
+		bool forceOpen = false;
+		bool forceClose = false;
+	};
+
 	// Contains a list of <character : files>
 	std::vector<AnimationLibChar*> m_characters;
 	// The search buffer
@@ -46,8 +45,8 @@ public:
 	// Stores the animation filename that needs to be imported
 	const wchar_t* animationToImport = nullptr;
 
-	EditorMove_Animations();
-	~EditorMove_Animations();
+	TEditorMove_Animations();
+	~TEditorMove_Animations();
 	// Read the library for every animation
 	void LoadAnimationList();
 	// Render the popup/window. Returns false if closed.

@@ -1,7 +1,7 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	int id = atoi(field->buffer);
 	auto& name = field->name;
@@ -12,7 +12,7 @@ void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)
 }
 
 
-void EditorMoveStartProperty::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorMoveStartProperty::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	switch (winType)
 	{

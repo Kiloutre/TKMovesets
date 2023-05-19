@@ -7,7 +7,7 @@
 
 // -- Private methods -- //
 
-void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -37,7 +37,7 @@ void EditorCancels::OnFieldLabelClick(int listIdx, EditorInput* field)
 	}
 }
 
-void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
+void TEditorCancels::OnUpdate(int listIdx, EditorInput* field)
 {
 	auto& name = field->name;
 	auto& item = m_items[listIdx];
@@ -66,7 +66,7 @@ void EditorCancels::OnUpdate(int listIdx, EditorInput* field)
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-void EditorCancels::BuildItemDetails(int listIdx)
+void TEditorCancels::BuildItemDetails(int listIdx)
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 	auto editor = Editor<EditorT7>();
@@ -149,7 +149,7 @@ void EditorCancels::BuildItemDetails(int listIdx)
 	item->itemLabel = label;
 }
 
-void EditorCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
+void TEditorCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
 	auto editor = Editor<EditorT7>();
 
@@ -216,7 +216,7 @@ void EditorCancels::RequestFieldUpdate(EditorWindowType winType, int valueChange
 	}
 }
 
-void EditorCancels::RenderExtraContextMenuItems()
+void TEditorCancels::RenderExtraContextMenuItems()
 {
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 

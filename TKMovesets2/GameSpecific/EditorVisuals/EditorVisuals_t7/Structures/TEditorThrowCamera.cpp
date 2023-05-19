@@ -1,7 +1,7 @@
 #include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
-void EditorThrowCamera::OnFieldLabelClick(int listIdx, EditorInput* field)
+void TEditorThrowCamera::OnFieldLabelClick(int listIdx, EditorInput* field)
 {
 	if (field->name == "cameradata_addr")
 	{
