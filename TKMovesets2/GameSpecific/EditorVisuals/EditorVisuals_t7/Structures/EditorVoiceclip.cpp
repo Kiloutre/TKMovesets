@@ -1,6 +1,6 @@
 #include <format>
 
-#include "EditorVoiceclip.hpp"
+#include "TEditorStructures.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 

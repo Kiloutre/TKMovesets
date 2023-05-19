@@ -1,4 +1,4 @@
-#include "EditorMoveStartProperty.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
 void EditorMoveStartProperty::OnFieldLabelClick(int listIdx, EditorInput* field)

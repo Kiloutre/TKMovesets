@@ -2,24 +2,7 @@
 #include "GameSharedMem.hpp"
 #include "Compression.hpp"
 // Structures
-#include "Structures/EditorMove.hpp"
-#include "Structures/EditorVoiceclip.hpp"
-#include "Structures/EditorExtraproperties.hpp"
-#include "Structures/EditorCancels.hpp"
-#include "Structures/EditorCancelExtra.hpp"
-#include "Structures/EditorGroupedCancels.hpp"
-#include "Structures/EditorRequirements.hpp"
-#include "Structures/EditorHitConditions.hpp"
-#include "Structures/EditorReactions.hpp"
-#include "Structures/EditorPushback.hpp"
-#include "Structures/EditorPushbackExtra.hpp"
-#include "Structures/EditorMoveStartProperty.hpp"
-#include "Structures/EditorMoveEndProperty.hpp"
-#include "Structures/EditorInputSequence.hpp"
-#include "Structures/EditorInputStruct.hpp"
-#include "Structures/EditorProjectile.hpp"
-#include "Structures/EditorThrowCamera.hpp"
-#include "Structures/EditorCameraData.hpp"
+#include "Structures/TEditorStructures.hpp"
 #include "Structures/DisplayableMovelist/EditorMovelistDisplayable.hpp"
 #include "Structures/DisplayableMovelist/EditorMovelistPlayable.hpp"
 #include "Structures/DisplayableMovelist/EditorMovelistInput.hpp"
@@ -47,7 +30,7 @@ void EditorVisuals_T7::PopulateWindowCreatorMap()
 		{TEditorWindowType_PushbackExtradata, { new EditorWindowFactory<EditorPushbackExtra>, "pushback_extradata" }},
 
 		{TEditorWindowType_Cancel, { new EditorWindowFactory<EditorCancels>, "cancel" }},
-		{TEditorWindowType_CancelExtradata, { new EditorWindowFactory<EditorCancelExtra>, "cancel_extra" }},
+		{TEditorWindowType_CancelExtradata, { new EditorWindowFactory<EditorForm>, "cancel_extra" }},
 		{TEditorWindowType_GroupedCancel, { new EditorWindowFactory<EditorGroupedCancels>, "grouped_cancel" }},
 
 		{TEditorWindowType_InputSequence, { new EditorWindowFactory<EditorInputSequence>, "input_sequence" }},
@@ -55,7 +38,7 @@ void EditorVisuals_T7::PopulateWindowCreatorMap()
 
 		{TEditorWindowType_Projectile, { new EditorWindowFactory<EditorProjectile>, "projectile" }},
 
-		{TEditorWindowType_CameraData, { new EditorWindowFactory<EditorCameraData>, "camera_data" }},
+		{TEditorWindowType_CameraData, { new EditorWindowFactory<EditorForm>, "camera_data" }},
 		{TEditorWindowType_ThrowCamera, { new EditorWindowFactory<EditorThrowCamera>, "throw_camera" }},
 
 		{TEditorWindowType_MovelistDisplayable, { new EditorWindowFactory<EditorMovelistDisplayable>, "mvl_displayable" }},

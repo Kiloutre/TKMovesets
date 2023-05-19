@@ -1,6 +1,6 @@
 #include <format>
 
-#include "EditorExtraproperties.hpp"
+#include "TEditorStructures.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 

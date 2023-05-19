@@ -1,11 +1,9 @@
 #include <format>
 
-#include "imgui_extras.hpp"
-#include "EditorMove.hpp"
+#include "TEditorStructures.hpp"
 #include "Localization.hpp"
-#include "Helpers.hpp"
-#include "EditorVisuals.hpp"
 #include "EditorVisuals_t7.hpp"
+#include "imgui_extras.hpp"
 
 void EditorMove::OnInitEnd()
 {

@@ -1,5 +1,4 @@
-#include "imgui_extras.hpp"
-#include "EditorHitConditions.hpp"
+#include "TEditorStructures.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 
@@ -18,6 +17,7 @@ void EditorHitConditions::OnFieldLabelClick(int listIdx, EditorInput* field)
 
 void EditorHitConditions::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
+	
 	switch (winType)
 	{
 	case TEditorWindowType_HitCondition:

@@ -1,4 +1,4 @@
-#include "EditorInputStruct.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
 void EditorInputStruct::OnUpdate(int listIdx, EditorInput* field)

@@ -1,6 +1,6 @@
 #include <format>
 
-#include "EditorRequirements.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals.hpp"
 
 void EditorRequirements::OnUpdate(int listIdx, EditorInput* field)

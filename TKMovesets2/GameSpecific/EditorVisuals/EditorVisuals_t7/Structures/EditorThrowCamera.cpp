@@ -1,4 +1,4 @@
-#include "EditorThrowCamera.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
 void EditorThrowCamera::OnFieldLabelClick(int listIdx, EditorInput* field)

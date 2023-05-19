@@ -1,4 +1,4 @@
-#include "EditorInputSequence.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
 void EditorInputSequence::OnFieldLabelClick(int listIdx, EditorInput* field)

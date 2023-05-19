@@ -1,4 +1,4 @@
-#include "EditorProjectile.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals_t7.hpp"
 
 void EditorProjectile::OnFieldLabelClick(int listIdx, EditorInput* field)

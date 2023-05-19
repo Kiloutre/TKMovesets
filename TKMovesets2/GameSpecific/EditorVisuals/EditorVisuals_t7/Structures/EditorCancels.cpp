@@ -1,10 +1,9 @@
 #include <format>
 
-#include "imgui_extras.hpp"
-#include "EditorCancels.hpp"
+#include "TEditorStructures.hpp"
 #include "Localization.hpp"
-#include "EditorVisuals.hpp"
 #include "EditorVisuals_t7.hpp"
+#include "imgui_extras.hpp"
 
 // -- Private methods -- //
 

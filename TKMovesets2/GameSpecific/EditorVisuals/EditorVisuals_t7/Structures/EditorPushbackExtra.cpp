@@ -1,7 +1,6 @@
 #include <format>
 
-#include "imgui_extras.hpp"
-#include "EditorPushbackExtra.hpp"
+#include "TEditorStructures.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals.hpp"
 

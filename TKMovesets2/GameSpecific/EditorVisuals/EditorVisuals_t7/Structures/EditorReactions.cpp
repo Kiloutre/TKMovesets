@@ -1,4 +1,4 @@
-#include "EditorReactions.hpp"
+#include "TEditorStructures.hpp"
 #include "EditorVisuals.hpp"
 #include "EditorVisuals_t7.hpp"
 
