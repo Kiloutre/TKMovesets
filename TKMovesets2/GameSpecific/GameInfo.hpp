@@ -83,6 +83,8 @@ struct GameInfo
 	EditorFactory_Base* editorVisuals;
 	// Dynamic type allocator to store the game's online handler. Can be nullptr for no available handler.
 	GameFactory_Base* onlineHandler;
+	// Address called to get the base address of the game
+	uint64_t(*GetBaseAddressFunc)(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process) = nullptr;
 
 
 	bool SupportsGameImport(uint16_t t_gameId) const

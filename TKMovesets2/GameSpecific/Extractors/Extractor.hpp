@@ -63,4 +63,6 @@ public:
 	virtual gameAddr GetCharacterAddress(uint8_t playerId) = 0;
 	// Returns every character addresses we can extract
 	virtual std::vector<gameAddr> GetCharacterAddresses() = 0;
+	// Returns the base address of the current game
+	virtual uint64_t GetBaseAddress() { return 0; }
 };

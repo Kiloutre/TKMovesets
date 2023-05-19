@@ -115,7 +115,7 @@ set(GAMESPECIFIC_SOURCES
                     # Game-specific
                     ## T7
                     "GameSpecific/Online/Online_t7.cpp"
-                    "GameSpecific/Extractors/Extractor_t7.cpp"
+                    "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
                     "GameSpecific/Importers/Importer_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms.cpp"
@@ -152,7 +152,10 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/TEditorMovelistPlayable.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/TEditorMovelistInput.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/Subwindows/TEditorMove_Animations.cpp"
-)
+
+                    # TTT2
+                    "GameSpecific/Extractors/Extractor_ttt2/Extractor_ttt2.cpp"
+)                   
 
 # This will be included in the .dll and should only be related to the injected DLL
 set(MOVESETLOADER_SOURCES

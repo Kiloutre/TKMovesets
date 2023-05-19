@@ -1,6 +1,8 @@
 #include "Games.hpp"
+#include "BaseAddresses.hpp"
 
-#include "Extractor_t7.hpp"
+#include "Extractor_t7/Extractor_t7.hpp"
+#include "Extractor_ttt2/Extractor_ttt2.hpp"
 #include "Importer_t7.hpp"
 #include "Editor_t7.hpp"
 #include "EditorVisuals_t7.hpp"
@@ -25,7 +27,8 @@ const GameInfo cg_gamesInfo[] = {
 		.importer = new GameFactory<ImporterT7>,
 		.editorLogic = new GameFactory<EditorT7>,
 		.editorVisuals = new EditorFactory<EditorVisuals_T7>,
-		.onlineHandler = new GameFactory<OnlineT7>
+		.onlineHandler = new GameFactory<OnlineT7>,
+		.GetBaseAddressFunc = GetBaseAddrFromFile
 	},
 	{
 		.name = "Tekken 8",
@@ -44,24 +47,26 @@ const GameInfo cg_gamesInfo[] = {
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetBaseAddrFromFile
 	},
 	{
-		.name = "Tekken Tag 2",
-		.processName = "Cemu.exe",
+		.name = "Tekken Tag 2 (RPCS3)",
+		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TTT2_",
 		.gameId = GameId_TTT2,
 		.minorVersion = 0,
 		.characterCount = 4,
 		.ptrSize = 4,
 		.flags = 0,
-		.dataString = "tag2",
-		.minorDataString = "tag2",
+		.dataString = "ttt2",
+		.minorDataString = "ttt2",
 		.supportedImports = {},
-		.extractor = nullptr,
+		.extractor = new GameFactory<ExtractorTTT2>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetRPCS3BaseAddr
 	},
 };
 

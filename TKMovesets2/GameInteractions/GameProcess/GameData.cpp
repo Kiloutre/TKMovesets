@@ -108,7 +108,7 @@ void GameData::ReadBytes(const char* c_addressId, void* buf, size_t readSize) co
 void GameData::SetCurrentGame(const GameInfo* game)
 {
 	// Resets base addr for every game change
-	baseAddr = 0;
+	baseAddr = game->GetBaseAddressFunc == nullptr ? 0 : game->GetBaseAddressFunc(game, addrFile, m_process);
 
 	currentGame = game;
 	m_ptrSize = game->ptrSize;
