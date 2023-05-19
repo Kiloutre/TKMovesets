@@ -144,7 +144,7 @@ namespace StructsTTT2
 		};
 	};
 
-	struct Input //todo
+	struct Input
 	{
 		union
 		{
@@ -157,7 +157,7 @@ namespace StructsTTT2
 		};
 	};
 
-	struct InputSequence // todo
+	struct InputSequence
 	{
 		int8_t _0x4_int8; // Apparently unused
 		uint8_t input_window_frames; // I assume the max amount of frames between the first &last input
@@ -165,39 +165,19 @@ namespace StructsTTT2
 		gameAddr32 input_addr;
 	};
 
-	struct Projectile // todo, not good
+	struct Projectile
 	{
-		uint32_t vfx_id;
-		int32_t _0x4_int;
-		uint32_t vfx_variation_id;
-		int32_t _0xC_int;
-		int32_t _0x10_int;
-		int32_t _0x14_int;
-		uint32_t delay; // Frames before both velocity components can be applied
-		uint32_t vertical_velocity;
-		uint32_t horizontal_velocity;
-		int32_t _0x24_int; // 0: disable projectile
-		uint32_t duration;
-		uint32_t no_collision; // default: 0. Non-zero: no collision
-		uint32_t size; // 0: no collision
-		int32_t _0x34_int;
-		uint32_t hit_level;
-		int32_t _0x3C_int[6];
-		uint32_t voiceclip_on_hit;
-		int32_t _0x58_int;
-		int32_t _0x5C_int;
-		gameAddr32 hit_condition_addr;
-		gameAddr32 cancel_addr;
-		int32_t _0x70_int;
-		int32_t _0x74_int;
-		uint32_t can_hitbox_connect;
-		int32_t _0x7C_int;
-		int32_t _0x80_int;
-		uint32_t gravity;
-		int32_t _0x88_int[8];
+		// As it seems, the projectile format is different between ttt2 & t7
+		char gap[0x88];
+
+		// 0x24: Maybe a moveid
+		// 0x38: Probably voiceclip
+		// 
+		// 0x40: Probably voiceclip
+		// 0x48: Probably voiceclip
 	};
 
-	struct CameraData // todo
+	struct CameraData
 	{
 		uint32_t _0x0_int;
 		uint16_t _0x4_short;
@@ -206,7 +186,7 @@ namespace StructsTTT2
 		uint16_t _0xA_short;
 	};
 
-	struct ThrowCamera // todo
+	struct ThrowCamera
 	{
 		uint32_t _0x0_uint;
 		gameAddr32 cameradata_addr;
@@ -233,20 +213,20 @@ namespace StructsTTT2
 		uint32_t vuln;
 		uint32_t hitlevel;
 		gameAddr32 cancel_addr;
-		gameAddr32 _0x28_cancel_addr;
-		int32_t _0x30_int__0x28_related;
-		int32_t _0x34_int;
-		gameAddr32 _0x38_cancel_addr;
-		int32_t _0x40_int__0x38_related;
-		int32_t _0x44_int;
-		gameAddr32 _0x48_cancel_addr;
-		uint32_t _0x50_int__0x48_related;
+
+		gameAddr32 _0x28_cancel_addr; // -
+		int32_t _0x30_int__0x28_related; // -
+		gameAddr32 _0x38_cancel_addr; // -
+		int32_t _0x40_int__0x38_related; // -
+		gameAddr32 _0x48_cancel_addr; // -
+		uint32_t _0x50_int__0x48_related; // -
+
 		uint16_t transition;
-		int16_t _0x56_short;
-		uint16_t moveId_val1; // Clearly related to move ID
+
+		int16_t _0x56_short; // -
+
 		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short;
+		uint16_t moveId_val1; // Clearly related to move ID
 		gameAddr32 hit_condition_addr;
 		int32_t anim_len;
 		uint32_t airborne_start;
@@ -260,9 +240,8 @@ namespace StructsTTT2
 		uint32_t hitbox_location;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _0xA8_short;
+		int16_t _0x6c_short;
 		uint16_t distance;
-		int16_t _0xAC_short;
 	};
 
 	// -- Other -- //
