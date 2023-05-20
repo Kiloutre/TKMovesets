@@ -21,8 +21,8 @@ namespace TAnimUtils
 				animCount = BYTESWAP_INT32(animCount);
 			}
 
-			SWAP_SHORT(motaAddr + 4); // Swap is_little_endian & is_big_endian values
-			SWAP_SHORT(motaAddr + 6);
+			SWAP_INT16(motaAddr + 4); // Swap is_little_endian & is_big_endian values
+			SWAP_INT16(motaAddr + 6);
 
 			SWAP_INT32(motaAddr + 8);
 			SWAP_INT32(motaAddr + 0xC); // Swap anim count
@@ -67,8 +67,8 @@ namespace TAnimUtils
 				animLength = BYTESWAP_INT16(animLength);
 			}
 
-			SWAP_SHORT(animAddr); // Byteswap anim type
-			SWAP_SHORT(animAddr + 2); // Byteswap bone count
+			SWAP_INT16(animAddr); // Byteswap anim type
+			SWAP_INT16(animAddr + 2); // Byteswap bone count
 
 			// Swap bone descriptor list and fill isBoneInt16;
 			for (unsigned int i = 0; i < boneCount; ++i)
@@ -83,7 +83,7 @@ namespace TAnimUtils
 				// This makes bone descriptor 0x3 a float, and anything over 0x7 (so 0xB) also a float
 				isBoneInt32[i] = 4 <= descriptor && descriptor <= 7;
 
-				SWAP_SHORT(animAddr + descriptorOffset);
+				SWAP_INT16(animAddr + descriptorOffset);
 			}
 
 			uint32_t offset = 4 + boneCount * sizeof(uint16_t);
@@ -93,9 +93,9 @@ namespace TAnimUtils
 				iterCount = BYTESWAP_INT16(iterCount);
 			}
 
-			SWAP_SHORT(animAddr + offset); // Swap anim length
-			//SWAP_SHORT(animAddr + boneCount + 2); // This one isn't actually done, not in my old working byteswap scripts and not in T7's code either.
-			SWAP_SHORT(animAddr + offset + 4); // Swap iter count
+			SWAP_INT16(animAddr + offset); // Swap anim length
+			//SWAP_INT16(animAddr + boneCount + 2); // This one isn't actually done, not in my old working byteswap scripts and not in T7's code either.
+			SWAP_INT16(animAddr + offset + 4); // Swap iter count
 
 			offset += 6;
 			for (int i = 0; i < iterCount; ++i) {
@@ -108,9 +108,9 @@ namespace TAnimUtils
 			{
 				if (isBoneInt32[i])
 				{
-					SWAP_SHORT(animAddr + offset);
-					SWAP_SHORT(animAddr + offset + 2);
-					SWAP_SHORT(animAddr + offset + 4);
+					SWAP_INT16(animAddr + offset);
+					SWAP_INT16(animAddr + offset + 2);
+					SWAP_INT16(animAddr + offset + 4);
 					offset += sizeof(int16_t) * 3;
 				}
 				else
@@ -143,8 +143,8 @@ namespace TAnimUtils
 				animLength = BYTESWAP_INT32(animLength);
 			}
 
-			SWAP_SHORT(animAddr + 0); // Swap anim type
-			SWAP_SHORT(animAddr + 2); // Swap bone count
+			SWAP_INT16(animAddr + 0); // Swap anim type
+			SWAP_INT16(animAddr + 2); // Swap bone count
 
 			SWAP_INT32(animAddr + 4); // Swap anim length
 

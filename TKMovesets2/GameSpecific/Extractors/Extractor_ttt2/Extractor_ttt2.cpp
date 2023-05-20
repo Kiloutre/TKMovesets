@@ -17,6 +17,100 @@ using namespace StructsTTT2;
 // -- Static helpers -- //
 
 // Converts absolute ptr into indexes before saving to file
+static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTable& table, const MovesetTable* offsets)
+{
+	// Convert move ptrs
+	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, table.moveCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&move.name_addr);
+		ByteswapHelpers::SWAP_INT32(&move.anim_name_addr);
+		ByteswapHelpers::SWAP_INT32(&move.anim_addr);
+		ByteswapHelpers::SWAP_INT32(&move.vuln);
+		ByteswapHelpers::SWAP_INT32(&move.hitlevel);
+		ByteswapHelpers::SWAP_INT32(&move.cancel_addr);
+
+		//... more fields omitted here
+
+		ByteswapHelpers::SWAP_INT16(&move.transition);
+
+		ByteswapHelpers::SWAP_INT16(&move._0x56_short);
+
+		// Swaps _val1 and 8val2 as an int because that is how they are stored
+		ByteswapHelpers::SWAP_INT32(&move.moveId_val2); 
+		ByteswapHelpers::SWAP_INT32(&move.hit_condition_addr);
+		ByteswapHelpers::SWAP_INT32(&move.anim_len);
+		ByteswapHelpers::SWAP_INT32(&move.airborne_start);
+		ByteswapHelpers::SWAP_INT32(&move.airborne_end);
+		ByteswapHelpers::SWAP_INT32(&move.ground_fall);
+		ByteswapHelpers::SWAP_INT32(&move.voicelip_addr);
+		ByteswapHelpers::SWAP_INT32(&move.extra_move_property_addr);
+		ByteswapHelpers::SWAP_INT32(&move.move_start_extraprop_addr);
+		ByteswapHelpers::SWAP_INT32(&move.move_end_extraprop_addr);
+		ByteswapHelpers::SWAP_INT32(&move._0x98_int);
+		ByteswapHelpers::SWAP_INT32(&move.hitbox_location);
+		ByteswapHelpers::SWAP_INT32(&move.first_active_frame);
+		ByteswapHelpers::SWAP_INT32(&move.last_active_frame);
+		ByteswapHelpers::SWAP_INT16(&move._0x6c_short);
+		ByteswapHelpers::SWAP_INT16(&move.distance);
+	}
+
+	// Convert cancel ptrs
+	for (auto& cancel : StructIterator<Cancel>(movesetBlock, offsets->cancel, table.cancelCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&cancel.requirements_addr);
+	}
+
+	// Convert groupCancel cancel ptrs
+	for (auto& groupCancel : StructIterator<Cancel>(movesetBlock, offsets->groupCancel, table.groupCancelCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&groupCancel.requirements_addr);
+	}
+
+	// Convert reaction ptrs
+	for (auto& reaction : StructIterator<Reactions>(movesetBlock, offsets->reactions, table.reactionsCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&reaction.front_pushback);
+	}
+
+	// Convert input sequence ptrs
+	for (auto& inputSequence : StructIterator<InputSequence>(movesetBlock, offsets->inputSequence, table.inputSequenceCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&inputSequence.input_addr);
+	}
+
+	// Convert throwCameras ptrs
+	for (auto& throwCameras : StructIterator<ThrowCamera>(movesetBlock, offsets->throwCameras, table.throwCamerasCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&throwCameras.cameradata_addr);
+	}
+
+	// Convert hit conditions ptrs
+	for (auto& hitCondition : StructIterator<HitCondition>(movesetBlock, offsets->hitCondition, table.hitConditionCount))
+	{
+		TO_INDEX(hitCondition.requirements_addr, table.requirement, Requirement);
+		TO_INDEX(hitCondition.reactions_addr, table.reactions, Reactions);
+	}
+
+	// Convert pushback ptrs
+	for (auto& pushback : StructIterator<Pushback>(movesetBlock, offsets->pushback, table.pushbackCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&pushback.extradata_addr);
+	}
+
+	// Convert move start prop ptrs
+	for (auto& moveBeginningProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveBeginningProp, table.moveBeginningPropCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&moveBeginningProp.requirements_addr);
+	}
+
+	// Convert move end prop ptrs
+	for (auto& moveEndingProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, table.moveEndingPropCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&moveEndingProp.requirements_addr);
+	}
+}
+
+// Converts absolute ptr into indexes before saving to file
 static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTable& table, const MovesetTable* offsets, gameAddr nameStart, std::map<gameAddr, uint64_t>& animOffsetMap)
 {
 	// Convert move ptrs
@@ -358,11 +452,16 @@ void ExtractorTTT2::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table,
 	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 8, sizeof(MovesetTable) / 4 / 2);
 }
 
-Byte* ExtractorTTT2::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table)
+Byte* ExtractorTTT2::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table, const MovesetTable* offsets)
 {
 	gameAddr blockStart = table.reactions;
 	gameAddr blockEnd = table.throwCameras + (sizeof(ThrowCamera) * table.throwCamerasCount);
-	return allocateAndReadBlock(blockStart, blockEnd, size_out);
+	auto block = allocateAndReadBlock(blockStart, blockEnd, size_out);
+	if (block == nullptr) {
+		return nullptr;
+	}
+	convertMovesetDataToLittleEndian(block, table, offsets);
+	return block;
 }
 
 char* ExtractorTTT2::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
@@ -580,7 +679,7 @@ ExtractionErrcode_ ExtractorTTT2::Extract(gameAddr playerAddress, ExtractSetting
 
 	// Reads block containing the actual moveset data
 	// Also get a pointer to our movelist in our own allocated memory. Will be needing it for animation & names extraction.
-	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table);
+	movesetBlock = CopyMovesetBlock(movesetAddr, s_movesetBlock, table, offsets);
 	const Move* movelist = (Move*)(movesetBlock + offsets->move);
 	if (movesetBlock == nullptr) {
 		// Since movesetBlock is used by those Copy functions, we have to check for allocation failure here

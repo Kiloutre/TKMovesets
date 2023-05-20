@@ -160,7 +160,7 @@ public:
 
 namespace ByteswapHelpers
 {
-	void SWAP_SHORT(void* x);
+	void SWAP_INT16(void* x);
 
 	void SWAP_INT32(void* x);
 }

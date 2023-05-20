@@ -14,7 +14,7 @@
 
 namespace ByteswapHelpers
 {
-	void SWAP_SHORT(void* x)
+	void SWAP_INT16(void* x)
 	{
 		auto val = DEREF_INT16(x);
 		DEREF_INT16(x) = BYTESWAP_INT16(val);

@@ -22,7 +22,7 @@ private:
 	// Fill moveset header with our own various useful informations
 	void FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t propertyCount);
 	// Allocate and copy the contents of the moveset block
-	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsTTT2::MovesetTable& table);
+	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsTTT2::MovesetTable& table, const StructsTTT2::MovesetTable* offsets);
 	// Allocate and copy the contents of the name block
 	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsTTT2::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart);
 	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
