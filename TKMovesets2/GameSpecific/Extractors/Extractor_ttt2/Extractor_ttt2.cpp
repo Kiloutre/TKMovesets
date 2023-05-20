@@ -341,6 +341,7 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 		MotaHeader header;
 		m_game->ReadBytes(motaAddr, &header, sizeof(MotaHeader));
 		if (memcmp(header.mota_string, "MOTA", 4) != 0) {
+			// todo
 			DEBUG_LOG("Malformed MOTA %d\n", motaId);
 			// Malformed MOTA, don't save it
 			continue;
@@ -418,7 +419,7 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 	}
 
 	//12 motas + 1 unknown (still clearly a ptr)
-	gameAddr* motaAddr = (gameAddr*)motas;
+	gameAddr32* motaAddr = (gameAddr32*)motas;
 	// In case the same mota is present twice, i'm using this set to avoid exporting it again
 	std::set<gameAddr> exportedMotas;
 	for (size_t i = 0; i <= 12; ++i)
@@ -584,8 +585,8 @@ char* ExtractorTTT2::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, con
 	size_t toCopy = strlen(namePrefix);
 	size_t charactersToReplace = 1; // Replace the first [
 
-	nameBlockStart = movesetAddr + 0x2E8 - (toCopy - charactersToReplace);
-	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x2E8 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
+	nameBlockStart = movesetAddr + 0x208 - (toCopy - charactersToReplace);
+	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x208 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
 	memcpy(nameBlock, namePrefix, toCopy);
 
 	return nameBlock;
@@ -594,6 +595,12 @@ char* ExtractorTTT2::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, con
 Byte* ExtractorTTT2::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
 	m_game->ReadBytes(movesetAddr + 0x1D8, motasList, sizeof(MotaList));
+
+	// Byteswap MOTA addresses
+	for (unsigned int i = 0; i < _countof(motasList->motas); ++i) {
+		ByteswapHelpers::SWAP_INT32(&motasList->motas[i]);
+	}
+
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
 
@@ -702,8 +709,7 @@ void ExtractorTTT2::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddre
 #ifdef BUILD_TYPE_DEBUG
 	// Mark that the moveset was extracted under debug mode
 	infos.flags |= MovesetFlags_Debug;
-	auto p = strlen(infos.version_string);
-	infos.version_string[p == 0 ? 0 : p - 1] = 'd';
+	strcat_s(infos.version_string, sizeof(infos.version_string), "d");
 #endif
 
 	uint64_t propertyListSize = customPropertyCount * sizeof(TKMovesetProperty);
@@ -737,7 +743,7 @@ ExtractionErrcode_ ExtractorTTT2::Extract(gameAddr playerAddress, ExtractSetting
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
 	uint64_t s_customProperties;
 	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
-	uint64_t s_movesetInfoBlock = 0x150; // Yeah, fixed size, this is on purpose. I do want to extract table and mota separately.
+	uint64_t s_movesetInfoBlock = 0x140; // Pretty much the offset of the moveset table
 	uint64_t s_tableBlock = sizeof(MovesetTable);
 	uint64_t s_motasListBlock = sizeof(MotaList);
 	uint64_t s_nameBlock;
