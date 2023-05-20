@@ -85,6 +85,8 @@ struct GameInfo
 	GameFactory_Base* onlineHandler;
 	// Address called to get the base address of the game
 	uint64_t(*GetBaseAddressFunc)(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process) = nullptr;
+	// True if game values must be interpreted as big endian
+	bool bigEndian;
 
 
 	bool SupportsGameImport(uint16_t t_gameId) const

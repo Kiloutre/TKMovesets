@@ -52,5 +52,4 @@ public:
 	uint32_t GetCharacterID(gameAddr playerAddress) override;
 	gameAddr GetCharacterAddress(uint8_t playerId) override;
 	std::vector<gameAddr> GetCharacterAddresses() override;
-	uint64_t GetBaseAddress() override { return 0x300000000; }
 };

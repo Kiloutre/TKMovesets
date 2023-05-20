@@ -3,24 +3,31 @@
 
 #include "GameTypes.h"
 
-void GameData::CacheAddresses()
+gameAddr GameData::ReadPtr(gameAddr address) const
 {
-	std::map<std::string, gameAddr> cachedAddresses;
+	uint64_t value;
 
-	for (const std::string& addressId : addrFile->GetAllKeys())
-	{
-		if (addressId.rfind("val_", 0) == 0) {
-			// Ignore if not address / ptr path
-			continue;
+	if (m_ptrSize == 8) {
+		value = m_process->readUInt64(baseAddr + address);
+		if (m_bigEndian) {
+			value = BYTESWAP_INT64(value);
 		}
-
-		cachedAddresses[addressId] = ReadPtrPath(addressId.c_str());
 	}
-	m_cachedAddresses = cachedAddresses;
+	else {
+		value = m_process->readUInt32(baseAddr + address);
+		if (m_bigEndian) {
+			value = BYTESWAP_INT32(value);
+		}
+	}
+	return value;
 }
 
 gameAddr GameData::ReadPtrPath(const char* c_addressId) const
 {
+	if (m_ptrSize == 4) {
+		return ReadPtrPath32(c_addressId);
+	}
+
 	bool isRelative;
 	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
 
@@ -37,13 +44,13 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId) const
 		size_t pathLen = ptrPath.size() - 1;
 		if (pathLen > 0)
 		{
-			addr = (gameAddr)m_process->readInt64(addr);
+			addr = ReadPtr(baseAddr + addr);
 			for (size_t i = 1; i < pathLen; ++i)
 			{
 				if (addr == (gameAddr)0) {
 					return GAME_ADDR_NULL;
 				}
-				addr = (gameAddr)m_process->readInt64(addr + ptrPath[i]);
+				addr = ReadPtr(baseAddr + addr + ptrPath[i]);
 			}
 			addr += ptrPath[pathLen];
 		}
@@ -52,57 +59,42 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId) const
 	return addr;
 }
 
-int8_t GameData::ReadInt8(const char* c_addressId) const
+gameAddr GameData::ReadPtrPath32(const char* c_addressId) const
 {
-    auto addrEntry = m_cachedAddresses.find(c_addressId);
-	gameAddr addr = (addrEntry == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : addrEntry->second;
-	return m_process->readInt8(addr);
+	bool isRelative;
+	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
+
+	if (ptrPath.size() == 0) {
+		return GAME_ADDR_NULL;
+	}
+
+	gameAddr32 addr = ptrPath[0];
+	if (isRelative) {
+		addr += (gameAddr32)m_process->mainModule.address;
+	}
+
+	{
+		size_t pathLen = ptrPath.size() - 1;
+		if (pathLen > 0)
+		{
+			addr = (gameAddr32)ReadPtr(baseAddr + addr);
+			for (size_t i = 1; i < pathLen; ++i)
+			{
+				if (addr == (gameAddr32)0) {
+					return GAME_ADDR_NULL;
+				}
+				addr = (gameAddr32)ReadPtr(baseAddr + addr + ptrPath[i]);
+			}
+			addr += (gameAddr32)ptrPath[pathLen];
+		}
+	}
+
+	return addr;
 }
 
-int16_t GameData::ReadInt16(const char* c_addressId) const
+void GameData::ReadBytes(gameAddr address, void* buf, size_t readSize) const
 {
-    auto addrEntry = m_cachedAddresses.find(c_addressId);
-	gameAddr addr = (addrEntry == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : addrEntry->second;
-	return m_process->readInt16(addr);
-}
-
-int32_t GameData::ReadInt32(const char* c_addressId) const
-{
-    auto addrEntry = m_cachedAddresses.find(c_addressId);
-	gameAddr addr = (addrEntry == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : addrEntry->second;
-	return m_process->readInt32(addr);
-}
-
-int64_t GameData::ReadInt64(const char* c_addressId) const
-{
-    auto addrEntry = m_cachedAddresses.find(c_addressId);
-	gameAddr addr = (addrEntry == m_cachedAddresses.end())
-				? ReadPtrPath(c_addressId) : addrEntry->second;
-	return m_process->readInt64(addr);
-}
-
-gameAddr GameData::ReadPtr(const char* c_addressId) const
-{
-	return (gameAddr)ReadPtrPath(c_addressId);
-}
-
-float GameData::ReadFloat(const char* c_addressId) const
-{
-    auto addrEntry = m_cachedAddresses.find(c_addressId);
-	gameAddr addr = (addrEntry == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : addrEntry->second;
-	return m_process->readFloat(addr);
-}
-
-void GameData::ReadBytes(const char* c_addressId, void* buf, size_t readSize) const
-{
-    auto addrEntry = m_cachedAddresses.find(c_addressId);
-	gameAddr addr = (addrEntry == m_cachedAddresses.end())
-		? ReadPtrPath(c_addressId) : addrEntry->second;
-	return m_process->readBytes(addr, buf, readSize);
+	m_process->readBytes(baseAddr + address, buf, readSize);
 }
 
 void GameData::SetCurrentGame(const GameInfo* game)
@@ -110,6 +102,7 @@ void GameData::SetCurrentGame(const GameInfo* game)
 	// Resets base addr for every game change
 	baseAddr = game->GetBaseAddressFunc == nullptr ? 0 : game->GetBaseAddressFunc(game, addrFile, m_process);
 
+	m_bigEndian = game->bigEndian;
 	currentGame = game;
 	m_ptrSize = game->ptrSize;
 }

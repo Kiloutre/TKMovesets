@@ -113,7 +113,7 @@ void ExtractorTTT2::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* move
 	movesetHeader->fulldate_addr -= movesetAddr;
 
 	// Correct offsets according to our name modifications
-	const size_t namelength = strlen(MOVESET_EXTRACTED_NAME_PREFIX) - 1; // - 1 because we replace one char
+	const uint32_t namelength = (uint32_t)strlen(MOVESET_EXTRACTED_NAME_PREFIX) - 1; // - 1 because we replace one char
 	movesetHeader->character_creator_addr += namelength;
 	movesetHeader->date_addr += namelength;
 	movesetHeader->fulldate_addr += namelength;
@@ -389,7 +389,7 @@ Byte* ExtractorTTT2::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr play
 	if (settings & ExtractSettings_DisplayableMovelist)
 	{
 		/*
-		gameAddr managerAddr = m_game->ReadPtr("movelist_manager_addr");
+		gameAddr managerAddr = m_game->ReadPtrPath("movelist_manager_addr");
 
 		int playerId = m_process->readInt32(playerAddress + m_game->GetValue("playerid_offset"));
 
@@ -735,7 +735,10 @@ bool ExtractorTTT2::CanExtract()
 {
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
+
+
+	DEBUG_LOG("player address: %llx\n", playerAddress);
 
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
@@ -835,7 +838,7 @@ uint32_t ExtractorTTT2::GetCharacterID(gameAddr playerAddress)
 
 gameAddr ExtractorTTT2::GetCharacterAddress(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	if (playerId > 0) {
 		playerAddress += playerId * m_game->GetValue("playerstruct_size");
 	}
@@ -844,7 +847,7 @@ gameAddr ExtractorTTT2::GetCharacterAddress(uint8_t playerId)
 
 std::vector<gameAddr> ExtractorTTT2::GetCharacterAddresses()
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	uint64_t playerstructSize = m_game->GetValue("playerstruct_size");
 	std::vector<gameAddr> addresses;
 

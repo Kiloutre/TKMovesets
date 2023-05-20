@@ -5,6 +5,7 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
+#include <stdlib.h>
 
 #include "GameTypes.h"
 
@@ -14,14 +15,18 @@
 
 #define offsetofVar(st, m) (offsetof(decltype(st), m))
 
+#define BYTESWAP_INT64(x) _byteswap_uint64(x)
 #define BYTESWAP_INT32(x) (((x & 0xFF000000) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x & 0xFF) << 24))
 #define BYTESWAP_INT16(x) (((x & 0xFFFF) >> 8) | ((x & 0xFF) << 8))
+
 #define DEREF_INT8(x) (*(int8_t*)(x))
 #define DEREF_UINT8(x) (*(uint8_t*)(x))
 #define DEREF_INT16(x) (*(int16_t*)(x))
 #define DEREF_UINT16(x) (*(uint16_t*)(x))
 #define DEREF_INT32(x) (*(int32_t*)(x))
 #define DEREF_UINT32(x) (*(uint32_t*)(x))
+#define DEREF_INT64(x) (*(int64_t*)(x))
+#define DEREF_UINT64(x) (*(uint64_t*)(x))
 
 // Helper class to iterate on struct pts
 template<class T>
@@ -157,7 +162,7 @@ namespace ByteswapHelpers
 {
 	void SWAP_SHORT(void* x);
 
-	void SWAP_INT(void* x);
+	void SWAP_INT32(void* x);
 }
 
 namespace Helpers

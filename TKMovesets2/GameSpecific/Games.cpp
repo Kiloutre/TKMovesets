@@ -28,7 +28,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorLogic = new GameFactory<EditorT7>,
 		.editorVisuals = new EditorFactory<EditorVisuals_T7>,
 		.onlineHandler = new GameFactory<OnlineT7>,
-		.GetBaseAddressFunc = GetBaseAddrFromFile
+		.GetBaseAddressFunc = GetBaseAddrFromFile,
+		.bigEndian = false
 	},
 	{
 		.name = "Tekken 8",
@@ -47,7 +48,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
-		.GetBaseAddressFunc = GetBaseAddrFromFile
+		.GetBaseAddressFunc = GetBaseAddrFromFile,
+		.bigEndian = false
 	},
 	{
 		.name = "Tekken Tag 2 (RPCS3)",
@@ -66,7 +68,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
-		.GetBaseAddressFunc = GetRPCS3BaseAddr
+		.GetBaseAddressFunc = GetRPCS3BaseAddr,
+		.bigEndian = true
 	},
 };
 

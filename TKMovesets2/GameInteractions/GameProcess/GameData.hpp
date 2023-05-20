@@ -2,6 +2,7 @@
 
 #include "GameProcess.hpp"
 #include "GameAddressesWrapper.hpp"
+#include "Helpers.hpp"
 
 class GameInfo;
 
@@ -11,35 +12,53 @@ class GameInfo;
 class GameData : public GameAddressesWrapper
 {
 private:
-	// Cached addresses and pointer path so that we don't have to re-compute everything mid-extraction/importation
-	std::map<std::string, gameAddr> m_cachedAddresses;
 	// The subclass that allows us to read/write on process memory
 	GameProcess* m_process;
 	// Size of PTRs in remote process. Used to properly read ptr paths.
 	unsigned int m_ptrSize = 8;
+	// True if the memory must be accessed as big endian
+	bool m_bigEndian = false;
 	// Stores current game informations
 	const GameInfo* currentGame;
 	
 	// Reads a ptr path from an address identifier and return its last pointer
-	gameAddr ReadPtrPath(const char* c_addressId) const;
+	gameAddr ReadPtrPath32(const char* c_addressId) const;
 public:
 	// For games where PTRs are read from a base memory area (like emulators)
 	uint64_t baseAddr = 0;
 
-	// Reads a char (1b) from the game in little endian
-	int8_t ReadInt8(const char* c_addressId) const;
-	// Reads a short (2b) from the game in little endian
-	int16_t ReadInt16(const char* c_addressId) const;
-	// Reads an int (4b) from the game in little endian
-	int32_t ReadInt32(const char* c_addressId) const;
-	// Reads an int (8b) from the game in little endian
-	int64_t ReadInt64(const char* c_addressId) const;
-	// Reads a ptr (8b or 4b) value from the game to be interpreted as a pointer
-	gameAddr ReadPtr(const char* c_addressId) const;
-	// Reads a floating point number (4b) from the game in little endian
-	float ReadFloat(const char* c_addressId) const;
+	template <typename T>
+	T Read(gameAddr addr) const
+	{
+		T value = m_process->read<T>(addr);
+		if (m_bigEndian) {
+			switch (sizeof(T))
+			{
+			case 8:
+				value = BYTESWAP_INT64(value);
+				break;
+			case 4:
+				value = BYTESWAP_INT32(value);
+				break;
+			case 2:
+				value BYTESWAP_INT16(value);
+				break;
+			default:
+				DEBUG_LOG("!! Error: Invalid read of size %u (must be 2/4/8) in GameData::Read (addr %llx) !!\n", sizeof(T), addr);
+				return 0;
+				break;
+			}
+		}
+		return value;
+	}
+
+	// Reads a ptr, reads 4 or 8 bytes depending on the ptr size and takes into account endian
+	gameAddr ReadPtr(gameAddr address) const;
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
-	void ReadBytes(const char* c_addressId, void* buf, size_t readSize) const;
+	void ReadBytes(gameAddr address, void* buf, size_t readSize) const;
+
+	// Reads a ptr path
+	gameAddr ReadPtrPath(const char* c_addressId) const;
 	// Todo: writing functions
 
 	GameData(GameProcess* process, GameAddressesFile* t_addrFile)
@@ -48,8 +67,6 @@ public:
 		addrFile = t_addrFile;
 	}
 
-	// Reads the addresses file and compute every address from their pointer path (when possible) to avoid having to do it later
-	void CacheAddresses();
 	// Sets the current game and sets up the PTR size
 	void SetCurrentGame(const GameInfo* game);
 };

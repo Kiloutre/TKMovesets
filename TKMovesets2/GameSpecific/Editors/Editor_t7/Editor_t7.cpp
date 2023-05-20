@@ -540,7 +540,7 @@ void EditorT7::ReloadDisplayableMoveList()
 
 uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	if (playerId > 0) {
 		playerAddress += playerId * m_game->GetValue("playerstruct_size");
 	}
@@ -555,7 +555,7 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId)
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	if (playerId > 0) {
 		playerAddress += playerId * m_game->GetValue("playerstruct_size");
 	}

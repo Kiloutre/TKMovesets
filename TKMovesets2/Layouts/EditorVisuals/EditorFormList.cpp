@@ -109,8 +109,8 @@ void EditorFormList::PasteFormFromClipboard()
 			++cursor;
 		}
 
-		unsigned int fieldAmountPerItem = m_items[0]->identifierMap.size();
-		unsigned int fieldAmount = fieldAmountPerItem * m_items.size();
+		unsigned int fieldAmountPerItem = (unsigned int)m_items[0]->identifierMap.size();
+		unsigned int fieldAmount = (unsigned int)fieldAmountPerItem * m_items.size();
 
 		while (fieldAmount < expectedFieldAmount) {
 			auto newId = CreateNewItem(-1);

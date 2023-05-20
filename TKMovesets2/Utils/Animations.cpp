@@ -24,15 +24,15 @@ namespace TAnimUtils
 			SWAP_SHORT(motaAddr + 4); // Swap is_little_endian & is_big_endian values
 			SWAP_SHORT(motaAddr + 6);
 
-			SWAP_INT(motaAddr + 8);
-			SWAP_INT(motaAddr + 0xC); // Swap anim count
+			SWAP_INT32(motaAddr + 8);
+			SWAP_INT32(motaAddr + 0xC); // Swap anim count
 
 			for (unsigned int i = 0; i < animCount; ++i)
 			{
 				uint32_t listOffset = 0x14 + (i * sizeof(int));
 				uint32_t animOffset = DEREF_UINT32(motaAddr + listOffset);
 
-				SWAP_INT(motaAddr + listOffset);
+				SWAP_INT32(motaAddr + listOffset);
 
 				// Make sure the animation matches the MOTA's endian
 				uint32_t realAnimOffset = sourceIsBigEndian ? BYTESWAP_INT32(animOffset) : animOffset;
@@ -99,7 +99,7 @@ namespace TAnimUtils
 
 			offset += 6;
 			for (int i = 0; i < iterCount; ++i) {
-				SWAP_INT(animAddr + offset);
+				SWAP_INT32(animAddr + offset);
 				offset += sizeof(int);
 			}
 
@@ -115,9 +115,9 @@ namespace TAnimUtils
 				}
 				else
 				{
-					SWAP_INT(animAddr + offset);
-					SWAP_INT(animAddr + offset + 4);
-					SWAP_INT(animAddr + offset + 8);
+					SWAP_INT32(animAddr + offset);
+					SWAP_INT32(animAddr + offset + 4);
+					SWAP_INT32(animAddr + offset + 8);
 					offset += sizeof(float) * 3;
 				}
 			}
@@ -126,7 +126,7 @@ namespace TAnimUtils
 			int keyframeCount = (animLength + 14) >> 4;
 			do
 			{
-				SWAP_INT(animAddr + offset);
+				SWAP_INT32(animAddr + offset);
 				offset += 4;
 			} while (--keyframeCount);
 		}
@@ -146,13 +146,13 @@ namespace TAnimUtils
 			SWAP_SHORT(animAddr + 0); // Swap anim type
 			SWAP_SHORT(animAddr + 2); // Swap bone count
 
-			SWAP_INT(animAddr + 4); // Swap anim length
+			SWAP_INT32(animAddr + 4); // Swap anim length
 
 			// Swap bone descriptor list
 			for (unsigned int i = 0; i < boneCount; ++i)
 			{
 				int descriptorOffset = 8 + (i * sizeof(int));
-				SWAP_INT(animAddr + descriptorOffset);
+				SWAP_INT32(animAddr + descriptorOffset);
 			}
 
 			// Swap every bone value (float)
@@ -163,9 +163,9 @@ namespace TAnimUtils
 			{
 				for (unsigned int i = 0; i < boneCount; ++i)
 				{
-					SWAP_INT(bonePtr);
-					SWAP_INT(bonePtr + 1);
-					SWAP_INT(bonePtr + 2);
+					SWAP_INT32(bonePtr);
+					SWAP_INT32(bonePtr + 1);
+					SWAP_INT32(bonePtr + 2);
 					bonePtr += 3;
 				}
 			}

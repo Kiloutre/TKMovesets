@@ -55,7 +55,7 @@ public:
 	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress) = 0;
 	// Returns true if extraction is possible (characters have been loaded)...
 	virtual bool CanExtract() = 0;
-	// Returns a string containing the character name of the provided playerId.
+	// Returns a string containing the character name of the provided player address
 	virtual std::string GetPlayerCharacterName(gameAddr playerAddress) = 0;
 	// Returns the ID of the character, actually important toward making movesets work properly
 	virtual uint32_t GetCharacterID(gameAddr playerAddress) = 0;
@@ -63,6 +63,4 @@ public:
 	virtual gameAddr GetCharacterAddress(uint8_t playerId) = 0;
 	// Returns every character addresses we can extract
 	virtual std::vector<gameAddr> GetCharacterAddresses() = 0;
-	// Returns the base address of the current game
-	virtual uint64_t GetBaseAddress() { return 0; }
 };

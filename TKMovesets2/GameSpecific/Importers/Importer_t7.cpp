@@ -293,7 +293,7 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 
 void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress)
 {
-	gameAddr managerAddr = m_game->ReadPtr("movelist_manager_addr");
+	gameAddr managerAddr = m_game->ReadPtrPath("movelist_manager_addr");
 
 	int playerId = m_process->readInt32(playerAddress + m_game->GetValue("playerid_offset"));
 
@@ -415,7 +415,7 @@ ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, By
 
 void ImporterT7::CleanupUnusedMovesets()
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	uint64_t playerstructSize = m_game->GetValue("playerstruct_size");
 	uint64_t motbinOffset = m_game->GetValue("motbin_offset");
 
@@ -443,7 +443,7 @@ void ImporterT7::CleanupUnusedMovesets()
 
 	// Check mvl manager
 	MvlManager mvlManager[2];
-	uint64_t mvlManagerAddr = m_game->ReadPtr("movelist_manager_addr");
+	uint64_t mvlManagerAddr = m_game->ReadPtrPath("movelist_manager_addr");
 	if (mvlManagerAddr != 0) {
 		m_process->readBytes(mvlManagerAddr, mvlManager, sizeof(mvlManager));
 	}
@@ -507,7 +507,7 @@ bool ImporterT7::CanImport()
 {
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
@@ -539,7 +539,7 @@ bool ImporterT7::CanImport()
 
 gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	if (playerId > 0) {
 		playerAddress += playerId * m_game->GetValue("playerstruct_size");
 	}
@@ -549,7 +549,7 @@ gameAddr ImporterT7::GetCharacterAddress(uint8_t playerId)
 
 gameAddr ImporterT7::GetMovesetAddress(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtr("p1_addr");
+	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 	if (playerAddress > 0) {
 		playerAddress += playerId * m_game->GetValue("playerstruct_size");
 		return m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
