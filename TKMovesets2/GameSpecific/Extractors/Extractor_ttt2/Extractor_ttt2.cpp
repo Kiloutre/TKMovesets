@@ -45,8 +45,8 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 
 	for (auto& cancel : StructIterator<Cancel>(movesetBlock, offsets->cancel, offsets->cancelCount))
 	{
-		// Todo: check if commands really must be byteswapped
-		ByteswapHelpers::SWAP_INT64(&cancel.command);
+		ByteswapHelpers::SWAP_INT32(&cancel.direction);
+		ByteswapHelpers::SWAP_INT32(&cancel.button);
 
 		ByteswapHelpers::SWAP_INT32(&cancel.requirements_addr);
 		ByteswapHelpers::SWAP_INT32(&cancel.extradata_addr);
@@ -59,8 +59,8 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 
 	for (auto& groupCancel : StructIterator<Cancel>(movesetBlock, offsets->groupCancel, offsets->groupCancelCount))
 	{
-		// Todo: check if commands really must be byteswapped
-		ByteswapHelpers::SWAP_INT64(&groupCancel.command);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.direction);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.button);
 
 		ByteswapHelpers::SWAP_INT32(&groupCancel.requirements_addr);
 		ByteswapHelpers::SWAP_INT32(&groupCancel.extradata_addr);
@@ -130,8 +130,8 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 
 	for (auto& input : StructIterator<Input>(movesetBlock, offsets->input, offsets->inputCount))
 	{
-		// Todo: check if commands really must be byteswapped
-		ByteswapHelpers::SWAP_INT64(&input.command);
+		ByteswapHelpers::SWAP_INT32(&input.direction);
+		ByteswapHelpers::SWAP_INT32(&input.button);
 	}
 
 	for (auto& inputSequence : StructIterator<InputSequence>(movesetBlock, offsets->inputSequence, offsets->inputSequenceCount))
@@ -585,8 +585,10 @@ char* ExtractorTTT2::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, con
 	size_t toCopy = strlen(namePrefix);
 	size_t charactersToReplace = 1; // Replace the first [
 
-	nameBlockStart = movesetAddr + 0x208 - (toCopy - charactersToReplace);
-	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + 0x208 - (toCopy - charactersToReplace), nameBlockEnd, size_out);
+	unsigned int nameOffset = 0x20C;
+
+	nameBlockStart = movesetAddr + nameOffset - (toCopy - charactersToReplace);
+	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + nameOffset - (toCopy - charactersToReplace), nameBlockEnd, size_out);
 	memcpy(nameBlock, namePrefix, toCopy);
 
 	return nameBlock;
