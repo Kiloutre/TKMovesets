@@ -137,7 +137,7 @@ public:
 	{
 		T value{ (T)-1 };
 		ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, sizeof(T), nullptr);
-		return T;
+		return value;
 	};
 
 	// Writes a byte to the game

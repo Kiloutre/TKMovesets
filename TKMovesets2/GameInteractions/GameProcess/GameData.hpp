@@ -6,9 +6,8 @@
 
 class GameInfo;
 
-// Class that allows you to read from the game using only the address identifier from game_address.txt
-// Also provides caching of pointer paths. But overall this is still a high-level class aimed at cleaning up code elsewhere and keeping things segmented.
-// Todo: store current player datas here for fancy displaying later on, maybe?
+// Class that allows you to read from the game, applying the base address and endian conversion is needed
+// Also allows you to read a ptr path from the game
 class GameData : public GameAddressesWrapper
 {
 private:
@@ -27,10 +26,11 @@ public:
 	// For games where PTRs are read from a base memory area (like emulators)
 	uint64_t baseAddr = 0;
 
+	// Reads a value from the game, applying the base address and the proper endian correction if needed
 	template <typename T>
 	T Read(gameAddr addr) const
 	{
-		T value = m_process->read<T>(addr);
+		T value = m_process->read<T>(baseAddr + addr);
 		if (m_bigEndian) {
 			switch (sizeof(T))
 			{
@@ -41,25 +41,20 @@ public:
 				value = BYTESWAP_INT32(value);
 				break;
 			case 2:
-				value BYTESWAP_INT16(value);
-				break;
-			default:
-				DEBUG_LOG("!! Error: Invalid read of size %u (must be 2/4/8) in GameData::Read (addr %llx) !!\n", sizeof(T), addr);
-				return 0;
+				value = BYTESWAP_INT16(value);
 				break;
 			}
 		}
 		return value;
 	}
 
-	// Reads a ptr, reads 4 or 8 bytes depending on the ptr size and takes into account endian
+	// Reads a ptr, reads 4 or 8 bytes depending on the ptr size, taking into account base address and endian
 	gameAddr ReadPtr(gameAddr address) const;
-	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer
+	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer, applies base address before reading
 	void ReadBytes(gameAddr address, void* buf, size_t readSize) const;
 
 	// Reads a ptr path
 	gameAddr ReadPtrPath(const char* c_addressId) const;
-	// Todo: writing functions
 
 	GameData(GameProcess* process, GameAddressesFile* t_addrFile)
 	{

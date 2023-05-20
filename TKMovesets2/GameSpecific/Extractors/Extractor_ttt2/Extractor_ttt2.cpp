@@ -737,9 +737,6 @@ bool ExtractorTTT2::CanExtract()
 	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
 
-
-	DEBUG_LOG("player address: %llx\n", playerAddress);
-
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
@@ -753,31 +750,14 @@ bool ExtractorTTT2::CanExtract()
 
 		// Read into current moveset to see if it has been initialized
 		{
-			gameAddr movesetAddr = m_process->readUInt64(playerAddress + m_game->GetValue("motbin_offset"));
+			gameAddr movesetAddr = m_game->ReadPtr(playerAddress + m_game->GetValue("motbin_offset"));
+
 			if (movesetAddr == 0 || movesetAddr == -1) {
 				return false;
 			}
 
-			int8_t isInitialized = m_process->readInt8(movesetAddr + offsetof(MovesetInfo, isInitialized));
+			int8_t isInitialized = m_game->Read<int8_t>(movesetAddr + offsetof(MovesetInfo, isInitialized));
 			if (isInitialized != 1) {
-				return false;
-			}
-		}
-
-		// Read into current move to see if it is valid
-		{
-			gameAddr currentMove = m_process->readUInt64(player + m_game->GetValue("currmove"));
-			if (currentMove == 0 || currentMove == -1) {
-				return false;
-			}
-
-			gameAddr animAddr = m_process->readInt64(currentMove + 0x10);
-			if (animAddr == 0 || animAddr == -1) {
-				return false;
-			}
-
-			uint8_t animType = m_process->readInt8(animAddr);
-			if (animType != 0x64 && animType != 0xC8) {
 				return false;
 			}
 		}
@@ -788,7 +768,7 @@ bool ExtractorTTT2::CanExtract()
 
 std::string ExtractorTTT2::GetPlayerCharacterName(gameAddr playerAddress)
 {
-	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
+	gameAddr movesetAddr = m_game->ReadPtr(playerAddress + m_game->GetValue("motbin_offset"));
 
 	std::string characterName;
 	if (movesetAddr == 0) {
@@ -796,8 +776,9 @@ std::string ExtractorTTT2::GetPlayerCharacterName(gameAddr playerAddress)
 	}
 
 	{
-		char buf[32]{ 0 };
-		m_process->readBytes(movesetAddr + 0x2E8, buf, 31);
+		char buf[32];
+		m_game->ReadBytes(movesetAddr + 0x20C, buf, 31);
+		buf[31] = '\0';
 		characterName = std::string(buf);
 	}
 
@@ -833,7 +814,7 @@ std::string ExtractorTTT2::GetPlayerCharacterName(gameAddr playerAddress)
 
 uint32_t ExtractorTTT2::GetCharacterID(gameAddr playerAddress)
 {
-	return m_process->readInt16(playerAddress + m_game->GetValue("chara_id_offset"));
+	return m_game->Read<uint32_t>(playerAddress + m_game->GetValue("chara_id_offset"));
 }
 
 gameAddr ExtractorTTT2::GetCharacterAddress(uint8_t playerId)
