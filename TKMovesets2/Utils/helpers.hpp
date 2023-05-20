@@ -161,8 +161,8 @@ public:
 namespace ByteswapHelpers
 {
 	void SWAP_INT16(void* x);
-
 	void SWAP_INT32(void* x);
+	void SWAP_INT64(void* x);
 }
 
 namespace Helpers

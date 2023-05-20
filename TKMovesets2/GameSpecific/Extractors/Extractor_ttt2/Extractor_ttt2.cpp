@@ -17,10 +17,175 @@ using namespace StructsTTT2;
 // -- Static helpers -- //
 
 // Converts absolute ptr into indexes before saving to file
-static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTable& table, const MovesetTable* offsets)
+static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTable* offsets)
 {
-	// Convert move ptrs
-	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, table.moveCount))
+	for (auto& pushbackExtra : StructIterator<PushbackExtradata>(movesetBlock, offsets->pushbackExtradata, offsets->pushbackExtradataCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&pushbackExtra.horizontal_offset);
+	}
+
+	for (auto& pushback : StructIterator<Pushback>(movesetBlock, offsets->pushback, offsets->pushbackCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&pushback.duration);
+		ByteswapHelpers::SWAP_INT16(&pushback.displacement);
+		ByteswapHelpers::SWAP_INT32(&pushback.num_of_loops);
+		ByteswapHelpers::SWAP_INT32(&pushback.extradata_addr);
+	}
+
+	for (auto& req : StructIterator<Requirement>(movesetBlock, offsets->requirement, offsets->requirementCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&req.condition);
+		ByteswapHelpers::SWAP_INT32(&req.param_unsigned);
+	}
+
+	for (auto& cancelExtra : StructIterator<CancelExtradata>(movesetBlock, offsets->cancelExtradata, offsets->cancelExtradataCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&cancelExtra.value);
+	}
+
+	for (auto& cancel : StructIterator<Cancel>(movesetBlock, offsets->cancel, offsets->cancelCount))
+	{
+		// Todo: check if commands really must be byteswapped
+		ByteswapHelpers::SWAP_INT64(&cancel.command);
+
+		ByteswapHelpers::SWAP_INT32(&cancel.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&cancel.extradata_addr);
+		ByteswapHelpers::SWAP_INT32(&cancel.detection_start);
+		ByteswapHelpers::SWAP_INT32(&cancel.detection_end);
+		ByteswapHelpers::SWAP_INT32(&cancel.starting_frame);
+		ByteswapHelpers::SWAP_INT16(&cancel.move_id);
+		ByteswapHelpers::SWAP_INT16(&cancel.cancel_option);
+	}
+
+	for (auto& groupCancel : StructIterator<Cancel>(movesetBlock, offsets->groupCancel, offsets->groupCancelCount))
+	{
+		// Todo: check if commands really must be byteswapped
+		ByteswapHelpers::SWAP_INT64(&groupCancel.command);
+
+		ByteswapHelpers::SWAP_INT32(&groupCancel.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.extradata_addr);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.detection_start);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.detection_end);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.starting_frame);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.move_id);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.cancel_option);
+	}
+
+	for (auto& reaction : StructIterator<Reactions>(movesetBlock, offsets->reactions, offsets->reactionsCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&reaction.front_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.backturned_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.left_side_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.right_side_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.front_counterhit_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.downed_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.block_pushback);
+
+		ByteswapHelpers::SWAP_INT16(&reaction.front_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.back_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.left_side_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.right_side_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.front_counterhit_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.downed_direction);
+
+		ByteswapHelpers::SWAP_INT32(&reaction._0x28_int);
+		ByteswapHelpers::SWAP_INT32(&reaction._0x2C_int);
+
+		ByteswapHelpers::SWAP_INT16(&reaction.vertical_pushback);
+		ByteswapHelpers::SWAP_INT16(&reaction.standing_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.default_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.counterhit_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_counterhit_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.left_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_left_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.right_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_right_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.backturned_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_backturned_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.block_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_block_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.wallslump_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.downed_moveid);
+	}
+
+	for (auto& hitCondition : StructIterator<HitCondition>(movesetBlock, offsets->hitCondition, offsets->hitConditionCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&hitCondition.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&hitCondition.damage);
+		ByteswapHelpers::SWAP_INT32(&hitCondition.reactions_addr);
+	}
+
+	for (auto& voiceclip : StructIterator<Voiceclip>(movesetBlock, offsets->voiceclip, offsets->voiceclipCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&voiceclip.id);
+	}
+
+	for (auto& extraProp : StructIterator<ExtraMoveProperty>(movesetBlock, offsets->extraMoveProperty, offsets->extraMovePropertyCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&extraProp.starting_frame);
+		ByteswapHelpers::SWAP_INT32(&extraProp.id);
+		ByteswapHelpers::SWAP_INT32(&extraProp.value_unsigned);
+	}
+
+	for (auto& input : StructIterator<Input>(movesetBlock, offsets->input, offsets->inputCount))
+	{
+		// Todo: check if commands really must be byteswapped
+		ByteswapHelpers::SWAP_INT64(&input.command);
+	}
+
+	for (auto& inputSequence : StructIterator<InputSequence>(movesetBlock, offsets->inputSequence, offsets->inputSequenceCount))
+	{
+		// 0x0: int8: not swapping
+		// 0x1: int8: not swapping
+		ByteswapHelpers::SWAP_INT16(&inputSequence.input_amount);
+		ByteswapHelpers::SWAP_INT32(&inputSequence.input_addr);
+	}
+
+	for (auto& projectile : StructIterator<Projectile>(movesetBlock, offsets->projectile, offsets->projectileCount))
+	{
+		// As of this time, don't do any conversion for projectiles
+		// Its format is different from the T7 format
+		// (The data is still there, in big endian, ready to be parsed by any importer)
+	}
+
+	for (auto& cameraData : StructIterator<CameraData>(movesetBlock, offsets->cameraData, offsets->cameraDataCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&cameraData._0x0_int);
+		ByteswapHelpers::SWAP_INT16(&cameraData._0x4_short);
+		ByteswapHelpers::SWAP_INT16(&cameraData.left_side_camera_data);
+		ByteswapHelpers::SWAP_INT16(&cameraData.right_side_camera_data);
+		ByteswapHelpers::SWAP_INT16(&cameraData._0xA_short);
+	}
+
+	for (auto& throwCameras : StructIterator<ThrowCamera>(movesetBlock, offsets->throwCameras, offsets->throwCamerasCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&throwCameras._0x0_uint);
+		ByteswapHelpers::SWAP_INT32(&throwCameras.cameradata_addr);
+	}
+
+
+	for (auto& parryRelated : StructIterator<UnknownParryRelated>(movesetBlock, offsets->unknownParryRelated, offsets->unknownParryRelatedCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&parryRelated.value);
+	}
+
+	for (auto& moveBeginningProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveBeginningProp, offsets->moveBeginningPropCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&moveBeginningProp.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&moveBeginningProp.extraprop);
+		ByteswapHelpers::SWAP_INT32(&moveBeginningProp.value);
+	}
+
+	for (auto& moveEndingProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, offsets->moveEndingPropCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&moveEndingProp.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&moveEndingProp.extraprop);
+		ByteswapHelpers::SWAP_INT32(&moveEndingProp.value);
+	}
+
+
+	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, offsets->moveCount))
 	{
 		ByteswapHelpers::SWAP_INT32(&move.name_addr);
 		ByteswapHelpers::SWAP_INT32(&move.anim_name_addr);
@@ -36,7 +201,7 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT16(&move._0x56_short);
 
 		// Swaps _val1 and 8val2 as an int because that is how they are stored
-		ByteswapHelpers::SWAP_INT32(&move.moveId_val2); 
+		ByteswapHelpers::SWAP_INT32(&move.moveId_val2);
 		ByteswapHelpers::SWAP_INT32(&move.hit_condition_addr);
 		ByteswapHelpers::SWAP_INT32(&move.anim_len);
 		ByteswapHelpers::SWAP_INT32(&move.airborne_start);
@@ -52,61 +217,6 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT32(&move.last_active_frame);
 		ByteswapHelpers::SWAP_INT16(&move._0x6c_short);
 		ByteswapHelpers::SWAP_INT16(&move.distance);
-	}
-
-	// Convert cancel ptrs
-	for (auto& cancel : StructIterator<Cancel>(movesetBlock, offsets->cancel, table.cancelCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&cancel.requirements_addr);
-	}
-
-	// Convert groupCancel cancel ptrs
-	for (auto& groupCancel : StructIterator<Cancel>(movesetBlock, offsets->groupCancel, table.groupCancelCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&groupCancel.requirements_addr);
-	}
-
-	// Convert reaction ptrs
-	for (auto& reaction : StructIterator<Reactions>(movesetBlock, offsets->reactions, table.reactionsCount))
-	{
-		ByteswapHelpers::SWAP_INT16(&reaction.front_pushback);
-	}
-
-	// Convert input sequence ptrs
-	for (auto& inputSequence : StructIterator<InputSequence>(movesetBlock, offsets->inputSequence, table.inputSequenceCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&inputSequence.input_addr);
-	}
-
-	// Convert throwCameras ptrs
-	for (auto& throwCameras : StructIterator<ThrowCamera>(movesetBlock, offsets->throwCameras, table.throwCamerasCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&throwCameras.cameradata_addr);
-	}
-
-	// Convert hit conditions ptrs
-	for (auto& hitCondition : StructIterator<HitCondition>(movesetBlock, offsets->hitCondition, table.hitConditionCount))
-	{
-		TO_INDEX(hitCondition.requirements_addr, table.requirement, Requirement);
-		TO_INDEX(hitCondition.reactions_addr, table.reactions, Reactions);
-	}
-
-	// Convert pushback ptrs
-	for (auto& pushback : StructIterator<Pushback>(movesetBlock, offsets->pushback, table.pushbackCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&pushback.extradata_addr);
-	}
-
-	// Convert move start prop ptrs
-	for (auto& moveBeginningProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveBeginningProp, table.moveBeginningPropCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&moveBeginningProp.requirements_addr);
-	}
-
-	// Convert move end prop ptrs
-	for (auto& moveEndingProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, table.moveEndingPropCount))
-	{
-		ByteswapHelpers::SWAP_INT32(&moveEndingProp.requirements_addr);
 	}
 }
 
@@ -460,7 +570,7 @@ Byte* ExtractorTTT2::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, 
 	if (block == nullptr) {
 		return nullptr;
 	}
-	convertMovesetDataToLittleEndian(block, table, offsets);
+	convertMovesetDataToLittleEndian(block, offsets);
 	return block;
 }
 
