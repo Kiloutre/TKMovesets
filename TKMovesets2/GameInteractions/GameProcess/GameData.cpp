@@ -68,7 +68,7 @@ gameAddr GameData::ReadPtrPath32(const char* c_addressId) const
 		return GAME_ADDR_NULL;
 	}
 
-	gameAddr32 addr = ptrPath[0];
+	gameAddr32 addr = (gameAddr32)ptrPath[0];
 	if (isRelative) {
 		addr += (gameAddr32)m_process->mainModule.address;
 	}

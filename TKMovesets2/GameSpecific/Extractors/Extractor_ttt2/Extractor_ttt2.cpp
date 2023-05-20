@@ -226,9 +226,9 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 	// Convert move ptrs
 	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, table.moveCount))
 	{
-		move.name_addr -= nameStart;
-		move.anim_name_addr -= nameStart;
-		move.anim_addr = animOffsetMap[move.anim_addr];
+		move.name_addr -= (gameAddr32)nameStart;
+		move.anim_name_addr -= (gameAddr32)nameStart;
+		move.anim_addr = (gameAddr32)animOffsetMap[move.anim_addr];
 		TO_INDEX(move.cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move._0x28_cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move._0x38_cancel_addr, table.cancel, Cancel);
@@ -327,10 +327,10 @@ void ExtractorTTT2::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* move
 	}
 
 	// Convert ptrs into offsets
-	movesetHeader->character_name_addr -= movesetAddr;
-	movesetHeader->character_creator_addr -= movesetAddr;
-	movesetHeader->date_addr -= movesetAddr;
-	movesetHeader->fulldate_addr -= movesetAddr;
+	movesetHeader->character_name_addr -= (gameAddr32)movesetAddr;
+	movesetHeader->character_creator_addr -= (gameAddr32)movesetAddr;
+	movesetHeader->date_addr -= (gameAddr32)movesetAddr;
+	movesetHeader->fulldate_addr -= (gameAddr32)movesetAddr;
 
 	// Correct offsets according to our name modifications
 	const uint32_t namelength = (uint32_t)strlen(MOVESET_EXTRACTED_NAME_PREFIX) - 1; // - 1 because we replace one char
@@ -339,14 +339,14 @@ void ExtractorTTT2::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* move
 	movesetHeader->fulldate_addr += namelength;
 }
 
-uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std::map<gameAddr, std::pair<gameAddr, uint64_t>>& offsetMap, ExtractSettings settings)
+uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std::map<gameAddr32, std::pair<uint32_t, uint32_t>>& offsetMap, ExtractSettings settings)
 {
-	uint64_t motaCustomBlockSize = 0;
+	uint32_t motaCustomBlockSize = 0;
 
 	for (uint16_t motaId = 0; motaId < 12; ++motaId)
 	{
-		gameAddr motaAddr = (gameAddr)motas->motas[motaId];
-		gameAddr motaSize;
+		gameAddr32 motaAddr = (gameAddr32)motas->motas[motaId];
+		uint32_t motaSize;
 		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
 
 		if (offsetMap.find(motaAddr) != offsetMap.end()) {
@@ -404,17 +404,17 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 			motaSize = 0x14;
 		}
 		else {
-			uint64_t lastAnimSize = GetAnimationSize(m_game->baseAddr + motaAddr + lastAnimOffset);
+			uint32_t lastAnimSize = (uint32_t)GetAnimationSize(m_game->baseAddr + motaAddr + lastAnimOffset);
 			motaSize = lastAnimOffset + lastAnimSize;
 		}
 
 		// Store new mota offset & size in keypair map
-		offsetMap[motaAddr] = std::pair<gameAddr, uint64_t>(motaCustomBlockSize, motaSize);
+		offsetMap[motaAddr] = std::pair<uint32_t, uint32_t>(motaCustomBlockSize, motaSize);
 		motaCustomBlockSize += motaSize;
 
-		DEBUG_LOG("Saved mota %d, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
+		DEBUG_LOG("Saved mota %d, size is %d (0x%x)\n", motaId, motaSize, motaSize);
 	}
-	return motaCustomBlockSize;
+	return (uint64_t)motaCustomBlockSize;
 }
 
 Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, ExtractSettings settings)
@@ -422,7 +422,7 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
 	// Map of GAME_ADDR:<offset, size> motas
-	std::map<gameAddr, std::pair<gameAddr, uint64_t>> offsetMap;
+	std::map<gameAddr32, std::pair<uint32_t, uint32_t>> offsetMap;
 	uint64_t sizeToAllocate = 0;
 
 	size_out = CalculateMotaCustomBlockSize(motas, offsetMap, settings);
@@ -463,7 +463,7 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 		else {
 			// Set to misisng address for mota block we aren't exporting
 			// The importer will recognize this and fill it with a proper value
-			motaAddr[i] = MOVESET_ADDR_MISSING;
+			motaAddr[i] = MOVESET_ADDR32_MISSING;
 		}
 	}
 

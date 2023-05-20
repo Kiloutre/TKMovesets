@@ -41,7 +41,7 @@ private:
 	// Returns an allocated block containing mota block offsets followed by mota blocks
 	Byte* AllocateMotaCustomBlock(StructsTTT2::MotaList* motas, uint64_t& size_out, ExtractSettings settings);
 	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
-	uint64_t CalculateMotaCustomBlockSize(const StructsTTT2::MotaList* motas, std::map<gameAddr, std::pair<gameAddr, uint64_t>>& offsetMap, ExtractSettings settings);
+	uint64_t CalculateMotaCustomBlockSize(const StructsTTT2::MotaList* motas, std::map<gameAddr32, std::pair<uint32_t, uint32_t>>& offsetMap, ExtractSettings settings);
 
 public:
 	using Extractor::Extractor; // Inherit constructor too

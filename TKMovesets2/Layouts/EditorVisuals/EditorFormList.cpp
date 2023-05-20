@@ -110,7 +110,7 @@ void EditorFormList::PasteFormFromClipboard()
 		}
 
 		unsigned int fieldAmountPerItem = (unsigned int)m_items[0]->identifierMap.size();
-		unsigned int fieldAmount = (unsigned int)fieldAmountPerItem * m_items.size();
+		unsigned int fieldAmount = fieldAmountPerItem * (unsigned int)m_items.size();
 
 		while (fieldAmount < expectedFieldAmount) {
 			auto newId = CreateNewItem(-1);
@@ -295,7 +295,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 unsigned int EditorFormList::CreateNewItem(int insertionPosition)
 {
 	if (insertionPosition == -1) {
-		insertionPosition = m_items.size() - 1;
+		insertionPosition = (int)m_items.size() - 1;
 	}
 
 	VectorSet<std::string> drawOrder;

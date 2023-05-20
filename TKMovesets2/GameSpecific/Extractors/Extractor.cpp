@@ -47,7 +47,7 @@ namespace ExtractorUtils
 Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {
 	if (blockEnd < blockStart) {
-		DEBUG_LOG("Extraction error: block end (%llx) smaller than block start (%ll)x\n", blockEnd, blockStart);
+		DEBUG_LOG("Extraction error: block end (%llx) smaller than block start (%llx)\n", blockEnd, blockStart);
 		return nullptr;
 	}
 

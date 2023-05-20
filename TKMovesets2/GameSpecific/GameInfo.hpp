@@ -9,7 +9,10 @@
 
 #include "constants.h"
 
+#pragma warning (push)
+#pragma warning (disable:4099)
 struct GameInfo;
+#pragma warning (pop)
 
 class GameFactory_Base
 {
@@ -49,6 +52,8 @@ enum GameFlag_
 	GameFlag_MovesetLiveEditable = (1 << 0),
 };
 
+#pragma warning (push)
+#pragma warning (disable:4099)
 struct GameInfo
 {
 	// Displayed name of the game
@@ -99,3 +104,4 @@ struct GameInfo
 		return editorLogic != nullptr && editorVisuals != nullptr;
 	}
 };
+#pragma warning (pop)

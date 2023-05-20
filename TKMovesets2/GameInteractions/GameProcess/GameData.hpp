@@ -32,6 +32,8 @@ public:
 	{
 		T value = m_process->read<T>(baseAddr + addr);
 		if (m_bigEndian) {
+#pragma warning (push)
+#pragma warning (disable:4244)
 			switch (sizeof(T))
 			{
 			case 8:
@@ -44,6 +46,7 @@ public:
 				value = BYTESWAP_INT16(value);
 				break;
 			}
+#pragma warning (pop)
 		}
 		return value;
 	}
