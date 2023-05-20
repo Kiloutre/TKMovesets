@@ -310,6 +310,22 @@ void ExtractorTTT2::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* move
 {
 	m_game->ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
 
+	// Byteswap data that needs to be swapped
+	ByteswapHelpers::SWAP_INT32(&movesetHeader->character_name_addr);
+	ByteswapHelpers::SWAP_INT32(&movesetHeader->character_creator_addr);
+	ByteswapHelpers::SWAP_INT32(&movesetHeader->date_addr);
+	ByteswapHelpers::SWAP_INT32(&movesetHeader->fulldate_addr);
+
+	for (unsigned int i = 0; i < _countof(movesetHeader->orig_aliases); ++i)
+	{
+		ByteswapHelpers::SWAP_INT16(&movesetHeader->orig_aliases[i]);
+		ByteswapHelpers::SWAP_INT16(&movesetHeader->current_aliases[i]);
+	}
+
+	for (unsigned int i = 0; i < _countof(movesetHeader->unknown_aliases); ++i) {
+		ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_aliases[i]);
+	}
+
 	// Convert ptrs into offsets
 	movesetHeader->character_name_addr -= movesetAddr;
 	movesetHeader->character_creator_addr -= movesetAddr;
