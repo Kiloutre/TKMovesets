@@ -9,7 +9,7 @@ enum GameId_
 
 namespace GameVersions
 {
-	enum TK
+	enum T7
 	{
 		NONE = 0,
 
@@ -17,5 +17,10 @@ namespace GameVersions
 		SEASON_1,
 		SEASON_2,
 		SEASON_3,
+	};
+
+	enum TTT2
+	{
+		RPCS3_BLES01702_0100
 	};
 };

@@ -7,7 +7,7 @@
 class GameInfo;
 
 // Class that allows you to read from the game, applying the base address and endian conversion is needed
-// Also allows you to read a ptr path from the game
+// Also allows you to read a ptr path from the addresses file
 class GameData : public GameAddressesWrapper
 {
 private:

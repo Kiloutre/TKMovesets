@@ -104,7 +104,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 
 void ExtractorTTT2::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movesetHeader)
 {
-	m_process->readBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
+	m_game->ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
 
 	// Convert ptrs into offsets
 	movesetHeader->character_name_addr -= movesetAddr;
@@ -135,7 +135,7 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 		}
 
 		MotaHeader header;
-		m_process->readBytes(motaAddr, &header, sizeof(MotaHeader));
+		m_game->ReadBytes(motaAddr, &header, sizeof(MotaHeader));
 		if (memcmp(header.mota_string, "MOTA", 4) != 0) {
 			DEBUG_LOG("Malformed MOTA %d\n", motaId);
 			// Malformed MOTA, don't save it
@@ -163,7 +163,7 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 
 		// Loop through every offset, find the highest
 		// There is no guarantee they are ordered so looking through all of them is quite safe
-		m_process->readBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
+		m_game->ReadBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
 		for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
 		{
 			uint32_t animOffset = animOffsetList[animIdx];
@@ -183,7 +183,7 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 			motaSize = 0x14;
 		}
 		else {
-			uint64_t lastAnimSize = GetAnimationSize(motaAddr + lastAnimOffset);
+			uint64_t lastAnimSize = GetAnimationSize(m_game->baseAddr + motaAddr + lastAnimOffset);
 			motaSize = lastAnimOffset + lastAnimSize;
 		}
 
@@ -225,7 +225,7 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 			if (!exportedMotas.contains(motaAddr[i]))
 			{
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
-				m_process->readBytes(motaAddr[i], (char*)motaPtr, motaSize);
+				m_game->ReadBytes(motaAddr[i], (char*)motaPtr, motaSize);
 
 				DEBUG_LOG("Mota %llu: little endian %d\n", i, motaPtr->is_little_endian);
 
@@ -276,7 +276,7 @@ void ExtractorTTT2::GetNamesBlockBounds(const Move* move, uint64_t moveCount, ga
 
 	// Move to the last string's END instead of staying at the start
 	gameAddr lastItemEnd = (gameAddr)highest;
-	while (m_process->readInt8(lastItemEnd) != 0) {
+	while (m_game->Read<uint8_t>(lastItemEnd) != 0) {
 		lastItemEnd += 1;
 	}
 
@@ -308,7 +308,7 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	// Find anim sizes and establish offsets
 	for (gameAddr animAddr : addrList)
 	{
-		uint64_t animSize = GetAnimationSize(animAddr);
+		uint64_t animSize = GetAnimationSize(m_game->baseAddr + animAddr);
 
 		if (animSize == 0) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
@@ -331,7 +331,7 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	for (gameAddr animAddr : addrList)
 	{
 		int64_t animSize = animSizes[animAddr];
-		m_process->readBytes(animAddr, animationBlockCursor, animSize);
+		m_game->ReadBytes(animAddr, animationBlockCursor, animSize);
 		animationBlockCursor += animSize;
 	}
 
@@ -342,18 +342,26 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 void ExtractorTTT2::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
 {
 	// Fill table
-	m_process->readBytes(movesetAddr + 0x150, table, sizeof(MovesetTable));
+	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr + 0x140, m_game->baseAddr + movesetAddr + 0x140);
+	m_game->ReadBytes(movesetAddr + 0x140, table, sizeof(MovesetTable));
+
+	// Byteswap to little endian
+	for (unsigned int i = 0; i < _countof(table->entries); ++i) {
+		ByteswapHelpers::SWAP_INT32(&(table->entries[i].listAddr));
+		ByteswapHelpers::SWAP_INT32(&(table->entries[i].listCount));
+	}
+
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
-	gameAddr tableStartAddr = (gameAddr)table->reactions;
+	gameAddr tableStartAddr = table->reactions;
 	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
 	memcpy(offsets, table, sizeof(MovesetTable));
-	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 16, sizeof(MovesetTable) / 8 / 2);
+	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 8, sizeof(MovesetTable) / 4 / 2);
 }
 
 Byte* ExtractorTTT2::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table)
 {
-	gameAddr blockStart = (gameAddr)table.reactions;
-	gameAddr blockEnd = (gameAddr)table.throwCameras + (sizeof(ThrowCamera) * table.throwCamerasCount);
+	gameAddr blockStart = table.reactions;
+	gameAddr blockEnd = table.throwCameras + (sizeof(ThrowCamera) * table.throwCamerasCount);
 	return allocateAndReadBlock(blockStart, blockEnd, size_out);
 }
 
@@ -376,9 +384,10 @@ char* ExtractorTTT2::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, con
 
 Byte* ExtractorTTT2::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
-	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
+	m_game->ReadBytes(movesetAddr + 0x1D8, motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
+
 #pragma warning(push)
 #pragma warning(disable:6385)
 Byte* ExtractorTTT2::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings)
@@ -544,7 +553,7 @@ ExtractionErrcode_ ExtractorTTT2::Extract(gameAddr playerAddress, ExtractSetting
 
 	// The address of the moveset we will be extracting
 	gameAddr movesetAddr;
-	movesetAddr = m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
+	movesetAddr = m_game->ReadPtr(playerAddress + m_game->GetValue("motbin_offset"));
 
 	// Will read the header of the moveset and write it here
 	MovesetInfo movesetHeader{ 0 };

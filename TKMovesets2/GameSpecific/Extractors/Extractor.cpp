@@ -43,13 +43,22 @@ namespace ExtractorUtils
 };
 
 // Private methods //
-
+#include <signal.h>
 Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {
+	if (blockEnd < blockStart) {
+		DEBUG_LOG("Extraction error: block end (%llx) smaller than block start (%ll)x\n", blockEnd, blockStart);
+		return nullptr;
+	}
+
 	size_t blockSize = blockEnd - blockStart;
 
 	if (blockSize >= (MOVESET_MAX_BLOCK_SIZE_MB * 1000000)) { // 50 MB
-		DEBUG_LOG("Block size too big to be valid, returning nullptr\n");
+		DEBUG_LOG("Bloc size too big to be valid (%llu / 0x%llx), returning nullptr\n", blockSize, blockSize);
+		
+#ifdef BUILD_TYPE_DEBUG
+		DebugBreak();
+#endif
 		// Arbitrary max block size in case something bad happened and we get a very invalid start & end
 		return nullptr;
 	}
@@ -60,7 +69,7 @@ Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 		return nullptr;
 	}
 
-	m_process->readBytes(blockStart, block, blockSize);
+	m_game->ReadBytes(blockStart, block, blockSize);
 	size_out = blockSize;
 
 	return block;
