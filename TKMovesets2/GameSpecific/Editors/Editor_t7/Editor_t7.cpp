@@ -305,7 +305,6 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		strncmp((char*)m_movesetData + m_offsets->movelistBlock, "MVLT", 4) == 0)
 	{
 		m_mvlHead = (MvlHead*)(m_movesetData + m_offsets->movelistBlock);
-		DEBUG_LOG("mvlHead = %llx\n", m_offsets->movelistBlock);
 		hasDisplayableMovelist = true;
 		SetupIterators_DisplayableMovelist();
 	}

@@ -73,9 +73,9 @@ uint32_t EditorT7::DuplicateMovelistPlayable(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateRequirement(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.requirementCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
 
-	ModifyGenericMovelistListSize<Requirement>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<Requirement>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.requirements;
 	memcpy(list[listCount], list[id], listSize * sizeof(Requirement));
 
@@ -85,9 +85,9 @@ uint32_t EditorT7::DuplicateRequirement(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateVoiceclip(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.voiceclipCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
 
-	ModifyGenericMovelistListSize<Voiceclip>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<Voiceclip>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.voiceclips;
 	memcpy(list[listCount], list[id], listSize * sizeof(Voiceclip));
 
@@ -97,9 +97,9 @@ uint32_t EditorT7::DuplicateVoiceclip(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateCancel(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.cancelCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
 
-	ModifyGenericMovelistListSize<Cancel>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<Cancel>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.cancels;
 	memcpy(list[listCount], list[id], listSize * sizeof(Cancel));
 
@@ -109,9 +109,9 @@ uint32_t EditorT7::DuplicateCancel(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateGroupedCancel(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.groupCancelCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
 
-	ModifyGenericMovelistListSize<Cancel>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<Cancel>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.grouped_cancels;
 	memcpy(list[listCount], list[id], listSize * sizeof(Cancel));
 
@@ -121,9 +121,9 @@ uint32_t EditorT7::DuplicateGroupedCancel(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateExtraproperty(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.extraMovePropertyCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 
-	ModifyGenericMovelistListSize<ExtraMoveProperty>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<ExtraMoveProperty>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.extra_move_properties;
 	memcpy(list[listCount], list[id], listSize * sizeof(ExtraMoveProperty));
 
@@ -133,9 +133,9 @@ uint32_t EditorT7::DuplicateExtraproperty(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateMoveBeginProperty(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.moveBeginningPropCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
 
-	ModifyGenericMovelistListSize<OtherMoveProperty>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.move_start_properties;
 	memcpy(list[listCount], list[id], listSize * sizeof(OtherMoveProperty));
 
@@ -145,9 +145,9 @@ uint32_t EditorT7::DuplicateMoveBeginProperty(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateMoveEndProperty(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.moveEndingPropCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 
-	ModifyGenericMovelistListSize<OtherMoveProperty>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.move_end_properties;
 	memcpy(list[listCount], list[id], listSize * sizeof(OtherMoveProperty));
 
@@ -157,9 +157,9 @@ uint32_t EditorT7::DuplicateMoveEndProperty(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateHitCondition(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.hitConditionCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
 
-	ModifyGenericMovelistListSize<HitCondition>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<HitCondition>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.hit_conditions;
 	memcpy(list[listCount], list[id], listSize * sizeof(HitCondition));
 
@@ -169,9 +169,9 @@ uint32_t EditorT7::DuplicateHitCondition(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicatePushbackExtradata(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.pushbackExtradataCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 
-	ModifyGenericMovelistListSize<PushbackExtradata>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<PushbackExtradata>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.pushback_extras;
 	memcpy(list[listCount], list[id], listSize * sizeof(PushbackExtradata));
 
@@ -181,9 +181,9 @@ uint32_t EditorT7::DuplicatePushbackExtradata(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateInput(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_infos->table.inputCount;
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
 
-	ModifyGenericMovelistListSize<Input>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<Input>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.inputs;
 	memcpy(list[listCount], list[id], listSize * sizeof(Input));
 
@@ -193,9 +193,9 @@ uint32_t EditorT7::DuplicateInput(uint32_t id, size_t listSize)
 uint32_t EditorT7::DuplicateMovelistInput(uint32_t id, size_t listSize)
 {
 	unsigned int listCount = (unsigned int)m_iterators.mvl_inputs.size();
-	uint64_t listStart = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset;
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset;
 
-	ModifyGenericMovelistListSize<MvlInput>(listCount, std::vector(listSize, -1), {}, listStart);
+	ModifyGenericMovelistListSize<MvlInput>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.mvl_inputs;
 	memcpy(list[listCount], list[id], listSize * sizeof(MvlInput));
 

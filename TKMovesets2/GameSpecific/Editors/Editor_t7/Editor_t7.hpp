@@ -415,15 +415,16 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 		{
 			unsigned int tableEntryCount = _countof(m_infos->table.entries);
 			for (size_t i = 0; i < tableEntryCount; ++i)
-			{
+			{	
 				auto& currentEntry = m_infos->table.entries[i];
 				gameAddr absolute_entryStartAddr = movesetBlockStart + (uint64_t)currentEntry.listAddr;
 
 				// listPosition be equal to a list's start both with and and without belonging to the list
 				// Rule out the case where an empty structure list (count = 0) is resized into more
 				// This is overkill and not likely to happen since ModifyListSize() is never called for list creations but modification of existing ones
-				if (listPosition < absolute_entryStartAddr || \
-					(listPosition == absolute_entryStartAddr && currentEntry.listCount != 0)) {
+				if (listPosition < absolute_entryStartAddr
+					|| (listPosition == absolute_entryStartAddr && currentEntry.listCount != 0)
+					|| (absolute_entryStartAddr > listStart_offset)) {
 					*(uint64_t*)&currentEntry.listAddr += structSizeDiff;
 					DEBUG_LOG("Shifting movesetblock entry %lld's offset\n", i);
 				}
@@ -437,15 +438,16 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 						auto& nextEntry = m_infos->table.entries[i + 1];
 						gameAddr absolute_nextEntryStartAddr = movesetBlockStart + (uint64_t)nextEntry.listAddr;
 
-						if (listPosition < absolute_nextEntryStartAddr || \
-							(listPosition == absolute_nextEntryStartAddr && nextEntry.listCount != 0)) {
+						if (listPosition < absolute_nextEntryStartAddr
+							|| (listPosition == absolute_nextEntryStartAddr && nextEntry.listCount != 0)
+							|| (absolute_nextEntryStartAddr > listStart_offset)) {
 							isPartOfCurrentList = true;
 						}
 					}
 
 					if (isPartOfCurrentList) {
 						currentEntry.listCount += sizeDiff;
-						DEBUG_LOG("Table: Adding movelist entry %llu count += %d\n", i, sizeDiff);
+						DEBUG_LOG("Table: Adding movelist entry %llu count += %d, total is %llu\n", i, sizeDiff, currentEntry.listCount);
 					}
 				}
 			}
