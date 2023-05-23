@@ -189,8 +189,12 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		}
 		else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
 		{
-			field->nextValue = ImGui::GetClipboardText();
-			moveFocusAway = true;
+			// ImGUI can sometimes fail this call and return NULL especially when storing images in the clipboard
+			auto clipboardText = ImGui::GetClipboardText();
+			if (clipboardText != nullptr) {
+				field->nextValue = clipboardText;
+				moveFocusAway = true;
+			}
 		}
 		else if ((field->flags & EditorInput_DataChangeable) && ImGui::IsKeyPressed(ImGuiKey_B, false))
 		{
@@ -225,6 +229,8 @@ void EditorForm::CopyFormToClipboard() const
 void EditorForm::PasteFormFromClipboard()
 {
 	moveFocusAway = true;
+
+	// ImGUI can sometimes fail this call and return NULL especially when storing images in the clipboard
 	const char* clipboardText = ImGui::GetClipboardText();
 	while (*clipboardText != '\n') ++clipboardText;
 	++clipboardText;
@@ -250,7 +256,12 @@ void EditorForm::PasteFormFromClipboard()
 bool EditorForm::CanPasteFormFromClipboard() const
 {
 	DEBUG_LOG("CanPasteFormFromClipboard\n");
+
 	const char* clipboardText = ImGui::GetClipboardText();
+
+	if (clipboardText == nullptr) {
+		return false;
+	}
 
 	auto newlinePos = strstr(clipboardText, "\n");
 	if (newlinePos == NULL || newlinePos == clipboardText) {
