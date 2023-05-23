@@ -8,7 +8,33 @@
 uint32_t EditorT7::DuplicateMove(uint32_t id, size_t listSize)
 {
 	uint32_t newId = CreateNewMove();
-	memcpy(m_iterators.moves[newId], m_iterators.moves[id], sizeof(Move));
+	auto move = m_iterators.moves[newId];
+
+	memcpy(move, m_iterators.moves[id], sizeof(Move));
+
+	// Generate new name address + name prefix / suffix
+	char const* namePtr = (char const*)(m_movesetData + m_offsets->nameBlock);
+
+	std::string move_name = (namePtr + move->name_addr);
+	if (!Helpers::startsWith<std::string>(move_name, MOVESET_CUSTOM_MOVE_NAME_PREFIX)) {
+		move_name = MOVESET_CUSTOM_MOVE_NAME_PREFIX + move_name;
+	}
+
+	// Make sure the name is unique for clarity purposes
+	std::string tmp = move_name;
+	unsigned int number = 1;
+	for (unsigned int i = 0; i < newId; ++i)
+	{
+		const char* moveName = namePtr + m_iterators.moves[i]->name_addr;
+
+		if (strcmp(moveName, tmp.c_str()) == 0) {
+			tmp = move_name + " (" + std::to_string(++number) + ")";
+			i = -1;
+		}
+	}
+
+	auto new_name_addr = CreateMoveName(tmp.c_str());
+	m_iterators.moves[newId]->name_addr = new_name_addr;
 	return newId;
 }
 

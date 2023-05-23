@@ -152,6 +152,8 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		strcpy_s(field->buffer, field->bufsize, field->nextValue.c_str());
 		// Put the focus back on the input as it should be after pasting
 		ImGui::SetKeyboardFocusHere();
+		field->nextValue.clear();
+		DEBUG_LOG("next value = '%s'\n", field->nextValue.c_str());
 	}
 
 	ImGui::PushID(field);
@@ -160,9 +162,6 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 	if (ImGui::InputText("##", field->buffer, field->bufsize, field->imguiInputFlags)
 		|| pastingToField)
 	{
-		if (pastingToField) {
-			field->nextValue.clear();
-		}
 
 		if (m_ignoreNextChange) {
 			m_ignoreNextChange = false;

@@ -1104,13 +1104,12 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 	if (m_animNameToOffsetMap->find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap->end()) {
 		// Todo: if old animation is unused, delete it
 		move->anim_addr = m_animNameToOffsetMap->at(inputs["anim_name"]->buffer);
+		move->anim_name_addr = m_animOffsetToNameOffset->at(move->anim_addr);
 	}
 
 	// Save move name at the end because it may imply reallocation and invalidation of existing pointers
 	char* newName = inputs["move_name"]->buffer;
 	char* namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
-
-
 
 	if (strlen(newName) != strlen(namePtr + move->name_addr)) {
 		// Only re-allocate moveset & shift offsets if the length doesn't match
