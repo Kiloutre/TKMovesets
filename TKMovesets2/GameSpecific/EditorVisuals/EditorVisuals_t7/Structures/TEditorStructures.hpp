@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EditorFormList.hpp"
-#include "Structures/Subwindows/TEditorMove_Animations.hpp"
+#include "EditorVisuals_t7/Structures/Subwindows/TEditorMove_Animations.hpp"
 
 class TEditorCancels : public EditorFormList
 {

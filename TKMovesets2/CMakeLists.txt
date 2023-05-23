@@ -32,12 +32,14 @@ set(INCLUDE_FOLDERS
                     "GameSpecific"
                     "GameSpecific/Structures"
                     "GameSpecific/Editors"
+                    "GameSpecific/EditorVisuals"
                     "GameSpecific/Extractors"
                     "GameSpecific/Importers"
                     "GameSpecific/Online"
 
-                    "GameSpecific/Editors/Editor_t7"
+                    
                     "GameSpecific/EditorVisuals/EditorVisuals_t7"
+                    "GameSpecific/Editors/Editor_t7"
                     
                     "Layouts"
                     "Layouts/Submenus"
@@ -116,7 +118,7 @@ set(GAMESPECIFIC_SOURCES
                     ## T7
                     "GameSpecific/Online/Online_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
-                    "GameSpecific/Importers/Importer_t7.cpp"
+                    "GameSpecific/Importers/Importer_t7/Importer_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms_DisplayableMovelist.cpp"

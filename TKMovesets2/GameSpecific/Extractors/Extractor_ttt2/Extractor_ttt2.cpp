@@ -195,6 +195,7 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT32(&move.cancel_addr);
 
 		//... more fields omitted here
+		// todo
 
 		ByteswapHelpers::SWAP_INT16(&move.transition);
 

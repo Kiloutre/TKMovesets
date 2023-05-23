@@ -302,8 +302,10 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	}
 
 	if ((m_offsets->movelistBlock + 4) < m_movesetDataSize && \
-		strncmp((char*)m_movesetData + m_offsets->movelistBlock, "MVLT", 4) == 0) {
+		strncmp((char*)m_movesetData + m_offsets->movelistBlock, "MVLT", 4) == 0)
+	{
 		m_mvlHead = (MvlHead*)(m_movesetData + m_offsets->movelistBlock);
+		DEBUG_LOG("mvlHead = %llx\n", m_offsets->movelistBlock);
 		hasDisplayableMovelist = true;
 		SetupIterators_DisplayableMovelist();
 	}
@@ -783,7 +785,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	delete[] anim;
 
 	// Copy all the data after the animation
-	memcpy(newMoveset + newAnimOffset + animSize, m_moveset + orig_animBlockEnd, m_movesetSize - orig_animBlockEnd);
+	memcpy(newMoveset + animBlockEnd, m_moveset + orig_animBlockEnd, m_movesetSize - orig_animBlockEnd);
 
 	// Assign new moveset
 	free(m_moveset);

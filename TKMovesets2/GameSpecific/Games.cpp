@@ -3,9 +3,9 @@
 
 #include "Extractor_t7/Extractor_t7.hpp"
 #include "Extractor_ttt2/Extractor_ttt2.hpp"
-#include "Importer_t7.hpp"
-#include "Editor_t7.hpp"
-#include "EditorVisuals_t7.hpp"
+#include "Importer_t7/Importer_t7.hpp"
+#include "Editor_t7/Editor_t7.hpp"
+#include "EditorVisuals_t7/EditorVisuals_t7.hpp"
 #include "Online_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
@@ -63,7 +63,7 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "ttt2",
 		.minorDataString = "ttt2",
 		.supportedImports = {},
-		.extractor = new GameFactory<ExtractorTTT2>,
+		.extractor = nullptr,//new GameFactory<ExtractorTTT2>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,

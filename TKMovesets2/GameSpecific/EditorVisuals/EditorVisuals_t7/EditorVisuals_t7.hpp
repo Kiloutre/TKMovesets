@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EditorVisuals.hpp"
-#include "Editor_t7.hpp"
+#include "Editors/Editor_t7/Editor_t7.hpp"
 
 namespace EditorVisualsT7
 {
