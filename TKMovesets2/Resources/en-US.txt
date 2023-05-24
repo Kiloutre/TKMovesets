@@ -190,6 +190,7 @@ edition.extract_animations = Extract animations
 edition.extract_animations_finished = Animation extraction finished!
 
 edition.form_popup.copy_structure_clipboard = Copy structure
+edition.form_popup.copy_single_item_clipboard = Copy single item
 edition.form_popup.paste_structure_clipboard = Paste structure
 edition.form_popup.duplicate_structure = Duplicate structure
 edition.form_popup.delete_structure = Delete structure

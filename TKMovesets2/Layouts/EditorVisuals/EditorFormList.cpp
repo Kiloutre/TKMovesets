@@ -397,7 +397,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	}
 
 	m_windowTitleBase = windowTitleBase;
-	ApplyWindowName(false);
+	ApplyWindowName();
 
 }
 

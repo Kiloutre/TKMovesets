@@ -191,6 +191,7 @@ edition.extract_animations = Extraire animations
 edition.extract_animations_finished = Extraction d'animation terminée !
 
 edition.form_popup.copy_structure_clipboard = Copier la structure
+edition.form_popup.copy_single_item_clipboard = Copier un seul élément
 edition.form_popup.paste_structure_clipboard = Coller la structure
 edition.form_popup.duplicate_structure = Dupliquer la structure
 edition.form_popup.delete_structure = Supprimer la structure

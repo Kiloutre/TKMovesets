@@ -82,7 +82,7 @@ private:
 
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 	void OnApply() override;
-	void ApplyWindowName(bool reapplyWindowProperties = true) override;
+	void ApplyWindowName() override;
 	void OnUpdate(int listIdx, EditorInput* field) override;
 	void OnInitEnd() override;
 	void PostRender() override;

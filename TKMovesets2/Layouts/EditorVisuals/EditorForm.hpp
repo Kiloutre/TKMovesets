@@ -83,7 +83,7 @@ protected:
 	// Actual rendering function
 	virtual void RenderInternal();
 	// Sets the window name and reapplies its position and size because imgui ties window pos / size to their name
-	virtual void ApplyWindowName(bool reapplyWindowProperties = true);
+	virtual void ApplyWindowName();
 	// Called whenever the changes are successfully applied
 	virtual void OnApply() {};
 	// Called whenever a field changes (and is valid). listIdx is always 0 if not a list of structs.

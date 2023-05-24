@@ -35,11 +35,11 @@ void TEditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
 	baseWindow->OnMoveCreate(moveId);
 }
 
-void TEditorMove::ApplyWindowName(bool reapplyWindowProperties)
+void TEditorMove::ApplyWindowName()
 {
 	std::string windowName = _(std::format("edition.{}.window_name", m_windowTypeName).c_str());
 	const char* moveName = m_fieldIdentifierMap["move_name"]->buffer;
-	m_windowTitle = std::format("{} {} {} - {}###{}{}{}", windowName, structureId, moveName, m_windowTitleBase.c_str(), windowName, structureId,m_windowTitleBase.c_str());
+	m_windowTitle = std::format("{} {} {} - {}###{}", windowName, structureId, moveName, m_windowTitleBase.c_str(), (uint64_t)this);
 }
 
 void TEditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
