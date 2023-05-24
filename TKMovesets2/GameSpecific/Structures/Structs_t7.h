@@ -445,7 +445,7 @@ namespace StructsT7
 			uint16_t command;
 		};
 		uint8_t frame_duration;
-		uint8_t trigger_highlight; // I believe this is a bool
+		uint8_t trigger_highlight;
 	};
 
 	// .mvl file
@@ -649,11 +649,11 @@ namespace StructsT7_gameAddr
 	{
 		union
 		{
-			int64_t command;
+			uint64_t command;
 			struct
 			{
-				int32_t input;
-				int32_t direction;
+				uint32_t direction;
+				uint32_t button;
 			};
 		};
 		gameAddr requirements_addr;

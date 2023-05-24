@@ -324,6 +324,7 @@ namespace Helpers
 		return strcmp(version1, version2) < 0;
 	}
 
+
 	unsigned int get_memory_string_length(const char* bytesString)
 	{
 		unsigned int size = 0;

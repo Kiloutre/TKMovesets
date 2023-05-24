@@ -601,12 +601,14 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 
 gameAddr GameProcess::AOBScan(unsigned int startingBytes, const char* bytesString)
 {
+	// This has not been tested
 	const unsigned int bufsize = 8192; // Must be a multiple of 4 at the very least
 	const unsigned int readBufUpTo = bufsize - 4;
 	unsigned char buffer[bufsize];
 
 	unsigned int bytesString_len = Helpers::get_memory_string_length(bytesString);
 
+	// Todo: limit to a single module. We know what we're looking for.
 	for (auto& module : GetModuleList())
 	{
 		gameAddr startAddr = module.address;

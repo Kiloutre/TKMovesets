@@ -249,7 +249,7 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	return new_moveset;
 }
 
-static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, TKMovesetHeaderBlocks& blocks_out)
+static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, TKMovesetHeaderBlocks& blocks_out)
 {
 	uint64_t new_moveset_size;
 	Byte* new_moveset = AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out);
@@ -303,6 +303,272 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte* moveset, uin
 
 		memcpy(target, source, old_blocks->GetBlockSize((TTT2::TKMovesetHeaderBlocks_)block));
 	}
+
+	// ** ** //
+	for (unsigned int i = 0; i < table.reactionsCount; ++i)
+	{
+		gAddr::Reactions* target = (gAddr::Reactions*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.reactions) + i;
+		TTT2::Reactions* source = (TTT2::Reactions*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.reactions) + i;
+
+		target->front_pushback = source->front_pushback;
+		target->backturned_pushback = source->front_pushback;
+		target->left_side_pushback = source->front_pushback;
+		target->right_side_pushback = source->front_pushback;
+		target->front_counterhit_pushback = source->front_pushback;
+		target->downed_pushback = source->front_pushback;
+		target->block_pushback = source->front_pushback;
+
+		target->front_direction = source->front_pushback;
+		target->back_direction = source->front_pushback;
+		target->left_side_direction = source->front_pushback;
+		target->right_side_direction = source->front_pushback;
+		target->front_counterhit_direction = source->front_pushback;
+		target->downed_direction = source->front_pushback;
+
+		target->_0x44_int = source->front_pushback;
+		target->_0x48_int = source->front_pushback;
+
+		target->vertical_pushback = source->front_pushback;
+		target->standing_moveid = source->front_pushback;
+		target->default_moveid = source->front_pushback;
+		target->crouch_moveid = source->front_pushback;
+		target->counterhit_moveid = source->front_pushback;
+		target->crouch_counterhit_moveid = source->front_pushback;
+		target->left_side_moveid = source->front_pushback;
+		target->crouch_left_side_moveid = source->front_pushback;
+		target->right_side_moveid = source->front_pushback;
+		target->crouch_right_side_moveid = source->front_pushback;
+		target->backturned_moveid = source->front_pushback;
+		target->crouch_backturned_moveid = source->front_pushback;
+		target->block_moveid = source->front_pushback;
+		target->crouch_block_moveid = source->front_pushback;
+		target->wallslump_moveid = source->front_pushback;
+		target->downed_moveid = source->front_pushback;
+	}
+
+	for (unsigned int i = 0; i < table.pushbackExtradataCount; ++i)
+	{
+		PushbackExtradata* target = (PushbackExtradata*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.pushbackExtradata) + i;
+		TTT2::PushbackExtradata* source = (TTT2::PushbackExtradata*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.pushbackExtradata) + i;
+
+		target->horizontal_offset = source->horizontal_offset;
+	}
+
+	for (unsigned int i = 0; i < table.pushbackCount; ++i)
+	{
+		gAddr::Pushback* target = (gAddr::Pushback*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.pushback) + i;
+		TTT2::Pushback* source = (TTT2::Pushback*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.pushback) + i;
+
+		target->duration = source->duration;
+		target->displacement = source->displacement;
+		target->num_of_loops = source->num_of_loops;
+		target->extradata_addr = source->extradata_addr;
+	}
+
+	for (unsigned int i = 0; i < table.requirementCount; ++i)
+	{
+		Requirement* target = (Requirement*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.requirement) + i;
+		TTT2::Requirement* source = (TTT2::Requirement*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.requirement) + i;
+
+		// todo: alias condition
+		target->condition = source->condition;
+		target->param_unsigned = source->param_unsigned;
+	}
+
+	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
+	{
+		CancelExtradata* target = (CancelExtradata*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancelExtradata) + i;
+		TTT2::CancelExtradata* source = (TTT2::CancelExtradata*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancelExtradata) + i;
+
+		target->value = source->value;
+	}
+
+	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
+	{
+		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i;
+		TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancel) + i;
+
+		target->direction = source->direction;
+		target->button = source->button;
+
+		target->requirements_addr = source->requirements_addr;
+		target->extradata_addr = source->extradata_addr;
+		target->detection_start = source->detection_start;
+		target->detection_end = source->detection_end;
+		target->starting_frame = source->starting_frame;
+		target->move_id = source->move_id;
+		target->cancel_option = source->cancel_option;
+	}
+
+	for (unsigned int i = 0; i < table.groupCancelCount; ++i)
+	{
+		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.groupCancel) + i;
+		TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.groupCancel) + i;
+
+		target->direction = source->direction;
+		target->button = source->button;
+
+		target->requirements_addr = source->requirements_addr;
+		target->extradata_addr = source->extradata_addr;
+		target->detection_start = source->detection_start;
+		target->detection_end = source->detection_end;
+		target->starting_frame = source->starting_frame;
+		target->move_id = source->move_id;
+		target->cancel_option = source->cancel_option;
+	}
+
+	for (unsigned int i = 0; i < table.hitConditionCount; ++i)
+	{
+		gAddr::HitCondition* target = (gAddr::HitCondition*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.hitCondition) + i;
+		TTT2::HitCondition* source = (TTT2::HitCondition*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.hitCondition) + i;
+
+		target->requirements_addr = source->requirements_addr;
+		target->damage = source->damage;
+		target->reactions_addr = source->reactions_addr;
+	}
+
+	for (unsigned int i = 0; i < table.voiceclipCount; ++i)
+	{
+		Voiceclip* target = (Voiceclip*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.voiceclip) + i;
+		TTT2::Voiceclip* source = (TTT2::Voiceclip*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.voiceclip) + i;
+
+		target->id = source->id;
+	}
+
+	for (unsigned int i = 0; i < table.extraMovePropertyCount; ++i)
+	{
+		ExtraMoveProperty* target = (ExtraMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.extraMoveProperty) + i;
+		TTT2::ExtraMoveProperty* source = (TTT2::ExtraMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.extraMoveProperty) + i;
+
+		// todo: alias id
+		target->starting_frame = source->starting_frame;
+		target->id = source->id;
+		target->value_unsigned = source->value_unsigned;
+	}
+
+	for (unsigned int i = 0; i < table.inputCount; ++i)
+	{
+		Input* target = (Input*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.input) + i;
+		TTT2::Input* source = (TTT2::Input*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.input) + i;
+
+		target->direction = source->direction;
+		target->button = source->button;
+	}
+
+	for (unsigned int i = 0; i < table.inputSequenceCount; ++i)
+	{
+		gAddr::InputSequence* target = (gAddr::InputSequence*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.inputSequence) + i;
+		TTT2::InputSequence* source = (TTT2::InputSequence*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.inputSequence) + i;
+
+		// 0x0: int8: not swapping
+		// 0x1: int8: not swapping
+		target->input_amount = source->input_amount;
+		target->input_addr = source->input_addr;
+	}
+
+	for (unsigned int i = 0; i < table.projectileCount; ++i)
+	{
+		gAddr::Projectile* target = (gAddr::Projectile*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.projectile) + i;
+		TTT2::Projectile* source = (TTT2::Projectile*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.projectile) + i;
+
+		// As of this time, don't do any conversion for projectiles
+		// Its format is different from the T7 format
+		// (The data is still there, in big endian, ready to be parsed by any importer)
+	}
+
+	for (unsigned int i = 0; i < table.cameraDataCount; ++i)
+	{
+		CameraData* target = (CameraData*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cameraData) + i;
+		TTT2::CameraData* source = (TTT2::CameraData*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cameraData) + i;
+
+		target->_0x0_int = source->_0x0_int;
+		target->_0x4_short = source->_0x4_short;
+		target->left_side_camera_data = source->left_side_camera_data;
+		target->right_side_camera_data = source->right_side_camera_data;
+		target->_0xA_short = source->_0xA_short;
+	}
+
+	for (unsigned int i = 0; i < table.throwCamerasCount; ++i)
+	{
+		gAddr::ThrowCamera* target = (gAddr::ThrowCamera*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.throwCameras) + i;
+		TTT2::ThrowCamera* source = (TTT2::ThrowCamera*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.throwCameras) + i;
+
+		target->_0x0_llong = source->_0x0_uint;
+		target->cameradata_addr = source->cameradata_addr;
+	}
+
+
+	for (unsigned int i = 0; i < table.unknownParryRelatedCount; ++i)
+	{
+		UnknownParryRelated* target = (UnknownParryRelated*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.unknownParryRelated) + i;
+		TTT2::UnknownParryRelated* source = (TTT2::UnknownParryRelated*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.unknownParryRelated) + i;
+
+		target->value = source->value;
+	}
+
+	for (unsigned int i = 0; i < table.moveBeginningPropCount; ++i)
+	{
+		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveBeginningProp) + i;
+		TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveBeginningProp) + i;
+
+		// todo: alias extraprop / requirement
+		target->requirements_addr = source->requirements_addr;
+		target->extraprop = source->extraprop;
+		target->value = source->value;
+	}
+
+	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
+	{
+		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveEndingProp) + i;
+		TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveEndingProp) + i;
+
+		// todo: alias extraprop / requirement
+		target->requirements_addr = source->requirements_addr;
+		target->extraprop = source->extraprop;
+		target->value = source->value;
+	}
+
+
+	for (unsigned int i = 0; i < table.moveCount; ++i)
+	{
+		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
+		TTT2::Move* source = (TTT2::Move*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
+
+		target->name_addr = source->name_addr;
+		target->anim_name_addr = source->anim_name_addr;
+		target->anim_addr = source->anim_addr;
+		target->vuln = source->vuln;
+		target->hitlevel = source->hitlevel;
+		target->cancel_addr = source->cancel_addr;
+
+		//... more fields omitted here
+		// todo
+
+		target->transition = source->transition;
+
+		target->_0x56_short = source->_0x56_short;
+
+		// Swaps _val1 and 8val2 as an int because that is how they are stored
+		target->moveId_val2 = source->moveId_val2;
+		target->hit_condition_addr = source->hit_condition_addr;
+		target->anim_len = source->anim_len;
+		target->airborne_start = source->airborne_start;
+		target->airborne_end = source->airborne_end;
+		target->ground_fall = source->ground_fall;
+		target->voicelip_addr = source->voicelip_addr;
+		target->extra_move_property_addr = source->extra_move_property_addr;
+		target->move_start_extraprop_addr = source->move_start_extraprop_addr;
+		target->move_end_extraprop_addr = source->move_end_extraprop_addr;
+		target->_0x98_int = source->_0x98_int;
+		target->hitbox_location = source->hitbox_location;
+		target->first_active_frame = source->first_active_frame;
+		target->last_active_frame = source->last_active_frame;
+		target->_0xA8_short = source->_0x6c_short;
+		target->distance = source->distance;
+	}
+
+	moveset = new_moveset;
+	s_moveset = new_moveset_size;
 }
 
 // -- Private methods -- //
@@ -313,8 +579,13 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	// Basic load is tied to online importing where we might want to import the moveset but not populate empty MOTA and apply character-specific fixes just yet
 	const bool BASIC_LOAD = (settings & ImportSettings_BasicLoadOnly) != 0;
 
+	Byte* orig_moveset = moveset;
+
+	TKMovesetHeaderBlocks t7_offsets;
+	ConvertToT7Moveset(header, moveset, s_moveset, t7_offsets);
+
 	// List of data blocks within the moveset
-	const TKMovesetHeaderBlocks* offsets = (const TKMovesetHeaderBlocks*)((char*)header + header->block_list);
+	const TKMovesetHeaderBlocks * offsets = &t7_offsets;
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -405,6 +676,8 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	lastLoaded.charId = header->characterId;
 	lastLoaded.address = gameMoveset;
 	lastLoaded.size = s_moveset;
+
+	delete[] moveset;
 
 	return ImportationErrcode_Successful;
 }
