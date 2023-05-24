@@ -464,6 +464,7 @@ edition.mvl_input.window_name = Liste de coups: Commande
 edition.mvl_input.directions = Directions
 edition.mvl_input.buttons = Boutons
 edition.mvl_input.frame_duration = Durée
+edition.mvl_input.trigger_highlight = Déclencher son
 edition.mvl_input.frame = Image
 edition.mvl_input.frames = images
 

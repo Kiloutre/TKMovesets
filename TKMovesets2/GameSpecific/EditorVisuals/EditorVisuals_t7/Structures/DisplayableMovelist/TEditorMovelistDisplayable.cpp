@@ -79,3 +79,13 @@ void TEditorMovelistDisplayable::OnFieldLabelClick(int listIdx, EditorInput* fie
 		}
 	}
 }
+
+void TEditorMovelistDisplayable::OnResize()
+{
+	BuidAllLabels();
+}
+
+void TEditorMovelistDisplayable::OnReorder()
+{
+	BuidAllLabels();
+}

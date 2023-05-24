@@ -464,6 +464,7 @@ edition.mvl_input.window_name = Movelist: Input
 edition.mvl_input.directions = Directions
 edition.mvl_input.buttons = Buttons
 edition.mvl_input.frame_duration = Duration
+edition.mvl_input.trigger_highlight = Trigger highlight
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 

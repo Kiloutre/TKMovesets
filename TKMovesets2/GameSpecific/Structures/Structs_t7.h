@@ -445,7 +445,7 @@ namespace StructsT7
 			uint16_t command;
 		};
 		uint8_t frame_duration;
-		uint8_t _unkn_0x2;
+		uint8_t trigger_highlight; // I believe this is a bool
 	};
 
 	// .mvl file

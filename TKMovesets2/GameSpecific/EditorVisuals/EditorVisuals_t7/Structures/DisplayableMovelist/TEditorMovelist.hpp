@@ -8,6 +8,8 @@ private:
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 	void BuildItemDetails(int listIdx) override {};
 	void OnUpdate(int listIdx, EditorInput* field) override;
+	void OnResize() override;
+	void OnReorder() override;
 	void BuidAllLabels();
 public:
 	using EditorFormList::EditorFormList;

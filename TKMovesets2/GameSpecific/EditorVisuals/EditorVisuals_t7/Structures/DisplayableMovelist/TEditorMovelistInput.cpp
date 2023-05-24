@@ -22,4 +22,11 @@ void TEditorMovelistInput::BuildItemDetails(int listIdx)
 	std::string commandLabel = editor->GetDisplayableMovelistInputStr(identifierMap["directions"]->buffer, identifierMap["buttons"]->buffer);
 	const char* frameLabel = EditorUtils::GetFieldValue(durationField) > 1 ? "edition.mvl_input.frames" : "edition.mvl_input.frame";
 	item->itemLabel = std::format("{} {} : {}", durationField->buffer, _(frameLabel), commandLabel);
+
+	if (EditorUtils::GetFieldValue(identifierMap["trigger_highlight"]) != 0) {
+		item->color = FORM_ITEM_HIGHLIGHT;
+	}
+	else {
+		item->color = 0;
+	}
 }

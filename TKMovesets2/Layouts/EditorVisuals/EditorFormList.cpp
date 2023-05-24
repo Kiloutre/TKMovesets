@@ -16,6 +16,7 @@ EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindow
 	m_baseWindow = baseWindow;
 	m_listSize = listSize;
 	InitForm(parentWindowName, t_structureId, editor);
+    m_isDeletable = false;
 }
 
 void EditorFormList::OnInitEnd()
@@ -320,6 +321,13 @@ unsigned int EditorFormList::CreateNewItem(int insertionPosition)
 	}
 	BuildItemDetails(insertionPosition);
 
+	for (const std::string& fieldName : drawOrder) {
+		EditorInput* field = item->identifierMap[fieldName];
+		std::string descriptionKey = field->fullName + ".description";
+		field->hoverDescription = Localization::HasText(descriptionKey) ? _(descriptionKey.c_str()) : _(field->fullName.c_str());
+		m_categories.insert(field->category);
+	}
+
 	++m_listSizeChange;
 	++m_listSize;
 
@@ -335,7 +343,6 @@ void EditorFormList::DeleteStructure()
 	popen = false;
 	unsavedChanges = false;
 	OnApplyResize(-origSize, origSize);
-	m_isDeletable = true;
 }
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor)

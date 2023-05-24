@@ -1353,7 +1353,7 @@ InputMap EditorT7::GetListSingleForm(EditorWindowType type, uint16_t id, VectorS
 	switch (type)
 	{
 	case TEditorWindowType_MovelistDisplayable:
-		list = GetMovelistDisplayablesInputs(-1, drawOrder);
+		list = GetMovelistDisplayablesInputs(id, drawOrder, true);
 		break;
 	default:
 		list = GetFormFieldsList(type, id, drawOrder, 1);

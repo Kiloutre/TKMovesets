@@ -180,7 +180,7 @@ void EditorT7::Live_OnMovelistInputEdit(int id, EditorInput* field)
 	else if (name == "frame_duration") {
 		m_process->writeInt8(structAddr + offsetof(MvlInput, frame_duration), value_s8);
 	}
-	else if (name == "_unkn_0x2") {
-		m_process->writeInt8(structAddr + offsetof(MvlInput, _unkn_0x2), value_s8);
+	else if (name == "trigger_highlight") {
+		m_process->writeInt8(structAddr + offsetof(MvlInput, trigger_highlight), value_s8);
 	}
 }

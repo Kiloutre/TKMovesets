@@ -144,7 +144,7 @@ std::vector<InputMap> EditorT7::GetMovelistInputListInputs(uint16_t id, int list
 		CREATE_FIELD("directions", 0, EditorInput_H8, input->directions);
 		CREATE_FIELD("buttons", 0, EditorInput_H8, input->buttons);
 		CREATE_FIELD("frame_duration", 0, EditorInput_U8, input->frame_duration);
-		CREATE_FIELD("_unkn_0x2", 0, EditorInput_U8, input->_unkn_0x2);
+		CREATE_FIELD("trigger_highlight", 0, EditorInput_U8, input->trigger_highlight);
 
 		WriteFieldFullname(inputMap, "mvl_input");
 		inputListMap.push_back(inputMap);
@@ -161,12 +161,12 @@ void EditorT7::SaveMovelistInput(uint16_t id, InputMap& inputs)
 	SetMemberValue(&input->directions, inputs["directions"]);
 	SetMemberValue(&input->buttons, inputs["buttons"]);
 	SetMemberValue(&input->frame_duration, inputs["frame_duration"]);
-	SetMemberValue(&input->_unkn_0x2, inputs["_unkn_0x2"]);
+	SetMemberValue(&input->trigger_highlight, inputs["trigger_highlight"]);
 }
 
 // -- Displayables -- //
 
-std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder)
+std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder, bool singleItem)
 {
 	std::vector<InputMap> inputListMap;
 
@@ -175,10 +175,11 @@ std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, Vecto
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 
-	bool isSingleItem = id == (uint16_t)-1;
+	unsigned int listSize = (unsigned int)m_iterators.mvl_displayables.size();
 
-	for (auto& displayable : m_iterators.mvl_displayables)
+	do
 	{
+		auto& displayable = *m_iterators.mvl_displayables[id];
 		InputMap inputMap;
 
 		CREATE_FIELD("type", 0, EditorInput_H32, displayable.type);
@@ -186,13 +187,13 @@ std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, Vecto
 
 		for (int i = 0; i < _countof(displayable.title_translation_offsets); ++i) {
 			std::string key = "title_translation_" + std::to_string(i);
-			std::string value = isSingleItem ? " " : GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
+			std::string value = GetMovelistDisplayableText(displayable.title_translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
 		for (int i = 0; i < _countof(displayable.translation_offsets); ++i) {
 			std::string key = "translation_" + std::to_string(i);
-			std::string value = isSingleItem ? " " : GetMovelistDisplayableText(displayable.translation_offsets[i]);
+			std::string value = GetMovelistDisplayableText(displayable.translation_offsets[i]);
 
 			CREATE_STRING_FIELD(key, 0, EditorInput_String, value.c_str(), FORM_INPUT_MAX_BUFSIZE);
 		}
@@ -225,10 +226,10 @@ std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, Vecto
 		WriteFieldFullname(inputMap, "mvl_displayable");
 		inputListMap.push_back(inputMap);
 
-		if (isSingleItem) {
+		if (singleItem) {
 			break;
 		}
-	}
+	} while (++id < listSize);
 
 	return inputListMap;
 }
@@ -422,17 +423,25 @@ std::string EditorT7::GetDisplayableMovelistInputStr(const char* directions, con
 		}
 	}
 
-	std::string buttons_str;
-	const char* buttonStrings[4] = { "+2", "+4", "+3", "+1" };
-	for (int i = 0; i < 4; ++i)
-	{
-		if (b & (0x10 << i)) {
-			buttons_str += buttonStrings[i];
-		}
-	}
-
 	if (retVal.size() != 0) {
 		retVal.erase(0, 1);
+	}
+
+	std::string buttons_str;
+	{
+		const char* buttonStrings[4] = { "+2", "+4", "+3", "+1" };
+		std::set<std::string> usedButtons;
+		for (int i = 0; i < 4; ++i)
+		{
+			if (b & (0x10 << i)) {
+				usedButtons.insert(buttonStrings[i]);
+			}
+		}
+
+		// Insert sorted
+		for (auto& button : usedButtons) {
+			buttons_str += button;
+		}
 	}
 
 	if (buttons_str.size() != 0) {

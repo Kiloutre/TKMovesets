@@ -219,7 +219,6 @@ uint32_t EditorT7::DuplicateInput(uint32_t id, size_t listSize)
 
 uint32_t EditorT7::DuplicateMovelistInput(uint32_t id, size_t listSize)
 {
-	DEBUG_LOG("DuplicateMovelistInput\n");
 	unsigned int listCount = (unsigned int)m_iterators.mvl_inputs.size();
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset;
 

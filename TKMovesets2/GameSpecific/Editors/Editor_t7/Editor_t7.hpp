@@ -145,7 +145,7 @@ private:
 	void SaveCameraData(uint16_t id, InputMap& inputs);
 
 	//  Movelist : Displayables
-	std::vector<InputMap> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder);
+	std::vector<InputMap> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder, bool singleItem=false);
 	void SaveMovelistDisplayable(uint16_t id, InputMap& inputs);
 	bool ValidateMovelistDisplayableField(EditorInput* field);
 

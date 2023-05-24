@@ -43,7 +43,7 @@ EditorForm::EditorForm(const std::string& parentWindowName, EditorWindowType t_w
 	m_baseWindow = baseWindow;
 	InitForm(parentWindowName, t_structureId, editor);
 	// Disable single-structure deletion for now.
-	m_isDeletable = false;
+	m_isDeletable = true;
 }
 
 // -- Private methods -- //
