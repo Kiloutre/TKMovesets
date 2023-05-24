@@ -4,6 +4,18 @@
 
 namespace StructsTTT2
 {
+	enum TKMovesetHeaderBlocks_
+	{
+		TKMovesetHeaderBlocks_MovesetInfo,
+		TKMovesetHeaderBlocks_Table,
+		TKMovesetHeaderBlocks_Motalists,
+		TKMovesetHeaderBlocks_Name,
+		TKMovesetHeaderBlocks_Moveset,
+		TKMovesetHeaderBlocks_Animation,
+		TKMovesetHeaderBlocks_Mota,
+		TKMovesetHeaderBlocks_Movelist,
+	};
+
 	// Custom-made offset list containing the list of blocks that compose our extracted moveset
 	// These are arbitrary blocks and do not match the game's moveset 1:1
 	struct TKMovesetHeaderBlocks
@@ -29,6 +41,22 @@ namespace StructsTTT2
 			};
 			uint64_t blocks[8];
 		};
+
+		Byte* GetBlock(TKMovesetHeaderBlocks_ block, Byte* moveset) const
+		{
+			return moveset + blocks[(unsigned int)block];
+		}
+
+		uint64_t GetBlockSize(TKMovesetHeaderBlocks_ block, uint64_t s_moveset = 0) const
+		{
+			unsigned int b = (unsigned int)block;
+			if (b + 1 == _countof(blocks)) {
+				return s_moveset - blocks[block];
+			}
+			else {
+				return blocks[block + 1] - blocks[block];
+			}
+		}
 	};
 
 	// -- Main data type -- //

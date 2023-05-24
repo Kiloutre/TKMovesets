@@ -208,6 +208,7 @@ void EditorT7::SetupIterators_DisplayableMovelist()
 
 void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 {
+	DEBUG_LOG("LoadMovesetPtr(%llu / h%llx)\n", t_movesetSize, t_movesetSize);
 	m_moveset = t_moveset;
 	m_movesetSize = t_movesetSize;
 

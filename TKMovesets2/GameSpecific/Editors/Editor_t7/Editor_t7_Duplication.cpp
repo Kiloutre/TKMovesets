@@ -91,6 +91,7 @@ uint32_t EditorT7::DuplicateMovelistPlayable(uint32_t id, size_t listSize)
 {
 	uint32_t newId = CreateNewMvlPlayable();
 	memcpy(m_iterators.mvl_playables[newId], m_iterators.mvl_playables[id], sizeof(MvlPlayable));
+	m_iterators.mvl_playables.set_size(m_iterators.mvl_playables.size() + 1);
 	return newId;
 }
 
@@ -218,12 +219,14 @@ uint32_t EditorT7::DuplicateInput(uint32_t id, size_t listSize)
 
 uint32_t EditorT7::DuplicateMovelistInput(uint32_t id, size_t listSize)
 {
+	DEBUG_LOG("DuplicateMovelistInput\n");
 	unsigned int listCount = (unsigned int)m_iterators.mvl_inputs.size();
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->inputs_offset;
 
 	ModifyGenericMovelistListSize<MvlInput>(listCount, std::vector(listSize, -1), {}, listHead);
 	auto& list = m_iterators.mvl_inputs;
 	memcpy(list[listCount], list[id], listSize * sizeof(MvlInput));
+	list.set_size(listCount + listSize);
 
 	return (uint32_t)listCount;
 }

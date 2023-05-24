@@ -453,9 +453,16 @@ void EditorForm::Render()
 					{
 						auto structureListSize = GetOriginalStructureListSize();
 						uint32_t newStructure = m_editor->DuplicateStructure(windowType, structureId, structureListSize);
-						justAppliedChanges = true;
-						m_baseWindow->OpenFormWindow(windowType, newStructure, structureListSize);
-						OnDuplication(newStructure, structureListSize);
+						if (newStructure > 0)
+						{
+							justAppliedChanges = true;
+							m_baseWindow->OpenFormWindow(windowType, newStructure, structureListSize);
+							OnDuplication(newStructure, structureListSize);
+						}
+						else
+						{
+							DEBUG_ERR("Duplication of type %u returned ID 0 (not possible)", windowType);
+						}
 					}
 				}
 

@@ -125,7 +125,7 @@ struct EditorInput
 	// Contains the actual string that will be displayed in the form. Write on this freely.
 	std::string displayName;
 	// Description shown on hover
-	std::string hoverDescription = nullptr;
+	std::string hoverDescription;
 	// Use to split various fields into various tree-like categories
 	uint8_t category = 0;
 	// Sets the allowed charset for the input

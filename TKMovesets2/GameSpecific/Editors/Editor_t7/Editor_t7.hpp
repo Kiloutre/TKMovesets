@@ -372,6 +372,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 		}
 		oldSize = ((int)ids.size() - newItemCount) + (int)deletedIds.size();
 		sizeDiff = newSize - oldSize;
+		DEBUG_LOG("ModifyGenericMovelistListSize(%u, , , %llx) - Diff is %d\n", listStart, listStart_offset, sizeDiff);
 	}
 
 	// Compute positions that will be used for copying
@@ -400,6 +401,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 	// Allocate new moveset
 	Byte* newMoveset = (Byte*)calloc(1, newMovesetSize);
 	if (newMoveset == nullptr) {
+		DEBUG_ERR("Failed to allocate new moveset of size %llu", newMovesetSize);
 		return 0;
 	}
 
@@ -455,10 +457,12 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 	}
 
 	// There are blocks to shift in the displayble movelist block
-	if (m_mvlHead != nullptr)
+	if (hasDisplayableMovelist)
 	{
 		uint64_t movelistBlockStart = (m_header->moveset_data_start + m_offsets->movelistBlock);
 		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
+
+		//DEBUG_LOG("%llx < %llx < %llx\n", movelistBlockStart, listPosition, movelistBlockEnd);
 
 		if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd)
 		{
@@ -479,6 +483,10 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 				}
 			}
 		}
+	}
+	else
+	{
+		DEBUG_LOG("No m_mvlHead to modify.\n");
 	}
 
 	// Global moveset blocks must be shifted, better here than later

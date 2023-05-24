@@ -53,7 +53,7 @@ struct TKMovesetHeader
 	uint32_t header_size = (uint32_t)-1;
 	// Offset to the list of blocks
 	uint32_t block_list = (uint32_t)-1;
-	// Size of the list of blocks
+	// Amount of items in the list of blocks
 	uint32_t block_list_size = (uint32_t)-1;
 	// Absolute offset of the block offset list
 	uint32_t moveset_data_start = (uint32_t)-1;

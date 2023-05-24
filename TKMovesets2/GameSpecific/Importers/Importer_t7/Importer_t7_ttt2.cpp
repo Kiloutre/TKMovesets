@@ -5,12 +5,14 @@
 #include "GameIDs.hpp"
 
 #include "Structs_t7.h"
+#include "Structs_ttt2.h"
 
 using namespace StructsT7;
 
 // Contains the same structure as StructsT7 but with gameAddr types instead of ptrs types
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
+#define TTT2 StructsTTT2
 
 // -- -- //
 
@@ -195,6 +197,113 @@ static void EnforceDefaultAliasesAsCurrent(Byte* moveset)
 	}
 }
 
+static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, uint64_t& size_out, TKMovesetHeaderBlocks& blocks_out)
+{
+	auto offsets = (const TTT2::TKMovesetHeaderBlocks*)((char*)header + header->block_list);
+
+	auto movesetInfo = (TTT2::MovesetInfo*)moveset;
+
+	size_t movesetSize = 0;
+	blocks_out.movesetInfoBlock = 0;
+
+	movesetSize += Helpers::align8Bytes(offsetof(TTT2::MovesetInfo, table));
+	blocks_out.tableBlock = movesetSize;
+	movesetSize += Helpers::align8Bytes(sizeof(TTT2::MovesetTable));
+
+	blocks_out.motalistsBlock = movesetSize;
+	movesetSize += Helpers::align8Bytes(sizeof(TTT2::MotaList));
+
+	blocks_out.nameBlock = movesetSize;
+	movesetSize += offsets->GetBlockSize(TTT2::TKMovesetHeaderBlocks_Name, s_moveset);
+
+	size_t movesetBlockSize = 0;
+	movesetBlockSize += sizeof(Reactions) * movesetInfo->table.reactionsCount;
+	movesetBlockSize += sizeof(Requirement) * movesetInfo->table.requirementCount;
+	movesetBlockSize += sizeof(HitCondition) * movesetInfo->table.hitConditionCount;
+	movesetBlockSize += sizeof(Projectile) * movesetInfo->table.projectileCount;
+	movesetBlockSize += sizeof(Pushback) * movesetInfo->table.pushbackCount;
+	movesetBlockSize += sizeof(PushbackExtradata) * movesetInfo->table.pushbackExtradataCount;
+	movesetBlockSize += sizeof(Cancel) * movesetInfo->table.cancelCount;
+	movesetBlockSize += sizeof(Cancel) * movesetInfo->table.groupCancelCount;
+	movesetBlockSize += sizeof(CancelExtradata) * movesetInfo->table.cancelExtradataCount;
+	movesetBlockSize += sizeof(ExtraMoveProperty) * movesetInfo->table.extraMovePropertyCount;
+	movesetBlockSize += sizeof(OtherMoveProperty) * movesetInfo->table.moveBeginningPropCount;
+	movesetBlockSize += sizeof(OtherMoveProperty) * movesetInfo->table.moveEndingPropCount;
+	movesetBlockSize += sizeof(Move) * movesetInfo->table.moveCount;
+	movesetBlockSize += sizeof(Voiceclip) * movesetInfo->table.voiceclipCount;
+	movesetBlockSize += sizeof(InputSequence) * movesetInfo->table.inputSequenceCount;
+	movesetBlockSize += sizeof(Input) * movesetInfo->table.inputCount;
+	movesetBlockSize += sizeof(UnknownParryRelated) * movesetInfo->table.unknownParryRelatedCount;
+	movesetBlockSize += sizeof(CameraData) * movesetInfo->table.cameraDataCount;
+	movesetBlockSize += sizeof(ThrowCamera) * movesetInfo->table.throwCamerasCount;
+	movesetSize += Helpers::align8Bytes(movesetBlockSize);
+
+	blocks_out.animationBlock = movesetSize;
+	movesetSize += offsets->GetBlockSize(TTT2::TKMovesetHeaderBlocks_Animation, s_moveset);
+	blocks_out.motaBlock = movesetSize;
+	movesetSize += offsets->GetBlockSize(TTT2::TKMovesetHeaderBlocks_Mota, s_moveset);
+	blocks_out.movelistBlock = movesetSize;
+
+	Byte* new_moveset = new Byte[movesetSize];
+	size_out = movesetSize;
+	return new_moveset;
+}
+
+static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, TKMovesetHeaderBlocks& blocks_out)
+{
+	uint64_t new_moveset_size;
+	Byte* new_moveset = AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out);
+
+	auto old_blocks = (const TTT2::TKMovesetHeaderBlocks*)((char*)header + header->block_list);
+	auto old_movesetInfo = (TTT2::MovesetInfo*)moveset;
+	auto new_movesetInfo = (MovesetInfo*)new_moveset;
+
+	new_movesetInfo->character_name_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	new_movesetInfo->character_creator_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	new_movesetInfo->date_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	new_movesetInfo->fulldate_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+
+	memcpy(new_movesetInfo->orig_aliases, old_movesetInfo->orig_aliases, sizeof(new_movesetInfo->orig_aliases));
+	memcpy(new_movesetInfo->current_aliases, old_movesetInfo->current_aliases, sizeof(new_movesetInfo->current_aliases));
+	memcpy(new_movesetInfo->unknown_aliases, old_movesetInfo->unknown_aliases, sizeof(new_movesetInfo->unknown_aliases));
+
+	gAddr::MovesetTable& table = (gAddr::MovesetTable&)new_movesetInfo->table;
+	for (unsigned int i = 0; i < _countof(new_movesetInfo->table.entries); ++i) {
+		table.entries[i].listCount = old_movesetInfo->table.entries[i].listCount;
+	}
+
+	table.reactions = 0;
+	table.requirement = table.reactions + sizeof(Reactions) * table.reactionsCount;
+	table.hitCondition = table.requirement + sizeof(Requirement) * table.requirementCount;
+	table.projectile = table.hitCondition + sizeof(HitCondition) * table.hitConditionCount;
+	table.pushback = table.projectile + sizeof(Projectile) * table.projectileCount;
+	table.pushbackExtradata = table.pushback + sizeof(Pushback) * table.pushbackCount;
+	table.cancel = table.pushbackExtradata + sizeof(PushbackExtradata) * table.pushbackExtradataCount;
+	table.groupCancel = table.cancel + sizeof(Cancel) * table.cancelCount;
+	table.cancelExtradata = table.groupCancel + sizeof(Cancel) * table.groupCancelCount;
+	table.extraMoveProperty = table.cancelExtradata + sizeof(CancelExtradata) * table.cancelExtradataCount;
+	table.moveBeginningProp = table.extraMoveProperty + sizeof(ExtraMoveProperty) * table.extraMovePropertyCount;
+	table.moveEndingProp = table.moveBeginningProp + sizeof(OtherMoveProperty) * table.moveBeginningPropCount;
+	table.move = table.moveEndingProp + sizeof(OtherMoveProperty) * table.moveEndingPropCount;
+	table.voiceclip = table.move + sizeof(Move) * table.moveCount;
+	table.inputSequence = table.voiceclip + sizeof(Voiceclip) * table.voiceclipCount;
+	table.input = table.inputSequence + sizeof(InputSequence) * table.inputSequenceCount;
+	table.unknownParryRelated = table.input + sizeof(Input) * table.inputCount;
+	table.cameraData = table.unknownParryRelated + sizeof(UnknownParryRelated) * table.unknownParryRelatedCount;
+	table.throwCameras = table.cameraData + sizeof(CameraData) * table.cameraDataCount;
+
+	for (auto block : std::vector< TKMovesetHeaderBlocks_>{
+		TKMovesetHeaderBlocks_Name,
+		TKMovesetHeaderBlocks_Animation,
+		TKMovesetHeaderBlocks_Mota,
+	})
+	{
+		Byte* target = blocks_out.GetBlock(block, new_moveset);
+		const Byte* source = old_blocks->GetBlock((TTT2::TKMovesetHeaderBlocks_)block, moveset);
+
+		memcpy(target, source, old_blocks->GetBlockSize((TTT2::TKMovesetHeaderBlocks_)block));
+	}
+}
 
 // -- Private methods -- //
 
