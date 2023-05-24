@@ -119,6 +119,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Online/Online_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7.cpp"
+                    "GameSpecific/Importers/Importer_t7/Importer_t7_ttt2.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms_DisplayableMovelist.cpp"

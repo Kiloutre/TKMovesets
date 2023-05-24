@@ -128,7 +128,7 @@ void EditorForm::RenderLabel(int listIdx, EditorInput* field)
 	{
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(field->hoverDescription);
+		ImGui::TextUnformatted(field->hoverDescription.c_str());
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}

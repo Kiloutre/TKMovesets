@@ -82,7 +82,6 @@ navmenu.update_explanation = Une mise à jour a été trouvée.\nVoulez-vous la 
 navmenu.update_bad_file = La mise à jour n'a pas pu s'effectuer automatiquement.\nMettez à jour manuellement.
 
 navmenu.vsync = Synchro verticale
-navmenu.vsync_0 = Aucune
 
 navmenu.changelog = Changements
 
