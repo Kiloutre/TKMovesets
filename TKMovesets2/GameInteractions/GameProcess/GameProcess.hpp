@@ -174,4 +174,7 @@ public:
 	void freeMem(gameAddr addr);
 	// Create a thread in the remote process. Can wait for the end of the thread and receive the thread exit code
 	GameProcessThreadCreation_ createRemoteThread(gameAddr startAddress, uint64_t argument=0, bool waitEnd=false, int32_t* exitCodeThread=nullptr);
+
+	// Scans the main module for an AOB
+	gameAddr AOBScan(const unsigned char* bytes);
 };

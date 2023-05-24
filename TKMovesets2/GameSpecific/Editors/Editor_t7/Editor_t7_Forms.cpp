@@ -1074,7 +1074,7 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 	SetMemberValue(&move->airborne_end, inputs["airborne_end"]);
 	SetMemberValue(&move->ground_fall, inputs["ground_fall"]);
 	SetMemberValue(&move->hitbox_location, inputs["hitbox_location"]);
-	SetMemberValue(&move->last_active_frame, inputs["last_active_frame"]);
+	SetMemberValue(&move->first_active_frame, inputs["first_active_frame"]);
 	SetMemberValue(&move->last_active_frame, inputs["last_active_frame"]);
 	SetMemberValue(&move->distance, inputs["distance"]);
 

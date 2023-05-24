@@ -597,3 +597,31 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 
 	return errcode != GameProcessThreadCreation_Error;
 }
+
+
+gameAddr GameProcess::AOBScan(const unsigned char* bytes)
+{
+	const unsigned int bufsize = 1024;
+	unsigned char buffer[bufsize];
+
+	for (auto& module : GetModuleList())
+	{
+		gameAddr startAddr = module.address;
+		gameAddr endAddr = startAddr + (module.size / bufsize) * bufsize;
+		memset(buffer, 0, bufsize);
+		DEBUG_LOG("%s\n", module.name.c_str());
+		while (startAddr < endAddr)
+		{
+			if (!ReadProcessMemory(m_processHandle, (LPCVOID)startAddr, (LPVOID)buffer, bufsize, nullptr))
+			{
+				DEBUG_LOG("ReadprocessMemory error\n");
+				break;
+			}
+			// todo
+			startAddr += bufsize;
+		}
+	}
+	DEBUG_LOG("fin\n");
+	
+	return 0;
+}
