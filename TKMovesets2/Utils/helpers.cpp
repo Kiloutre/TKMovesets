@@ -315,7 +315,12 @@ namespace Helpers
 
 	bool remoteVersionGreater(const char* otherVersion)
 	{
+		return VersionGreater(PROGRAM_VERSION, otherVersion);
+	}
+
+	bool VersionGreater(const char* version1, const char* version2)
+	{
 		const char* currentVersion = PROGRAM_VERSION;
-		return strcmp(currentVersion, otherVersion) < 0;
+		return strcmp(version1, version2) < 0;
 	}
 }

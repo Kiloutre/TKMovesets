@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "Helpers.hpp"
+
 typedef uint8_t TKMovesetCompressionType;
 enum TKMovesetCompressionType_
 {
@@ -75,6 +77,8 @@ struct TKMovesetHeader
 	char origin[32] = "";
 	// Target character to play on
 	char target_character[32] = "";
+	// Original name of the character
+	char orig_character_name[32] = "";
 
 	// Function to validate some of the header content, first step to ensuring the file isn't badly formated
 	bool ValidateHeader() const
@@ -89,6 +93,12 @@ struct TKMovesetHeader
 		return true;
 	}
 
+	char* GetOrigCharacterName()
+	{
+		// Orig_character_name was introduced in 0.6.4
+		if (Helpers::VersionGreater(version_string, "0.6.4")) return orig_character_name;
+		return target_character;
+	}
 
 	bool isCompressed() const { return compressionType != TKMovesetCompressionType_None; }
 };

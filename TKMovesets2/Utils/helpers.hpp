@@ -253,4 +253,7 @@ namespace Helpers
 
 	// Compares the version of the current program to the given one. Used for updating purposes
 	bool remoteVersionGreater(const char* otherVersion);
+
+	// Returns true if version1 is greater than version2
+	bool VersionGreater(const char* version1, const char* version2);
 }

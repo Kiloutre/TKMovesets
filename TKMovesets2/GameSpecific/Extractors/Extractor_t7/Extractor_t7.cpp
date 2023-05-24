@@ -486,7 +486,10 @@ void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 	memset(infos.gameVersionHash, 0, sizeof(infos.gameVersionHash));
 	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
 	strcpy_s(infos.origin, sizeof(infos.origin), m_gameInfo.name);
-	strcpy_s(infos.target_character, sizeof(infos.target_character), GetPlayerCharacterName(playerAddress).c_str());
+    
+    std::string charName = GetPlayerCharacterName(playerAddress);
+	strcpy_s(infos.target_character, sizeof(infos.target_character), charName.c_str());
+	strcpy_s(infos.orig_character_name, sizeof(infos.orig_character_name), charName.c_str());
 	infos.date = Helpers::getCurrentTimestamp();
 	infos.extraction_date = infos.date;
 
