@@ -411,7 +411,7 @@ void MovesetLoaderT7::InitHooks()
 
 		// Find TK__Log
 		auto funcAddr = addresses.ReadPtrPathInCurrProcess("f_Log_addr", moduleAddr);
-		if (InjectionUtils::compare_memory_string((void*)funcAddr, addresses.GetString("f_Log")))
+		if (Helpers::compare_memory_string((void*)funcAddr, addresses.GetString("f_Log")))
 		{
 			InitHook("TK__Log", funcAddr, (uint64_t)&T7Hooks::Log);
 			DEBUG_LOG("Found Log function\n");

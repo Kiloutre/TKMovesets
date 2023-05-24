@@ -12,6 +12,8 @@ namespace TAnimUtils
 		void ByteswapMota(Byte* motaAddr);
 		// Byteswaps an animation (little endian <-> big endian)
 		void ByteswapAnimation(Byte* animAddr);
+		// Returns true if an animation is in little endian
+		bool IsLittleEndian(Byte* animAddr);
 	};
 
 	namespace FromProcess

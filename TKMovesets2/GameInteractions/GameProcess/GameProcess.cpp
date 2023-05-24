@@ -599,15 +599,18 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 }
 
 
-gameAddr GameProcess::AOBScan(const unsigned char* bytes)
+gameAddr GameProcess::AOBScan(unsigned int startingBytes, const char* bytesString)
 {
-	const unsigned int bufsize = 1024;
+	const unsigned int bufsize = 8192; // Must be a multiple of 4 at the very least
+	const unsigned int readBufUpTo = bufsize - 4;
 	unsigned char buffer[bufsize];
+
+	unsigned int bytesString_len = Helpers::get_memory_string_length(bytesString);
 
 	for (auto& module : GetModuleList())
 	{
 		gameAddr startAddr = module.address;
-		gameAddr endAddr = startAddr + (module.size / bufsize) * bufsize;
+		gameAddr endAddr = startAddr + (module.size / bytesString_len) * bytesString_len;
 		memset(buffer, 0, bufsize);
 		DEBUG_LOG("%s\n", module.name.c_str());
 		while (startAddr < endAddr)
@@ -617,7 +620,35 @@ gameAddr GameProcess::AOBScan(const unsigned char* bytes)
 				DEBUG_LOG("ReadprocessMemory error\n");
 				break;
 			}
-			// todo
+
+			for (unsigned int i = 0; i < readBufUpTo; ++i)
+			{
+				if (*(unsigned int*)&buffer[i] == startingBytes)
+				{
+					bool result;
+
+					if (bufsize - i <= bytesString_len) {
+						result = Helpers::compare_memory_string(&buffer[i], bytesString);
+					} if (endAddr - startAddr <= bytesString_len) {
+						unsigned char* tmp_buffer = new unsigned char[bytesString_len];
+						if (!ReadProcessMemory(m_processHandle, (LPCVOID)startAddr, (LPVOID)tmp_buffer, bytesString_len, nullptr))
+						{
+							DEBUG_LOG("ReadprocessMemory error\n");
+							startAddr = endAddr;
+							break;
+						}
+						result = Helpers::compare_memory_string(tmp_buffer, bytesString);
+						delete[] tmp_buffer;
+					}
+					else {
+						result = false;
+					}
+
+					if (result) {
+						return startAddr + i;
+					}
+				}	
+			}
 			startAddr += bufsize;
 		}
 	}

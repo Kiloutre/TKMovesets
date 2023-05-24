@@ -10,7 +10,7 @@ MovesetLoader* g_loader = nullptr;
 bool g_loading = false;
 
 // -- Debug console -- //
-// Only if compiled in debug mode
+// Only if in debug mode
 
 void InitConsole()
 {

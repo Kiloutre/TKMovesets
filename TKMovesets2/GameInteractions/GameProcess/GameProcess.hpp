@@ -176,5 +176,5 @@ public:
 	GameProcessThreadCreation_ createRemoteThread(gameAddr startAddress, uint64_t argument=0, bool waitEnd=false, int32_t* exitCodeThread=nullptr);
 
 	// Scans the main module for an AOB
-	gameAddr AOBScan(const unsigned char* bytes);
+	gameAddr AOBScan(unsigned int startingBytes, const char* bytesString);
 };

@@ -323,4 +323,74 @@ namespace Helpers
 		const char* currentVersion = PROGRAM_VERSION;
 		return strcmp(version1, version2) < 0;
 	}
+
+	unsigned int get_memory_string_length(const char* bytesString)
+	{
+		unsigned int size = 0;
+		while (*bytesString != '\0')
+		{
+			while (*bytesString == ' ' || !isprint(*bytesString)) ++bytesString; // Ignore spaces
+			if (*bytesString == '\0') break;
+
+			// first byte
+			// second byte
+
+			size += 2;
+
+			++bytesString;
+			if (*bytesString != '\0') ++bytesString;
+		}
+		return size;
+	}
+
+	bool compare_memory_string(void* address, const char* bytesString)
+	{
+		if (address == 0 || bytesString == nullptr) {
+			return false;
+		}
+
+		Byte* currentAddress = (Byte*)address;
+
+		char buf[3]{ 0, 0, 0 };
+
+		while (*bytesString != '\0')
+		{
+			while (*bytesString == ' ' || !isprint(*bytesString)) ++bytesString; // Ignore spaces
+			if (*bytesString == '\0') break;
+
+			Byte b = *currentAddress;
+
+			char firstChar = bytesString[0];
+			char secondChar = *bytesString ? bytesString[1] : '?';
+
+			bool firstCharWildcard = firstChar == '?';
+			bool secondCharWildcard = secondChar == '?' || secondChar == '\0';
+
+			if (firstCharWildcard && secondCharWildcard) {
+				++currentAddress;
+				++bytesString;
+				if (*bytesString != '\0') ++bytesString;
+				continue;
+			}
+			else {
+				buf[1] = '\0';
+				if (secondCharWildcard) {
+					buf[0] = firstChar;
+					b >>= 4;
+				}
+				else {
+					buf[0] = secondChar;
+					b &= 0xF;
+				}
+			}
+
+			Byte value = (Byte)strtol(buf, 0, 16);
+			if (b != value)  return false;
+
+			++currentAddress;
+			++bytesString;
+			if (*bytesString != '\0') ++bytesString;
+		}
+		return true;
+	}
 }

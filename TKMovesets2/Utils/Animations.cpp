@@ -189,6 +189,10 @@ namespace TAnimUtils
 			}
 		}
 
+		bool IsLittleEndian(Byte* animAddr)
+		{
+			return animAddr[1] == 0;
+		}
 	};
 
 	namespace FromProcess

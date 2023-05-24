@@ -256,4 +256,8 @@ namespace Helpers
 
 	// Returns true if version1 is greater than version2
 	bool VersionGreater(const char* version1, const char* version2);
+
+	// Compares a memory area with a memory string such as '00 F7 E1 45 0? 45 ?? ?? 89'
+	bool compare_memory_string(void* address, const char* bytesString);
+	unsigned int get_memory_string_length(const char* bytesString);
 }
