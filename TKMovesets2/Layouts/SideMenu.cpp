@@ -1,5 +1,6 @@
 #include <ImGui.h>
 #include "GLFW/glfw3.h"
+#include "shlobj_core.h"
 
 #include "SideMenu.hpp"
 #include "Localization.hpp"
@@ -8,9 +9,112 @@
 
 bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only);
 
+// -- Static helpers -- //
+
+static void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue)
+{
+	HKEY hkey;
+
+	char szValueCurrent[1000];
+	DWORD dwType;
+	DWORD dwSize = sizeof(szValueCurrent);
+
+	int iRC = RegGetValue(hkeyHive, pszVar, NULL, RRF_RT_ANY, &dwType, szValueCurrent, &dwSize);
+
+	bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
+
+	if (iRC != ERROR_SUCCESS && !bDidntExist)
+		DEBUG_ERR("RegGetValue( %s ): %s", pszVar, strerror(iRC));
+
+	if (!bDidntExist) {
+		if (dwType != REG_SZ)
+			DEBUG_ERR("RegGetValue( %s ) found type unhandled %d", pszVar, dwType);
+
+		if (strcmp(szValueCurrent, pszValue) == 0) {
+			DEBUG_ERR("RegSet( \"%s\" \"%s\" ): already correct", pszVar, pszValue);
+			return;
+		}
+	}
+
+	DWORD dwDisposition;
+	iRC = RegCreateKeyEx(hkeyHive, pszVar, 0, 0, 0, KEY_ALL_ACCESS, NULL, &hkey, &dwDisposition);
+	if (iRC != ERROR_SUCCESS)
+		DEBUG_ERR("RegCreateKeyEx( %s ): %s", pszVar, strerror(iRC));
+
+	iRC = RegSetValueEx(hkey, "", 0, REG_SZ, (BYTE*)pszValue, strlen(pszValue) + 1);
+	if (iRC != ERROR_SUCCESS)
+		DEBUG_ERR("RegSetValueEx( %s ): %s", pszVar, strerror(iRC));
+
+	if (bDidntExist)
+		DEBUG_ERR("RegSet( %s ): set to \"%s\"", pszVar, pszValue);
+	else
+		DEBUG_ERR("RegSet( %s ): changed \"%s\" to \"%s\"", pszVar, szValueCurrent, pszValue);
+
+	RegCloseKey(hkey);
+}
+
+static void RegSetW(HKEY hkeyHive, const wchar_t* pszVar, const wchar_t* pszValue)
+{
+	HKEY hkey;
+
+	wchar_t szValueCurrent[1000];
+	DWORD dwType;
+	DWORD dwSize = sizeof(szValueCurrent);
+
+	int iRC = RegGetValueW(hkeyHive, pszVar, NULL, RRF_RT_ANY, &dwType, szValueCurrent, &dwSize);
+
+	bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
+
+	if (iRC != ERROR_SUCCESS && !bDidntExist)
+		DEBUG_ERR("RegGetValue( %S ): %S", pszVar, strerror(iRC));
+
+	if (!bDidntExist) {
+		if (dwType != REG_SZ)
+			DEBUG_ERR("RegGetValue( %S ) found type unhandled %d", pszVar, dwType);
+
+		if (wcscmp(szValueCurrent, pszValue) == 0) {
+			DEBUG_ERR("RegSet( \"%S\" \"%S\" ): already correct", pszVar, pszValue);
+			return;
+		}
+	}
+
+	DWORD dwDisposition;
+	iRC = RegCreateKeyExW(hkeyHive, pszVar, 0, 0, 0, KEY_ALL_ACCESS, NULL, &hkey, &dwDisposition);
+	if (iRC != ERROR_SUCCESS)
+		DEBUG_ERR("RegCreateKeyEx( %S ): %S", pszVar, strerror(iRC));
+
+	iRC = RegSetValueExW(hkey, L"", 0, REG_SZ, (BYTE*)pszValue, (wcslen(pszValue) + 1) * sizeof(wchar_t));
+	if (iRC != ERROR_SUCCESS)
+		DEBUG_ERR("RegSetValueEx( %S ): %S", pszVar, strerror(iRC));
+
+	if (bDidntExist)
+		DEBUG_ERR("RegSet( %S ): set to \"%S\"", pszVar, pszValue);
+	else
+		DEBUG_ERR("RegSet( %S ): changed \"%S\" to \"%S\"", pszVar, szValueCurrent, pszValue);
+
+	RegCloseKey(hkey);
+}
+
+static void SetWindowsFileAssociation()
+{
+	wchar_t program_path[MAX_PATH] = { 0 };
+	GetModuleFileNameW(nullptr, program_path, MAX_PATH);
+	std::wstring command = L"\"" + std::wstring(program_path) + L"\" \"%1\"";
+
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkmvst", "tkmvst_file");
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanim64", "tkanim_file");
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanimC8", "tkanim_file");
+
+	RegSetW(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\TKMovesets2\\shell\\open\\command", command.c_str());
+	RegSetW(HKEY_CURRENT_USER, L"Software\\Classes\\tkmvst_file\\shell\\open\\command", command.c_str());
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\tkmvst_file", "TKM Moveset");
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\tkanim_file", "TKM Animation");
+
+	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+}
+
 
 // -- Public methods -- //
-
 
 SideMenu::SideMenu()
 {
@@ -23,7 +127,6 @@ SideMenu::~SideMenu()
 {
 	CleanupThread();
 }
-
 
 void SideMenu::Render(float width)
 {
@@ -130,4 +233,10 @@ void SideMenu::Render(float width)
 
 		ImGui::EndPopup();
 	}
+
+	/*
+	if (ImGui::Button(_("sidemenu.file_association"))) {
+		SetWindowsFileAssociation();
+	}
+	*/
 }
