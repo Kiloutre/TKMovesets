@@ -224,6 +224,9 @@ static void HandleFileArgument(const std::wstring& argFile)
 	}
 	else {
 		std::wstring filename = argFile.substr(argFile.find_last_of(L"\\") + 1);
+		std::wstring name = filename.substr(0, filename.find_last_of(L"."));
+
+		DEBUG_LOG("Filename is '%S'\n", filename.c_str());
 
 		if (Helpers::endsWith<std::wstring>(argFile, L"" MOVESET_FILENAME_EXTENSION))
 		{
@@ -239,7 +242,7 @@ static void HandleFileArgument(const std::wstring& argFile)
 			{
 				DEBUG_LOG("File already exists\n");
 				const std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\extracted_chars\\";
-				std::wstring name = filename.substr(0, filename.find_last_of(L"."));
+				
 				unsigned int number = 2;
 				target = prefix + name + L" (" + std::to_wstring(number) + L") " MOVESET_FILENAME_EXTENSION;
 				while (Helpers::fileExists(target.c_str()))
@@ -262,6 +265,38 @@ static void HandleFileArgument(const std::wstring& argFile)
 			|| Helpers::endsWith<std::wstring>(argFile, L"" ANIMATION_EXTENSION L"C8"))
 		{
 			// Animation file: move to animation library
+			std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\" EDITOR_LIB_DIRECTORY "\\";
+			std::wstring outputFolder = prefix + L"EXTERNAL\\";
+			CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
+			CreateDirectoryW(outputFolder.c_str(), nullptr);
+
+			std::wstring outputFile = outputFolder + filename;
+
+			if (wcscmp(outputFile.c_str(), argFile.c_str()) == 0 || Helpers::startsWith<std::wstring>(argFile, prefix)) {
+				DEBUG_LOG("Not copying anim file: already in our folders\n");
+				return;
+			}
+
+			if (Helpers::fileExists(outputFile.c_str()))
+			{
+				unsigned int number = 2;
+				std::wstring extension = filename.substr(filename.find_last_of(L"."));
+				outputFile = outputFolder + name + L" (" + std::to_wstring(number) + L")" + extension;
+				while (Helpers::fileExists(outputFile.c_str()))
+				{
+					++number;
+					outputFile = outputFolder + name + L" (" + std::to_wstring(number) + L")" + extension;
+				}
+			}
+
+			DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
+			std::filesystem::copy_file(argFile, outputFile);
+			try {
+				std::filesystem::remove(argFile);
+			}
+			catch (std::filesystem::filesystem_error const&) {
+				DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", argFile.c_str());
+			}
 		}
 	}
 }
