@@ -102,14 +102,14 @@ static void SetWindowsFileAssociation()
 	std::wstring command = L"\"" + std::wstring(program_path) + L"\" \"%1\"";
 
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_FILENAME_EXTENSION, "tkmvst_file");
-	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanim64", "tkanim_file");
-	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanimC8", "tkanim_file");
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanim64", "tkanim_file");
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanimC8", "tkanim_file");
 
 	RegSetW(HKEY_CURRENT_USER, L"Software\\Classes\\Applications\\TKMovesets2\\shell\\open\\command", command.c_str());
 	RegSetW(HKEY_CURRENT_USER, L"Software\\Classes\\tkmvst_file\\shell\\open\\command", command.c_str());
-	RegSetW(HKEY_CURRENT_USER, L"Software\\Classes\\tkanim_file\\shell\\open\\command", command.c_str());
-	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\tkmvst_file", "TKM Moveset");
-	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\tkanim_file", "TKM Animation");
+	//RegSetW(HKEY_CURRENT_USER, L"Software\\Classes\\tkanim_file\\shell\\open\\command", command.c_str());
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\tkmvst_file", "TKM Moveset");
+	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\tkanim_file", "TKM Animation");
 
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 }
