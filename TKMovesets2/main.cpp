@@ -74,8 +74,8 @@ static void InitMainClasses(MainWindow& program)
 	program.onlineMenu.gameHelper = &program.sharedMem;
 	program.persistentPlayMenu.gameHelper = &program.sharedMem;
 
-	program.navMenu.requestedUpdatePtr = &program.requestedUpdate;
-	program.navMenu.SetAddrFile(addrFile);
+	program.sideMenu.requestedUpdatePtr = &program.requestedUpdate;
+	program.sideMenu.SetAddrFile(addrFile);
 
 	{
 		// Detect running games and latch on to them if possible
@@ -365,7 +365,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		program.Shutdown();
 
 		if (program.requestedUpdate) {
-			program.navMenu.CleanupThread();
+			program.sideMenu.CleanupThread();
 			StartProcess(std::string(UPDATE_TMP_FILENAME) + ".exe");
 		}
 	}

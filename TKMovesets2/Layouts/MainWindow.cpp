@@ -97,16 +97,27 @@ void MainWindow::Update()
 
 	if (ImGui::Begin("###", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking))
 	{
-		const int navMenuWidth = 160;
+		const int sidebarWidth = 160;
 
 		const float width = mainView->Size.x;
 		const float height = mainView->Size.y;
 
-		// Navbar
-		if (navMenuWidth > 0)
+		// Sidebar
 		{
-			ImGui::BeginChild("Navbar", ImVec2(navMenuWidth, 0), true, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
-			navMenu.Render((float)(navMenuWidth - 10), persistentPlayMenu.gameHelper->lockedIn);
+			float sideMenuWidth = (float)(sidebarWidth - 10);
+
+			ImGui::BeginChild("SideBar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+
+			// Render nav menu
+			navMenu.Render(sideMenuWidth, persistentPlayMenu.gameHelper->lockedIn);
+
+			ImGui::NewLine();
+			ImGui::NewLine();
+			ImGui::Separator();
+
+			// Render side menu
+			sideMenu.Render(sideMenuWidth);
+
 			ImGui::EndChild();
 		}
 
@@ -114,7 +125,7 @@ void MainWindow::Update()
 		// Menus
 		{
 			ImGui::SameLine();
-			ImGui::BeginChild("Tools", ImVec2(width - navMenuWidth - 25, 0), false, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
+			ImGui::BeginChild("Tools", ImVec2(width - sidebarWidth - 25, 0), false, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 			switch (navMenu.menuId)
 			{

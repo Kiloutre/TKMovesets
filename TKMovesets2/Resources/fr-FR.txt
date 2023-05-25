@@ -73,17 +73,17 @@ navmenu.category_other = Autre
 navmenu.documentation = Documentation
 navmenu.about = À propos
 
-navmenu.up_to_date = À jour
-navmenu.updated_addr = Addresses à jour !
-navmenu.update_check = Vérification...
-navmenu.update = Mettre à jour
-navmenu.update_error = MÀJ Erreur 
-navmenu.update_explanation = Une mise à jour a été trouvée.\nVoulez-vous la télécharger et relancer le programme maintenant ?
-navmenu.update_bad_file = La mise à jour n'a pas pu s'effectuer automatiquement.\nMettez à jour manuellement.
+sidemenu.up_to_date = À jour
+sidemenu.updated_addr = Addresses à jour !
+sidemenu.update_check = Vérification...
+sidemenu.update = Mettre à jour
+sidemenu.update_error = MÀJ Erreur 
+sidemenu.update_explanation = Une mise à jour a été trouvée.\nVoulez-vous la télécharger et relancer le programme maintenant ?
+sidemenu.update_bad_file = La mise à jour n'a pas pu s'effectuer automatiquement.\nMettez à jour manuellement.
 
-navmenu.vsync = Synchro verticale
+sidemenu.vsync = Synchro verticale
 
-navmenu.changelog = Changements
+sidemenu.changelog = Changements
 
 ## Sous-menus ##
 

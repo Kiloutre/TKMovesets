@@ -2,14 +2,15 @@
 
 // Toplevel menus
 #include "NavigationMenu.hpp"
-// Editor window
-#include "EditorVisuals.hpp"
+#include "SideMenu.hpp"
 // Submenus
 #include "Submenu_Import.hpp"
 #include "Submenu_Extract.hpp"
 #include "Submenu_Edition.hpp"
 #include "Submenu_OnlinePlay.hpp"
 #include "Submenu_PersistentPlay.hpp"
+// Editor window
+#include "EditorVisuals.hpp"
 
 // Other
 #include "GameExtract.hpp"
@@ -28,6 +29,8 @@ public:
 
 	// Navigation menu, also handles language selection and update button
 	NavigationMenu navMenu;
+	// Side menu containing language selector, vsync, updater & other settings
+	SideMenu sideMenu;
 
 	// Extractor instance, can attach to its own process separately from everyone else
 	GameExtract extractor;

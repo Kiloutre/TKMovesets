@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "NavigationMenu.hpp"
+#include "SideMenu.hpp"
 #include "helpers.hpp"
 
 #include "constants.h"
@@ -84,7 +84,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 	}
 
 	updateStatus->tagName = tagName;
-	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("navmenu.changelog"), tagName);
+	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("sidemenu.changelog"), tagName);
 	{
 		std::vector<std::string> changelogLines;
 		std::string delim = "\n";
@@ -251,7 +251,7 @@ static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
 }
 
 
-void NavigationMenu::CheckForUpdates(bool firstTime)
+void SideMenu::CheckForUpdates(bool firstTime)
 {
 	DEBUG_LOG("::CheckForUpdates(%d)\n", firstTime);
 	bool updatedAnything = false;
@@ -281,7 +281,7 @@ void NavigationMenu::CheckForUpdates(bool firstTime)
 }
 
 
-void NavigationMenu::RequestCheckForUpdates()
+void SideMenu::RequestCheckForUpdates()
 {
 	if (m_addresses == nullptr || m_updateStatus.verifying) {
 		return;
@@ -299,12 +299,12 @@ void NavigationMenu::RequestCheckForUpdates()
 
 	m_updateStatus.verifying = true;
 	// Start thread to avoid HTTP thread hanging the display thread
-	m_updateStatus.thread = std::thread(&NavigationMenu::CheckForUpdates, this, !m_updateStatus.verifiedOnce);
+	m_updateStatus.thread = std::thread(&SideMenu::CheckForUpdates, this, !m_updateStatus.verifiedOnce);
 	m_updateStatus.verifiedOnce = true;
 }
 
 
-void NavigationMenu::SetAddrFile(GameAddressesFile* addresses)
+void SideMenu::SetAddrFile(GameAddressesFile* addresses)
 {
 	m_addresses = addresses;
 #ifndef BUILD_TYPE_DEBUG
@@ -313,7 +313,7 @@ void NavigationMenu::SetAddrFile(GameAddressesFile* addresses)
 #endif
 }
 
-void NavigationMenu::CleanupThread()
+void SideMenu::CleanupThread()
 {
 	if (m_updateStatus.verifiedOnce) {
 		m_updateStatus.thread.join();

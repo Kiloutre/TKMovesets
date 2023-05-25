@@ -77,6 +77,7 @@ set(BINARY_SOURCES
                     # Main Layout
                     "Layouts/MainWindow.cpp"
                     "Layouts/NavigationMenu.cpp"
+                    "Layouts/SideMenu.cpp"
                     # Layout: submenus
                     "Layouts/Submenus/Submenu_Extract.cpp"
                     "Layouts/Submenus/Submenu_Import.cpp"
