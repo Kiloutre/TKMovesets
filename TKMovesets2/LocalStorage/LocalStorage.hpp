@@ -12,6 +12,7 @@ struct movesetInfo
 	int color; // Color is defined by moveset flags
 	std::wstring filename;
 	std::string name;
+	std::wstring wname;
 	FasterStringComp origin;
 	std::string target_character;
 	std::string version_string;

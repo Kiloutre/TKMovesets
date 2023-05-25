@@ -589,7 +589,7 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 
 // -- Anim extraction -- //
 
-void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
+void EditorT7::OrderAnimationsExtraction(const std::wstring& characterFilename)
 {
 	if (animationExtractionStatus & AnimExtractionStatus_Started) {
 		return;
@@ -619,13 +619,13 @@ void EditorT7::OrderAnimationsExtraction(const std::string& characterFilename)
 	*animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, characterFilename, offsets, animOffsetToNameOffset);
 }
 
-void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, TKMovesetHeaderBlocks offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset)
+void EditorT7::ExtractAnimations(Byte* moveset, std::wstring characterFilename, TKMovesetHeaderBlocks offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset)
 {
-	std::string outputFolder;
+	std::wstring outputFolder;
 
-	outputFolder = std::format(EDITOR_LIB_DIRECTORY "/{}", characterFilename.c_str());
-	CreateDirectoryA(EDITOR_LIB_DIRECTORY, nullptr);
-	CreateDirectory(outputFolder.c_str(), nullptr);
+	outputFolder = L"" EDITOR_LIB_DIRECTORY "/" + characterFilename;
+	CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
+	CreateDirectoryW(outputFolder.c_str(), nullptr);
 
 	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 	Byte* movesetData = moveset + header->moveset_data_start;
@@ -667,7 +667,9 @@ void EditorT7::ExtractAnimations(Byte* moveset, std::string characterFilename, T
 			}
 		}
 
-		std::string filename = std::format("{}/{}" ANIMATION_EXTENSION "{:X}" , outputFolder, name, animType);
+		std::wstring wname = *name == 0 ? std::to_wstring(idx) : Helpers::to_unicode(name);
+		std::wstring filename = outputFolder + L"/" + wname + L"" ANIMATION_EXTENSION + (animType == 0xC8 ? L"C8" : L"64");
+
 		// todo: check if anim exists already
 		std::ofstream file(filename.c_str(), std::ios::binary);
 
@@ -689,7 +691,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	std::wstring animName_wstr = filepath;
 	animName_wstr = animName_wstr.substr(animName_wstr.find_last_of(L"/\\") + 1);
 	animName_wstr = animName_wstr.substr(0, animName_wstr.find_last_of(L'.'));
-	std::string animName_str = Helpers::wstring_to_string(animName_wstr);
+	std::string animName_str = Helpers::to_utf8(animName_wstr);
 
 	Byte* anim;
 	uint64_t animSize;

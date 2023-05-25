@@ -158,6 +158,7 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 	m_liveEditable = Games::IsGameLiveEditable(movesetInfo->gameId, movesetInfo->minorVersion);
 
 	m_loadedCharacter.filename = movesetInfo->filename;
+	m_loadedCharacter.wname = movesetInfo->wname;
 	m_loadedCharacter.name = movesetInfo->name;
 	m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(movesetInfo->date);
 	filename = m_loadedCharacter.filename.c_str();

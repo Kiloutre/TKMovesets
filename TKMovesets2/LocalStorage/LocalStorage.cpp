@@ -61,6 +61,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.color = getMovesetColor(movesetInfos.flags),
 				.filename = filename,
 				.name = Helpers::getMovesetNameFromFilename(filename),
+				.wname = Helpers::getMovesetWNameFromFilename(filename),
 				.origin = std::string(movesetInfos.origin),
 				.target_character = std::string(movesetInfos.target_character),
 				.version_string = std::string(movesetInfos.version_string),

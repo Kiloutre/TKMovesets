@@ -96,7 +96,7 @@ void TEditorMove_Animations::LoadAnimationList()
 				continue;
 			}
 
-			std::string name = Helpers::wstring_to_string(filename.substr(filename.find_last_of(L"/\\") + 1));
+			std::string name = Helpers::to_utf8(filename.substr(filename.find_last_of(L"/\\") + 1));
 			name = name.substr(0, name.find_last_of('.'));
 			std::string lowercaseName = name;
 			std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);

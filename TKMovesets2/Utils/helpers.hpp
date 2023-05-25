@@ -238,6 +238,7 @@ namespace Helpers
 
     // Converts filename into displayable name. U32 for UTF8
     std::string getMovesetNameFromFilename(const std::wstring& filename);
+    std::wstring getMovesetWNameFromFilename(const std::wstring& filename);
 
     // Returns true if one of the header strings is not properly formatted indicating a bad moveset file
     bool isHeaderStringMalformated(const char* string, size_t size);

@@ -13,6 +13,7 @@ class GameSharedMem;
 struct EditorInfos
 {
 	std::wstring filename;
+	std::wstring wname;
 	std::string name;
 	std::string lastSavedDate;
 	int32_t gameId;
@@ -53,7 +54,7 @@ protected:
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
-	EditorInfos m_loadedCharacter = { .filename = L"", .name = "", .lastSavedDate = "", .gameId = -1};
+	EditorInfos m_loadedCharacter = { .filename = L"", .wname = L"", .name = "", .lastSavedDate = "", .gameId = -1};
 	// True if we need to enable the save button
 	bool m_savedLastChange = true;
 	// If the moveset can be live edited or not (need to actually code it)

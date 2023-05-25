@@ -255,6 +255,19 @@ namespace Helpers
 		}
 	}
 
+	std::wstring getMovesetWNameFromFilename(const std::wstring& filename)
+	{
+		size_t lastSlash = filename.find_last_of(L"/\\");
+		std::wstring tmp;
+
+		if (lastSlash == std::string::npos) {
+			return filename.substr(0, filename.size() - strlen(MOVESET_FILENAME_EXTENSION));
+		}
+		else {
+			return filename.substr(lastSlash + 1, filename.size() - lastSlash - strlen(MOVESET_FILENAME_EXTENSION) - 1);
+		}
+	}
+
 	bool isHeaderStringMalformated(const char* str, size_t size)
 	{
 		size_t i = 0;

@@ -227,6 +227,7 @@ static void HandleFileArgument(const std::wstring& argFile)
 
 		if (Helpers::endsWith<std::wstring>(argFile, L"" MOVESET_FILENAME_EXTENSION))
 		{
+			// Moveset file : Move to "extracted_chars" folder
 			std::wstring target = std::wstring(std::filesystem::current_path()) + L"\\extracted_chars\\" + filename;
 
 			if (wcscmp(target.c_str(), argFile.c_str()) == 0) {
@@ -256,6 +257,11 @@ static void HandleFileArgument(const std::wstring& argFile)
 			catch (std::filesystem::filesystem_error const&) {
 				DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", argFile.c_str());
 			}
+		}
+		else if (Helpers::endsWith<std::wstring>(argFile, L"" ANIMATION_EXTENSION L"64")
+			|| Helpers::endsWith<std::wstring>(argFile, L"" ANIMATION_EXTENSION L"C8"))
+		{
+			// Animation file: move to animation library
 		}
 	}
 }
@@ -296,6 +302,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		}
 	}
 
+	// Handle file arguments
 	{
 		auto cmdLine = GetCommandLineW();
 		int argc;
