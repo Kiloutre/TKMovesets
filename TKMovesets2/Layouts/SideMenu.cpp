@@ -101,7 +101,7 @@ static void SetWindowsFileAssociation()
 	GetModuleFileNameW(nullptr, program_path, MAX_PATH);
 	std::wstring command = L"\"" + std::wstring(program_path) + L"\" \"%1\"";
 
-	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkmvst", "tkmvst_file");
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_FILENAME_EXTENSION, "tkmvst_file");
 	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanim64", "tkanim_file");
 	//RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanimC8", "tkanim_file");
 
@@ -234,9 +234,10 @@ void SideMenu::Render(float width)
 		ImGui::EndPopup();
 	}
 
-	/*
+	
+	ImGui::Separator();
 	if (ImGui::Button(_("sidemenu.file_association"))) {
 		SetWindowsFileAssociation();
 	}
-	*/
+	
 }

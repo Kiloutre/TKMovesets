@@ -215,6 +215,51 @@ void CleanupUpdateFiles(const std::string& filename);
 
 // -- main -- //
 
+static void HandleFileArgument(const std::wstring& argFile)
+{
+	DEBUG_LOG("Argument: '%S'\n", argFile.c_str());
+
+	if (!Helpers::fileExists(argFile.c_str())) {
+		DEBUG_ERR("File does not exist: '%S'", argFile.c_str());
+	}
+	else {
+		std::wstring filename = argFile.substr(argFile.find_last_of(L"\\") + 1);
+
+		if (Helpers::endsWith<std::wstring>(argFile, L"" MOVESET_FILENAME_EXTENSION))
+		{
+			std::wstring target = std::wstring(std::filesystem::current_path()) + L"\\extracted_chars\\" + filename;
+
+			if (wcscmp(target.c_str(), argFile.c_str()) == 0) {
+				DEBUG_LOG("Not copying moveset: already in our folders\n");
+				return;
+			}
+
+			if (Helpers::fileExists(target.c_str()))
+			{
+				DEBUG_LOG("File already exists\n");
+				const std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\extracted_chars\\";
+				std::wstring name = filename.substr(0, filename.find_last_of(L"."));
+				unsigned int number = 2;
+				target = prefix + name + L" (" + std::to_wstring(number) + L") " MOVESET_FILENAME_EXTENSION;
+				while (Helpers::fileExists(target.c_str()))
+				{
+					++number;
+					target = prefix + name + L" (" + std::to_wstring(number) + L")" MOVESET_FILENAME_EXTENSION;
+				}
+			}
+
+			DEBUG_LOG("Copying to target '%S'..\n", target.c_str());
+			std::filesystem::copy_file(argFile, target);
+			try {
+				std::filesystem::remove(argFile);
+			}
+			catch (std::filesystem::filesystem_error const&) {
+				DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", argFile.c_str());
+			}
+		}
+	}
+}
+
 int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LPSTR lpCmdLine, _In_  int nShowCmd)
 {
 #ifdef BUILD_TYPE_DEBUG
@@ -251,6 +296,24 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		}
 	}
 
+	{
+		auto cmdLine = GetCommandLineW();
+		int argc;
+		auto argv = CommandLineToArgvW(cmdLine, &argc);
+
+		if (argc == 2) {
+			HandleFileArgument(argv[1]);
+
+			DWORD currPid = GetCurrentProcessId();
+			for (auto& process : GameProcessUtils::GetRunningProcessList())
+			{
+				if (process.name == PROGRAM_FILENAME && process.pid != currPid) {
+					DEBUG_LOG("Not starting another instance of this software if using args.\n");
+					return 0;
+				}
+			}
+		}
+	}
 
 	// Initialize GLFW library
 	glfwSetErrorCallback(glfw_error_callback);
