@@ -241,7 +241,7 @@ static void HandleFileArgument(const std::wstring& argFile)
 			if (Helpers::fileExists(target.c_str()))
 			{
 				DEBUG_LOG("File already exists\n");
-				const std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\extracted_chars\\";
+				const std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\" MOVESET_DIRECTORY L"\\";
 				
 				unsigned int number = 2;
 				target = prefix + name + L" (" + std::to_wstring(number) + L") " MOVESET_FILENAME_EXTENSION;
@@ -252,6 +252,8 @@ static void HandleFileArgument(const std::wstring& argFile)
 				}
 			}
 
+
+			CreateDirectoryW(L"" MOVESET_DIRECTORY, nullptr);
 			DEBUG_LOG("Copying to target '%S'..\n", target.c_str());
 			std::filesystem::copy_file(argFile, target);
 			try {
@@ -267,6 +269,7 @@ static void HandleFileArgument(const std::wstring& argFile)
 			// Animation file: move to animation library
 			std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\" EDITOR_LIB_DIRECTORY "\\";
 			std::wstring outputFolder = prefix + L"EXTERNAL\\";
+
 			CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
 			CreateDirectoryW(outputFolder.c_str(), nullptr);
 

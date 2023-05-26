@@ -513,13 +513,13 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 			writeOffset += sizeof(T);
 
 			if (id != -1) {
-				// Copy old structure data from its previous position (likely to not have changed but this handles reodering just fine)
-				readOffset = listPosition + (sizeof(T) * id);
+				// Copy old structure data from its previous position (likely to be unchanged, but this handles reordering just fine)
+				readOffset = listPosition + (sizeof(T) * (id - listStart));
 			}
 			else {
 				// Try to use existing data from deleted lists. This can be useful in rare cases like MvlDisplayables.
 				if (it != deletedIds.end()) {
-					readOffset = listPosition + (sizeof(T) * id);
+					readOffset = listPosition + (sizeof(T) * *it);
 					std::advance(it, 1);
 				}
 				else {
