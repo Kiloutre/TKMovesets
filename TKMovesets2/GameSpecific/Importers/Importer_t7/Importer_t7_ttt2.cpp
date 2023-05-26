@@ -216,6 +216,7 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	blocks_out.nameBlock = movesetSize;
 	movesetSize += offsets->GetBlockSize(TTT2::TKMovesetHeaderBlocks_Name, s_moveset);
 
+	blocks_out.movesetBlock = movesetSize;
 	size_t movesetBlockSize = 0;
 	movesetBlockSize += sizeof(Reactions) * movesetInfo->table.reactionsCount;
 	movesetBlockSize += sizeof(Requirement) * movesetInfo->table.requirementCount;
@@ -292,6 +293,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	table.cameraData = table.unknownParryRelated + sizeof(UnknownParryRelated) * table.unknownParryRelatedCount;
 	table.throwCameras = table.cameraData + sizeof(CameraData) * table.cameraDataCount;
 
+	/*
 	for (auto block : std::vector< TKMovesetHeaderBlocks_>{
 		TKMovesetHeaderBlocks_Name,
 		TKMovesetHeaderBlocks_Animation,
@@ -303,12 +305,13 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 
 		memcpy(target, source, old_blocks->GetBlockSize((TTT2::TKMovesetHeaderBlocks_)block));
 	}
+	*/
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
 	{
 		gAddr::Reactions* target = (gAddr::Reactions*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.reactions) + i;
-		TTT2::Reactions* source = (TTT2::Reactions*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.reactions) + i;
+		const TTT2::Reactions* source = (TTT2::Reactions*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.reactions) + i;
 
 		target->front_pushback = source->front_pushback;
 		target->backturned_pushback = source->front_pushback;
@@ -349,7 +352,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.pushbackExtradataCount; ++i)
 	{
 		PushbackExtradata* target = (PushbackExtradata*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.pushbackExtradata) + i;
-		TTT2::PushbackExtradata* source = (TTT2::PushbackExtradata*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.pushbackExtradata) + i;
+		const TTT2::PushbackExtradata* source = (TTT2::PushbackExtradata*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.pushbackExtradata) + i;
 
 		target->horizontal_offset = source->horizontal_offset;
 	}
@@ -357,7 +360,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.pushbackCount; ++i)
 	{
 		gAddr::Pushback* target = (gAddr::Pushback*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.pushback) + i;
-		TTT2::Pushback* source = (TTT2::Pushback*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.pushback) + i;
+		const TTT2::Pushback* source = (TTT2::Pushback*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.pushback) + i;
 
 		target->duration = source->duration;
 		target->displacement = source->displacement;
@@ -368,7 +371,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.requirementCount; ++i)
 	{
 		Requirement* target = (Requirement*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.requirement) + i;
-		TTT2::Requirement* source = (TTT2::Requirement*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.requirement) + i;
+		const TTT2::Requirement* source = (TTT2::Requirement*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.requirement) + i;
 
 		// todo: alias condition
 		target->condition = source->condition;
@@ -378,7 +381,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
 	{
 		CancelExtradata* target = (CancelExtradata*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancelExtradata) + i;
-		TTT2::CancelExtradata* source = (TTT2::CancelExtradata*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancelExtradata) + i;
+		const TTT2::CancelExtradata* source = (TTT2::CancelExtradata*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancelExtradata) + i;
 
 		target->value = source->value;
 	}
@@ -386,7 +389,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
 	{
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i;
-		TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancel) + i;
+		const TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancel) + i;
 
 		target->direction = source->direction;
 		target->button = source->button;
@@ -403,7 +406,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.groupCancelCount; ++i)
 	{
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.groupCancel) + i;
-		TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.groupCancel) + i;
+		const TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.groupCancel) + i;
 
 		target->direction = source->direction;
 		target->button = source->button;
@@ -420,7 +423,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.hitConditionCount; ++i)
 	{
 		gAddr::HitCondition* target = (gAddr::HitCondition*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.hitCondition) + i;
-		TTT2::HitCondition* source = (TTT2::HitCondition*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.hitCondition) + i;
+		const TTT2::HitCondition* source = (TTT2::HitCondition*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.hitCondition) + i;
 
 		target->requirements_addr = source->requirements_addr;
 		target->damage = source->damage;
@@ -430,7 +433,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.voiceclipCount; ++i)
 	{
 		Voiceclip* target = (Voiceclip*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.voiceclip) + i;
-		TTT2::Voiceclip* source = (TTT2::Voiceclip*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.voiceclip) + i;
+		const TTT2::Voiceclip* source = (TTT2::Voiceclip*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.voiceclip) + i;
 
 		target->id = source->id;
 	}
@@ -438,7 +441,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.extraMovePropertyCount; ++i)
 	{
 		ExtraMoveProperty* target = (ExtraMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.extraMoveProperty) + i;
-		TTT2::ExtraMoveProperty* source = (TTT2::ExtraMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.extraMoveProperty) + i;
+		const TTT2::ExtraMoveProperty* source = (TTT2::ExtraMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.extraMoveProperty) + i;
 
 		// todo: alias id
 		target->starting_frame = source->starting_frame;
@@ -449,7 +452,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.inputCount; ++i)
 	{
 		Input* target = (Input*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.input) + i;
-		TTT2::Input* source = (TTT2::Input*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.input) + i;
+		const TTT2::Input* source = (TTT2::Input*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.input) + i;
 
 		target->direction = source->direction;
 		target->button = source->button;
@@ -458,7 +461,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.inputSequenceCount; ++i)
 	{
 		gAddr::InputSequence* target = (gAddr::InputSequence*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.inputSequence) + i;
-		TTT2::InputSequence* source = (TTT2::InputSequence*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.inputSequence) + i;
+		const TTT2::InputSequence* source = (TTT2::InputSequence*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.inputSequence) + i;
 
 		// 0x0: int8: not swapping
 		// 0x1: int8: not swapping
@@ -469,7 +472,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.projectileCount; ++i)
 	{
 		gAddr::Projectile* target = (gAddr::Projectile*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.projectile) + i;
-		TTT2::Projectile* source = (TTT2::Projectile*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.projectile) + i;
+		const TTT2::Projectile* source = (TTT2::Projectile*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.projectile) + i;
 
 		// As of this time, don't do any conversion for projectiles
 		// Its format is different from the T7 format
@@ -479,7 +482,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.cameraDataCount; ++i)
 	{
 		CameraData* target = (CameraData*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cameraData) + i;
-		TTT2::CameraData* source = (TTT2::CameraData*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cameraData) + i;
+		const TTT2::CameraData* source = (TTT2::CameraData*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cameraData) + i;
 
 		target->_0x0_int = source->_0x0_int;
 		target->_0x4_short = source->_0x4_short;
@@ -491,7 +494,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.throwCamerasCount; ++i)
 	{
 		gAddr::ThrowCamera* target = (gAddr::ThrowCamera*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.throwCameras) + i;
-		TTT2::ThrowCamera* source = (TTT2::ThrowCamera*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.throwCameras) + i;
+		const TTT2::ThrowCamera* source = (TTT2::ThrowCamera*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.throwCameras) + i;
 
 		target->_0x0_llong = source->_0x0_uint;
 		target->cameradata_addr = source->cameradata_addr;
@@ -501,7 +504,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.unknownParryRelatedCount; ++i)
 	{
 		UnknownParryRelated* target = (UnknownParryRelated*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.unknownParryRelated) + i;
-		TTT2::UnknownParryRelated* source = (TTT2::UnknownParryRelated*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.unknownParryRelated) + i;
+		const TTT2::UnknownParryRelated* source = (TTT2::UnknownParryRelated*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.unknownParryRelated) + i;
 
 		target->value = source->value;
 	}
@@ -509,7 +512,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.moveBeginningPropCount; ++i)
 	{
 		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveBeginningProp) + i;
-		TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveBeginningProp) + i;
+		const TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveBeginningProp) + i;
 
 		// todo: alias extraprop / requirement
 		target->requirements_addr = source->requirements_addr;
@@ -520,7 +523,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
 	{
 		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveEndingProp) + i;
-		TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveEndingProp) + i;
+		const TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveEndingProp) + i;
 
 		// todo: alias extraprop / requirement
 		target->requirements_addr = source->requirements_addr;
@@ -532,7 +535,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	for (unsigned int i = 0; i < table.moveCount; ++i)
 	{
 		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
-		TTT2::Move* source = (TTT2::Move*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
+		const TTT2::Move* source = (TTT2::Move*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
 
 		target->name_addr = source->name_addr;
 		target->anim_name_addr = source->anim_name_addr;
@@ -565,6 +568,10 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->last_active_frame = source->last_active_frame;
 		target->_0xA8_short = source->_0x6c_short;
 		target->distance = source->distance;
+	}
+
+	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
+		new_movesetInfo->motas.motas[i] = (MotaHeader*)old_movesetInfo->motas.motas[i];
 	}
 
 	moveset = new_moveset;
@@ -655,6 +662,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
+	/*
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
 		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
@@ -671,6 +679,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 			ForcePlayerMove(playerAddress, gameMoveset, 32769);
 		}
 	}
+	*/
 
 	lastLoaded.crc32 = header->crc32;
 	lastLoaded.charId = header->characterId;

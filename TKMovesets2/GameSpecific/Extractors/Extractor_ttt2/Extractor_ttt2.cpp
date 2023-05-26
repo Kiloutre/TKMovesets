@@ -554,12 +554,12 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	{
 		int64_t animSize = animSizes[animAddr];
 		m_game->ReadBytes(animAddr, animationBlockCursor, animSize);
-		Byte* anim = animationBlockCursor;
-		animationBlockCursor += animSize;
 
-		if (!TAnimUtils::FromMemory::IsLittleEndian(anim)) {
+		if (!TAnimUtils::FromMemory::IsLittleEndian(animationBlockCursor)) {
 			TAnimUtils::FromMemory::ByteswapAnimation(animationBlockCursor);
 		}
+
+		animationBlockCursor += animSize;
 	}
 
 	size_out = totalSize;
