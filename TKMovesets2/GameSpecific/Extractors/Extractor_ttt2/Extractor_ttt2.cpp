@@ -227,18 +227,23 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 	// Convert move ptrs
 	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, table.moveCount))
 	{
+
 		move.name_addr -= (gameAddr32)nameStart;
 		move.anim_name_addr -= (gameAddr32)nameStart;
 		move.anim_addr = (gameAddr32)animOffsetMap[move.anim_addr];
 		TO_INDEX(move.cancel_addr, table.cancel, Cancel);
+
+		// These are incorrect, those fields do not seem to exist in TTT2
 		TO_INDEX(move._0x28_cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move._0x38_cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move._0x48_cancel_addr, table.cancel, Cancel);
+
 		TO_INDEX(move.hit_condition_addr, table.hitCondition, HitCondition);
 		TO_INDEX(move.voicelip_addr, table.voiceclip, Voiceclip);
 		TO_INDEX(move.extra_move_property_addr, table.extraMoveProperty, ExtraMoveProperty);
 		TO_INDEX(move.move_start_extraprop_addr, table.moveBeginningProp, OtherMoveProperty);
 		TO_INDEX(move.move_end_extraprop_addr, table.moveEndingProp, OtherMoveProperty);
+
 	}
 
 	// Convert cancel ptrs

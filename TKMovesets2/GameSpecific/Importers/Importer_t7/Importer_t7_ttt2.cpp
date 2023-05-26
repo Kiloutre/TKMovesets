@@ -206,12 +206,12 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	size_t movesetSize = 0;
 	blocks_out.movesetInfoBlock = 0;
 
-	movesetSize += Helpers::align8Bytes(offsetof(TTT2::MovesetInfo, table));
+	movesetSize += Helpers::align8Bytes(offsetof(MovesetInfo, table));
 	blocks_out.tableBlock = movesetSize;
-	movesetSize += Helpers::align8Bytes(sizeof(TTT2::MovesetTable));
+	movesetSize += Helpers::align8Bytes(sizeof(MovesetTable));
 
 	blocks_out.motalistsBlock = movesetSize;
-	movesetSize += Helpers::align8Bytes(sizeof(TTT2::MotaList));
+	movesetSize += Helpers::align8Bytes(sizeof(MotaList));
 
 	blocks_out.nameBlock = movesetSize;
 	movesetSize += offsets->GetBlockSize(TTT2::TKMovesetHeaderBlocks_Name, s_moveset);
@@ -259,10 +259,11 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	auto old_movesetInfo = (TTT2::MovesetInfo*)moveset;
 	auto new_movesetInfo = (MovesetInfo*)new_moveset;
 
-	new_movesetInfo->character_name_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
-	new_movesetInfo->character_creator_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
-	new_movesetInfo->date_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
-	new_movesetInfo->fulldate_addr += sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	memcpy(new_movesetInfo, old_movesetInfo, 8);
+	new_movesetInfo->character_name_addr = (char*)0 + old_movesetInfo->character_name_addr + sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	new_movesetInfo->character_creator_addr = (char*)0 + old_movesetInfo->character_creator_addr + sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	new_movesetInfo->date_addr = (char*)0 + old_movesetInfo->date_addr + sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
+	new_movesetInfo->fulldate_addr = (char*)0 + old_movesetInfo->fulldate_addr + sizeof(MovesetInfo) - sizeof(TTT2::MovesetInfo);
 
 	memcpy(new_movesetInfo->orig_aliases, old_movesetInfo->orig_aliases, sizeof(new_movesetInfo->orig_aliases));
 	memcpy(new_movesetInfo->current_aliases, old_movesetInfo->current_aliases, sizeof(new_movesetInfo->current_aliases));
@@ -293,7 +294,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	table.cameraData = table.unknownParryRelated + sizeof(UnknownParryRelated) * table.unknownParryRelatedCount;
 	table.throwCameras = table.cameraData + sizeof(CameraData) * table.cameraDataCount;
 
-	/*
+
 	for (auto block : std::vector< TKMovesetHeaderBlocks_>{
 		TKMovesetHeaderBlocks_Name,
 		TKMovesetHeaderBlocks_Animation,
@@ -305,7 +306,6 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 
 		memcpy(target, source, old_blocks->GetBlockSize((TTT2::TKMovesetHeaderBlocks_)block));
 	}
-	*/
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
@@ -531,7 +531,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->value = source->value;
 	}
 
-
+	
 	for (unsigned int i = 0; i < table.moveCount; ++i)
 	{
 		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
@@ -544,8 +544,15 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->hitlevel = source->hitlevel;
 		target->cancel_addr = source->cancel_addr;
 
-		//... more fields omitted here
 		// todo
+		target->_0x28_cancel_addr = 0;
+		target->_0x30_int__0x28_related = 0;
+		target->_0x34_int = 0;
+		target->_0x38_cancel_addr = 0;
+		target->_0x40_int__0x38_related = 0;
+		target->_0x44_int = 0;
+		target->_0x48_cancel_addr = 0;
+		target->_0x50_int__0x48_related = 0;
 
 		target->transition = source->transition;
 
@@ -571,7 +578,15 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 	}
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
-		new_movesetInfo->motas.motas[i] = (MotaHeader*)old_movesetInfo->motas.motas[i];
+		gameAddr32 motaAddr32 = old_movesetInfo->motas.motas[i];
+		if (motaAddr32 == MOVESET_ADDR32_MISSING) {
+			new_movesetInfo->motas.motas[i] = 0;
+		}
+		else {
+
+			uint64_t motaAddr = (uint64_t)0 + motaAddr32;
+			new_movesetInfo->motas.motas[i] = (MotaHeader*)motaAddr;// +(new_motaBlock - orig_motaBlock);
+		}
 	}
 
 	moveset = new_moveset;
@@ -662,6 +677,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
+	progress = 100;
 	/*
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
