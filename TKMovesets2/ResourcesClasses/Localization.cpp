@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <map>
 #include <sstream>
 
@@ -14,6 +14,9 @@ extern "C" const size_t en_US_txt_size;
 extern "C" const char fr_FR_txt[];
 extern "C" const size_t fr_FR_txt_size;
 // --
+extern "C" const char ja_txt[];
+extern "C" const size_t ja_size;
+// --
 
 const TranslationData g_translation_datas[] = {
 	{
@@ -22,9 +25,14 @@ const TranslationData g_translation_datas[] = {
 		.data = en_US_txt
 	},
 	{
-		.displayName = (const char*)u8"Fran�ais",
+		.displayName = (const char*)u8"Français",
 		.locale = "fr-FR",
 		.data = fr_FR_txt
+	},
+	{
+		.displayName = (const char*)u8"日本語",
+		.locale = "ja",
+		.data = ja_txt
 	},
 };
 //
