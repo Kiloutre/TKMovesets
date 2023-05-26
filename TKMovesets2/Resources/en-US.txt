@@ -390,7 +390,7 @@ edition.projectile.gravity = Gravity
 edition.projectile.hit_level = Hit level
 edition.projectile.hit_condition_addr = Hit Conditions ID
 edition.projectile.cancel_addr = Cancels ID
-edition.projectile.voiceclip_on_hit = Voix (COUP)
+edition.projectile.voiceclip_on_hit = Voiceclip (hit)
 
 edition.pushback.window_name = Pushback
 edition.pushback.duration = Duration
