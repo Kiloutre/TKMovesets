@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <string>
 
 #define _(...) Localization::GetText(__VA_ARGS__)
@@ -9,6 +10,8 @@ struct TranslationData
 	const char* displayName;
 	const char* locale;
 	const char* data;
+	// Set of locale that will trigger a match. Must be lowercase only.
+	std::set<std::string> matchingLocale;
 };
 
 namespace Localization

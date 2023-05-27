@@ -9,10 +9,8 @@
 
 // Embedded translation file data
 extern "C" const char en_US_txt[];
-extern "C" const size_t en_US_txt_size;
-//
 extern "C" const char fr_FR_txt[];
-extern "C" const size_t fr_FR_txt_size;
+extern "C" const char de_DE_txt[];
 // --
 
 const TranslationData g_translation_datas[] = {
@@ -24,7 +22,15 @@ const TranslationData g_translation_datas[] = {
 	{
 		.displayName = (const char*)u8"Français",
 		.locale = "fr-FR",
-		.data = fr_FR_txt
+		.data = fr_FR_txt,
+		// .matchingLocale must contains lowercase-only characters
+		.matchingLocale = { "fr-fr", "fr-ca", "fr-lu", "fr-ch" }
+	},
+	{
+		.displayName = "Deutsch",
+		.locale = "de-DE",
+		.data = de_DE_txt,
+		.matchingLocale = { "de-at", "de-li", "de-lu", "de-ch" }
 	},
 };
 //
@@ -40,9 +46,13 @@ namespace Localization
 		int langId = -1;
 		
 		// Attempt to find locale in translation list
+
+		std::string lowercaseLocale = locale;
+		std::transform(lowercaseLocale.begin(), lowercaseLocale.end(), lowercaseLocale.begin(), tolower);
 		for (int i = 0; i < _countof(g_translation_datas); ++i)
 		{
-			if (strcmp(g_translation_datas[i].locale, locale) == 0)
+			if (strcmp(g_translation_datas[i].locale, locale) == 0
+				|| g_translation_datas[i].matchingLocale.contains(lowercaseLocale))
 			{
 				langId = i;
 				break;
