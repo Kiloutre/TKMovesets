@@ -301,7 +301,7 @@ namespace StructsT7
 		uint32_t last_active_frame;
 		int16_t _0xA8_short;
 		uint16_t distance;
-		int16_t _0xAC_short;
+		int32_t _0xAC_int;
 	};
 
 	// -- Other -- //
@@ -812,7 +812,7 @@ namespace StructsT7_gameAddr
 		uint32_t last_active_frame;
 		int16_t _0xA8_short;
 		uint16_t distance;
-		int16_t _0xAC_short;
+		int32_t _0xAC_int;
 	};
 
 	// -- Other -- //

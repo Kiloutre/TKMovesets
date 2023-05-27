@@ -976,7 +976,7 @@ InputMap EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 	CREATE_FIELD("_0x5E_short", 5, EditorInput_U16_Changeable, move->_0x5E_short);
 	CREATE_FIELD("_0x98_int", 5, EditorInput_H32_Changeable, move->_0x98_int);
 	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16_Changeable, move->_0xA8_short);
-	CREATE_FIELD("_0xAC_short", 5, EditorInput_U16_Changeable, move->_0xAC_short);
+	CREATE_FIELD("_0xAC_int", 5, EditorInput_S32_Changeable, move->_0xAC_int);
 
 	WriteFieldFullname(inputMap, "move");
 	return inputMap;
@@ -1099,7 +1099,7 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 	SetMemberValue(&move->_0x5E_short, inputs["_0x5E_short"]);
 	SetMemberValue(&move->_0x98_int, inputs["_0x98_int"]);
 	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
-	SetMemberValue(&move->_0xAC_short, inputs["_0xAC_short"]);
+	SetMemberValue(&move->_0xAC_int, inputs["_0xAC_int"]);
 
 	if (m_animNameToOffsetMap->find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap->end()) {
 		// Todo: if old animation is unused, delete it

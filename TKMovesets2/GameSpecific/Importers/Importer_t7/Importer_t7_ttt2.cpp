@@ -14,6 +14,8 @@ using namespace StructsT7;
 #define gAddr StructsT7_gameAddr
 #define TTT2 StructsTTT2
 
+#define CONVERT_POSSIBLE_MISSING_ADDR(x) (x == MOVESET_ADDR32_MISSING ? MOVESET_ADDR_MISSING : x)
+
 // -- Aliases -- //
 
 // -- -- //
@@ -554,40 +556,43 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->anim_addr = source->anim_addr;
 		target->vuln = source->vuln;
 		target->hitlevel = source->hitlevel;
-		target->cancel_addr = source->cancel_addr;
+		target->cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->cancel_addr);
 
 		// todo
-		target->_0x28_cancel_addr = 0;
+		target->_0x28_cancel_addr = -1;
 		target->_0x30_int__0x28_related = 0;
 		target->_0x34_int = 0;
-		target->_0x38_cancel_addr = 0;
+		target->_0x38_cancel_addr = -1;
 		target->_0x40_int__0x38_related = 0;
 		target->_0x44_int = 0;
-		target->_0x48_cancel_addr = 0;
+		target->_0x48_cancel_addr = -1;
 		target->_0x50_int__0x48_related = 0;
 
 		target->transition = source->transition;
 		target->_0x56_short = source->_0x56_short;
-		target->moveId_val1 = source->moveId_val1;
-		target->moveId_val2 = source->moveId_val2;
+
+		// For some reason, these two must be turned into negative to match the T7 format
+		target->moveId_val1 = 0 - source->moveId_val1;
+		target->moveId_val2 = 0 - source->moveId_val2;
+
 		target->_0x5C_short = 0; // Does not exist
 		target->_0x5E_short = 0; // Does not exist
-		target->hit_condition_addr = source->hit_condition_addr;
+		target->hit_condition_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->hit_condition_addr);
 		target->anim_len = source->anim_len;
 		target->airborne_start = source->airborne_start;
 		target->airborne_end = source->airborne_end;
 		target->ground_fall = source->ground_fall;
-		target->voicelip_addr = source->voicelip_addr;
-		target->extra_move_property_addr = source->extra_move_property_addr;
-		target->move_start_extraprop_addr = source->move_start_extraprop_addr;
-		target->move_end_extraprop_addr = source->move_end_extraprop_addr;
+		target->voicelip_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->voicelip_addr);
+		target->extra_move_property_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->extra_move_property_addr);
+		target->move_start_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_start_extraprop_addr);
+		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
 		target->_0x98_int = source->_0x98_int;
 		target->hitbox_location = source->hitbox_location;
 		target->first_active_frame = source->first_active_frame;
 		target->last_active_frame = source->last_active_frame;
 		target->_0xA8_short = source->_0x6c_short;
 		target->distance = source->distance;
-		target->_0xAC_short = 0; // Does not exist
+		target->_0xAC_int = 0; // Does not exist
 	}
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {

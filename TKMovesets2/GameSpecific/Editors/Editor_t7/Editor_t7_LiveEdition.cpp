@@ -136,8 +136,8 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 	else if (name == "_0xA8_short") {
 		m_process->writeInt16(move + offsetof(Move, _0xA8_short), value_s16);
 	}
-	else if (name == "_0xAC_short") {
-		m_process->writeInt16(move + offsetof(Move, _0xAC_short), value_s16);
+	else if (name == "_0xAC_int") {
+		m_process->writeInt16(move + offsetof(Move, _0xAC_int), value_s16);
 	}
 }
 
