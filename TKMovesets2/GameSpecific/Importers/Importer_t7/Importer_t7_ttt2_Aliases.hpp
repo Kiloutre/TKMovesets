@@ -590,14 +590,10 @@ namespace Aliases
 		if (item == g_propertyAliases.end()) return;
 
 		id = item->second.target_id;
-		switch (id)
-		{
-		default:
-			auto value_item = item->second.param_alias.find(value);
-			if (value_item != item->second.param_alias.end()) {
-				value = value_item->second;
-			}
-			break;
+
+		auto value_item = item->second.param_alias.find(value);
+		if (value_item != item->second.param_alias.end()) {
+			value = value_item->second;
 		}
 
 	}

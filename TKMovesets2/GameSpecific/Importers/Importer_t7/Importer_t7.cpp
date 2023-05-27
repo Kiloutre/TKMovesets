@@ -274,6 +274,7 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 	// In movesets, some moves (for some reason) can be transitionned into only on specific character IDs
 	// I am taking about mundane moves such as EWHF not working where WHF does
 	// The why is hard to understand and might possibly be linked to Mokujin/Combot, but anyway, this fixes things
+
 	uint16_t movesetCharacterId = header->characterId;
 	uint16_t currentCharacterId = m_process->readInt16(playerAddress + m_game->GetValue("chara_id_offset"));
 

@@ -323,39 +323,39 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		const TTT2::Reactions* source = (TTT2::Reactions*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.reactions) + i;
 
 		target->front_pushback = source->front_pushback;
-		target->backturned_pushback = source->front_pushback;
-		target->left_side_pushback = source->front_pushback;
-		target->right_side_pushback = source->front_pushback;
-		target->front_counterhit_pushback = source->front_pushback;
-		target->downed_pushback = source->front_pushback;
-		target->block_pushback = source->front_pushback;
+		target->backturned_pushback = source->backturned_pushback;
+		target->left_side_pushback = source->left_side_pushback;
+		target->right_side_pushback = source->right_side_pushback;
+		target->front_counterhit_pushback = source->front_counterhit_pushback;
+		target->downed_pushback = source->downed_pushback;
+		target->block_pushback = source->block_pushback;
 
-		target->front_direction = source->front_pushback;
-		target->back_direction = source->front_pushback;
-		target->left_side_direction = source->front_pushback;
-		target->right_side_direction = source->front_pushback;
-		target->front_counterhit_direction = source->front_pushback;
-		target->downed_direction = source->front_pushback;
+		target->front_direction = source->front_direction;
+		target->back_direction = source->back_direction;
+		target->left_side_direction = source->left_side_direction;
+		target->right_side_direction = source->right_side_direction;
+		target->front_counterhit_direction = source->front_counterhit_direction;
+		target->downed_direction = source->downed_direction;
 
-		target->_0x44_int = source->front_pushback;
-		target->_0x48_int = source->front_pushback;
+		target->_0x44_int = source->_0x28_int;
+		target->_0x48_int = source->_0x2C_int;
 
-		target->vertical_pushback = source->front_pushback;
-		target->standing_moveid = source->front_pushback;
-		target->default_moveid = source->front_pushback;
-		target->crouch_moveid = source->front_pushback;
-		target->counterhit_moveid = source->front_pushback;
-		target->crouch_counterhit_moveid = source->front_pushback;
-		target->left_side_moveid = source->front_pushback;
-		target->crouch_left_side_moveid = source->front_pushback;
-		target->right_side_moveid = source->front_pushback;
-		target->crouch_right_side_moveid = source->front_pushback;
-		target->backturned_moveid = source->front_pushback;
-		target->crouch_backturned_moveid = source->front_pushback;
-		target->block_moveid = source->front_pushback;
-		target->crouch_block_moveid = source->front_pushback;
-		target->wallslump_moveid = source->front_pushback;
-		target->downed_moveid = source->front_pushback;
+		target->vertical_pushback = source->vertical_pushback;
+		target->standing_moveid = source->standing_moveid;
+		target->default_moveid = source->default_moveid;
+		target->crouch_moveid = source->crouch_moveid;
+		target->counterhit_moveid = source->counterhit_moveid;
+		target->crouch_counterhit_moveid = source->crouch_counterhit_moveid;
+		target->left_side_moveid = source->left_side_moveid;
+		target->crouch_left_side_moveid = source->crouch_left_side_moveid;
+		target->right_side_moveid = source->right_side_moveid;
+		target->crouch_right_side_moveid = source->crouch_right_side_moveid;
+		target->backturned_moveid = source->backturned_moveid;
+		target->crouch_backturned_moveid = source->crouch_backturned_moveid;
+		target->block_moveid = source->block_moveid;
+		target->crouch_block_moveid = source->crouch_block_moveid;
+		target->wallslump_moveid = source->wallslump_moveid;
+		target->downed_moveid = source->downed_moveid;
 	}
 
 	for (unsigned int i = 0; i < table.pushbackExtradataCount; ++i)
@@ -657,8 +657,8 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 
 	if (!BASIC_LOAD) {
 		// Fix moves that use characterID conditions to work
-		// // todo
-		//ApplyCharacterIDFixes(moveset, playerAddress, table, header, offsets);
+		// todo
+		ApplyCharacterIDFixes(moveset, playerAddress, table, header, offsets);
 	}
 	progress = 85;
 
@@ -675,6 +675,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
+		// todo
 		ConvertDisplayableMovelistOffsets(mvlHead);
 	}
 
