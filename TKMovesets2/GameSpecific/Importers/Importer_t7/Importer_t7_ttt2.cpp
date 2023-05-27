@@ -395,8 +395,8 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->_0x56_short = source->_0x56_short;
 
 		// For some reason, these two must be turned into negative to match the T7 format
-		target->moveId_val1 = 0 - source->moveId_val1;
-		target->moveId_val2 = 0 - source->moveId_val2;
+		target->moveId_val1 = source->moveId_val1;
+		target->moveId_val2 = source->moveId_val2;
 
 		target->_0x5C_short = 0; // Does not exist
 		target->_0x5E_short = 0; // Does not exist

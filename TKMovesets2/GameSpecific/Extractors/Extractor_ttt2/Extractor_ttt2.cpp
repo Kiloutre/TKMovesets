@@ -202,7 +202,8 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT16(&move._0x56_short);
 
 		// Swaps _val1 and 8val2 as an int because that is how they are stored
-		ByteswapHelpers::SWAP_INT32(&move.moveId_val2);
+		ByteswapHelpers::SWAP_INT16(&move.moveId_val1);
+		ByteswapHelpers::SWAP_INT16(&move.moveId_val2);
 
 		ByteswapHelpers::SWAP_INT32(&move.hit_condition_addr);
 		ByteswapHelpers::SWAP_INT32(&move.anim_len);
