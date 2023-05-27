@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <map>
 #include <sstream>
 
@@ -12,6 +12,9 @@ extern "C" const char en_US_txt[];
 extern "C" const char fr_FR_txt[];
 extern "C" const char de_DE_txt[];
 // --
+extern "C" const char ja_txt[];
+extern "C" const size_t ja_size;
+// --
 
 const TranslationData g_translation_datas[] = {
 	{
@@ -20,7 +23,7 @@ const TranslationData g_translation_datas[] = {
 		.data = en_US_txt
 	},
 	{
-		.displayName = (const char*)u8"Fran�ais",
+		.displayName = (const char*)u8"Français",
 		.locale = "fr-FR",
 		.data = fr_FR_txt,
 		// .matchingLocale must contains lowercase-only characters
@@ -31,6 +34,11 @@ const TranslationData g_translation_datas[] = {
 		.locale = "de-DE",
 		.data = de_DE_txt,
 		.matchingLocale = { "de-at", "de-li", "de-lu", "de-ch" }
+	},
+	{
+		.displayName = (const char*)u8"日本語",
+		.locale = "ja",
+		.data = ja_txt
 	},
 };
 //
