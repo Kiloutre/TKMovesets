@@ -584,18 +584,15 @@ namespace Aliases
 		return value;
 	}
 
-	void ApplyPropertyAlias(unsigned int& id, unsigned int& value, unsigned int orig_characterId, unsigned int new_characterId)
+	void ApplyPropertyAlias(unsigned int& id, unsigned int& value)
 	{
 		auto item = g_propertyAliases.find(id);
 		if (item == g_propertyAliases.end()) return;
 
+		id = item->second.target_id;
 		switch (id)
 		{
-		case 217: // Is current char specific ID
-			value = (value == orig_characterId) ? new_characterId : new_characterId + 10;
-			break;
 		default:
-			id = item->second.target_id;
 			auto value_item = item->second.param_alias.find(value);
 			if (value_item != item->second.param_alias.end()) {
 				value = value_item->second;
@@ -674,7 +671,7 @@ namespace Aliases
 		}
 		
 		g_propertyAliases[iter->first] = iter->second;
-		DEBUG_LOG("Built alias dictionary: %llu extra items (%u total)\n", filled, g_propertyAliases.size());
+		DEBUG_LOG("Built alias dictionary: %u extra items (%llu total)\n", filled, g_propertyAliases.size());
 	}
 
 };

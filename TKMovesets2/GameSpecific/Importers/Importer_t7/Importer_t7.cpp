@@ -258,10 +258,12 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, By
 	{
 		if (fileMotas[i] != MOVESET_ADDR_MISSING) {
 			fileMotas[i] += gameMoveset + offsets->motaBlock;
+			DEBUG_LOG("1\n");
 		}
 		else if (replaceEmpty) {
 			// Moveset block was not included in the file: copy the currently used one
 			fileMotas[i] = gameMotas[i];
+			DEBUG_LOG("2\n");
 		}
 	}
 }
@@ -285,7 +287,23 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 		// When the requirement ask for any other character ID, i will supply a character ID that ISN'T the current one, to make it always false.
 
 		if (requirement[i].condition == c_characterIdCondition) {
-			requirement[i].param_unsigned = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 1;
+			requirement[i].param_unsigned = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 10;
+		}
+	}
+
+	OtherMoveProperty* prop = (OtherMoveProperty*)(moveset + offsets->movesetBlock + table->moveBeginningProp);
+	for (size_t i = 0; i < table->moveBeginningPropCount; ++i)
+	{
+		if (prop->extraprop == c_characterIdCondition) {
+			prop[i].extraprop = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 10;
+		}
+	}
+
+	prop = (OtherMoveProperty*)(moveset + offsets->movesetBlock + table->moveEndingProp);
+	for (size_t i = 0; i < table->moveEndingPropCount; ++i)
+	{
+		if (prop->extraprop == c_characterIdCondition) {
+			prop[i].extraprop = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 10;
 		}
 	}
 }

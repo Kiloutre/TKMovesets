@@ -149,7 +149,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		MotaHeader header;
 		m_process->readBytes(motaAddr, &header, sizeof(MotaHeader));
 		if (memcmp(header.mota_string, "MOTA", 4) != 0) {
-			DEBUG_LOG("Malformed MOTA %d\n", motaId);
+			DEBUG_LOG("Malformed MOTA %d at addr %llx\n", motaId, motaAddr);
 			// Malformed MOTA, don't save it
 			continue;
 		}
@@ -263,7 +263,7 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 
 void ExtractorT7::GetNamesBlockBounds(const gAddr::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
-	uint64_t smallest = (int64_t)move[0].name_addr;
+	uint64_t smallest = (uint64_t)move[0].name_addr;
 	uint64_t highest = smallest;
 
 	for (size_t moveId = 0; moveId < moveCount; ++moveId)

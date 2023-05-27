@@ -386,7 +386,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->condition = source->condition;
 		target->param_unsigned = source->param_unsigned;
 
-		Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned, orig_character_id, new_character_id);
+		Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned);
 	}
 
 	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
@@ -459,7 +459,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->id = source->id;
 		target->value_unsigned = source->value_unsigned;
 
-		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned, orig_character_id, new_character_id);
+		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned);
 	}
 
 	for (unsigned int i = 0; i < table.inputCount; ++i)
@@ -532,7 +532,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
-		Aliases::ApplyPropertyAlias(target->extraprop, target->value, orig_character_id, new_character_id);
+		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
 	}
 
 	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
@@ -544,7 +544,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
-		Aliases::ApplyPropertyAlias(target->extraprop, target->value, orig_character_id, new_character_id);
+		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
 	}
 
 	
@@ -600,11 +600,10 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
 		gameAddr32 motaAddr32 = old_movesetInfo->motas.motas[i];
-		if (motaAddr32 == MOVESET_ADDR32_MISSING) {
-			new_movesetInfo->motas.motas[i] = 0;
+		if (motaAddr32 == MOVESET_ADDR32_MISSING || true) {
+			new_movesetInfo->motas.motas[i] = (MotaHeader*)MOVESET_ADDR_MISSING;
 		}
 		else {
-
 			uint64_t motaAddr = (uint64_t)0 + motaAddr32;
 			new_movesetInfo->motas.motas[i] = (MotaHeader*)motaAddr;// +(new_motaBlock - orig_motaBlock);
 		}
@@ -658,7 +657,8 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 
 	if (!BASIC_LOAD) {
 		// Fix moves that use characterID conditions to work
-		ApplyCharacterIDFixes(moveset, playerAddress, table, header, offsets);
+		// // todo
+		//ApplyCharacterIDFixes(moveset, playerAddress, table, header, offsets);
 	}
 	progress = 85;
 
@@ -698,19 +698,21 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
-	progress = 100;
 	/*
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
 		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
 	}
+	*/
 	progress = 100;
 
+	/*
 	if (!BASIC_LOAD) {
 		// Also write camera mota offsts to the player structure if those motas have been exported
 		WriteCameraMotasToPlayer(gameMoveset, playerAddress);
 	}
-
+	*/
+	/*
 	if (!BASIC_LOAD) {
 		if (settings & ImportSettings_ApplyInstantly) {
 			ForcePlayerMove(playerAddress, gameMoveset, 32769);

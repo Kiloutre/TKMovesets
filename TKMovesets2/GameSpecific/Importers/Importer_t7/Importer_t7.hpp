@@ -19,7 +19,7 @@ private:
 	// Write the player's camera motas to his structure. This is required for proper camera mota importation, and does not break anything of those camera mota have not been imported by us
 	void WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress);
 	// Fixes move that rely on correct character IDs to work
-	void ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* table, const TKMovesetHeader* header, const StructsT7::TKMovesetHeaderBlocks* blockOoffsetsffsets);
+	void ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, const StructsT7_gameAddr::MovesetTable* table, const TKMovesetHeader* header, const StructsT7::TKMovesetHeaderBlocks* offsets);
 	// Import the displayable movelist
 	void ImportMovelist(StructsT7::MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress);
 
