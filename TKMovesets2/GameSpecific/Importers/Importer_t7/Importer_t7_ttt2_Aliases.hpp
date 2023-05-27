@@ -592,7 +592,7 @@ namespace Aliases
 		switch (id)
 		{
 		case 217: // Is current char specific ID
-			value = (value == orig_characterId) ? new_characterId : new_characterId + 1;;
+			value = (value == orig_characterId) ? new_characterId : new_characterId + 10;
 			break;
 		default:
 			id = item->second.target_id;
@@ -639,12 +639,15 @@ namespace Aliases
 
 	void BuildAliasDictionary()
 	{
-		auto& orig_dict = cg_propertyAliases;
-		auto& new_dict = g_propertyAliases;
+#ifdef BUILD_TYPE_DEBUG
+		unsigned int filled = 0;
+#endif
 
 		auto iter = cg_propertyAliases.begin();
 		auto nextiter = std::next(iter, 1);
-		for (unsigned int i = 0; i < (orig_dict.size() - 1); ++i, std::advance(iter, 1), std::advance(nextiter, 1))
+		auto iter_count = cg_propertyAliases.size() - 1;
+
+		for (unsigned int i = 0; i < iter_count; ++i, std::advance(iter, 1), std::advance(nextiter, 1))
 		{
 			auto key = iter->first;
 			auto next_key = nextiter->first;
@@ -654,12 +657,15 @@ namespace Aliases
 				continue;
 			}
 
-			int key_diff = next_key - (key + 1);
+			unsigned int key_diff = next_key - (key + 1);
 			auto alias_offset = iter->second.target_id - key;
-			auto alias_offset2 = nextiter->second.target_id - key;
+			auto alias_offset2 = nextiter->second.target_id - next_key;
 
 			if (alias_offset == alias_offset2 and key_diff > 0) {
 				for (unsigned int j = 1; j < key_diff + 1; ++j) {
+#ifdef BUILD_TYPE_DEBUG
+					++filled;
+#endif
 					g_propertyAliases[key + j] = {
 						.target_id = iter->second.target_id + j
 					};
@@ -668,6 +674,7 @@ namespace Aliases
 		}
 		
 		g_propertyAliases[iter->first] = iter->second;
+		DEBUG_LOG("Built alias dictionary: %llu extra items (%u total)\n", filled, g_propertyAliases.size());
 	}
 
 };
