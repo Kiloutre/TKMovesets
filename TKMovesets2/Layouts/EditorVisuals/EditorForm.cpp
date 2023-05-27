@@ -421,8 +421,6 @@ void EditorForm::Render()
 
 			// Open popup on right click
 			if (IsWindowRightClicked()) {
-				DEBUG_LOG("%s - Right click\n", m_windowTitle.c_str());
-				
 				ImGui::OpenPopup("ContextMenuPopup");
 			}
 
@@ -542,7 +540,7 @@ bool EditorForm::IsWindowRightClicked() const
 	DEBUG_LOG("Bound start: %f %f \n", boundStart.x, boundStart.y);
 
 	if (cursorPos.x < boundStart.x) return false;
-	if (cursorPos.y < boundStart.y) return false;
+	if (cursorPos.y < (boundStart.y + ImGui::GetFrameHeightWithSpacing())) return false;
 
 	auto boundEnd = m_winInfo.pos + m_winInfo.size;
 	DEBUG_LOG("Bound end: %f %f \n", boundEnd.x, boundEnd.y);
