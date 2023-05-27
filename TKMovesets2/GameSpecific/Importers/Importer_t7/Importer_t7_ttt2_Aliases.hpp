@@ -584,16 +584,25 @@ namespace Aliases
 		return value;
 	}
 
-	void ApplyPropertyAlias(unsigned int& id, unsigned int& value)
+	void ApplyPropertyAlias(unsigned int& id, unsigned int& value, unsigned int orig_characterId, unsigned int new_characterId)
 	{
 		auto item = g_propertyAliases.find(id);
 		if (item == g_propertyAliases.end()) return;
 
-		id = item->second.target_id;
-		auto value_item = item->second.param_alias.find(value);
-		if (value_item != item->second.param_alias.end()) {
-			value = value_item->second;
+		switch (id)
+		{
+		case 217: // Is current char specific ID
+			value = (value == orig_characterId) ? new_characterId : new_characterId + 1;;
+			break;
+		default:
+			id = item->second.target_id;
+			auto value_item = item->second.param_alias.find(value);
+			if (value_item != item->second.param_alias.end()) {
+				value = value_item->second;
+			}
+			break;
 		}
+
 	}
 
 	unsigned char GetCharacterIdAlias(unsigned char value)
@@ -605,7 +614,19 @@ namespace Aliases
 		return value - 2;
 	}
 
-	void GetHitboxAlias(unsigned int& hitbox)
+	int ConvertMove0x98(int value)
+	{
+		// What the fuck?
+		int tmp = 0;
+		for (unsigned int i = 0; i < 7; ++i)
+		{
+			int bitVal = (value & (1 << i)) != 0;
+			tmp |= bitVal << (7 - i);
+		}
+		return (value >> 7) | (tmp << 24);
+	}
+
+	void ApplyHitboxAlias(unsigned int& hitbox)
 	{
 		Byte* orig_hitbox_bytes = (Byte*)&hitbox;
 
@@ -645,5 +666,8 @@ namespace Aliases
 				}
 			}
 		}
+		
+		g_propertyAliases[iter->first] = iter->second;
 	}
+
 };

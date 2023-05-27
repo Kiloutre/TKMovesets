@@ -313,6 +313,8 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 
 
 	Aliases::BuildAliasDictionary();
+	unsigned int orig_character_id = header->characterId;
+	unsigned int new_character_id = Aliases::GetCharacterIdAlias(orig_character_id);
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
@@ -384,7 +386,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->condition = source->condition;
 		target->param_unsigned = source->param_unsigned;
 
-		Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned);
+		Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned, orig_character_id, new_character_id);
 	}
 
 	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
@@ -457,7 +459,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->id = source->id;
 		target->value_unsigned = source->value_unsigned;
 
-		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned);
+		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned, orig_character_id, new_character_id);
 	}
 
 	for (unsigned int i = 0; i < table.inputCount; ++i)
@@ -530,7 +532,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
-		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
+		Aliases::ApplyPropertyAlias(target->extraprop, target->value, orig_character_id, new_character_id);
 	}
 
 	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
@@ -542,7 +544,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
-		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
+		Aliases::ApplyPropertyAlias(target->extraprop, target->value, orig_character_id, new_character_id);
 	}
 
 	
@@ -586,8 +588,9 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->extra_move_property_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->extra_move_property_addr);
 		target->move_start_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_start_extraprop_addr);
 		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
-		target->_0x98_int = source->_0x98_int;
+		target->_0x98_int = Aliases::ConvertMove0x98(source->_0x98_int);
 		target->hitbox_location = source->hitbox_location;
+		Aliases::ApplyHitboxAlias(target->hitbox_location);
 		target->first_active_frame = source->first_active_frame;
 		target->last_active_frame = source->last_active_frame;
 		target->_0xA8_short = source->_0x6c_short;
