@@ -397,7 +397,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->value = source->value;
 	}
 
-	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
+	for (unsigned int i = 0; i < table.cancelCount; ++i)
 	{
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i;
 		const TTT2::Cancel* source = (TTT2::Cancel*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancel) + i;
@@ -698,27 +698,27 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
-	/*
+	
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
 		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
 	}
-	*/
+	
 	progress = 100;
 
-	/*
+	
 	if (!BASIC_LOAD) {
 		// Also write camera mota offsts to the player structure if those motas have been exported
 		WriteCameraMotasToPlayer(gameMoveset, playerAddress);
 	}
-	*/
-	/*
+	
+	
 	if (!BASIC_LOAD) {
 		if (settings & ImportSettings_ApplyInstantly) {
 			ForcePlayerMove(playerAddress, gameMoveset, 32769);
 		}
 	}
-	*/
+	
 
 	lastLoaded.crc32 = header->crc32;
 	lastLoaded.charId = header->characterId;
