@@ -421,6 +421,8 @@ void EditorForm::Render()
 
 			// Open popup on right click
 			if (IsWindowRightClicked()) {
+				DEBUG_LOG("%s - Right click\n", m_windowTitle.c_str());
+				
 				ImGui::OpenPopup("ContextMenuPopup");
 			}
 

@@ -2,7 +2,7 @@
 
 #include "helpers.hpp"
 #include "Importer_t7.hpp"
-#include "GameIDs.hpp"
+#include "Importer_t7/Importer_t7_ttt2_Aliases.hpp"
 
 #include "Structs_t7.h"
 #include "Structs_ttt2.h"
@@ -13,6 +13,8 @@ using namespace StructsT7;
 // Defined here because i don't want any other file to have access to this shortcut
 #define gAddr StructsT7_gameAddr
 #define TTT2 StructsTTT2
+
+// -- Aliases -- //
 
 // -- -- //
 
@@ -307,6 +309,9 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		memcpy(target, source, old_blocks->GetBlockSize((TTT2::TKMovesetHeaderBlocks_)block));
 	}
 
+
+	Aliases::BuildAliasDictionary();
+
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
 	{
@@ -376,6 +381,8 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		// todo: alias condition
 		target->condition = source->condition;
 		target->param_unsigned = source->param_unsigned;
+
+		Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned);
 	}
 
 	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
@@ -428,6 +435,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->requirements_addr = source->requirements_addr;
 		target->damage = source->damage;
 		target->reactions_addr = source->reactions_addr;
+		target->_0xC_int = 0; // Does not exist
 	}
 
 	for (unsigned int i = 0; i < table.voiceclipCount; ++i)
@@ -443,10 +451,11 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		ExtraMoveProperty* target = (ExtraMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.extraMoveProperty) + i;
 		const TTT2::ExtraMoveProperty* source = (TTT2::ExtraMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.extraMoveProperty) + i;
 
-		// todo: alias id
 		target->starting_frame = source->starting_frame;
 		target->id = source->id;
 		target->value_unsigned = source->value_unsigned;
+
+		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned);
 	}
 
 	for (unsigned int i = 0; i < table.inputCount; ++i)
@@ -463,9 +472,9 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		gAddr::InputSequence* target = (gAddr::InputSequence*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.inputSequence) + i;
 		const TTT2::InputSequence* source = (TTT2::InputSequence*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.inputSequence) + i;
 
-		// 0x0: int8: not swapping
-		// 0x1: int8: not swapping
+		target->input_window_frames = source->input_window_frames;
 		target->input_amount = source->input_amount;
+		target->_0x4_int = source->_0x0_int8;
 		target->input_addr = source->input_addr;
 	}
 
@@ -477,6 +486,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		// As of this time, don't do any conversion for projectiles
 		// Its format is different from the T7 format
 		// (The data is still there, in big endian, ready to be parsed by any importer)
+		memset(target, 0, sizeof(Projectile));
 	}
 
 	for (unsigned int i = 0; i < table.cameraDataCount; ++i)
@@ -514,10 +524,11 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveBeginningProp) + i;
 		const TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveBeginningProp) + i;
 
-		// todo: alias extraprop / requirement
 		target->requirements_addr = source->requirements_addr;
 		target->extraprop = source->extraprop;
 		target->value = source->value;
+
+		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
 	}
 
 	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
@@ -525,10 +536,11 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveEndingProp) + i;
 		const TTT2::OtherMoveProperty* source = (TTT2::OtherMoveProperty*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveEndingProp) + i;
 
-		// todo: alias extraprop / requirement
 		target->requirements_addr = source->requirements_addr;
 		target->extraprop = source->extraprop;
 		target->value = source->value;
+
+		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
 	}
 
 	
@@ -555,11 +567,11 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->_0x50_int__0x48_related = 0;
 
 		target->transition = source->transition;
-
 		target->_0x56_short = source->_0x56_short;
-
-		// Swaps _val1 and 8val2 as an int because that is how they are stored
+		target->moveId_val1 = source->moveId_val1;
 		target->moveId_val2 = source->moveId_val2;
+		target->_0x5C_short = 0; // Does not exist
+		target->_0x5E_short = 0; // Does not exist
 		target->hit_condition_addr = source->hit_condition_addr;
 		target->anim_len = source->anim_len;
 		target->airborne_start = source->airborne_start;
@@ -575,6 +587,7 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->last_active_frame = source->last_active_frame;
 		target->_0xA8_short = source->_0x6c_short;
 		target->distance = source->distance;
+		target->_0xAC_short = 0; // Does not exist
 	}
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
