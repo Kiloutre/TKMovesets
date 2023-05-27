@@ -354,7 +354,7 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 	for (uint16_t motaId = 0; motaId < 12; ++motaId)
 	{
 		gameAddr32 motaAddr = (gameAddr32)motas->motas[motaId];
-		uint32_t motaSize;
+		uint32_t expectedMotaSize = motaId + 2 >= 12 ? 0 : (uint32_t)(motas->motas[motaId + 2] - motaAddr);
 		// Motas are listed contigously in two different blocks. The list alternate between one pointer of one block then one pointer to the other. Hnece the i + 2
 
 		if (offsetMap.find(motaAddr) != offsetMap.end()) {
@@ -364,63 +364,65 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 
 		MotaHeader header;
 		m_game->ReadBytes(motaAddr, &header, sizeof(MotaHeader));
-		if (memcmp(header.mota_string, "MOTA", 4) != 0) {
+
+		if (memcmp(header.mota_string, "MOTA", 4) == 0)
+		{
+			// Known format 1
+			uint32_t animCount = header.anim_count;
+			if (header.IsBigEndian()) {
+				animCount = BYTESWAP_INT32(animCount);
+			}
+
+			// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
+			// Use bitwise flags to store which one we want to store
+			if ((((uint64_t)1 << motaId) & settings) == 0) {
+				DEBUG_LOG("Not saving mota %d : not set to be exported.\n", motaId);
+				continue;
+			}
+			uint32_t lastAnimOffset = 0;
+			uint32_t* animOffsetList = (uint32_t*)calloc(animCount, sizeof(uint32_t));
+
+			if (animOffsetList == nullptr) {
+				DEBUG_LOG("Error while allocating the animation offset list (size %u * 4) for mota %d\n", animCount, motaId);
+				throw;
+			}
+
+			// Loop through every offset, find the highest
+			// There is no guarantee they are ordered so looking through all of them is quite safe
+			m_game->ReadBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
+			for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
+			{
+				uint32_t animOffset = animOffsetList[animIdx];
+				if (header.IsBigEndian()) {
+					animOffset = BYTESWAP_INT32(animOffset);
+				}
+				if (animOffset > lastAnimOffset) {
+					lastAnimOffset = animOffset;
+				}
+			}
+
+			free(animOffsetList);
+
+			uint32_t motaSize;
+			if (lastAnimOffset == 0) {
+				DEBUG_LOG("Empty MOTA %d - ", motaId);
+				motaSize = 0x14;
+			}
+			else {
+				uint32_t lastAnimSize = (uint32_t)GetAnimationSize(m_game->baseAddr + motaAddr + lastAnimOffset);
+				motaSize = lastAnimOffset + lastAnimSize;
+			}
+
+			// Store new mota offset & size in keypair map
+			offsetMap[motaAddr] = std::pair<uint32_t, uint32_t>(motaCustomBlockSize, motaSize);
+			motaCustomBlockSize += motaSize;
+
+			DEBUG_LOG("Saved mota %d, size is %d (0x%x)\n", motaId, motaSize, motaSize);
+		} else {
 			// todo
 			DEBUG_LOG("Malformed MOTA %d at addr %llx\n", motaId, motaAddr);
 			// Malformed MOTA, don't save it
-			continue;
 		}
-
-		uint32_t animCount = header.anim_count;
-		if (header.IsBigEndian()) {
-			animCount = BYTESWAP_INT32(animCount);
-		}
-
-		// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
-		// Use bitwise flags to store which one we want to store
-		if ((((uint64_t)1 << motaId) & settings) == 0) {
-			DEBUG_LOG("Not saving mota %d : not set to be exported.\n", motaId);
-			continue;
-		}
-		uint32_t lastAnimOffset = 0;
-		uint32_t* animOffsetList = (uint32_t*)calloc(animCount, sizeof(uint32_t));
-
-		if (animOffsetList == nullptr) {
-			DEBUG_LOG("Error while allocating the animation offset list (size %u * 4) for mota %d\n", animCount, motaId);
-			throw;
-		}
-
-		// Loop through every offset, find the highest
-		// There is no guarantee they are ordered so looking through all of them is quite safe
-		m_game->ReadBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
-		for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
-		{
-			uint32_t animOffset = animOffsetList[animIdx];
-			if (header.IsBigEndian()) {
-				animOffset = BYTESWAP_INT32(animOffset);
-			}
-			if (animOffset > lastAnimOffset) {
-				lastAnimOffset = animOffset;
-			}
-		}
-
-		free(animOffsetList);
-
-
-		if (lastAnimOffset == 0) {
-			DEBUG_LOG("Empty MOTA %d - ", motaId);
-			motaSize = 0x14;
-		}
-		else {
-			uint32_t lastAnimSize = (uint32_t)GetAnimationSize(m_game->baseAddr + motaAddr + lastAnimOffset);
-			motaSize = lastAnimOffset + lastAnimSize;
-		}
-
-		// Store new mota offset & size in keypair map
-		offsetMap[motaAddr] = std::pair<uint32_t, uint32_t>(motaCustomBlockSize, motaSize);
-		motaCustomBlockSize += motaSize;
-
-		DEBUG_LOG("Saved mota %d, size is %d (0x%x)\n", motaId, motaSize, motaSize);
 	}
 	return (uint64_t)motaCustomBlockSize;
 }
