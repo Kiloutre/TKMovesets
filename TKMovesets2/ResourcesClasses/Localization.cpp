@@ -11,9 +11,9 @@
 extern "C" const char en_US_txt[];
 extern "C" const char fr_FR_txt[];
 extern "C" const char de_DE_txt[];
-// --
+extern "C" const char es_ES_txt[];
+extern "C" const char ko_txt[];
 extern "C" const char ja_txt[];
-extern "C" const size_t ja_size;
 // --
 
 const TranslationData g_translation_datas[] = {
@@ -27,7 +27,24 @@ const TranslationData g_translation_datas[] = {
 		.locale = "fr-FR",
 		.data = fr_FR_txt,
 		// .matchingLocale must contains lowercase-only characters
-		.matchingLocale = { "fr-fr", "fr-ca", "fr-lu", "fr-ch" }
+		.matchingLocale = { "fr-ca", "fr-lu", "fr-ch" }
+	},
+	{
+		.displayName = (const char*)u8"日本語",
+		.locale = "ja",
+		.data = ja_txt
+	},
+	/*
+	{
+		.displayName = (const char*)u8"한국인",
+		.locale = "ko",
+		.data = ko_txt
+	},
+	{
+		.displayName = "Español",
+		.locale = "es-ES",
+		.data = es_ES_txt,
+		.matchingLocale = { "es-ar", "es-bo", "es-cl", "es-co", "es-cr", "es-do", "es-ec", "es-sv", "es-gt", "es-hn", "es-mx", "es-ni", "es-pa", "es-py", "es-pe", "es-pr", "es-uy", "es-ve" }
 	},
 	{
 		.displayName = "Deutsch",
@@ -35,11 +52,7 @@ const TranslationData g_translation_datas[] = {
 		.data = de_DE_txt,
 		.matchingLocale = { "de-at", "de-li", "de-lu", "de-ch" }
 	},
-	{
-		.displayName = (const char*)u8"日本語",
-		.locale = "ja",
-		.data = ja_txt
-	},
+	*/
 };
 //
 
