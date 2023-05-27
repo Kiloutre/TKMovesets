@@ -1,1 +1,485 @@
 # Japanese
+# This is a comment
+# key = Text
+# Each line represents a different translation.
+# '\n' can be used for inserting newlines in paragraphs. Leading and trailing spaces of keys and texts are removed.
+# " navmenu =  This  is a    test   " becomes "navmenu=This  is a    test", so feel free to align what needs to be aligned
+
+# Utils #
+
+item = Item
+end = END
+yes = Yes
+no = No
+mota_00 = Anims 1
+mota_01 = Anims 2
+mota_02 = Hands 1
+mota_03 = Hands 2
+mota_04 = Face 1
+mota_05 = Face 2
+mota_06 = Wings 1
+mota_07 = Wings 2
+mota_08 = Camera 1
+mota_09 = Camera 2
+mota_10 = Unknown 1
+mota_11 = Unknown 2
+close = 閉じる
+close_window = ウィンドウを閉じる
+1p = Player 1
+2p = Player 2
+3p = Player 3
+4p = Player 4
+select_game = ゲーム選択
+
+# Process #
+
+process.status = Status:
+process.game_not_attached = ゲームとリンクしてません。ゲームを選択してください。
+process.game_not_running = ゲームが実行されていないか、見つかりませんでした。
+process.game_version_mismatch = 現在のゲームバージョンはgame_address.txtでサポートされていません。
+process.game_attach_err = ゲームが見つかりましたが、アタッチできませんでした。これは、特権が低いことが原因である可能性があります。
+process.dll_version_mismatch = 展開されているDLLがプログラムのバージョンと一致しません。ゲームとツールを再起動します。
+
+# Moveset #
+moveset.origin = ゲーム名
+moveset.target_character = キャラクター
+moveset.date = 日付
+moveset.invalid = 無効
+moveset.size = サイズ
+moveset.size_mb = MB
+moveset.size_kb = KB
+moveset.rename = リネーム
+moveset.duplicate = 複製
+moveset.import = インポート
+moveset.edit = 編集
+moveset.delete = 削除
+moveset.version = Version
+moveset.hash = Hash
+
+## Main ##
+
+# Navmenu #
+navmenu.category_moveset = Movesets
+navmenu.category_play = Play
+navmenu.extraction = 抽出
+navmenu.import = インポート
+navmenu.online = オンラインプレイ
+navmenu.persistent_play = 永続プレイ
+
+navmenu.category_tools = Tools
+navmenu.moveset_edit = Movesetの編集
+navmenu.camera = Camera
+
+navmenu.category_other = Other
+navmenu.documentation = ドキュメント
+navmenu.about = 概要
+
+navmenu.up_to_date = 最新
+navmenu.updated_addr = アドレスを更新しました!
+navmenu.update_check = 更新を確認しています...
+navmenu.update = 更新
+navmenu.update_error = 更新エラー
+navmenu.update_explanation = 更新プログラムがあります。\n今すぐダウンロードして再起動しますか?
+navmenu.update_bad_file = 更新を適用できませんでした。\n手動で更新してください。
+
+navmenu.vsync = VSync設定
+sidemenu.file_association = Associate .tkmvst
+
+navmenu.changelog = Changelog
+
+## Submenus ##
+
+# Extraction #
+extraction.explanation = まず初めに、ゲームからMovesetやモーションを抽出する必要があります。モデルやテクスチャー、エフェクト等は抽出しません。\nゲームモードは問いませんが、対戦画面中に抽出を行うと、対象のキャラクターが取り込まれ表示されます。\n抽出中にキャラクターを操作しない、またはゲームを一時停止するのが理想的です。
+extraction.extraction = Extraction
+extraction.extract = 抽出
+extraction.extract_all = すべてを抽出
+extraction.extract_from = 抽出元:
+extraction.overwrite_duplicate = 同じ名前のMovesetに上書きする
+extraction.overwrite_explanation = 同じ名前の末尾に数字を加えたファイル名にするには無効にします。\n例:T7_JIN (2)
+extraction.progress = 抽出中...  (%u%%)
+extraction.progress_error = 抽出エラー (%u%%)
+extraction.progress_done = 抽出中... 完了!
+extraction.extracted_movesets = 抽出されたMoveset
+extraction.cant_extract = キャラクターがロードされていないため抽出できません。
+extraction.error_file_creation = Movesetファイルの作成中にエラーが発生しました
+extraction.error_compression = Movesetファイルの圧縮中にエラーが発生しました
+extraction.error_allocation = Movesetデータのコピー中にメモリ割り当てエラーが発生しました
+extraction.mota_explanation = 追加のアニメーション
+extraction.settings = 設定
+extraction.settings.other = その他
+extraction.settings.displayable_movelist = 表示可能なMovelist
+extraction.settings.compress_moveset = Movesetを圧縮
+extraction.settings.compression_type = 圧縮タイプ
+extraction.settings.compression_type.none = 無圧縮
+
+# Importation #
+importation.explanation = Movesetを抽出し保存後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。主にプラクティスモードで使用します。インポートされたMovesetは、対戦ロード画面中にメモリ領域からアンロードされ消失します。\nオンラインプレイについては、「オンライン」の項を参照してください。
+importation.importation = Importation
+importation.select_moveset = インポートするMovesetを選択
+importation.cant_import = アクティブなゲームモード(プラクティスモード等)がロードされていないため、インポートできません。
+importation.import_to = インポート先:
+importation.progress = インポート中... (%u%%)
+importation.progress_error = インポートエラー (%u%%)
+importation.progress_done = インポート... 完了!
+importation.apply_instantly = 即時適用
+importation.apply_instantly_explanation = オフにすると、現在のMoveが終了するまで待機してから新しいMovesetに切り替わります。\n一部の動き(ニーガンのアイドリングアニメーションなど)の場合は、かなり時間がかかることがあります。
+importation.free_unused_movesets = 未使用のMovesetを解放する
+importation.free_unused_movesets_explanation = オンにすると、使用されていないMovesetがメモリから解放されます。\nこれにより、このツールがすべてのRAMを使用するのを防ぐことができます。
+importation.error_file_reading = Movesetファイルの読み込み中にエラーが発生しました
+importation.error_allocation = Movesetデータの読み取り中にメモリ割り当てエラーが発生しました
+importation.error_game_allocation = Movesetデータの書き込み中にゲームメモリの割り当てエラーが発生しました
+importation.error_decompression = Movesetデータの圧縮中にエラーが発生しました
+
+# Persistent play #
+persistent.explanation = 永続プレイモードでは、ゲーム側のキャラクターを切り替えてもプレイヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、お互いが両方のMovesetを既にダウンロード/抽出している場合は、これをオンラインで使用できます。\nそれぞれが自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定します。
+persistent.player_1 = Player 1:
+persistent.player_2 = Player 2:
+persistent.player_3 = Player 3:
+persistent.player_4 = Player 4:
+persistent.none = Moveset無し
+persistent.lock = Moveset固定
+persistent.unlock = 固定解除
+persistent.hash = Hash:
+persistent.select_moveset = Moveset選択
+persistent.clear_moveset = 選択解除
+
+# Online #
+online.explanation = オンラインプレイでは、両方のプレイヤーがこのツールを使用している必要があります。\n対戦前に両方のプレイヤーはmovesetまたはnoneを選択する必要があります。このツールは、両者のPC間をバックグラウンドで同期します。\n相手がツールを使用していない場合、または2人のプレイヤーのいずれかがMoveset選択を固定していない場合、CustomMovesetはロードされません。
+online.select_moveset = Movesetを選択
+online.no_selected_moveset = Movesetが選択されていません
+online.dll_not_loaded = DLLがロードされていない。展開します
+online.inject_dll = 展開
+online.injecting_dll = 展開中...
+online.select_moveset = 選択
+online.selected_moveset = 選択済み:
+online.lock_to_play = ロードするMovesetを固定します
+
+# Movest Edition : rename #
+edition.rename.new_moveset_name = 新しいMoveset名
+edition.rename.empty_name = 名前がありません
+edition.rename.already_exists = この名前はすでに使用されています
+edition.rename.rename_err = 名前の変更中にエラーが発生しました。文字は有効ですか？
+edition.rename.invalid_name = 名前に無効な文字が含まれています。(/\|<:"?※)
+
+# Moveset Edition #
+edition.explanation = ここでは抽出したMovesetを編集できます。チュートリアルや役立つリソースについては、ドキュメントを参照してください。\n「ライブ編集」をオンにすると、CustomMovesetをすばやく変更できます。単純な値の変更は、即メモリに適用されます。
+edition.select_moveset = 編集するMovesetを選択
+edition.last_saved = 最終保存日時:
+edition.save = 保存
+edition.discard_changes = 変更を破棄しますか?\nライブ編集が有効になっている場合、変更はゲーム内で元の状態にリセットされません。
+edition.process_err = エラー
+edition.live_edition = ライブ編集
+edition.live_edition_explanation = オンにすると、Moveset変更後のインポートを要求せずに、単純な値の変更などの些細な変更をゲームメモリ内に直接適用します。\nリストの項目を追加または削除したり、Movesetのサイズを増やす必要がある場合は、インポートが必要になります。
+edition.move_name = Name
+edition.move_generic_id = Alias
+edition.moves_all = All
+edition.moves_attacks = Attacks
+edition.moves_generic = Generic
+edition.moves_throws = Throws
+edition.moves_custom = Custom
+edition.moves_char_specific = Character
+edition.move_id_hint = Move ID...
+edition.move_current = Current
+edition.move_current_1p = Current (1P)
+edition.move_current_2p = Current (2P)
+edition.play_move_1p = Play (1P)
+edition.play_move_2p = Play (2P)
+edition.window_title = Editor
+edition.apply = 適用
+edition.window_controls_explanation = MovelistのMoveをクリックすると、関連するウィンドウが開きます。変更がなく保存されていないウィンドウは、置き換えます。またMoveをCTRL LEFT+クリックすると、別ウィンドウで開きます。ウィンドウは任意の場所にドラッグでき、ドッキングでき、さまざまなレイアウトを形成できます。
+edition.extract_animations = アニメーションを抽出
+edition.extract_animations_finished = アニメーション抽出完了!
+
+edition.form_popup.copy_structure_clipboard = Structureをクリップ
+edition.form_popup.copy_single_item_clipboard = 単一の項目をクリップ
+edition.form_popup.paste_structure_clipboard = Structureの貼り付け
+edition.form_popup.duplicate_structure = Structureを複製
+edition.form_popup.delete_structure = Structureの削除
+edition.form_popup.what_cancels_into_this_move = このMoveを使用するCancelを検索
+edition.form_popup.what_moves_use_this_cancel_list = このcancel listを使用するMoveを検索
+edition.form_popup.deletion_are_you_sure = 本当にStructureを削除しますか?\nこのStructureが他の場所でも使用している場合は、問題を回避するためにStructureを削除しないことをお勧めします。
+edition.form_popup.yes_delete = はい、削除します。
+
+edition.create_new = 新規作成
+edition.requirement = Requirement list
+edition.move = Move
+edition.voiceclips = Voiceclips
+edition.cancel_list = Cancel list
+edition.grouped_cancel_list = Grouped cancel list
+edition.cancel_extradata = Cancel extradata
+edition.extra_properties = Extra properties
+edition.move_begin_properties = Move begin properties
+edition.move_end_properties = Move end properties
+edition.hit_conditions = Hit Condition list
+edition.reactions = Reactions
+edition.pushback = Pushback
+edition.pushback_extra = Pushback extra
+edition.input_sequence = Input sequence
+edition.inputs = Inputs
+edition.projectile = Projectile(飛び道具)
+edition.throw_camera = Throw camera
+edition.camera_data = Camera data
+edition.mvl_playable = Movelist: Playable
+edition.mvl_inputs = Movelist: Inputs
+
+edition.update_labels = Labelを更新する
+edition.updating_labels = Label: 更新中...
+edition.updating_labels_err = Label: エラー
+edition.up_to_date_labels = Label: 最新
+
+edition.updated_labels = Label: 更新されました!
+
+edition.open_movelist = Movelistを開く
+
+edition.move.window_name = Move
+edition.move.category_2 = References
+edition.move.category_3 = Extras
+edition.move.category_5 = Unnamed fields
+edition.move.move_name = Move名
+edition.move.move_name.description = Move名 ゲームプレイには影響しません。
+edition.move.anim_name = アニメーション名
+edition.move.vulnerability = Vuln(ステータス設定)
+edition.move.hitlevel = HitLevel(技判定の設定)
+edition.move.transition = Transition
+edition.move.anim_len = アニメーション長
+edition.move.hitbox_location = HITBOX設定
+edition.move.first_active_frame = 技判定開始
+edition.move.last_active_frame = 技判定終り
+edition.move.airborne_start = 空中判定開始
+edition.move.airborne_end = 空中判定終り
+edition.move.ground_fall = 着地フレーム
+edition.move.distance = 距離設定
+edition.move.hit_condition_addr = Hit conditions ID番号
+edition.move.extra_properties_addr = Extra properties ID番号
+edition.move.move_start_extraprop_addr = Beginning extra prop ID番号
+edition.move.move_end_extraprop_addr = Ending extra prop ID番号
+edition.move.voiceclip_addr = Voiceclip ID番号
+edition.move.cancel_addr = Cancels ID番号
+edition.move.cancel_addr_2 = Cancels ID番号 (2)
+edition.move.cancel_related_id_2 = Cancel ID番号 2: related
+edition.move.cancel_addr_3 = Cancels ID番号 (4)
+edition.move.cancel_related_id_3 = Cancel ID番号 3: related
+edition.move.cancel_addr_4 = Cancels ID番号 (4)
+edition.move.cancel_related_id_4 = Cancels ID番号 4: related
+edition.move._0x98_int = Facing/Extras?
+
+edition.voiceclip.window_name = Voiceclip
+edition.voiceclip.id = ID
+edition.voiceclip.limb_swinging = Limb swinging SFX
+edition.voiceclip.hit = Hit SFX
+edition.voiceclip.end = END
+
+edition.extraproperty.window_name = Extra property list
+edition.extraproperty.starting_frame = 開始フレーム
+edition.extraproperty.id = ID
+edition.extraproperty.throw_camera_id = Throw camera ID番号
+edition.extraproperty.projectile_id = Projectile ID番号
+edition.extraproperty.instant = INSTANT
+edition.extraproperty.every_frame = EVERY FRAME
+edition.extraproperty.every_nth_frame = EVERY %d FRAMES
+edition.extraproperty.value_unsigned = 値 (U32)
+edition.extraproperty.value_signed = 値 (S32)
+edition.extraproperty.value_hex = 値 (H32)
+edition.extraproperty.value_float = 値 (Float)
+
+edition.move_start_extraprop.window_name = Start property list
+edition.move_start_extraprop.requirements_addr = Requirements List番号
+edition.move_start_extraprop.extraprop = Property / Requirement
+edition.move_start_extraprop.value = 値
+
+edition.move_end_extraprop.window_name = End property list
+edition.move_end_extraprop.requirements_addr = Requirements List番号
+edition.move_end_extraprop.extraprop =  Property / Requirement
+edition.move_end_extraprop.value = 値
+
+edition.cancel.window_name = Cancel list
+edition.cancel.command = Command設定
+edition.cancel.requirements_addr = Requirements List番号
+edition.cancel.extradata_addr = Extradata ID番号
+edition.cancel.detection_start = 入力幅開始
+edition.cancel.detection_end = 入力幅終り
+edition.cancel.starting_frame = Move開始フレーム
+edition.cancel.move_id = Move ID番号
+edition.cancel.group_id = Grouped Cancel ID番号
+edition.cancel.sequence_id = Sequence ID番号
+edition.cancel.cancel_option = Cancel Option
+edition.cancel.invalid_sequence_id = 無効なID番号
+
+edition.grouped_cancel.window_name = Grouped Cancel list
+edition.grouped_cancel.command = Command設定
+edition.grouped_cancel.requirements_addr = Requirements List番号
+edition.grouped_cancel.extradata_addr = Extradata ID番号
+edition.grouped_cancel.detection_start = Detection start (既定0)
+edition.grouped_cancel.detection_end = Detection end (既定0)
+edition.grouped_cancel.starting_frame = Grouped Cancel総数-1
+edition.grouped_cancel.move_id = Move ID番号
+edition.grouped_cancel.cancel_option = Cancel option
+
+edition.cancel_extra.window_name = Cancel extra
+edition.cancel_extra.value = 値
+
+edition.requirement.window_name = Requirement list
+edition.requirement.condition = Requirements ID番号
+edition.requirement.param_unsigned = パラメータ
+edition.requirement.param_float = パラメータ(Float)
+
+edition.hit_condition.window_name = Hit condition list
+edition.hit_condition.requirements_addr = Requirements List番号
+edition.hit_condition.damage = ダメージ
+edition.hit_condition.reactions_addr = Reactions ID番号
+
+edition.reactions.window_name = Reactions
+edition.reactions.category_1 = Pushback ID番号
+edition.reactions.category_3 = やられモーションMove ID番号
+edition.reactions.category_5 = Direction
+edition.reactions.category_7 = Other
+edition.reactions.front_pushback = 正面
+edition.reactions.backturned_pushback = 背面
+edition.reactions.left_side_pushback = 左側面
+edition.reactions.right_side_pushback = 右側面
+edition.reactions.front_counterhit_pushback = 正面CH
+edition.reactions.downed_pushback = ダウン
+edition.reactions.block_pushback = ガード
+edition.reactions.front_direction = 正面
+edition.reactions.back_direction = 背面
+edition.reactions.left_side_direction = 左側面
+edition.reactions.right_side_direction = 右側面
+edition.reactions.front_counterhit_direction = 正面CH
+edition.reactions.downed_direction = ダウン
+edition.reactions.0x44_long = _0x44_long
+edition.reactions.vertical_pushback = 垂直方向への押す力
+edition.reactions.standing_moveid = 立ち
+edition.reactions.default_moveid = 既定
+edition.reactions.crouch_moveid = しゃがみ
+edition.reactions.counterhit_moveid = 立ちCH
+edition.reactions.crouch_counterhit_moveid = しゃがみCH
+edition.reactions.left_side_moveid = 左側面
+edition.reactions.crouch_left_side_moveid = しゃがみ左側面
+edition.reactions.right_side_moveid = 右側面
+edition.reactions.crouch_right_side_moveid = しゃがみ右側面
+edition.reactions.backturned_moveid = 背面
+edition.reactions.crouch_backturned_moveid = しゃがみ背面
+edition.reactions.block_moveid = 立ちガード
+edition.reactions.crouch_block_moveid = しゃがみガード
+edition.reactions.wallslump_moveid = 壁やられ
+edition.reactions.downed_moveid = ダウン
+
+edition.input_sequence.window_name = Input sequence
+edition.input_sequence.input_window_frames = 入力幅
+edition.input_sequence.input_amount = 入力回数
+edition.input_sequence.input_addr = Input ID番号
+
+edition.input.window_name = Input
+edition.input.direction = 方向入力値
+edition.input.button = ボタン入力値
+edition.input.inputs = Inputs
+
+edition.projectile.window_name = Projectile
+edition.projectile.category_2 = References
+edition.projectile.category_3 = Unnamed
+edition.projectile.vfx_id = VFX ID番号
+edition.projectile.vfx_variation_id = VFX Variation ID番号
+edition.projectile.delay = ディレイ
+edition.projectile.vertical_velocity = 垂直速度
+edition.projectile.horizontal_velocity = 水平速度
+edition.projectile.duration = 持続時間
+edition.projectile.no_collision = 判定無し
+edition.projectile.size = サイズ
+edition.projectile.hash = Hash
+edition.projectile.can_hitbox_connect = HITBOX追加
+edition.projectile.gravity = 重力追加
+edition.projectile.hit_level = HIT Levels
+edition.projectile.hit_condition_addr = Hit Conditions ID番号
+edition.projectile.cancel_addr = Cancels ID番号
+edition.projectile.voiceclip_on_hit = HIT時の声
+
+edition.pushback.window_name = Pushback
+edition.pushback.duration = 期間
+edition.pushback.num_of_loops = ループ回数
+edition.pushback.displacement = 移動量
+edition.pushback.extradata_addr = Pushback Extradata ID番号
+
+edition.pushback_extradata.window_name = Pushback Extradata
+edition.pushback_extradata.horizontal_offset = 水平補正量
+
+edition.form_list.item = Item
+edition.form_list.end = END
+edition.form_list.invalid = 無効
+edition.form_list.controls_disabled_explanation =  開始IDが1を超えるリストのみがリストコントロールにアクセスできます
+
+edition.animation_list.anim_name = アニメーションファイル名
+edition.animation_list.duration = 実フレーム数
+edition.animation_list.size = サイズ
+edition.animation_list.import = Moveにインポート
+edition.animation_list.search_animation = CurrentMoveにインポートするアニメーションを検索...
+edition.animation_list.no_anim = ライブラリにアニメーションが見つかりません。Editorからキャラクターを開き、「アニメーションを抽出」ボタンをクリックすると、ライブラリに追加されます。
+edition.animation_list.loading = アニメーションリストを読み込み中...
+edition.animation_list.clear_filter = Clear filter
+
+edition.throw_camera.window_name = Throw Camera
+edition.throw_camera._0x0_int = _0x0_int
+edition.throw_camera.cameradata_addr = Camera data ID番号
+
+edition.camera_data.window_name = Camera data
+edition.camera_data._0x0_int = _0x0_int
+edition.camera_data._0x4_short = _0x4_short
+edition.camera_data.left_side_camera_data = 左側面
+edition.camera_data.right_side_camera_data = 右側面
+edition.camera_data._0xA_short = _0xA_short
+
+edition.mvl_displayable.window_name = Movelist: Displayable
+edition.mvl_displayable.type = Type
+edition.mvl_displayable.playable_id = Playable ID番号
+edition.mvl_displayable.playable = (Playable)
+edition.mvl_displayable.not_playable = (Not playable)
+edition.mvl_displayable.category_1 = 不明
+edition.mvl_displayable.title_translation_0 = 日本語タイトル 1
+edition.mvl_displayable.title_translation_1 = タイトル 1
+edition.mvl_displayable.title_translation_2 = 日本語タイトル 2
+edition.mvl_displayable.title_translation_3 = タイトル 2
+edition.mvl_displayable.translation_0 = 日本語
+edition.mvl_displayable.translation_1 = 英語
+edition.mvl_displayable.translation_2 = ポルトガル語
+edition.mvl_displayable.translation_3 = スペイン語
+edition.mvl_displayable.translation_4 = フランス語
+edition.mvl_displayable.translation_5 = イタリア語
+edition.mvl_displayable.translation_6 = ドイツ語
+edition.mvl_displayable.translation_7 = メキシコ
+edition.mvl_displayable.translation_8 = キリル文字
+edition.mvl_displayable.translation_9 = アラビア語
+edition.mvl_displayable.translation_10 = 中国語
+edition.mvl_displayable.translation_11 = 韓国語
+edition.mvl_displayable.icons = ICON
+edition.mvl_displayable.icons_2 = ICON 2
+edition.mvl_displayable.combo_difficulty = 難易度
+edition.mvl_displayable.combo_damage = ダメージ
+edition.mvl_displayable.p2_action = P2 アクション
+
+edition.mvl_playable.window_name = Movelist: Playable
+edition.mvl_playable.distance = 距離
+edition.mvl_playable.p2_rotation = P2 Rotation
+edition.mvl_playable.input_count = Input count
+edition.mvl_playable.input_sequence_id = Input sequence ID番号
+edition.mvl_playable.has_rage = レイジ時
+
+edition.mvl_input.window_name = Movelist: Input
+edition.mvl_input.directions = 方向入力
+edition.mvl_input.buttons = ボタン入力
+edition.mvl_input.frame_duration = 入力幅
+edition.mvl_input.trigger_highlight = Trigger highlight
+edition.mvl_input.frame = Frame
+edition.mvl_input.frames = frames
+
+# Documentation #
+
+# About #
+
+about.explanation = TKMovesetsはModderによって作られたソフトウェアであり、このソフトウェアが操作するゲームとは法的な関係は一切ありません。\nこのソフトウェアはGPLv 3でライセンスされています。ライセンスを変更しない限り、取得、変更、再配布が自由に行えるフリーソフトウェアです。\nこのソフトウェアにお金を払った場合、詐欺にあったことになります。
+about.credits = クレジット:
+about.kilo_explanation = moveset extractorの主要な開発者で、データ構造の大部分をリバースエンジニアリングし、エクスポート/インポート方法論を確立し、このmoveset export/import/editionソフトウェアを記述する責任があります。
+about.ali_explanation = 特に、移動セット構造のリバースエンジニアリング、移動セット編集のためのIDの大幅な解明、移動セット編集チュートリアルの作成、カメラや手のアニメーションなどの多くの機能の実現に貢献しました。
+about.fletch_explanation = かなりの数のmoveset編集プロパティのドキュメントを作成し、多くのチュートリアルを作成することで、moveset editionを大幅に拡張しました。
+about.koenji_explanation = moveset editionに早く参加し、そのワークフローを非常に理解するのに役立ち、多くのmovesetプロパティの解読にも貢献しました。
+about.sadamitsu_explanation = さまざまな種類のアニメーションについて、どのように構成され、どこに格納されているかを理解するのに役立ちました。
+about.dennis_stanistan_explanation = Movesetの抽出プログラムを作る時、自由気ままな彼の投稿を見ていたらを知らず知らずのうちに助けられた。
