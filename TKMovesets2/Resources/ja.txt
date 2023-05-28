@@ -61,10 +61,10 @@ moveset.hash = Hash
 # Navmenu #
 navmenu.category_moveset = Movesets
 navmenu.category_play = Play
-navmenu.extraction = 抽出
+navmenu.extraction = エクスポート
 navmenu.import = インポート
-navmenu.online = オンラインプレイ
-navmenu.persistent_play = 永続プレイ
+navmenu.online = オンラインプレー
+navmenu.persistent_play = 永続プレー
 
 navmenu.category_tools = Tools
 navmenu.moveset_edit = Movesetの編集
@@ -90,18 +90,18 @@ navmenu.changelog = Changelog
 ## Submenus ##
 
 # Extraction #
-extraction.explanation = まず初めに、ゲームからMovesetやモーションを抽出する必要があります。モデルやテクスチャー、エフェクト等は抽出しません。\nゲームモードは問いませんが、対戦画面中に抽出を行うと、対象のキャラクターが取り込まれ表示されます。\n抽出中にキャラクターを操作しない、またはゲームを一時停止するのが理想的です。
+extraction.explanation = まず初めに、ゲームからMovesetやモーションをエクスポートする必要があります。モデルやエフェクト等はエクスポートしません。\nエクスポートするタイミングはゲームモードを問いませんが、対戦画面中のみです。\nエクスポート中にキャラクターを操作しない、またはゲームを一時停止するのが理想的です。
 extraction.extraction = Extraction
-extraction.extract = 抽出
-extraction.extract_all = すべてを抽出
-extraction.extract_from = 抽出元:
+extraction.extract = エクスポート
+extraction.extract_all = すべてをエクスポート
+extraction.extract_from = エクスポート元:
 extraction.overwrite_duplicate = 同じ名前のMovesetに上書きする
 extraction.overwrite_explanation = 同じ名前の末尾に数字を加えたファイル名にするには無効にします。\n例:T7_JIN (2)
-extraction.progress = 抽出中...  (%u%%)
-extraction.progress_error = 抽出エラー (%u%%)
-extraction.progress_done = 抽出中... 完了!
-extraction.extracted_movesets = 抽出されたMoveset
-extraction.cant_extract = キャラクターがロードされていないため抽出できません。
+extraction.progress = エクスポート中...  (%u%%)
+extraction.progress_error = エクスポートエラー (%u%%)
+extraction.progress_done = エクスポート中... 完了!
+extraction.extracted_movesets = エクスポートされたMoveset
+extraction.cant_extract = キャラクターがロードされていないためエクスポートできません。
 extraction.error_file_creation = Movesetファイルの作成中にエラーが発生しました
 extraction.error_compression = Movesetファイルの圧縮中にエラーが発生しました
 extraction.error_allocation = Movesetデータのコピー中にメモリ割り当てエラーが発生しました
@@ -114,7 +114,7 @@ extraction.settings.compression_type = 圧縮タイプ
 extraction.settings.compression_type.none = 無圧縮
 
 # Importation #
-importation.explanation = Movesetを抽出し保存後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。主にプラクティスモードで使用します。インポートされたMovesetは、対戦ロード画面中にメモリ領域からアンロードされ消失します。\nオンラインプレイについては、「オンライン」の項を参照してください。
+importation.explanation = Movesetをエクスポートし保存後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。主にプラクティスモードで使用します。インポートされたMovesetは、対戦ロード画面中にメモリ領域からアンロードされ消失します。\nオンラインプレイについては、「オンライン」の項を参照してください。
 importation.importation = Importation
 importation.select_moveset = インポートするMovesetを選択
 importation.cant_import = アクティブなゲームモード(プラクティスモード等)がロードされていないため、インポートできません。
@@ -123,7 +123,7 @@ importation.progress = インポート中... (%u%%)
 importation.progress_error = インポートエラー (%u%%)
 importation.progress_done = インポート... 完了!
 importation.apply_instantly = 即時適用
-importation.apply_instantly_explanation = オフにすると、現在のMoveが終了するまで待機してから新しいMovesetに切り替わります。\n一部の動き(ニーガンのアイドリングアニメーションなど)の場合は、かなり時間がかかることがあります。
+importation.apply_instantly_explanation = オフにすると、現在のMoveが終了するまで待機してから新しいMovesetに切り替わります。\n一部の動き(ニーガンのニュートラル時アニメーションなど)の場合は、かなり時間がかかることがあります。
 importation.free_unused_movesets = 未使用のMovesetを解放する
 importation.free_unused_movesets_explanation = オンにすると、使用されていないMovesetがメモリから解放されます。\nこれにより、このツールがすべてのRAMを使用するのを防ぐことができます。
 importation.error_file_reading = Movesetファイルの読み込み中にエラーが発生しました
@@ -132,7 +132,7 @@ importation.error_game_allocation = Movesetデータの書き込み中にゲー�
 importation.error_decompression = Movesetデータの圧縮中にエラーが発生しました
 
 # Persistent play #
-persistent.explanation = 永続プレイモードでは、ゲーム側のキャラクターを切り替えてもプレイヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、お互いが両方のMovesetを既にダウンロード/抽出している場合は、これをオンラインで使用できます。\nそれぞれが自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定します。
+persistent.explanation = 永続プレイモードでは、ゲーム側のキャラクターを切り替えてもプレイヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、お互いが両方のMovesetを既にダウンロード/エクスポートしている場合は、これをオンラインで使用できます。\nそれぞれが自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定します。
 persistent.player_1 = Player 1:
 persistent.player_2 = Player 2:
 persistent.player_3 = Player 3:
@@ -163,7 +163,7 @@ edition.rename.rename_err = 名前の変更中にエラーが発生しました�
 edition.rename.invalid_name = 名前に無効な文字が含まれています。(/\|<:"?※)
 
 # Moveset Edition #
-edition.explanation = ここでは抽出したMovesetを編集できます。チュートリアルや役立つリソースについては、ドキュメントを参照してください。\n「ライブ編集」をオンにすると、CustomMovesetをすばやく変更できます。単純な値の変更は、即メモリに適用されます。
+edition.explanation = ここではエクスポートしたMovesetを編集できます。チュートリアルや役立つリソースについては、ドキュメントを参照してください。\n「ライブ編集」をオンにすると、CustomMovesetをすばやく変更できます。単純な値の変更は、即メモリに適用されます。
 edition.select_moveset = 編集するMovesetを選択
 edition.last_saved = 最終保存日時:
 edition.save = 保存
@@ -188,8 +188,8 @@ edition.play_move_2p = Play (2P)
 edition.window_title = Editor
 edition.apply = 適用
 edition.window_controls_explanation = MovelistのMoveをクリックすると、関連するウィンドウが開きます。変更がなく保存されていないウィンドウは、置き換えます。またMoveをCTRL LEFT+クリックすると、別ウィンドウで開きます。ウィンドウは任意の場所にドラッグでき、ドッキングでき、さまざまなレイアウトを形成できます。
-edition.extract_animations = アニメーションを抽出
-edition.extract_animations_finished = アニメーション抽出完了!
+edition.extract_animations = アニメーションをエクスポート
+edition.extract_animations_finished = アニメーションのエクスポート完了!
 
 edition.form_popup.copy_structure_clipboard = Structureをクリップ
 edition.form_popup.copy_single_item_clipboard = 単一の項目をクリップ
@@ -237,21 +237,27 @@ edition.move.category_2 = References
 edition.move.category_3 = Extras
 edition.move.category_5 = Unnamed fields
 edition.move.move_name = Move名
-edition.move.move_name.description = Move名 ゲームプレイには影響しません。
+edition.move.move_name.description = ゲームプレーに影響しません。
 edition.move.anim_name = アニメーション名
-edition.move.vulnerability = Vuln(ステータス設定)
-edition.move.hitlevel = HitLevel(技判定の設定)
+edition.move.vulnerability = Vulnerability
+edition.move.vulnerability.description = ステータスの設定 オートガードの有無
+edition.move.hitlevel = HitLevel
+edition.move.hitlevel.description = 技判定の設定 上中下段 投げ等
 edition.move.transition = Transition
+edition.move.transition.description = Move終了後、次のMoveやAliasを指定
 edition.move.anim_len = アニメーション長
 edition.move.hitbox_location = HITBOX設定
-edition.move.first_active_frame = 技判定開始
-edition.move.last_active_frame = 技判定終り
-edition.move.airborne_start = 空中判定開始
-edition.move.airborne_end = 空中判定終り
+edition.move.hitbox_location.description = 体部位にHITBOXを与える
+edition.move.first_active_frame = 判定開始フレーム
+edition.move.last_active_frame = 判定終りフレーム
+edition.move.airborne_start = 空中判定開始フレーム
+edition.move.airborne_end = 空中判定終りフレーム
 edition.move.ground_fall = 着地フレーム
 edition.move.distance = 距離設定
 edition.move.hit_condition_addr = Hit conditions ID番号
+edition.move.hit_condition_addr.description = 技判定の接触を総括するID番号
 edition.move.extra_properties_addr = Extra properties ID番号
+edition.move.extra_properties_addr.description = 機能追加するID番号
 edition.move.move_start_extraprop_addr = Beginning extra prop ID番号
 edition.move.move_end_extraprop_addr = Ending extra prop ID番号
 edition.move.voiceclip_addr = Voiceclip ID番号
