@@ -367,6 +367,21 @@ namespace StructsTTT2
 		}
 	};
 
+	// Some alternate MOTA format that is not compatible with T7
+	struct AltMotaHeader
+	{
+		uint16_t _0x0; // Seemingly always 1
+		uint16_t anim_count;
+		uint16_t _0x4; // Has to be smaller than _0x6
+		uint16_t _0x6;
+
+		// -- Size depends on anim_count. -- //
+		//List of offsets, points to anim_lengths[?] (first bit is discarded to do so)
+		uint32_t offsets[1];
+		// List of anim lengths
+		uint16_t anim_lengths[1];
+	};
+
 	struct MotaList
 	{
 		union {

@@ -13,6 +13,9 @@ private:
 	bool m_overwriteSameFilename;
 	// Whether to export the displayable movelist shown in training mode or not
 	bool m_extractDisplayableMovelist;
+	// Whether to extract unsupported MOTA formats (used for debug purposes)
+	bool m_extractUnsupportedMotas;
+
 	// Type of compression to apply to the moveset
 	unsigned int m_compressionIndex = 0;
 
@@ -20,5 +23,6 @@ private:
 	ExtractSettings GetExtractionSettings();
 public:
 	Submenu_Extract();
+	void RenderSettingsPopup();
 	void Render(GameExtract& extractorHelper);
 };

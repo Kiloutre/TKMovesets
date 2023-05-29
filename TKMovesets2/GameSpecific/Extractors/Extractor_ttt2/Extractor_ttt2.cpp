@@ -420,15 +420,15 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 			DEBUG_LOG("Saved mota %d, size is %d (0x%x)\n", motaId, motaSize, motaSize);
 		} else {
 			// Malformed/Unknown format
-			if (expectedMotaSize != 0)
+			if (expectedMotaSize != 0 && (settings & ExtractSettings_UnknownMotas))
 			{
 				// Unknown format, still exporting
-				DEBUG_LOG("Unknown MOTA %u of size %u at addr %llx\n", motaId, expectedMotaSize, motaAddr);
+				DEBUG_LOG("Unknown MOTA %u of size %u at addr %x\n", motaId, expectedMotaSize, motaAddr);
 				offsetMap[motaAddr] = std::pair<uint32_t, uint32_t>(motaCustomBlockSize, expectedMotaSize);
 				motaCustomBlockSize += expectedMotaSize;
 			}
 			else {
-				DEBUG_LOG("Malformed MOTA %u at addr %llx\n", motaId, motaAddr);
+				DEBUG_LOG("Malformed MOTA %u at addr %x\n", motaId, motaAddr);
 			}
 		}
 	}

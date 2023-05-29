@@ -253,14 +253,19 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, By
 	// This is just a list of uint64_t anyway so might as well do this
 	for (size_t i = 0; i <= 12; ++i)
 	{
-		if (fileMotas[i] != MOVESET_ADDR_MISSING) {
-			fileMotas[i] += gameMoveset + offsets->motaBlock;
-			DEBUG_LOG("Using custom mota %llu\n", i);
+		if (fileMotas[i] != MOVESET_ADDR_MISSING)
+		{
+			MotaHeader* mota = (MotaHeader*)offsets->GetBlock(TKMovesetHeaderBlocks_Mota, moveset);
+			if (mota->IsValid()) {
+				DEBUG_LOG("Using custom mota %llu\n", i);
+				fileMotas[i] += gameMoveset + offsets->motaBlock;
+				continue;
+			}
 		}
-		else if (replaceEmpty) {
+
+		if (replaceEmpty) {
 			// Moveset block was not included in the file: copy the currently used one
 			fileMotas[i] = gameMotas[i];
-			DEBUG_LOG("2\n");
 		}
 	}
 }

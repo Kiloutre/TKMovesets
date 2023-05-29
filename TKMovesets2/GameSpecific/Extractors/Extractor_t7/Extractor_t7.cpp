@@ -203,8 +203,17 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			DEBUG_LOG("Saved mota %u, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
 		}
 		else {
-			DEBUG_LOG("Malformed MOTA %u at addr %llx\n", motaId, motaAddr);
-			// Malformed MOTA, don't save it
+			// Malformed/Unknown format
+			if (expectedMotaSize != 0 && (settings & ExtractSettings_UnknownMotas))
+			{
+				// Unknown format, still exporting
+				DEBUG_LOG("Unknown MOTA %u of size %llu at addr %llx\n", motaId, expectedMotaSize, motaAddr);
+				offsetMap[motaAddr] = std::pair<uint64_t, uint64_t>(motaCustomBlockSize, expectedMotaSize);
+				motaCustomBlockSize += expectedMotaSize;
+			}
+			else {
+				DEBUG_LOG("Malformed MOTA %u at addr %llx\n", motaId, motaAddr);
+			}
 		}
 	}
 	return motaCustomBlockSize;
@@ -243,7 +252,7 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 
 				if (motaPtr->IsValid(motaSize))
 				{
-					DEBUG_LOG("Mota %llu, size is %u: little endian %d\n", i, motaSize, motaPtr->is_little_endian);
+					DEBUG_LOG("Mota %llu, size is %llu: little endian %d\n", i, motaSize, motaPtr->is_little_endian);
 
 					if (motaPtr->IsBigEndian()) {
 						// Like the game does when they are big endianed, force every MOTA to be little endianed
@@ -254,7 +263,7 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 				else
 				{
 					// Unknown mota format
-					DEBUG_LOG("Mota %u: size is %u\n", i, motaSize);
+					DEBUG_LOG("Mota %llu: size is %llu\n", i, motaSize);
 				}
 
 				exportedMotas.insert(motaAddr[i]);

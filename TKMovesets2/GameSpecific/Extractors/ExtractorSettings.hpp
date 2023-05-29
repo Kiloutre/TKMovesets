@@ -32,5 +32,7 @@ enum ExtractSettings_
 	ExtractSettings_CompressLZMA = (1 << 14),
 	ExtractSettings_CompressLZ4 = (1 << 15),
 
+	ExtractSettings_UnknownMotas = (1 << 16),
+
 	ExtractSettings_Compress = ExtractSettings_CompressLZMA | ExtractSettings_CompressLZ4,
 };

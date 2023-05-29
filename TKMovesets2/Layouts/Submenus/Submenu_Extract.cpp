@@ -27,6 +27,8 @@ Submenu_Extract::Submenu_Extract()
 	m_overwriteSameFilename = false;
 	m_extractDisplayableMovelist = true;
 
+	m_extractUnsupportedMotas = false;
+
 	m_compressionIndex = CompressionUtils::GetDefaultCompressionSetting();
 }
 
@@ -35,6 +37,10 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 	ExtractSettings settings = 0;
 
 	settings |= CompressionUtils::GetCompressionSetting(m_compressionIndex).extractSetting;
+
+	if (m_extractUnsupportedMotas) {
+		settings |= ExtractSettings_UnknownMotas;
+	}
 
 	if (m_overwriteSameFilename) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
@@ -54,6 +60,48 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 }
 
 // -- Public methods -- //
+
+void Submenu_Extract::RenderSettingsPopup()
+{
+	ImGui::SeparatorText("MOTA");
+	ImGui::TextUnformatted(_("extraction.mota_explanation"));
+
+	char buf[8] = { "mota_00" };
+	for (uint8_t motaId = 0; motaId < 12; ++motaId) {
+		buf[5] = '0' + motaId / 10;
+		buf[6] = '0' + motaId % 10;
+		ImGui::Checkbox(_(buf), &m_motaExport[motaId]);
+
+		if ((motaId & 1) == 0) {
+			ImGui::SameLine();
+		}
+
+	}
+
+	ImGui::NewLine();
+
+	ImGui::Checkbox(_("extraction.settings.extract_unsupported_motas"), &m_extractUnsupportedMotas);
+	ImGui::NewLine();
+
+	ImGui::SeparatorText(_("extraction.settings.other"));
+	ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
+
+	ImGui::TextUnformatted(_("extraction.settings.compress_moveset"));
+	if (ImGui::BeginCombo("##", m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
+	{
+		for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
+			if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
+				m_compressionIndex = i;
+			}
+		}
+		ImGui::EndCombo();
+	}
+
+	ImGui::Separator();
+	if (ImGui::Button(_("close"))) {
+		ImGui::CloseCurrentPopup();
+	}
+}
 
 void Submenu_Extract::Render(GameExtract& extractorHelper)
 {
@@ -105,41 +153,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	// Extraction settings
 	if (ImGui::BeginPopupModal("ExtractionSettingsPopup"))
 	{
-		ImGui::SeparatorText("MOTA");
-		ImGui::TextUnformatted(_("extraction.mota_explanation"));
-
-		char buf[8] = { "mota_00" };
-		for (uint8_t motaId = 0; motaId < 12; ++motaId) {
-			buf[5] = '0' + motaId / 10;
-			buf[6] = '0' + motaId % 10;
-			ImGui::Checkbox(_(buf), &m_motaExport[motaId]);
-
-			if ((motaId & 1) == 0) {
-				ImGui::SameLine();
-			}
-
-		}
-
-		ImGui::NewLine();
-
-		ImGui::SeparatorText(_("extraction.settings.other"));
-		ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
-
-		ImGui::TextUnformatted(_("extraction.settings.compress_moveset"));
-		if (ImGui::BeginCombo("##", m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
-		{
-			for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
-				if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
-					m_compressionIndex = i;
-				}
-			}
-			ImGui::EndCombo();
-		}
-
-		ImGui::Separator();
-		if (ImGui::Button(_("close"))) {
-			ImGui::CloseCurrentPopup();
-		}
+		RenderSettingsPopup();
 		ImGui::EndPopup();
 	}
 

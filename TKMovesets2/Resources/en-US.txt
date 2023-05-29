@@ -111,6 +111,7 @@ extraction.settings.displayable_movelist = Displayable movelist
 extraction.settings.compress_moveset = Compress moveset
 extraction.settings.compression_type = Compression type
 extraction.settings.compression_type.none = No compression
+extraction.settings.extract_unsupported_motas = Extract fringe MOTAs (unsupported formats)
 
 # Importation #
 importation.explanation = After movesets are extracted and saved on your computer, they can be loaded into an active game (must not be online) using this submenu. This is a one time only thing: movesets loaded here will be unloaded after you pass through any loading screen, so this is mainly for training mode use.\nFor online play, see the "Online" section.
