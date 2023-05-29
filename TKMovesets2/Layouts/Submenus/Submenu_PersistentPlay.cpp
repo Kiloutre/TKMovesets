@@ -26,13 +26,14 @@ void Submenu_PersistentPlay::RenderMovesetList(bool canSelectMoveset)
 	availableSpace.y -= ImGui::GetFrameHeightWithSpacing();
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
-	if (ImGui::BeginTable("MovesetImportationList", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetImportationList", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, availableSpace))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
-		ImGui::TableSetupColumn(_("moveset.hash"));
+		ImGui::TableSetupColumn(_("moveset.version"));
+		ImGui::TableSetupColumn(_("persistent.hash"));
 		ImGui::TableSetupColumn(_("moveset.import"));
 		ImGui::TableHeadersRow();
 

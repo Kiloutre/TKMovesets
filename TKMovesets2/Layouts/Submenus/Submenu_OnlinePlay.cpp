@@ -35,7 +35,7 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.size"));
-		ImGui::TableSetupColumn(_("moveset.hash"));
+		ImGui::TableSetupColumn(_("persistent.hash"));
 		ImGui::TableSetupColumn(_("moveset.import"));
 		ImGui::TableHeadersRow();
 
