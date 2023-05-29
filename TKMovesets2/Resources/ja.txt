@@ -83,9 +83,9 @@ navmenu.update_explanation = 更新プログラムがあります。\n今すぐ�
 navmenu.update_bad_file = 更新を適用できませんでした。\n手動で更新してください。
 
 navmenu.vsync = VSync設定
-sidemenu.file_association = Associate .tkmvst
 
 navmenu.changelog = Changelog
+sidemenu.file_association = Associate .tkmvst
 
 ## Submenus ##
 
@@ -112,9 +112,10 @@ extraction.settings.displayable_movelist = 表示可能なMovelist
 extraction.settings.compress_moveset = Movesetを圧縮
 extraction.settings.compression_type = 圧縮タイプ
 extraction.settings.compression_type.none = 無圧縮
+extraction.settings.extract_unsupported_motas = Extract fringe MOTAs (unsupported formats)
 
 # Importation #
-importation.explanation = Movesetをエクスポートし保存後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。主にプラクティスモードで使用します。インポートされたMovesetは、対戦ロード画面中にメモリ領域からアンロードされ消失します。\nオンラインプレイについては、「オンライン」の項を参照してください。
+importation.explanation = 主にプラクティスモードで使用します。Movesetをエクスポートし改変後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。\n対戦画面を抜け、再び対戦画面に戻ろうとするとロード画面中にメモリ領域からMovesetは解放されます。\nオンライン対戦については、「オンラインプレー」の項を参照してください。
 importation.importation = Importation
 importation.select_moveset = インポートするMovesetを選択
 importation.cant_import = アクティブなゲームモード(プラクティスモード等)がロードされていないため、インポートできません。
@@ -132,7 +133,7 @@ importation.error_game_allocation = Movesetデータの書き込み中にゲー�
 importation.error_decompression = Movesetデータの圧縮中にエラーが発生しました
 
 # Persistent play #
-persistent.explanation = 永続プレイモードでは、ゲーム側のキャラクターを切り替えてもプレイヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、お互いが両方のMovesetを既にダウンロード/エクスポートしている場合は、これをオンラインで使用できます。\nそれぞれが自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定します。
+persistent.explanation = 永続プレーモードでは、ゲーム側のキャラクターを切り替えてもプレイヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、互いに両方のMovesetを既にダウンロード/エクスポートしている場合は、オンラインでも使用できます。\n各々が自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定してください。
 persistent.player_1 = Player 1:
 persistent.player_2 = Player 2:
 persistent.player_3 = Player 3:
@@ -145,7 +146,7 @@ persistent.select_moveset = Moveset選択
 persistent.clear_moveset = 選択解除
 
 # Online #
-online.explanation = オンラインプレイでは、両方のプレイヤーがこのツールを使用している必要があります。\n対戦前に両方のプレイヤーはmovesetまたはnoneを選択する必要があります。このツールは、両者のPC間をバックグラウンドで同期します。\n相手がツールを使用していない場合、または2人のプレイヤーのいずれかがMoveset選択を固定していない場合、CustomMovesetはロードされません。
+online.explanation = オンラインプレーでは、両方のプレイヤーがこのツールを使用している必要があります。\n対戦前に両方のプレイヤーはmovesetまたはnoneを選択する必要があります。このツールは、両者のPC間をバックグラウンドで同期します。\n相手がツールを使用していない場合、または2人のプレイヤーのいずれかがMoveset選択を固定していない場合、CustomMovesetはロードされません。
 online.select_moveset = Movesetを選択
 online.no_selected_moveset = Movesetが選択されていません
 online.dll_not_loaded = DLLがロードされていない。展開します
@@ -167,7 +168,7 @@ edition.explanation = ここではエクスポートしたMovesetを編集でき
 edition.select_moveset = 編集するMovesetを選択
 edition.last_saved = 最終保存日時:
 edition.save = 保存
-edition.discard_changes = 変更を破棄しますか?\nライブ編集が有効になっている場合、変更はゲーム内で元の状態にリセットされません。
+edition.discard_changes = 変更を破棄しますか?\nライブ編集が有効中、保存していない場合は変更内容を失います。
 edition.process_err = エラー
 edition.live_edition = ライブ編集
 edition.live_edition_explanation = オンにすると、Moveset変更後のインポートを要求せずに、単純な値の変更などの些細な変更をゲームメモリ内に直接適用します。\nリストの項目を追加または削除したり、Movesetのサイズを増やす必要がある場合は、インポートが必要になります。
@@ -239,17 +240,18 @@ edition.move.category_5 = Unnamed fields
 edition.move.move_name = Move名
 edition.move.move_name.description = ゲームプレーに影響しません。
 edition.move.anim_name = アニメーション名
+edition.move.anim_name.description = 使用するアニメーションファイル名
 edition.move.vulnerability = Vulnerability
 edition.move.vulnerability.description = ステータスの設定 オートガードの有無
 edition.move.hitlevel = HitLevel
 edition.move.hitlevel.description = 技判定の設定 上中下段 投げ等
 edition.move.transition = Transition
 edition.move.transition.description = Move終了後のAlias番号やMove ID番号を指定
-edition.move.anim_len = アニメーション長
+edition.move.anim_len = アニメーションの長さ
 edition.move.hitbox_location = HITBOX設定
-edition.move.hitbox_location.description = 体部位にHITBOXを与える
-edition.move.first_active_frame = 判定開始フレーム
-edition.move.last_active_frame = 判定終りフレーム
+edition.move.hitbox_location.description = HITBOXを与える体部位の値
+edition.move.first_active_frame = 技判定開始フレーム
+edition.move.last_active_frame = 技技判定終りフレーム
 edition.move.airborne_start = 空中判定開始フレーム
 edition.move.airborne_end = 空中判定終りフレーム
 edition.move.ground_fall = 着地フレーム
@@ -261,6 +263,7 @@ edition.move.extra_properties_addr.description = 機能追加するID番号
 edition.move.move_start_extraprop_addr = Beginning extra prop ID番号
 edition.move.move_end_extraprop_addr = Ending extra prop ID番号
 edition.move.voiceclip_addr = Voiceclip ID番号
+edition.move.voiceclip_addr.description = 声を再生する設定ID番号
 edition.move.cancel_addr = Cancels ID番号
 edition.move.cancel_addr_2 = Cancels ID番号 (2)
 edition.move.cancel_related_id_2 = Cancel ID番号 2: related
@@ -271,41 +274,48 @@ edition.move.cancel_related_id_4 = Cancels ID番号 4: related
 edition.move._0x98_int = Facing/Extras?
 
 edition.voiceclip.window_name = Voiceclip
-edition.voiceclip.id = ID
+edition.voiceclip.id = 再生する声のID番号
 edition.voiceclip.limb_swinging = Limb swinging SFX
 edition.voiceclip.hit = Hit SFX
 edition.voiceclip.end = END
 
 edition.extraproperty.window_name = Extra property list
 edition.extraproperty.starting_frame = 開始フレーム
-edition.extraproperty.id = ID
+edition.extraproperty.id = 機能追加ID番号
 edition.extraproperty.throw_camera_id = Throw camera ID番号
+edition.extraproperty.throw_camera_id.description = 投げ技中のカメラID番号
 edition.extraproperty.projectile_id = Projectile ID番号
+edition.extraproperty.projectile_id.description = 飛び道具ID番号(アイテム技、波動拳等)
 edition.extraproperty.instant = INSTANT
 edition.extraproperty.every_frame = EVERY FRAME
 edition.extraproperty.every_nth_frame = EVERY %d FRAMES
-edition.extraproperty.value_unsigned = 値 (U32)
-edition.extraproperty.value_signed = 値 (S32)
-edition.extraproperty.value_hex = 値 (H32)
-edition.extraproperty.value_float = 値 (Float)
+edition.extraproperty.value_unsigned = Value (U32)
+edition.extraproperty.value_signed = Value (S32)
+edition.extraproperty.value_hex = Value (H32)
+edition.extraproperty.value_float = Value (Float)
 
 edition.move_start_extraprop.window_name = Start property list
 edition.move_start_extraprop.requirements_addr = Requirements List番号
 edition.move_start_extraprop.extraprop = Property / Requirement
-edition.move_start_extraprop.value = 値
+edition.move_start_extraprop.value = Value
 
 edition.move_end_extraprop.window_name = End property list
 edition.move_end_extraprop.requirements_addr = Requirements List番号
 edition.move_end_extraprop.extraprop =  Property / Requirement
-edition.move_end_extraprop.value = 値
+edition.move_end_extraprop.value = Value
 
 edition.cancel.window_name = Cancel list
-edition.cancel.command = Command設定
+edition.cancel.command = Command Value
 edition.cancel.requirements_addr = Requirements List番号
+edition.cancel.requirements_addr.description = 要件List番号
 edition.cancel.extradata_addr = Extradata ID番号
+edition.cancel.extradata_addr.description = モーションの繋ぎ方の設定ID番号
 edition.cancel.detection_start = 入力幅開始
+edition.cancel.detection_start.description = Grouped Cancel時は既定0
 edition.cancel.detection_end = 入力幅終り
+edition.cancel.detection_end.description = Grouped Cancel時は既定0
 edition.cancel.starting_frame = Move開始フレーム
+edition.cancel.starting_frame.description = Grouped Cancel時はGrouped Cancelをチェックする数になります。\nGrouped Cancel ID番号先のリスト最終段(motOrigin)を除いた数\nGrouped Cancel総数が139なら138を入力
 edition.cancel.move_id = Move ID番号
 edition.cancel.group_id = Grouped Cancel ID番号
 edition.cancel.sequence_id = Sequence ID番号
@@ -313,17 +323,20 @@ edition.cancel.cancel_option = Cancel Option
 edition.cancel.invalid_sequence_id = 無効なID番号
 
 edition.grouped_cancel.window_name = Grouped Cancel list
-edition.grouped_cancel.command = Command設定
+edition.grouped_cancel.command = Command Value
 edition.grouped_cancel.requirements_addr = Requirements List番号
+edition.grouped_cancel.requirements_addr.description = 要件List番号
 edition.grouped_cancel.extradata_addr = Extradata ID番号
-edition.grouped_cancel.detection_start = Detection start (既定0)
-edition.grouped_cancel.detection_end = Detection end (既定0)
-edition.grouped_cancel.starting_frame = Grouped Cancel総数-1
+edition.grouped_cancel.extradata_addr.description = モーションの繋ぎ方の設定ID番号
+edition.grouped_cancel.detection_start = 入力幅開始
+edition.grouped_cancel.detection_end = 入力幅終り
+edition.grouped_cancel.starting_frame = Move開始フレーム
 edition.grouped_cancel.move_id = Move ID番号
 edition.grouped_cancel.cancel_option = Cancel option
 
 edition.cancel_extra.window_name = Cancel extra
-edition.cancel_extra.value = 値
+edition.cancel_extra.value = Value
+#####
 
 edition.requirement.window_name = Requirement list
 edition.requirement.condition = Requirements ID番号
