@@ -405,7 +405,7 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 
 			uint32_t motaSize;
 			if (lastAnimOffset == 0) {
-				DEBUG_LOG("Empty MOTA %d - ", motaId);
+				DEBUG_LOG("Empty MOTA %u - ", motaId);
 				motaSize = 0x14;
 			}
 			else {
@@ -419,9 +419,17 @@ uint64_t ExtractorTTT2::CalculateMotaCustomBlockSize(const MotaList* motas, std:
 
 			DEBUG_LOG("Saved mota %d, size is %d (0x%x)\n", motaId, motaSize, motaSize);
 		} else {
-			// todo
-			DEBUG_LOG("Malformed MOTA %d at addr %llx\n", motaId, motaAddr);
-			// Malformed MOTA, don't save it
+			// Malformed/Unknown format
+			if (expectedMotaSize != 0)
+			{
+				// Unknown format, still exporting
+				DEBUG_LOG("Unknown MOTA %u of size %u at addr %llx\n", motaId, expectedMotaSize, motaAddr);
+				offsetMap[motaAddr] = std::pair<uint32_t, uint32_t>(motaCustomBlockSize, expectedMotaSize);
+				motaCustomBlockSize += expectedMotaSize;
+			}
+			else {
+				DEBUG_LOG("Malformed MOTA %u at addr %llx\n", motaId, motaAddr);
+			}
 		}
 	}
 	return (uint64_t)motaCustomBlockSize;
@@ -458,12 +466,20 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
 				m_game->ReadBytes(motaAddr[i], (char*)motaPtr, motaSize);
 
-				DEBUG_LOG("Mota %llu: little endian %d\n", i, motaPtr->is_little_endian);
+				if (motaPtr->IsValid(motaSize))
+				{
+					DEBUG_LOG("Mota %llu, size is %u: little endian %d\n", i, motaSize, motaPtr->is_little_endian);
 
-				if (motaPtr->IsBigEndian()) {
-					// Like the game does when they are big endianed, force every MOTA to be little endianed
-					// This helps provide a more deterministic extraction
-					TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr);
+					if (motaPtr->IsBigEndian()) {
+						// Like the game does when they are big endianed, force every MOTA to be little endianed
+						// This helps provide a more deterministic extraction
+						TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr);
+					}
+				}
+				else
+				{
+					// Unknown mota format
+					DEBUG_LOG("Mota %llu: size is %u\n", i, motaSize);
 				}
 
 				exportedMotas.insert(motaAddr[i]);

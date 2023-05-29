@@ -36,7 +36,7 @@
 
 static void glfw_error_callback(int error, const char* description)
 {
-	DEBUG_LOG("!! GLFW Error %d: '%s' !!\n", error, description);
+	DEBUG_ERR("GLFW Error %d: '%s'", error, description);
 }
 
 // Tries to find a translation file for the current system locale, return false on failure

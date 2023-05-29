@@ -280,11 +280,6 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 			}
 
 			t_moveset = new_moveset;
-
-			// Mark the moveset as decompressed while it's in the editor
-			// Compressor should mark it on its own if compressing, when saving
-			((TKMovesetHeader*)t_moveset)->moveset_data_size = 0;
-			((TKMovesetHeader*)t_moveset)->compressionType = 0;
 		}
 	}
 

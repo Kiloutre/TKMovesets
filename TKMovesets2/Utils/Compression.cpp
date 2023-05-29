@@ -582,13 +582,13 @@ namespace CompressionUtils
 					break;
 				default:
 					size_out = 0;
-					DEBUG_LOG("!! Moveset decompression: unhandled compression type '%u' !!\n", header->compressionType);
+					DEBUG_ERR("Moveset decompression: unhandled compression type '%u'", header->compressionType);
 					return nullptr;
 					break;
 				}
 
 				if (result == nullptr) {
-					DEBUG_LOG("!! Error during decompression !!\n");
+					DEBUG_ERR("Error during decompression");
 				}
 
 				DEBUG_LOG("Decompressed moveset, compressed size was %llu, size_out is %llu\n", compressed_data_size, size_out);
@@ -616,13 +616,13 @@ namespace CompressionUtils
 					result = CompressionUtils::RAW::LZMA::DecompressToBuffer(moveset_data_start, compressed_data_size, output_buffer, header->moveset_data_size);
 					break;
 				default:
-					DEBUG_LOG("!! Moveset decompression: unhandled compression type '%u' !!\n", header->compressionType);
+					DEBUG_ERR("Moveset decompression: unhandled compression type '%u'", header->compressionType);
 					return false;
 					break;
 				}
 
 				if (result == false) {
-					DEBUG_LOG("!! Error during decompression !!\n");
+					DEBUG_ERR("Error during decompression");
 				}
 
 				DEBUG_LOG("Decompressed moveset, compressed size was %llu, result was %llu\n", compressed_data_size, header->moveset_data_size);
@@ -644,6 +644,7 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
+				// Mark the moveset as decompressed
 				((TKMovesetHeader*)new_moveset)->moveset_data_size = 0;
 				((TKMovesetHeader*)new_moveset)->compressionType = 0;
 

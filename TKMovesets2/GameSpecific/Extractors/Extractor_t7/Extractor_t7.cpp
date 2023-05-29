@@ -159,14 +159,14 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			// 1st bit = 1st mota. 2nd bit = 2nd mota. And so on...
 			// Use bitwise flags to store which one we want to store
 			if ((((uint64_t)1 << motaId) & settings) == 0) {
-				DEBUG_LOG("Not saving mota %d : not set to be exported.\n", motaId);
+				DEBUG_LOG("Not saving mota %u : not set to be exported.\n", motaId);
 				continue;
 			}
 			uint32_t lastAnimOffset = 0;
 			uint32_t* animOffsetList = (uint32_t*)calloc(animCount, sizeof(uint32_t));
 
 			if (animOffsetList == nullptr) {
-				DEBUG_LOG("Error while allocating the animation offset list (size %u * 4) for mota %d\n", animCount, motaId);
+				DEBUG_LOG("Error while allocating the animation offset list (size %u * 4) for mota %u\n", animCount, motaId);
 				throw;
 			}
 
@@ -188,7 +188,7 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 
 			uint64_t motaSize;
 			if (lastAnimOffset == 0) {
-				DEBUG_LOG("Empty MOTA %d - ", motaId);
+				DEBUG_LOG("Empty MOTA %u - ", motaId);
 				motaSize = 0x14;
 			}
 			else {
@@ -200,10 +200,10 @@ uint64_t ExtractorT7::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			offsetMap[motaAddr] = std::pair<gameAddr, uint64_t>(motaCustomBlockSize, motaSize);
 			motaCustomBlockSize += motaSize;
 
-			DEBUG_LOG("Saved mota %d, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
+			DEBUG_LOG("Saved mota %u, size is %lld (0x%llx)\n", motaId, motaSize, motaSize);
 		}
 		else {
-			DEBUG_LOG("Malformed MOTA %d at addr %llx\n", motaId, motaAddr);
+			DEBUG_LOG("Malformed MOTA %u at addr %llx\n", motaId, motaAddr);
 			// Malformed MOTA, don't save it
 		}
 	}
@@ -241,12 +241,20 @@ Byte* ExtractorT7::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
 				m_process->readBytes(motaAddr[i], (char*)motaPtr, motaSize);
 
-				DEBUG_LOG("Mota %llu: little endian %d\n", i, motaPtr->is_little_endian);
-				
-				if (motaPtr->IsBigEndian()) {
-					// Like the game does when they are big endianed, force every MOTA to be little endianed
-					// This helps provide a more deterministic extraction
-					TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr);
+				if (motaPtr->IsValid(motaSize))
+				{
+					DEBUG_LOG("Mota %llu, size is %u: little endian %d\n", i, motaSize, motaPtr->is_little_endian);
+
+					if (motaPtr->IsBigEndian()) {
+						// Like the game does when they are big endianed, force every MOTA to be little endianed
+						// This helps provide a more deterministic extraction
+						TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr);
+					}
+				}
+				else
+				{
+					// Unknown mota format
+					DEBUG_LOG("Mota %u: size is %u\n", i, motaSize);
 				}
 
 				exportedMotas.insert(motaAddr[i]);
@@ -775,20 +783,6 @@ bool ExtractorT7::CanExtract()
 				return false;
 			}
 
-			// Todo: Some mota are converted to little endian when movesets are loaded in the game
-			// Some aren't, find which, to avoid bad exports
-			/*
-			uint64_t listStart = offsetof(MovesetInfo, motas);
-			for (size_t motaId = 0; motaId < _countof(((MotaList*)0)->motas); ++motaId)
-			{
-				gameAddr motaAddr = m_process->readUInt64(movesetAddr + listStart + (8 * motaId));
-				if (motaAddr == 0 || motaAddr == -1) {
-					return false;
-				}
-
-				auto mota_swapped = m_process->readInt16(motaAddr + offsetof(MotaHeader, is_little_endian));
-			}
-			*/
 		}
 
 		// Read into current move to see if it is valid

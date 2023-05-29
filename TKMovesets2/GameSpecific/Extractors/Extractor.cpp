@@ -54,7 +54,7 @@ Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 	size_t blockSize = blockEnd - blockStart;
 
 	if (blockSize >= (MOVESET_MAX_BLOCK_SIZE_MB * 1000000)) { // 50 MB
-		DEBUG_LOG("Bloc size too big to be valid (%llu / 0x%llx), returning nullptr\n", blockSize, blockSize);
+		DEBUG_LOG("Block size too big to be valid (%llu / 0x%llx), returning nullptr\n", blockSize, blockSize);
 		
 #ifdef BUILD_TYPE_DEBUG
 		DebugBreak();
@@ -93,7 +93,7 @@ std::wstring Extractor::GenerateFilename(const char* characterName, const char* 
 
 void Extractor::GetFilepath(const char* characterName, std::wstring& out, std::wstring& out_tmp, bool overwriteSameFilename)
 {
-	CreateDirectory(cm_extractionDir, NULL);
+	CreateDirectoryA(cm_extractionDir, NULL);
 	// Make sure the directory for extraction exists 
 
 	const char* gameIdentifierstring = m_gameInfo.movesetNamePrefix;

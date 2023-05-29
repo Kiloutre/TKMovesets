@@ -191,7 +191,7 @@ bool LocalStorage::DeleteMoveset(const wchar_t* filename)
 		std::filesystem::remove(filename);
 	}
 	catch (std::filesystem::filesystem_error const&) {
-		DEBUG_LOG("!! DELETION OF MOVESET '%S' FAILED !!\n", filename);
+		DEBUG_ERR("DELETION OF MOVESET '%S' FAILED", filename);
 		return false;
 	}
 	return true;

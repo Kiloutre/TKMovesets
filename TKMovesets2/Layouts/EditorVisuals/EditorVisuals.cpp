@@ -103,7 +103,7 @@ void EditorVisuals::Save()
 		}
 	}
 	else {
-		DEBUG_LOG("!! Editor: failed to save. !!\n");
+		DEBUG_ERR("Editor: failed to save. !!");
 		// Showing failure would be nice. Even simply changing the Save button text would suffice.
 		//todo
 	}

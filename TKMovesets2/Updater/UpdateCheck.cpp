@@ -47,12 +47,12 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 		}
 		catch (curlpp::LibcurlRuntimeError&) {
 			updateStatus->error = true;
-			DEBUG_LOG("!! CURL ERROR !!\n");
+			DEBUG_ERR("CURL ERROR");
 			return false;
 		}
 		catch (curlpp::LogicError&) {
 			updateStatus->error = true;
-			DEBUG_LOG("!! CURL ERROR !!\n");
+			DEBUG_ERR("CURL ERROR");
 			return false;
 		}
 	}
@@ -147,18 +147,18 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 				// First validation step is filesize
 				size_t fileSize = ofs.tellp();
 				if (fileSize < UPDATE_MIN_FILESIZE) {
-					DEBUG_LOG("File size too small (%llu)\n", fileSize);
+					DEBUG_ERR("File size too small (%llu)", fileSize);
 					validFile = false;
 				}
 			}
 			catch (curlpp::LibcurlRuntimeError&) {
 				updateStatus->error = true;
-				DEBUG_LOG("!! CURL ERROR !!\n");
+				DEBUG_ERR("CURL ERROR");
 				return false;
 			}
 			catch (curlpp::LogicError&) {
 				updateStatus->error = true;
-				DEBUG_LOG("!! CURL ERROR !!\n");
+				DEBUG_ERR("CURL ERROR");
 				return false;
 			}
 
@@ -214,12 +214,12 @@ static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
 	}
 	catch (curlpp::LibcurlRuntimeError&) {
 		*error = true;
-		DEBUG_LOG("!! CURL ERROR !!\n");
+		DEBUG_ERR("CURL ERROR");
 		return false;
 	}
 	catch (curlpp::LogicError&) {
 		*error = true;
-		DEBUG_LOG("!! CURL ERROR !!\n");
+		DEBUG_ERR("CURL ERROR");
 		return false;
 	}
 

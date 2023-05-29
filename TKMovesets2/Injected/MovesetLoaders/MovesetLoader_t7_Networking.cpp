@@ -63,7 +63,7 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 	switch (packet->packetType)
 	{
 	default:
-		DEBUG_LOG("!! COMMUNICTION: Unknown packet type %u !!\n", packet->packetType);
+		DEBUG_ERR("COMMUNICTION: Unknown packet type %u", packet->packetType);
 		break;
 	case PacketT7Type_Ready:
 		{

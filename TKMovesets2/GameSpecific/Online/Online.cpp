@@ -36,7 +36,7 @@ static bool ExtractMovesetLoaderIfNeeded()
                 catch (std::filesystem::filesystem_error const&) {
                     // If another process is using the obsolete DLL we are trying to inject,
                     // warn that we can't inject.
-                    DEBUG_LOG("!! ERROR WHILE TRYING TO REMOVE OLD DLL !!\n");
+                    DEBUG_ERR("ERROR WHILE TRYING TO REMOVE OLD DLL");
                     return false;
                 }
             }

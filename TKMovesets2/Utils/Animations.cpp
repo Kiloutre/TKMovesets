@@ -183,7 +183,7 @@ namespace TAnimUtils
 				ByteswapC8Animation(animAddr);
 				break;
 			default:
-				DEBUG_LOG("!! ByteswapAnimation() ERROR: INVALID ANIMATION TYPE '%x' FOR ADDR '%p' !!\n", animType, animAddr);
+				DEBUG_ERR("ByteswapAnimation() ERROR: INVALID ANIMATION TYPE '%x' FOR ADDR '%p'", animType, animAddr);
 				throw;
 				break;
 			}

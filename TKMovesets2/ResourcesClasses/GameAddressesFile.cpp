@@ -295,13 +295,13 @@ bool GameAddressesFile::LoadFromSharedMemory()
 
 	m_memoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, "Local\\TKMovesets2AddrMem");
 	if (m_memoryHandle == nullptr) {
-		DEBUG_LOG("!! GameAddressesFile::LoadFromSharedMemory() - Failed to open file mapping !!\n");
+		DEBUG_ERR("GameAddressesFile::LoadFromSharedMemory() - Failed to open file mapping");
 		return false;
 	}
 
 	m_sharedMemory = (s_GameAddressesSharedMem*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_ADDR_MEMORY_BUFSIZE);
 	if (m_sharedMemory == nullptr) {
-		DEBUG_LOG("!! GameAddressesFile::LoadFromSharedMemory() - Failed to map view of file !!\n");
+		DEBUG_ERR("GameAddressesFile::LoadFromSharedMemory() - Failed to map view of file");
 		CloseHandle(m_memoryHandle);
 		return false;
 	}
@@ -311,7 +311,7 @@ bool GameAddressesFile::LoadFromSharedMemory()
 	char* decompressed_data = (char*)CompressionUtils::RAW::LZMA::Decompress((Byte*)m_sharedMemory->compressedData, m_sharedMemory->compressedSize, m_sharedMemory->originalSize);
 
 	if (decompressed_data == nullptr) {
-		DEBUG_LOG("!! Not loading addresses from shared mem !! \n");
+		DEBUG_ERR("Not loading addresses from shared mem");
 		return false;
 	}
 
@@ -335,13 +335,13 @@ void GameAddressesFile::LoadToSharedMemory()
 
 	m_memoryHandle = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, SHARED_ADDR_MEMORY_BUFSIZE, "Local\\TKMovesets2AddrMem");
 	if (m_memoryHandle == nullptr) {
-		DEBUG_LOG("!! GameAddressesFile::LoadToSharedMemory() - Failed to create file mapping !!\n");
+		DEBUG_ERR("GameAddressesFile::LoadToSharedMemory() - Failed to create file mapping");
 		return;
 	}
 
 	m_sharedMemory = (s_GameAddressesSharedMem*)MapViewOfFile(m_memoryHandle, FILE_MAP_ALL_ACCESS, 0, 0, SHARED_ADDR_MEMORY_BUFSIZE);
 	if (m_sharedMemory == nullptr) {
-		DEBUG_LOG("!! GameAddressesFile::LoadToSharedMemory() - Failed to map view of file !!\n");
+		DEBUG_ERR("GameAddressesFile::LoadToSharedMemory() - Failed to map view of file");
 		CloseHandle(m_memoryHandle);
 		return;
 	}

@@ -388,7 +388,12 @@ namespace StructsT7
 		char unk0x14;
 		unsigned int anim_offset_list[1];
 
-		bool IsBigEndian()
+		bool IsValid(uint64_t size) const
+		{
+			return size >= (sizeof(MotaHeader) - 4) && strncmp(mota_string, "MOTA", 4) == 0;
+		}
+
+		bool IsBigEndian() const
 		{
 			return !is_little_endian;
 		}

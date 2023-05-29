@@ -202,7 +202,7 @@ void MovesetLoader::HookFunction(const char* functionName)
         hook->second.isHooked = true;
     }
     else {
-        DEBUG_LOG("!! MovesetLoader::HookFunction() : Could not find %s !!\n", functionName);
+        DEBUG_ERR("MovesetLoader::HookFunction() : Could not find %s", functionName);
     }
 }
 
@@ -215,7 +215,7 @@ void MovesetLoader::UnhookFunction(const char* functionName)
         hook->second.isHooked = false;
     }
     else {
-        DEBUG_LOG("!! MovesetLoader::UnhookFunction() : Could not find %s !!\n", functionName);
+        DEBUG_ERR("MovesetLoader::UnhookFunction() : Could not find %s", functionName);
     }
 }
 

@@ -42,11 +42,11 @@ static bool downloadFile(const char* url, const char* filepath)
 		myRequest.perform();
 	}
 	catch (curlpp::LibcurlRuntimeError&) {
-		DEBUG_LOG("!! CURL ERROR !!\n");
+		DEBUG_ERR("CURL ERROR");
 		return false;
 	}
 	catch (curlpp::LogicError&) {
-		DEBUG_LOG("!! CURL ERROR !!\n");
+		DEBUG_ERR("CURL ERROR");
 		return false;
 	}
 
@@ -158,13 +158,13 @@ void EditorLabel::DownloadFromWebsite()
 		catch (curlpp::LibcurlRuntimeError&) {
 			errored = true;
 			ongoingQuery = false;
-			DEBUG_LOG("!! CURL ERROR !!\n");
+			DEBUG_ERR("CURL ERROR");
 			return;
 		}
 		catch (curlpp::LogicError&) {
 			errored = true;
 			ongoingQuery = false;
-			DEBUG_LOG("!! CURL ERROR !!\n");
+			DEBUG_ERR("CURL ERROR");
 			return;
 		}
 	}
