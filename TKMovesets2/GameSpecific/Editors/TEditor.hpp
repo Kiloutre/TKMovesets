@@ -65,6 +65,7 @@ enum TEditorWindowType_
 	TEditorWindowType_Invalid,
 };
 
+// Base editor class for T games
 class TEditor : public EditorLogic
 {
 protected:

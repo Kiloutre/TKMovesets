@@ -12,8 +12,8 @@ extern "C" const char en_US_txt[];
 extern "C" const char fr_FR_txt[];
 extern "C" const char de_DE_txt[];
 extern "C" const char es_ES_txt[];
+extern "C" const char ja_JP_txt[];
 extern "C" const char ko_txt[];
-extern "C" const char ja_txt[];
 // --
 
 const TranslationData g_translation_datas[] = {
@@ -27,12 +27,13 @@ const TranslationData g_translation_datas[] = {
 		.locale = "fr-FR",
 		.data = fr_FR_txt,
 		// .matchingLocale must contains lowercase-only characters
-		.matchingLocale = { "fr-ca", "fr-lu", "fr-ch" }
+		.matchingLocale = { "fr-ca", "fr-lu", "fr-ch", "fr"}
 	},
 	{
 		.displayName = (const char*)u8"日本語",
-		.locale = "ja",
-		.data = ja_txt
+		.locale = "ja-JP",
+		.data = ja_JP_txt,
+		.matchingLocale = { "ja" }
 	},
 	/*
 	{

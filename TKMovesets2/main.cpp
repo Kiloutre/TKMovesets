@@ -43,8 +43,8 @@ static void glfw_error_callback(int error, const char* description)
 static bool LoadLocaleTranslation()
 {
 	char name[LOCALE_NAME_MAX_LENGTH];
+	wchar_t w_name[LOCALE_NAME_MAX_LENGTH];
 	{
-		wchar_t w_name[LOCALE_NAME_MAX_LENGTH];
 		if (LCIDToLocaleName(GetThreadLocale(), w_name, LOCALE_NAME_MAX_LENGTH, 0) == 0) {
 			return false;
 		}
@@ -55,6 +55,12 @@ static bool LoadLocaleTranslation()
 		}
 	}
 
+#ifdef BUILD_TYPE_DEBUG
+	std::ofstream f("TKM-DEBUG-locale.txt");
+	auto t = std::format("[{}]\n", name);
+	f.write(t.c_str(), t.size());
+	f.write((char*)w_name, wcslen(w_name) * sizeof(wchar_t));
+#endif
 	DEBUG_LOG("Attempting to load locale %s\n", name);
 	return Localization::LoadFile(name);
 }
