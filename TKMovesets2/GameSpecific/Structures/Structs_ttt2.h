@@ -242,12 +242,12 @@ namespace StructsTTT2
 		uint32_t hitlevel;
 		gameAddr32 cancel_addr;
 
-		gameAddr32 _0x28_cancel_addr; // -
-		int32_t _0x30_int__0x28_related; // -
-		gameAddr32 _0x38_cancel_addr; // -
-		int32_t _0x40_int__0x38_related; // -
-		gameAddr32 _0x48_cancel_addr; // -
-		uint32_t _0x50_int__0x48_related; // -
+		gameAddr32 _0x28_cancel_addr; 
+		int32_t _0x30_int__0x28_related;
+		gameAddr32 _0x38_cancel_addr;
+		int32_t _0x40_int__0x38_related;
+		gameAddr32 _0x48_cancel_addr;
+		uint32_t _0x50_int__0x48_related;
 
 		uint16_t transition;
 
@@ -376,7 +376,7 @@ namespace StructsTTT2
 		uint16_t _0x6;
 
 		// -- Size depends on anim_count. -- //
-		//List of offsets, points to anim_lengths[?] (first bit is discarded to do so)
+		// List of offsets, points to anim_lengths[?] (first bit is discarded to do so)
 		uint32_t offsets[1];
 		// List of anim lengths
 		uint16_t anim_lengths[1];

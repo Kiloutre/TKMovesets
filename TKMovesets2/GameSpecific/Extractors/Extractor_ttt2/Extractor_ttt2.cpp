@@ -194,11 +194,15 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT32(&move.hitlevel);
 		ByteswapHelpers::SWAP_INT32(&move.cancel_addr);
 
-		//... more fields omitted here
-		// todo
+		ByteswapHelpers::SWAP_INT32(&move._0x28_cancel_addr);
+		ByteswapHelpers::SWAP_INT32(&move._0x30_int__0x28_related);
+		ByteswapHelpers::SWAP_INT32(&move._0x38_cancel_addr);
+		ByteswapHelpers::SWAP_INT32(&move._0x40_int__0x38_related);
+		ByteswapHelpers::SWAP_INT32(&move._0x48_cancel_addr);
+		ByteswapHelpers::SWAP_INT32(&move._0x50_int__0x48_related);
+
 
 		ByteswapHelpers::SWAP_INT16(&move.transition);
-
 		ByteswapHelpers::SWAP_INT16(&move._0x56_short);
 
 		// Swaps _val1 and 8val2 as an int because that is how they are stored
@@ -235,7 +239,6 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 		move.anim_addr = (gameAddr32)animOffsetMap[move.anim_addr];
 		TO_INDEX(move.cancel_addr, table.cancel, Cancel);
 
-		// These are incorrect, those fields do not seem to exist in TTT2
 		TO_INDEX(move._0x28_cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move._0x38_cancel_addr, table.cancel, Cancel);
 		TO_INDEX(move._0x48_cancel_addr, table.cancel, Cancel);

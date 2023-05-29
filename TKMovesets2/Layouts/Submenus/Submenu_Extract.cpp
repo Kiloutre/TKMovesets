@@ -78,11 +78,9 @@ void Submenu_Extract::RenderSettingsPopup()
 
 	}
 
-	ImGui::NewLine();
-
 	ImGui::Checkbox(_("extraction.settings.extract_unsupported_motas"), &m_extractUnsupportedMotas);
-	ImGui::NewLine();
 
+	ImGui::NewLine();
 	ImGui::SeparatorText(_("extraction.settings.other"));
 	ImGui::Checkbox(_("extraction.settings.displayable_movelist"), &m_extractDisplayableMovelist);
 
