@@ -15,6 +15,7 @@ struct movesetInfo
 	std::wstring wname;
 	FasterStringComp origin;
 	std::string target_character;
+	std::string original_character;
 	std::string version_string;
 
 	uint64_t date;
@@ -23,7 +24,7 @@ struct movesetInfo
 	uint64_t size;
 	std::string sizeStr;
 
-	std::string crc32Str;
+	std::string hash;
 
 	time_t modificationDate;
 	uint16_t gameId;

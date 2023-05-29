@@ -140,14 +140,13 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	ImVec2 tableSize = ImVec2(0, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
 
 	ImGui::SeparatorText(_("importation.select_moveset"));
-	if (ImGui::BeginTable("MovesetImportationList", 6, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetImportationList", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
-		ImGui::TableSetupColumn(_("moveset.date"));
-		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.date"));;
 		ImGui::TableSetupColumn(_("moveset.import"));
 		ImGui::TableHeadersRow();
 
@@ -190,9 +189,6 @@ void Submenu_Import::Render(GameImport& importerHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->date_str.c_str());
-
-				ImGui::TableNextColumn();
-				ImGui::TextUnformatted(moveset->sizeStr.c_str());
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());

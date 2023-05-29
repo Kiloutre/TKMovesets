@@ -40,7 +40,6 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 			Helpers::isHeaderStringMalformated(movesetInfos.version_string, sizeof(movesetInfos.version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.origin, sizeof(movesetInfos.origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.target_character, sizeof(movesetInfos.target_character))) {
-			DEBUG_LOG("HEADER MALFORMATED\n");
 			// File malformated
 			return nullptr;
 		}
@@ -62,14 +61,15 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.filename = filename,
 				.name = Helpers::getMovesetNameFromFilename(filename),
 				.wname = Helpers::getMovesetWNameFromFilename(filename),
-				.origin = std::string(movesetInfos.origin),
-				.target_character = std::string(movesetInfos.target_character),
+				.origin = movesetInfos.origin,
+				.target_character = movesetInfos.target_character,
+				.original_character = movesetInfos.GetOrigCharacterName(),
 				.version_string = std::string(movesetInfos.version_string),
 				.date = movesetInfos.date,
 				.date_str = Helpers::formatDateTime(movesetInfos.date),
 				.size = totalSize,
 				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
-				.crc32Str = crc32Str,
+				.hash = crc32Str,
 				.modificationDate = buffer.st_mtime,
 				.gameId = movesetInfos.gameId,
 				.minorVersion = movesetInfos.minorVersion,
@@ -141,7 +141,8 @@ void LocalStorage::ReloadMovesetList()
 						.filename = filename,
 						.name = Helpers::getMovesetNameFromFilename(filename),
 						.origin = std::string("INVALID"),
-						.target_character = std::string(""),
+						.target_character = "",
+						.original_character = "",
 						.date = 0,
 						.size = 0,
 						.modificationDate = 0,

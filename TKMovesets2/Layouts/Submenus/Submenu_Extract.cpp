@@ -240,14 +240,15 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 	// List of extracted moveset
 	ImGui::SeparatorText(_("extraction.extracted_movesets"));
-	if (ImGui::BeginTable("MovesetExtractionList", 7, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetExtractionList", 8, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 				| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
-		ImGui::TableSetupColumn(_("moveset.target_character"));
+		ImGui::TableSetupColumn(_("moveset.original_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("persistent.hash"));
 		ImGui::TableSetupColumn(_("moveset.version"));
 		ImGui::TableSetupColumn(_("moveset.delete"), 0, 0.0f);
 		ImGui::TableHeadersRow();
@@ -305,6 +306,9 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->version_string.c_str());
+
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(moveset->hash.c_str());
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(moveset->filename.c_str());

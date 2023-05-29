@@ -81,7 +81,7 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TextUnformatted(moveset->sizeStr.c_str());
 
 			ImGui::TableNextColumn();
-			ImGui::TextUnformatted(moveset->crc32Str.c_str());
+			ImGui::TextUnformatted(moveset->hash.c_str());
 
 			ImGui::TableNextColumn();
 			ImGui::PushID(moveset->filename.c_str());
@@ -247,7 +247,7 @@ void Submenu_OnlinePlay::Render()
 
 			if (selectedMovesetList_copy.size() > playerid && selectedMovesetList_copy[playerid].size != 0) {
 				characterName = selectedMovesetList_copy[playerid].name;
-				crc32 = selectedMovesetList_copy[playerid].crc32Str;
+				crc32 = selectedMovesetList_copy[playerid].hash;
 			}
 
 			ImGui::TextUnformatted(_("persistent.player_1"));

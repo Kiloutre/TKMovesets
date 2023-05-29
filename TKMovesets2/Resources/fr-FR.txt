@@ -42,6 +42,7 @@ process.dll_version_mismatch = La version DLL injectée dans le jeu ne correspon
 # Moveset #
 moveset.origin = Origine
 moveset.target_character = Personnage cible
+moveset.original_character = Personnage original
 moveset.date = Date
 moveset.invalid = INVALIDE
 moveset.size = Taille

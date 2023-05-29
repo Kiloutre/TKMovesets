@@ -42,8 +42,9 @@ process.dll_version_mismatch = The DLL currently injected does not match the pro
 # Moveset #
 moveset.origin = Origin
 moveset.target_character = Character
+moveset.original_character = Original character
 moveset.date = Date
-moveset.invalid = INVALID7
+moveset.invalid = INVALID
 moveset.size = Size
 moveset.size_mb = MB
 moveset.size_kb = KB
