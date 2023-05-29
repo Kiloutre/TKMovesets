@@ -2,6 +2,10 @@
 
 #include "GameTypes.h"
 
+// Most of the names in this file indicating offsets (_0x00_int etc...) are wrong
+// This is because i copy-pasted the structures from T7
+// Fix it up anytime you want
+
 namespace StructsTTT2
 {
 	enum TKMovesetHeaderBlocks_

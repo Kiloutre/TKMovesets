@@ -203,7 +203,6 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		Requirement* target = (Requirement*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.requirement) + i;
 		const TTT2::Requirement* source = (TTT2::Requirement*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.requirement) + i;
 
-		// todo: alias condition
 		target->condition = source->condition;
 		target->param_unsigned = source->param_unsigned;
 
@@ -218,6 +217,73 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->value = source->value;
 	}
 
+
+	// List of moves to forbid (any cancel that points toward it will be disabled)
+	std::set<unsigned int> forbiddenMoveIds;
+	const char forbiddenMoves[][64] = {
+		"Co_DA_Ground"
+	};
+
+	for (unsigned int i = 0; i < table.moveCount; ++i)
+	{
+		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
+		const TTT2::Move* source = (TTT2::Move*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
+
+		// Register move as forbidden if its name matches
+		const char* orig_name_ptr = (char*)old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Name, moveset) + source->name_addr;
+		for (unsigned int j = 0; j < _countof(forbiddenMoves); ++j)
+		{
+			if (strcmp(orig_name_ptr, forbiddenMoves[j]) == 0)
+			{
+				DEBUG_LOG("Found forbidden move '%s' (id %u).\n", orig_name_ptr, i);
+				forbiddenMoveIds.insert(i);
+				break;
+			}
+		}
+
+		target->name_addr = source->name_addr;
+		target->anim_name_addr = source->anim_name_addr;
+		target->anim_addr = source->anim_addr;
+		target->vuln = source->vuln;
+		target->hitlevel = source->hitlevel;
+		target->cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->cancel_addr);
+
+		target->_0x28_cancel_addr = source->_0x28_cancel_addr;
+		target->_0x30_int__0x28_related = source->_0x30_int__0x28_related;
+		target->_0x34_int = 0; // Does not exist
+		target->_0x38_cancel_addr = source->_0x38_cancel_addr;
+		target->_0x40_int__0x38_related = source->_0x40_int__0x38_related;
+		target->_0x44_int = 0; // Does not exist
+		target->_0x48_cancel_addr = source->_0x48_cancel_addr;
+		target->_0x50_int__0x48_related = source->_0x50_int__0x48_related;
+
+		target->transition = source->transition;
+		target->_0x56_short = source->_0x56_short;
+
+		// For some reason, these two must be turned into negative to match the T7 format
+		target->moveId_val1 = source->moveId_val1;
+		target->moveId_val2 = source->moveId_val2;
+
+		target->_0x5C_short = 0; // Does not exist
+		target->_0x5E_short = 0; // Does not exist
+		target->hit_condition_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->hit_condition_addr);
+		target->anim_len = source->anim_len;
+		target->airborne_start = source->airborne_start;
+		target->airborne_end = source->airborne_end;
+		target->ground_fall = source->ground_fall;
+		target->voicelip_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->voicelip_addr);
+		target->extra_move_property_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->extra_move_property_addr);
+		target->move_start_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_start_extraprop_addr);
+		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
+		target->_0x98_int = Aliases::ConvertMove0x98(source->_0x98_int);
+		target->hitbox_location = source->hitbox_location;
+		Aliases::ApplyHitboxAlias(target->hitbox_location);
+		target->first_active_frame = source->first_active_frame;
+		target->last_active_frame = source->last_active_frame;
+		target->_0xA8_short = source->_0x6c_short;
+		target->distance = source->distance;
+		target->_0xAC_int = 0; // Does not exist
+	}
 	for (unsigned int i = 0; i < table.cancelCount; ++i)
 	{
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i;
@@ -233,6 +299,10 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->starting_frame = source->starting_frame;
 		target->move_id = source->move_id;
 		target->cancel_option = source->cancel_option;
+
+		if (forbiddenMoveIds.contains(target->move_id)) {
+			target->command = 0xFFFFFFFFFFFFFFFF;
+		}
 	}
 
 	for (unsigned int i = 0; i < table.groupCancelCount; ++i)
@@ -250,6 +320,10 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->starting_frame = source->starting_frame;
 		target->move_id = source->move_id;
 		target->cancel_option = source->cancel_option;
+
+		if (forbiddenMoveIds.contains(target->move_id)) {
+			target->command = 0xFFFFFFFFFFFFFFFF;
+		}
 	}
 
 	for (unsigned int i = 0; i < table.hitConditionCount; ++i)
@@ -368,55 +442,6 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		Aliases::ApplyPropertyAlias(target->extraprop, target->value);
 	}
 
-	
-	for (unsigned int i = 0; i < table.moveCount; ++i)
-	{
-		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
-		const TTT2::Move* source = (TTT2::Move*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
-
-		target->name_addr = source->name_addr;
-		target->anim_name_addr = source->anim_name_addr;
-		target->anim_addr = source->anim_addr;
-		target->vuln = source->vuln;
-		target->hitlevel = source->hitlevel;
-		target->cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->cancel_addr);
-
-		target->_0x28_cancel_addr = source->_0x28_cancel_addr;
-		target->_0x30_int__0x28_related = source->_0x30_int__0x28_related;
-		target->_0x34_int = 0;
-		target->_0x38_cancel_addr = source->_0x38_cancel_addr;
-		target->_0x40_int__0x38_related = source->_0x40_int__0x38_related;
-		target->_0x44_int = 0;
-		target->_0x48_cancel_addr = source->_0x48_cancel_addr;
-		target->_0x50_int__0x48_related = source->_0x50_int__0x48_related;
-
-		target->transition = source->transition;
-		target->_0x56_short = source->_0x56_short;
-
-		// For some reason, these two must be turned into negative to match the T7 format
-		target->moveId_val1 = source->moveId_val1;
-		target->moveId_val2 = source->moveId_val2;
-
-		target->_0x5C_short = 0; // Does not exist
-		target->_0x5E_short = 0; // Does not exist
-		target->hit_condition_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->hit_condition_addr);
-		target->anim_len = source->anim_len;
-		target->airborne_start = source->airborne_start;
-		target->airborne_end = source->airborne_end;
-		target->ground_fall = source->ground_fall;
-		target->voicelip_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->voicelip_addr);
-		target->extra_move_property_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->extra_move_property_addr);
-		target->move_start_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_start_extraprop_addr);
-		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
-		target->_0x98_int = Aliases::ConvertMove0x98(source->_0x98_int);
-		target->hitbox_location = source->hitbox_location;
-		Aliases::ApplyHitboxAlias(target->hitbox_location);
-		target->first_active_frame = source->first_active_frame;
-		target->last_active_frame = source->last_active_frame;
-		target->_0xA8_short = source->_0x6c_short;
-		target->distance = source->distance;
-		target->_0xAC_int = 0; // Does not exist
-	}
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
 		gameAddr32 motaAddr32 = old_movesetInfo->motas.motas[i];
