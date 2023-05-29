@@ -25,7 +25,7 @@ struct TKMovesetProperty
 	int value;
 };
 
-typedef uint64_t MovesetFlags;
+typedef uint32_t MovesetFlags;
 enum MovesetFlags_
 {
 	// Used to show which movesets the user has modified (knowing if it's an original or not can be useful)
@@ -73,6 +73,8 @@ struct TKMovesetHeader
 	uint32_t characterId = (uint32_t)-1;
 	// Flags used for storing useful data. Currently unused. Todo : see what we can do with this?
 	MovesetFlags flags = (MovesetFlags)-1;
+	// Flags used to store game-specific information
+	uint32_t game_specific_flags = -1;
 	// Origin (Game name)
 	char origin[32] = "";
 	// Target character to play on

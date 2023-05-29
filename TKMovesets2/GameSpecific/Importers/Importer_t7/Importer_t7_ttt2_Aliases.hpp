@@ -21,7 +21,7 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 };
 
 struct s_propAlias {
-	unsigned int target_id;
+	unsigned int target_id = 0;
 	std::map<unsigned int, unsigned int> param_alias;
 	bool nofill = false;
 };
@@ -30,7 +30,10 @@ struct s_propAlias {
 // Will be built from cg_propertyAliases, attempts to guess unknown values in between known values
 std::map<unsigned int, s_propAlias> g_propertyAliases;
 
-const std::map<unsigned int, s_propAlias> cg_propertyAliases = {
+// Put this inside of a function and not globally, in order to avoid using HEAP over nothing
+static void InitAliasDictionary()
+{
+	g_propertyAliases = {
 	{ 3, {.target_id = 3 }}, // 1536: Enemy standing, throw (checking vuln?)
 	{ 27, {.target_id = 27 }}, // 2536: Enemy airborne, throw (checking vuln?)
 	{ 46, {.target_id = 44 }}, // Counterhit
@@ -562,7 +565,9 @@ const std::map<unsigned int, s_propAlias> cg_propertyAliases = {
 	{ 0x8303, {.target_id = 0x84ce }}, // MAPPING
 	{ 0x830a, {.target_id = 0x853c }}, // (HEIHACHI) sDm_2K3_Fy -> wDm_GndF_00
 	{ 0x830b, {.target_id = 0x853d }}, // (ALISA) sDw_AIR00_
-};
+
+	};
+}
 
 namespace Aliases
 {
@@ -632,13 +637,17 @@ namespace Aliases
 
 	void BuildAliasDictionary()
 	{
+		InitAliasDictionary();
+
 #ifdef BUILD_TYPE_DEBUG
 		unsigned int filled = 0;
 #endif
 
-		auto iter = cg_propertyAliases.begin();
+		std::map<unsigned int, s_propAlias> aliasesCopy = g_propertyAliases;
+
+		auto iter = aliasesCopy.begin();
 		auto nextiter = std::next(iter, 1);
-		auto iter_count = cg_propertyAliases.size() - 1;
+		auto iter_count = aliasesCopy.size() - 1;
 
 		for (unsigned int i = 0; i < iter_count; ++i, std::advance(iter, 1), std::advance(nextiter, 1))
 		{

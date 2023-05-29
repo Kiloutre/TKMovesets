@@ -18,7 +18,7 @@ private:
 	// True if the memory must be accessed as big endian
 	bool m_bigEndian = false;
 	// Stores current game informations
-	const GameInfo* currentGame;
+	const GameInfo* currentGame = nullptr;
 	
 	// Reads a ptr path from an address identifier and return its last pointer
 	gameAddr ReadPtrPath32(const char* c_addressId) const;

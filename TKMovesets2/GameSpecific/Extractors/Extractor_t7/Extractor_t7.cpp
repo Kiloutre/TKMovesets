@@ -499,6 +499,7 @@ Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 void ExtractorT7::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
 {
 	infos.flags = 0;
+	infos.game_specific_flags = 0;
 	infos.gameId = m_gameInfo.gameId;
 	infos.minorVersion = m_gameInfo.minorVersion;
 	infos.characterId = GetCharacterID(playerAddress);
