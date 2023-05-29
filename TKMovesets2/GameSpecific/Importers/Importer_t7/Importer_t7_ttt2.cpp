@@ -15,6 +15,7 @@ using namespace T7ImportUtils;
 #define gAddr StructsT7_gameAddr
 #define TTT2 StructsTTT2
 
+// Required macro to properly convert uint32_t -1 to uint64_t -1, if needed
 #define CONVERT_POSSIBLE_MISSING_ADDR(x) (x == MOVESET_ADDR32_MISSING ? MOVESET_ADDR_MISSING : x)
 
 // -- Aliases -- //
@@ -248,13 +249,13 @@ static void ConvertToT7Moveset(const TKMovesetHeader* header, Byte*& moveset, ui
 		target->hitlevel = source->hitlevel;
 		target->cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->cancel_addr);
 
-		target->_0x28_cancel_addr = source->_0x28_cancel_addr;
+		target->_0x28_cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->_0x28_cancel_addr);
 		target->_0x30_int__0x28_related = source->_0x30_int__0x28_related;
 		target->_0x34_int = 0; // Does not exist
-		target->_0x38_cancel_addr = source->_0x38_cancel_addr;
+		target->_0x38_cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->_0x38_cancel_addr);
 		target->_0x40_int__0x38_related = source->_0x40_int__0x38_related;
 		target->_0x44_int = 0; // Does not exist
-		target->_0x48_cancel_addr = source->_0x48_cancel_addr;
+		target->_0x48_cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->_0x48_cancel_addr);
 		target->_0x50_int__0x48_related = source->_0x50_int__0x48_related;
 
 		target->transition = source->transition;
