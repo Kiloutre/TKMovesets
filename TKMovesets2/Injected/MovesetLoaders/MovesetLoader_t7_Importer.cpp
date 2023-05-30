@@ -4,8 +4,10 @@
 #include "Compression.hpp"
 #include "MovesetLoader_t7.hpp"
 
-#include "Structs_t7.h"
 #include "GameIDs.hpp"
+#include "MovesetConverters.hpp"
+
+#include "Structs_t7.h"
 
 using namespace StructsT7;
 
@@ -195,7 +197,6 @@ static void ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, Byte* m
 
 Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset)
 {
-	bool result = false;
 	Byte* orig_moveset = moveset;
 
 	// Header of the moveset that will contain our own information about it
@@ -232,10 +233,15 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 	player.moveset_character_id = header->characterId;
 	player.previous_character_id = header->characterId;
 
+	Byte* final_moveset = nullptr;
+
 	switch (gameId)
 	{
 	case GameId_T7:
-		result = ImportForOnline_FromT7(header, moveset, s_moveset);
+		final_moveset = ImportForOnline_FromT7(header, moveset, s_moveset);
+		break;
+	case GameId_TTT2:
+		final_moveset = ImportForOnline_FromTTT2(header, moveset, s_moveset);
 		break;
 	default:
 		DEBUG_LOG("No game found for given game id '%u'\n", gameId);
@@ -246,22 +252,23 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 		delete[] orig_moveset;
 	}
 
-	if (result == false) {
+	if (final_moveset != nullptr && final_moveset != moveset) {
+		delete[] moveset;
+	}
+	else if (final_moveset == nullptr) {
 		DEBUG_LOG("ImportForOnline: Result was zero.\n");
 		delete[] moveset;
 		return nullptr;
 
 	}
 
-	return moveset;
+	return final_moveset;
 }
 
 
-bool MovesetLoaderT7::ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset)
+Byte* MovesetLoaderT7::ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset)
 {
 	DEBUG_LOG("ImportForOnline_FromT7()\n");
-	// Basic load is tied to online importing where we might want to import the moveset but not populate empty MOTA and apply character-specific fixes just yet
-	bool isCompressed = false;
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = (const TKMovesetHeaderBlocks*)((char*)header + header->block_list);
@@ -297,5 +304,50 @@ bool MovesetLoaderT7::ImportForOnline_FromT7(const TKMovesetHeader* header, Byte
 
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
-	return true;
+	return moveset;
+}
+
+
+Byte* MovesetLoaderT7::ImportForOnline_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset)
+{
+	DEBUG_LOG("ImportForOnline_FromTTT2()\n");
+
+	TKMovesetHeaderBlocks t7_offsets;
+	MovesetConverter::TTT2ToT7(header, moveset, s_moveset, t7_offsets);
+
+	// List of data blocks within the moveset
+	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+
+	// Table that contains offsets and amount of cancels, move, requirements, etc...
+	gAddr::MovesetTable* table;
+
+	// TODO: Validate moveset
+
+	// -- Basic reading & allocations -- //
+
+	const gameAddr gameMoveset = (gameAddr)moveset;
+
+	// -- Conversions -- //
+
+	// Get the table address
+	table = (gAddr::MovesetTable*)(moveset + offsets->tableBlock);
+
+	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
+
+	//Convert move offets into ptrs
+	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+
+	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
+	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);
+
+	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset);
+
+	// -- Allocation & Conversion finished -- //
+
+	EnforceDefaultAliasesAsCurrent(moveset);
+
+	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
+
+	return moveset;
 }

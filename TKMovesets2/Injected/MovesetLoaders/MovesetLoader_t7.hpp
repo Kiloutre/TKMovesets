@@ -142,8 +142,9 @@ public:
 
 	// Moveset importing function
 	Byte* ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
-	// Game-specific Moveset importing functions, returns false on failure
-	bool ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	// Game-specific Moveset importing functions, returns moveset or nullptr on failure
+	Byte* ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	Byte* ImportForOnline_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
 
 	// Utils
 	CSteamID GetLobbyOpponentSteamId() const;

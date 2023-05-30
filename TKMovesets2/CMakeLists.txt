@@ -36,6 +36,7 @@ set(INCLUDE_FOLDERS
                     "GameSpecific/Extractors"
                     "GameSpecific/Importers"
                     "GameSpecific/Online"
+                    "GameSpecific/MovesetConverters"
 
                     
                     "GameSpecific/EditorVisuals/EditorVisuals_t7"
@@ -118,6 +119,7 @@ set(GAMESPECIFIC_SOURCES
                     # Game-specific
                     ## T7
                     "GameSpecific/Online/Online_t7.cpp"
+                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7_ttt2.cpp"
@@ -174,6 +176,8 @@ set(MOVESETLOADER_SOURCES
     "ResourcesClasses/GameAddressesWrapper.cpp"
     "Utils/helpers.cpp"
     "Utils/Compression.cpp"
+    
+    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
 )
 
 ## Setup embedded resources ##
