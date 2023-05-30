@@ -255,7 +255,7 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, By
 	{
 		if (fileMotas[i] != MOVESET_ADDR_MISSING)
 		{
-			MotaHeader* mota = (MotaHeader*)offsets->GetBlock(TKMovesetHeaderBlocks_Mota, moveset) + fileMotas[i];
+			MotaHeader* mota = (MotaHeader*)(offsets->GetBlock(TKMovesetHeaderBlocks_Mota, moveset) + fileMotas[i]);
 			if (mota->IsValid()) {
 				DEBUG_LOG("Using custom mota %llu\n", i);
 				fileMotas[i] += gameMoveset + offsets->motaBlock;
