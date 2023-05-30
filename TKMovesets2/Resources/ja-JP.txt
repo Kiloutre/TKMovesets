@@ -252,7 +252,7 @@ edition.move.anim_len = アニメーションの長さ
 edition.move.hitbox_location = HITBOX設定
 edition.move.hitbox_location.description = HITBOXを与える体部位の値
 edition.move.first_active_frame = 技判定開始フレーム
-edition.move.last_active_frame = 技技判定終りフレーム
+edition.move.last_active_frame = 技判定終りフレーム
 edition.move.airborne_start = 空中判定開始フレーム
 edition.move.airborne_end = 空中判定終りフレーム
 edition.move.ground_fall = 着地フレーム
@@ -500,11 +500,11 @@ edition.mvl_input.frames = frames
 
 # About #
 
-about.explanation = TKMovesetsはModderによって作られたソフトウェアであり、このソフトウェアが操作するゲームとは法的な関係は一切ありません。\nこのソフトウェアはGPLv 3でライセンスされています。ライセンスを変更しない限り、取得、変更、再配布が自由に行えるフリーソフトウェアです。\nこのソフトウェアにお金を払った場合、詐欺にあったことになります。
+about.explanation = TKMovesets2は一人のModderによって作られたソフトウェアであり、このソフトウェアが操作するゲームとは法的な関係は一切ありません。\nこのソフトウェアはGPLv 3でライセンスされています。ライセンスを変更しない限り、取得、変更、再配布が自由に行えるフリーソフトウェアです。\nこのソフトウェアにお金を払った場合、詐欺にあったことになります。
 about.credits = クレジット:
-about.kilo_explanation = moveset extractorの主要な開発者で、データ構造の大部分をリバースエンジニアリングし、エクスポート/インポート方法論を確立し、このmoveset export/import/editionソフトウェアを記述する責任があります。
-about.ali_explanation = 特に、移動セット構造のリバースエンジニアリング、移動セット編集のためのIDの大幅な解明、移動セット編集チュートリアルの作成、カメラや手のアニメーションなどの多くの機能の実現に貢献しました。
-about.fletch_explanation = かなりの数のmoveset編集プロパティのドキュメントを作成し、多くのチュートリアルを作成することで、moveset editionを大幅に拡張しました。
-about.koenji_explanation = moveset editionに早く参加し、そのワークフローを非常に理解するのに役立ち、多くのmovesetプロパティの解読にも貢献しました。
+about.kilo_explanation = TekkenMovesetExtractor、TKMovesets2の主要な開発者で、データ構造の大部分をリバースエンジニアリングし、エクスポート/インポート方法論を確立し、このMoveset export/import/editionソフトウェアを記述する責任があります。
+about.ali_explanation = 特に、Moveset構造のリバースエンジニアリング、Moveset編集のためのIDの大幅な解明やチュートリアルの作成、カメラや手のアニメーションなどの多くの機能の実現に貢献しました。
+about.fletch_explanation = かなりの数のMoveset編集プロパティのドキュメントを作成し、多くのチュートリアルを作成することで、Moveset editionを大幅に拡張しました。
+about.koenji_explanation = Moveset editionに早く参加し、そのワークフローを非常に理解するのに役立ち、多くのMovesetプロパティの解読にも貢献しました。
 about.sadamitsu_explanation = さまざまな種類のアニメーションについて、どのように構成され、どこに格納されているかを理解するのに役立ちました。
-about.dennis_stanistan_explanation = Movesetの抽出プログラムを作る時、自由気ままな彼の投稿を見ていたらを知らず知らずのうちに助けられた。
+about.dennis_stanistan_explanation = TekkenMovesetExtractorを作る際、自由気ままな彼の投稿を見ていたらを知らず知らずのうちに助けられた。
