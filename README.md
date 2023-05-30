@@ -35,7 +35,7 @@ The tool is tailored for the latest Tekken 7 version. It can be modified to work
 - Import a moveset and edit it live: small changes made to the moveset are instantly mirrored in-game
 
 #### Other
-- Support for multiple translations (help wanted!), for now English & French are supported
+- Support for multiple translations (help wanted!), for now English, Japanese & French are supported
 
 
 # Developer readme
