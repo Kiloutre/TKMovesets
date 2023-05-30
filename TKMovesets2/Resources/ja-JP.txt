@@ -43,6 +43,7 @@ process.dll_version_mismatch = 展開されているDLLがプログラムのバ�
 # Moveset #
 moveset.origin = ゲーム名
 moveset.target_character = キャラクター
+moveset.original_character = キャラクター
 moveset.date = 日付
 moveset.invalid = 無効
 moveset.size = サイズ
@@ -115,7 +116,7 @@ extraction.settings.compression_type.none = 無圧縮
 extraction.settings.extract_unsupported_motas = Extract fringe MOTAs (unsupported formats)
 
 # Importation #
-importation.explanation = 主にプラクティスモードで使用します。Movesetをエクスポートし改変後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。\n対戦画面を抜け、再び対戦画面に戻ろうとするとロード画面中にメモリ領域からMovesetは解放されます。\nオンライン対戦については、「オンラインプレー」の項を参照してください。
+importation.explanation = 主にプラクティスモードで使用します。\nMovesetをエクスポートし改変後、このサブメニューから対戦画面中にインポートして下さい (オンライン対戦は使用禁止) 。\n対戦画面を抜け、再び対戦画面に戻ろうとするとロード画面中にメモリ領域からMovesetは解放されます。\nオンライン対戦については、「オンラインプレー」の項を参照してください。
 importation.importation = Importation
 importation.select_moveset = インポートするMovesetを選択
 importation.cant_import = アクティブなゲームモード(プラクティスモード等)がロードされていないため、インポートできません。
@@ -133,7 +134,7 @@ importation.error_game_allocation = Movesetデータの書き込み中にゲー�
 importation.error_decompression = Movesetデータの圧縮中にエラーが発生しました
 
 # Persistent play #
-persistent.explanation = 永続プレーモードでは、ゲーム側のキャラクターを切り替えてもプレイヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、互いに両方のMovesetを既にダウンロード/エクスポートしている場合は、オンラインでも使用できます。\n各々が自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定してください。
+persistent.explanation = 永続プレーモードでは、ゲーム側のキャラクターを切り替えてもプレーヤーに適用するMovesetを固定します。\n対戦相手もこのツールを使用していて、互いに両方のMovesetを既にダウンロード/エクスポートしている場合は、オンラインでも使用できます。\n各々が自分のMoveset (またはNone) を"Player 1"、相手のMoveset (またはNone) を"Player 2"に設定し、固定してください。
 persistent.player_1 = Player 1:
 persistent.player_2 = Player 2:
 persistent.player_3 = Player 3:
@@ -146,10 +147,10 @@ persistent.select_moveset = Moveset選択
 persistent.clear_moveset = 選択解除
 
 # Online #
-online.explanation = オンラインプレーでは、両方のプレイヤーがこのツールを使用している必要があります。\n対戦前に両方のプレイヤーはmovesetまたはnoneを選択する必要があります。このツールは、両者のPC間をバックグラウンドで同期します。\n相手がツールを使用していない場合、または2人のプレイヤーのいずれかがMoveset選択を固定していない場合、CustomMovesetはロードされません。
+online.explanation = オンラインプレーでは、両方のプレーヤーがこのツールを使用している必要があります。\n対戦前に両方のプレーヤーはmovesetまたはnoneを選択する必要があります。このツールは、両者のPC間をバックグラウンドで同期します。\n相手がツールを使用していない場合、または2人のプレーヤーのいずれかがMoveset選択を固定していない場合、CustomMovesetはロードされません。
 online.select_moveset = Movesetを選択
 online.no_selected_moveset = Movesetが選択されていません
-online.dll_not_loaded = DLLがロードされていない。展開します
+online.dll_not_loaded = DLLが展開されていません。
 online.inject_dll = 展開
 online.injecting_dll = 展開中...
 online.select_moveset = 選択
@@ -188,7 +189,7 @@ edition.play_move_1p = Play (1P)
 edition.play_move_2p = Play (2P)
 edition.window_title = Editor
 edition.apply = 適用
-edition.window_controls_explanation = MovelistのMoveをクリックすると、関連するウィンドウが開きます。変更がなく保存されていないウィンドウは、置き換えます。またMoveをCTRL LEFT+クリックすると、別ウィンドウで開きます。ウィンドウは任意の場所にドラッグでき、ドッキングでき、さまざまなレイアウトを形成できます。
+edition.window_controls_explanation = MovelistのMoveをクリックすると関連するウィンドウが開きます。\n変更がなく保存されていないウィンドウは、置き換えます。\nまたMoveをCTRL LEFT+クリックすると、別ウィンドウで開きます。\nウィンドウは任意の場所にドラッグでき、ドッキングでき、さまざまなレイアウトを形成できます。
 edition.extract_animations = アニメーションをエクスポート
 edition.extract_animations_finished = アニメーションのエクスポート完了!
 
@@ -221,8 +222,8 @@ edition.inputs = Inputs
 edition.projectile = Projectile(飛び道具)
 edition.throw_camera = Throw camera
 edition.camera_data = Camera data
-edition.mvl_playable = Movelist: Playable
-edition.mvl_inputs = Movelist: Inputs
+edition.mvl_playable = コマンド表示list: デモ設定
+edition.mvl_inputs = コマンド表示list: デモ Input
 
 edition.update_labels = Labelを更新する
 edition.updating_labels = Label: 更新中...
@@ -231,7 +232,7 @@ edition.up_to_date_labels = Label: 最新
 
 edition.updated_labels = Label: 更新されました!
 
-edition.open_movelist = Movelistを開く
+edition.open_movelist = コマンド表示Listを開く
 
 edition.move.window_name = Move
 edition.move.category_2 = References
@@ -274,14 +275,14 @@ edition.move.cancel_related_id_4 = Cancels ID番号 4: related
 edition.move._0x98_int = Facing/Extras?
 
 edition.voiceclip.window_name = Voiceclip
-edition.voiceclip.id = 再生する声のID番号
+edition.voiceclip.id = 声のID番号
 edition.voiceclip.limb_swinging = Limb swinging SFX
 edition.voiceclip.hit = Hit SFX
 edition.voiceclip.end = END
 
 edition.extraproperty.window_name = Extra property list
 edition.extraproperty.starting_frame = 開始フレーム
-edition.extraproperty.id = 機能追加ID番号
+edition.extraproperty.id = 機能のID番号
 edition.extraproperty.throw_camera_id = Throw camera ID番号
 edition.extraproperty.throw_camera_id.description = 投げ技中のカメラID番号
 edition.extraproperty.projectile_id = Projectile ID番号
@@ -309,7 +310,7 @@ edition.cancel.command = Command Value
 edition.cancel.requirements_addr = Requirements List番号
 edition.cancel.requirements_addr.description = 要件List番号
 edition.cancel.extradata_addr = Extradata ID番号
-edition.cancel.extradata_addr.description = モーションの繋ぎ方の設定ID番号
+edition.cancel.extradata_addr.description = モーションのつなげ方の設定ID番号
 edition.cancel.detection_start = 入力幅開始
 edition.cancel.detection_start.description = Grouped Cancel時は既定0
 edition.cancel.detection_end = 入力幅終り
@@ -318,6 +319,7 @@ edition.cancel.starting_frame = Move開始フレーム
 edition.cancel.starting_frame.description = Grouped Cancel時はGrouped Cancelをチェックする数になります。\nGrouped Cancel ID番号先のリスト最終段(motOrigin)を除いた数\nGrouped Cancel総数が139なら138を入力
 edition.cancel.move_id = Move ID番号
 edition.cancel.group_id = Grouped Cancel ID番号
+edition.cancel.group_id.description = Grouped Cancel ID番号
 edition.cancel.sequence_id = Sequence ID番号
 edition.cancel.cancel_option = Cancel Option
 edition.cancel.invalid_sequence_id = 無効なID番号
@@ -327,7 +329,7 @@ edition.grouped_cancel.command = Command Value
 edition.grouped_cancel.requirements_addr = Requirements List番号
 edition.grouped_cancel.requirements_addr.description = 要件List番号
 edition.grouped_cancel.extradata_addr = Extradata ID番号
-edition.grouped_cancel.extradata_addr.description = モーションの繋ぎ方の設定ID番号
+edition.grouped_cancel.extradata_addr.description = モーションのつなげ方の設定ID番号
 edition.grouped_cancel.detection_start = 入力幅開始
 edition.grouped_cancel.detection_end = 入力幅終り
 edition.grouped_cancel.starting_frame = Move開始フレーム
@@ -336,49 +338,51 @@ edition.grouped_cancel.cancel_option = Cancel option
 
 edition.cancel_extra.window_name = Cancel extra
 edition.cancel_extra.value = Value
-#####
 
 edition.requirement.window_name = Requirement list
 edition.requirement.condition = Requirements ID番号
+edition.requirement.condition.description = 要件ID番号
 edition.requirement.param_unsigned = パラメータ
 edition.requirement.param_float = パラメータ(Float)
 
 edition.hit_condition.window_name = Hit condition list
 edition.hit_condition.requirements_addr = Requirements List番号
+edition.hit_condition.requirements_addr.description = 要件List番号
 edition.hit_condition.damage = ダメージ
 edition.hit_condition.reactions_addr = Reactions ID番号
+edition.hit_condition.reactions_addr.description = 相手側リアクションID番号
 
 edition.reactions.window_name = Reactions
 edition.reactions.category_1 = Pushback ID番号
 edition.reactions.category_3 = やられモーションMove ID番号
 edition.reactions.category_5 = Direction
 edition.reactions.category_7 = Other
-edition.reactions.front_pushback = 正面
-edition.reactions.backturned_pushback = 背面
-edition.reactions.left_side_pushback = 左側面
-edition.reactions.right_side_pushback = 右側面
+edition.reactions.front_pushback = 正面NH
+edition.reactions.backturned_pushback = 背面NH
+edition.reactions.left_side_pushback = 左側面NH
+edition.reactions.right_side_pushback = 右側面NH
 edition.reactions.front_counterhit_pushback = 正面CH
 edition.reactions.downed_pushback = ダウン
 edition.reactions.block_pushback = ガード
-edition.reactions.front_direction = 正面
-edition.reactions.back_direction = 背面
-edition.reactions.left_side_direction = 左側面
-edition.reactions.right_side_direction = 右側面
+edition.reactions.front_direction = 正面NH
+edition.reactions.back_direction = 背面NH
+edition.reactions.left_side_direction = 左側面NH
+edition.reactions.right_side_direction = 右側面NH
 edition.reactions.front_counterhit_direction = 正面CH
 edition.reactions.downed_direction = ダウン
 edition.reactions.0x44_long = _0x44_long
 edition.reactions.vertical_pushback = 垂直方向への押す力
-edition.reactions.standing_moveid = 立ち
+edition.reactions.standing_moveid = 立ちNH
 edition.reactions.default_moveid = 既定
-edition.reactions.crouch_moveid = しゃがみ
+edition.reactions.crouch_moveid = しゃがみNH
 edition.reactions.counterhit_moveid = 立ちCH
 edition.reactions.crouch_counterhit_moveid = しゃがみCH
-edition.reactions.left_side_moveid = 左側面
-edition.reactions.crouch_left_side_moveid = しゃがみ左側面
-edition.reactions.right_side_moveid = 右側面
-edition.reactions.crouch_right_side_moveid = しゃがみ右側面
-edition.reactions.backturned_moveid = 背面
-edition.reactions.crouch_backturned_moveid = しゃがみ背面
+edition.reactions.left_side_moveid = 左側面NH
+edition.reactions.crouch_left_side_moveid = しゃがみ左側面NH
+edition.reactions.right_side_moveid = 右側面NH
+edition.reactions.crouch_right_side_moveid = しゃがみ右側面NH
+edition.reactions.backturned_moveid = 背面NH
+edition.reactions.crouch_backturned_moveid = しゃがみ背面NH
 edition.reactions.block_moveid = 立ちガード
 edition.reactions.crouch_block_moveid = しゃがみガード
 edition.reactions.wallslump_moveid = 壁やられ
@@ -394,6 +398,7 @@ edition.input.direction = 方向入力値
 edition.input.button = ボタン入力値
 edition.input.inputs = Inputs
 
+#######
 edition.projectile.window_name = Projectile
 edition.projectile.category_2 = References
 edition.projectile.category_3 = Unnamed
@@ -412,6 +417,7 @@ edition.projectile.hit_level = HIT Levels
 edition.projectile.hit_condition_addr = Hit Conditions ID番号
 edition.projectile.cancel_addr = Cancels ID番号
 edition.projectile.voiceclip_on_hit = HIT時の声
+#######
 
 edition.pushback.window_name = Pushback
 edition.pushback.duration = 期間
@@ -432,7 +438,7 @@ edition.animation_list.duration = 実フレーム数
 edition.animation_list.size = サイズ
 edition.animation_list.import = Moveにインポート
 edition.animation_list.search_animation = CurrentMoveにインポートするアニメーションを検索...
-edition.animation_list.no_anim = ライブラリにアニメーションが見つかりません。Editorからキャラクターを開き、「アニメーションを抽出」ボタンをクリックすると、ライブラリに追加されます。
+edition.animation_list.no_anim = ライブラリにアニメーションが見つかりません。Editorからキャラクターを開き、「アニメーションをエクスポート」ボタンをクリックすると、ライブラリに追加されます。
 edition.animation_list.loading = アニメーションリストを読み込み中...
 edition.animation_list.clear_filter = Clear filter
 
@@ -447,9 +453,9 @@ edition.camera_data.left_side_camera_data = 左側面
 edition.camera_data.right_side_camera_data = 右側面
 edition.camera_data._0xA_short = _0xA_short
 
-edition.mvl_displayable.window_name = Movelist: Displayable
+edition.mvl_displayable.window_name = コマンド表示list: コマンド表示
 edition.mvl_displayable.type = Type
-edition.mvl_displayable.playable_id = Playable ID番号
+edition.mvl_displayable.playable_id = デモ ID番号
 edition.mvl_displayable.playable = (Playable)
 edition.mvl_displayable.not_playable = (Not playable)
 edition.mvl_displayable.category_1 = 不明
@@ -475,18 +481,18 @@ edition.mvl_displayable.combo_difficulty = 難易度
 edition.mvl_displayable.combo_damage = ダメージ
 edition.mvl_displayable.p2_action = P2 アクション
 
-edition.mvl_playable.window_name = Movelist: Playable
+edition.mvl_playable.window_name = コマンド表示list: デモ設定
 edition.mvl_playable.distance = 距離
 edition.mvl_playable.p2_rotation = P2 Rotation
 edition.mvl_playable.input_count = Input count
-edition.mvl_playable.input_sequence_id = Input sequence ID番号
-edition.mvl_playable.has_rage = レイジ時
+edition.mvl_playable.input_sequence_id = デモ sequence ID番号
+edition.mvl_playable.has_rage = レイジの有無
 
-edition.mvl_input.window_name = Movelist: Input
-edition.mvl_input.directions = 方向入力
-edition.mvl_input.buttons = ボタン入力
-edition.mvl_input.frame_duration = 入力幅
-edition.mvl_input.trigger_highlight = Trigger highlight
+edition.mvl_input.window_name = コマンド表示list: デモ Input
+edition.mvl_input.directions = 方向入力値
+edition.mvl_input.buttons = ボタン入力値
+edition.mvl_input.frame_duration = 持続幅
+edition.mvl_input.trigger_highlight = 入力音
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 
