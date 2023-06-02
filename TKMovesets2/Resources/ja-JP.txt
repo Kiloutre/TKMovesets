@@ -453,9 +453,9 @@ edition.camera_data.left_side_camera_data = 左側面
 edition.camera_data.right_side_camera_data = 右側面
 edition.camera_data._0xA_short = _0xA_short
 
-edition.mvl_displayable.window_name = コマンド表示list: コマンド表示
+edition.mvl_displayable.window_name = コマンドlist: コマンド表示
 edition.mvl_displayable.type = Type
-edition.mvl_displayable.playable_id = デモ ID番号
+edition.mvl_displayable.playable_id = デモ設定 ID番号
 edition.mvl_displayable.playable = (Playable)
 edition.mvl_displayable.not_playable = (Not playable)
 edition.mvl_displayable.category_1 = 不明
@@ -481,15 +481,15 @@ edition.mvl_displayable.combo_difficulty = 難易度
 edition.mvl_displayable.combo_damage = ダメージ
 edition.mvl_displayable.p2_action = P2 アクション
 
-edition.mvl_playable.window_name = コマンド表示list: デモ設定
+edition.mvl_playable.window_name = コマンドlist: デモ設定
 edition.mvl_playable.distance = 距離
 edition.mvl_playable.p2_rotation = P2 Rotation
 edition.mvl_playable.input_count = 入力回数
-edition.mvl_playable.input_count.description = デモ sequence ID番号先で行う入力回数
-edition.mvl_playable.input_sequence_id = デモ sequence ID番号
+edition.mvl_playable.input_count.description = デモシーケンス ID番号先で行う入力回数
+edition.mvl_playable.input_sequence_id = デモシーケンス ID番号
 edition.mvl_playable.has_rage = レイジの有無
 
-edition.mvl_input.window_name = コマンド表示list: デモ Input
+edition.mvl_input.window_name = コマンドlist: デモシーケンス
 edition.mvl_input.directions = 方向入力値
 edition.mvl_input.buttons = ボタン入力値
 edition.mvl_input.frame_duration = 持続幅
