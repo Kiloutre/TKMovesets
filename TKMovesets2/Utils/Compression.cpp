@@ -447,7 +447,7 @@ namespace CompressionUtils
 #ifdef BUILD_TYPE_DEBUG
 		return TKMovesetCompressionType_None;
 #else
-		return TKMovesetCompressionType_LZMA;
+		return TKMovesetCompressionType_LZ4;
 #endif
 	}
 
