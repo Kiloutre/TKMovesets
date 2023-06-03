@@ -103,11 +103,13 @@ public:
 
 		bool opponent_ready = false;
 		bool loaded_remote_moveset = false;
+		bool received_opponent_sync_request = false;
 		uint64_t battle_start_call_time = 0;
 
 		void Reset() {
 			opponent_ready = false;
 			loaded_remote_moveset = false;
+			received_opponent_sync_request = false;
 			battle_start_call_time = 0;
 		}
 

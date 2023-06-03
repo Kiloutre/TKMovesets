@@ -82,10 +82,11 @@ struct TKMovesetHeader
 	// Flags used for storing useful game-specific infos. Access using GetGameSpecificFlags()
 	uint64_t game_specific_flags = -1;
 
+	// todo: convert movesets to new versions to avoid having these variables missing
 	uint64_t GetGameSpecificFlags() const
 	{
-		// game_specific_flags was introduced in 0.6.4
-		if (Helpers::VersionGreater(version_string, "0.7.3")) return game_specific_flags;
+		// game_specific_flags was introduced in 0.6
+		if (Helpers::VersionGreater(version_string, "0.5")) return game_specific_flags;
 		return 0;
 	}
 
@@ -104,8 +105,8 @@ struct TKMovesetHeader
 
 	const char* GetOrigCharacterName() const
 	{
-		// Orig_character_name was introduced in 0.6.4
-		if (Helpers::VersionGreater(version_string, "0.6.4")) return orig_character_name;
+		// Orig_character_name was introduced in 0.6
+		if (Helpers::VersionGreater(version_string, "0.5")) return orig_character_name;
 		return target_character;
 	}
 

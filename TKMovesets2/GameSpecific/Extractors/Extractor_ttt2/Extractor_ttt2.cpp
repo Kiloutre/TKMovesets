@@ -639,7 +639,10 @@ char* ExtractorTTT2::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, con
 
 	nameBlockStart = movesetAddr + nameOffset - (toCopy - charactersToReplace);
 	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + nameOffset - (toCopy - charactersToReplace), nameBlockEnd, size_out);
-	memcpy(nameBlock, namePrefix, toCopy);
+
+	if (nameBlock != nullptr) {
+		memcpy(nameBlock, namePrefix, toCopy);
+	}
 
 	return nameBlock;
 }

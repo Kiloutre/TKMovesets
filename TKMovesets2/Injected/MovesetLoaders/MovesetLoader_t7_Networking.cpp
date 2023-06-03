@@ -90,6 +90,7 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 				return;
 			}
 
+			syncStatus.received_opponent_sync_request = true;
 			DEBUG_LOG("COMMUNICATION: PACKET REQUEST_SYNC RECEIVED\n");
 			// Received a packet from the opponent providing us with informations about what he wants
 

@@ -322,7 +322,13 @@ namespace T7Hooks
 			else {
 				// Wait up to X seconds before finally giving up on loading
 				uint64_t diff = Helpers::getCurrentTimestamp() - g_loader->syncStatus.battle_start_call_time;
-				unsigned int maxWaitTime = 60;
+
+				unsigned int maxSyncedWaitTime = 60; // Wait 60 seconds max if moveset sync has started
+				unsigned int maxUnsyncedWaitTime = 15; // Wait 15 seconds max if moveset sync has not started
+
+				// Different wait time, smaller if opponent has not locked-in
+				const unsigned int maxWaitTime = g_loader->syncStatus.received_opponent_sync_request ? maxUnsyncedWaitTime : maxSyncedWaitTime;
+
 				DEBUG_LOG("GetSyncBattleStart: %llu / %u\n", diff + 1, maxWaitTime);
 				if (diff >= maxWaitTime) {
 					g_loader->sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
