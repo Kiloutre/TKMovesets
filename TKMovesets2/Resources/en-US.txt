@@ -75,17 +75,17 @@ navmenu.category_other = Other
 navmenu.documentation = Documentation
 navmenu.about = About
 
-navmenu.up_to_date = Up to date
-navmenu.updated_addr = Updated addresses!
-navmenu.update_check = Checking for updates...
-navmenu.update = Update
-navmenu.update_error = Updating error
-navmenu.update_explanation = An update has been found.\nDo you want to download it and restart the program now?
-navmenu.update_bad_file = The update could not be applied.\nPlease update manually.
+sidemenu.up_to_date = Up to date
+sidemenu.updated_addr = Updated addresses!
+sidemenu.update_check = Checking for updates...
+sidemenu.update = Update
+sidemenu.update_error = Updating error
+sidemenu.update_explanation = An update has been found.\nDo you want to download it and restart the program now?
+sidemenu.update_bad_file = The update could not be applied.\nPlease update manually.
 
-navmenu.vsync = Vertical Sync
+sidemenu.vsync = Vertical Sync
 
-navmenu.changelog = Changelog
+sidemenu.changelog = Changelog
 sidemenu.file_association = Associate .tkmvst
 
 ## Submenus ##
