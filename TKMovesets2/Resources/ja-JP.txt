@@ -76,17 +76,17 @@ navmenu.category_other = Other
 navmenu.documentation = ドキュメント
 navmenu.about = 概要
 
-navmenu.up_to_date = 最新
-navmenu.updated_addr = アドレスを更新しました!
-navmenu.update_check = 更新を確認しています...
-navmenu.update = 更新
-navmenu.update_error = 更新エラー
-navmenu.update_explanation = 更新プログラムがあります。\n今すぐダウンロードして再起動しますか?
-navmenu.update_bad_file = 更新を適用できませんでした。\n手動で更新してください。
+sidemenu.up_to_date = 最新
+sidemenu.updated_addr = アドレスを更新しました!
+sidemenu.update_check = 更新を確認しています...
+sidemenu.update = 更新
+sidemenu.update_error = 更新エラー
+sidemenu.update_explanation = 更新プログラムがあります。\n今すぐダウンロードして再起動しますか?
+sidemenu.update_bad_file = 更新を適用できませんでした。\n手動で更新してください。
 
-navmenu.vsync = VSync設定
+sidemenu.vsync = VSync設定
 
-navmenu.changelog = Changelog
+sidemenu.changelog = Changelog
 sidemenu.file_association = Associate .tkmvst
 
 ## Submenus ##
