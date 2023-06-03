@@ -17,7 +17,7 @@
 
 bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only)
 {
-	std::string repoUrl = addresses->GetString("global", "repo_url");
+	std::string repoUrl = UPDATE_REPO_URL;
 	std::string releasesUrl = repoUrl;
 	releasesUrl.replace(releasesUrl.find("github.com"), sizeof("github.com") - 1, "api.github.com/repos");
 	releasesUrl += "/releases/latest";
@@ -200,7 +200,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
 {
-	std::string addrUrl = addresses->GetString("global", "repo_url");
+	std::string addrUrl = UPDATE_REPO_URL;
 	addrUrl.replace(addrUrl.find("github.com"), sizeof("github.com") - 1, "raw.githubusercontent.com");
 	addrUrl += "/master/TKMovesets2/Resources/game_addresses.ini";
 

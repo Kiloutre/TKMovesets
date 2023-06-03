@@ -79,8 +79,15 @@ struct TKMovesetHeader
 	char target_character[32] = "";
 	// Original name of the character
 	char orig_character_name[32] = "";
-	// Flags used for storing useful game-specific infos
+	// Flags used for storing useful game-specific infos. Access using GetGameSpecificFlags()
 	uint64_t game_specific_flags = -1;
+
+	uint64_t GetGameSpecificFlags() const
+	{
+		// game_specific_flags was introduced in 0.6.4
+		if (Helpers::VersionGreater(version_string, "0.7.3")) return game_specific_flags;
+		return 0;
+	}
 
 	// Function to validate some of the header content, first step to ensuring the file isn't badly formated
 	bool ValidateHeader() const
@@ -95,7 +102,7 @@ struct TKMovesetHeader
 		return true;
 	}
 
-	char* GetOrigCharacterName()
+	const char* GetOrigCharacterName() const
 	{
 		// Orig_character_name was introduced in 0.6.4
 		if (Helpers::VersionGreater(version_string, "0.6.4")) return orig_character_name;

@@ -18,6 +18,9 @@ set(VCPKG_TARGET_TRIPLET x64-windows-static)
 set(VCPKG_CRT_LINKAGE static)
 set(VCPKG_LIBRARY_LINKAGE static)
 
+# Optimization flags aren't really needed
+#set(CMAKE_CXX_FLAGS_RELEASE "-O")
+
 project ("TKMovesets2")
 add_subdirectory ("TKMovesets2")
 

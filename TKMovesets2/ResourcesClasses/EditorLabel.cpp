@@ -124,7 +124,7 @@ void EditorLabel::LoadFile(const std::string& dataString, const char* name)
 void EditorLabel::DownloadFromWebsite()
 {
 	DEBUG_LOG("EditorLabel::DownloadFromWebsite()\n");
-	std::string repoUrl = m_addrFile->GetString("global", "repo_url");
+	std::string repoUrl = UPDATE_REPO_URL;
 
 	// Get url of TKInterface folder
 	std::string interfaceResourcesUrl = repoUrl;

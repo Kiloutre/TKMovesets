@@ -15,6 +15,7 @@
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LOCALE  "en-US"
 # define PROGRAM_DEBUG_LOG_FILE  "tkmovesets_logs.log"
+# define UPDATE_REPO_URL         "https://github.com/Kiloutre/TKMovesets"
 
 # define INTERFACE_DATA_DIR      "TKMInterface"
 # define GAME_ADDRESSES_FILE     "game_addresses.ini"
