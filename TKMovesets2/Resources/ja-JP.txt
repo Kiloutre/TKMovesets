@@ -50,6 +50,7 @@ moveset.size = サイズ
 moveset.size_mb = MB
 moveset.size_kb = KB
 moveset.rename = リネーム
+moveset.convert = Convert
 moveset.duplicate = 複製
 moveset.import = インポート
 moveset.edit = 編集
@@ -163,6 +164,7 @@ edition.rename.empty_name = 名前がありません
 edition.rename.already_exists = この名前はすでに使用されています
 edition.rename.rename_err = 名前の変更中にエラーが発生しました。文字は有効ですか？
 edition.rename.invalid_name = 名前に無効な文字が含まれています。(/\|<:"?※)
+edition.convert.format_target = Format to convert to
 
 # Moveset Edition #
 edition.explanation = ここではエクスポートしたMovesetを編集できます。チュートリアルや役立つリソースについては、ドキュメントを参照してください。\n「ライブ編集」をオンにすると、CustomMovesetをすばやく変更できます。単純な値の変更は、即メモリに適用されます。
