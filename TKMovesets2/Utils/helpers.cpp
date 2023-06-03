@@ -194,7 +194,7 @@ namespace Helpers
 		}
 	}
 
-	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks)
+	uint32_t CalculateCrc32(const std::vector<std::pair<Byte*, uint64_t>>& blocks)
 	{
 		uint32_t crc32 = 0;
 		uint32_t table[256];

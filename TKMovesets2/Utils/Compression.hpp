@@ -28,7 +28,9 @@ namespace CompressionUtils
 
 	namespace FILE {
 		namespace Moveset {
-			// Compress the moveset from file to file
+			// Compress a moveset in place
+			bool Compress(const std::wstring& dest_filename, TKMovesetCompressionType_ compressionType);
+			// Compress a moveset from file to file
 			bool Compress(const std::wstring& dest_filename, const std::wstring& src_filename, TKMovesetCompressionType_ compressionType);
 		};
 	};

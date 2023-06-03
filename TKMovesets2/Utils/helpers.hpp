@@ -190,7 +190,7 @@ namespace Helpers
     void align8Bytes(std::ofstream& file);
 
 	// Calcualte a crc32 from a list of data blocks. Always skip the first one.
-	uint32_t CalculateCrc32(std::vector<std::pair<Byte*, uint64_t>>& blocks);
+	uint32_t CalculateCrc32(const std::vector<std::pair<Byte*, uint64_t>>& blocks);
 
     // Formats given date in 'hour:minutes day/month/year'
     std::string formatDateTime(uint64_t date);

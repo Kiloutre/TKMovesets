@@ -23,7 +23,7 @@ static void CopyHeader(TKMovesetHeader* dest, const TKMovesetHeader* src)
 	dest->block_list_size = src->block_list_size;
 	dest->moveset_data_start = src->moveset_data_start;
 	dest->moveset_data_size = src->moveset_data_size;
-	dest->compressionType = src->compressionType;
+	dest->compressionType = TKMovesetCompressionType_None;
 	dest->crc32 = src->crc32;
 	dest->orig_crc32 = src->orig_crc32;
 	dest->date = src->date;
@@ -134,14 +134,30 @@ static bool ConvertTTT2ToT7(const movesetInfo& mInfo, const TKMovesetHeader* ori
 	// Copy moveset data
 	memcpy(movesetData, orig_moveset, s_moveset);
 
-	// todo: compress
+	// Re-calculate CRC32
+	std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
+		{(Byte*)propertyList.data(), propertyList.size() * sizeof(TKMovesetProperty)},
+		{orig_moveset + blocks.movesetInfoBlock, blocks.tableBlock - blocks.movesetInfoBlock },
+		{orig_moveset + blocks.tableBlock, blocks.motalistsBlock - blocks.tableBlock },
+		{orig_moveset + blocks.motalistsBlock, blocks.nameBlock - blocks.motalistsBlock },
+		{orig_moveset + blocks.movesetBlock, blocks.animationBlock - blocks.movesetBlock },
+		{orig_moveset + blocks.animationBlock, blocks.motaBlock - blocks.animationBlock },
+		{orig_moveset + blocks.motaBlock, blocks.movelistBlock - blocks.motaBlock },
+	};
+	new_header->crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
 
-	// Generate new name
+	// Generate new name & write to file
 	std::wstring new_filename = GenerateNewName(mInfo.filename, L"TTT2", L"T7", L" (TTT2)");
+	{
+		std::ofstream new_moveset_file(new_filename, std::ios::binary);
+		new_moveset_file.write((char*)new_moveset, new_size);
+	}
 
-	// Write to file
-	std::ofstream new_moveset_file(new_filename, std::ios::binary);
-	new_moveset_file.write((char*)new_moveset, new_size);
+	// Compress if needed
+	if (orig_header->compressionType != TKMovesetCompressionType_None) {
+		CompressionUtils::FILE::Moveset::Compress(new_filename, (TKMovesetCompressionType_)orig_header->compressionType);
+	}
+
 	return true;
 }
 
@@ -175,19 +191,15 @@ void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
 	if (header->isCompressed())
 	{
 		// Decompress moveset and free old copy if needed
-		moveset = CompressionUtils::RAW::Moveset::Decompress(orig_moveset, header->moveset_data_size, s_moveset);
-		delete[] orig_moveset;
+		moveset = CompressionUtils::RAW::Moveset::Decompress(orig_moveset, s_moveset - header->moveset_data_start, s_moveset);
 		if (moveset == nullptr) {
 			return;
 		}
-		orig_moveset = moveset;
 	}
 	else {
-		moveset = orig_moveset;
+		moveset = orig_moveset + header->moveset_data_start;
+		s_moveset -= header->moveset_data_start;
 	}
-
-	moveset += header->moveset_data_start;
-	s_moveset -= header->moveset_data_start;
 
 	// Convert the moveset
 	switch (targetGameId)
@@ -212,5 +224,8 @@ void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
 	}
 
 	// Cleanup
+	if (header->isCompressed()) {
+		delete[] moveset;
+	}
 	delete[] orig_moveset;
 }

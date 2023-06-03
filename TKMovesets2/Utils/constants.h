@@ -44,6 +44,7 @@
 # define MOVESET_LOADER_RUN_FUNC         "MovesetLoaderRun"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
 
+// Some unique number that is identical between the two clients
 # define MOVESET_LOADER_P2P_CHANNEL      (48697987)
 
 # define ANIMATION_EXTENSION             ".tkanim"
