@@ -81,14 +81,10 @@ struct TKMovesetHeader
 	char orig_character_name[32] = "";
 	// Flags used for storing useful game-specific infos. Access using GetGameSpecificFlags()
 	uint64_t game_specific_flags = -1;
+	// Origin of the conversion, if the moveset was converted
+	uint16_t conversion_origin = 0;
 
-	// todo: convert movesets to new versions to avoid having these variables missing
-	uint64_t GetGameSpecificFlags() const
-	{
-		// game_specific_flags was introduced in 0.6
-		if (Helpers::VersionGreater(version_string, "0.5")) return game_specific_flags;
-		return 0;
-	}
+	// -- Functions -- //
 
 	// Function to validate some of the header content, first step to ensuring the file isn't badly formated
 	bool ValidateHeader() const
@@ -103,12 +99,29 @@ struct TKMovesetHeader
 		return true;
 	}
 
+	bool isCompressed() const { return compressionType != TKMovesetCompressionType_None; }
+
+	// -- Version specific -- //
+
+	uint64_t GetConversionOrigin() const
+	{
+		// conversion_origin was introduced in 0.6
+		if (Helpers::VersionGreater(version_string, "0.6")) return conversion_origin;
+		return 0;
+	}
+
+	// todo: convert movesets to new versions to avoid having these variables missing
+	uint64_t GetGameSpecificFlags() const
+	{
+		// game_specific_flags was introduced in 0.6
+		if (Helpers::VersionGreater(version_string, "0.5")) return game_specific_flags;
+		return 0;
+	}
+
 	const char* GetOrigCharacterName() const
 	{
 		// Orig_character_name was introduced in 0.6
 		if (Helpers::VersionGreater(version_string, "0.5")) return orig_character_name;
 		return target_character;
 	}
-
-	bool isCompressed() const { return compressionType != TKMovesetCompressionType_None; }
 };

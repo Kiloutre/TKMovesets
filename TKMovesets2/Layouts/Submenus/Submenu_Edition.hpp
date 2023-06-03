@@ -17,13 +17,19 @@ class Submenu_Edition
 private:
 	// Current error message in rename popup
 	RenameErrcode_ currentErr = RenameErrcode_NoErr;
-	// Stores whether the popup is open or not
-	bool m_popupOpen = false;
+	// Stores whether the rename popup is open or not
+	bool m_renamePopup = false;
+	// Stores whether the conversion popup is open or not
+	bool m_conversionPopup = false;
 	// Name of the moveset to apply in the rename popup
-	char m_newName[256];
-	// Filename of the moveset to rename in the rename popup
-	std::wstring m_toRename;
+	char m_newName[FILENAME_MAX];
+	// Moveset to rename/convert in the popups
+	movesetInfo m_actionTarget;
 
+	// Render the popup used for moveset renaming
+	void RenderRenamePopup();
+	// Render the popup used for moveset conversion
+	void RenderConversionPopup();
 public:
 	movesetInfo* Render(LocalStorage& storage);
 };

@@ -49,6 +49,7 @@ moveset.size = Taille
 moveset.size_mb = MO
 moveset.size_kb = KO
 moveset.rename = Renommer
+moveset.convert = Convertir
 moveset.duplicate = Dupliquer
 moveset.import = Importer
 moveset.edit = Modifier
@@ -162,6 +163,7 @@ edition.rename.empty_name = Nom est vide
 edition.rename.already_exists = Le nom est déjà utilisé par un autre fichier
 edition.rename.rename_err = Erreur lors du renommage
 edition.rename.invalid_name = Le nom contient des charactères invalide. (/\|<>:"?*)
+edition.convert.format_target = Format cible
 
 # Modifcation de moveset #
 edition.explanation = Vous pouvez ici modifier les personnage extraits. Consultez la documentation pour les information utiles et les tutoriels.\nActivez le mode 'Prévisualisation directe' pour rapidement modifier le personnage choisi : Les petits changement seront immédiatement appliqués dans le jeu, sans temps de chargement.
