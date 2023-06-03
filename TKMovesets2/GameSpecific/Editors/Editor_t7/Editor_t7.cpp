@@ -694,7 +694,12 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 		std::ifstream animFile(filepath, std::ios::binary);
 		animFile.seekg(0, std::ios::end);
 		animSize = animFile.tellg();
-		anim = new Byte[animSize];
+        try {
+            anim = new Byte[animSize];
+        } catch (std::bad_alloc) {
+            DEBUG_ERR("Failed to allocate anim size %llun", animSize);
+            return "";
+        }
 		animFile.seekg(0, std::ios::beg);
 		animFile.read((char*)anim, animSize);
 

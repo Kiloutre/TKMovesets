@@ -50,7 +50,11 @@ int main(int argc, char** argv)
     file_size = (int)input_file.tellg();
 
     // Create buffers
+    try {
     inbuf = new char[file_size];
+    } catch (std::bad_alloc) {
+        return 1;
+    }
 
     // Go back to the start of the file and fill input buffer
     input_file.seekg(0, std::ios::beg);

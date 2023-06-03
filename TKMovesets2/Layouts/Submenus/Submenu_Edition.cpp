@@ -27,6 +27,7 @@ void DuplicateMoveset(std::wstring filename)
 	try {
 		std::filesystem::copy_file(filename, new_name);
 	} catch (std::exception& _) {
+        DEBUG_ERR("Failed to duplicate moveset");
 		(void)_;
 		// Todo: maybe an error popup of some kind
 	}
@@ -55,6 +56,7 @@ static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newN
 	try {
 		std::filesystem::rename(full_filename.c_str(), new_full_filename.c_str());
 	} catch (std::exception& _) {
+        DEBUG_ERR("Failed to rename moveset");
 		(void)_;
 		// Todo: maybe an error popup of some kind
 	}

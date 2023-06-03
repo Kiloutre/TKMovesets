@@ -71,8 +71,10 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 		size_out = movesetSize;
 		return new_moveset;
 	}
-	catch (std::bad_alloc& exc)
+	catch (std::bad_alloc& _)
 	{
+        (void)_;
+        DEBUG_ERR("Failed to allocate %llu", movesetSize);
 		size_out = 0;
 		return nullptr;
 	}

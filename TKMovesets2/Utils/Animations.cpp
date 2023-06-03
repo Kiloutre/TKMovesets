@@ -309,7 +309,7 @@ namespace TAnimUtils
 				return -1;
 			}
 
-			char* buf = new char[8];
+			char buf[8];
 			int duration = -1;
 
 			file.read(buf, 8);
@@ -342,7 +342,7 @@ namespace TAnimUtils
 					break;
 				}
 			}
-			delete[] buf;
+            
 			return duration;
 		}
 	};

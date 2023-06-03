@@ -113,10 +113,14 @@ void TEditorExtraproperties::BuildItemDetails(int listIdx)
 	{
 		const char* format_str = _("edition.extraproperty.every_nth_frame");
 		const int bufsize = (int)strlen(format_str) + 8;
-		char* buf = new char[bufsize];
-		sprintf_s(buf, bufsize, format_str, startingFrame - 0x4000);
-		startingFrameText = std::string(buf);
-		delete[] buf;
+        try {
+            char* buf = new char[bufsize];
+            sprintf_s(buf, bufsize, format_str, startingFrame - 0x4000);
+            startingFrameText = std::string(buf);
+            delete[] buf;
+        } catch (std::bad_alloc&) {
+            DEBUG_ERR("Extraprop startingFrameText: Failed to allocate buffer");
+        }
 	}
 	else {
 		startingFrameText = std::to_string(startingFrame);

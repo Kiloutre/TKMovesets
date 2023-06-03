@@ -498,7 +498,12 @@ namespace CompressionUtils
 					moveset_data_start = header.moveset_data_start;
 
 					// Read up to moveset data start (includes header and more)
-					moveset_header_buf = new char[moveset_data_start];
+                    try {
+                        moveset_header_buf = new char[moveset_data_start];
+                    } catch (std::bad_alloc&) {
+                        return false;
+                    }
+                    
 					orig_file.seekg(0, std::ios::beg);
 					orig_file.read(moveset_header_buf, moveset_data_start);
 
@@ -519,8 +524,8 @@ namespace CompressionUtils
 				try {
 					inbuf = new Byte[moveset_data_size];
 				}
-				catch (std::bad_alloc& ex) {
-					DEBUG_ERR("Compress: Failed to allocate %llu bytes (%s)", moveset_data_size, ex.what());
+				catch (std::bad_alloc&) {
+					DEBUG_ERR("Compress: Failed to allocate %llu bytes (%s)", moveset_data_size);
 					return false;
 				}
 
@@ -537,8 +542,8 @@ namespace CompressionUtils
 					try {
 						std::filesystem::remove(src_filename);
 					}
-					catch (std::exception& ex) {
-						DEBUG_ERR("Compression: (%s)", ex.what());
+					catch (std::exception&) {
+						DEBUG_ERR("Compression: src file removal error");
 					}
 				}
 				uint64_t compressed_size = 0;
@@ -657,7 +662,15 @@ namespace CompressionUtils
 				TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 				uint64_t full_moveset_size = header->moveset_data_start + header->moveset_data_size;
 
-				Byte* new_moveset = new Byte[full_moveset_size];
+				Byte* new_moveset;
+                
+                try {
+                    new_moveset = new Byte[full_moveset_size];
+                } catch (std::bad_alloc&) {
+                    size_out = 0;
+                    return nullptr;
+                }
+                
 				memcpy(new_moveset, header, header->moveset_data_start);
 
 				if (!CompressionUtils::RAW::Moveset::DecompressToBuffer(moveset, compressed_data_size, new_moveset + header->moveset_data_start)) {
@@ -691,7 +704,13 @@ namespace CompressionUtils
 				const Byte* moveset_data_start = moveset + header->moveset_data_start;
 				uint64_t moveset_data_size = full_size - header->moveset_data_start;
 
-				Byte* new_moveset = new Byte[full_size];
+				Byte* new_moveset;
+                
+                try {
+                    new_moveset = new Byte[full_size];
+                } catch (std::bad_alloc&) {
+                    return nullptr;
+                }
 				Byte* new_moveset_data_start = new_moveset + header->moveset_data_start;
 				memcpy(new_moveset, header, sizeof(TKMovesetHeader));
 
@@ -794,7 +813,14 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
-				result = new Byte[input_size];
+                try {
+                    result = new Byte[input_size];
+                } catch (std::bad_alloc&) {
+                    DEBUG_ERR("Failed to allocate %llu bytes for compressed data", input_size);
+                    lzma_end(&strm);
+                    return nullptr;
+                }
+                
 				if (!lzma_compress(&strm, input_data, input_size, result, size_out))
 				{
 					DEBUG_LOG("LZMA Compression failure\n");
@@ -812,6 +838,13 @@ namespace CompressionUtils
 			{
 				Byte* result = nullptr;
 
+				try {
+                    result = new Byte[decompressed_size];
+                } catch (std::bad_alloc&) {
+                    DEBUG_ERR("Failed to allocate %llu bytes for decompressed data", decompressed_size);
+                    return nullptr;
+                }
+                
 				lzma_stream strm = LZMA_STREAM_INIT;
 
 				if (!lzma_init_decoder(&strm)) {
@@ -819,7 +852,7 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
-				result = new Byte[decompressed_size];
+                
 				if (!lzma_decompress(&strm, compressed_data, compressed_size, result, decompressed_size))
 				{
 					DEBUG_LOG("LZMA Decompression failure\n");
@@ -879,7 +912,14 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
-				Byte* result = new Byte[decompressed_size];
+				Byte* result;
+                
+                try {
+                    result = new Byte[decompressed_size];
+                } catch (std::bad_alloc&) {
+                    DEBUG_ERR("Failed to allocate %llu bytes for decompressed data", decompressed_size);
+                    return nullptr;
+                }
 
 				int compressed_size = LZ4_compress_default((char*)decompressed_data, (char*)result, (int)decompressed_size, (int)decompressed_size);
 
@@ -904,7 +944,13 @@ namespace CompressionUtils
 					return nullptr;
 				}
 
-				Byte* result = new Byte[decompressed_size];
+				Byte* result;
+                try {
+                    result = new Byte[decompressed_size];
+                } catch (std::bad_alloc&) {
+                    DEBUG_ERR("Failed to allocate %llu bytes for decompressed data", decompressed_size);
+                    return nullptr;
+                }
 
 				int decompressedSize;
 				decompressedSize = LZ4_decompress_safe((char*)compressed_data, (char*)result, (int)compressed_size, (int)decompressed_size);
