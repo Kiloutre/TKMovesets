@@ -52,7 +52,33 @@ static Byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
 
 // -- -- //
 
-static bool ConvertTTT2ToT7(const TKMovesetHeader* orig_header, Byte* orig_moveset, uint64_t s_moveset)
+static std::wstring GenerateNewName(const std::wstring& currentName, const wchar_t* oldPrefix, const wchar_t* newPrefix, const wchar_t* newSuffix)
+{
+	std::wstring filepath = currentName;
+	std::wstring name = currentName;
+
+	auto lastSlash = name.find_last_of(L"/\\");
+	if (lastSlash != std::wstring::npos) {
+		filepath.erase(lastSlash + 1);
+		name.erase(0, lastSlash + 1);
+		name.erase(name.find_last_of(L"."));
+	}
+
+	if (Helpers::startsWith<std::wstring>(name.c_str(), oldPrefix)) {
+		name.erase(name.begin(), name.begin() + wcslen(oldPrefix));
+	}
+
+	std::wstring newName = filepath + newPrefix + name + newSuffix + L"" MOVESET_FILENAME_EXTENSION;
+	unsigned int counter = 2;
+	while (Helpers::fileExists(newName.c_str())) {
+		newName = filepath + newPrefix + name + newSuffix + L" (" + std::to_wstring(counter) + L")" MOVESET_FILENAME_EXTENSION;
+		counter++;
+	}
+
+	return newName;
+}
+
+static bool ConvertTTT2ToT7(const movesetInfo& mInfo, const TKMovesetHeader* orig_header, Byte* orig_moveset, uint64_t s_moveset)
 {
 	StructsT7::TKMovesetHeaderBlocks blocks;
 
@@ -109,9 +135,12 @@ static bool ConvertTTT2ToT7(const TKMovesetHeader* orig_header, Byte* orig_moves
 	memcpy(movesetData, orig_moveset, s_moveset);
 
 	// todo: compress
+
+	// Generate new name
+	std::wstring new_filename = GenerateNewName(mInfo.filename, L"TTT2", L"T7", L" (TTT2)");
+
 	// Write to file
-	std::wstring filename = L"test.out";
-	std::ofstream new_moveset_file(filename, std::ios::binary);
+	std::ofstream new_moveset_file(new_filename, std::ios::binary);
 	new_moveset_file.write((char*)new_moveset, new_size);
 	return true;
 }
@@ -157,6 +186,9 @@ void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
 		moveset = orig_moveset;
 	}
 
+	moveset += header->moveset_data_start;
+	s_moveset -= header->moveset_data_start;
+
 	// Convert the moveset
 	switch (targetGameId)
 	{
@@ -166,7 +198,7 @@ void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
 			{
 				case GameId_TTT2:
 				{
-					ConvertTTT2ToT7(header, moveset, s_moveset);
+					ConvertTTT2ToT7(mInfo, header, moveset, s_moveset);
 					break;
 				}
 			}
