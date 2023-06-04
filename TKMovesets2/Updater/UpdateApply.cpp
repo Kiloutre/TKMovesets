@@ -77,7 +77,7 @@ void CleanupUpdateFiles(const std::string& filename)
 void ApplyUpdate(const std::string& filename)
 {
 	DEBUG_LOG("ApplyUpdate()\n");
-	// Wait until [UPDATE_FINALFILENAME] process has ended
+	// Wait until [PROGRAM_FILENAME] process has ended
 	{
 		// Max is 200 * 25 = 5 secs
 		bool found = true;
@@ -106,9 +106,23 @@ void ApplyUpdate(const std::string& filename)
 			return;
 		}
 	}
+
 	DEBUG_LOG("ApplyUpdate() - Copying file\n");
-	std::filesystem::remove(PROGRAM_FILENAME);
-	std::filesystem::copy_file(filename, PROGRAM_FILENAME);
+	try {
+		std::filesystem::remove(PROGRAM_FILENAME);
+	}
+	catch (std::exception&) {
+		DEBUG_ERR("Failed to remove original file for update");
+		return;
+	}
+
+	try {
+		std::filesystem::copy_file(filename, PROGRAM_FILENAME);
+	}
+	catch (std::exception&) {
+		DEBUG_ERR("Failed to replace original file for update");
+		return;
+	}
 
 	StartProcess(".\\" PROGRAM_FILENAME);
 }

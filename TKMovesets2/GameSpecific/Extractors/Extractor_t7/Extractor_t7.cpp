@@ -734,7 +734,11 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 			}
 			else {
 				DEBUG_LOG("Not compressing.\n");
-				std::filesystem::rename(tmp_filepath, filepath);
+                try {
+                    std::filesystem::rename(tmp_filepath, filepath);
+                } catch (std::exception&) {
+                    errcode = ExtractionErrcode_FileCreationErr;
+                }
 			}
 
 			DEBUG_LOG("- Saved moveset at '%S' -\n", filepath.c_str());
