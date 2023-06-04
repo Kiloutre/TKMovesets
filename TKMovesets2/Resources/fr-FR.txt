@@ -18,8 +18,8 @@ mota_04 = Visage 1
 mota_05 = Visage 2
 mota_06 = Ailes 1
 mota_07 = Ailes 2
-mota_08 = Camera 1
-mota_09 = Camera 2
+mota_08 = Caméra 1
+mota_09 = Caméra 2
 mota_10 = Inconnu 1
 mota_11 = Inconnu 2
 close = Fermer
@@ -419,7 +419,7 @@ edition.animation_list.no_anim = Aucune animation n'a encore été extraite dans
 edition.animation_list.loading = Chargement de la liste d'animation...
 edition.animation_list.clear_filter = Effacer le filtre
 
-edition.throw_camera.window_name = Camera de prise
+edition.throw_camera.window_name = Caméra de prise
 edition.throw_camera._0x0_int = _0x0_int
 edition.throw_camera.cameradata_addr = ID de donnée de caméra
 
