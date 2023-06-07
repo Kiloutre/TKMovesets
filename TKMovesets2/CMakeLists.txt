@@ -93,6 +93,7 @@ set(BINARY_SOURCES
 
                     # Helpers and such
                     "Utils/Animations.cpp"
+                    "Utils/Animations_T_x64.cpp"
                     "Utils/helpers.cpp"
                     "Utils/imgui_extras.cpp"
                     "Utils/ThreadedClass.cpp"
@@ -115,6 +116,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/TEditor.cpp"
                     "GameSpecific/Editors/EditorLogic.cpp"
                     "GameSpecific/Online/Online.cpp"
+                    "GameSpecific/MovesetConverters/MovesetFileConverter.cpp"
                     
                     # Game-specific
                     ## T7

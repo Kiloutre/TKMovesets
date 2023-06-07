@@ -6,6 +6,7 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
+#include "MovesetConverters/MovesetFileConverter.hpp"
 
 // -- Static helpers -- //
 
@@ -23,7 +24,13 @@ void DuplicateMoveset(std::wstring filename)
 		new_name = name + L" (" + std::to_wstring(number) + L")" + extension;
 	}
 
-	std::filesystem::copy_file(filename, new_name);
+	try {
+		std::filesystem::copy_file(filename, new_name);
+	} catch (std::exception& _) {
+        DEBUG_ERR("Failed to duplicate moveset");
+		(void)_;
+		// Todo: maybe an error popup of some kind
+	}
 }
 
 // -- Public methods -- //
@@ -46,12 +53,86 @@ static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newN
 		return RenameErrcode_AlreadyExists;
 	}
 
-	std::filesystem::rename(full_filename.c_str(), new_full_filename.c_str());
-	//if () {
-		//return RenameErrcode_RenameErr;
-	//}
+	try {
+		std::filesystem::rename(full_filename.c_str(), new_full_filename.c_str());
+	} catch (std::exception& _) {
+        DEBUG_ERR("Failed to rename moveset");
+		(void)_;
+		// Todo: maybe an error popup of some kind
+	}
+
 
 	return RenameErrcode_NoErr;
+}
+
+void Submenu_Edition::RenderRenamePopup()
+{
+
+	ImGui::InputText(_("edition.rename.new_moveset_name"), m_newName, sizeof(m_newName));
+
+	if (ImGui::Button(_("close")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
+		ImGui::CloseCurrentPopup();
+		m_renamePopup = false;
+		return;
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button(_("edition.save")))
+	{
+		currentErr = RenameMoveset(m_actionTarget.filename, m_newName);
+		if (currentErr == RenameErrcode_NoErr) {
+			ImGui::CloseCurrentPopup();
+			m_renamePopup = false;
+			return;
+		}
+	}
+
+	switch (currentErr)
+	{
+	case RenameErrcode_EmptyName:
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.empty_name"));
+		break;
+	case RenameErrcode_AlreadyExists:
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.already_exists"));
+		break;
+	case RenameErrcode_RenameErr:
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.rename_err"));
+		break;
+	case RenameErrcode_InvalidName:
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.invalid_name"));
+		break;
+	}
+}
+
+void Submenu_Edition::RenderConversionPopup()
+{
+	if (ImGui::Button(_("close")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
+		ImGui::CloseCurrentPopup();
+		m_conversionPopup = false;
+		return;
+	}
+
+	ImGui::SeparatorText(_("edition.convert.format_target"));
+
+	auto gameListCount = Games::GetGamesCount();
+	const GameInfo* games = Games::GetGameInfoFromIndex(0);
+
+	ImGui::PushID(games);
+	for (unsigned int i = 0; i < gameListCount; ++i)
+	{
+		if (games->supportedImports.contains(m_actionTarget.gameId)){
+			if (ImGui::Button(games->name)) {
+				ConvertMoveset(m_actionTarget, (GameId_)games->gameId);
+				ImGui::CloseCurrentPopup();
+				m_conversionPopup = false;
+				ImGui::PopID();
+				return;
+			}
+		}
+		++games;
+	}
+	ImGui::PopID();
+
 }
 
 movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
@@ -64,7 +145,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	auto availableSpace = ImGui::GetContentRegionAvail();
 	ImVec2 tableSize = ImVec2(0, availableSpace.y);
 
-	if (ImGui::BeginTable("MovesetEditionList", 8, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+	if (ImGui::BeginTable("MovesetEditionList", 9, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
@@ -72,6 +153,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.size"));
+		ImGui::TableSetupColumn(_("moveset.convert"));
 		ImGui::TableSetupColumn(_("moveset.duplicate"));
 		ImGui::TableSetupColumn(_("moveset.rename"));
 		ImGui::TableSetupColumn(_("moveset.edit"));
@@ -121,6 +203,13 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::TextUnformatted(moveset->sizeStr.c_str());
 
 				ImGui::PushID(moveset->filename.c_str());
+
+				ImGui::TableNextColumn();
+				if (ImGui::Button(_("moveset.convert"))) {
+					m_actionTarget = *moveset;
+					m_conversionPopup = true;
+				}
+
 				ImGui::TableNextColumn();
 				if (ImGui::Button(_("moveset.duplicate"))) {
 					DuplicateMoveset(moveset->filename);
@@ -128,9 +217,9 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 				ImGui::TableNextColumn();
 				if (ImGui::Button(_("moveset.rename"))) {
-					m_toRename = moveset->filename;
+					m_actionTarget = *moveset;
 					strcpy_s(m_newName, sizeof(m_newName), moveset->name.c_str());
-					m_popupOpen = true;
+					m_renamePopup = true;
 					currentErr = RenameErrcode_NoErr;
 				}
 
@@ -148,47 +237,23 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::EndTable();
 	}
 
-	if (m_popupOpen) {
+	if (m_renamePopup) {
 		ImGui::OpenPopup("EditionRenamePopup");
 		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
 	}
+	else if (m_conversionPopup) {
+		ImGui::OpenPopup("EditionConvertPopup");
+		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
+	}
 
-	if (ImGui::BeginPopupModal("EditionRenamePopup", &m_popupOpen))
+	if (ImGui::BeginPopupModal("EditionRenamePopup", &m_renamePopup))
 	{
-		ImGui::InputText(_("edition.rename.new_moveset_name"), m_newName, sizeof(m_newName));
-
-		if (ImGui::Button(_("close"))) {
-			ImGui::CloseCurrentPopup();
-			m_popupOpen = false;
-		}
-
-		ImGui::SameLine();
-		if (ImGui::Button(_("edition.save")))
-		{
-			currentErr = RenameMoveset(m_toRename, m_newName);
-			if (currentErr == RenameErrcode_NoErr)
-			{
-				ImGui::CloseCurrentPopup();
-				m_popupOpen = false;
-			}
-		}
-
-		switch (currentErr)
-		{
-		case RenameErrcode_EmptyName:
-			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.empty_name"));
-			break;
-		case RenameErrcode_AlreadyExists:
-			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.already_exists"));
-			break;
-		case RenameErrcode_RenameErr:
-			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.rename_err"));
-			break;
-		case RenameErrcode_InvalidName:
-			ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.invalid_name"));
-			break;
-		}
-
+		RenderRenamePopup();
+		ImGui::EndPopup();
+	}
+	else if (ImGui::BeginPopupModal("EditionConvertPopup", &m_conversionPopup))
+	{
+		RenderConversionPopup();
 		ImGui::EndPopup();
 	}
 

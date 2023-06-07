@@ -421,7 +421,15 @@ void MovesetLoaderT7::ConsumePackets()
 	uint32_t packetSize;
 	while (SteamHelper::SteamNetworking()->IsP2PPacketAvailable(&packetSize, MOVESET_LOADER_P2P_CHANNEL))
 	{
-		Byte* packetBuf = new Byte[packetSize];
+		Byte* packetBuf;
+        try {
+            // In case you are wondering what happens if the opponent sends a too big packet:
+            // Steam would refuse it. Max size is somewhere around 1024KB.
+            packetBuf = new Byte[packetSize];
+        } catch (std::bad_alloc&) {
+            DEBUG_ERR("Failed to allocate %llu bytes for packet", packetSize);
+            break;
+        }
 
 		CSteamID senderId;
 		if (SteamHelper::SteamNetworking()->ReadP2PPacket(packetBuf, packetSize, &packetSize, &senderId, MOVESET_LOADER_P2P_CHANNEL)) {

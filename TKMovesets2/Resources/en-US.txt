@@ -49,6 +49,7 @@ moveset.size = Size
 moveset.size_mb = MB
 moveset.size_kb = KB
 moveset.rename = Rename
+moveset.convert = Convert
 moveset.duplicate = Duplicate
 moveset.import = Import
 moveset.edit = Edit
@@ -74,17 +75,17 @@ navmenu.category_other = Other
 navmenu.documentation = Documentation
 navmenu.about = About
 
-navmenu.up_to_date = Up to date
-navmenu.updated_addr = Updated addresses!
-navmenu.update_check = Checking for updates...
-navmenu.update = Update
-navmenu.update_error = Updating error
-navmenu.update_explanation = An update has been found.\nDo you want to download it and restart the program now?
-navmenu.update_bad_file = The update could not be applied.\nPlease update manually.
+sidemenu.up_to_date = Up to date
+sidemenu.updated_addr = Updated addresses!
+sidemenu.update_check = Checking for updates...
+sidemenu.update = Update
+sidemenu.update_error = Updating error
+sidemenu.update_explanation = An update has been found.\nDo you want to download it and restart the program now?
+sidemenu.update_bad_file = The update could not be applied.\nPlease update manually.
 
-navmenu.vsync = Vertical Sync
+sidemenu.vsync = Vertical Sync
 
-navmenu.changelog = Changelog
+sidemenu.changelog = Changelog
 sidemenu.file_association = Associate .tkmvst
 
 ## Submenus ##
@@ -162,6 +163,7 @@ edition.rename.empty_name = Name is empty
 edition.rename.already_exists = Name is already in use by another fail
 edition.rename.rename_err = Error while trying to rename. Are the characters valid?
 edition.rename.invalid_name = Name contains invalid characters. (/\|<>:"?*)
+edition.convert.format_target = Format to convert to
 
 # Moveset Edition #
 edition.explanation = You can hereedit extracted movesets. Refer to documentation for tutorials and helpful ressources.\nTurn on 'Live edition' for quickly modifying the custom moveset: Simple values changes will be instantly applied in memory with zero loading time.

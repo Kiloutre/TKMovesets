@@ -229,7 +229,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 			break;
 		}
 
-		if (ImGui::Button(_("close")))
+		if (ImGui::Button(_("close")) || ImGui::IsKeyDown(ImGuiKey_Escape))
 		{
 			m_err = ImportationErrcode_Successful;
 			ImGui::CloseCurrentPopup();

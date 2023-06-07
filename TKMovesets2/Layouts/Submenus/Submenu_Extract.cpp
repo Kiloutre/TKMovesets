@@ -96,7 +96,7 @@ void Submenu_Extract::RenderSettingsPopup()
 	}
 
 	ImGui::Separator();
-	if (ImGui::Button(_("close"))) {
+	if (ImGui::Button(_("close")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
 		ImGui::CloseCurrentPopup();
 	}
 }
@@ -346,7 +346,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			break;
 		}
 
-		if (ImGui::Button(_("close")))
+		if (ImGui::Button(_("close")) || ImGui::IsKeyDown(ImGuiKey_Escape))
 		{
 			// Reset the errcode
 			m_err = ExtractionErrcode_Successful;

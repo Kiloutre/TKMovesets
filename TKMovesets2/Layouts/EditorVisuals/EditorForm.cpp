@@ -499,7 +499,7 @@ void EditorForm::Render()
 				ImGui::PopStyleColor();
 
 				ImGui::SameLine();
-				if (ImGui::Button(_("no"))) {
+				if (ImGui::Button(_("no")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
 					ImGui::CloseCurrentPopup();
 					m_deletionPopupOpen = false;
 				}

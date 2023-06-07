@@ -51,6 +51,7 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
+        DEBUG_ERR("Failed to load editor for moveset '%S'", movesetInfos->filename);
 		// A throw in a constructor frees its memory so no need to do anything
 	}
 }

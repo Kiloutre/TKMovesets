@@ -335,7 +335,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 			std::filesystem::current_path(ws);
 		}
 
-		std::string update_file_name = std::string(UPDATE_TMP_FILENAME) + ".exe";
+		std::string update_file_name = UPDATE_TMP_FILENAME ".exe";
 		if (filename == update_file_name) {
 			// Copy self .exe into TKMovesets.exe
 			ApplyUpdate(update_file_name);
@@ -480,7 +480,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 
 		if (program.requestedUpdate) {
 			program.sideMenu.CleanupThread();
-			StartProcess(std::string(UPDATE_TMP_FILENAME) + ".exe");
+			StartProcess(UPDATE_TMP_FILENAME ".exe");
 		}
 	}
 

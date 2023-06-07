@@ -51,7 +51,7 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 	const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
 	if (s_moveset < sizeof(header) || !header->ValidateHeader()) {
-		DEBUG_LOG("Failed to validate header of incoming online moveset.\n");
+		DEBUG_ERR("Failed to validate header of incoming online moveset.");
 		delete[] moveset;
 		return nullptr;
 	}
@@ -65,7 +65,7 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 		moveset = CompressionUtils::RAW::Moveset::Decompress(moveset, src_size, s_moveset);
 
 		if (moveset == nullptr) {
-			DEBUG_LOG("Decompression of moveset failed!\n");
+			DEBUG_ERR("Decompression of moveset failed!");
 			delete[] orig_moveset;
 			return nullptr;
 		}
@@ -92,22 +92,32 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 		final_moveset = ImportForOnline_FromTTT2(header, moveset, s_moveset);
 		break;
 	default:
-		DEBUG_LOG("No game found for given game id '%u'\n", gameId);
+		DEBUG_ERR("No game found for given game id '%u'", gameId);
 		break;
 	}
 
 	if (isCompressed) {
+		DEBUG_LOG("Moveset was compressed, deleting compressed version from memory\n");
 		delete[] orig_moveset;
 	}
 
-	if (final_moveset != nullptr && final_moveset != moveset) {
-		delete[] moveset;
-	}
-	else if (final_moveset == nullptr) {
-		DEBUG_LOG("ImportForOnline: Result was zero.\n");
+	if (final_moveset == nullptr) {
+		DEBUG_ERR("ImportForOnline: Result was zero.");
 		delete[] moveset;
 		return nullptr;
 
+	}
+	else if (final_moveset != moveset) {
+		DEBUG_LOG("Moveset underwent an extra conversion, freeing original version\n");
+		if (isCompressed) {
+			// Free the decompressed copy that we converted
+			delete[] moveset;
+		}
+		else {
+			// Free the original moveset data
+			// delete[] moveset; Would crash because it doesn't point exactly to the start of the allocated area
+			delete[] orig_moveset;
+		}
 	}
 
 	return final_moveset;
@@ -161,7 +171,9 @@ Byte* MovesetLoaderT7::ImportForOnline_FromTTT2(const TKMovesetHeader* header, B
 	DEBUG_LOG("ImportForOnline_FromTTT2()\n");
 
 	TKMovesetHeaderBlocks t7_offsets;
-	MovesetConverter::TTT2ToT7(header, moveset, s_moveset, t7_offsets);
+	if (!MovesetConverter::TTT2ToT7(header, moveset, s_moveset, t7_offsets)) {
+		return nullptr;
+	}
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;

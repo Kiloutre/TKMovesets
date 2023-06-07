@@ -13,10 +13,7 @@ namespace GameVersions
 	{
 		NONE = 0,
 
-		// Examples (to change)
-		SEASON_1,
-		SEASON_2,
-		SEASON_3,
+		FROM_TTT2,
 	};
 
 	enum TTT2

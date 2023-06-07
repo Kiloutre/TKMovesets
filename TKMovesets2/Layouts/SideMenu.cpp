@@ -223,7 +223,7 @@ void SideMenu::Render(float width)
 			}
 		}
         ImGui::SameLine();
-		if (ImGui::Button(_("no"))) {
+		if (ImGui::Button(_("no")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
 			ImGui::CloseCurrentPopup();
 			m_updateStatus.programUpdateAvailable = false;
 		}

@@ -8,5 +8,5 @@
 
 namespace MovesetConverter
 {
-	void TTT2ToT7(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
+	bool TTT2ToT7(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
 };

@@ -14,6 +14,10 @@ namespace TAnimUtils
 		void ByteswapAnimation(Byte* animAddr);
 		// Returns true if an animation is in little endian
 		bool IsLittleEndian(Byte* animAddr);
+
+		// Parse a specific frame of animation data, filling the float buffer with the appropriate values
+		// Returns the amount of bones the animation contains which you may use to read the pos_out buffer (bone_count * 3 * float)
+		uint16_t ParseAnimation0x64(const Byte* anim, unsigned int frame, float* pos_out);
 	};
 
 	namespace FromProcess

@@ -25,12 +25,13 @@ static bool ExtractMovesetLoaderIfNeeded()
             if (dll_buffer.st_mtime < program_buffer.st_mtime || dll_buffer.st_size != TKMovesetLoader_orig_len) {
                 DEBUG_LOG("- .dll out of date, deleting it -\n");
                 // DLL was created before this .exe, which means it is not up to date
+                
+                // Unload library from ourself
+                HMODULE h;
+                while ((h = GetModuleHandleA(MOVESET_LOADER_NAME)) != nullptr) {
+                    FreeLibrary(h);
+                }
                 try {
-                    // Unload library from ourself
-                    HMODULE h;
-                    while ((h = GetModuleHandleA(MOVESET_LOADER_NAME)) != nullptr) {
-                        FreeLibrary(h);
-                    }
                     std::filesystem::remove(MOVESET_LOADER_NAME);
                 }
                 catch (std::filesystem::filesystem_error const&) {

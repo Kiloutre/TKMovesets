@@ -10,7 +10,7 @@
 
 # define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define PROGRAM_TITLE           "TKMovesets - kilo"
-# define PROGRAM_VERSION         "0.7.3a"
+# define PROGRAM_VERSION         "0.7.5"
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LOCALE  "en-US"
@@ -34,7 +34,7 @@
 # define MOVESET_FILENAME_EXTENSION      ".tkmvst"
 # define MOVESET_TMPFILENAME_EXTENSION   "._tmp_tkmvst"
 // We might update extractors/importers without touching the main tool, so this is separated
-# define MOVESET_VERSION_STRING          "0.6"
+# define MOVESET_VERSION_STRING          "0.7"
 // Accepted chars in header strings are alphanum + those specified here
 // Anything else indicate a malformed header : a bad file
 # define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
@@ -44,6 +44,7 @@
 # define MOVESET_LOADER_RUN_FUNC         "MovesetLoaderRun"
 # define MOVESET_LOADER_STOP_FUNC        "MovesetLoaderStop"
 
+// Some unique number that is identical between the two clients
 # define MOVESET_LOADER_P2P_CHANNEL      (48697987)
 
 # define ANIMATION_EXTENSION             ".tkanim"

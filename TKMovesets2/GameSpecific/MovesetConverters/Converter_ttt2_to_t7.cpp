@@ -66,17 +66,30 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	movesetSize += offsets->GetBlockSize(TTT2::TKMovesetHeaderBlocks_Mota, s_moveset);
 	blocks_out.movelistBlock = movesetSize;
 
-	Byte* new_moveset = new Byte[movesetSize];
-	size_out = movesetSize;
-	return new_moveset;
+	try {
+		Byte* new_moveset = new Byte[movesetSize];
+		size_out = movesetSize;
+		return new_moveset;
+	}
+	catch (std::bad_alloc& _)
+	{
+        (void)_;
+        DEBUG_ERR("Failed to allocate %llu", movesetSize);
+		size_out = 0;
+		return nullptr;
+	}
 }
 
 namespace MovesetConverter
 {
-	void TTT2ToT7(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, TKMovesetHeaderBlocks& blocks_out)
+	bool TTT2ToT7(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, TKMovesetHeaderBlocks& blocks_out)
 	{
 		uint64_t new_moveset_size;
 		Byte* new_moveset = AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out);
+
+		if (new_moveset == nullptr) {
+			return false;
+		}
 
 		auto old_blocks = (const TTT2::TKMovesetHeaderBlocks*)((char*)header + header->block_list);
 		auto old_movesetInfo = (TTT2::MovesetInfo*)moveset;
@@ -454,5 +467,7 @@ namespace MovesetConverter
 
 		moveset = new_moveset;
 		s_moveset = new_moveset_size;
+
+		return true;
 	}
 };

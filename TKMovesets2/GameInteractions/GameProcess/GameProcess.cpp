@@ -403,7 +403,13 @@ bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
 	uint64_t sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
 
 	DEBUG_LOG("Alloc size %llu\n", sizeOfImage);
-	Byte* dllCopy = new Byte[sizeOfImage];
+	Byte* dllCopy;
+    try {
+        dllCopy = new Byte[sizeOfImage];
+    } catch (std::bad_alloc) {
+        return false;
+    }
+    
 	gameAddr dllGame = allocateMem(sizeOfImage, true);
 
 	if (dllGame == 0) {

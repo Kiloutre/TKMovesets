@@ -187,8 +187,7 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 	movelist = m_editor->displayableMovelist;
 	ReloadMovelistFilter();
 
-	// Set compression setting as the pre-configured default one
-	m_compressionIndex = CompressionUtils::GetCompressionSettingIndex(compressionType);
+	m_compressionIndex = CompressionUtils::GetDefaultCompressionSetting();
 }
 
 void EditorVisuals_T7::ReloadMovelistFilter()

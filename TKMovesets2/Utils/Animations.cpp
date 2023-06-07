@@ -52,7 +52,9 @@ namespace TAnimUtils
 
 		void Byteswap64Animation(Byte* animAddr)
 		{
-			bool isBoneInt32[256]; // Stack indicating whether a specific bone is 3x short or 3x floats
+			// Stack indicating whether a specific bone is 3x short or 3x floats
+			// Could get rid of it and directly read the bone descriptors when needed
+			bool isBoneInt16[256];
 
 			bool sourceIsBigEndian = animAddr[0] == 0;
 			bool targetIsBigEndian = !sourceIsBigEndian;
@@ -81,7 +83,7 @@ namespace TAnimUtils
 
 				// The overflow here is purposeful (casting the result of the substraction to unsigned)
 				// This makes bone descriptor 0x3 a float, and anything over 0x7 (so 0xB) also a float
-				isBoneInt32[i] = 4 <= descriptor && descriptor <= 7;
+				isBoneInt16[i] = 4 <= descriptor && descriptor <= 7;
 
 				SWAP_INT16(animAddr + descriptorOffset);
 			}
@@ -106,7 +108,7 @@ namespace TAnimUtils
 			// Swap base position
 			for (unsigned int i = 0; i < boneCount; ++i)
 			{
-				if (isBoneInt32[i])
+				if (isBoneInt16[i])
 				{
 					SWAP_INT16(animAddr + offset);
 					SWAP_INT16(animAddr + offset + 2);
@@ -309,7 +311,7 @@ namespace TAnimUtils
 				return -1;
 			}
 
-			char* buf = new char[8];
+			char buf[8];
 			int duration = -1;
 
 			file.read(buf, 8);
@@ -342,7 +344,7 @@ namespace TAnimUtils
 					break;
 				}
 			}
-			delete[] buf;
+            
 			return duration;
 		}
 	};

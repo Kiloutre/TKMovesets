@@ -327,7 +327,7 @@ namespace T7Hooks
 				unsigned int maxUnsyncedWaitTime = 15; // Wait 15 seconds max if moveset sync has not started
 
 				// Different wait time, smaller if opponent has not locked-in
-				const unsigned int maxWaitTime = g_loader->syncStatus.received_opponent_sync_request ? maxUnsyncedWaitTime : maxSyncedWaitTime;
+				const unsigned int maxWaitTime = g_loader->syncStatus.received_opponent_sync_request ? maxSyncedWaitTime : maxUnsyncedWaitTime;
 
 				DEBUG_LOG("GetSyncBattleStart: %llu / %u\n", diff + 1, maxWaitTime);
 				if (diff >= maxWaitTime) {

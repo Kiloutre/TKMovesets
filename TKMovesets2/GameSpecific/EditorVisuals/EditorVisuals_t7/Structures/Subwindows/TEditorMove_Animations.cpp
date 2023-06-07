@@ -143,7 +143,7 @@ bool TEditorMove_Animations::Render()
 	ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(9999, 9999));
 	if (ImGui::BeginPopupModal("AnimListPopup", &popen))
 	{
-		if (ImGui::Button(_("close_window"))) {
+		if (ImGui::Button(_("close_window")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
 			ImGui::CloseCurrentPopup();
 			popen = false;
 		}

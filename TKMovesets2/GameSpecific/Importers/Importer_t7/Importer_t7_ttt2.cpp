@@ -24,7 +24,10 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	Byte* orig_moveset = moveset;
 
 	TKMovesetHeaderBlocks t7_offsets;
-	MovesetConverter::TTT2ToT7(header, moveset, s_moveset, t7_offsets);
+	if (!MovesetConverter::TTT2ToT7(header, moveset, s_moveset, t7_offsets)) {
+		delete[] moveset;
+		return ImportationErrcode_AllocationErr;
+	}
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks * offsets = &t7_offsets;
