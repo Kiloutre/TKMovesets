@@ -16,7 +16,7 @@ The tool is tailored for the latest Tekken 7 version. It can be modified to work
 
 # Feature set:
 ## - Extractor
-- Extract movesets from memory (game running, characters loaded) (Tekken 7)
+- Extract movesets from memory (game running, characters loaded) (Tekken 7, Tekken Tag2, Tekken Revolution)
 - Chose whether or not to carry over camera animations, face animations, hands animations...
 - Movesets are compressed on disk in order for them not to take too much space
 
@@ -40,7 +40,7 @@ The tool is tailored for the latest Tekken 7 version. It can be modified to work
 
 # Developer readme
 
-##Todo lists:
+## Todo lists:
 
 https://github.com/Kiloutre/TKMovesets/projects?query=is%3Aopen
 
