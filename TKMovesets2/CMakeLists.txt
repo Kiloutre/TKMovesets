@@ -116,12 +116,12 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/TEditor.cpp"
                     "GameSpecific/Editors/EditorLogic.cpp"
                     "GameSpecific/Online/Online.cpp"
+                    "GameSpecific/MovesetConverters/Aliases.cpp"
                     "GameSpecific/MovesetConverters/MovesetFileConverter.cpp"
                     
                     # Game-specific
                     ## T7
                     "GameSpecific/Online/Online_t7.cpp"
-                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7_Utils.cpp"
@@ -138,6 +138,9 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Utils.cpp"
+                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
+                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7_Aliases.cpp"
+                    "GameSpecific/MovesetConverters/Converter_trev_to_t7_Aliases.cpp"
                     ### Editor layout
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
@@ -180,15 +183,21 @@ set(MOVESETLOADER_SOURCES
     "Utils/helpers.cpp"
     "Utils/Compression.cpp"
     
+    "GameSpecific/MovesetConverters/Aliases.cpp"
+
+
     "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
+    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7_Aliases.cpp"
     "GameSpecific/Importers/Importer_t7/Importer_t7_Utils.cpp"
+
+    "GameSpecific/MovesetConverters/Converter_trev_to_t7_Aliases.cpp"
 )
 
 ## Setup embedded resources ##
 set(EMBEDDED_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../EmbeddedResources.c")
 create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources" ${EMBEDDED_RESOURCES})
 # Build file embedder .EXE. This file embedder applies lz4 compression and can be used on files generated at compile them
-add_executable (FileEmbedder "External/embedfile.cpp" "Utils/Compression.cpp")
+add_executable (FileEmbedder "External/embedfile.cpp" "Utils/Compression.cpp" )
 target_include_directories(FileEmbedder PRIVATE ${INCLUDE_FOLDERS})
 
 # Build injected TKTKMovesetLoader.dll

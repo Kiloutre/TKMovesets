@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "MovesetConverters.hpp"
+
 #include "GameTypes.h"
 
 const auto cg_odd_hitbox_aliases = std::map<Byte, Byte>{
@@ -20,20 +22,11 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 	{ 0x1E, 0x16 }, // Kunimitsu fire breath
 };
 
-struct s_propAlias {
-	unsigned int target_id = 0;
-	std::map<unsigned int, unsigned int> param_alias;
-	bool nofill = false;
-};
-
 // Aliases for extraprops andrequirements
 // Will be built from cg_propertyAliases, attempts to guess unknown values in between known values
-std::map<unsigned int, s_propAlias> g_propertyAliases;
-
-// Put this inside of a function and not globally, in order to avoid using HEAP over nothing
-static void InitAliasDictionary()
+ std::map<unsigned int, s_propAlias> MovesetConverter::TTT2ToT7::InitAliasDictionary()
 {
-	g_propertyAliases = {
+	return std::map<unsigned int, s_propAlias> {
 	{ 3, {.target_id = 3 }}, // 1536: Enemy standing, throw (checking vuln?)
 	{ 27, {.target_id = 27 }}, // 2536: Enemy airborne, throw (checking vuln?)
 	{ 46, {.target_id = 44 }}, // Counterhit
@@ -565,11 +558,10 @@ static void InitAliasDictionary()
 	{ 0x8303, {.target_id = 0x84ce }}, // MAPPING
 	{ 0x830a, {.target_id = 0x853c }}, // (HEIHACHI) sDm_2K3_Fy -> wDm_GndF_00
 	{ 0x830b, {.target_id = 0x853d }}, // (ALISA) sDw_AIR00_
-
 	};
 }
 
-namespace Aliases
+namespace TTT2_T7_Aliases
 {
 	Byte OddHitboxByte(Byte value)
 	{
@@ -587,20 +579,6 @@ namespace Aliases
 			return item->second;
 		}
 		return value;
-	}
-
-	void ApplyPropertyAlias(unsigned int& id, unsigned int& value)
-	{
-		auto item = g_propertyAliases.find(id);
-		if (item == g_propertyAliases.end()) return;
-
-		id = item->second.target_id;
-
-		auto value_item = item->second.param_alias.find(value);
-		if (value_item != item->second.param_alias.end()) {
-			value = value_item->second;
-		}
-
 	}
 
 	unsigned char GetCharacterIdAlias(unsigned char value)
@@ -634,49 +612,4 @@ namespace Aliases
 			orig_hitbox_bytes[i] = (b & 1) ? OddHitboxByte(b) : EvenHitboxByte(b);
 		}
 	}
-
-	void BuildAliasDictionary()
-	{
-		InitAliasDictionary();
-
-#ifdef BUILD_TYPE_DEBUG
-		unsigned int filled = 0;
-#endif
-
-		std::map<unsigned int, s_propAlias> aliasesCopy = g_propertyAliases;
-
-		auto iter = aliasesCopy.begin();
-		auto nextiter = std::next(iter, 1);
-		auto iter_count = aliasesCopy.size() - 1;
-
-		for (unsigned int i = 0; i < iter_count; ++i, std::advance(iter, 1), std::advance(nextiter, 1))
-		{
-			auto key = iter->first;
-			auto next_key = nextiter->first;
-
-			g_propertyAliases[key] = iter->second;
-			if (iter->second.nofill || nextiter->second.nofill) {
-				continue;
-			}
-
-			unsigned int key_diff = next_key - (key + 1);
-			auto alias_offset = iter->second.target_id - key;
-			auto alias_offset2 = nextiter->second.target_id - next_key;
-
-			if (alias_offset == alias_offset2 and key_diff > 0) {
-				for (unsigned int j = 1; j < key_diff + 1; ++j) {
-#ifdef BUILD_TYPE_DEBUG
-					++filled;
-#endif
-					g_propertyAliases[key + j] = {
-						.target_id = iter->second.target_id + j
-					};
-				}
-			}
-		}
-		
-		g_propertyAliases[iter->first] = iter->second;
-		DEBUG_LOG("Built alias dictionary: %u extra items (%llu total)\n", filled, g_propertyAliases.size());
-	}
-
 };

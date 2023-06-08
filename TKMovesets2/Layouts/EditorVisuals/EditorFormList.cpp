@@ -357,19 +357,32 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	if (m_listSize == 0) {
 		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
 		m_listSize = fieldIdentifierMaps.size();
+		DEBUG_LOG("GetFormFieldsList() without list size, returned size is %llu\n", m_listSize);
 	} else {
 		// Some struct lists may have fixed list sizes: in this case, we'll call a different function
 		// For now these two GetFormFields aren't swappable, if a list is not supposed to have a known size ahead of time, don't provide a size
 		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, (int)m_listSize);
+		DEBUG_LOG("GetFormFieldsList() with list size %llu, returned size is %llu\n", m_listSize, fieldIdentifierMaps.size());
 	}
+
+	DEBUG_LOG("GetFormFieldsList: drawOrder size is %llu\n", drawOrder.size());
 
 	// Tries to find a name to show in the window title
 	// Also figure out the categories
+
 
 	for (const std::string& fieldName : drawOrder) {
 		EditorInput* field = fieldIdentifierMaps[0][fieldName];
 		m_categories.insert(field->category);
 	}
+
+#ifdef BUILD_TYPE_DEBUG
+	std::string categories;
+	for (auto c : m_categories) {
+		categories += std::to_string(c) + " ";
+	}
+	DEBUG_LOG("Registered categories: %s\n", categories.c_str());
+#endif
 
 	// Builds the <category : fields> maps & the item labels
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)

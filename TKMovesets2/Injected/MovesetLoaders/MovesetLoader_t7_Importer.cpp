@@ -91,6 +91,9 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 	case GameId_TTT2:
 		final_moveset = ImportForOnline_FromTTT2(header, moveset, s_moveset);
 		break;
+	case GameId_TREV:
+		final_moveset = ImportForOnline_FromTREV(header, moveset, s_moveset);
+		break;
 	default:
 		DEBUG_ERR("No game found for given game id '%u'", gameId);
 		break;
@@ -171,7 +174,53 @@ Byte* MovesetLoaderT7::ImportForOnline_FromTTT2(const TKMovesetHeader* header, B
 	DEBUG_LOG("ImportForOnline_FromTTT2()\n");
 
 	TKMovesetHeaderBlocks t7_offsets;
-	if (!MovesetConverter::TTT2ToT7(header, moveset, s_moveset, t7_offsets)) {
+	if (!MovesetConverter::TTT2ToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
+		return nullptr;
+	}
+
+	// List of data blocks within the moveset
+	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+
+	// Table that contains offsets and amount of cancels, move, requirements, etc...
+	gAddr::MovesetTable* table;
+
+	// TODO: Validate moveset
+
+	// -- Basic reading & allocations -- //
+
+	const gameAddr gameMoveset = (gameAddr)moveset;
+
+	// -- Conversions -- //
+
+	// Get the table address
+	table = (gAddr::MovesetTable*)(moveset + offsets->tableBlock);
+
+	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
+
+	//Convert move offets into ptrs
+	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+
+	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
+	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);
+
+	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset);
+
+	// -- Allocation & Conversion finished -- //
+
+	EnforceDefaultAliasesAsCurrent(moveset);
+
+	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
+
+	return moveset;
+}
+
+Byte* MovesetLoaderT7::ImportForOnline_FromTREV(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset)
+{
+	DEBUG_LOG("ImportForOnline_FromTREV()\n");
+
+	TKMovesetHeaderBlocks t7_offsets;
+	if (!MovesetConverter::TREVToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
 		return nullptr;
 	}
 

@@ -50,7 +50,7 @@ namespace StructsT7
 		uint64_t GetBlockSize(TKMovesetHeaderBlocks_ block, uint64_t s_moveset)
 		{
 			unsigned int b = (unsigned int)block;
-			if (b + 1 == _countof(blocks)) {
+			if (b + 1 == (unsigned int)_countof(blocks)) {
 				return s_moveset - blocks[block];
 			}
 			else {

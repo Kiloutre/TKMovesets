@@ -6,7 +6,26 @@
 
 #include "Structs_t7.h"
 
+struct s_propAlias {
+	unsigned int target_id = 0;
+	std::map<unsigned int, unsigned int> param_alias;
+	bool nofill = false;
+};
+
 namespace MovesetConverter
 {
-	bool TTT2ToT7(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
+	class TTT2ToT7
+	{
+	private:
+		virtual std::map<unsigned int, s_propAlias> InitAliasDictionary();
+	public:
+
+		bool Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
+	};
+
+	class TREVToT7 : public TTT2ToT7
+	{
+	private:
+		std::map<unsigned int, s_propAlias> InitAliasDictionary() override;
+	};
 };
