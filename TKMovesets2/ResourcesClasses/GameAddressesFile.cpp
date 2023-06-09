@@ -24,10 +24,10 @@ static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 		try {
 			ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos, pos), NULL, 0));
 		}
-		catch (const std::out_of_range& oor) {
+		catch (const std::exception&) {
 			// Todo: warn of bad formatting
-			oor;
 			ptrPath.push_back((gameAddr)0);
+			DEBUG_ERR("Game addr: bad entry '%s'", path.c_str());
 		}
 		pos += 1;
 		prevPos = pos;
@@ -36,10 +36,10 @@ static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 	try {
 		ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos), NULL, 0));
 	}
-	catch (const std::out_of_range& oor) {
+	catch (const std::exception&) {
 		// Todo: warn of bad formatting
-		oor;
 		ptrPath.push_back((gameAddr)0);
+		DEBUG_ERR("Game addr: bad vaoue '%s'", path.c_str());
 	}
 
 	return ptrPath;

@@ -24,3 +24,10 @@ uint64_t GetRPCS3BaseAddr(const GameInfo* game, const GameAddressesFile* addrFil
 	auto base = GetBaseAddrFromFile(game, addrFile, process);
 	return base == 0 ? 0x300000000 : base;
 }
+
+// PCSX2 base addr is constant
+uint64_t GetPCSX2BaseAddr(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process) {
+	// Still leave the possibility to set a (non-zero) base in case RPCS3 ever change its behaviour
+	auto base = GetBaseAddrFromFile(game, addrFile, process);
+	return base == 0 ? 0x20000000 : base;
+}

@@ -43,7 +43,7 @@ namespace ExtractorUtils
 };
 
 // Private methods //
-#include <signal.h>
+
 Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {
 	if (blockEnd < blockStart) {

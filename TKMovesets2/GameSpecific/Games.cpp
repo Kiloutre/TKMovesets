@@ -1,11 +1,18 @@
 #include "Games.hpp"
 #include "BaseAddresses.hpp"
 
+
 #include "Extractor_t7/Extractor_t7.hpp"
 #include "Extractor_ttt2/Extractor_ttt2.hpp"
+#include "Extractor_t6/Extractor_t6.hpp"
+#include "Extractor_t5/Extractor_t5.hpp"
+
 #include "Importer_t7/Importer_t7.hpp"
+
 #include "Editor_t7/Editor_t7.hpp"
+
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
+
 #include "Online_t7.hpp"
 
 // You should never reorder the list because it would change the game ids which are contained within movesets
@@ -69,6 +76,46 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
+		.bigEndian = true
+	},
+	{
+		.name = "Tekken 6 (RPCS3)",
+		.processName = "rpcs3.exe",
+		.movesetNamePrefix = "T6_",
+		.gameId = GameId_T6,
+		.minorVersion = 0,
+		.characterCount = 2,
+		.ptrSize = 4,
+		.flags = 0,
+		.dataString = "t6",
+		.minorDataString = "t6",
+		.supportedImports = {},
+		.extractor = new GameFactory<ExtractorT6>,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetRPCS3BaseAddr,
+		.bigEndian = true
+	},
+	{
+		.name = "Tekken 5 (PCSX2)",
+		.processName = "pcsx2.exe",
+		.movesetNamePrefix = "T5_",
+		.gameId = GameId_T5,
+		.minorVersion = 0,
+		.characterCount = 2,
+		.ptrSize = 4,
+		.flags = 0,
+		.dataString = "t5",
+		.minorDataString = "t5",
+		.supportedImports = {},
+		.extractor = new GameFactory<ExtractorT5>,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = true
 	},
 };

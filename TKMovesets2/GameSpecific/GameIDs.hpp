@@ -6,6 +6,8 @@ enum GameId_
 	GameId_T8,
 	GameId_TTT2,
 	GameId_TREV,
+	GameId_T6,
+	GameId_T5,
 };
 
 namespace GameVersions

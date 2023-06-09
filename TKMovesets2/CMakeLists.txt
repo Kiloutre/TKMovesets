@@ -138,9 +138,6 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Utils.cpp"
-                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
-                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7_Aliases.cpp"
-                    "GameSpecific/MovesetConverters/Converter_trev_to_t7_Aliases.cpp"
                     ### Editor layout
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
@@ -167,6 +164,17 @@ set(GAMESPECIFIC_SOURCES
 
                     # TTT2
                     "GameSpecific/Extractors/Extractor_ttt2/Extractor_ttt2.cpp"
+                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
+                    "GameSpecific/MovesetConverters/Converter_ttt2_to_t7_Aliases.cpp"
+
+                    # TREV
+                    "GameSpecific/MovesetConverters/Converter_trev_to_t7_Aliases.cpp"
+
+                    # T6
+                    "GameSpecific/Extractors/Extractor_t6/Extractor_t6.cpp"
+
+                    # T5
+                    "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"
 )                   
 
 # This will be included in the .dll and should only be related to the injected DLL
