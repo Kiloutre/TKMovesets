@@ -98,18 +98,18 @@ namespace StructsT5
 	{
 		union
 		{
-			uint64_t command;
+			uint32_t command;
 			struct
 			{
-				uint32_t direction;
-				uint32_t button;
+				uint16_t direction;
+				uint16_t button;
 			};
 		};
 		gameAddr32 requirements_addr;
 		gameAddr32 extradata_addr;
-		uint32_t detection_start;
-		uint32_t detection_end;
-		uint32_t starting_frame;
+		uint16_t detection_start;
+		uint16_t detection_end;
+		uint16_t starting_frame;
 		uint16_t move_id;
 		uint16_t cancel_option;
 	};
@@ -161,7 +161,7 @@ namespace StructsT5
 
 	struct Voiceclip
 	{
-		uint32_t id;
+		uint16_t id;
 	};
 
 	struct ExtraMoveProperty
@@ -180,11 +180,11 @@ namespace StructsT5
 	{
 		union
 		{
-			uint64_t command;
+			uint32_t command;
 			struct
 			{
-				uint32_t direction;
-				uint32_t button;
+				uint16_t direction;
+				uint16_t button;
 			};
 		};
 	};
@@ -250,10 +250,10 @@ namespace StructsT5
 
 		int16_t _0x56_short; // -
 
-		uint16_t moveId_val2; // Clearly related to current character ID
-		uint16_t moveId_val1; // Clearly related to move ID
+		//uint16_t moveId_val2; // Clearly related to current character ID
+		//uint16_t moveId_val1; // Clearly related to move ID
 		gameAddr32 hit_condition_addr;
-		int32_t anim_len;
+		int16_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
 		uint32_t ground_fall;
@@ -263,8 +263,8 @@ namespace StructsT5
 		gameAddr32 move_end_extraprop_addr; // Can be NULL
 		int32_t _0x98_int; // facing/extras
 		uint32_t hitbox_location;
-		uint32_t first_active_frame;
-		uint32_t last_active_frame;
+		uint16_t first_active_frame;
+		uint16_t last_active_frame;
 		int16_t _0x6c_short;
 		uint16_t distance;
 	};
