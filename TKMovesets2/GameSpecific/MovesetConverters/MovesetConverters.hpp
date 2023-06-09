@@ -14,6 +14,7 @@ struct s_propAlias {
 
 namespace MovesetConverter
 {
+	// T7
 	class TTT2ToT7
 	{
 	private:
@@ -23,9 +24,20 @@ namespace MovesetConverter
 		bool Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
 	};
 
+	// TREV just has different aliases from TTT2 so inherit from it
 	class TREVToT7 : public TTT2ToT7
 	{
 	private:
 		std::map<unsigned int, s_propAlias> InitAliasDictionary() override;
+	};
+
+
+	class T6ToT7
+	{
+	private:
+		virtual std::map<unsigned int, s_propAlias> InitAliasDictionary();
+	public:
+
+		bool Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
 	};
 };

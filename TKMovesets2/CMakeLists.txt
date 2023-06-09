@@ -125,7 +125,9 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7.cpp"
                     "GameSpecific/Importers/Importer_t7/Importer_t7_Utils.cpp"
-                    "GameSpecific/Importers/Importer_t7/Importer_t7_ttt2.cpp"
+                    "GameSpecific/Importers/Importer_t7/Importer_t7_OtherGames.cpp"
+                    "GameSpecific/AnimExtractors/AnimExtractor_t7.cpp"
+                    ### Editor logic
                     "GameSpecific/Editors/Editor_t7/Editor_t7.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Forms_DisplayableMovelist.cpp"
@@ -172,6 +174,8 @@ set(GAMESPECIFIC_SOURCES
 
                     # T6
                     "GameSpecific/Extractors/Extractor_t6/Extractor_t6.cpp"
+                    "GameSpecific/MovesetConverters/Converter_t6_to_t7.cpp"
+                    "GameSpecific/MovesetConverters/Converter_t6_to_t7_Aliases.cpp"
 
                     # T5
                     "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"
@@ -193,12 +197,15 @@ set(MOVESETLOADER_SOURCES
     
     "GameSpecific/MovesetConverters/Aliases.cpp"
 
-
+    # Converters
     "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
     "GameSpecific/MovesetConverters/Converter_ttt2_to_t7_Aliases.cpp"
     "GameSpecific/Importers/Importer_t7/Importer_t7_Utils.cpp"
 
     "GameSpecific/MovesetConverters/Converter_trev_to_t7_Aliases.cpp"
+
+    "GameSpecific/MovesetConverters/Converter_t6_to_t7.cpp"
+    "GameSpecific/MovesetConverters/Converter_t6_to_t7_Aliases.cpp"
 )
 
 ## Setup embedded resources ##

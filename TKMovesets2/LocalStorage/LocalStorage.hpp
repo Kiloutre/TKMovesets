@@ -31,6 +31,8 @@ struct movesetInfo
 	uint16_t minorVersion;
 	bool editable;
 	bool onlineImportable; // Moveset over a certain size can't be used online
+
+	bool is_valid;
 };
 
 class LocalStorage : public ThreadedClass

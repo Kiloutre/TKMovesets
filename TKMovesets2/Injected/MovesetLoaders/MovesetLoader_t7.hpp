@@ -148,6 +148,7 @@ public:
 	Byte* ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
 	Byte* ImportForOnline_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
 	Byte* ImportForOnline_FromTREV(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	Byte* ImportForOnline_FromT6(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
 
 	// Utils
 	CSteamID GetLobbyOpponentSteamId() const;

@@ -410,6 +410,7 @@ Byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, Mota
 	m_process->readBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
+
 #pragma warning(push)
 #pragma warning(disable:6385)
 Byte* ExtractorT7::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings)

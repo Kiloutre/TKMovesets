@@ -416,6 +416,9 @@ ImportationErrcode_ ImporterT7::ImportMovesetData(const TKMovesetHeader* header,
 	case GameId_TREV:
 		importFunc = &ImporterT7::_Import_FromTREV;
 		break;
+	case GameId_T6:
+		importFunc = &ImporterT7::_Import_FromT6;
+		break;
 	default:
 		DEBUG_ERR("IMPORT: Unsupported game version %u", gameId);
 		return ImportationErrcode_UnsupportedGameVersion;

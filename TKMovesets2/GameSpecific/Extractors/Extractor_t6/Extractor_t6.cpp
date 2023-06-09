@@ -654,7 +654,8 @@ char* ExtractorT6::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 
 Byte* ExtractorT6::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
-	m_game->ReadBytes(movesetAddr + 0x1D8, motasList, sizeof(MotaList));
+	
+	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 
 	// Byteswap MOTA addresses
 	for (unsigned int i = 0; i < _countof(motasList->motas); ++i) {
@@ -673,78 +674,7 @@ Byte* ExtractorT6::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr player
 
 	if (settings & ExtractSettings_DisplayableMovelist)
 	{
-		/*
-		gameAddr managerAddr = m_game->ReadPtrPath("movelist_manager_addr");
-
-		int playerId = m_process->readInt32(playerAddress + m_game->GetValue("playerid_offset"));
-
-		if (playerId == 1) {
-			managerAddr += sizeof(MvlManager);
-		}
-
-		MvlHead head;
-		gameAddr blockStart = m_process->readInt64(managerAddr + offsetof(MvlManager, mvlHead));
-		m_process->readBytes(blockStart, &head, sizeof(head));
-
-		const uint64_t s_playableBlock = sizeof(MvlPlayable) * head.playables_count;
-		if (head.playables_count == 0) {
-			return (Byte*)calloc(1, size_out);
-		}
-		MvlPlayable* playables = (MvlPlayable*)malloc(s_playableBlock);
-		if (playables == nullptr) {
-			return nullptr;
-		}
-		m_process->readBytes(blockStart + head.playables_offset, playables, s_playableBlock);
-
-		// Use the biggest input offset in order to get the end of the movelist
-		// Haven't found a better way but it doesn't crash so there probably is nothing after the inputs
-		uint64_t biggestInputOffset = 0;
-		for (size_t i = 0; i < head.playables_count; ++i)
-		{
-			uint64_t lastInputOffset = playables[i].input_sequence_offset + sizeof(MvlInput) * playables[i].input_count;
-			lastInputOffset += (i * sizeof(MvlPlayable));
-			if (lastInputOffset > biggestInputOffset) {
-				biggestInputOffset = lastInputOffset;
-			}
-		}
-
-		free(playables);
-		gameAddr blockEnd = blockStart + biggestInputOffset + head.playables_offset;
-		Byte* mvlBlock = allocateAndReadBlock(blockStart, blockEnd, size_out);
-		if (mvlBlock == nullptr) {
-			return nullptr;
-		}
-
-		// Correct translation strings offsets
-		{
-			MvlDisplayable* displayable = (MvlDisplayable*)((uint64_t)mvlBlock + head.displayables_offset);
-			for (size_t i = 0; i < head.displayables_count; ++i)
-			{
-				int32_t absoluteDisplayableOffset = head.displayables_offset + (int32_t)(i * sizeof(MvlDisplayable));
-				for (int j = 0; j < _countof(displayable->all_translation_offsets); ++j) {
-					int32_t correctedOffset = absoluteDisplayableOffset + displayable->all_translation_offsets[j];
-					displayable->all_translation_offsets[j] = correctedOffset;
-				}
-				++displayable;
-			}
-		}
-
-		// Convert relative input sequence offsets to absolute IDs
-		{
-			MvlPlayable* playable = (MvlPlayable*)((uint64_t)mvlBlock + head.playables_offset);
-			uint32_t input_sequence_start = head.inputs_offset;
-			for (size_t i = 0; i < head.playables_count; ++i)
-			{
-				uint32_t playable_addr = head.playables_offset + (int32_t)(sizeof(MvlPlayable) * i);
-				uint32_t input_sequence_addr = playable_addr + playable->input_sequence_offset;
-				uint32_t input_sequence_id = ((uint64_t)input_sequence_addr - input_sequence_start) / sizeof(MvlInput);
-				playable->input_sequence_offset = input_sequence_id;
-				++playable;
-			}
-		}
-
-		return mvlBlock;
-		*/
+		// Don't really care about T6 movelists
 		return (Byte*)calloc(1, size_out);
 	}
 	else {

@@ -74,7 +74,8 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.gameId = movesetInfos.gameId,
 				.minorVersion = movesetInfos.minorVersion,
 				.editable = Games::IsGameEditable(movesetInfos.gameId, movesetInfos.minorVersion),
-				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES
+				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES,
+				.is_valid = true
 			};
 		}
 
@@ -146,7 +147,8 @@ void LocalStorage::ReloadMovesetList()
 						.date = 0,
 						.size = 0,
 						.modificationDate = 0,
-						.editable = false
+						.editable = false,
+						.is_valid = false
 					};
 				}
 
