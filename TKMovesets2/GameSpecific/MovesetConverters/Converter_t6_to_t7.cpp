@@ -52,7 +52,7 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	movesetBlockSize += sizeof(Reactions) * movesetInfo->table.reactionsCount;
 	movesetBlockSize += sizeof(Requirement) * movesetInfo->table.requirementCount;
 	movesetBlockSize += sizeof(HitCondition) * movesetInfo->table.hitConditionCount;
-	movesetBlockSize += sizeof(Projectile) * movesetInfo->table.projectileCount;
+	movesetBlockSize += sizeof(Projectile) * 0;
 	movesetBlockSize += sizeof(Pushback) * movesetInfo->table.pushbackCount;
 	movesetBlockSize += sizeof(PushbackExtradata) * movesetInfo->table.pushbackExtradataCount;
 	movesetBlockSize += sizeof(Cancel) * movesetInfo->table.cancelCount;
@@ -122,7 +122,7 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	table.requirement = table.reactions + sizeof(Reactions) * table.reactionsCount;
 	table.hitCondition = table.requirement + sizeof(Requirement) * table.requirementCount;
 	table.projectile = table.hitCondition + sizeof(HitCondition) * table.hitConditionCount;
-	table.pushback = table.projectile + sizeof(Projectile) * table.projectileCount;
+	table.pushback = table.projectile + sizeof(Projectile) * 0;
 	table.pushbackExtradata = table.pushback + sizeof(Pushback) * table.pushbackCount;
 	table.cancel = table.pushbackExtradata + sizeof(PushbackExtradata) * table.pushbackExtradataCount;
 	table.groupCancel = table.cancel + sizeof(Cancel) * table.cancelCount;
@@ -238,28 +238,10 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	}
 
 
-	// List of moves to forbid (any cancel that points toward it will be disabled)
-	std::set<unsigned int> forbiddenMoveIds;
-	const char forbiddenMoves[][64] = {
-		"Co_DA_Ground"
-	};
-
 	for (unsigned int i = 0; i < table.moveCount; ++i)
 	{
 		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
 		const T6::Move* source = (T6::Move*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
-
-		// Register move as forbidden if its name matches
-		const char* orig_name_ptr = (char*)old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Name, moveset) + source->name_addr;
-		for (unsigned int j = 0; j < _countof(forbiddenMoves); ++j)
-		{
-			if (strcmp(orig_name_ptr, forbiddenMoves[j]) == 0)
-			{
-				DEBUG_LOG("Found forbidden move '%s' (id %u).\n", orig_name_ptr, i);
-				forbiddenMoveIds.insert(i);
-				break;
-			}
-		}
 
 		target->name_addr = 0; // Does not exist
 		target->anim_name_addr = 0; // Does not exist
@@ -319,10 +301,6 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->starting_frame = source->starting_frame;
 		target->move_id = source->move_id;
 		target->cancel_option = source->cancel_option;
-
-		if (forbiddenMoveIds.contains(target->move_id)) {
-			target->command = 0xFFFFFFFFFFFFFFFF;
-		}
 	}
 
 	for (unsigned int i = 0; i < table.groupCancelCount; ++i)
@@ -340,10 +318,6 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->starting_frame = source->starting_frame;
 		target->move_id = source->move_id;
 		target->cancel_option = source->cancel_option;
-
-		if (forbiddenMoveIds.contains(target->move_id)) {
-			target->command = 0xFFFFFFFFFFFFFFFF;
-		}
 	}
 
 	for (unsigned int i = 0; i < table.hitConditionCount; ++i)
@@ -395,17 +369,6 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->input_amount = source->input_amount;
 		target->_0x4_int = source->_0x0_int8;
 		target->input_addr = source->input_addr;
-	}
-
-	for (unsigned int i = 0; i < table.projectileCount; ++i)
-	{
-		gAddr::Projectile* target = (gAddr::Projectile*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.projectile) + i;
-		const T6::Projectile* source = (T6::Projectile*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.projectile) + i;
-
-		// As of this time, don't do any conversion for projectiles
-		// Its format is different from the T7 format
-		// (The data is still there, in big endian, ready to be parsed by any importer)
-		memset(target, 0, sizeof(Projectile));
 	}
 
 	for (unsigned int i = 0; i < table.cameraDataCount; ++i)
