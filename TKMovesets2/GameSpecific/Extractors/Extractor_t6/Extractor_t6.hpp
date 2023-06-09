@@ -24,7 +24,7 @@ private:
 	// Allocate and copy the contents of the moveset block
 	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT6::MovesetTable& table, const StructsT6::MovesetTable* offsets);
 	// Allocate and copy the contents of the name block
-	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT6::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart);
+	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out);
 	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
 	Byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, StructsT6::MotaList* motasList, ExtractSettings settings);
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
@@ -36,8 +36,6 @@ private:
 
 	/// Helpers
 
-	// Writes bounds of the block containing anim and move names
-	void GetNamesBlockBounds(const StructsT6::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
 	// Returns an allocated block containing mota block offsets followed by mota blocks
 	Byte* AllocateMotaCustomBlock(StructsT6::MotaList* motas, uint64_t& size_out, ExtractSettings settings);
 	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find

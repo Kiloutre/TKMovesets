@@ -597,7 +597,7 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 void ExtractorTTT2::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
 {
 	// Fill table
-	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr + 0x140, m_game->baseAddr + movesetAddr + 0x140);
+	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game->baseAddr + movesetAddr + offsetof(MovesetInfo, table));
 	m_game->ReadBytes(movesetAddr + 0x140, table, sizeof(MovesetTable));
 
 	// Byteswap to little endian

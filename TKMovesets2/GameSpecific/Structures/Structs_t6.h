@@ -237,19 +237,15 @@ namespace StructsT6
 		uint32_t value;
 	};
 
-	struct Move // todo
+	struct Move
 	{
-		gameAddr32 name_addr;
-		gameAddr32 anim_name_addr;
+		uint32_t _0x0_int; // todo: look at wtf this is
+		uint32_t _0x4_int; // todo: look at wtf this is
 		gameAddr32 anim_addr;
 		uint32_t vuln;
 		uint32_t hitlevel;
 		gameAddr32 cancel_addr;
-
 		uint16_t transition;
-
-		int16_t _0x56_short; // -
-
 		uint16_t moveId_val2; // Clearly related to current character ID
 		uint16_t moveId_val1; // Clearly related to move ID
 		gameAddr32 hit_condition_addr;
@@ -269,6 +265,80 @@ namespace StructsT6
 		uint16_t distance;
 	};
 
+	struct MvlPlayable
+	{
+		uint16_t p2_action;
+		uint16_t distance;
+		uint16_t p2_rotation;
+		uint16_t _unk0x6;
+		uint16_t _unk0x8;
+		uint16_t p1_facing_related;
+		uint16_t _unk0xc;
+		uint16_t input_count; 
+		gameAddr32 input_addr;
+	};
+
+	struct MvlInput
+	{
+		union {
+			struct {
+				Byte directions;
+				Byte buttons;
+			};
+			uint16_t command;
+		};
+		uint8_t frame_duration;
+		uint8_t trigger_highlight;
+	};
+
+	struct MvlDisplayable
+	{
+		union {
+			// In T7, these are relative offsets, but not here: they are absolute ptrs
+			struct {
+				gameAddr32 title_translation_japanese;
+				gameAddr32 title_translation_english;
+				gameAddr32 title_translation_japanese_2;
+				gameAddr32 title_translation_other;
+				gameAddr32 translation_offsets_japanese;
+				gameAddr32 translation_offsets_english;
+				gameAddr32 translation_offsets_portuguese;
+				gameAddr32 translation_offsets_spanish;
+				gameAddr32 translation_offsets_french;
+				gameAddr32 translation_offsets_italian;
+				gameAddr32 translation_offsets_german;
+				gameAddr32 translation_offsets_mexican;
+				gameAddr32 translation_offsets_cyrillic;
+				gameAddr32 translation_offsets_arabic;
+				gameAddr32 translation_offsets_chinese;
+				gameAddr32 translation_offsets_korean;
+			};
+			struct {
+				gameAddr32 title_translation_offsets[4];
+				gameAddr32 translation_offsets[12];
+			};
+			gameAddr32 all_translation_offsets[16];
+		};
+	};
+
+	struct StructA4
+	{
+		char gap[1];
+		// Unknown size
+	};
+
+	struct StructA5
+	{
+		char gap[1];
+		// Unknown size
+	};
+
+	struct StructA6
+	{
+		char gap[1];
+		// Unknown size
+	};
+
 	// -- Other -- //
 
 	struct MovesetTable
@@ -283,9 +353,6 @@ namespace StructsT6
 
 				gameAddr32 hitCondition;
 				uint32_t hitConditionCount;
-
-				gameAddr32 projectile;
-				uint32_t projectileCount;
 
 				gameAddr32 pushback;
 				uint32_t pushbackCount;
@@ -326,6 +393,24 @@ namespace StructsT6
 				gameAddr32 unknownParryRelated;
 				uint32_t unknownParryRelatedCount;
 
+				gameAddr32 mvlPlayable;
+				uint32_t mvlPlayableCount;
+
+				gameAddr32 mvlInput;
+				uint32_t mvlInputCount;
+
+				gameAddr32 StructA3; // Size ??
+				uint32_t StructA3Count;
+
+				gameAddr32 mvlDisplayable;
+				uint32_t mvlDisplayableCount;
+
+				gameAddr32 StructA5; // Size ??
+				uint32_t StructA5Count;
+
+				gameAddr32 StructA6; // Size ??
+				uint32_t StructA6Count;
+
 				gameAddr32 cameraData;
 				uint32_t cameraDataCount;
 
@@ -335,7 +420,7 @@ namespace StructsT6
 			struct {
 				gameAddr32 listAddr;
 				uint32_t listCount;
-			} entries[19];
+			} entries[24];
 		};
 	};
 
@@ -410,8 +495,8 @@ namespace StructsT6
 		gameAddr32 character_creator_addr;
 		gameAddr32 date_addr;
 		gameAddr32 fulldate_addr;
-		uint16_t orig_aliases[56];
-		uint16_t current_aliases[56];
+		uint16_t orig_aliases[69];
+		uint16_t current_aliases[69];
 		uint16_t unknown_aliases[36];
 		MovesetTable table;
 		MotaList motas;

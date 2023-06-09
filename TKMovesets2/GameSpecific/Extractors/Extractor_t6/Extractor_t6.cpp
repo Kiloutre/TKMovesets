@@ -132,6 +132,7 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 	{
 		ByteswapHelpers::SWAP_INT32(&input.direction);
 		ByteswapHelpers::SWAP_INT32(&input.button);
+
 	}
 
 	for (auto& inputSequence : StructIterator<InputSequence>(movesetBlock, offsets->inputSequence, offsets->inputSequenceCount))
@@ -142,12 +143,14 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT32(&inputSequence.input_addr);
 	}
 
+	/*
 	for (auto& projectile : StructIterator<Projectile>(movesetBlock, offsets->projectile, offsets->projectileCount))
 	{
 		// As of this time, don't do any conversion for projectiles
 		// Its format is different from the T7 format
 		// (The data is still there, in big endian, ready to be parsed by any importer)
 	}
+	*/
 
 	for (auto& cameraData : StructIterator<CameraData>(movesetBlock, offsets->cameraData, offsets->cameraDataCount))
 	{
@@ -184,18 +187,17 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT32(&moveEndingProp.value);
 	}
 
-
 	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, offsets->moveCount))
 	{
-		ByteswapHelpers::SWAP_INT32(&move.name_addr);
-		ByteswapHelpers::SWAP_INT32(&move.anim_name_addr);
+		//ByteswapHelpers::SWAP_INT32(&move._0x0_int);
+		//ByteswapHelpers::SWAP_INT32(&move._0x4_int);
+
 		ByteswapHelpers::SWAP_INT32(&move.anim_addr);
 		ByteswapHelpers::SWAP_INT32(&move.vuln);
 		ByteswapHelpers::SWAP_INT32(&move.hitlevel);
 		ByteswapHelpers::SWAP_INT32(&move.cancel_addr);
 
 		ByteswapHelpers::SWAP_INT16(&move.transition);
-		ByteswapHelpers::SWAP_INT16(&move._0x56_short);
 
 		ByteswapHelpers::SWAP_INT16(&move.moveId_val1);
 		ByteswapHelpers::SWAP_INT16(&move.moveId_val2);
@@ -218,17 +220,34 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT16(&move._0x6c_short);
 		ByteswapHelpers::SWAP_INT16(&move.distance);
 	}
+
+	for (auto& mvlPlayable : StructIterator<MvlPlayable>(movesetBlock, offsets->mvlPlayable, offsets->mvlPlayableCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.p2_action);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.distance);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.p2_rotation);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable._unk0x6);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable._unk0x8);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.p1_facing_related);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable._unk0xc);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.input_count);
+		ByteswapHelpers::SWAP_INT32(&mvlPlayable.input_addr);
+	}
+
+	for (auto& mvlDisplayable : StructIterator<MvlDisplayable>(movesetBlock, offsets->mvlPlayable, offsets->mvlPlayableCount))
+	{
+		for (unsigned int i = 0; i < _countof(mvlDisplayable.all_translation_offsets); ++i) {
+			ByteswapHelpers::SWAP_INT32(&mvlDisplayable.all_translation_offsets[i]);
+		}
+	}
 }
 
 // Converts absolute ptr into indexes before saving to file
-static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTable& table, const MovesetTable* offsets, gameAddr nameStart, std::map<gameAddr, uint64_t>& animOffsetMap)
+static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTable& table, const MovesetTable* offsets, std::map<gameAddr, uint64_t>& animOffsetMap)
 {
 	// Convert move ptrs
 	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, table.moveCount))
 	{
-
-		move.name_addr -= (gameAddr32)nameStart;
-		move.anim_name_addr -= (gameAddr32)nameStart;
 		move.anim_addr = (gameAddr32)animOffsetMap[move.anim_addr];
 		TO_INDEX(move.cancel_addr, table.cancel, Cancel);
 
@@ -301,6 +320,33 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 	for (auto& moveEndingProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, table.moveEndingPropCount))
 	{
 		TO_INDEX(moveEndingProp.requirements_addr, table.requirement, Requirement);
+	}
+
+	// Convert mvl playable ptrs
+	for (auto& mvlPlayable : StructIterator<MvlPlayable>(movesetBlock, offsets->mvlPlayable, table.mvlPlayableCount))
+	{
+		TO_INDEX(mvlPlayable.input_addr, table.mvlInput, MvlInput);
+	}
+
+	// Convert mvl displayable ptrs
+	{
+		gameAddr32 smallestDisplayableTextAddr = -1;
+		for (auto& mvlDisplayable : StructIterator<MvlDisplayable>(movesetBlock, offsets->mvlDisplayable, table.mvlDisplayableCount))
+		{
+			for (unsigned int i = 0; i < _countof(mvlDisplayable.all_translation_offsets); ++i) {
+				if (smallestDisplayableTextAddr < mvlDisplayable.all_translation_offsets[i]) {
+					smallestDisplayableTextAddr = mvlDisplayable.all_translation_offsets[i];
+				}
+			}
+		}
+
+		// Convert absolute pts to relative offsets. Can't really do conversion to index here.
+		for (auto& mvlDisplayable : StructIterator<MvlDisplayable>(movesetBlock, offsets->mvlDisplayable, table.mvlDisplayableCount))
+		{
+			for (unsigned int i = 0; i < _countof(mvlDisplayable.all_translation_offsets); ++i) {
+				mvlDisplayable.all_translation_offsets[i] -= smallestDisplayableTextAddr;
+			}
+		}
 	}
 }
 
@@ -488,41 +534,6 @@ Byte* ExtractorT6::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	return customBlock;
 }
 
-void ExtractorT6::GetNamesBlockBounds(const Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
-{
-	uint64_t smallest = (uint64_t)move[0].name_addr;
-	uint64_t highest = smallest;
-
-	for (size_t moveId = 0; moveId < moveCount; ++moveId)
-	{
-		uint64_t nameAddr = (uint64_t)move[moveId].name_addr;
-		uint64_t animNameAddr = (uint64_t)move[moveId].anim_name_addr;
-
-		if (nameAddr < smallest) {
-			smallest = nameAddr;
-		}
-		else if (nameAddr > highest) {
-			highest = nameAddr;
-		}
-
-		if (animNameAddr < smallest) {
-			smallest = animNameAddr;
-		}
-		else if (animNameAddr > highest) {
-			highest = animNameAddr;
-		}
-	}
-
-	// Move to the last string's END instead of staying at the start
-	gameAddr lastItemEnd = (gameAddr)highest;
-	while (m_game->Read<uint8_t>(lastItemEnd) != 0) {
-		lastItemEnd += 1;
-	}
-
-	start = smallest;
-	end = lastItemEnd + 1; // Add 1 to extract the nullbyte too
-}
-
 
 Byte* ExtractorT6::CopyAnimations(const Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets)
 {
@@ -547,11 +558,15 @@ Byte* ExtractorT6::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 	// Find anim sizes and establish offsets
 	for (gameAddr animAddr : addrList)
 	{
-		uint64_t animSize = GetAnimationSize(m_game->baseAddr + animAddr);
+		uint64_t animSize;
 
-		if (animSize == 0) {
+		try {
+			animSize = GetAnimationSize(m_game->baseAddr + animAddr);
+		} catch (const std::exception&) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
-			throw;
+			size_out = 0;
+			return nullptr;
+
 		}
 
 		offsets[animAddr] = totalSize;
@@ -586,8 +601,8 @@ Byte* ExtractorT6::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 void ExtractorT6::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
 {
 	// Fill table
-	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr + 0x140, m_game->baseAddr + movesetAddr + 0x140);
-	m_game->ReadBytes(movesetAddr + 0x140, table, sizeof(MovesetTable));
+	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game->baseAddr + movesetAddr + offsetof(MovesetInfo, table));
+	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 
 	// Byteswap to little endian
 	for (unsigned int i = 0; i < _countof(table->entries); ++i) {
@@ -614,19 +629,17 @@ Byte* ExtractorT6::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, co
 	return block;
 }
 
-char* ExtractorT6::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+char* ExtractorT6::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out)
 {
-	gameAddr nameBlockEnd;
-	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
+	gameAddr nameBlockEnd = 0; // todo
 
 	// Prefix we apply to recognize movesets we extracted
 	const char* namePrefix = MOVESET_EXTRACTED_NAME_PREFIX;
 	size_t toCopy = strlen(namePrefix);
 	size_t charactersToReplace = 1; // Replace the first [
 
-	unsigned int nameOffset = 0x20C;
+	unsigned int nameOffset = 0x270;
 
-	nameBlockStart = movesetAddr + nameOffset - (toCopy - charactersToReplace);
 	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + nameOffset - (toCopy - charactersToReplace), nameBlockEnd, size_out);
 
 	if (nameBlock != nullptr) {
@@ -866,15 +879,14 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 	progress = 65;
 
 	// Reads block containing names of moves and animations
-	gameAddr nameBlockStart;
-	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock, movelist, table.moveCount, nameBlockStart);
+	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock);
 
 	// Reads block containing basic moveset infos and aliases
 	CopyMovesetInfoBlock(movesetAddr, &movesetHeader);
 	progress = 70;
 
 	// Now that we extracted everything, we can properly convert pts to indexes
-	convertMovesetPointersToIndexes(movesetBlock, table, offsets, nameBlockStart, animOffsets);
+	convertMovesetPointersToIndexes(movesetBlock, table, offsets, animOffsets);
 	progress = 75;
 
 	// -- Extraction & data conversion finished --
@@ -1054,7 +1066,7 @@ std::string ExtractorT6::GetPlayerCharacterName(gameAddr playerAddress)
 
 	{
 		char buf[32];
-		m_game->ReadBytes(movesetAddr + 0x20C, buf, 31);
+		m_game->ReadBytes(movesetAddr + 0x270, buf, 31);
 		buf[31] = '\0';
 		characterName = std::string(buf);
 	}

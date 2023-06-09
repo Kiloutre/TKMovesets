@@ -373,7 +373,7 @@ Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 void ExtractorT7::FillMovesetTables(gameAddr movesetAddr, gAddr::MovesetTable* table, gAddr::MovesetTable* offsets)
 {
 	// Fill table
-	m_process->readBytes(movesetAddr + 0x150, table, sizeof(MovesetTable));
+	m_process->readBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
 	gameAddr tableStartAddr = (gameAddr)table->reactions;
 	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
@@ -407,7 +407,7 @@ char* ExtractorT7::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 
 Byte* ExtractorT7::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
-	m_process->readBytes(movesetAddr + 0x280, motasList, sizeof(MotaList));
+	m_process->readBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
 #pragma warning(push)

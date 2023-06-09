@@ -197,9 +197,6 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 		ByteswapHelpers::SWAP_INT16(&move.transition);
 		ByteswapHelpers::SWAP_INT16(&move._0x56_short);
 
-		ByteswapHelpers::SWAP_INT16(&move.moveId_val1);
-		ByteswapHelpers::SWAP_INT16(&move.moveId_val2);
-
 		ByteswapHelpers::SWAP_INT32(&move.hit_condition_addr);
 		ByteswapHelpers::SWAP_INT32(&move.anim_len);
 		ByteswapHelpers::SWAP_INT32(&move.airborne_start);
@@ -586,8 +583,8 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
 {
 	// Fill table
-	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr + 0x140, m_game->baseAddr + movesetAddr + 0x140);
-	m_game->ReadBytes(movesetAddr + 0x140, table, sizeof(MovesetTable));
+	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game->baseAddr + movesetAddr + offsetof(MovesetInfo, table));
+	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 
 	// Byteswap to little endian
 	for (unsigned int i = 0; i < _countof(table->entries); ++i) {
