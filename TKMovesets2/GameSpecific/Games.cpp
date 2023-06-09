@@ -116,7 +116,7 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
-		.bigEndian = true
+		.bigEndian = false
 	},
 };
 

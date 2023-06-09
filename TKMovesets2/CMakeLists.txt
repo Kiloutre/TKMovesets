@@ -179,6 +179,8 @@ set(GAMESPECIFIC_SOURCES
 
                     # T5
                     "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"
+                    "GameSpecific/MovesetConverters/Converter_t5_to_t7.cpp"
+                    "GameSpecific/MovesetConverters/Converter_t5_to_t7_Aliases.cpp"
 )                   
 
 # This will be included in the .dll and should only be related to the injected DLL
@@ -206,6 +208,9 @@ set(MOVESETLOADER_SOURCES
 
     "GameSpecific/MovesetConverters/Converter_t6_to_t7.cpp"
     "GameSpecific/MovesetConverters/Converter_t6_to_t7_Aliases.cpp"
+
+    "GameSpecific/MovesetConverters/Converter_t5_to_t7.cpp"
+    "GameSpecific/MovesetConverters/Converter_t5_to_t7_Aliases.cpp"
 )
 
 ## Setup embedded resources ##

@@ -338,6 +338,93 @@ static bool ConvertT6ToT7(const movesetInfo& mInfo, const TKMovesetHeader* orig_
 	return true;
 }
 
+
+static bool ConvertT5ToT7(const movesetInfo& mInfo, const TKMovesetHeader* orig_header, Byte* orig_moveset, uint64_t s_moveset)
+{
+	StructsT7::TKMovesetHeaderBlocks blocks;
+
+	std::vector<TKMovesetProperty> propertyList;
+	propertyList.push_back({ .id = TKMovesetProperty_END, .value = 0 });
+
+	{
+		if (!MovesetConverter::T5ToT7().Convert(orig_header, orig_moveset, s_moveset, blocks)) {
+			return false;
+		}
+	}
+
+	// Calculate new moveset size 
+	uint64_t new_size = 0;
+
+	new_size += Helpers::align8Bytes(sizeof(TKMovesetHeader));
+	new_size += Helpers::align8Bytes(propertyList.size() * sizeof(TKMovesetProperty));
+	new_size += Helpers::align8Bytes(sizeof(blocks));
+	new_size += s_moveset;
+
+	Byte* new_moveset;
+	TKMovesetHeader* new_header;
+	try {
+		new_moveset = new Byte[new_size];
+		new_header = (TKMovesetHeader*)new_moveset;
+	}
+	catch (std::bad_alloc& _) {
+		(void)_;
+		return false;
+	}
+
+	// Copy header
+	CopyHeader(new_header, orig_header);
+	new_header->gameId = GameId_T7;
+	new_header->minorVersion = GameVersions::T7::NONE;
+	new_header->conversion_origin = GameVersions::T7::FROM_T5;
+
+	// Copy property list
+	TKMovesetProperty* dest_propertyList = (TKMovesetProperty*)(new_moveset + Helpers::align8Bytes(sizeof(TKMovesetHeader)));
+	memcpy(dest_propertyList, propertyList.data(), propertyList.size() * sizeof(TKMovesetProperty));
+
+	// Copy block list
+	StructsT7::TKMovesetHeaderBlocks* dest_blocks = (StructsT7::TKMovesetHeaderBlocks*)((Byte*)dest_propertyList + Helpers::align8Bytes(propertyList.size() * sizeof(TKMovesetProperty)));
+	memcpy(dest_blocks, &blocks, sizeof(blocks));
+
+	// Get moveset data ptr
+	Byte* movesetData = (Byte*)dest_blocks + Helpers::align8Bytes(sizeof(blocks));
+
+	// Correct block list ptr & moveset data start ptr
+	new_header->moveset_data_start = (uint32_t)((Byte*)movesetData - new_moveset);
+	new_header->moveset_data_size = 0;
+	new_header->block_list = (uint32_t)((Byte*)dest_blocks - new_moveset);
+	new_header->block_list_size = _countof(blocks.blocks);
+
+	// Copy moveset data
+	memcpy(movesetData, orig_moveset, s_moveset);
+
+	// Re-calculate CRC32
+	std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
+		{(Byte*)propertyList.data(), propertyList.size() * sizeof(TKMovesetProperty)},
+		{orig_moveset + blocks.movesetInfoBlock, blocks.tableBlock - blocks.movesetInfoBlock },
+		{orig_moveset + blocks.tableBlock, blocks.motalistsBlock - blocks.tableBlock },
+		{orig_moveset + blocks.motalistsBlock, blocks.nameBlock - blocks.motalistsBlock },
+		{orig_moveset + blocks.movesetBlock, blocks.animationBlock - blocks.movesetBlock },
+		{orig_moveset + blocks.animationBlock, blocks.motaBlock - blocks.animationBlock },
+		{orig_moveset + blocks.motaBlock, blocks.movelistBlock - blocks.motaBlock },
+	};
+	new_header->crc32 = Helpers::CalculateCrc32(hashedFileBlocks);
+
+	// Generate new name & write to file
+	std::wstring new_filename = GenerateNewName(mInfo.filename, L"T5", L"T7", L" (T5)");
+	{
+		std::ofstream new_moveset_file(new_filename, std::ios::binary);
+		new_moveset_file.write((char*)new_moveset, new_size);
+	}
+
+	// Compress if needed
+	if (orig_header->compressionType != TKMovesetCompressionType_None) {
+		CompressionUtils::FILE::Moveset::Compress(new_filename, (TKMovesetCompressionType_)orig_header->compressionType);
+	}
+
+	return true;
+}
+
+
 // -- -- //
 
 void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
@@ -401,6 +488,11 @@ void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
 				case GameId_T6:
 				{
 					ConvertT6ToT7(mInfo, header, moveset, s_moveset);
+					break;
+				}
+				case GameId_T5:
+				{
+					ConvertT5ToT7(mInfo, header, moveset, s_moveset);
 					break;
 				}
 				default:

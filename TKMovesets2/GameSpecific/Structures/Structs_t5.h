@@ -228,7 +228,7 @@ namespace StructsT5
 		uint32_t value;
 	};
 
-	struct Move // todo
+	struct Move
 	{
 		gameAddr32 name_addr;
 		gameAddr32 anim_name_addr;

@@ -23,8 +23,11 @@ static void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue)
 
 	bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
 
-	if (iRC != ERROR_SUCCESS && !bDidntExist)
-		DEBUG_ERR("RegGetValue( %s ): %s", pszVar, strerror(iRC));
+	if (iRC != ERROR_SUCCESS && !bDidntExist) {
+		char buf[128];
+		strerror_s(buf, sizeof(buf), iRC);
+		DEBUG_ERR("RegGetValue( %s ): %s", pszVar, buf);
+	}
 
 	if (!bDidntExist) {
 		if (dwType != REG_SZ)
@@ -38,12 +41,18 @@ static void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue)
 
 	DWORD dwDisposition;
 	iRC = RegCreateKeyEx(hkeyHive, pszVar, 0, 0, 0, KEY_ALL_ACCESS, NULL, &hkey, &dwDisposition);
-	if (iRC != ERROR_SUCCESS)
-		DEBUG_ERR("RegCreateKeyEx( %s ): %s", pszVar, strerror(iRC));
+	if (iRC != ERROR_SUCCESS) {
+		char buf[128];
+		strerror_s(buf, sizeof(buf), iRC);
+		DEBUG_ERR("RegCreateKeyEx( %s ): %s", pszVar, buf);
+	}
 
-	iRC = RegSetValueEx(hkey, "", 0, REG_SZ, (BYTE*)pszValue, strlen(pszValue) + 1);
-	if (iRC != ERROR_SUCCESS)
-		DEBUG_ERR("RegSetValueEx( %s ): %s", pszVar, strerror(iRC));
+	iRC = RegSetValueEx(hkey, "", 0, REG_SZ, (BYTE*)pszValue, (DWORD)strlen(pszValue) + 1);
+	if (iRC != ERROR_SUCCESS) {
+		char buf[128];
+		strerror_s(buf, sizeof(buf), iRC);
+		DEBUG_ERR("RegSetValueEx( %s ): %s", pszVar, buf);
+	}
 
 	if (bDidntExist)
 		DEBUG_ERR("RegSet( %s ): set to \"%s\"", pszVar, pszValue);
@@ -65,8 +74,11 @@ static void RegSetW(HKEY hkeyHive, const wchar_t* pszVar, const wchar_t* pszValu
 
 	bool bDidntExist = iRC == ERROR_FILE_NOT_FOUND;
 
-	if (iRC != ERROR_SUCCESS && !bDidntExist)
-		DEBUG_ERR("RegGetValue( %S ): %S", pszVar, strerror(iRC));
+	if (iRC != ERROR_SUCCESS && !bDidntExist) {
+		char buf[128];
+		strerror_s(buf, sizeof(buf), iRC);
+		DEBUG_ERR("RegGetValue( %S ): %s", pszVar, buf);
+	}
 
 	if (!bDidntExist) {
 		if (dwType != REG_SZ)
@@ -80,12 +92,18 @@ static void RegSetW(HKEY hkeyHive, const wchar_t* pszVar, const wchar_t* pszValu
 
 	DWORD dwDisposition;
 	iRC = RegCreateKeyExW(hkeyHive, pszVar, 0, 0, 0, KEY_ALL_ACCESS, NULL, &hkey, &dwDisposition);
-	if (iRC != ERROR_SUCCESS)
-		DEBUG_ERR("RegCreateKeyEx( %S ): %S", pszVar, strerror(iRC));
+	if (iRC != ERROR_SUCCESS) {
+		char buf[128];
+		strerror_s(buf, sizeof(buf), iRC);
+		DEBUG_ERR("RegCreateKeyEx( %S ): %s", pszVar, buf);
+	}
 
-	iRC = RegSetValueExW(hkey, L"", 0, REG_SZ, (BYTE*)pszValue, (wcslen(pszValue) + 1) * sizeof(wchar_t));
-	if (iRC != ERROR_SUCCESS)
-		DEBUG_ERR("RegSetValueEx( %S ): %S", pszVar, strerror(iRC));
+	iRC = RegSetValueExW(hkey, L"", 0, REG_SZ, (BYTE*)pszValue, (DWORD)(wcslen(pszValue) + 1) * (DWORD)sizeof(wchar_t));
+	if (iRC != ERROR_SUCCESS) {
+		char buf[128];
+		strerror_s(buf, sizeof(buf), iRC);
+		DEBUG_ERR("RegSetValueEx( %S ): %s", pszVar, buf);
+	}
 
 	if (bDidntExist)
 		DEBUG_ERR("RegSet( %S ): set to \"%S\"", pszVar, pszValue);
