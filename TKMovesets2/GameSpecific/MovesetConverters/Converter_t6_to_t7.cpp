@@ -47,6 +47,24 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	blocks_out.nameBlock = movesetSize;
 	movesetSize += offsets->GetBlockSize(T6::TKMovesetHeaderBlocks_Name, s_moveset);
 
+	// Expand name block size with move and anim names that we created
+	std::set<gameAddr32> animAddresses;
+	const T6::Move* moves = (T6::Move*)(offsets->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + movesetInfo->table.move);
+	for (unsigned int i = 0; i < movesetInfo->table.moveCount; ++i)
+	{
+		const char* name_prefix = "move_";
+		const char* anim_name_prefix = "anim_";
+
+		movesetSize += (unsigned int)sizeof(name_prefix) + (unsigned int)log10(i + 1) + 1;
+
+		// Ensure shared animations share the same anim names
+		if (!animAddresses.contains(moves[i].anim_addr)) {
+			//animAddresses.insert(moves[i].anim_addr);
+			movesetSize += (unsigned int)sizeof(anim_name_prefix) + (unsigned int)log10(i + 1) + 1;
+		}
+	}
+	movesetSize = Helpers::align8Bytes(movesetSize);
+
 	blocks_out.movesetBlock = movesetSize;
 	size_t movesetBlockSize = 0;
 	movesetBlockSize += sizeof(Reactions) * movesetInfo->table.reactionsCount;
@@ -113,16 +131,35 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	memcpy(new_movesetInfo->current_aliases, old_movesetInfo->current_aliases, sizeof(new_movesetInfo->current_aliases));
 	memcpy(new_movesetInfo->unknown_aliases, old_movesetInfo->unknown_aliases, sizeof(new_movesetInfo->unknown_aliases));
 
+
 	gAddr::MovesetTable& table = (gAddr::MovesetTable&)new_movesetInfo->table;
-	for (unsigned int i = 0; i < _countof(new_movesetInfo->table.entries); ++i) {
-		table.entries[i].listCount = old_movesetInfo->table.entries[i].listCount;
-	}
+
+	table.reactionsCount = old_movesetInfo->table.reactionsCount;
+	table.requirementCount = old_movesetInfo->table.requirementCount;
+	table.hitConditionCount = old_movesetInfo->table.hitConditionCount;
+	table.projectileCount = 0;
+	table.pushbackCount = old_movesetInfo->table.pushbackCount;
+	table.pushbackExtradataCount = old_movesetInfo->table.pushbackExtradataCount;
+	table.cancelCount = old_movesetInfo->table.cancelCount;
+	table.groupCancelCount = old_movesetInfo->table.groupCancelCount;
+	table.cancelExtradataCount = old_movesetInfo->table.cancelExtradataCount;
+	table.extraMovePropertyCount = old_movesetInfo->table.extraMovePropertyCount;
+	table.moveBeginningPropCount = old_movesetInfo->table.moveBeginningPropCount;
+	table.moveEndingPropCount = old_movesetInfo->table.moveEndingPropCount;
+	table.moveCount = old_movesetInfo->table.moveCount;
+	table.voiceclipCount = old_movesetInfo->table.voiceclipCount;
+	table.inputSequenceCount = old_movesetInfo->table.inputSequenceCount;
+	table.inputCount = old_movesetInfo->table.inputCount;
+	table.unknownParryRelatedCount = old_movesetInfo->table.unknownParryRelatedCount;
+	table.cameraDataCount = old_movesetInfo->table.cameraDataCount;
+	table.throwCamerasCount = old_movesetInfo->table.throwCamerasCount;
+
 
 	table.reactions = 0;
 	table.requirement = table.reactions + sizeof(Reactions) * table.reactionsCount;
 	table.hitCondition = table.requirement + sizeof(Requirement) * table.requirementCount;
 	table.projectile = table.hitCondition + sizeof(HitCondition) * table.hitConditionCount;
-	table.pushback = table.projectile + sizeof(Projectile) * 0;
+	table.pushback = table.projectile + sizeof(Projectile) * table.projectileCount;
 	table.pushbackExtradata = table.pushback + sizeof(Pushback) * table.pushbackCount;
 	table.cancel = table.pushbackExtradata + sizeof(PushbackExtradata) * table.pushbackExtradataCount;
 	table.groupCancel = table.cancel + sizeof(Cancel) * table.cancelCount;
@@ -139,16 +176,22 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	table.throwCameras = table.cameraData + sizeof(CameraData) * table.cameraDataCount;
 
 
-	for (auto block : std::vector< TKMovesetHeaderBlocks_>{
-		TKMovesetHeaderBlocks_Name,
-		TKMovesetHeaderBlocks_Animation,
-		TKMovesetHeaderBlocks_Mota,
-		})
+	// Copy name block, animation block & MOTA block
 	{
-		Byte* target = blocks_out.GetBlock(block, new_moveset);
-		const Byte* source = old_blocks->GetBlock((T6::TKMovesetHeaderBlocks_)block, moveset);
+		Byte* target;
+		const Byte* source;
 
-		memcpy(target, source, old_blocks->GetBlockSize((T6::TKMovesetHeaderBlocks_)block));
+		target = blocks_out.GetBlock(TKMovesetHeaderBlocks_Name, new_moveset);
+		source = old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Name, moveset);
+		memcpy(target, source, old_blocks->GetBlockSize(T6::TKMovesetHeaderBlocks_Name));
+
+		target = blocks_out.GetBlock(TKMovesetHeaderBlocks_Animation, new_moveset);
+		source = old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Animation, moveset);
+		memcpy(target, source, old_blocks->GetBlockSize(T6::TKMovesetHeaderBlocks_Animation));
+
+		target = blocks_out.GetBlock(TKMovesetHeaderBlocks_Mota, new_moveset);
+		source = old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Mota, moveset);
+		memcpy(target, source, old_blocks->GetBlockSize(T6::TKMovesetHeaderBlocks_Mota, s_moveset));
 	}
 
 
@@ -237,26 +280,43 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->value = source->value;
 	}
 
-
+	std::map<gameAddr32, unsigned long long> animNameOffsets;
+	char* new_nameBlock_start = (char*)blocks_out.GetBlock(TKMovesetHeaderBlocks_Name, new_moveset);
+	char* new_nameBlock = new_nameBlock_start + old_blocks->GetBlockSize(T6::TKMovesetHeaderBlocks_Name);
 	for (unsigned int i = 0; i < table.moveCount; ++i)
 	{
+		DEBUG_LOG("move %u\n", i);
 		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
 		const T6::Move* source = (T6::Move*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
 
-		target->name_addr = 0; // Does not exist
-		target->anim_name_addr = 0; // Does not exist
+		target->name_addr = new_nameBlock - new_nameBlock_start;
+		sprintf_s(new_nameBlock, 32,  "move_%u", i + 1);
+		new_nameBlock += (unsigned int)sizeof("move_") + (unsigned int)log10(i + 1) + 1;
+
+		if (animNameOffsets.contains(source->anim_addr)) {
+			// Reuse name from previous animation
+			target->anim_name_addr = animNameOffsets[source->anim_addr];
+		}
+		else
+		{
+			animNameOffsets[source->anim_addr] = (unsigned long long)(new_nameBlock - new_nameBlock_start);
+			target->anim_name_addr = new_nameBlock - new_nameBlock_start;
+			sprintf_s(new_nameBlock, 32, "anim_%u", i + 1);
+			new_nameBlock += (unsigned int)sizeof("anim_") + (unsigned int)log10(i + 1) + 1;
+		}
+
 		target->anim_addr = source->anim_addr;
 		target->vuln = source->vuln;
 		target->hitlevel = source->hitlevel;
 		target->cancel_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->cancel_addr);
 
-		target->_0x28_cancel_addr = 0; // Does not exist
+		target->_0x28_cancel_addr = MOVESET_ADDR_MISSING; // Does not exist
 		target->_0x30_int__0x28_related = 0; // Does not exist
 		target->_0x34_int = 0; // Does not exist
-		target->_0x38_cancel_addr = 0; // Does not exist
+		target->_0x38_cancel_addr = MOVESET_ADDR_MISSING; // Does not exist
 		target->_0x40_int__0x38_related = 0;
 		target->_0x44_int = 0; // Does not exist
-		target->_0x48_cancel_addr = 0; // Does not exist
+		target->_0x48_cancel_addr = MOVESET_ADDR_MISSING; // Does not exist
 		target->_0x50_int__0x48_related = 0;
 
 		target->transition = source->transition;

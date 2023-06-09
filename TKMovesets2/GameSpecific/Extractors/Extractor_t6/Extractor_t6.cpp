@@ -566,7 +566,6 @@ Byte* ExtractorT6::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
 			size_out = 0;
 			return nullptr;
-
 		}
 
 		offsets[animAddr] = totalSize;
@@ -654,7 +653,6 @@ char* ExtractorT6::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 
 Byte* ExtractorT6::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
-	
 	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 
 	// Byteswap MOTA addresses
@@ -664,24 +662,6 @@ Byte* ExtractorT6::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, Mota
 
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
-
-#pragma warning(push)
-#pragma warning(disable:6385)
-Byte* ExtractorT6::CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings)
-{
-	// Default size if we don't actually extract this block
-	size_out = 8;
-
-	if (settings & ExtractSettings_DisplayableMovelist)
-	{
-		// Don't really care about T6 movelists
-		return (Byte*)calloc(1, size_out);
-	}
-	else {
-		return (Byte*)calloc(1, size_out);
-	}
-}
-#pragma warning(pop)
 
 void ExtractorT6::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
 {
@@ -726,26 +706,20 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 	Byte* customPropertiesBlock;
 	Byte* offsetListBlock;
 	Byte* movesetInfoBlock;
-	Byte* tableBlock;
-	Byte* motasListBlock;
 	char* nameBlock;
 	Byte* movesetBlock;
 	Byte* animationBlock; // This is a custom block: we are building it ourselves because animations are not stored contiguously, as opposed to other datas
 	Byte* motaCustomBlock; // This is also a custom block because not contiguously stored
-	Byte* movelistBlock;
 
 	// The size in bytes of the same blocks
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
 	uint64_t s_customProperties;
 	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
-	uint64_t s_movesetInfoBlock = 0x140; // Pretty much the offset of the moveset table
-	uint64_t s_tableBlock = sizeof(MovesetTable);
-	uint64_t s_motasListBlock = sizeof(MotaList);
+	uint64_t s_movesetInfoBlock = sizeof(MovesetInfo);
 	uint64_t s_nameBlock;
 	uint64_t s_movesetBlock;
 	uint64_t s_animationBlock;
 	uint64_t s_motaCustomBlock;
-	uint64_t s_movelistBlock;
 
 	// Establish the list of default properties
 	TKMovesetProperty customProperties[1] = {
@@ -780,8 +754,6 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 	headerBlock = (Byte*)&customHeader;
 	customPropertiesBlock = (Byte*)&customProperties;
 	offsetListBlock = (Byte*)&offsetList;
-	tableBlock = (Byte*)offsets;
-	motasListBlock = (Byte*)&motasList;
 	movesetInfoBlock = (Byte*)&movesetHeader;
 
 	// Fill table containing lists of move, lists of cancels, etc...
@@ -797,10 +769,6 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 		return ExtractionErrcode_AllocationErr;
 	}
 	progress = 20;
-
-	// movelistBlock
-	movelistBlock = CopyDisplayableMovelist(movesetAddr, playerAddress, s_movelistBlock, settings);
-	progress = 35;
 
 	// Read mota list, allocate & copy desired mota, prepare anim list to properly guess size of anims later
 	motaCustomBlock = CopyMotaBlocks(movesetAddr, s_motaCustomBlock, &motasList, settings);
@@ -837,24 +805,21 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 	// This is because you are not suppoed to allocate the header in the game, header that is stored before movesetInfoBlock
 	// 8 bytes alignment isn't strictly needed, but i've had problems in the past on misaligned structures so this is safer
 	offsetList.movesetInfoBlock = 0;
-	offsetList.tableBlock = Helpers::align8Bytes(offsetList.movesetInfoBlock + s_movesetInfoBlock);
-	offsetList.motalistsBlock = Helpers::align8Bytes(offsetList.tableBlock + s_tableBlock);
-	offsetList.nameBlock = Helpers::align8Bytes(offsetList.motalistsBlock + s_motasListBlock);
+	offsetList.nameBlock = Helpers::align8Bytes(offsetList.movesetInfoBlock + s_movesetInfoBlock);
 	offsetList.movesetBlock = Helpers::align8Bytes(offsetList.nameBlock + s_nameBlock);
 	offsetList.animationBlock = Helpers::align8Bytes(offsetList.movesetBlock + s_movesetBlock);
 	offsetList.motaBlock = Helpers::align8Bytes(offsetList.animationBlock + s_animationBlock);
-	offsetList.movelistBlock = Helpers::align8Bytes(offsetList.motaBlock + s_motaCustomBlock);
 
 	ExtractionErrcode_ errcode = ExtractionErrcode_Successful;
 
 	// -- Writing the file -- 
 
 	if (movesetInfoBlock == nullptr || nameBlock == nullptr || movesetBlock == nullptr
-		|| animationBlock == nullptr || motaCustomBlock == nullptr || movelistBlock == nullptr)
+		|| animationBlock == nullptr || motaCustomBlock == nullptr)
 	{
 		errcode = ExtractionErrcode_AllocationErr;
-		DEBUG_LOG("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\nmovelistBlock = %llx\n",
-			(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock, (uint64_t)s_movelistBlock);
+		DEBUG_LOG("movesetInfoBlock = %llx\nnameBlock = %llx\nmovesetBlock = %llx\nanimationBlock = %llx\nmotaCustomBlock = %llx\n",
+			(uint64_t)movesetInfoBlock, (uint64_t)nameBlock, (uint64_t)movesetBlock, (uint64_t)animationBlock, (uint64_t)motaCustomBlock);
 	}
 	else {
 		// Create the file
@@ -882,14 +847,10 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 
 				// Actual moveset data start. Accurate up to the animation block
 				{movesetInfoBlock, s_movesetInfoBlock},
-				{tableBlock, s_tableBlock },
-				{motasListBlock, s_motasListBlock},
 				{(Byte*)nameBlock, s_nameBlock},
 				{movesetBlock, s_movesetBlock},
 				{animationBlock, s_animationBlock},
 				{motaCustomBlock, s_motaCustomBlock},
-				// Displayable movelist block
-				{movelistBlock, s_movelistBlock},
 			};
 
 			// List of blocks used for the CRC32 calculation. Some blocks above are purposefully ignored.
@@ -898,8 +859,6 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 				{customPropertiesBlock, s_customProperties},
 
 				{movesetInfoBlock, s_movesetInfoBlock},
-				{tableBlock, s_tableBlock },
-				{motasListBlock, s_motasListBlock},
 				{movesetBlock, s_movesetBlock},
 				{animationBlock, s_animationBlock},
 				{motaCustomBlock, s_motaCustomBlock},
@@ -942,13 +901,10 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 	/// Cleanup our temp allocated memory blocks
 	// headerBlock: not allocated, don't free()
 	// movesetInfoBlock: not allocated, don't free()
-	// tableBlock: not allocated, don't free()
-	// motasListBlock: not allocated, don't free()
 	free(nameBlock);
 	free(movesetBlock);
 	free(animationBlock);
 	free(motaCustomBlock);
-	free(movelistBlock);
 
 	return errcode;
 }

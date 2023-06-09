@@ -31,8 +31,6 @@ private:
 	Byte* CopyAnimations(const StructsT5::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets);
 	// Copies the moveset info block (aliases, couple strings)
 	void CopyMovesetInfoBlock(gameAddr movesetAddr, StructsT5::MovesetInfo* movesetHeader);
-	// Copies the displayable movelist, visible in training mode and maybe elsewhere
-	Byte* CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings);
 
 	/// Helpers
 

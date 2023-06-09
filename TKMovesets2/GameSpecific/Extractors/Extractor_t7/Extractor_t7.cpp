@@ -339,11 +339,15 @@ Byte* ExtractorT7::CopyAnimations(const gAddr::Move* movelist, size_t moveCount,
 	// Find anim sizes and establish offsets
 	for (gameAddr animAddr : addrList)
 	{
-		uint64_t animSize = GetAnimationSize(animAddr);
+		uint64_t animSize;
 
-		if (animSize == 0) {
+		try {
+			animSize = GetAnimationSize(m_game->baseAddr + animAddr);
+		}
+		catch (const std::exception&) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
-			throw;
+			size_out = 0;
+			return nullptr;
 		}
 		
 		offsets[animAddr] = totalSize;
@@ -553,7 +557,7 @@ ExtractionErrcode_ ExtractorT7::Extract(gameAddr playerAddress, ExtractSettings 
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
 	uint64_t s_customProperties;
 	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
-	uint64_t s_movesetInfoBlock = 0x150; // Yeah, fixed size, this is on purpose. I do want to extract table and mota separately.
+	uint64_t s_movesetInfoBlock = offsetof(MovesetInfo, table);
 	uint64_t s_tableBlock = sizeof(MovesetTable);
 	uint64_t s_motasListBlock = sizeof(MotaList);
 	uint64_t s_nameBlock;

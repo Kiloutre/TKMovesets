@@ -558,11 +558,15 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	// Find anim sizes and establish offsets
 	for (gameAddr animAddr : addrList)
 	{
-		uint64_t animSize = GetAnimationSize(m_game->baseAddr + animAddr);
+		uint64_t animSize;
 
-		if (animSize == 0) {
+		try {
+			animSize = GetAnimationSize(m_game->baseAddr + animAddr);
+		}
+		catch (const std::exception&) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
-			throw;
+			size_out = 0;
+			return nullptr;
 		}
 
 		offsets[animAddr] = totalSize;
@@ -732,7 +736,7 @@ ExtractionErrcode_ ExtractorTTT2::Extract(gameAddr playerAddress, ExtractSetting
 	uint64_t s_headerBlock = sizeof(TKMovesetHeader);
 	uint64_t s_customProperties;
 	uint64_t s_offsetListBlock = sizeof(TKMovesetHeaderBlocks);
-	uint64_t s_movesetInfoBlock = 0x140; // Pretty much the offset of the moveset table
+	uint64_t s_movesetInfoBlock = offsetof(MovesetInfo, table);
 	uint64_t s_tableBlock = sizeof(MovesetTable);
 	uint64_t s_motasListBlock = sizeof(MotaList);
 	uint64_t s_nameBlock;

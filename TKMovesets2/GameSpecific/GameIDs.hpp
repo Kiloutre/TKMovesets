@@ -18,6 +18,7 @@ namespace GameVersions
 
 		FROM_TTT2,
 		FROM_TREV,
+		FROM_T6,
 	};
 
 	enum TTT2

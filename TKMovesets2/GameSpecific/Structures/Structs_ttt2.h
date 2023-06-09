@@ -10,14 +10,14 @@ namespace StructsTTT2
 {
 	enum TKMovesetHeaderBlocks_
 	{
-		TKMovesetHeaderBlocks_MovesetInfo,
-		TKMovesetHeaderBlocks_Table,
-		TKMovesetHeaderBlocks_Motalists,
-		TKMovesetHeaderBlocks_Name,
-		TKMovesetHeaderBlocks_Moveset,
-		TKMovesetHeaderBlocks_Animation,
-		TKMovesetHeaderBlocks_Mota,
-		TKMovesetHeaderBlocks_Movelist,
+		TKMovesetHeaderBlocks_MovesetInfo = 0,
+		TKMovesetHeaderBlocks_Table       = 1,
+		TKMovesetHeaderBlocks_Motalists   = 2,
+		TKMovesetHeaderBlocks_Name        = 3,
+		TKMovesetHeaderBlocks_Moveset     = 4,
+		TKMovesetHeaderBlocks_Animation   = 5,
+		TKMovesetHeaderBlocks_Mota        = 6,
+		TKMovesetHeaderBlocks_Movelist    = 7,
 	};
 
 	// Custom-made offset list containing the list of blocks that compose our extracted moveset
@@ -54,7 +54,7 @@ namespace StructsTTT2
 		uint64_t GetBlockSize(TKMovesetHeaderBlocks_ block, uint64_t s_moveset = 0) const
 		{
 			unsigned int b = (unsigned int)block;
-			if (b + 1 == _countof(blocks)) {
+			if ((b + 1) >= _countof(blocks)) {
 				return s_moveset - blocks[block];
 			}
 			else {

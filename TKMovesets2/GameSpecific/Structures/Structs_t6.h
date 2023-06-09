@@ -10,14 +10,11 @@ namespace StructsT6
 {
 	enum TKMovesetHeaderBlocks_
 	{
-		TKMovesetHeaderBlocks_MovesetInfo,
-		TKMovesetHeaderBlocks_Table,
-		TKMovesetHeaderBlocks_Motalists,
-		TKMovesetHeaderBlocks_Name,
-		TKMovesetHeaderBlocks_Moveset,
-		TKMovesetHeaderBlocks_Animation,
-		TKMovesetHeaderBlocks_Mota,
-		TKMovesetHeaderBlocks_Movelist,
+		TKMovesetHeaderBlocks_MovesetInfo = 0,
+		TKMovesetHeaderBlocks_Name        = 1,
+		TKMovesetHeaderBlocks_Moveset     = 2,
+		TKMovesetHeaderBlocks_Animation   = 3,
+		TKMovesetHeaderBlocks_Mota        = 4,
 	};
 
 	// Custom-made offset list containing the list of blocks that compose our extracted moveset
@@ -28,10 +25,6 @@ namespace StructsT6
 			struct {
 				// Store moveid aliases and some more i don't understand
 				uint64_t movesetInfoBlock;
-				// Store a list of offsets toward various structure lists paired with their size
-				uint64_t tableBlock;
-				// Store a list of offets pointing to mota files
-				uint64_t motalistsBlock;
 				// Stores an offset to the block containing move names & anim names (they are the same)
 				uint64_t nameBlock;
 				// Stores an offset to the block containing stucture lists
@@ -40,10 +33,8 @@ namespace StructsT6
 				uint64_t animationBlock;
 				// Store an offset to the block containing the multiple mota files for those that are extracted . (customly-built)
 				uint64_t motaBlock;
-				// Stores the .mvl file in order to show the custom movelist in training mode
-				uint64_t movelistBlock;
 			};
-			uint64_t blocks[8];
+			uint64_t blocks[5];
 		};
 
 		Byte* GetBlock(TKMovesetHeaderBlocks_ block, Byte* moveset) const
@@ -54,7 +45,7 @@ namespace StructsT6
 		uint64_t GetBlockSize(TKMovesetHeaderBlocks_ block, uint64_t s_moveset = 0) const
 		{
 			unsigned int b = (unsigned int)block;
-			if (b + 1 == _countof(blocks)) {
+			if ((b + 1) >= _countof(blocks)) {
 				return s_moveset - blocks[block];
 			}
 			else {

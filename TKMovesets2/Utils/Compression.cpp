@@ -525,7 +525,7 @@ namespace CompressionUtils
 					inbuf = new Byte[moveset_data_size];
 				}
 				catch (std::bad_alloc&) {
-					DEBUG_ERR("Compress: Failed to allocate %llu bytes (%s)", moveset_data_size);
+					DEBUG_ERR("Compress: Failed to allocate %llu bytes", moveset_data_size);
 					return false;
 				}
 
