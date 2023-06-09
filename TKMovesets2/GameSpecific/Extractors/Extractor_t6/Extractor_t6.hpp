@@ -24,7 +24,7 @@ private:
 	// Allocate and copy the contents of the moveset block
 	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT6::MovesetTable& table, const StructsT6::MovesetTable* offsets);
 	// Allocate and copy the contents of the name block
-	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out);
+	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT6::MovesetInfo& movesetHeader);
 	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
 	Byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, StructsT6::MotaList* motasList, ExtractSettings settings);
 	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.

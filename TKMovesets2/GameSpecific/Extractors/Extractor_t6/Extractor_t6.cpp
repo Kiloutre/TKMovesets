@@ -629,9 +629,12 @@ Byte* ExtractorT6::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, co
 	return block;
 }
 
-char* ExtractorT6::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out)
+char* ExtractorT6::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT6::MovesetInfo& movesetHeader)
 {
-	gameAddr nameBlockEnd = 0; // todo
+	char fulldate[32] = "";
+	m_game->ReadBytes(movesetAddr + movesetHeader.fulldate_addr, fulldate, sizeof(fulldate));
+	fulldate[sizeof(fulldate) - 1] = '\0';
+	gameAddr nameBlockEnd = movesetAddr + movesetHeader.fulldate_addr + strlen(fulldate);
 
 	// Prefix we apply to recognize movesets we extracted
 	const char* namePrefix = MOVESET_EXTRACTED_NAME_PREFIX;
@@ -878,12 +881,12 @@ ExtractionErrcode_ ExtractorT6::Extract(gameAddr playerAddress, ExtractSettings 
 	animationBlock = CopyAnimations(movelist, table.moveCount, s_animationBlock, animOffsets);
 	progress = 65;
 
-	// Reads block containing names of moves and animations
-	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock);
-
 	// Reads block containing basic moveset infos and aliases
 	CopyMovesetInfoBlock(movesetAddr, &movesetHeader);
 	progress = 70;
+
+	// Reads block containing name of character, date, tec
+	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock, movesetHeader);
 
 	// Now that we extracted everything, we can properly convert pts to indexes
 	convertMovesetPointersToIndexes(movesetBlock, table, offsets, animOffsets);
