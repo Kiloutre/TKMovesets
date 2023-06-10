@@ -390,11 +390,11 @@ namespace StructsT6
 				gameAddr32 mvlInput;
 				uint32_t mvlInputCount;
 
-				gameAddr32 StructA3; // Size ??
-				uint32_t StructA3Count;
-
 				gameAddr32 mvlDisplayable;
 				uint32_t mvlDisplayableCount;
+
+				gameAddr32 StructA3; // Size ??
+				uint32_t StructA3Count;
 
 				gameAddr32 StructA5; // Size ??
 				uint32_t StructA5Count;

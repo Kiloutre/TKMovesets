@@ -240,6 +240,19 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 			ByteswapHelpers::SWAP_INT32(&mvlDisplayable.all_translation_offsets[i]);
 		}
 	}
+
+	if (offsets->StructA3Count != 0)
+	{
+		DEBUG_LOG("\n\n\n ------------------ STRUCTA3 ----------------\n\n\n");
+	}
+	if (offsets->StructA5Count != 0)
+	{
+		DEBUG_LOG("\n\n\n ------------------ STRUCTA5 ----------------\n\n\n");
+	}
+	if (offsets->StructA6Count != 0)
+	{
+		DEBUG_LOG("\n\n\n ------------------ STRUCTA6 ----------------\n\n\n");
+	}
 }
 
 // Converts absolute ptr into indexes before saving to file

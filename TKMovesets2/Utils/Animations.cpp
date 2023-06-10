@@ -126,11 +126,11 @@ namespace TAnimUtils
 
 			// Byteswap keyframe informations
 			int keyframeCount = (animLength + 14) >> 4;
-			do
+			for (unsigned int i = 0; i < keyframeCount; ++i)
 			{
 				SWAP_INT32(animAddr + offset);
 				offset += 4;
-			} while (--keyframeCount);
+			}
 		}
 
 		void ByteswapC8Animation(Byte* animAddr)
