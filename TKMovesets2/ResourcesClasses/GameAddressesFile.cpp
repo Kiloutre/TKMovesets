@@ -218,11 +218,8 @@ int64_t GameAddressesFile::GetValue(const std::string& gameKey, const char* c_ad
 	}
 
 #ifdef BUILD_TYPE_DEBUG
-	auto ex = GameAddressNotFound("val:", gameKey, c_addressId);
+	auto ex = GameAddressNotFoundMsg("val:", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
-#ifndef DLL_EXPORTING
-	throw ex;
-#endif
 #endif
 	return 0;
 }
@@ -241,11 +238,8 @@ const char* GameAddressesFile::GetString(const std::string& gameKey, const char*
 	}
 
 #ifdef BUILD_TYPE_DEBUG
-	auto ex = GameAddressNotFound("str:", gameKey, c_addressId);
+	auto ex = GameAddressNotFoundMsg("str:", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
-#ifndef DLL_EXPORTING
-	throw ex;
-#endif
 #endif
 	return nullptr;
 }
@@ -275,15 +269,70 @@ const std::vector<gameAddr>& GameAddressesFile::GetPtrPath(const std::string& ga
 	}
 
 #ifdef BUILD_TYPE_DEBUG
-	auto ex = GameAddressNotFound("", gameKey, c_addressId);
+	auto ex = GameAddressNotFoundMsg("", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
-#ifndef DLL_EXPORTING
-	throw ex;
-#else
-#endif
 #endif
 	return cg_emptyVector;
 }
+
+
+int64_t GameAddressesFile::GetValueEx(const std::string& gameKey, const char* c_addressId) const
+{
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
+	{
+		auto& values = gameEntry->second.values;
+		auto entry = values.find(c_addressId);
+		if (entry != values.end()) {
+			return entry->second;
+		}
+	}
+
+	throw GameAddressNotFound();
+}
+
+
+const char* GameAddressesFile::GetStringEx(const std::string& gameKey, const char* c_addressId) const
+{
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
+	{
+		auto& strings = gameEntry->second.strings;
+		auto entry = strings.find(c_addressId);
+		if (entry != strings.end()) {
+			return entry->second.c_str();
+		}
+	}
+
+	throw GameAddressNotFound();
+}
+
+const std::vector<gameAddr>& GameAddressesFile::GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative) const
+{
+	auto gameEntry = m_entries.find(gameKey);
+	if (gameEntry != m_entries.end())
+	{
+		{
+			auto& relative_pointer_paths = gameEntry->second.relative_pointer_paths;
+			auto entry = relative_pointer_paths.find(c_addressId);
+			if (entry != relative_pointer_paths.end()) {
+				isRelative = true;
+				return entry->second;
+			}
+		}
+		{
+			auto& absolute_pointer_paths = gameEntry->second.absolute_pointer_paths;
+			auto entry = absolute_pointer_paths.find(c_addressId);
+			isRelative = false;
+			if (entry != absolute_pointer_paths.end()) {
+				return entry->second;
+			}
+		}
+	}
+
+	throw GameAddressNotFound();
+}
+
 
 
 // -- Private -- //

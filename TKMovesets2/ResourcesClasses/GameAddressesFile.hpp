@@ -17,13 +17,18 @@ struct s_GameAddressesSharedMem
 	char compressedData[SHARED_ADDR_MEMORY_BUFSIZE - sizeof(int) * 2];
 };
 
-class GameAddressNotFound : public std::exception {
+class GameAddressNotFound : public std::exception
+{
+	using std::exception::exception;
+};
+
+class GameAddressNotFoundMsg : public std::exception {
 	std::string m_reason;
 	std::string m_gameKey;
 	std::string m_addressKey;
 
 public:
-	GameAddressNotFound(const std::string& reason, const std::string& gameKey, const std::string& addressKey) : m_reason(reason), m_gameKey(gameKey), m_addressKey(addressKey) {}
+	GameAddressNotFoundMsg(const std::string& reason, const std::string& gameKey, const std::string& addressKey) : m_reason(reason), m_gameKey(gameKey), m_addressKey(addressKey) {}
 
 	std::string what() {
 		return std::format("!!! Addresses key: '{}{}_{}' not found !!!\n", m_reason.c_str(), m_gameKey.c_str(), m_addressKey.c_str());
@@ -69,6 +74,7 @@ public:
 
 	// Returns true if such a key exists (looks at values, strings and ptr paths)
 	bool HasKey(const std::string& gameKey, const char* key) const;
+
 	// Returns a list of every game_address.txt entry (key only).
 	const std::vector<std::string>& GetAllKeys() const;
 	// Returns a single numerical value from the file
@@ -77,4 +83,9 @@ public:
 	const char* GetString(const std::string& gameKey, const char* c_addressId) const;
 	// Returns a pointer path, that may rely on the base address or not.
 	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
+
+
+	int64_t GetValueEx(const std::string& gameKey, const char* c_addressId) const;
+	const char* GetStringEx(const std::string& gameKey, const char* c_addressId) const;
+	const std::vector<gameAddr>& GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
 };

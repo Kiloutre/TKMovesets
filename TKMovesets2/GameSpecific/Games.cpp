@@ -39,16 +39,36 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = false
 	},
 	{
-		.name = "Tekken Tag 2 (RPCS3)",
+		.name = "Tekken Tag 2 1.00 (RPCS3)",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TTT2_",
 		.gameId = GameId_TTT2,
-		.minorVersion = 0,
+		.minorVersion = GameVersions::TTT2::RPCS3_BLES01702_0100,
 		.characterCount = 4,
 		.ptrSize = 4,
 		.flags = 0,
 		.dataString = "ttt2",
 		.minorDataString = "ttt2",
+		.supportedImports = {},
+		.extractor = new GameFactory<ExtractorTTT2>,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetRPCS3BaseAddr,
+		.bigEndian = true
+	},
+	{
+		.name = "Tekken Tag 2 1.03 (RPCS3)",
+		.processName = "rpcs3.exe",
+		.movesetNamePrefix = "TTT2_",
+		.gameId = GameId_TTT2,
+		.minorVersion = GameVersions::TTT2::RPCS3_BLES01702_0103,
+		.characterCount = 4,
+		.ptrSize = 4,
+		.flags = 0,
+		.dataString = "ttt2",
+		.minorDataString = "ttt2-1-03",
 		.supportedImports = {},
 		.extractor = new GameFactory<ExtractorTTT2>,
 		.importer = nullptr,
@@ -98,6 +118,7 @@ const GameInfo cg_gamesInfo[] = {
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true
 	},
+	/*
 	{
 		.name = "Tekken 5 (PCSX2)",
 		.processName = "pcsx2.exe",
@@ -118,6 +139,7 @@ const GameInfo cg_gamesInfo[] = {
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = false
 	},
+	*/
 };
 
 namespace Games

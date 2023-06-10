@@ -24,6 +24,7 @@ namespace GameVersions
 
 	enum TTT2
 	{
-		RPCS3_BLES01702_0100 = 0
+		RPCS3_BLES01702_0100 = 0,
+		RPCS3_BLES01702_0103 = 1,
 	};
 };

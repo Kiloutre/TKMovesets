@@ -5,7 +5,7 @@
 int64_t GameAddressesWrapper::GetValue(const char* c_addressId) const
 {
 	try {
-		return addrFile->GetValue(minorGameKey, c_addressId);
+		return addrFile->GetValueEx(minorGameKey, c_addressId);
 	}
 	catch (GameAddressNotFound&) {
 		return addrFile->GetValue(gameKey, c_addressId);
@@ -15,7 +15,7 @@ int64_t GameAddressesWrapper::GetValue(const char* c_addressId) const
 const char* GameAddressesWrapper::GetString(const char* c_addressId) const
 {
 	try {
-		return addrFile->GetString(minorGameKey, c_addressId);
+		return addrFile->GetStringEx(minorGameKey, c_addressId);
 	}
 	catch (GameAddressNotFound&) {
 		return addrFile->GetString(gameKey, c_addressId);
@@ -25,7 +25,7 @@ const char* GameAddressesWrapper::GetString(const char* c_addressId) const
 const std::vector<gameAddr>& GameAddressesWrapper::GetPtrPath(const char* c_addressId, bool& isRelative) const
 {
 	try {
-		return addrFile->GetPtrPath(minorGameKey, c_addressId, isRelative);
+		return addrFile->GetPtrPathEx(minorGameKey, c_addressId, isRelative);
 	}
 	catch (GameAddressNotFound&) {
 		return addrFile->GetPtrPath(gameKey, c_addressId, isRelative);
