@@ -285,7 +285,6 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	char* new_nameBlock = new_nameBlock_start + old_blocks->GetBlockSize(T6::TKMovesetHeaderBlocks_Name);
 	for (unsigned int i = 0; i < table.moveCount; ++i)
 	{
-		DEBUG_LOG("move %u\n", i);
 		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
 		const T6::Move* source = (T6::Move*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
 
