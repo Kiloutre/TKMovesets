@@ -68,12 +68,6 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 		TO_INDEX(inputSequence.input_addr, table.input, Input);
 	}
 
-	// Convert throwCameras ptrs
-	for (auto& throwCameras : StructIterator<ThrowCamera>(movesetBlock, offsets->throwCameras, table.throwCamerasCount))
-	{
-		TO_INDEX(throwCameras.cameradata_addr, table.cameraData, CameraData);
-	}
-
 	// Convert hit conditions ptrs
 	for (auto& hitCondition : StructIterator<HitCondition>(movesetBlock, offsets->hitCondition, table.hitConditionCount))
 	{
@@ -105,22 +99,6 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 void ExtractorT5::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movesetHeader)
 {
 	m_game->ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
-
-	// Byteswap data that needs to be swapped
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->character_name_addr);
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->character_creator_addr);
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->date_addr);
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->fulldate_addr);
-
-	for (unsigned int i = 0; i < _countof(movesetHeader->orig_aliases); ++i)
-	{
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->orig_aliases[i]);
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->current_aliases[i]);
-	}
-
-	for (unsigned int i = 0; i < _countof(movesetHeader->unknown_aliases); ++i) {
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_aliases[i]);
-	}
 
 	// Convert ptrs into offsets
 	movesetHeader->character_name_addr -= (gameAddr32)movesetAddr;
@@ -197,7 +175,7 @@ uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 				motaSize = 0x14;
 			}
 			else {
-				uint32_t lastAnimSize = (uint32_t)GetAnimationSize(m_game->baseAddr + motaAddr + lastAnimOffset);
+				uint32_t lastAnimSize = (uint32_t)TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game->baseAddr + motaAddr + lastAnimOffset);
 				motaSize = lastAnimOffset + lastAnimSize;
 			}
 
@@ -340,13 +318,14 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 		}
 	}
 
+	auto prefix_size = TAnimUtils::GetT5AnimPrefixSize();
 	// Find anim sizes and establish offsets
 	for (gameAddr animAddr : addrList)
 	{
 		uint64_t animSize;
 
 		try {
-			animSize = GetAnimationSize(m_game->baseAddr + animAddr);
+			animSize = TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game->baseAddr + animAddr);
 		}
 		catch (const std::exception&) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
@@ -356,7 +335,7 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 
 		offsets[animAddr] = totalSize;
 		animSizes[animAddr] = animSize;
-		totalSize += animSize;
+		totalSize += animSize + prefix_size;
 	}
 
 	// Allocate block
@@ -369,12 +348,13 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 	Byte* animationBlockCursor = animationBlock;
 	for (gameAddr animAddr : addrList)
 	{
+		// Write prefix
+		TAnimUtils::GetT5AnimPrefix(animationBlockCursor, true);
+		animationBlockCursor += prefix_size;
+
+		// Write anim data
 		int64_t animSize = animSizes[animAddr];
 		m_game->ReadBytes(animAddr, animationBlockCursor, animSize);
-
-		if (!TAnimUtils::FromMemory::IsLittleEndian(animationBlockCursor)) {
-			TAnimUtils::FromMemory::ByteswapAnimation(animationBlockCursor);
-		}
 
 		animationBlockCursor += animSize;
 	}
@@ -389,12 +369,6 @@ void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, M
 	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game->baseAddr + movesetAddr + offsetof(MovesetInfo, table));
 	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 
-	// Byteswap to little endian
-	for (unsigned int i = 0; i < _countof(table->entries); ++i) {
-		ByteswapHelpers::SWAP_INT32(&(table->entries[i].listAddr));
-		ByteswapHelpers::SWAP_INT32(&(table->entries[i].listCount));
-	}
-
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
 	gameAddr tableStartAddr = table->reactions;
 	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
@@ -405,7 +379,7 @@ void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, M
 Byte* ExtractorT5::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table, const MovesetTable* offsets)
 {
 	gameAddr blockStart = table.reactions;
-	gameAddr blockEnd = table.throwCameras + (sizeof(ThrowCamera) * table.throwCamerasCount);
+	gameAddr blockEnd = table.StructA5 + (sizeof(ThrowCamera) * table.StructA5Count);
 	auto block = allocateAndReadBlock(blockStart, blockEnd, size_out);
 	if (block == nullptr) {
 		return nullptr;
@@ -423,7 +397,7 @@ char* ExtractorT5::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	size_t toCopy = strlen(namePrefix);
 	size_t charactersToReplace = 1; // Replace the first [
 
-	unsigned int nameOffset = 0x20C;
+	unsigned int nameOffset = 0x26C;
 
 	nameBlockStart = movesetAddr + nameOffset - (toCopy - charactersToReplace);
 	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + nameOffset - (toCopy - charactersToReplace), nameBlockEnd, size_out);
@@ -438,11 +412,6 @@ char* ExtractorT5::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 Byte* ExtractorT5::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
 	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
-
-	// Byteswap MOTA addresses
-	for (unsigned int i = 0; i < _countof(motasList->motas); ++i) {
-		ByteswapHelpers::SWAP_INT32(&motasList->motas[i]);
-	}
 
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
@@ -740,7 +709,7 @@ std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
 
 	{
 		char buf[32];
-		m_game->ReadBytes(movesetAddr + 0x20C, buf, 31);
+		m_game->ReadBytes(movesetAddr + 0x26C, buf, 31);
 		buf[31] = '\0';
 		characterName = std::string(buf);
 	}
@@ -777,7 +746,7 @@ std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
 
 uint32_t ExtractorT5::GetCharacterID(gameAddr playerAddress)
 {
-	return m_game->Read<uint32_t>(playerAddress + m_game->GetValue("chara_id_offset"));
+	return m_game->Read<uint16_t>(playerAddress + m_game->GetValue("chara_id_offset"));
 }
 
 gameAddr ExtractorT5::GetCharacterAddress(uint8_t playerId)

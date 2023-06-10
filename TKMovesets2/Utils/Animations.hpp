@@ -6,6 +6,11 @@
 
 namespace TAnimUtils
 {
+	// Get the size of the prefix to apply to T5 anims
+	unsigned int GetT5AnimPrefixSize();
+	// Write the preifx to a T5 anim in the proper endianness
+	void GetT5AnimPrefix(Byte* buffer, bool little_endian);
+
 	namespace FromMemory
 	{
 		// Byteswaps a MOTA block and its animations (little endian <-> big endian). Animations will be made to match the MOTA's endian.
@@ -30,6 +35,11 @@ namespace TAnimUtils
 		uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim);
 		// Returns the size in bytes of a 0x64 animation (big endian anim)
 		uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
+
+		// T5 0x64 anims lack anim type, bone count and bone descriptors.
+		// They all are 0x64, 0x17 bones with the same bone descriptors
+		uint64_t getT5_64AnimSize_LittleEndian(GameProcess* process, gameAddr anim);
+		uint64_t getT5_64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
 	};
 
 	namespace FromFile

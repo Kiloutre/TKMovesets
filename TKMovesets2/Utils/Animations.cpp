@@ -9,6 +9,24 @@ using namespace ByteswapHelpers;
 
 namespace TAnimUtils
 {
+	char t5_anim_prefix[] = { 0x64, 0x00, 0x17, 0x00, 0x0B, 0x00, 0x0B, 0x00, 0x05, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x0B, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00 };
+	char t5_anim_prefix_big_endian[] = { 0x00, 0x64, 0x00, 0x17, 0x00, 0x0B, 0x00, 0x0B, 0x00, 0x05, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x0B, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07, 0x00, 0x07, 0x00, 0x06, 0x00, 0x07 };
+
+	void GetT5AnimPrefix(Byte* buffer, bool little_endian)
+	{
+		if (little_endian) {
+			memcpy(buffer, t5_anim_prefix, sizeof(t5_anim_prefix));
+		}
+		else {
+			memcpy(buffer, t5_anim_prefix_big_endian, sizeof(t5_anim_prefix_big_endian));
+		}
+	}
+
+	unsigned int GetT5AnimPrefixSize()
+	{
+		return sizeof t5_anim_prefix;
+	}
+
 	namespace FromMemory
 	{
 		void ByteswapMota(Byte* motaAddr)
@@ -125,7 +143,7 @@ namespace TAnimUtils
 			}
 
 			// Byteswap keyframe informations
-			int keyframeCount = (animLength + 14) >> 4;
+			unsigned int keyframeCount = (animLength + 14) >> 4;
 			for (unsigned int i = 0; i < keyframeCount; ++i)
 			{
 				SWAP_INT32(animAddr + offset);
@@ -299,6 +317,82 @@ namespace TAnimUtils
 			return (uint64_t)animPtr_2 - (uint64_t)anim;
 		}
 
+
+
+		uint64_t getT5_64AnimSize_BigEndian(GameProcess* process, gameAddr anim)
+		{
+			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
+			uint64_t boneCount = 0x17;
+
+			gameAddr anim_postBoneDescriptorAddr = anim;
+
+			uint64_t animLength = process->readUInt16(anim_postBoneDescriptorAddr);
+			uint64_t __unknown__ = process->readUInt16(anim_postBoneDescriptorAddr + 4);
+			animLength = BYTESWAP_INT16(animLength);
+			__unknown__ = BYTESWAP_INT16(__unknown__);
+
+			uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+			uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+			gameAddr animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+			unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+			unsigned int keyframe = baseFrame / 16;
+			unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * (uint64_t)keyframe);
+			_v56_intPtr = BYTESWAP_INT32(_v56_intPtr);
+
+			gameAddr animPtr_2 = animPtr + _v56_intPtr;
+			int lastArg_copy = (int)boneCount;
+
+			do
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					Byte v58 = process->readInt8(animPtr_2);
+					int offsetStep = v58 / 4;
+					animPtr_2 += offsetStep;
+				}
+			} while (--lastArg_copy != 0);
+
+			return (uint64_t)animPtr_2 - (uint64_t)anim;
+		}
+
+		uint64_t getT5_64AnimSize_LittleEndian(GameProcess* process, gameAddr anim)
+		{
+			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
+			uint64_t boneCount = 0x17;
+
+			gameAddr anim_postBoneDescriptorAddr = anim;
+
+			uint64_t animLength = process->readUInt16(anim_postBoneDescriptorAddr);
+			uint64_t __unknown__ = process->readUInt16(anim_postBoneDescriptorAddr + 4);
+
+			uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+			uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+			gameAddr animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+			unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+			unsigned int keyframe = baseFrame / 16;
+			unsigned int _v56_intPtr = (unsigned int)process->readInt32(animPtr + 4 * (uint64_t)keyframe);
+
+			gameAddr animPtr_2 = animPtr + _v56_intPtr;
+			int lastArg_copy = (int)boneCount;
+
+			do
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					Byte v58 = process->readInt8(animPtr_2);
+					int offsetStep = v58 / 4;
+					animPtr_2 += offsetStep;
+				}
+			} while (--lastArg_copy != 0);
+
+			return (uint64_t)animPtr_2 - (uint64_t)anim;
+		}
 	};
 
 	namespace FromFile

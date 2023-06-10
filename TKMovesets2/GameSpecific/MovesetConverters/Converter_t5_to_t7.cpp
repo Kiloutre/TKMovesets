@@ -83,9 +83,9 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	movesetBlockSize += sizeof(Voiceclip) * movesetInfo->table.voiceclipCount;
 	movesetBlockSize += sizeof(InputSequence) * movesetInfo->table.inputSequenceCount;
 	movesetBlockSize += sizeof(Input) * movesetInfo->table.inputCount;
-	movesetBlockSize += sizeof(UnknownParryRelated) * movesetInfo->table.unknownParryRelatedCount;
-	movesetBlockSize += sizeof(CameraData) * movesetInfo->table.cameraDataCount;
-	movesetBlockSize += sizeof(ThrowCamera) * movesetInfo->table.throwCamerasCount;
+	movesetBlockSize += sizeof(UnknownParryRelated) * 0;
+	movesetBlockSize += sizeof(CameraData) * 0;
+	movesetBlockSize += sizeof(ThrowCamera) * 0;
 	movesetSize += Helpers::align8Bytes(movesetBlockSize);
 
 	blocks_out.animationBlock = movesetSize;
@@ -150,9 +150,9 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	table.voiceclipCount = old_movesetInfo->table.voiceclipCount;
 	table.inputSequenceCount = old_movesetInfo->table.inputSequenceCount;
 	table.inputCount = old_movesetInfo->table.inputCount;
-	table.unknownParryRelatedCount = old_movesetInfo->table.unknownParryRelatedCount;
-	table.cameraDataCount = old_movesetInfo->table.cameraDataCount;
-	table.throwCamerasCount = old_movesetInfo->table.throwCamerasCount;
+	table.unknownParryRelatedCount = 0;
+	table.cameraDataCount = 0;
+	table.throwCamerasCount = 0;
 
 
 	table.reactions = 0;
@@ -429,36 +429,6 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->input_amount = source->input_amount;
 		target->_0x4_int = source->_0x0_int8;
 		target->input_addr = source->input_addr;
-	}
-
-	for (unsigned int i = 0; i < table.cameraDataCount; ++i)
-	{
-		CameraData* target = (CameraData*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cameraData) + i;
-		const T5::CameraData* source = (T5::CameraData*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cameraData) + i;
-
-		target->_0x0_int = source->_0x0_int;
-		target->_0x4_short = source->_0x4_short;
-		target->left_side_camera_data = source->left_side_camera_data;
-		target->right_side_camera_data = source->right_side_camera_data;
-		target->_0xA_short = source->_0xA_short;
-	}
-
-	for (unsigned int i = 0; i < table.throwCamerasCount; ++i)
-	{
-		gAddr::ThrowCamera* target = (gAddr::ThrowCamera*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.throwCameras) + i;
-		const T5::ThrowCamera* source = (T5::ThrowCamera*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.throwCameras) + i;
-
-		target->_0x0_llong = source->_0x0_uint;
-		target->cameradata_addr = source->cameradata_addr;
-	}
-
-
-	for (unsigned int i = 0; i < table.unknownParryRelatedCount; ++i)
-	{
-		UnknownParryRelated* target = (UnknownParryRelated*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.unknownParryRelated) + i;
-		const T5::UnknownParryRelated* source = (T5::UnknownParryRelated*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.unknownParryRelated) + i;
-
-		target->value = source->value;
 	}
 
 	for (unsigned int i = 0; i < table.moveBeginningPropCount; ++i)

@@ -98,7 +98,6 @@ const GameInfo cg_gamesInfo[] = {
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true
 	},
-	/*
 	{
 		.name = "Tekken 5 (PCSX2)",
 		.processName = "pcsx2.exe",
@@ -119,7 +118,6 @@ const GameInfo cg_gamesInfo[] = {
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = false
 	},
-	*/
 };
 
 namespace Games

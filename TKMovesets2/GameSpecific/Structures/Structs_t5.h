@@ -71,12 +71,11 @@ namespace StructsT5
 
 	struct Requirement
 	{
-		uint32_t condition;
+		uint16_t condition;
 		union
 		{
-			uint32_t param_unsigned;
-			int32_t param_signed;
-			float param_float;
+			uint16_t param_unsigned;
+			int16_t param_signed;
 		};
 	};
 
@@ -215,9 +214,17 @@ namespace StructsT5
 		gameAddr32 cameradata_addr;
 	};
 
-	struct UnknownParryRelated
+	struct StructA1
 	{
-		uint32_t value;
+		uint16_t value;
+	};
+
+	struct StructA3
+	{
+		uint16_t _0x0; // Assumed
+		uint16_t _0x2; // Assumed
+		uint16_t _0x4; // Assumed
+		uint16_t _0x6; // Assumed
 	};
 
 	// Struct for Extra Move Properties that play when a move starts or ends
@@ -236,13 +243,10 @@ namespace StructsT5
 		uint32_t vuln;
 		uint32_t hitlevel;
 		gameAddr32 cancel_addr;
-
 		uint16_t transition;
-
-		int16_t _0x56_short; // -
-
-		//uint16_t moveId_val2; // Clearly related to current character ID
-		//uint16_t moveId_val1; // Clearly related to move ID
+		uint16_t moveId_val2; // Clearly related to current character ID
+		uint16_t moveId_val1; // Clearly related to move ID
+		int16_t _0x1e_short;
 		gameAddr32 hit_condition_addr;
 		int16_t anim_len;
 		uint32_t airborne_start;
@@ -260,6 +264,41 @@ namespace StructsT5
 		uint16_t distance;
 	};
 
+
+	struct MvlPlayable
+	{
+		uint16_t p2_action;
+		uint16_t distance;
+		uint16_t p2_rotation;
+		uint16_t _unk0x6;
+		uint16_t _unk0x8;
+		uint16_t p1_facing_related;
+		uint16_t _unk0xc;
+		uint16_t input_count;
+		gameAddr32 input_addr;
+	};
+
+	struct MvlInput
+	{
+		union {
+			struct {
+				Byte directions;
+				Byte buttons;
+			};
+			uint16_t command;
+		};
+		uint8_t frame_duration;
+		uint8_t trigger_highlight;
+	};
+
+	struct MvlDisplayable
+	{
+		gameAddr32 all_translation_offsets[7];
+		uint32_t _0x1c;
+		uint32_t _0x20;
+		uint32_t _0x24;
+	};
+
 	// -- Other -- //
 
 	struct MovesetTable
@@ -274,9 +313,6 @@ namespace StructsT5
 
 				gameAddr32 hitCondition;
 				uint32_t hitConditionCount;
-
-				gameAddr32 projectile;
-				uint32_t projectileCount;
 
 				gameAddr32 pushback;
 				uint32_t pushbackCount;
@@ -314,19 +350,34 @@ namespace StructsT5
 				gameAddr32 input;
 				uint32_t inputCount;
 
-				gameAddr32 unknownParryRelated;
-				uint32_t unknownParryRelatedCount;
+				gameAddr32 StructA1; // Size ??
+				uint32_t StructA1Count; // These are 0 for every moveset i tried in T6's training mode
 
-				gameAddr32 cameraData;
-				uint32_t cameraDataCount;
+				gameAddr32 mvlPlayable;
+				uint32_t mvlPlayableCount;
 
-				gameAddr32 throwCameras;
-				uint32_t throwCamerasCount;
+				gameAddr32 mvlInput;
+				uint32_t mvlInputCount;
+
+				gameAddr32 mvlDisplayable;
+				uint32_t mvlDisplayableCount;
+
+				gameAddr32 StructA2; // Size ??
+				uint32_t StructA2Count; // These are 0 for every moveset i tried in T6's training mode
+
+				gameAddr32 StructA3; // Size ??
+				uint32_t StructA3Count; // These are 0 for every moveset i tried in T6's training mode
+
+				gameAddr32 StructA4; // Size ??
+				uint32_t StructA4Count; // These are 0 for every moveset i tried in T6's training mode
+
+				gameAddr32 StructA5; // Size ??
+				uint32_t StructA5Count; // These are 0 for every moveset i tried in T6's training mode
 			};
 			struct {
 				gameAddr32 listAddr;
 				uint32_t listCount;
-			} entries[19];
+			} entries[23];
 		};
 	};
 
@@ -401,8 +452,8 @@ namespace StructsT5
 		gameAddr32 character_creator_addr;
 		gameAddr32 date_addr;
 		gameAddr32 fulldate_addr;
-		uint16_t orig_aliases[56];
-		uint16_t current_aliases[56];
+		uint16_t orig_aliases[72];
+		uint16_t current_aliases[72];
 		uint16_t unknown_aliases[36];
 		MovesetTable table;
 		MotaList motas;

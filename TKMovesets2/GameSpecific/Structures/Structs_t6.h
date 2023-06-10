@@ -394,13 +394,13 @@ namespace StructsT6
 				uint32_t mvlDisplayableCount;
 
 				gameAddr32 StructA3; // Size ??
-				uint32_t StructA3Count;
+				uint32_t StructA3Count; // These are 0 for every moveset i tried in T6's training mode
 
 				gameAddr32 StructA5; // Size ??
-				uint32_t StructA5Count;
+				uint32_t StructA5Count; // These are 0 for every moveset i tried in T6's training mode
 
 				gameAddr32 StructA6; // Size ??
-				uint32_t StructA6Count;
+				uint32_t StructA6Count; // These are 0 for every moveset i tried in T6's training mode
 
 				gameAddr32 cameraData;
 				uint32_t cameraDataCount;
