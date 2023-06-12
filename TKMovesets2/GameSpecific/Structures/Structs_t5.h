@@ -156,8 +156,8 @@ namespace StructsT5
 
 	struct ExtraMoveProperty
 	{
-		uint32_t starting_frame;
-		uint32_t id;
+		uint16_t starting_frame;
+		uint16_t id;
 		union
 		{
 			uint32_t value_unsigned;
