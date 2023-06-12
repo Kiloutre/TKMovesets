@@ -233,7 +233,7 @@ namespace StructsTTT2
 	struct OtherMoveProperty
 	{
 		gameAddr32 requirements_addr;
-		uint32_t extraprop; // 881 list end value & extraprop values
+		uint32_t extraprop;
 		uint32_t value;
 	};
 

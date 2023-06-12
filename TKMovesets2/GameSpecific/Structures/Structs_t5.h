@@ -228,11 +228,11 @@ namespace StructsT5
 	};
 
 	// Struct for Extra Move Properties that play when a move starts or ends
-	struct OtherMoveProperty // todo
+	struct OtherMoveProperty
 	{
-		gameAddr32 requirements_addr;
-		uint32_t extraprop; // 881 list end value & extraprop values
-		uint32_t value;
+		gameAddr32 requirements_addr; // Assumed
+		uint16_t extraprop; // Assumed
+		uint16_t value; // Assumed
 	};
 
 	struct Move
@@ -332,11 +332,11 @@ namespace StructsT5
 				gameAddr32 extraMoveProperty;
 				uint32_t extraMovePropertyCount;
 
-				gameAddr32 moveBeginningProp; // Extraprops that play when a move starts
-				uint32_t moveBeginningPropCount;
+				gameAddr32 moveBeginningProp;
+				uint32_t moveBeginningPropCount; // 0 on every playable character
 
-				gameAddr32 moveEndingProp; // Extraprops that play when a move ends
-				uint32_t moveEndingPropCount;
+				gameAddr32 moveEndingProp;
+				uint32_t moveEndingPropCount; // 0 on every playable character
 
 				gameAddr32 move;
 				uint32_t moveCount;
