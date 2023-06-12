@@ -427,7 +427,7 @@ void MovesetLoaderT7::ConsumePackets()
             // Steam would refuse it. Max size is somewhere around 1024KB.
             packetBuf = new Byte[packetSize];
         } catch (std::bad_alloc&) {
-            DEBUG_ERR("Failed to allocate %llu bytes for packet", packetSize);
+            DEBUG_ERR("Failed to allocate %u bytes for packet", packetSize);
             break;
         }
 
@@ -443,6 +443,7 @@ void MovesetLoaderT7::ConsumePackets()
 	}
 }
 
-bool MovesetLoaderT7::CanConsumePackets() {
+bool MovesetLoaderT7::CanConsumePackets()
+{
 	return sharedMemPtr->moveset_sync_status != MovesetSyncStatus_NotStarted && sharedMemPtr->moveset_sync_status != MovesetSyncStatus_Ready;
-};
+}

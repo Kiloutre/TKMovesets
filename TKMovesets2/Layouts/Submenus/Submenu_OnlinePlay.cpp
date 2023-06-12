@@ -58,7 +58,7 @@ void Submenu_OnlinePlay::RenderMovesetList(bool canSelectMoveset)
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 
-			bool isImportable = moveset->onlineImportable && gameHelper->currentGame->SupportsGameImport(moveset->gameId);
+			bool isImportable = moveset->onlineImportable && gameHelper->currentGame->SupportsOnlineGameImport(moveset->gameId);
 			int color = !isImportable ? MOVESET_INVALID : moveset->color;
 			if (moveset->color != 0)
 			{

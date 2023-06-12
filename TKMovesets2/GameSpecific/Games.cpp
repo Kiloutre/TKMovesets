@@ -29,7 +29,8 @@ const GameInfo cg_gamesInfo[] = {
 		.flags = GameFlag_MovesetLiveEditable,
 		.dataString = "t7",
 		.minorDataString = "t7",
-		.supportedImports = { GameId_TTT2, GameId_TREV, GameId_T6 },
+		.supportedImports = { GameId_TTT2, GameId_TREV, GameId_T6, GameId_T5 },
+		.supportedOnlineImports = { GameId_TTT2, GameId_TREV, GameId_T6 },
 		.extractor = new GameFactory<ExtractorT7>,
 		.importer = new GameFactory<ImporterT7>,
 		.editorLogic = new GameFactory<EditorT7>,
@@ -50,6 +51,7 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "ttt2",
 		.minorDataString = "ttt2",
 		.supportedImports = {},
+		.supportedOnlineImports = {},
 		.extractor = new GameFactory<ExtractorTTT2>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
@@ -70,6 +72,7 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "ttt2",
 		.minorDataString = "ttt2-1-03",
 		.supportedImports = {},
+		.supportedOnlineImports = {},
 		.extractor = new GameFactory<ExtractorTTT2>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
@@ -90,6 +93,7 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "trev",
 		.minorDataString = "trev",
 		.supportedImports = {},
+		.supportedOnlineImports = {},
 		.extractor = new GameFactory<ExtractorTTT2>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
@@ -110,6 +114,7 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "t6",
 		.minorDataString = "t6",
 		.supportedImports = {},
+		.supportedOnlineImports = {},
 		.extractor = new GameFactory<ExtractorT6>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
@@ -118,7 +123,6 @@ const GameInfo cg_gamesInfo[] = {
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true
 	},
-	/*
 	{
 		.name = "Tekken 5 (PCSX2)",
 		.processName = "pcsx2.exe",
@@ -131,6 +135,7 @@ const GameInfo cg_gamesInfo[] = {
 		.dataString = "t5",
 		.minorDataString = "t5",
 		.supportedImports = {},
+		.supportedOnlineImports = {},
 		.extractor = new GameFactory<ExtractorT5>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
@@ -139,7 +144,6 @@ const GameInfo cg_gamesInfo[] = {
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = false
 	},
-	*/
 };
 
 namespace Games

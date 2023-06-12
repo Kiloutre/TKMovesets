@@ -78,6 +78,8 @@ struct GameInfo
 	const char* minorDataString;
 	// List of movesets' games we can import from, doesn't have to include ourselves
 	std::set<uint16_t> supportedImports;
+	// List of movesets' games we can import from, doesn't have to include ourselves
+	std::set<uint16_t> supportedOnlineImports;
 	// Dynamic type allocator to store the game's extractor. Can be nullptr for no available extractor.
 	GameFactory_Base* extractor;
 	// Dynamic type allocator to store the game's importer. Can be nullptr for no available importer.
@@ -97,6 +99,12 @@ struct GameInfo
 	bool SupportsGameImport(uint16_t t_gameId) const
 	{
 		return this != nullptr && (gameId == t_gameId || supportedImports.contains(t_gameId));
+	}
+
+
+	bool SupportsOnlineGameImport(uint16_t t_gameId) const
+	{
+		return this != nullptr && (gameId == t_gameId || supportedOnlineImports.contains(t_gameId));
 	}
 
 	bool IsEditable() const

@@ -30,6 +30,7 @@ private:
 	ImportationErrcode_ _Import_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	ImportationErrcode_ _Import_FromTREV(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	ImportationErrcode_ _Import_FromT6(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
+	ImportationErrcode_ _Import_FromT5(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 public:
 	using Importer::Importer; // Inherit constructor too
 	bool CanImport() override;

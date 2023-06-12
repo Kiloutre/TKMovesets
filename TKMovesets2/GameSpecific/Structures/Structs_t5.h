@@ -249,9 +249,9 @@ namespace StructsT5
 		int16_t _0x1e_short;
 		gameAddr32 hit_condition_addr;
 		int16_t anim_len;
-		uint32_t airborne_start;
-		uint32_t airborne_end;
-		uint32_t ground_fall;
+		uint16_t airborne_start;
+		uint16_t airborne_end;
+		uint16_t ground_fall;
 		gameAddr32 voicelip_addr; // Can be NULL
 		gameAddr32 extra_move_property_addr; // Can be NULL
 		gameAddr32 move_start_extraprop_addr; // Can be NULL

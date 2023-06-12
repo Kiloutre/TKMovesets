@@ -47,24 +47,6 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	blocks_out.nameBlock = movesetSize;
 	movesetSize += offsets->GetBlockSize(T5::TKMovesetHeaderBlocks_Name, s_moveset);
 
-	// Expand name block size with move and anim names that we created
-	std::set<gameAddr32> animAddresses;
-	const T5::Move* moves = (T5::Move*)(offsets->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + movesetInfo->table.move);
-	for (unsigned int i = 0; i < movesetInfo->table.moveCount; ++i)
-	{
-		const char* name_prefix = "move_";
-		const char* anim_name_prefix = "anim_";
-
-		movesetSize += (unsigned int)sizeof(name_prefix) + (unsigned int)log10(i + 1) + 1;
-
-		// Ensure shared animations share the same anim names
-		if (!animAddresses.contains(moves[i].anim_addr)) {
-			//animAddresses.insert(moves[i].anim_addr);
-			movesetSize += (unsigned int)sizeof(anim_name_prefix) + (unsigned int)log10(i + 1) + 1;
-		}
-	}
-	movesetSize = Helpers::align8Bytes(movesetSize);
-
 	blocks_out.movesetBlock = movesetSize;
 	size_t movesetBlockSize = 0;
 	movesetBlockSize += sizeof(Reactions) * movesetInfo->table.reactionsCount;
@@ -280,31 +262,13 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->value = source->value;
 	}
 
-	std::map<gameAddr32, unsigned long long> animNameOffsets;
-	char* new_nameBlock_start = (char*)blocks_out.GetBlock(TKMovesetHeaderBlocks_Name, new_moveset);
-	char* new_nameBlock = new_nameBlock_start + old_blocks->GetBlockSize(T5::TKMovesetHeaderBlocks_Name);
 	for (unsigned int i = 0; i < table.moveCount; ++i)
 	{
-		DEBUG_LOG("move %u\n", i);
 		gAddr::Move* target = (gAddr::Move*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.move) + i;
 		const T5::Move* source = (T5::Move*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.move) + i;
 
-		target->name_addr = new_nameBlock - new_nameBlock_start;
-		sprintf_s(new_nameBlock, 32, "move_%u", i + 1);
-		new_nameBlock += (unsigned int)sizeof("move_") + (unsigned int)log10(i + 1) + 1;
-
-		if (animNameOffsets.contains(source->anim_addr)) {
-			// Reuse name from previous animation
-			target->anim_name_addr = animNameOffsets[source->anim_addr];
-		}
-		else
-		{
-			animNameOffsets[source->anim_addr] = (unsigned long long)(new_nameBlock - new_nameBlock_start);
-			target->anim_name_addr = new_nameBlock - new_nameBlock_start;
-			sprintf_s(new_nameBlock, 32, "anim_%u", i + 1);
-			new_nameBlock += (unsigned int)sizeof("anim_") + (unsigned int)log10(i + 1) + 1;
-		}
-
+		target->name_addr = source->name_addr;
+		target->anim_name_addr = source->anim_name_addr;
 		target->anim_addr = source->anim_addr;
 		target->vuln = source->vuln;
 		target->hitlevel = source->hitlevel;
