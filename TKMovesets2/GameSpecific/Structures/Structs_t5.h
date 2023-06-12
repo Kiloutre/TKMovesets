@@ -452,9 +452,9 @@ namespace StructsT5
 		gameAddr32 character_creator_addr;
 		gameAddr32 date_addr;
 		gameAddr32 fulldate_addr;
-		uint16_t orig_aliases[72];
-		uint16_t current_aliases[72];
-		uint16_t unknown_aliases[36];
+		uint32_t orig_aliases[36];
+		uint32_t current_aliases[36];
+		uint16_t unknown_values[36];
 		MovesetTable table;
 		MotaList motas;
 	};

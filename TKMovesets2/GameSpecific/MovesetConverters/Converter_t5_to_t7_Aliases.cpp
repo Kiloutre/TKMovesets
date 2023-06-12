@@ -157,15 +157,6 @@ namespace T5_T7_Aliases
 		return value;
 	}
 
-	unsigned char GetCharacterIdAlias(unsigned char value)
-	{
-		if (value <= 18) return value;
-		if (19 <= value && value <= 31) return value - 1;
-		if (value <= 42) return value;
-		if (43 <= value && value <= 49) return value - 1;
-		return value - 2;
-	}
-
 	int ConvertMove0x98(int value)
 	{
 		// What the fuck?
@@ -178,14 +169,46 @@ namespace T5_T7_Aliases
 		return (value >> 7) | (tmp << 24);
 	}
 
-	void ApplyHitboxAlias(unsigned int& hitbox)
-	{
-		Byte* orig_hitbox_bytes = (Byte*)&hitbox;
+    uint32_t ConvertVoiceclip(uint16_t value)
+    {
+        // Converts 2 byte value into 4 byte equivalent
+        if (value == 0xFFFF) {
+            return 0xFFFFFFFF;
+        }
+        else if (0x0F00 <= value && value < 0x1000) {
+            // If in range of 0x0F00
+            return (value << 16) & 0xFF000000 | (value & 0x000000FF);
+        }
+        else {
+            //E.g; 0x2006 -> 0x0200006
+            return (value << 12) & 0xFF000000 | value & 0x000000FF;
+        }
+    }
 
-		for (unsigned int i = 0; i < 4; ++i)
-		{
-			Byte b = orig_hitbox_bytes[i];
-			orig_hitbox_bytes[i] = (b & 1) ? OddHitboxByte(b) : EvenHitboxByte(b);
-		}
-	}
+    uint64_t ApplyCancelCommandAlias(uint32_t command)
+    {
+        uint64_t t = 0;
+        uint64_t c = (uint64_t)command;
+
+        t = (c & 0x00FF0000) << 16;
+        t |= (c & 0xFF000000) << 33;
+        t |= (c & 0x0000FFFF);
+
+        switch (t)
+        {
+        case 0x8005:
+            // Group cancel
+            return 0x800b;
+        case 0x8006:
+            // Group cancel END
+            return 0x800c;
+        default:
+            c = t;
+            if (0x8013 <= t && t <= 0x81FF) {
+                // Input sequences
+                c += 6;
+            }
+            return c;
+       }
+    }
 };

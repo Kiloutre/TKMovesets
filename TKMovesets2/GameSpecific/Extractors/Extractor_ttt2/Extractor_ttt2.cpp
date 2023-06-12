@@ -333,8 +333,8 @@ void ExtractorTTT2::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* move
 		ByteswapHelpers::SWAP_INT16(&movesetHeader->current_aliases[i]);
 	}
 
-	for (unsigned int i = 0; i < _countof(movesetHeader->unknown_aliases); ++i) {
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_aliases[i]);
+	for (unsigned int i = 0; i < _countof(movesetHeader->unknown_values); ++i) {
+		ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_values[i]);
 	}
 
 	// Convert ptrs into offsets

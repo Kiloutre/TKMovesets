@@ -193,15 +193,6 @@ namespace T6_T7_Aliases
 		return value;
 	}
 
-	unsigned char GetCharacterIdAlias(unsigned char value)
-	{
-		if (value <= 18) return value;
-		if (19 <= value && value <= 31) return value - 1;
-		if (value <= 42) return value;
-		if (43 <= value && value <= 49) return value - 1;
-		return value - 2;
-	}
-
 	int ConvertMove0x98(int value)
 	{
 		// What the fuck?

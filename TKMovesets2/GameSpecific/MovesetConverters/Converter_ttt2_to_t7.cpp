@@ -111,7 +111,7 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 
 	memcpy(new_movesetInfo->orig_aliases, old_movesetInfo->orig_aliases, sizeof(new_movesetInfo->orig_aliases));
 	memcpy(new_movesetInfo->current_aliases, old_movesetInfo->current_aliases, sizeof(new_movesetInfo->current_aliases));
-	memcpy(new_movesetInfo->unknown_aliases, old_movesetInfo->unknown_aliases, sizeof(new_movesetInfo->unknown_aliases));
+	memcpy(new_movesetInfo->unknown_values, old_movesetInfo->unknown_values, sizeof(new_movesetInfo->unknown_values));
 
 	gAddr::MovesetTable& table = (gAddr::MovesetTable&)new_movesetInfo->table;
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->table.entries); ++i) {
@@ -154,8 +154,6 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 
 	auto propertyAliases = InitAliasDictionary();
 	Aliases::BuildAliasDictionary(propertyAliases);
-	unsigned int orig_character_id = header->characterId;
-	unsigned int new_character_id = TTT2_T7_Aliases::GetCharacterIdAlias(orig_character_id);
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)

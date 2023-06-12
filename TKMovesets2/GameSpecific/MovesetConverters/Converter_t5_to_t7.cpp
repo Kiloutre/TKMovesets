@@ -23,9 +23,10 @@ namespace T5_T7_Aliases
 {
 	Byte OddHitboxByte(Byte value);
 	Byte EvenHitboxByte(Byte value);
+	uint32_t ConvertVoiceclip(uint16_t value);
 	unsigned char GetCharacterIdAlias(unsigned char value);
 	int ConvertMove0x98(int value);
-	void ApplyHitboxAlias(unsigned int& hitbox);
+	uint64_t ApplyCancelCommandAlias(uint32_t command);
 };
 
 static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, uint64_t& size_out, TKMovesetHeaderBlocks& blocks_out)
@@ -109,9 +110,23 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	new_movesetInfo->date_addr = (char*)0 + old_movesetInfo->date_addr + sizeof(MovesetInfo) - sizeof(T5::MovesetInfo);
 	new_movesetInfo->fulldate_addr = (char*)0 + old_movesetInfo->fulldate_addr + sizeof(MovesetInfo) - sizeof(T5::MovesetInfo);
 
-	memcpy(new_movesetInfo->orig_aliases, old_movesetInfo->orig_aliases, sizeof(new_movesetInfo->orig_aliases));
-	memcpy(new_movesetInfo->current_aliases, old_movesetInfo->current_aliases, sizeof(new_movesetInfo->current_aliases));
-	memcpy(new_movesetInfo->unknown_aliases, old_movesetInfo->unknown_aliases, sizeof(new_movesetInfo->unknown_aliases));
+	for (size_t i = 0; i < _countof(new_movesetInfo->orig_aliases); ++i)
+	{
+		// T5 has less aliases
+		if (i < _countof(old_movesetInfo->orig_aliases))
+		{
+			new_movesetInfo->orig_aliases[i] = (uint16_t)old_movesetInfo->orig_aliases[i];
+			new_movesetInfo->current_aliases[i] = (uint16_t)old_movesetInfo->current_aliases[i];
+		}
+		else
+		{
+			// Fill the ones not provided by T5 with the default 32769 pos
+			new_movesetInfo->orig_aliases[i] = (uint16_t)old_movesetInfo->orig_aliases[0];
+			new_movesetInfo->current_aliases[i] = (uint16_t)old_movesetInfo->orig_aliases[0];
+		}
+	}
+
+	memcpy(new_movesetInfo->unknown_values, old_movesetInfo->unknown_values, sizeof(new_movesetInfo->unknown_values));
 
 
 	gAddr::MovesetTable& table = (gAddr::MovesetTable&)new_movesetInfo->table;
@@ -179,8 +194,6 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 
 	auto propertyAliases = InitAliasDictionary();
 	Aliases::BuildAliasDictionary(propertyAliases);
-	unsigned int orig_character_id = header->characterId;
-	unsigned int new_character_id = T5_T7_Aliases::GetCharacterIdAlias(orig_character_id);
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
@@ -304,7 +317,6 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
 		target->_0x98_int = T5_T7_Aliases::ConvertMove0x98(source->_0x98_int);
 		target->hitbox_location = source->hitbox_location;
-		T5_T7_Aliases::ApplyHitboxAlias(target->hitbox_location);
 		target->first_active_frame = source->first_active_frame;
 		target->last_active_frame = source->last_active_frame;
 		target->_0xA8_short = source->_0x6c_short;
@@ -316,8 +328,7 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i;
 		const T5::Cancel* source = (T5::Cancel*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.cancel) + i;
 
-		target->direction = source->direction;
-		target->button = source->button;
+		target->command = T5_T7_Aliases::ApplyCancelCommandAlias(source->command);
 
 		target->requirements_addr = source->requirements_addr;
 		target->extradata_addr = source->extradata_addr;
@@ -333,6 +344,7 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.groupCancel) + i;
 		const T5::Cancel* source = (T5::Cancel*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.groupCancel) + i;
 
+		target->command = T5_T7_Aliases::ApplyCancelCommandAlias(source->command);
 		target->direction = source->direction;
 		target->button = source->button;
 
@@ -361,7 +373,7 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		Voiceclip* target = (Voiceclip*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.voiceclip) + i;
 		const T5::Voiceclip* source = (T5::Voiceclip*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.voiceclip) + i;
 
-		target->id = source->id;
+		target->id = T5_T7_Aliases::ConvertVoiceclip(source->id);
 	}
 
 	for (unsigned int i = 0; i < table.extraMovePropertyCount; ++i)

@@ -23,7 +23,6 @@ namespace T6_T7_Aliases
 {
 	Byte OddHitboxByte(Byte value);
 	Byte EvenHitboxByte(Byte value);
-	unsigned char GetCharacterIdAlias(unsigned char value);
 	int ConvertMove0x98(int value);
 	void ApplyHitboxAlias(unsigned int& hitbox);
 };
@@ -129,7 +128,7 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 
 	memcpy(new_movesetInfo->orig_aliases, old_movesetInfo->orig_aliases, sizeof(new_movesetInfo->orig_aliases));
 	memcpy(new_movesetInfo->current_aliases, old_movesetInfo->current_aliases, sizeof(new_movesetInfo->current_aliases));
-	memcpy(new_movesetInfo->unknown_aliases, old_movesetInfo->unknown_aliases, sizeof(new_movesetInfo->unknown_aliases));
+	memcpy(new_movesetInfo->unknown_values, old_movesetInfo->unknown_values, sizeof(new_movesetInfo->unknown_values));
 
 
 	gAddr::MovesetTable& table = (gAddr::MovesetTable&)new_movesetInfo->table;
@@ -197,8 +196,6 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 
 	auto propertyAliases = InitAliasDictionary();
 	Aliases::BuildAliasDictionary(propertyAliases);
-	unsigned int orig_character_id = header->characterId;
-	unsigned int new_character_id = T6_T7_Aliases::GetCharacterIdAlias(orig_character_id);
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
