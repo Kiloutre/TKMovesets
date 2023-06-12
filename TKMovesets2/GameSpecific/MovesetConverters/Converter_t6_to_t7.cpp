@@ -240,6 +240,7 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		target->crouch_block_moveid = source->crouch_block_moveid;
 		target->wallslump_moveid = source->wallslump_moveid;
 		target->downed_moveid = source->downed_moveid;
+		target->_0x6c = 0;
 	}
 
 	for (unsigned int i = 0; i < table.pushbackExtradataCount; ++i)

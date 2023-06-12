@@ -96,11 +96,11 @@ namespace StructsT5
 			};
 		};
 		gameAddr32 requirements_addr;
+		uint32_t move_id;
 		gameAddr32 extradata_addr;
 		uint16_t detection_start;
 		uint16_t detection_end;
 		uint16_t starting_frame;
-		uint16_t move_id;
 		uint16_t cancel_option;
 	};
 

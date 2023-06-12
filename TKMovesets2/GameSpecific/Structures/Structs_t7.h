@@ -722,6 +722,11 @@ namespace StructsT7_gameAddr
 			};
 			uint16_t moveids[16];
 		};
+
+		// Some unused and unaccessed 4 bytes
+		// Probably there because of C structure padding
+		// Constantly at 0
+		unsigned int _0x6c;
 	};
 
 	struct HitCondition
