@@ -139,34 +139,10 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 
 namespace T5_T7_Aliases
 {
-	Byte OddHitboxByte(Byte value)
-	{
-		auto item = cg_odd_hitbox_aliases.find(value);
-		if (item != cg_odd_hitbox_aliases.end()) {
-			return item->second;
-		}
-		return value;
-	}
-
-	Byte EvenHitboxByte(Byte value)
-	{
-		auto item = cg_even_hitbox_aliases.find(value);
-		if (item != cg_even_hitbox_aliases.end()) {
-			return item->second;
-		}
-		return value;
-	}
-
 	int ConvertMove0x98(int value)
 	{
-		// What the fuck?
-		int tmp = 0;
-		for (unsigned int i = 0; i < 7; ++i)
-		{
-			int bitVal = (value & (1 << i)) != 0;
-			tmp |= bitVal << (7 - i);
-		}
-		return (value >> 7) | (tmp << 24);
+        if (value == 0x20000000) return 0x04000000;
+        return value;
 	}
 
     uint32_t ConvertVoiceclip(uint16_t value)
@@ -185,7 +161,7 @@ namespace T5_T7_Aliases
         }
     }
 
-    uint64_t ApplyCancelCommandAlias(uint32_t command)
+    uint64_t ConvertCommand(uint32_t command)
     {
         uint64_t t = 0;
         uint64_t c = (uint64_t)command;

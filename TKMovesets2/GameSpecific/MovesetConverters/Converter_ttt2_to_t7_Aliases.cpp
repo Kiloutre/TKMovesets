@@ -592,12 +592,13 @@ namespace TTT2_T7_Aliases
 
 	int ConvertMove0x98(int value)
 	{
-		// What the fuck?
+		// Bit reversal except on the last bit
 		int tmp = 0;
 		for (unsigned int i = 0; i < 7; ++i)
 		{
-			int bitVal = (value & (1 << i)) != 0;
-			tmp |= bitVal << (7 - i);
+			if ((value & (1 << i)) != 0) {
+				tmp |= 1 << (7 - i);
+			}
 		}
 		return (value >> 7) | (tmp << 24);
 	}

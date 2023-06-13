@@ -181,8 +181,8 @@ namespace StructsT5
 
 	struct InputSequence
 	{
-		int8_t _0x0_int8; // Apparently unused
 		uint8_t input_window_frames; // I assume the max amount of frames between the first &last input
+		int8_t _0x0_int8; // Apparently unused
 		uint16_t input_amount; // The amount of input to read from input_addr
 		gameAddr32 input_addr;
 	};

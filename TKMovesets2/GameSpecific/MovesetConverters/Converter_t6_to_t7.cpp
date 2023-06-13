@@ -21,8 +21,6 @@ using namespace T7ImportUtils;
 
 namespace T6_T7_Aliases
 {
-	Byte OddHitboxByte(Byte value);
-	Byte EvenHitboxByte(Byte value);
 	int ConvertMove0x98(int value);
 	void ApplyHitboxAlias(unsigned int& hitbox);
 };
@@ -401,11 +399,15 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		ExtraMoveProperty* target = (ExtraMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.extraMoveProperty) + i;
 		const T6::ExtraMoveProperty* source = (T6::ExtraMoveProperty*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.extraMoveProperty) + i;
 
+		memset(target, 0, sizeof(*target));
+		// Void out extra properties to avoid crashes
+		/*
 		target->starting_frame = source->starting_frame;
 		target->id = source->id;
 		target->value_unsigned = source->value_unsigned;
 
 		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned, propertyAliases);
+		*/
 	}
 
 	for (unsigned int i = 0; i < table.inputCount; ++i)
@@ -463,11 +465,15 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveBeginningProp) + i;
 		const T6::OtherMoveProperty* source = (T6::OtherMoveProperty*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveBeginningProp) + i;
 
+		memset(target, 0, sizeof(*target));
+		// Void out extra properties to avoid crashes
+		/*
 		target->requirements_addr = source->requirements_addr;
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
 		Aliases::ApplyPropertyAlias(target->extraprop, target->value, propertyAliases);
+		*/
 	}
 
 	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
@@ -475,11 +481,15 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		gAddr::OtherMoveProperty* target = (gAddr::OtherMoveProperty*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.moveEndingProp) + i;
 		const T6::OtherMoveProperty* source = (T6::OtherMoveProperty*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.moveEndingProp) + i;
 
+		memset(target, 0, sizeof(*target));
+		// Void out extra properties to avoid crashes
+		/*
 		target->requirements_addr = source->requirements_addr;
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
 		Aliases::ApplyPropertyAlias(target->extraprop, target->value, propertyAliases);
+		*/
 	}
 
 
