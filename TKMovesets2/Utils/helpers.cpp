@@ -326,15 +326,57 @@ namespace Helpers
 		}
 	}
 
-	bool remoteVersionGreater(const char* otherVersion)
-	{
-		return VersionGreater(PROGRAM_VERSION, otherVersion);
-	}
-
 	bool VersionGreater(const char* version1, const char* version2)
 	{
-		const char* currentVersion = PROGRAM_VERSION;
-		return strcmp(version1, version2) < 0;
+		while (*version1 && *version2)
+		{
+			int number1 = -1;
+			int number2 = -1;
+
+			if (isdigit((unsigned char)*version1)) {
+				number1 = atoi(version1);
+				while (isdigit((unsigned char)*version1)) ++version1;
+			}
+
+			if (isdigit((unsigned char)*version2)) {
+				number2 = atoi(version2);
+				while (isdigit((unsigned char)*version2)) ++version2;
+
+			}
+
+			if (number1 != -1 && number2 != -1)
+			{
+				// Both are numbers
+				if (number1 != number2) {
+					// Numbers are different, return the true if v1 is greater
+					return number1 > number2;
+				}
+			}
+			else if (number1 != -1)
+			{
+				// Only string 1 is a number, making it greater
+				return true;
+			}
+			else if (number2 != -1)
+			{
+				// Only string 2 is a number, making it greater than v1
+				return false;
+			}
+			else
+			{
+				// Neither are numbers
+				if (*version1 != *version2) {
+					// Different characters, return true if v1 is greater in the ascii table
+					return *version1 > *version2;
+				}
+
+				// Pass to the next characters if we haven't already reached the end 
+				if (*version1) ++version1;
+				if (*version2) ++version2;
+			}
+
+		}
+		return *version1 > *version2;
 	}
 
 

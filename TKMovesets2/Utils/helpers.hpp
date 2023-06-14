@@ -252,9 +252,6 @@ namespace Helpers
     // Create a table required for the crc32 generation
     void crc32_generate_table(uint32_t(&table)[256]);
 
-	// Compares the version of the current program to the given one. Used for updating purposes
-	bool remoteVersionGreater(const char* otherVersion);
-
 	// Returns true if version1 is greater than version2
 	bool VersionGreater(const char* version1, const char* version2);
 

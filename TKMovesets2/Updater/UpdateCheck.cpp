@@ -103,7 +103,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 		updateStatus->changelog = changelogLines;
 	}
 
-	if (!Helpers::remoteVersionGreater(tagName.c_str())) {
+	if (!Helpers::VersionGreater(tagName.c_str(), PROGRAM_VERSION)) {
 		return false;
 	}
 
