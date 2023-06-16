@@ -7,6 +7,7 @@
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "MovesetConverters/MovesetFileConverter.hpp"
+#include "AnimExtractors/AnimExtractors.hpp"
 
 // -- Static helpers -- //
 
@@ -135,9 +136,36 @@ void Submenu_Edition::RenderConversionPopup()
 
 }
 
+void Submenu_Edition::ExtractAllAnimations(std::vector<movesetInfo> movesets)
+{
+	DEBUG_LOG("Extracting all animations...\n");
+	AnimExtractor::ExtractAnimations(movesets);
+	m_extracting_animations = false;
+}
+
 movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 {
 	ImGuiExtra::RenderTextbox(_("edition.explanation"));
+
+	ImGui::SeparatorText(_("edition.tools"));
+	{
+		// Extract all movesets
+		if (ImGuiExtra::RenderButtonEnabled(_("edition.extract_all_animations"), !m_extracting_animations)) {
+			std::vector<movesetInfo> movesets;
+			for (auto& item : storage.extractedMovesets) {
+				movesets.push_back(*item);
+			}
+
+			if (m_started_animation_extraction) {
+				m_animation_extraction_thread.join();
+			}
+			m_started_animation_extraction = true;
+			m_extracting_animations = true;
+			m_animation_extraction_thread = std::thread(&Submenu_Edition::ExtractAllAnimations, this, movesets);
+		}
+	}
+
+
 	ImGui::SeparatorText(_("edition.select_moveset"));
 
 	movesetInfo* movesetToLoad = nullptr;
@@ -258,4 +286,11 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	}
 
 	return movesetToLoad;
+}
+
+Submenu_Edition::~Submenu_Edition()
+{
+	if (m_started_animation_extraction) {
+		m_animation_extraction_thread.join();
+	}
 }

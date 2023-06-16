@@ -118,6 +118,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Online/Online.cpp"
                     "GameSpecific/MovesetConverters/Aliases.cpp"
                     "GameSpecific/MovesetConverters/MovesetFileConverter.cpp"
+                    "GameSpecific/AnimExtractors/AnimExtractors.cpp"
                     
                     # Game-specific
                     ## T7
@@ -168,6 +169,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Extractors/Extractor_ttt2/Extractor_ttt2.cpp"
                     "GameSpecific/MovesetConverters/Converter_ttt2_to_t7.cpp"
                     "GameSpecific/MovesetConverters/Converter_ttt2_to_t7_Aliases.cpp"
+                    "GameSpecific/AnimExtractors/AnimExtractor_ttt2.cpp"
 
                     # TREV
                     "GameSpecific/MovesetConverters/Converter_trev_to_t7_Aliases.cpp"
@@ -176,6 +178,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Extractors/Extractor_t6/Extractor_t6.cpp"
                     "GameSpecific/MovesetConverters/Converter_t6_to_t7.cpp"
                     "GameSpecific/MovesetConverters/Converter_t6_to_t7_Aliases.cpp"
+                    "GameSpecific/AnimExtractors/AnimExtractor_t6.cpp"
 
                     # T5
                     "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"

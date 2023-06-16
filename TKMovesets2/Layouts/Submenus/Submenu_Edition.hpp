@@ -2,6 +2,7 @@
 
 #include "GameImport.hpp"
 #include "LocalStorage.hpp"
+#include <thread>
 
 enum RenameErrcode_
 {
@@ -25,11 +26,21 @@ private:
 	char m_newName[FILENAME_MAX];
 	// Moveset to rename/convert in the popups
 	movesetInfo m_actionTarget;
+	// True if the thread to extract animations has been started in the past
+	bool m_started_animation_extraction = false;
+	// Thread to extract animation
+	std::thread m_animation_extraction_thread;
+	// True if an animation extraction is currently ongoing
+	bool m_extracting_animations = false;
 
+	// Extract all animations in a thread
+	void ExtractAllAnimations(std::vector<movesetInfo> movesets);
 	// Render the popup used for moveset renaming
 	void RenderRenamePopup();
 	// Render the popup used for moveset conversion
 	void RenderConversionPopup();
 public:
 	movesetInfo* Render(LocalStorage& storage);
+
+	~Submenu_Edition();
 };

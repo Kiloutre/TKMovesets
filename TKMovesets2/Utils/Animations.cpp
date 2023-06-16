@@ -225,9 +225,9 @@ namespace TAnimUtils
 			switch (animType)
 			{
 			case 0x64:
-				return GetC8AnimDuration(anim);
-			case 0xC8:
 				return Get64AnimDuration(anim);
+			case 0xC8:
+				return GetC8AnimDuration(anim);
 			}
 
 			DEBUG_ERR("Bad animation type: First four bytes 0x%X", READ(anim, uint32_t));
@@ -254,15 +254,14 @@ namespace TAnimUtils
 		{
 			bool isSwapped = !IsLittleEndian(anim);
 
-			uint64_t boneCount = READ(anim + 2, uint16_t);
+			uint16_t boneCount = READ(anim + 2, uint16_t);
 			if (isSwapped) {
 				boneCount = BYTESWAP_INT16(boneCount);
 			}
 
-			uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
-			const Byte* anim_postBoneDescriptorAddr = anim + postBoneDescriptor_offset;
+			uint16_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
 
-			uint16_t animLength = READ(anim_postBoneDescriptorAddr, uint16_t);
+			uint16_t animLength = READ(anim + postBoneDescriptor_offset, uint16_t);
 			if (isSwapped) {
 				animLength = BYTESWAP_INT16(animLength);
 			}
