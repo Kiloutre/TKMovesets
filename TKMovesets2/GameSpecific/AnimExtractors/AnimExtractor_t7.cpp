@@ -28,7 +28,6 @@ void ExtractAnimation(const char* name, const Byte* anim, const std::wstring& ou
 void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolder, std::ofstream& outputFile)
 {
 	const TKMovesetHeader& header = *(TKMovesetHeader*)moveset;
-
 	const TKMovesetHeaderBlocks& blocks = *(TKMovesetHeaderBlocks*)(moveset + header.block_list);
 
 	MovesetInfo& moveset_info = *(MovesetInfo*)blocks.GetBlock(TKMovesetHeaderBlocks_MovesetInfo, moveset);
@@ -36,7 +35,6 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 	auto moveset_block = blocks.GetBlock(TKMovesetHeaderBlocks_Moveset, moveset);
 	auto animation_block = blocks.GetBlock(TKMovesetHeaderBlocks_Animation, moveset);
 	auto mota_block = blocks.GetBlock(TKMovesetHeaderBlocks_Mota, moveset);
-
 
 	Move* movelist = (Move*)(moveset_block + (uint64_t)moveset_info.table.move);
 

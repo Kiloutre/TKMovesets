@@ -996,7 +996,7 @@ std::string ExtractorTTT2::GetPlayerCharacterName(gameAddr playerAddress)
 	}
 
 	char characterName[32];
-	m_process->readBytes(movesetAddr + 0x20C, characterName, sizeof(characterName));
+	m_game->ReadBytes(movesetAddr + 0x20C, characterName, sizeof(characterName));
 	characterName[sizeof(characterName) - 1] = '\0';
 
 	auto name_len = strlen(characterName);
