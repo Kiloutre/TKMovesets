@@ -111,7 +111,7 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 	for (size_t i = 0; i < _countof(new_movesetInfo->orig_aliases); ++i)
 	{
 		// T5 has less aliases
-		if (i < _countof(old_movesetInfo->orig_aliases))
+		if (i < _countof(old_movesetInfo->current_aliases))
 		{
 			new_movesetInfo->orig_aliases[i] = (uint16_t)old_movesetInfo->orig_aliases[i];
 			new_movesetInfo->current_aliases[i] = (uint16_t)old_movesetInfo->current_aliases[i];
@@ -343,8 +343,6 @@ bool MovesetConverter::T5ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		const T5::Cancel* source = (T5::Cancel*)(old_blocks->GetBlock(T5::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.groupCancel) + i;
 
 		target->command = T5_T7_Aliases::ConvertCommand(source->command);
-		target->direction = source->direction;
-		target->button = source->button;
 
 		target->requirements_addr = source->requirements_addr;
 		target->extradata_addr = source->extradata_addr;
