@@ -830,44 +830,53 @@ std::string ExtractorT7::GetPlayerCharacterName(gameAddr playerAddress)
 {
 	gameAddr movesetAddr = m_process->readInt64(playerAddress + m_game->GetValue("motbin_offset"));
 
-	std::string characterName;
 	if (movesetAddr == 0) {
+		return "";
+	}
+
+	char characterName[32];
+	m_process->readBytes(movesetAddr + 0x2E8, characterName, sizeof(characterName));
+	characterName[sizeof(characterName) - 1] = '\0';
+
+	auto name_len = strlen(characterName);
+
+	if (name_len == 0) {
+		return "";
+	}
+
+	char* character_name_cursor = characterName;
+
+	// Turn name into something more readable. '[CHARACTER_NAME.s]' becomes 'Character Name.S'
+	if (*character_name_cursor == '[') {
+		++character_name_cursor;
+	}
+
+	if (characterName[name_len - 1] == ']') {
+		characterName[name_len - 1] = '\0';
+		--name_len;
+	}
+
+	if (name_len == 1) {
 		return characterName;
 	}
 
+	bool isWordStart = true;
+	for (size_t i = 0; i < character_name_cursor[i]; ++i)
 	{
-		char buf[32]{ 0 };
-		m_process->readBytes(movesetAddr + 0x2E8, buf, 31);
-		characterName = std::string(buf);
-	}
-
-	if (characterName.size() == 0) {
-		return std::string();
-	}
-
-	// Turn name into something more readable. '[CHARACTER_NAME.s]' becomes 'Character Name.S'
-	if (characterName.front() == '[') {
-		characterName.erase(0, 1);
-	}
-	if (characterName.back() == ']') {
-		characterName.erase(characterName.size() - 1);
-	}
-
-	std::replace(characterName.begin(), characterName.end(), '_', ' ');
-	{
-		bool isWordStart = true;
-		for (size_t i = 0; i < characterName.size(); ++i)
-		{
-			// Have to pass an unsigned char or this will throw when an invalid character is found
-			if (!isprint((unsigned char)characterName[i])) {
-				characterName[i] = ' ';
-			} else if (isalpha((unsigned char)characterName[i])) {
-				characterName[i] = isWordStart ? toupper(characterName[i]) : tolower(characterName[i]);
-			}
-			isWordStart = strchr(" -.:", characterName[i]) != nullptr;
+		// Have to pass an unsigned char or this will throw when an invalid character is found
+		if (!isprint((unsigned char)character_name_cursor[i])) {
+			character_name_cursor[i] = ' ';
+		} else if (isalpha((unsigned char)character_name_cursor[i])) {
+			character_name_cursor[i] = isWordStart ? toupper(character_name_cursor[i]) : tolower(character_name_cursor[i]);
 		}
+		else if (character_name_cursor[i] == '_') {
+			character_name_cursor[i] = ' ';
+		}
+
+		isWordStart = strchr(" -.:", character_name_cursor[i]) != nullptr;
 	}
-	return characterName;
+
+	return character_name_cursor;
 }
 
 uint32_t ExtractorT7::GetCharacterID(gameAddr playerAddress)

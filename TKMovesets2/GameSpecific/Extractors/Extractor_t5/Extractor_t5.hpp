@@ -31,6 +31,43 @@ private:
 	Byte* CopyAnimations(const StructsT5::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets);
 	// Copies the moveset info block (aliases, couple strings)
 	void CopyMovesetInfoBlock(gameAddr movesetAddr, StructsT5::MovesetInfo* movesetHeader);
+	// Map containing the game character names to legible character names
+    std::map<std::string, std::string> m_characterNamesMap = {
+        { "\x95""\x97""\x8a""\xd4"" \x90""m", "Jin" },
+        { "BAEK DOO SAN", "Baek Doo San" },
+        { "[\x83""G\x83""f\x83""B\x81""E\x83""S\x83""\x8b""\x83""h\x81""[]", "Eddy" },
+        { "[DEVIL JIN]", "Devil Jin" },
+        { "[\x8d""\x95""\x90""l\x94""E\x8e""\xd2""]", "Raven" },
+        { "[ \x94""\xf2""\x92""\xb9"" ]", "Asuka" },
+        { "[\x91""\xbe""\x8b""\xc9""\x8c""\x9d""]", "Feng" },
+        { "[\x8c""\xb5""\x97""\xb3""]", "Ganryu" },
+        { "[ \x89""\xa4"" \x96""\xb8""\x97""\x8b"" ]", "Wang" },
+        { "[\x83""A\x83""}\x83""L\x83""\x93""]", "Armor King" },
+        { "[\x93""S\x8c""\x9d""5\x83""{\x83""X]", "Jinpachi" },
+        { "[ VALE-TUDO ]", "Marduk" },
+        { "[ANNA]", "Anna" },
+        { "[ \x83""\x8d""\x83""E ]", "Law" },
+        { "[\x89""\xd4""\x98""Y]", "Hwoarang" },
+        { "[\x83""L\x83""\x93""\x83""O]", "King" },
+        { "[EMILIE]", "Emilie" },
+        { "[\x90""V\x83""L\x83""\x83""\x83""\x89""(\x91""\xe5""\x8d""\xb2"")]", "Dragunov" },
+        { "\x8e""O\x93""\x87"" \x95""\xbd""\x94""\xaa", "Heihachi" },
+        { "[\x83""N\x83""\x8a""\x83""X\x83""e\x83""B]", "Christie" },
+        { "[\x83""|\x81""[\x83""\x8b""]", "Paul" },
+        { "[\x83""W\x83""\x83""\x83""b\x83""N\x82""T]", "Jack-5" },
+        { "\x83""u\x83""\x8b""\x81""[\x83""X", "Bruce" },
+        { "[\x83""\x8d""\x83""W\x83""\x83""\x81""[]", "Roger Jr." },
+        { "[ \x97""\x8b"" \x95""\x90""\x97""\xb4"" ]", "Lei Wulong" },
+        { "[\x83""j\x81""[\x83""i]", "Nina" },
+        { "\x83""{\x83""N\x83""T\x81""[", "Steve Fox" },
+        { "[ \x8e""O\x93""\x87"" \x88""\xea""\x94""\xaa"" ]", "Kazuya" },
+        { "\x97""\xbd"" \x8b""\xc5""\x89""J", "Xiaoyu" },
+        { "[ \x97""\x9b"" \x92""\xb4""\x98""T ]", "Lee" },
+        { "[ \x83""W\x83""\x85""\x83""\x8a""\x83""A ]", "Julia" },
+        { "\x8b""g\x8c""\xf5", "Yoshimitsu" },
+        { "\x83""u\x83""\x89""\x83""C\x83""A\x83""\x93""", "Bryan" },
+        { "[\x83""N\x83""}]", "Panda" }
+    };
 
 	/// Helpers
 
