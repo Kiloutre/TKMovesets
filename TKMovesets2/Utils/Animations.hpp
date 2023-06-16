@@ -18,7 +18,21 @@ namespace TAnimUtils
 		// Byteswaps an animation (little endian <-> big endian)
 		void ByteswapAnimation(Byte* animAddr);
 		// Returns true if an animation is in little endian
-		bool IsLittleEndian(Byte* animAddr);
+		inline bool IsLittleEndian(const Byte* animAddr);
+		
+		// Returns an animation's duration in frames (60 per sec)
+		uint32_t GetAnimDuration(const Byte* anim);
+		// Returns a 0xC8 animation's duration in frames (60 per sec)
+		uint32_t GetC8AnimDuration(const Byte* anim);
+		// Returns a 0x64 animation's duration in frames (60 per sec)
+		uint32_t Get64AnimDuration(const Byte* anim);
+
+		// Returns the size in bytes of an animation
+		uint64_t GetAnimSize(const Byte* anim);
+		// Returns the size in bytes of a 0xC8 animation
+		uint64_t getC8AnimSize(const Byte* anim);
+		// Returns the size in bytes of a 0x64 animation
+		uint64_t get64AnimSize(const Byte* anim);
 
 		// Parse a specific frame of animation data, filling the float buffer with the appropriate values
 		// Returns the amount of bones the animation contains which you may use to read the pos_out buffer (bone_count * 3 * float)

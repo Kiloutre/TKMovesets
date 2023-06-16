@@ -34,7 +34,7 @@ void TEditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 		};
 		value_uint64 = EditorUtils::GetFieldValue(field);
 
-		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%d", value_uint32);
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", value_uint32);
 		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
 		sprintf_s(fields["value_float"]->buffer, bufsize, "%.7g", value_float);
 	}
@@ -49,7 +49,7 @@ void TEditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 		value_uint64 = EditorUtils::GetFieldValue(field);
 
 		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", value_int32);
-		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "0x%X", value_uint32);
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "0u", value_uint32);
 		sprintf_s(fields["value_float"]->buffer, bufsize, "%.7g", value_float);
 	}
 	else if (name == "value_float")
@@ -62,8 +62,8 @@ void TEditorExtraproperties::OnUpdate(int listIdx, EditorInput* field)
 		};
 		value_uint64 = EditorUtils::GetFieldValue(field);
 
-		sprintf_s(fields["value_signed"]->buffer, bufsize, "0x%X", value_int32);
-		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%d", value_uint32);
+		sprintf_s(fields["value_signed"]->buffer, bufsize, "%d", value_int32);
+		sprintf_s(fields["value_unsigned"]->buffer, bufsize, "%u", value_uint32);
 		sprintf_s(fields["value_hex"]->buffer, bufsize, "0x%X", value_uint32);
 	}
 

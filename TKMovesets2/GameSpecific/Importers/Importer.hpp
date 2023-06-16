@@ -38,6 +38,7 @@ enum ImportationErrcode_
 	ImportationErrcode_FileReadErr,
 	ImportationErrcode_DecompressionError,
 	ImportationErrcode_UnsupportedGameVersion,
+	ImportationErrcode_MovesetDataError,
 };
 
 // Base class for extracting from a game

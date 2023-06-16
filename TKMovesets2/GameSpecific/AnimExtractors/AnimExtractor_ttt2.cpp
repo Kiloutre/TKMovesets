@@ -4,7 +4,7 @@
 
 using namespace StructsTTT2;
 
-void AnimExtractor::_FromTTT2(const movesetInfo& moveset_info)
+void AnimExtractor::_FromTTT2(const Byte* moveset, const std::wstring& outputFolder, std::ofstream& outputFile)
 {
 	// todo
 }

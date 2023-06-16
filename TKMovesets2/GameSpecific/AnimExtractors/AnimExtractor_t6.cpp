@@ -4,7 +4,7 @@
 
 using namespace StructsT6;
 
-void AnimExtractor::_FromT6(const movesetInfo& moveset_info)
+void AnimExtractor::_FromT6(const Byte* moveset, const std::wstring& outputFolder, std::ofstream& outputFile)
 {
 	// todo
 }

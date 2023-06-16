@@ -1,23 +1,10 @@
 #include "Importer.hpp"
 #include "Compression.hpp"
+#include "Helpers.hpp"
 
 #include "MovesetStructs.h"
 
 // -- Static helpers -- //
-
-// Reads the the moveset size, allocate the moveset in our own memory and write to it
-static Byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
-{
-	file.seekg(0, std::ios::end);
-	size_out = file.tellg();
-	Byte* moveset = (Byte*)malloc(size_out);
-	if (moveset != nullptr) {
-		file.seekg(0, std::ios::beg);
-		file.read((char*)moveset, size_out);
-	}
-	file.close();
-	return moveset;
-}
 
 // -- Public -- //
 
@@ -28,22 +15,17 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 
 	DEBUG_LOG("Loading file '%S'\n", filename);
 	progress = 5;
-	std::ifstream file(filename, std::ios::binary);
-
-	if (file.fail()) {
-		return ImportationErrcode_FileReadErr;
-	}
 
 	// Variables that will store the moveset size & the moveset itself in our own memory
 	uint64_t s_moveset;
 	Byte* moveset;
 ;
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
-	moveset = getMovesetInfos(file, s_moveset);
-	progress = 10;
+	moveset = Helpers::ReadMovesetFile(filename, s_moveset);
 	if (moveset == nullptr) {
-		return ImportationErrcode_AllocationErr;
+		return ImportationErrcode_FileReadErr;
 	}
+	progress = 10;
 
 	ImportationErrcode_ errcode = _Import(moveset, s_moveset, playerAddress, settings, progress);
 
@@ -53,6 +35,10 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 
 ImportationErrcode_ Importer::Import(const Byte* orig_moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
+	if (s_moveset < sizeof(TKMovesetHeader*) || !((TKMovesetHeader*)orig_moveset)->ValidateHeader()) {
+		return ImportationErrcode_MovesetDataError;
+	}
+
 	Byte* moveset = (Byte*)malloc(s_moveset);
 	progress = 5;
 	if (moveset == nullptr) {

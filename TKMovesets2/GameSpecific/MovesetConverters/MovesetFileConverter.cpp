@@ -36,20 +36,6 @@ static void CopyHeader(TKMovesetHeader* dest, const TKMovesetHeader* src)
 	dest->game_specific_flags = src->GetGameSpecificFlags();
 }
 
-// Reads the the moveset size, allocate the moveset in our own memory and write to it
-static Byte* getMovesetInfos(std::ifstream& file, uint64_t& size_out)
-{
-	file.seekg(0, std::ios::end);
-	size_out = file.tellg();
-	Byte* moveset = (Byte*)malloc(size_out);
-	if (moveset != nullptr) {
-		file.seekg(0, std::ios::beg);
-		file.read((char*)moveset, size_out);
-	}
-	file.close();
-	return moveset;
-}
-
 // -- -- //
 
 static std::wstring GenerateNewName(const std::wstring& currentName, const wchar_t* oldPrefix, const wchar_t* newPrefix, const wchar_t* newSuffix)
@@ -431,20 +417,13 @@ void ConvertMoveset(const movesetInfo& mInfo, GameId_ targetGameId)
 {
 	DEBUG_LOG("ConvertMoveset '%S' - Game ID %u -> %u\n", mInfo.filename.c_str(), mInfo.gameId, targetGameId);
 
-	// Read moveset data
-	std::ifstream file(mInfo.filename, std::ios::binary);
-	if (file.fail()) {
-		DEBUG_ERR("Failed to open file for moveset conversion.");
-		return;
-	}
-
 	uint64_t s_moveset;
-	Byte* orig_moveset = getMovesetInfos(file, s_moveset);
+	Byte* orig_moveset = Helpers::ReadMovesetFile(mInfo.filename, s_moveset);
 	Byte* moveset;
 	TKMovesetHeader* header = (TKMovesetHeader*)orig_moveset;
 
 	if (orig_moveset == nullptr) {
-		DEBUG_ERR("Failed to parse moveset data");
+		DEBUG_ERR("Failed to read moveset data");
 		return;
 	}
 

@@ -5,6 +5,8 @@
 
 #include "constants.h"
 
+# define READ(addr, type) *(type*)(addr)
+
 using namespace ByteswapHelpers;
 
 namespace TAnimUtils
@@ -209,9 +211,147 @@ namespace TAnimUtils
 			}
 		}
 
-		bool IsLittleEndian(Byte* animAddr)
+		inline bool IsLittleEndian(const Byte* animAddr)
 		{
 			return animAddr[1] == 0;
+		}
+
+
+		uint32_t GetAnimDuration(const Byte* anim)
+		{
+			Byte animType = *anim;
+			if (animType == 0) animType = *(anim + 1);
+
+			switch (animType)
+			{
+			case 0x64:
+				return GetC8AnimDuration(anim);
+			case 0xC8:
+				return Get64AnimDuration(anim);
+			}
+
+			DEBUG_ERR("Bad animation type: First four bytes 0x%X", READ(anim, uint32_t));
+			return 0;
+		}
+
+
+		uint32_t GetC8AnimDuration(const Byte* anim)
+		{
+			bool isSwapped = !IsLittleEndian(anim);
+
+			uint8_t bone_count = *(anim + (isSwapped ? 3 : 2));
+
+			uint32_t length = READ(anim + 4, uint32_t);
+			if (isSwapped) {
+				length = BYTESWAP_INT32(length);
+			}
+
+			return length;
+		}
+
+
+		uint32_t Get64AnimDuration(const Byte* anim)
+		{
+			bool isSwapped = !IsLittleEndian(anim);
+
+			uint64_t boneCount = READ(anim + 2, uint16_t);
+			if (isSwapped) {
+				boneCount = BYTESWAP_INT16(boneCount);
+			}
+
+			uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+			const Byte* anim_postBoneDescriptorAddr = anim + postBoneDescriptor_offset;
+
+			uint16_t animLength = READ(anim_postBoneDescriptorAddr, uint16_t);
+			if (isSwapped) {
+				animLength = BYTESWAP_INT16(animLength);
+			}
+
+			return animLength;
+		}
+
+
+		uint64_t GetAnimSize(const Byte* anim)
+		{
+			Byte animType = *anim;
+			if (animType == 0) animType = *(anim + 1);
+
+			switch (animType)
+			{
+			case 0x64:
+				return get64AnimSize(anim);
+			case 0xC8:
+				return getC8AnimSize(anim);
+			}
+
+			DEBUG_ERR("Bad animation type: First four bytes 0x%X", READ(anim, uint32_t));
+			return 0;
+		}
+
+
+		uint64_t getC8AnimSize(const Byte* anim)
+		{
+			bool isSwapped = !IsLittleEndian(anim);
+
+			uint8_t bone_count = *(anim + (isSwapped ? 3 : 2));
+			uint32_t header_size = bone_count * 0x4 + 0x8;
+			uint32_t frame_size = bone_count * 0x4 * 3;
+
+			uint32_t length = READ(anim + 4, uint32_t);
+			if (isSwapped) {
+				length = BYTESWAP_INT32(length);
+			}
+
+			return (int64_t)header_size + (int64_t)frame_size * (int64_t)length;
+		}
+
+
+		uint64_t get64AnimSize(const Byte* anim)
+		{
+			bool isSwapped = *anim == 0;
+			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
+			uint64_t boneCount = READ(anim + 2, uint16_t);
+			if (isSwapped) {
+				boneCount = BYTESWAP_INT16(boneCount);
+			}
+
+			uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+			const Byte* anim_postBoneDescriptorAddr = anim + postBoneDescriptor_offset;
+
+			uint64_t animLength = READ(anim_postBoneDescriptorAddr, uint16_t);
+			uint64_t __unknown__ = READ(anim_postBoneDescriptorAddr + 4, uint16_t);
+			if (isSwapped) {
+				animLength = BYTESWAP_INT16(animLength);
+				__unknown__ = BYTESWAP_INT16(__unknown__);
+			}
+
+			uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+			uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+			const Byte* animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+			unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+			unsigned int keyframe = baseFrame / 16;
+			unsigned int _v56_intPtr = READ(animPtr + 4 * (uint64_t)keyframe, unsigned int);
+			if (isSwapped) {
+				_v56_intPtr = BYTESWAP_INT32(_v56_intPtr);
+			}
+
+			const Byte* animPtr_2 = animPtr + _v56_intPtr;
+			int lastArg_copy = (int)boneCount;
+
+			do
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					Byte v58 = *animPtr_2;
+					int offsetStep = v58 / 4;
+					animPtr_2 += offsetStep;
+				}
+			} while (--lastArg_copy != 0);
+
+			return (uint64_t)animPtr_2 - (uint64_t)anim;
 		}
 	};
 

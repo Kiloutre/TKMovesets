@@ -42,6 +42,11 @@ namespace StructsT6
 			return moveset + blocks[(unsigned int)block];
 		}
 
+		const Byte* GetBlock(TKMovesetHeaderBlocks_ block, const Byte* moveset) const
+		{
+			return moveset + blocks[(unsigned int)block];
+		}
+
 		uint64_t GetBlockSize(TKMovesetHeaderBlocks_ block, uint64_t s_moveset = 0) const
 		{
 			unsigned int b = (unsigned int)block;

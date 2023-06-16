@@ -258,4 +258,7 @@ namespace Helpers
 	// Compares a memory area with a memory string such as '00 F7 E1 45 0? 45 ?? ?? 89'
 	bool compare_memory_string(void* address, const char* bytesString);
 	unsigned int get_memory_string_length(const char* bytesString);
+
+	// Read a moveset file, allocate space or it, return allocated memory (or nullptr on error)
+	Byte* ReadMovesetFile(const std::wstring& filename, uint64_t& size_out);
 }

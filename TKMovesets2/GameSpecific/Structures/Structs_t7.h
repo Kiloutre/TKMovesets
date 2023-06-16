@@ -42,7 +42,12 @@ namespace StructsT7
 			uint64_t blocks[8];
 		};
 
-		Byte* GetBlock(TKMovesetHeaderBlocks_ block, Byte* moveset) const 
+		Byte* GetBlock(TKMovesetHeaderBlocks_ block, Byte* moveset) const
+		{
+			return moveset + blocks[(unsigned int)block];
+		}
+
+		const Byte* GetBlock(TKMovesetHeaderBlocks_ block, const Byte* moveset) const
 		{
 			return moveset + blocks[(unsigned int)block];
 		}

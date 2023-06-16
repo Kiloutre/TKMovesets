@@ -8,6 +8,7 @@
 
 #include "constants.h"
 #include "GameTypes.h"
+#include "MovesetStructs.h"
 
 // -- -- //
 
@@ -448,5 +449,36 @@ namespace Helpers
 			if (*bytesString != '\0') ++bytesString;
 		}
 		return true;
+	}
+
+	Byte* ReadMovesetFile(const std::wstring& filename, uint64_t& size_out)
+	{
+		std::ifstream file(filename, std::ios::binary);
+		file.seekg(0, std::ios::end);
+		size_out = file.tellg();
+
+		if (size_out < sizeof(TKMovesetHeader)) {
+			size_out = 0;
+			file.close();
+			return nullptr;
+		}
+
+		Byte* moveset = (Byte*)malloc(size_out);
+		if (moveset == nullptr) {
+			size_out = 0;
+		} else {
+			file.seekg(0, std::ios::beg);
+			file.read((char*)moveset, size_out);
+
+
+			if (!((TKMovesetHeader*)moveset)->ValidateHeader()) {
+				free(moveset);
+				size_out = 0;
+				moveset = nullptr;
+			}
+		}
+		file.close();
+
+		return moveset;
 	}
 }
