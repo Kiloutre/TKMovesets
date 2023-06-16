@@ -51,7 +51,7 @@
 # define ANIMATION_FACE_EXTENSION        ".tkfaceanim"
 # define ANIMATION_HAND_EXTENSION        ".tkhandanim"
 # define ANIMATION_CAM_EXTENSION         ".tkcamanim"
-# define ANIMATION__OTHEREXTENSION       ".tkotheranim"
+# define ANIMATION_OTHER_EXTENSION       ".tkotheranim"
 
 # define ONLINE_MOVESET_MAX_SIZE_BYTES   (30000000) // 30MB
 

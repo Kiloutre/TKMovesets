@@ -9,7 +9,7 @@
 
 using namespace StructsT7;
 
-void ExtractAnimation(const char* name, const Byte* anim, const std::wstring& outputFolder, std::ofstream& outputFile)
+void ExtractAnimation(const char* name, const Byte* anim, const std::wstring& outputFolder, std::ofstream& outputFile, const wchar_t* extension)
 {
 	auto anim_size = TAnimUtils::FromMemory::GetAnimSize(anim);
 
@@ -18,12 +18,12 @@ void ExtractAnimation(const char* name, const Byte* anim, const std::wstring& ou
 		return;
 	}
 
-	std::wstring filename = Helpers::to_unicode(name) + L"" ANIMATION_EXTENSION + (*anim == 0xC8 ? L"C8" : L"64");
+	std::wstring filename = Helpers::to_unicode(name) + extension + (*anim == 0xC8 ? L"C8" : L"64");
 	std::ofstream file(outputFolder + filename, std::ios::binary);
 	if (!file.fail())
 	{
 		file.write((char*)anim, anim_size);
-		outputFile << name << ANIMATION_EXTENSION << (*anim == 0xC8 ? "C8" : "64") << "," << TAnimUtils::FromMemory::GetAnimDuration(anim) << std::endl;
+		outputFile << name << extension << (*anim == 0xC8 ? "C8" : "64") << "," << TAnimUtils::FromMemory::GetAnimDuration(anim) << std::endl;
 	}
 }
 
@@ -51,7 +51,7 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 			char* anim_name = name_block + (uint64_t)move.anim_name_addr;
 			const Byte* anim = animation_block + (uint64_t)move.anim_addr;
 			extracted_animations.insert(move.anim_addr);
-			ExtractAnimation(anim_name, anim, outputFolder, outputFile);
+			ExtractAnimation(anim_name, anim, outputFolder, outputFile, L"" ANIMATION_EXTENSION);
 		}
 	}
 
@@ -72,6 +72,27 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 			continue;
 		}
 
+		const wchar_t* extension;
+
+		switch (i)
+		{
+		case 2:
+		case 3:
+			extension = L"" ANIMATION_HAND_EXTENSION;
+			break;
+		case 4:
+		case 5:
+			extension = L"" ANIMATION_FACE_EXTENSION;
+			break;
+		case 8:
+		case 9:
+			extension = L"" ANIMATION_CAM_EXTENSION;
+			break;
+		default:
+			extension = L"" ANIMATION_OTHER_EXTENSION;
+			break;
+		}
+
 		for (unsigned int i = 0; i < mota.anim_count; ++i)
 		{
 			uint32_t anim_offset = mota.anim_offset_list[i];
@@ -79,7 +100,7 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 			{
 				extracted_mota_animations.insert(anim_offset);
 				const Byte* anim = (Byte*)&mota + anim_offset;
-				ExtractAnimation(std::to_string(i).c_str(), anim, motaOutputFolder, motaOutputFile);
+				ExtractAnimation(std::to_string(i).c_str(), anim, motaOutputFolder, motaOutputFile, extension);
 			}
 		}
 	}
