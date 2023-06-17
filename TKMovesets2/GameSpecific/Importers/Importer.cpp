@@ -21,10 +21,16 @@ ImportationErrcode_ Importer::Import(const wchar_t* filename, gameAddr playerAdd
 	Byte* moveset;
 ;
 	// Allocate a copy of the moveset locally. This is NOT in the game's memory
-	moveset = Helpers::ReadMovesetFile(filename, s_moveset);
-	if (moveset == nullptr) {
+    try {
+        moveset = Helpers::ReadMovesetFile(filename, s_moveset);
+    } catch(const MovesetFile_AllocationError&)
+    {
+		return ImportationErrcode_AllocationErr;
+    } catch(const std::exception&)
+    {
 		return ImportationErrcode_FileReadErr;
-	}
+    }
+    
 	progress = 10;
 
 	ImportationErrcode_ errcode = _Import(moveset, s_moveset, playerAddress, settings, progress);

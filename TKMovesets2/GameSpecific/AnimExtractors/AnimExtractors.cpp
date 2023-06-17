@@ -63,12 +63,15 @@ namespace AnimExtractor
 			}
 
 			uint64_t s_moveset;
-			Byte* moveset = Helpers::ReadMovesetFile(m.filename, s_moveset);
-
-			if (moveset == nullptr) {
+			Byte* moveset;
+            
+            try {
+                moveset = Helpers::ReadMovesetFile(m.filename, s_moveset);
+            } catch(const std::exception&)
+            {
 				extractionStatus.status = AnimExtractionStatus_Skipped;
 				continue;
-			}
+            }
 
 			if (((TKMovesetHeader*)moveset)->conversion_origin != 0)
 			{

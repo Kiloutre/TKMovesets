@@ -165,6 +165,10 @@ namespace ByteswapHelpers
 	void SWAP_INT64(void* x);
 }
 
+class MovesetFile_BadSize : public std::exception{};
+class MovesetFile_AllocationError : public std::exception{};
+class MovesetFile_InvalidHeader : public std::exception{};
+
 namespace Helpers
 {
 

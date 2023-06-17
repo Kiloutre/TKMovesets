@@ -458,14 +458,12 @@ namespace Helpers
 		size_out = file.tellg();
 
 		if (size_out < sizeof(TKMovesetHeader)) {
-			size_out = 0;
-			file.close();
-			return nullptr;
+			throw MovesetFile_BadSize();
 		}
 
 		Byte* moveset = (Byte*)malloc(size_out);
 		if (moveset == nullptr) {
-			size_out = 0;
+			throw MovesetFile_AllocationError();
 		} else {
 			file.seekg(0, std::ios::beg);
 			file.read((char*)moveset, size_out);
@@ -473,11 +471,9 @@ namespace Helpers
 
 			if (!((TKMovesetHeader*)moveset)->ValidateHeader()) {
 				free(moveset);
-				size_out = 0;
-				moveset = nullptr;
+				throw MovesetFile_InvalidHeader();
 			}
 		}
-		file.close();
 
 		return moveset;
 	}
