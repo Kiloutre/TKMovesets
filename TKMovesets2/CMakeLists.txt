@@ -284,9 +284,13 @@ add_custom_command(TARGET TKMovesets2 PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 ## Extra dependencies ##
 # Link the other libraries that we use #
 
-# OpenGL (Renderer)
+# OpenGL (actual rendering)
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE glad::glad)
+
+# Glut (GL rendering utils)
+#find_package(GLUT REQUIRED)
+#target_link_libraries(TKMovesets2 PRIVATE GLUT::GLUT)
 
 # GLFW (Renderer)
 find_package(glfw3 CONFIG REQUIRED)

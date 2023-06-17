@@ -17,6 +17,7 @@
 #include <locale>
 #include <filesystem>
 #include <fstream>
+#include <windows.h>
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
@@ -368,7 +369,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 
 	// Initialize GLFW library
 	glfwSetErrorCallback(glfw_error_callback);
-	if (!glfwInit()) {
+	if (glfwInit() == GLFW_FALSE) {
 		return MAIN_ERR_GLFW_INIT;
 	}
 
@@ -426,6 +427,16 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		int screen_width, screen_height;
 		glfwGetFramebufferSize(window, &screen_width, &screen_height);
 		glViewport(0, 0, screen_width, screen_height);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+
+		//const float ar = (float)screen_width / (float)screen_height;
+		//glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+		glOrtho(-300, 300, -300, 300, -1, 1);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 	}
 
 	// Load translation
@@ -457,9 +468,30 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 				glViewport(0, 0, display_w, display_h);
 			}
 			glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+			//glBegin(GL_QUADS);
+			/*
+			glColor3d(1, 0, 0);
+			glVertex3f(-1, -1, -10);
+			glColor3d(1, 1, 0);
+			glVertex3f(1, -1, -10);
+			glColor3d(1, 1, 1);
+			glVertex3f(1, 1, -10);
+			glColor3d(0, 1, 1);
+			glVertex3f(-1, 1, -10);
+			glColor3d(0, 1, 1);
+			glVertex3f(-4, 4, -10);
+			*/
+
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glRectf(225.0f, 150.0f, 150.0f, 100.0f);
+			//glEnd();
+
+			
+
+			
 			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -467,6 +499,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 				ImGui::RenderPlatformWindowsDefault();
 				glfwMakeContextCurrent(backup_current_context);
 			}
+			
 			glfwSwapBuffers(window);
 
 			if (io.DeltaTime < (1.0f / MAX_FPS)) {
