@@ -4,13 +4,13 @@
 #include "AnimExtractors.hpp"
 #include "Animations.hpp"
 
-#include "Structs_ttt2.h"
+#include "Structs_t5.h"
 #include "MovesetStructs.h"
 #include "constants.h"
 
-using namespace StructsTTT2;
+using namespace StructsT5;
 
-void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_extractionStatus& extractionStatus)
+void AnimExtractor::_FromT5(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_extractionStatus& extractionStatus)
 {
 	const TKMovesetHeader& header = *(TKMovesetHeader*)moveset;
 	const Byte* moveset_data = moveset + header.moveset_data_start;
@@ -27,7 +27,6 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 	// Get animation count
 	extractionStatus.total_animation_count = moveset_info.table.moveCount;
 
-	const Byte* moveset_end = moveset + s_moveset;
 	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
 	{
 		if (moveset_info.motas.motas[i] == MOVESET_ADDR32_MISSING) {

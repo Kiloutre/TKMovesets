@@ -1,4 +1,5 @@
 #include <fstream>
+#include <windows.h>
 
 #include "AnimExtractors.hpp"
 #include "Animations.hpp"
@@ -9,25 +10,7 @@
 
 using namespace StructsT7;
 
-void ExtractAnimation(const char* name, const Byte* anim, const std::wstring& outputFolder, std::ofstream& outputFile, const wchar_t* extension)
-{
-	auto anim_size = TAnimUtils::FromMemory::GetAnimSize(anim);
-
-	if (anim_size == 0) {
-		DEBUG_ERR("Bad anim data for anim name '%s'\n", name);
-		return;
-	}
-
-	std::wstring filename = Helpers::to_unicode(name) + extension + (*anim == 0xC8 ? L"C8" : L"64");
-	std::ofstream file(outputFolder + filename, std::ios::binary);
-	if (!file.fail())
-	{
-		file.write((char*)anim, anim_size);
-		outputFile << name << extension << (*anim == 0xC8 ? "C8" : "64") << "," << TAnimUtils::FromMemory::GetAnimDuration(anim) << std::endl;
-	}
-}
-
-void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolder, std::ofstream& outputFile)
+void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_extractionStatus& extractionStatus)
 {
 	const TKMovesetHeader& header = *(TKMovesetHeader*)moveset;
 	const Byte* moveset_data = moveset + header.moveset_data_start;
@@ -41,17 +24,43 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 
 	Move* movelist = (Move*)(moveset_block + (uint64_t)moveset_info.table.move);
 
-	std::set<void*> extracted_animations;
-	for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
-	{
-		auto& move = movelist[i];
+	// Get animation count
+	extractionStatus.total_animation_count = (uint32_t)moveset_info.table.moveCount;
 
-		if (!extracted_animations.contains(move.anim_addr))
+	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
+	{
+		if ((gameAddr)moveset_info.motas.motas[i] == MOVESET_ADDR_MISSING) {
+			continue;
+		}
+
+		const MotaHeader& mota = *(MotaHeader*)(mota_block + (uint64_t)moveset_info.motas.motas[i]);
+
+		uint32_t mota_size = (uint32_t)(s_moveset - (((Byte*)&mota) - moveset));
+
+		if (!mota.IsValid(mota_size)) {
+			continue;
+		}
+
+		extractionStatus.total_animation_count += mota.anim_count;
+	}
+
+	// Extract animations
+	extractionStatus.status = AnimExtractionStatus_Started;
+
+	{
+		std::set<decltype(movelist->anim_addr)> extracted_animations;
+		for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
 		{
-			char* anim_name = name_block + (uint64_t)move.anim_name_addr;
-			const Byte* anim = animation_block + (uint64_t)move.anim_addr;
-			extracted_animations.insert(move.anim_addr);
-			ExtractAnimation(anim_name, anim, outputFolder, outputFile, L"" ANIMATION_EXTENSION);
+			auto& move = movelist[i];
+
+			if (!extracted_animations.contains(move.anim_addr))
+			{
+				char* anim_name = name_block + (uint64_t)move.anim_name_addr;
+				const Byte* anim = animation_block + (uint64_t)move.anim_addr;
+				extracted_animations.insert(move.anim_addr);
+				TAnimExtractorUtils::ExtractAnimation(anim_name, anim, outputFolder, outputFile, L"" ANIMATION_EXTENSION);
+				extractionStatus.current_animation++;
+			}
 		}
 	}
 
@@ -68,7 +77,9 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 		const MotaHeader& mota = *(MotaHeader*)(mota_block + (uint64_t)moveset_info.motas.motas[i]);
 		std::ofstream motaOutputFile(motaOutputFolder + L"anims.txt");
 
-		if (!mota.IsValid()) {
+		uint32_t mota_size = (uint32_t)(s_moveset - (((Byte*)&mota) - moveset));
+
+		if (!mota.IsValid(mota_size)) {
 			continue;
 		}
 
@@ -100,8 +111,11 @@ void AnimExtractor::_FromT7(const Byte* moveset, const std::wstring& outputFolde
 			{
 				extracted_mota_animations.insert(anim_offset);
 				const Byte* anim = (Byte*)&mota + anim_offset;
-				ExtractAnimation(std::to_string(i).c_str(), anim, motaOutputFolder, motaOutputFile, extension);
+				TAnimExtractorUtils::ExtractAnimation(std::to_string(i).c_str(), anim, motaOutputFolder, motaOutputFile, extension);
+				extractionStatus.current_animation++;
 			}
 		}
 	}
+
+	extractionStatus.status = AnimExtractionStatus_Finished;
 }

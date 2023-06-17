@@ -191,8 +191,14 @@ edition.play_move_2p = Play (2P)
 edition.window_title = Editor
 edition.apply = Apply
 edition.window_controls_explanation = Click on a move in the movelist to open its associated window. The new window will replace the previous one opened UNLESS there are unsaved changes in the previous one OR if you were holding CTRL LEFT while clicking the move in the movelist. Windows can be dragged anywhere, be docked together and can form various layouts.
+
+edition.tools = Tools
 edition.extract_animations = Extract animations
 edition.extract_animations_finished = Animation extraction finished!
+edition.animation_extraction.extraction_status = Extraction status
+edition.animation_extraction.not_started = Not started
+edition.animation_extraction.skipped = Skipped
+edition.animation_extraction.duplicates = Duplicates
 
 edition.form_popup.copy_structure_clipboard = Copy structure
 edition.form_popup.copy_single_item_clipboard = Copy single item

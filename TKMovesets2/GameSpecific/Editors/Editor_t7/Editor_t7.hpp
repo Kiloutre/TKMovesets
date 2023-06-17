@@ -286,7 +286,6 @@ private:
 
 public:
 	using TEditor::TEditor;
-	~EditorT7();
 
 	void LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize) override;
 	bool LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
@@ -303,10 +302,6 @@ public:
 	// -- Interactions -- //
 	// Sets the current move of a player
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
-	// Starts a thread that extracts the moveset's animations
-	void OrderAnimationsExtraction(const std::wstring& characterFilename) override;
-	// Saves all the moveset animations in our library. Explicit copy of the parameters because this runs in another thread and the source data might be freed in parallel.
-	void ExtractAnimations(Byte* moveset, std::wstring characterFilename, TKMovesetHeaderBlocks offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset);
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
 	std::string ImportAnimation(const wchar_t* filepath, int moveid) override;
 

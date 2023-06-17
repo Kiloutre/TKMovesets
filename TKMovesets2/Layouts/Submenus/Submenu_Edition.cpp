@@ -136,11 +136,11 @@ void Submenu_Edition::RenderConversionPopup()
 
 }
 
-void Submenu_Edition::ExtractAllAnimations(std::vector<movesetInfo> movesets)
+void Submenu_Edition::ExtractAllAnimations()
 {
 	DEBUG_LOG("Extracting all animations...\n");
-	AnimExtractor::ExtractAnimations(movesets);
-	m_extracting_animations = false;
+	AnimExtractor::ExtractAnimations(m_animExtraction.movesets, m_animExtraction.statuses);
+	m_animExtraction.extracting = false;
 }
 
 movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
@@ -150,20 +150,105 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	ImGui::SeparatorText(_("edition.tools"));
 	{
 		// Extract all movesets
-		if (ImGuiExtra::RenderButtonEnabled(_("edition.extract_all_animations"), !m_extracting_animations)) {
-			std::vector<movesetInfo> movesets;
+		if (ImGuiExtra::RenderButtonEnabled(_("edition.extract_animations"), !m_animExtraction.extracting)) {
+
+			m_animExtraction.statuses = std::vector<s_extractionStatus>(storage.extractedMovesets.size());
+
+			m_animExtraction.movesets.clear();
+			// Createe a copy of extractedMovesets so that there's no problem if it changes while we're extracting stuff
 			for (auto& item : storage.extractedMovesets) {
-				movesets.push_back(*item);
+				m_animExtraction.movesets.push_back(*item);
 			}
 
-			if (m_started_animation_extraction) {
-				m_animation_extraction_thread.join();
+			if (m_animExtraction.started) {
+				m_animExtraction.thread.join();
 			}
-			m_started_animation_extraction = true;
-			m_extracting_animations = true;
-			m_animation_extraction_thread = std::thread(&Submenu_Edition::ExtractAllAnimations, this, movesets);
+			m_animExtraction.started = true;
+			m_animExtraction.extracting = true;
+			m_animExtraction.thread = std::thread(&Submenu_Edition::ExtractAllAnimations, this);
+
+
+			ImGui::OpenPopup("AnimExtractionPopup");
+			m_animExtraction.popup = true;
 		}
 	}
+
+	if (m_animExtraction.popup) {
+		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 300), ImVec2(1920, 1080));
+	}
+
+	if (ImGui::BeginPopupModal("AnimExtractionPopup", &m_animExtraction.popup))
+	{
+		uint32_t total_extracted_count = 0;
+		uint32_t total_anlmations = 0;
+
+		ImVec2 tableSize = ImGui::GetContentRegionAvail();
+		tableSize.y -= ImGui::GetFrameHeightWithSpacing() * 5;
+			
+		ImGui::SeparatorText(_("edition.animation_extraction.extraction_status"));
+		if (ImGui::BeginTable("AnimExtractionMovesetList", 2, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+			| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
+		{
+			for (unsigned int i = 0; i < m_animExtraction.movesets.size(); ++i)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+
+				auto& m = m_animExtraction.movesets[i];
+				auto& s = m_animExtraction.statuses[i];
+
+				ImGui::TextUnformatted(m.name.c_str());
+
+				ImGui::TableNextColumn();
+
+				switch (s.status)
+				{
+				case AnimExtractionStatus_NotStarted:
+					ImGui::TextUnformatted(_("edition.animation_extraction.not_started"));
+					break;
+				case AnimExtractionStatus_Skipped:
+					ImGui::TextUnformatted(_("edition.animation_extraction.skipped"));
+					break;
+				case AnimExtractionStatus_Started:
+				case AnimExtractionStatus_Finished:
+					total_extracted_count += s.current_animation;
+					total_anlmations += s.total_animation_count;
+					ImGui::TextUnformatted(std::format("{}/{}", s.current_animation, s.total_animation_count).c_str());
+					break;
+				}
+			}
+
+			ImGui::EndTable();
+		}
+
+		if (!m_animExtraction.extracting)
+		{
+
+			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_anlmations).c_str());
+			ImGui::TextUnformatted(_("edition.extract_animations_finished"));
+
+			uint32_t duplicated_anims = total_anlmations - total_extracted_count;
+			if (duplicated_anims) {
+				char n[10];
+				sprintf_s(n, sizeof(n), "%u", duplicated_anims);
+				ImGui::TextUnformatted(n);
+				ImGui::SameLine();
+				ImGui::TextUnformatted(_("edition.animation_extraction.duplicates"));
+			}
+
+			if (ImGui::Button(_("close")))
+			{
+				ImGui::CloseCurrentPopup();
+				m_animExtraction.popup = false;
+			}
+		}
+		else {
+			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_anlmations).c_str());
+			ImGuiExtra::RenderButtonEnabled(_("close"), true);
+		}
+		ImGui::EndPopup();
+	}
+	
 
 
 	ImGui::SeparatorText(_("edition.select_moveset"));
@@ -290,7 +375,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 Submenu_Edition::~Submenu_Edition()
 {
-	if (m_started_animation_extraction) {
-		m_animation_extraction_thread.join();
+	if (m_animExtraction.started) {
+		m_animExtraction.thread.join();
 	}
 }

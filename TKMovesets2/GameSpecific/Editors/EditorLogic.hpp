@@ -26,15 +26,6 @@
 // Shifting logic for list resizing
 # define MUST_SHIFT_ID(id, valueChange, listStart, listOldEnd) EditorUtils::MustShiftId(id, valueChange, listStart, listOldEnd)
 
-// Animation extraction status
-enum AnimExtractionStatus_
-{
-	AnimExtractionStatus_NotStarted,
-	AnimExtractionStatus_Started,
-	AnimExtractionStatus_Failed,
-	AnimExtractionStatus_Finished,
-};
-
 enum EditorConstants_
 {
 	// Marks the end of a requirements list
@@ -255,10 +246,6 @@ protected:
 public:
 	// Constants useful constant variables, to be set on a per-game basis
 	std::map<EditorConstants_, unsigned int >* constants;
-	// Status of the animation extraction
-	AnimExtractionStatus_ animationExtractionStatus = AnimExtractionStatus_NotStarted;
-	// Thread where the animations extraction will be running to avoid blocking the display thread
-	std::thread* animExtractionThread;
 	// Stores the address of the loaded moveset in-game. Will become 0 if it does not match the current moveset.
 	gameAddr live_loadedMoveset = 0;
 	// Id of the currently selected player, used for extra properties execution
@@ -288,8 +275,6 @@ public:
 	virtual void SaveItem(EditorWindowType type, uint16_t id, InputMap& inputs) = 0;
 
 	// -- Iteractions -- //
-	// Saves all the moveset animations in our library
-	virtual void OrderAnimationsExtraction(const std::wstring& characterFilename) = 0;
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
 	virtual std::string ImportAnimation(const wchar_t* filepath, int moveid) = 0;
 

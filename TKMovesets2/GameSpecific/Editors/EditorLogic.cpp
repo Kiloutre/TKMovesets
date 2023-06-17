@@ -363,11 +363,9 @@ bool EditorLogic::ValidateFieldType(EditorInput* field)
 EditorLogic::EditorLogic(GameProcess* process, GameData* game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
 {
 	constants = new std::map<EditorConstants_, unsigned int >();
-	animExtractionThread = new std::thread();
 }
 
 EditorLogic::~EditorLogic()
 {
 	delete constants;
-	delete animExtractionThread; // todo: join this thread here
 }

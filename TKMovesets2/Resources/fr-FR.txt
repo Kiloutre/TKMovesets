@@ -191,8 +191,14 @@ edition.play_move_2p = Lancer (J2)
 edition.window_title = Édition
 edition.apply = Appliquer
 edition.window_controls_explanation = Cliquez sur un Move dans la liste des moves pour ouvrir sa fenêtre associée. Elle viendra écraser toute fenêtre précédemment ouverte, sauf si cette ancienne fenêtre contient du contenu non-sauvegardé OU si vous maintenez CTRL GAUCHE avant de cliquer. Les fenêtres ouvertes peuvent être déplacées où vous le souhaitez, peuvent être assemblées et il est possible de les positionner de diverses manières.
+
+edition.tools = Outils
 edition.extract_animations = Extraire animations
 edition.extract_animations_finished = Extraction d'animation terminée !
+edition.animation_extraction.extraction_status = Status de l'extraction
+edition.animation_extraction.not_started = Pas commencé
+edition.animation_extraction.skipped = Passé
+edition.animation_extraction.duplicates = Doublons
 
 edition.form_popup.copy_structure_clipboard = Copier la structure
 edition.form_popup.copy_single_item_clipboard = Copier un seul élément

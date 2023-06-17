@@ -37,6 +37,7 @@ set(INCLUDE_FOLDERS
                     "GameSpecific/Importers"
                     "GameSpecific/Online"
                     "GameSpecific/MovesetConverters"
+                    "GameSpecific/AnimExtractors"
 
                     
                     "GameSpecific/EditorVisuals/EditorVisuals_t7"
@@ -184,6 +185,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5_to_t7.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5_to_t7_Aliases.cpp"
+                    "GameSpecific/AnimExtractors/AnimExtractor_t5.cpp"
 )                   
 
 # This will be included in the .dll and should only be related to the injected DLL

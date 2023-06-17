@@ -365,6 +365,11 @@ namespace StructsTTT2
 		char unk0x14;
 		unsigned int anim_offset_list[1];
 
+		bool IsValid() const
+		{
+			return strncmp(mota_string, "MOTA", 4) == 0;
+		}
+
 		bool IsValid(uint32_t size) const
 		{
 			return size >= (sizeof(MotaHeader) - 4) && strncmp(mota_string, "MOTA", 4) == 0;

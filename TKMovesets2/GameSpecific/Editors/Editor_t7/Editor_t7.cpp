@@ -582,104 +582,6 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	m_process->writeInt64(playerAddress + m_game->GetValue("currmove_id"), moveId);
 }
 
-// -- Anim extraction -- //
-
-void EditorT7::OrderAnimationsExtraction(const std::wstring& characterFilename)
-{
-	if (animationExtractionStatus & AnimExtractionStatus_Started) {
-		return;
-	}
-
-	if (animationExtractionStatus & AnimExtractionStatus_Finished) {
-		// Join to cleanly destroy the previous started thread
-		animExtractionThread->join();
-	}
-
-	animationExtractionStatus = AnimExtractionStatus_Started;
-
-	// Create moveset and various other variable copies
-	// The extraction run in another thread and i don't want the moveset being modified / reallocated while i access it, so i work on a copy instead.
-	Byte* moveset = (Byte*)malloc(m_movesetSize);
-	if (moveset == nullptr) {
-		animationExtractionStatus = AnimExtractionStatus_Failed;
-		return;
-	}
-	memcpy((void*)moveset, m_moveset, m_movesetSize);
-
-	// These can also be modified during the extraction or worse, deallocated
-	TKMovesetHeaderBlocks offsets = *m_offsets;
-	auto& animOffsetToNameOffset = *m_animOffsetToNameOffset;
-
-	// Start in another thread to avoid the display thread hanging
-	*animExtractionThread = std::thread(&EditorT7::ExtractAnimations, this, moveset, characterFilename, offsets, animOffsetToNameOffset);
-}
-
-void EditorT7::ExtractAnimations(Byte* moveset, std::wstring characterFilename, TKMovesetHeaderBlocks offsets, std::map<gameAddr, uint64_t> animOffsetToNameOffset)
-{
-	std::wstring outputFolder;
-
-	outputFolder = L"" EDITOR_LIB_DIRECTORY "/" + characterFilename;
-	CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
-	CreateDirectoryW(outputFolder.c_str(), nullptr);
-
-	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
-	Byte* movesetData = moveset + header->moveset_data_start;
-
-	const Byte* baseAnimPtr = movesetData + offsets.animationBlock;
-	char const* namePtr = (char const*)(movesetData + offsets.nameBlock);
-
-	const size_t animCount = animOffsetToNameOffset.size();
-	auto it = animOffsetToNameOffset.begin();
-	auto end = animOffsetToNameOffset.end();
-
-	for (int idx = 0; idx < animCount; ++idx)
-	{
-		const char* name = namePtr + it->second;
-		auto& offset = it->first;
-		const char* anim = (char*)baseAnimPtr + offset;
-		Byte animType = *(Byte*)anim;
-		uint64_t size;
-
-		if (animType == 0) {
-			animType = *(Byte*)(anim + 1);
-		}
-
-		std::advance(it, 1);
-		if (it == end) {
-			// For the very last animation, we get the size by looking at the start of the next block
-			// This is a bit flawed because of 8 bytes alignement, but what's a little 7 bytes at most, for one anim?
-			size = (offsets.motaBlock - offsets.animationBlock) - offset;
-		}
-		else {
-			size = it->first - offset;
-			if (size == 0) {
-				// Two animation names referring to the same anim offset. Loop until we find a different offset in order to get the proper size
-				std::map<gameAddr, uint64_t>::iterator it_copy = it;
-				while (it_copy != end && it_copy->first == offset) {
-					std::advance(it_copy, 1);
-				}
-				size = it_copy->first - offset;
-			}
-		}
-
-		std::wstring wname = *name == 0 ? std::to_wstring(idx) : Helpers::to_unicode(name);
-		std::wstring filename = outputFolder + L"/" + wname + L"" ANIMATION_EXTENSION + (animType == 0xC8 ? L"C8" : L"64");
-
-		// todo: check if anim exists already
-		std::ofstream file(filename.c_str(), std::ios::binary);
-
-		if (file.fail()) {
-			continue;
-		}
-
-		file.write(anim, size);
-	}
-
-	free(moveset);
-	animationExtractionStatus = AnimExtractionStatus_Finished;
-}
-
-
 std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 {
 	// Keep file name only
@@ -847,13 +749,5 @@ void EditorT7::ExecuteExtraprop(EditorInput* idField, EditorInput* valueField)
 		uint32_t id = (uint32_t)EditorUtils::GetFieldValue(idField);
 		uint32_t value = (uint32_t)EditorUtils::GetFieldValue(valueField);
 		(*m_sharedMemHandler)->ExecuteExtraprop(currentPlayerId, (uint32_t)id, (uint32_t)value);
-	}
-}
-
-EditorT7::~EditorT7()
-{
-	if (animationExtractionStatus & AnimExtractionStatus_Finished) {
-		// Join the thread if it was ever created. Could be ongoing or finished, we still need to join it.
-		animExtractionThread->join();
 	}
 }
