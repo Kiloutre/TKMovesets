@@ -6,14 +6,17 @@
 #include "Compression.hpp"
 
 // Embedded moveset loader .dll
+#ifndef BUILD_TYPE_DEBUG
 extern "C" const char TKMovesetLoader[];
 extern "C" const size_t TKMovesetLoader_len;
 extern "C" const size_t TKMovesetLoader_orig_len;
+#endif
 
 // -- Unpack embedded DLL -- //
 
 static bool ExtractMovesetLoaderIfNeeded()
 {
+#ifndef BUILD_TYPE_DEBUG
     {
         // Get rid of the potentially obsolete old .dll
         struct _stat dll_buffer;
@@ -77,6 +80,7 @@ static bool ExtractMovesetLoaderIfNeeded()
         }
     }
 
+#endif
     return true;
 }
 
