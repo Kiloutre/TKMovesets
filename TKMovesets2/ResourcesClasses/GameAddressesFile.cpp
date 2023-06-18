@@ -241,7 +241,7 @@ const char* GameAddressesFile::GetString(const std::string& gameKey, const char*
 	auto ex = GameAddressNotFoundMsg("str:", gameKey, c_addressId);
 	DEBUG_LOG(ex.what().c_str());
 #endif
-	return nullptr;
+	return "";
 }
 
 std::vector<gameAddr> cg_emptyVector;
