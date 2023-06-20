@@ -642,11 +642,15 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end())
 	{
 		// An animation with the same name has been found
-		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)m_animNameToOffsetMap->at(animName_str));
+		auto anim_offset = m_animNameToOffsetMap->at(animName_str);
+		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)anim_offset;
 
 		if (TAnimUtils::FromMemory::GetAnimSize(existing_anim) == realAnimSize && memcmp(anim, existing_anim, realAnimSize) == 0)
 		{
-			DEBUG_LOG("Attempted to import duplicate animation: using existing one.\n");
+			// todo: show popup
+			DEBUG_LOG("(1) Attempted to import duplicate animation: using existing one.\n");
+			m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset->at(anim_offset);
+			m_iterators.moves[moveid]->anim_addr = anim_offset;
 			delete[] anim;
 			return animName_str;
 		}
@@ -669,22 +673,25 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 			animOffsets.insert(move.anim_addr);
 		}
 
-		auto iter = animOffsets.begin();
-		auto iter2 = animOffsets.begin();
-		std::advance(iter2, 1);
-		while (iter2 != animOffsets.end())
+		auto offset_cursor = animOffsets.begin();
+		auto offset_cursor_2 = animOffsets.begin();
+		std::advance(offset_cursor_2, 1);
+		while (offset_cursor_2 != animOffsets.end())
 		{
-			uint64_t size = (*iter2) - (*iter);
+			uint64_t size = (*offset_cursor_2) - (*offset_cursor);
 
-			if (size == realAnimSize && memcmp(anim, anim_block + *iter, realAnimSize) == 0)
+			if (size == realAnimSize && memcmp(anim, anim_block + *offset_cursor, realAnimSize) == 0)
 			{
-				DEBUG_LOG("Attempted to import duplicate animation: using existing one.\n");
+				// todo: show popup
+				DEBUG_LOG("(2) Attempted to import duplicate animation: using existing one.\n");
+				m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset->at(*offset_cursor);
+				m_iterators.moves[moveid]->anim_addr = *offset_cursor;
 				delete[] anim;
 				return animName_str;
 			}
 
-			std::advance(iter, 1);
-			std::advance(iter2, 1);
+			std::advance(offset_cursor, 1);
+			std::advance(offset_cursor_2, 1);
 		}
 	}
 
