@@ -643,7 +643,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	{
 		// An animation with the same name has been found
 		auto anim_offset = m_animNameToOffsetMap->at(animName_str);
-		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)anim_offset;
+		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)anim_offset);
 
 		if (TAnimUtils::FromMemory::GetAnimSize(existing_anim) == realAnimSize && memcmp(anim, existing_anim, realAnimSize) == 0)
 		{
