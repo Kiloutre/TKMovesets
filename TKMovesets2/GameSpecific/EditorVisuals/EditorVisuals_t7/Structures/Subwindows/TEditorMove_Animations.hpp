@@ -21,6 +21,7 @@ private:
 	struct AnimationLibChar
 	{
 		std::string name;
+		// These are pointers so that we can freely copy the list of pointers without copying its actual members
 		std::vector<AnimationLibFile*> files;
 		std::vector<AnimationLibFile*> filteredFiles;
 		bool forceOpen = false;

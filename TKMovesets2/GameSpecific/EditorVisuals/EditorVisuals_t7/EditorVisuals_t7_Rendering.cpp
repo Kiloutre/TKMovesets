@@ -387,7 +387,7 @@ void EditorVisuals_T7::RenderMovelist()
 			ImDrawList* drawlist = ImGui::GetWindowDrawList();
 			auto windowPos = ImGui::GetWindowPos();
 
-			for (DisplayableMove* move : m_filteredMovelist)
+			for (const auto& move : m_filteredMovelist)
 			{
 				ImGui::TableNextRow();
 				ImGui::TableNextColumn();

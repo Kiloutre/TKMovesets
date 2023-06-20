@@ -250,9 +250,17 @@ bool TEditorMove_Animations::Render()
 			ImGuiExtra::RenderTextbox(_("edition.animation_list.no_anim"));
 		}
 
+		// Cache these because animation listing might get executed dozens of thousands of time
+		const char* animation_list__anim_name = _("edition.animation_list.anim_name");
+		const char* animation_list__duration = _("edition.animation_list.duration");
+		const char* animation_list__size = _("edition.animation_list.size");
+		const char* animation_list__hash = _("hash");
+		const char* moveset__size_kb = _("moveset.size_kb");
+		const char* animation_list__import = _("edition.animation_list.import");
+
 		for (int i = 0; i < m_characters.size(); ++i)
 		{
-			auto& character = m_characters[i];
+			const auto& character = m_characters[i];
 			if (character->filteredFiles.size() == 0) {
 				continue;
 			}
@@ -267,14 +275,14 @@ bool TEditorMove_Animations::Render()
 			{
 				if (ImGui::BeginTable("##", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 				{
-					ImGui::TableSetupColumn(_("edition.animation_list.anim_name"));
-					ImGui::TableSetupColumn(_("edition.animation_list.duration"));
-					ImGui::TableSetupColumn(_("edition.animation_list.size"));
-					ImGui::TableSetupColumn(_("hash"));
+					ImGui::TableSetupColumn(animation_list__anim_name);
+					ImGui::TableSetupColumn(animation_list__duration);
+					ImGui::TableSetupColumn(animation_list__size);
+					ImGui::TableSetupColumn(animation_list__hash);
 					ImGui::TableSetupColumn("##");
 					ImGui::TableHeadersRow();
 
-					for (auto& file : character->filteredFiles)
+					for (const auto& file : character->filteredFiles)
 					{
 						ImGui::TableNextRow();
 						ImGui::TableNextColumn();
@@ -286,14 +294,14 @@ bool TEditorMove_Animations::Render()
 						ImGui::TableNextColumn();
 						ImGui::TextUnformatted(file->size_kilobytes.c_str());
 						ImGui::SameLine();
-						ImGui::TextUnformatted(_("moveset.size_kb"));
+						ImGui::TextUnformatted(moveset__size_kb);
 
 						ImGui::TableNextColumn();
 						ImGui::TextUnformatted(file->hash.c_str());
 
 						ImGui::TableNextColumn();
 						ImGui::PushID(file->filepath.c_str());
-						if (ImGui::Button(_("edition.animation_list.import"))) {
+						if (ImGui::Button(animation_list__import)) {
 							animationToImport = file->filepath.c_str();
 							// Value will be caught by parent window
 						}
