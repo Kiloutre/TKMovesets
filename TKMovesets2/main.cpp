@@ -381,7 +381,6 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 				}
 			}
 
-			Sleep(10000);
 			DWORD currPid = GetCurrentProcessId();
 			for (auto& process : GameProcessUtils::GetRunningProcessList())
 			{
