@@ -613,12 +613,13 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 
 		// Ensure old bad animations don't get completely carried over
 		uint64_t realAnimSize = Helpers::GetAnimationSize(anim);
-		if (realAnimSize <= animSize) {
-			animSize = animSize;
+		if (realAnimSize < animSize) {
+			animSize = realAnimSize;
+			DEBUG_LOG("Imported animation is too big (useless bytes): shrinking its size\n");
 		}
 		else {
 			// todo: Display a warning to the user
-			DEBUG_LOG("Error: Animation is missing bytes.");
+			DEBUG_ERR("Imported animation is missing bytes.");
 		}
 	}
 
