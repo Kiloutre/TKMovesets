@@ -594,6 +594,12 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	uint64_t animSize;
 	{
 		std::ifstream animFile(filepath, std::ios::binary);
+
+		if (animFile.fail()) {
+			DEBUG_ERR("Failed to read anim file '%S'", filepath);
+			return "";
+		}
+
 		animFile.seekg(0, std::ios::end);
 		animSize = animFile.tellg();
         try {
