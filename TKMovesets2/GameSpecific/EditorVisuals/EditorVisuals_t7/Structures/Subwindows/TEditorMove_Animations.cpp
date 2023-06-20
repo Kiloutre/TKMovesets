@@ -107,7 +107,7 @@ void TEditorMove_Animations::LoadAnimationList()
 				};
 
 				charAnims->files.push_back(anim);
-				charAnims->filteredFiles.push_back(anim);
+				m_animCount++;
 
 				if (!addedFile) {
 					m_characters.push_back(charAnims);
@@ -158,7 +158,7 @@ void TEditorMove_Animations::LoadAnimationList()
 					.size = (unsigned int)file.file_size()
 				};
 				charAnims->files.push_back(anim);
-				charAnims->filteredFiles.push_back(anim);
+				m_animCount++;
 
 				if (!addedFile) {
 					m_characters.push_back(charAnims);
@@ -203,6 +203,12 @@ bool TEditorMove_Animations::Render()
 		if (ImGui::Button(_("close_window")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
 			ImGui::CloseCurrentPopup();
 			popen = false;
+		}
+
+		if (!loadedList && m_animCount != m_prevRenderAnimCount) {
+			m_prevRenderAnimCount = m_animCount;
+			ApplySearchFilter();
+			// Animation was added, re-compute animation list
 		}
 
 		ImGui::SameLine();
@@ -257,9 +263,8 @@ bool TEditorMove_Animations::Render()
 					ImGui::TableSetupColumn("##");
 					ImGui::TableHeadersRow();
 
-					for (int j = 0; j < character->filteredFiles.size(); ++j)
+					for (auto& file : character->filteredFiles)
 					{
-						auto& file = character->filteredFiles[j];
 						ImGui::TableNextRow();
 						ImGui::TableNextColumn();
 						ImGui::TextUnformatted(file->name.c_str());

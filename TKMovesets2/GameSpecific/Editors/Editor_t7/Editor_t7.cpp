@@ -653,6 +653,34 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 			animName_str = std::format("{} {}", animName_orig.c_str(), ++num);
 		}
 	}
+	else
+	{
+		// Name is unique, but will still (quickly) try to assert if the animation exists under a different name
+		Byte* anim_block = (Byte*)(m_movesetData + m_offsets->animationBlock);
+
+		std::set<gameAddr> animOffsets;
+		for (auto& move : m_iterators.moves) {
+			animOffsets.insert(move.anim_addr);
+		}
+
+		auto iter = animOffsets.begin();
+		auto iter2 = animOffsets.begin();
+		std::advance(iter2, 1);
+		while (iter2 != animOffsets.end())
+		{
+			uint64_t size = (*iter2) - (*iter);
+
+			if (size == realAnimSize && memcmp(anim, anim_block + *iter, realAnimSize) == 0)
+			{
+				DEBUG_LOG("Attempted to import duplicate animation: using existing one.\n");
+				delete[] anim;
+				return animName_str;
+			}
+
+			std::advance(iter, 1);
+			std::advance(iter2, 1);
+		}
+	}
 
 	// Importation start
 	const char* animName = animName_str.c_str();

@@ -35,6 +35,10 @@ private:
 	bool m_destructionRequested = false;
 	// Thread that will take care of the animation loading
 	std::thread m_loadingThread;
+	// Amount of animations in total
+	size_t m_animCount = 0;
+	// Amount of animations in total, during the last render
+	size_t m_prevRenderAnimCount = 0;
 
 	// Filters the animation list according to the search buffer
 	void ApplySearchFilter();
