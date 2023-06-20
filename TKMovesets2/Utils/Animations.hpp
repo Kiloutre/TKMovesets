@@ -4,6 +4,13 @@
 
 #include "GameTypes.h"
 
+struct s_animInfo
+{
+	unsigned int duration;
+	uint32_t hash;
+	uint64_t size;
+};
+
 namespace TAnimUtils
 {
 	// Get the size of the prefix to apply to T5 anims
@@ -58,6 +65,9 @@ namespace TAnimUtils
 
 	namespace FromFile
 	{
+		// Gets animation duration in frame, size in bytes and crc32 hash and feeds it to a structure. Returns false on failure.
+		bool GetAnimationInfos(const wchar_t* filename, s_animInfo& animInfo);
+
 		// Gets the animation duration in frame or -1 if the file is invalid (validation isn't extensive)
 		int GetAnimationDuration(const wchar_t* filename);
 	};

@@ -13,8 +13,9 @@ private:
 		std::string lowercaseName;
 		std::wstring filepath;
 		std::string duration;
-		std::string size_megabytes;
+		std::string size_kilobytes;
 		unsigned int size;
+		std::string hash;
 	};
 
 	struct AnimationLibChar
@@ -39,6 +40,8 @@ private:
 	size_t m_animCount = 0;
 	// Amount of animations in total, during the last render. Used to determine if the list needs to be re-computed
 	size_t m_prevRenderAnimCount = 0;
+	// True if animation enumerating was just finished. Used in order to refresh the filtered list
+	bool m_justFinishedLoading = false;
 
 	// Filters the animation list according to the search buffer
 	void ApplySearchFilter();

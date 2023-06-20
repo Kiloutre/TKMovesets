@@ -632,6 +632,12 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 			DEBUG_ERR("Imported animation is missing bytes. (file %llu, real %llu)", animSize, realAnimSize);
 		}
 	}
+
+	// Byteswap the animation in little endian if needed
+	if (!TAnimUtils::FromMemory::IsLittleEndian(anim)) {
+		TAnimUtils::FromMemory::ByteswapAnimation(anim);
+	}
+
 	// Ensure animation name is unique
 	if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end())
 	{

@@ -536,6 +536,46 @@ namespace TAnimUtils
 
 	namespace FromFile
 	{
+		bool GetAnimationInfos(const wchar_t* filename, s_animInfo& animInfo)
+		{
+			std::ifstream file(filename, std::ios::binary);
+
+			if (file.fail()) {
+				// Error
+				return false;
+			}
+
+			file.seekg(0, std::ios::end);
+			animInfo.size = file.tellg();
+
+			if (animInfo.size < 8) {
+				// Arbitrary size to determine that animations are invalid
+				return false;
+			}
+
+			Byte* buf = new Byte[animInfo.size];
+			file.seekg(0, std::ios::beg);
+			file.read((char*)buf, animInfo.size);
+
+			bool isBigEndian = buf[0] == 0;
+			Byte animType = isBigEndian ? buf[1] : buf[0];
+			uint32_t boneCount = isBigEndian ? buf[3] : buf[2];
+
+			if ((animType != 0x64 && animType != 0xC8) || animInfo.size < (4 + boneCount * 2 + 4))
+			{
+				// Unknown animation type OR bad animation size
+				delete[] buf;
+				return false;
+			}
+
+			animInfo.duration = FromMemory::GetAnimDuration(buf);
+			animInfo.hash = Helpers::CalculateCrc32(buf, animInfo.size);
+
+			delete[]buf;
+
+			return true;
+		}
+
 		int GetAnimationDuration(const wchar_t* filename)
 		{
 			std::ifstream file(filename, std::ios::binary);
@@ -548,7 +588,8 @@ namespace TAnimUtils
 			int duration = -1;
 
 			file.read(buf, 8);
-			if (file.gcount() == 8) {
+			if (file.gcount() == 8)
+			{
 				Byte isBigEndian = buf[0] == 0;
 				Byte animType = isBigEndian ? buf[1] : buf[0];
 				Byte boneCount = isBigEndian ? buf[3] : buf[2];

@@ -186,8 +186,10 @@ namespace Helpers
     // Make sure a file's writing cursor is divisble by 8
     void align8Bytes(std::ofstream& file);
 
-	// Calcualte a crc32 from a list of data blocks. Always skip the first one.
+	// Calcualte a CRC32 from a list of data blocks. Always skip the first one.
 	uint32_t CalculateCrc32(const std::vector<std::pair<Byte*, uint64_t>>& blocks);
+	// Calculate a CRC32 from a block of data
+	uint32_t CalculateCrc32(const Byte* data, uint64_t size);
 
     // Formats given date in 'hour:minutes day/month/year'
     std::string formatDateTime(uint64_t date);

@@ -14,6 +14,7 @@
 
 void TEditorMove_Animations::ApplySearchFilter()
 {
+	DEBUG_LOG("ApplySearchFilter\n");
 	std::vector<AnimationLibChar*> characters = m_characters;
 	for (auto& character : characters)
 	{
@@ -88,8 +89,9 @@ void TEditorMove_Animations::LoadAnimationList()
 			{
 				auto i = line.find(",");
 				auto i2 = line.find(",", i + 1);
+				auto i3 = line.find(",", i2 + 1);
 				
-				if (i == std::string::npos || i2 == std::string::npos) {
+				if (i == std::string::npos || i2 == std::string::npos || i3 == std::string::npos) {
 					DEBUG_ERR("%s anims.txt : Bad line formatting: '%s'", characterName.c_str(), line.c_str());
 					continue;
 				}
@@ -104,13 +106,16 @@ void TEditorMove_Animations::LoadAnimationList()
 					.lowercaseName = lowercaseName,
 					.filepath = characterFolder + L"/" + Helpers::to_unicode(line.substr(0, i)),
 					.duration = line.substr(i + 1, i2 - i - 1),
-					.size_megabytes = std::format("{:.2f}", ((float)file_size) / 1000.0f)
+					.size_kilobytes = std::format("{:.2f}", ((float)file_size) / 1000.0f),
+					.size = file_size,
+					.hash = line.substr(i3 + 1)
 				};
 
 				charAnims->files.push_back(anim);
 				m_animCount++;
 
 				if (!addedFile) {
+					DEBUG_LOG("Adding pre-computed animation list from character %s\n", charAnims->name.c_str());
 					m_characters.push_back(charAnims);
 					addedFile = true;
 				}
@@ -120,6 +125,7 @@ void TEditorMove_Animations::LoadAnimationList()
 		{
 			// Fallback to file listing and animation analyzing
 
+			s_animInfo animInfo;
 			for (const auto& file : std::filesystem::directory_iterator(characterFolder))
 			{
 				if (m_destructionRequested) {
@@ -143,9 +149,7 @@ void TEditorMove_Animations::LoadAnimationList()
 				std::string lowercaseName = name;
 				std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);
 
-				int duration = TAnimUtils::FromFile::GetAnimationDuration(filename.c_str());
-
-				if (duration == -1) {
+				if (!TAnimUtils::FromFile::GetAnimationInfos(filename.c_str(), animInfo)) {
 					// Probably an invalid file. todo : show, but prevent import?
 					continue;
 				}
@@ -154,30 +158,36 @@ void TEditorMove_Animations::LoadAnimationList()
 					.name = name,
 					.lowercaseName = lowercaseName,
 					.filepath = filename,
-					.duration = std::to_string(duration),
-					.size_megabytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f),
-					.size = (unsigned int)file.file_size()
+					.duration = std::to_string(animInfo.duration),
+					.size_kilobytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f),
+					.size = (unsigned int)file.file_size(),
+					.hash = std::format("{:08X}", animInfo.hash)
 				};
 				charAnims->files.push_back(anim);
 				m_animCount++;
 
 				if (!addedFile) {
+					DEBUG_LOG("Adding computed animation list from character %s\n", charAnims->name.c_str());
 					m_characters.push_back(charAnims);
 					addedFile = true;
 				}
+
 			}
 
 
-			// Write new anims.txt with newly computed informations
-			std::ofstream newAnimListFile(characterFolder + L"/anims.txt");
-			if (newAnimListFile.fail()) {
-				DEBUG_ERR("Failed to create '%S'", (characterFolder + L"/anims.txt").c_str());
-			}
-			else {
-				for (auto anim : charAnims->files) {
-					newAnimListFile << anim->name << "," << anim->duration << "," << anim->size << std::endl;
+			if (!m_destructionRequested)
+			{
+				// Write new anims.txt with newly computed informations
+				std::ofstream newAnimListFile(characterFolder + L"/anims.txt");
+				if (newAnimListFile.fail()) {
+					DEBUG_ERR("Failed to create '%S'", (characterFolder + L"/anims.txt").c_str());
 				}
-				DEBUG_LOGN("Successfully wrote %llu animations to '%S'", charAnims->files.size(), (characterFolder + L"/anims.txt").c_str());
+				else {
+					for (auto anim : charAnims->files) {
+						newAnimListFile << anim->name << "," << anim->duration << "," << anim->size << "," << anim->hash << std::endl;
+					}
+					DEBUG_LOGN("Successfully wrote %llu animations to '%S'", charAnims->files.size(), (characterFolder + L"/anims.txt").c_str());
+				}
 			}
 		}
 
@@ -194,6 +204,7 @@ void TEditorMove_Animations::LoadAnimationList()
 	}
 
 	loadedList = true;
+	m_justFinishedLoading = true;
 }
 
 bool TEditorMove_Animations::Render()
@@ -206,14 +217,16 @@ bool TEditorMove_Animations::Render()
 			popen = false;
 		}
 
-		if (!loadedList && m_animCount != m_prevRenderAnimCount) {
+		if (m_justFinishedLoading || (m_animCount != m_prevRenderAnimCount)) {
+			if (m_justFinishedLoading) {
+				m_justFinishedLoading = false;
+			}
 			m_prevRenderAnimCount = m_animCount;
 			ApplySearchFilter();
 			// Animation was added, re-compute animation list
 		}
 
 		ImGui::SameLine();
-		bool disabled = !loadedList;
 		if (ImGui::Button(_("edition.animation_list.clear_filter"))) {
 			m_searchBuffer[0] = '\0';
 			m_lowercaseBuffer = std::string();
@@ -252,11 +265,12 @@ bool TEditorMove_Animations::Render()
 
 			if (ImGui::TreeNode(character->name.c_str()))
 			{
-				if (ImGui::BeginTable("##", 4, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+				if (ImGui::BeginTable("##", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 				{
 					ImGui::TableSetupColumn(_("edition.animation_list.anim_name"));
 					ImGui::TableSetupColumn(_("edition.animation_list.duration"));
 					ImGui::TableSetupColumn(_("edition.animation_list.size"));
+					ImGui::TableSetupColumn(_("hash"));
 					ImGui::TableSetupColumn("##");
 					ImGui::TableHeadersRow();
 
@@ -270,9 +284,12 @@ bool TEditorMove_Animations::Render()
 						ImGui::TextUnformatted(file->duration.c_str());
 
 						ImGui::TableNextColumn();
-						ImGui::TextUnformatted(file->size_megabytes.c_str());
+						ImGui::TextUnformatted(file->size_kilobytes.c_str());
 						ImGui::SameLine();
 						ImGui::TextUnformatted(_("moveset.size_kb"));
+
+						ImGui::TableNextColumn();
+						ImGui::TextUnformatted(file->hash.c_str());
 
 						ImGui::TableNextColumn();
 						ImGui::PushID(file->filepath.c_str());

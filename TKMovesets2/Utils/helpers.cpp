@@ -95,6 +95,17 @@ namespace Helpers
 		return crc32;
 	}
 
+	uint32_t CalculateCrc32(const Byte* data, uint64_t size)
+	{
+		uint32_t crc32 = 0;
+		uint32_t table[256];
+
+		Helpers::crc32_generate_table(table);
+		crc32 = Helpers::crc32_update(table, crc32, (char*)data, size);
+
+		return crc32;
+	}
+
 	std::string formatDateTime(uint64_t date) {
 		time_t     now = date;
 		struct tm  tstruct;

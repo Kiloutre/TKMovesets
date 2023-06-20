@@ -29,6 +29,7 @@ close_window = Close window
 3p = Player 3
 4p = Player 4
 select_game = Select a game
+hash = Hash
 
 # Process #
 

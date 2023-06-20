@@ -29,6 +29,7 @@ close_window = Fermer fenêtre
 3p = Joueur 3
 4p = Joueur 4
 select_game = Sélectionner un jeu
+hash = Hachage
 
 # Processus #
 

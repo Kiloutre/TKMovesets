@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <format>
 #include <windows.h>
 
 #include "AnimExtractors.hpp"
@@ -122,7 +123,20 @@ namespace TAnimExtractorUtils
 		if (!file.fail())
 		{
 			file.write((char*)anim, anim_size);
-			outputFile << name << Helpers::wstring_to_string(extension) << (*anim == 0xC8 ? "C8" : "64") << "," << TAnimUtils::FromMemory::GetAnimDuration(anim) << "," << anim_size << std::endl;
+
+			// Animation Name
+			outputFile << name << Helpers::wstring_to_string(extension) << (*anim == 0xC8 ? "C8" : "64");
+			outputFile << ",";
+			// Animation duration
+			outputFile << TAnimUtils::FromMemory::GetAnimDuration(anim);
+			outputFile << ",";
+			// Animation size
+			outputFile << anim_size;
+			outputFile << ",";
+			// Set up HEX formatting
+			// Animation hash
+			uint32_t crc32 = Helpers::CalculateCrc32(anim, anim_size);
+			outputFile << std::format("{:08X}", crc32) << std::endl;
 		}
 	}
 }
