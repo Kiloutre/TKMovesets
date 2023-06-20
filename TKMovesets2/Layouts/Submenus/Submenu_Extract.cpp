@@ -172,7 +172,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			std::string buttonText;
 
 			const char playerIdTranslationId[3] = { '1' + (char)playerId , 'p', '\0' };
-			if (characterName[0] == '\0') {
+			if (!canExtract || characterName[0] == '\0') {
 				buttonText = std::format("{} ({})", _("extraction.extract"), _(playerIdTranslationId));
 			}
 			else {

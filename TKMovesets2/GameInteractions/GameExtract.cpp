@@ -12,12 +12,9 @@
 
 void GameExtract::LoadCharacterNames()
 {
-	if (m_extractor != nullptr && m_extractor->CanExtract()) {
-
-		uint8_t playerId = 0;
-		for (gameAddr playerAddress : m_extractor->GetCharacterAddresses()) {
-			characterNames[playerId++] = m_extractor->GetPlayerCharacterName(playerAddress);
-		}
+	uint8_t playerId = 0;
+	for (gameAddr playerAddress : m_extractor->GetCharacterAddresses()) {
+		characterNames[playerId++] = m_extractor->GetPlayerCharacterName(playerAddress);
 	}
 }
 

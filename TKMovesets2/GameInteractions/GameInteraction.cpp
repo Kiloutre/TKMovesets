@@ -14,6 +14,7 @@ void GameInteraction::SetTargetProcess(const GameInfo* gameInfo)
 		return;
 	}
 
+	m_canStart = false;
 	currentGame = gameInfo;
 	currentGameProcess = std::string(gameInfo->processName);
 
