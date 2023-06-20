@@ -14,19 +14,20 @@
 
 void TEditorMove_Animations::ApplySearchFilter()
 {
-	for (unsigned int j = 0; j < m_characters.size(); ++j)
+	std::vector<AnimationLibChar*> characters = m_characters;
+	for (auto& character : characters)
 	{
-		auto& character = m_characters[j];
 		if (strlen(m_searchBuffer) == 0) {
 			character->filteredFiles = character->files;
 		}
 		else {
 			auto& filteredFiles = character->filteredFiles;
+
 			filteredFiles.clear();
 
-			for (unsigned int i = 0; i < character->files.size(); ++i)
+			std::vector<AnimationLibFile*> files = character->files;
+			for (auto& file : files)
 			{
-				auto& file = character->files[i];
 				if (strstr(file->lowercaseName.c_str(), m_lowercaseBuffer.c_str())) {
 					filteredFiles.push_back(file);
 					character->forceOpen = true;
@@ -222,9 +223,6 @@ bool TEditorMove_Animations::Render()
 		ImGui::SameLine();
 		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
-		if (disabled) {
-			ImGui::BeginDisabled();
-		}
 		if (ImGui::InputTextWithHint("##", _("edition.animation_list.search_animation"), m_searchBuffer, sizeof(m_searchBuffer))) {
 			m_lowercaseBuffer = std::string(m_searchBuffer);
 			std::transform(m_lowercaseBuffer.begin(), m_lowercaseBuffer.end(), m_lowercaseBuffer.begin(), tolower);
@@ -233,8 +231,7 @@ bool TEditorMove_Animations::Render()
 
 		ImGui::PopItemWidth();
 
-		if (disabled) {
-			ImGui::EndDisabled();
+		if (!loadedList) {
 			ImGui::TextUnformatted(_("edition.animation_list.loading"));
 		} else if (m_characters.size() == 0) {
 			ImGuiExtra::RenderTextbox(_("edition.animation_list.no_anim"));

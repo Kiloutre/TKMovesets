@@ -37,7 +37,7 @@ private:
 	std::thread m_loadingThread;
 	// Amount of animations in total
 	size_t m_animCount = 0;
-	// Amount of animations in total, during the last render
+	// Amount of animations in total, during the last render. Used to determine if the list needs to be re-computed
 	size_t m_prevRenderAnimCount = 0;
 
 	// Filters the animation list according to the search buffer
