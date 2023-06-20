@@ -14,6 +14,7 @@ private:
 		std::wstring filepath;
 		std::string duration;
 		std::string size_megabytes;
+		unsigned int size;
 	};
 
 	struct AnimationLibChar

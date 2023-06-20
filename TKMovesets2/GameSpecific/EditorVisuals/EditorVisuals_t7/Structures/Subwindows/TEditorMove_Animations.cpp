@@ -73,57 +73,114 @@ void TEditorMove_Animations::LoadAnimationList()
 		std::wstring characterFolder = directory.path().wstring();
 		std::string characterName = Helpers::wstring_to_string(characterFolder.substr(characterFolder.find_last_of(L"/\\")));
 
+		std::ifstream animListFile(characterFolder + L"/anims.txt");
+
 		AnimationLibChar* charAnims = new AnimationLibChar;
+		bool addedFile = false;
 		charAnims->name = characterName;
-		int fileIdx = 0;
 
-		for (const auto& file : std::filesystem::directory_iterator(characterFolder))
+		if (!animListFile.fail())
 		{
-			if (m_destructionRequested) {
-				break;
+			// Use pre-computed anims.txt if it exists
+			std::string line;
+			while (std::getline(animListFile, line))
+			{
+				auto i = line.find(",");
+				auto i2 = line.find(",", i + 1);
+				
+				if (i == std::string::npos || i2 == std::string::npos) {
+					DEBUG_ERR("%s anims.txt : Bad line formatting: '%s'", characterName.c_str(), line.c_str());
+					continue;
+				}
+
+				std::string name = line.substr(0, i);
+				std::string lowercaseName = name;
+				std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);
+				unsigned int file_size = std::atoi(line.c_str() + i2 + 1);
+
+				auto anim = new AnimationLibFile{
+					.name = name,
+					.lowercaseName = lowercaseName,
+					.filepath = characterFolder + L"/" + Helpers::to_unicode(line.substr(0, i)),
+					.duration = line.substr(i + 1, i2 - i - 1),
+					.size_megabytes = std::format("{:.2f}", ((float)file_size) / 1000.0f)
+				};
+
+				charAnims->files.push_back(anim);
+				charAnims->filteredFiles.push_back(anim);
+
+				if (!addedFile) {
+					m_characters.push_back(charAnims);
+					addedFile = true;
+				}
+			}
+		}
+		else
+		{
+			// Fallback to file listing and animation analyzing
+
+			for (const auto& file : std::filesystem::directory_iterator(characterFolder))
+			{
+				if (m_destructionRequested) {
+					break;
+				}
+
+				if (!file.is_regular_file()) {
+					continue;
+				}
+
+				std::wstring filename = file.path().wstring();
+
+				if (!Helpers::endsWith<std::wstring>(filename, L".bin") &&
+					!Helpers::endsWith<std::wstring>(filename, L"" ANIMATION_EXTENSION L"C8") &&
+					!Helpers::endsWith<std::wstring>(filename, L"" ANIMATION_EXTENSION L"64")
+					) {
+					continue;
+				}
+
+				std::string name = Helpers::to_utf8(filename.substr(filename.find_last_of(L"/\\") + 1));
+				std::string lowercaseName = name;
+				std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);
+
+				int duration = TAnimUtils::FromFile::GetAnimationDuration(filename.c_str());
+
+				if (duration == -1) {
+					// Probably an invalid file. todo : show, but prevent import?
+					continue;
+				}
+
+				auto anim = new AnimationLibFile{
+					.name = name,
+					.lowercaseName = lowercaseName,
+					.filepath = filename,
+					.duration = std::to_string(duration),
+					.size_megabytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f),
+					.size = (unsigned int)file.file_size()
+				};
+				charAnims->files.push_back(anim);
+				charAnims->filteredFiles.push_back(anim);
+
+				if (!addedFile) {
+					m_characters.push_back(charAnims);
+					addedFile = true;
+				}
 			}
 
-			if (!file.is_regular_file()) {
-				continue;
+
+			// Write new anims.txt with newly computed informations
+			std::ofstream newAnimListFile(characterFolder + L"/anims.txt");
+			if (newAnimListFile.fail()) {
+				DEBUG_ERR("Failed to create '%S'", (characterFolder + L"/anims.txt").c_str());
 			}
-
-			std::wstring filename = file.path().wstring();
-
-			if (!Helpers::endsWith<std::wstring>(filename, L".bin") &&
-				!Helpers::endsWith<std::wstring>(filename, L"" ANIMATION_EXTENSION L"C8") &&
-				!Helpers::endsWith<std::wstring>(filename, L"" ANIMATION_EXTENSION L"64")
-				) {
-				continue;
+			else {
+				for (auto anim : charAnims->files) {
+					newAnimListFile << anim->name << "," << anim->duration << "," << anim->size << std::endl;
+				}
+				DEBUG_LOG("Successfully wrote %llu animations to '%S'\n", charAnims->files.size(), (characterFolder + L"/anims.txt").c_str());
 			}
-
-			std::string name = Helpers::to_utf8(filename.substr(filename.find_last_of(L"/\\") + 1));
-			name = name.substr(0, name.find_last_of('.'));
-			std::string lowercaseName = name;
-			std::transform(lowercaseName.begin(), lowercaseName.end(), lowercaseName.begin(), tolower);
-
-			int duration = TAnimUtils::FromFile::GetAnimationDuration(filename.c_str());
-
-			if (duration == -1) {
-				// Probably an invalid file. todo : show, but prevent import?
-				continue;
-			}
-
-			charAnims->files.push_back(new AnimationLibFile{
-				.name = name,
-				.lowercaseName = lowercaseName,
-				.filepath = filename,
-				.duration = std::to_string(duration),
-				.size_megabytes = std::format("{:.2f}", ((float)file.file_size()) / 1000.0f)
-			});
-
-			charAnims->filteredFiles.push_back(charAnims->files[fileIdx]);
-			if (fileIdx == 0) {
-				m_characters.push_back(charAnims);
-			}
-			++fileIdx;
 		}
 
-		if (fileIdx == 0) {
+		if (charAnims->files.size() == 0) {
 			delete charAnims;
 		}
 		else {

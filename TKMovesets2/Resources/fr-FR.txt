@@ -198,7 +198,6 @@ edition.extract_animations_finished = Extraction d'animation terminée !
 edition.animation_extraction.extraction_status = Status de l'extraction
 edition.animation_extraction.not_started = Pas commencé
 edition.animation_extraction.skipped = Passé
-edition.animation_extraction.duplicates = Doublons
 
 edition.form_popup.copy_structure_clipboard = Copier la structure
 edition.form_popup.copy_single_item_clipboard = Copier un seul élément

@@ -24,9 +24,20 @@ void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::
 
 	Move* movelist = (Move*)(moveset_block + (uint64_t)moveset_info.table.move);
 
-	// Get animation count
-	extractionStatus.total_animation_count = (uint32_t)moveset_info.table.moveCount;
+	// Count move animations
+	std::set<decltype(movelist->anim_addr)> extracted_animations;
+	for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
+	{
+		auto& move = movelist[i];
 
+		if (!extracted_animations.contains(move.anim_addr))
+		{
+			++extractionStatus.total_animation_count;
+			extracted_animations.insert(move.anim_addr);
+		}
+	}
+
+	// Count mota animations
 	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
 	{
 		if ((gameAddr)moveset_info.motas.motas[i] == MOVESET_ADDR_MISSING) {
@@ -41,29 +52,38 @@ void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::
 			continue;
 		}
 
-		extractionStatus.total_animation_count += mota.anim_count;
+		std::set<uint32_t> extracted_mota_animations;
+		for (unsigned int i = 0; i < mota.anim_count; ++i)
+		{
+			uint32_t anim_offset = mota.anim_offset_list[i];
+			if (!extracted_mota_animations.contains(anim_offset))
+			{
+				++extractionStatus.total_animation_count;
+				extracted_mota_animations.insert(anim_offset);
+			}
+		}
 	}
 
 	// Extract animations
 	extractionStatus.status = AnimExtractionStatus_Started;
 
+	// Extract move animations
+	extracted_animations.clear();
+	for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
 	{
-		std::set<decltype(movelist->anim_addr)> extracted_animations;
-		for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
-		{
-			auto& move = movelist[i];
+		auto& move = movelist[i];
 
-			if (!extracted_animations.contains(move.anim_addr))
-			{
-				char* anim_name = name_block + (uint64_t)move.anim_name_addr;
-				const Byte* anim = animation_block + (uint64_t)move.anim_addr;
-				extracted_animations.insert(move.anim_addr);
-				TAnimExtractorUtils::ExtractAnimation(anim_name, anim, outputFolder, outputFile, L"" ANIMATION_EXTENSION);
-				extractionStatus.current_animation++;
-			}
+		if (!extracted_animations.contains(move.anim_addr))
+		{
+			char* anim_name = name_block + (uint64_t)move.anim_name_addr;
+			const Byte* anim = animation_block + (uint64_t)move.anim_addr;
+			extracted_animations.insert(move.anim_addr);
+			TAnimExtractorUtils::ExtractAnimation(anim_name, anim, outputFolder, outputFile, L"" ANIMATION_EXTENSION);
+			extractionStatus.current_animation++;
 		}
 	}
 
+	// Extract mota animatio,s
 	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
 	{
 		if ((gameAddr)moveset_info.motas.motas[i] == MOVESET_ADDR_MISSING) {

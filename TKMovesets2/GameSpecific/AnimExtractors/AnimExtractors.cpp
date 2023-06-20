@@ -122,7 +122,7 @@ namespace TAnimExtractorUtils
 		if (!file.fail())
 		{
 			file.write((char*)anim, anim_size);
-			outputFile << name << Helpers::wstring_to_string(extension) << (*anim == 0xC8 ? "C8" : "64") << "," << TAnimUtils::FromMemory::GetAnimDuration(anim) << std::endl;
+			outputFile << name << Helpers::wstring_to_string(extension) << (*anim == 0xC8 ? "C8" : "64") << "," << TAnimUtils::FromMemory::GetAnimDuration(anim) << "," << anim_size << std::endl;
 		}
 	}
 }
