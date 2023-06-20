@@ -2,10 +2,11 @@
 #include <format>
 #include <fstream>
 
-# include "Compression.hpp"
-# include "helpers.hpp"
-# include "Importer.hpp"
-# include "Editor_t7.hpp"
+#include "Compression.hpp"
+#include "helpers.hpp"
+#include "Importer.hpp"
+#include "Editor_t7.hpp"
+#include "Animations.hpp"
 
 using namespace EditorUtils;
 
@@ -590,8 +591,10 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	animName_wstr = animName_wstr.substr(0, animName_wstr.find_last_of(L'.'));
 	std::string animName_str = Helpers::to_utf8(animName_wstr);
 
+
 	Byte* anim;
 	uint64_t animSize;
+	uint64_t realAnimSize;
 	{
 		std::ifstream animFile(filepath, std::ios::binary);
 
@@ -612,19 +615,37 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 		animFile.read((char*)anim, animSize);
 
 		// Ensure old bad animations don't get completely carried over
-		uint64_t realAnimSize = Helpers::GetAnimationSize(anim);
+		realAnimSize = TAnimUtils::FromMemory::GetAnimSize(anim);
+
+		if (realAnimSize == 0) {
+			DEBUG_ERR("Bad animation file : %S", filepath);
+			delete[] anim;
+			return "";
+		}
+
 		if (realAnimSize < animSize) {
 			animSize = realAnimSize;
 			DEBUG_LOG("Imported animation is too big (useless bytes): shrinking its size\n");
 		}
-		else {
+		else if (realAnimSize > animSize) {
 			// todo: Display a warning to the user
-			DEBUG_ERR("Imported animation is missing bytes.");
+			DEBUG_ERR("Imported animation is missing bytes. (file %llu, real %llu)", animSize, realAnimSize);
 		}
 	}
-
 	// Ensure animation name is unique
-	if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
+	if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end())
+	{
+		// An animation with the same name has been found
+		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)m_animNameToOffsetMap->at(animName_str));
+
+		if (TAnimUtils::FromMemory::GetAnimSize(existing_anim) == realAnimSize && memcmp(anim, existing_anim, realAnimSize) == 0)
+		{
+			DEBUG_LOG("Attempted to import duplicate animation: using existing one.\n");
+			delete[] anim;
+			return animName_str;
+		}
+
+
 		std::string animName_orig = animName_str;
 		animName_str += " (2)";
 		unsigned int num = 2;

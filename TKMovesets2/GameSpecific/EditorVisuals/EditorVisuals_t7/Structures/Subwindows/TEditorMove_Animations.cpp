@@ -176,7 +176,7 @@ void TEditorMove_Animations::LoadAnimationList()
 				for (auto anim : charAnims->files) {
 					newAnimListFile << anim->name << "," << anim->duration << "," << anim->size << std::endl;
 				}
-				DEBUG_LOG("Successfully wrote %llu animations to '%S'\n", charAnims->files.size(), (characterFolder + L"/anims.txt").c_str());
+				DEBUG_LOGN("Successfully wrote %llu animations to '%S'", charAnims->files.size(), (characterFolder + L"/anims.txt").c_str());
 			}
 		}
 
