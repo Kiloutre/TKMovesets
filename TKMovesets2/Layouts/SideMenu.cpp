@@ -139,6 +139,8 @@ static void SetWindowsFileAssociation()
 
 SideMenu::SideMenu()
 {
+	m_auto_update_check = Settings::Get(SETTING_AUTO_UPDATE_KEY, SETTING_AUTO_UPDATE);
+	m_auto_addr_update_check = Settings::Get(SETTING_AUTO_ADDR_UPDATE_KEY, SETTING_AUTO_ADDR_UPDATE);
 	m_vsync_setting = Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER);
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
@@ -263,5 +265,11 @@ void SideMenu::Render(float width)
 	if (ImGui::Button(_("sidemenu.file_association"))) {
 		SetWindowsFileAssociation();
 	}
-	
+
+	if (ImGui::Checkbox(_("sidemenu.auto_update_check"), &m_auto_update_check)) {
+		Settings::Set(SETTING_AUTO_UPDATE_KEY, m_auto_update_check);
+	}
+	if (ImGui::Checkbox(_("sidemenu.auto_addr_update_check"), &m_auto_addr_update_check)) {
+		Settings::Set(SETTING_AUTO_ADDR_UPDATE_KEY, m_auto_addr_update_check);
+	}
 }

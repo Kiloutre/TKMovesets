@@ -88,6 +88,8 @@ sidemenu.vsync = Synchro verticale
 
 sidemenu.changelog = Changements
 sidemenu.file_association = Associer .tkmvst
+sidemenu.auto_update_check = Avertir mises à jour
+sidemenu.auto_addr_update_check = Mise à jour addr. auto
 
 ## Sous-menus ##
 

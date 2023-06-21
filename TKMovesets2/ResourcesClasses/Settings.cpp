@@ -72,7 +72,7 @@ namespace Settings
 		}
 
 
-		DEBUG_LOG("Loaded settings '%s'");
+		DEBUG_LOG("Loaded settings.");
 		return true;
 	}
 
@@ -100,7 +100,7 @@ namespace Settings
 	float Get(const char* c_stringId, float defaultValue)
 	{
 		auto item = g_settings.find(c_stringId);
-		return item == g_settings.end() ? defaultValue : atof(item->second.c_str());
+		return item == g_settings.end() ? defaultValue : (float)atof(item->second.c_str());
 	}
 
 	bool Get(const char* c_stringId, bool defaultValue)
@@ -113,7 +113,7 @@ namespace Settings
 		const char* setting = item->second.c_str();
 		while (*setting == ' ') ++setting;
 
-		if (strnicmp(setting, "true", 4) == 0) {
+		if (_strnicmp(setting, "true", 4) == 0) {
 			// Returns true if string is "TRUE"
 			return true;
 		}

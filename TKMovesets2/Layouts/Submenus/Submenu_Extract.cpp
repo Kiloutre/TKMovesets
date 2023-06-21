@@ -9,6 +9,7 @@
 #include "GameExtract.hpp"
 #include "Helpers.hpp"
 #include "Compression.hpp"
+#include "Settings.hpp"
 
 // -- Private methods -- //
 
@@ -24,7 +25,7 @@ Submenu_Extract::Submenu_Extract()
 	m_motaExport[8] = true; // Camera
 	m_motaExport[9] = true; // Camera
 
-	m_overwriteSameFilename = false;
+	m_overwriteSameFilename = Settings::Get(SETTING_EXPORT_OVERWRITE_KEY, SETTING_EXPORT_OVERWRITE);
 	m_extractDisplayableMovelist = true;
 
 	m_extractUnsupportedMotas = false;
@@ -139,7 +140,9 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 		// Extraction settings
 		ImGui::SameLine();
-		ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwriteSameFilename);
+		if (ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwriteSameFilename)) {
+			Settings::Set(SETTING_EXPORT_OVERWRITE_KEY, &m_overwriteSameFilename);
+		}
 		ImGui::SameLine();
 		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
 	}

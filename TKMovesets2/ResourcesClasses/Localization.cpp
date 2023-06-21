@@ -81,7 +81,7 @@ namespace Localization
 		std::transform(lowercaseLocale.begin(), lowercaseLocale.end(), lowercaseLocale.begin(), tolower);
 		for (int i = 0; i < _countof(g_translation_datas); ++i)
 		{
-			if (stricmp(g_translation_datas[i].locale, locale) == 0
+			if (_stricmp(g_translation_datas[i].locale, locale) == 0
 				|| g_translation_datas[i].matchingLocale.contains(lowercaseLocale))
 			{
 				langId = i;

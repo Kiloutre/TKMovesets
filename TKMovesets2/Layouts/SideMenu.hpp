@@ -36,6 +36,9 @@ private:
 	bool m_updateFileInvalid = false;
 	// Vsync dropdown index
 	uint8_t m_vsync_setting;
+	// 
+	bool m_auto_update_check;
+	bool m_auto_addr_update_check;
 
 	// Start a thread that will check for updates
 	void RequestCheckForUpdates();

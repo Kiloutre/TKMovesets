@@ -9,6 +9,7 @@
 
 #include "SideMenu.hpp"
 #include "helpers.hpp"
+#include "Settings.hpp"
 
 #include "constants.h"
 
@@ -256,7 +257,8 @@ void SideMenu::CheckForUpdates(bool firstTime)
 	DEBUG_LOG("::CheckForUpdates(%d)\n", firstTime);
 	bool updatedAnything = false;
 
-	if (!firstTime || m_addresses->GetValue("global", "startup_update_check") == 1) {
+	
+	if (!firstTime || Settings::Get(SETTING_AUTO_UPDATE_KEY, SETTING_AUTO_UPDATE) == 1) {
 		// Now check for new releases
 		if (DownloadProgramUpdate(&m_updateStatus, m_addresses, true)) {
 			m_updateStatus.programUpdateAvailable = true;
@@ -265,7 +267,7 @@ void SideMenu::CheckForUpdates(bool firstTime)
 		}
 	}
 
-	if (!firstTime || m_addresses->GetValue("global", "startup_addr_update_check") == 1) {
+	if (!firstTime || Settings::Get(SETTING_AUTO_ADDR_UPDATE_KEY, SETTING_AUTO_ADDR_UPDATE) == 1) {
 		// Check for addresses update first
 		if (UpdateAddresses(&m_updateStatus.error, m_addresses)) {
 			m_updateStatus.addrFile = true;

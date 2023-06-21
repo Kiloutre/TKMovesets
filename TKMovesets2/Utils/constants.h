@@ -59,11 +59,17 @@
 # define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 
-# define MAX_FPS                 (60.0f)
-# define SETTING_VSYNC_BUFFER_KEY ("vsync")
-# define SETTING_VSYNC_BUFFER     (2) // 0 is no vsync, 1 is one screen refresh, etc
-# define SETTING_LANG_KEY         ("language")
-# define SETTING_LANG             (-1) // -1 means autodetect
+# define MAX_FPS                       (60.0f)
+# define SETTING_VSYNC_BUFFER_KEY      ("vsync_interval")
+# define SETTING_VSYNC_BUFFER          (2) // 0 is no vsync, 1 is one screen refresh, etc
+# define SETTING_LANG_KEY              ("language_id")
+# define SETTING_LANG                  (-1) // -1 means autodetect
+# define SETTING_AUTO_UPDATE_KEY       ("auto_update_check")
+# define SETTING_AUTO_UPDATE           (true)
+# define SETTING_AUTO_ADDR_UPDATE_KEY  ("auto_addresses_update_check")
+# define SETTING_AUTO_ADDR_UPDATE      (true)
+# define SETTING_EXPORT_OVERWRITE_KEY  ("export.overwrite_identical_name")
+# define SETTING_EXPORT_OVERWRITE      (true)
 
 # define TEXTBOX_HORIZ_PADDING   15
 # define TEXTBOX_VERT_PADDING    10
