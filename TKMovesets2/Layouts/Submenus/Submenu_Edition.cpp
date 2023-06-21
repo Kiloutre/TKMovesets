@@ -177,6 +177,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		{
 			std::wstring path = std::filesystem::current_path();
 			path += L"/" EDITOR_LIB_DIRECTORY;
+			CreateDirectoryW(path.c_str(), nullptr);
 			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 		}
 	}
