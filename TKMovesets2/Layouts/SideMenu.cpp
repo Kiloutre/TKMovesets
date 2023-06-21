@@ -31,8 +31,9 @@ static void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue)
 	}
 
 	if (!bDidntExist) {
-		if (dwType != REG_SZ)
+		if (dwType != REG_SZ) {
 			DEBUG_ERR("RegGetValue( %s ) found type unhandled %d", pszVar, dwType);
+		}
 
 		if (strcmp(szValueCurrent, pszValue) == 0) {
 			DEBUG_ERR("RegSet( \"%s\" \"%s\" ): already correct", pszVar, pszValue);
@@ -194,7 +195,7 @@ void SideMenu::Render(float width)
 	}
 	else {
 		if (m_updateStatus.up_to_date) {
-			ImGui::TextUnformatted(_("sidemenu.up_to_date"));
+			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("sidemenu.up_to_date"));
 		}
 		else {
 			if (m_updateStatus.addrFile) {

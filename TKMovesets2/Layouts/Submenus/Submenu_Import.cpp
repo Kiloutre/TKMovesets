@@ -151,7 +151,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
-		ImGui::TableSetupColumn(_("moveset.date"));;
+		ImGui::TableSetupColumn(_("moveset.date"));
 		ImGui::TableSetupColumn(_("moveset.import"));
 		ImGui::TableHeadersRow();
 
