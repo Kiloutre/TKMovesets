@@ -9,6 +9,7 @@
 #define DEBUG_LAST_GL_ERR() { auto _err = glGetError(); _err == GL_NO_ERROR ? true : printf("glGetError(): %d / 0x%x\n", _err, _err); }
 #else
 #define DEBUG_LOG(...) 
+#define DEBUG_LOGN(...) 
 #define DEBUG_ERR(...) 
 #define DEBUG_LAST_ERR()
 #endif
