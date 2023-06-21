@@ -114,11 +114,17 @@ namespace Settings
 		while (*setting == ' ') ++setting;
 
 		if (_strnicmp(setting, "true", 4) == 0) {
-			// Returns true if string is "TRUE"
+			// Returns true if string starts with "TRUE", case insensitive
 			return true;
 		}
-		if (*setting && *setting != '0') {
-			// Returns true if string is a non-zero character
+
+		if (_strnicmp(setting, "false", 4) == 0) {
+			// Returns false if string starts with "FALSE", case insensitive
+			return false;
+		}
+
+		if (atoi(setting) || (*setting && *setting != '0')) {
+			// Returns true if string is non-zero
 			return true;
 		}
 

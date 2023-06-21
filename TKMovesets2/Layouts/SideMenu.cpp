@@ -139,8 +139,14 @@ static void SetWindowsFileAssociation()
 
 SideMenu::SideMenu()
 {
+#ifdef BUILD_TYPE_DEBUG
+	m_auto_update_check = false;
+	m_auto_addr_update_check = false;
+#else
 	m_auto_update_check = Settings::Get(SETTING_AUTO_UPDATE_KEY, SETTING_AUTO_UPDATE);
 	m_auto_addr_update_check = Settings::Get(SETTING_AUTO_ADDR_UPDATE_KEY, SETTING_AUTO_ADDR_UPDATE);
+#endif
+
 	m_vsync_setting = Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER);
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
@@ -266,10 +272,17 @@ void SideMenu::Render(float width)
 		SetWindowsFileAssociation();
 	}
 
-	if (ImGui::Checkbox(_("sidemenu.auto_update_check"), &m_auto_update_check)) {
-		Settings::Set(SETTING_AUTO_UPDATE_KEY, m_auto_update_check);
-	}
-	if (ImGui::Checkbox(_("sidemenu.auto_addr_update_check"), &m_auto_addr_update_check)) {
-		Settings::Set(SETTING_AUTO_ADDR_UPDATE_KEY, m_auto_addr_update_check);
+	{
+#ifdef BUILD_TYPE_DEBUG
+		// Automatic updates are disabled in debug builds
+		ImGuiExtra::DisableBlockIf __(true);
+#endif
+
+		if (ImGui::Checkbox(_("sidemenu.auto_update_check"), &m_auto_update_check)) {
+			Settings::Set(SETTING_AUTO_UPDATE_KEY, m_auto_update_check);
+		}
+		if (ImGui::Checkbox(_("sidemenu.auto_addr_update_check"), &m_auto_addr_update_check)) {
+			Settings::Set(SETTING_AUTO_ADDR_UPDATE_KEY, m_auto_addr_update_check);
+		}
 	}
 }
