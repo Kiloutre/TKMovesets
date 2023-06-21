@@ -19,6 +19,7 @@
 
 # define INTERFACE_DATA_DIR      "TKMInterface"
 # define GAME_ADDRESSES_FILE     "game_addresses.ini"
+# define SETTINGS_FILE           "TKMSettings.ini"
 
 # define UPDATE_TMP_FILENAME     "TKMovesets2Updater"
 # define UPDATE_MIN_FILESIZE     500000 // Update files smaller than this are most likely invalid (500KB)
@@ -59,7 +60,10 @@
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
 
 # define MAX_FPS                 (60.0f)
-# define VSYNC_BUFFER            (2) // 0 is no vsync, 1 is one screen refresh, etc
+# define SETTING_VSYNC_BUFFER_KEY ("vsync")
+# define SETTING_VSYNC_BUFFER     (2) // 0 is no vsync, 1 is one screen refresh, etc
+# define SETTING_LANG_KEY         ("language")
+# define SETTING_LANG             (-1) // -1 means autodetect
 
 # define TEXTBOX_HORIZ_PADDING   15
 # define TEXTBOX_VERT_PADDING    10

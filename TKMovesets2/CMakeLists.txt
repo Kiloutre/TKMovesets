@@ -101,6 +101,7 @@ set(BINARY_SOURCES
                     "Utils/Compression.cpp"
 
                     # Resources-accessing
+                    "ResourcesClasses/Settings.cpp"
                     "ResourcesClasses/Localization.cpp"
                     "ResourcesClasses/EditorLabel.cpp"
                     "ResourcesClasses/GameAddressesFile.cpp"

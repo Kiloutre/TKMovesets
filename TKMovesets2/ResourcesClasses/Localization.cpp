@@ -62,6 +62,14 @@ unsigned int g_langId = 0;
 
 namespace Localization
 {
+	bool LoadFile(int locale_index, bool unloadPrevious)
+	{
+		if (locale_index < 0 || locale_index >= _countof(g_translation_datas)) {
+			return false;
+		}
+		return LoadFile(g_translation_datas[locale_index].locale);
+	}
+
 	bool LoadFile(const char* locale, bool unloadPrevious)
 	{
 		DEBUG_LOG("-- LoadFile(%s) --\n", locale);
@@ -73,7 +81,7 @@ namespace Localization
 		std::transform(lowercaseLocale.begin(), lowercaseLocale.end(), lowercaseLocale.begin(), tolower);
 		for (int i = 0; i < _countof(g_translation_datas); ++i)
 		{
-			if (strcmp(g_translation_datas[i].locale, locale) == 0
+			if (stricmp(g_translation_datas[i].locale, locale) == 0
 				|| g_translation_datas[i].matchingLocale.contains(lowercaseLocale))
 			{
 				langId = i;

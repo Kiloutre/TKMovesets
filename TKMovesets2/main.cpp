@@ -21,6 +21,7 @@
 #include "MainWindow.hpp"
 #include "Localization.hpp"
 #include "GameAddressesFile.hpp"
+#include "Settings.hpp"
 
 #include "constants.h"
 
@@ -62,7 +63,11 @@ static bool LoadLocaleTranslation()
 	f.write((char*)w_name, wcslen(w_name) * sizeof(wchar_t));
 #endif
 	DEBUG_LOG("Attempting to load locale %s\n", name);
-	return Localization::LoadFile(name);
+	if (Localization::LoadFile(name)) {
+		Settings::Set(SETTING_LANG_KEY, Localization::GetCurrLangId());
+		return true;
+	}
+	return false;
 }
 
 // Initialize the important members of mainwindow. I prefer doing it here because it is mostly a layout and GUI-related class
@@ -424,7 +429,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
 	// Enable vsync
-	glfwSwapInterval(VSYNC_BUFFER);
+	glfwSwapInterval(Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER));
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -454,9 +459,22 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 		glViewport(0, 0, screen_width, screen_height);
 	}
 
+	// Load settings
+	Settings::LoadFile();
+
 	// Load translation
-	if (!LoadLocaleTranslation()) {
-		Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
+	{
+		int langId = Settings::Get(SETTING_LANG_KEY, SETTING_LANG);
+		if (langId != -1) {
+			// Attempt to load locale from settings
+			if (!Localization::LoadFile(langId)) {
+				Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
+			}
+		}
+		else if (!LoadLocaleTranslation()) {
+			// Attempted to load locale from automatic locale detection, failed
+			Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
+		}
 	}
 
 	{

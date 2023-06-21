@@ -2,6 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "shlobj_core.h"
 
+#include "Settings.hpp"
 #include "SideMenu.hpp"
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
@@ -138,6 +139,7 @@ static void SetWindowsFileAssociation()
 
 SideMenu::SideMenu()
 {
+	m_vsync_setting = Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER);
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
 }
@@ -160,6 +162,7 @@ void SideMenu::Render(float width)
 			if (ImGui::Selectable(m_translations[i].displayName, i == m_languageId)) {
 				if (Localization::LoadFile(m_translations[i].locale, true)) {
 					m_languageId = Localization::GetCurrLangId();
+					Settings::Set(SETTING_LANG_KEY, m_languageId);
 				}
 			}
 			ImGui::PopID();
@@ -205,6 +208,7 @@ void SideMenu::Render(float width)
 			if (ImGui::Selectable(buf, i == m_vsync_setting)) {
 				m_vsync_setting = i;
 				glfwSwapInterval(i);
+				Settings::Set(SETTING_VSYNC_BUFFER_KEY, i);
 			}
 			ImGui::PopID();
 		}

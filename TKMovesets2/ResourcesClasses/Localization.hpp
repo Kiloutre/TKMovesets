@@ -19,6 +19,9 @@ namespace Localization
 	// Load a translation file for use with Localization::GetText(). Returns false if locale not found.
 	bool LoadFile(const char* c_langId, bool unloadPrevious = true);
 
+	// Load a translation file from its index
+	bool LoadFile(int locale_index, bool unloadPrevious = true);
+
 	// Returns true if the specified translation exists
 	bool HasText(const std::string& c_stringId);
 
