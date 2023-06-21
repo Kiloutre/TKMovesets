@@ -171,6 +171,14 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			ImGui::OpenPopup("AnimExtractionPopup");
 			m_animExtraction.popup = true;
 		}
+
+		ImGui::SameLine();
+		if (ImGui::Button(_("edition.open_editor_library")))
+		{
+			std::wstring path = std::filesystem::current_path();
+			path += L"/" EDITOR_LIB_DIRECTORY;
+			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+		}
 	}
 
 	if (m_animExtraction.popup) {
