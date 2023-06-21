@@ -70,6 +70,10 @@
 # define SETTING_AUTO_ADDR_UPDATE      (true)
 # define SETTING_EXPORT_OVERWRITE_KEY  ("export.overwrite_identical_name")
 # define SETTING_EXPORT_OVERWRITE      (true)
+# define SETTING_IMPORT_INSTANT_KEY    ("import.apply_instantly")
+# define SETTING_IMPORT_INSTANT        (true)
+# define SETTING_FREE_UNUSED_KEY       ("import.free_unused")
+# define SETTING_FREE_UNUSED           (true)
 
 # define TEXTBOX_HORIZ_PADDING   15
 # define TEXTBOX_VERT_PADDING    10
