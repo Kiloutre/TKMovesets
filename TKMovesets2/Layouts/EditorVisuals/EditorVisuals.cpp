@@ -80,6 +80,7 @@ void EditorVisuals::Save()
 	tmp_filename.erase(tmp_filename.find_last_of(L"."));
 	tmp_filename += L"" MOVESET_TMPFILENAME_EXTENSION;
 
+	CreateDirectoryW(L"" MOVESET_DIRECTORY, nullptr);
 	std::ofstream file(tmp_filename, std::ios::binary);
 	if (!file.fail()) {
 		file.write((char*)moveset, movesetSize);
