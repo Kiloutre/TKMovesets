@@ -59,7 +59,7 @@
 
 # define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
-# define EDITOR_BACKUP_FREQUENCY_MINUTES  (15)
+# define EDITOR_BACKUP_FREQUENCY_MINUTES  (20)
 
 # define MAX_FPS                       (60.0f)
 # define SETTING_VSYNC_BUFFER_KEY      ("vsync_interval")
