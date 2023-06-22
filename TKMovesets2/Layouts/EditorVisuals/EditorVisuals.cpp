@@ -117,6 +117,8 @@ void EditorVisuals::Save()
 
 void EditorVisuals::SaveBackup(bool saveOnlyIfNoneExist)
 {
+	DEBUG_LOG("SaveBackup(%u)\n", saveOnlyIfNoneExist);
+
 	uint64_t currentTime = Helpers::getCurrentTimestamp();
 	// Get target file name
 
@@ -145,8 +147,10 @@ void EditorVisuals::SaveBackup(bool saveOnlyIfNoneExist)
 		}
 
 		if (saveOnlyIfNoneExist && matching_names.size() != 0) {
+			DEBUG_LOG("saveOnlyIfNoneExist: Files already exist\n");
 			return;
 		}
+		DEBUG_LOG("saveOnlyIfNoneExist: None exist\n");
 
 		while (matching_names.size() >= m_maxAutoSaves)
 		{
@@ -187,9 +191,15 @@ void EditorVisuals::SaveBackup(bool saveOnlyIfNoneExist)
 		if (!CompressionUtils::FILE::Moveset::Compress(dst_filename, tmp_filename, TKMovesetCompressionType_LZ4)) {
 			std::filesystem::rename(tmp_filename, dst_filename);
 		}
+
+		m_lastAutoSave = currentTime;
+		DEBUG_LOG("SaveBackup() succeeded\n");
+	}
+	else
+	{
+		DEBUG_ERR("SaveBackup() failed");
 	}
 
-	m_lastAutoSave = currentTime;
 }
 
 
