@@ -15,9 +15,31 @@
 
 #include "Online_t7.hpp"
 
-// You should never reorder the list because it would change the game ids which are contained within movesets
-// THe IDs correspond to the index of the game in the list
+// -- -- //
+
 const GameInfo cg_gamesInfo[] = {
+	{
+		.name = "Tekken 8 CNT",
+		.processName = "Tekken8.exe",
+		.movesetNamePrefix = "T8_",
+		.gameId = GameId_T8,
+		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
+		.characterCount = 2,
+		.ptrSize = 8,
+		.flags = 0,
+		.dataString = "t8",
+		.minorDataString = "t8",
+		.supportedImports = { },
+		.supportedOnlineImports = { },
+		.extractor = nullptr,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetBaseAddrFromFile,
+		.bigEndian = false,
+		.autoProcessSelection = true,
+	},
 	{
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",

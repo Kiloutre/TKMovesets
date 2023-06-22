@@ -1,5 +1,6 @@
 #pragma once
 
+// Items here may only be renamed, not moved / deleted / replaced
 enum GameId_
 {
 	GameId_T7,
@@ -12,19 +13,33 @@ enum GameId_
 
 namespace GameVersions
 {
-	enum T7
+	namespace T8
 	{
-		NONE = 0,
+		enum
+		{
+			CLOSED_NETWORK_TEST,
+		};
+	}
 
-		FROM_TTT2,
-		FROM_TREV,
-		FROM_T6,
-		FROM_T5,
-	};
-
-	enum TTT2
+	namespace T7
 	{
-		RPCS3_BLES01702_0100 = 0,
-		RPCS3_BLES01702_0103 = 1,
-	};
+		enum
+		{
+			NONE = 0,
+
+			FROM_TTT2,
+			FROM_TREV,
+			FROM_T6,
+			FROM_T5,
+		};
+	}
+
+	namespace TTT2
+	{
+		enum
+		{
+			RPCS3_BLES01702_0100 = 0,
+			RPCS3_BLES01702_0103 = 1,
+		};
+	}
 };
