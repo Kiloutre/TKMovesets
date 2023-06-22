@@ -285,6 +285,7 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 
 	m_lastAutoSave = Helpers::getCurrentTimestamp();
 	m_lastChangeDate = m_lastAutoSave;
+	SaveBackup();
 }
 
 void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
