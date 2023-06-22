@@ -783,6 +783,8 @@ uint32_t EditorT7::CalculateCRC32()
 		++customPropertyCount;
 	}
 
+	++customPropertyCount;
+
 	std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
 		{(Byte*)customPropertyList, customPropertyCount * sizeof(TKMovesetProperty)},
 
