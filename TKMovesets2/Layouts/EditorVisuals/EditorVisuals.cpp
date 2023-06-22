@@ -68,6 +68,9 @@ void EditorVisuals::OpenFormWindow(EditorWindowType windowType, uint16_t structI
 
 void EditorVisuals::Save()
 {
+	// Save backup if none exist
+	SaveBackup(true);
+
 	uint64_t movesetSize;
 	const Byte* moveset = m_abstractEditor->GetMoveset(movesetSize);
 
@@ -112,7 +115,7 @@ void EditorVisuals::Save()
 }
 
 
-void EditorVisuals::SaveBackup()
+void EditorVisuals::SaveBackup(bool saveOnlyIfNoneExist)
 {
 	uint64_t currentTime = Helpers::getCurrentTimestamp();
 	// Get target file name
@@ -139,6 +142,10 @@ void EditorVisuals::SaveBackup()
 				matching_names.insert(filename);
 				DEBUG_LOG("Match Basename: '%S'\n", basename);
 			}
+		}
+
+		if (saveOnlyIfNoneExist && matching_names.size() != 0) {
+			return;
 		}
 
 		while (matching_names.size() >= m_maxAutoSaves)
@@ -285,7 +292,6 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 
 	m_lastAutoSave = Helpers::getCurrentTimestamp();
 	m_lastChangeDate = m_lastAutoSave;
-	SaveBackup();
 }
 
 void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)

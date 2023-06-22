@@ -109,7 +109,7 @@ protected:
 	// Save the loaded moveset to a file
 	void Save();
 	// Save the loaded moveset to a file in the backup folders
-	void SaveBackup();
+	void SaveBackup(bool saveOnlyIfNoneExist=false);
 public:
 	// Determines if main window is open or not. If not, this tells the MainWindow parent class to destroy this very class
 	bool popen = true;
