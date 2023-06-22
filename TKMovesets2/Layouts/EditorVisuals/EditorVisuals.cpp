@@ -104,9 +104,9 @@ void EditorVisuals::Save()
 			m_loadedCharacter.lastSavedDate = Helpers::formatDateTime(header->date);
 		}
 		else {
-			DEBUG_LOG("Err: failed to compress file\n");
+			DEBUG_ERR("Editor: failed to compress file\n");
 		}
-		m_savingError = success;
+		m_savingError = !success;
 	}
 	else {
 		DEBUG_ERR("Editor: failed to save.");
