@@ -173,6 +173,7 @@ edition.explanation = You can hereedit extracted movesets. Refer to documentatio
 edition.select_moveset = Chose the moveset to modify
 edition.last_saved = Last save:
 edition.save = Save
+edition.saving_error = Saving error
 edition.discard_changes = Discard changes?\nIf live edition is enabled, this will not reset the structure back to its original state in-game.
 edition.process_err = Error
 edition.live_edition = Live edition

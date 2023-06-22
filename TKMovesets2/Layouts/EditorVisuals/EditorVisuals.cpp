@@ -102,11 +102,11 @@ void EditorVisuals::Save()
 		else {
 			DEBUG_LOG("Err: failed to compress file\n");
 		}
+		m_savingError = success;
 	}
 	else {
-		DEBUG_ERR("Editor: failed to save. !!");
-		// Showing failure would be nice. Even simply changing the Save button text would suffice.
-		//todo
+		DEBUG_ERR("Editor: failed to save.");
+		m_savingError = true;
 	}
 }
 

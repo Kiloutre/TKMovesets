@@ -87,6 +87,8 @@ protected:
 	unsigned int m_compressionIndex = 0;
 	// Contains a ptr to the editor logic class
 	EditorLogic* m_abstractEditor = nullptr;
+	// Whether to show "Saving error" or not
+	bool m_savingError = false;
 
 	// Render each created subwindows
 	void RenderSubwindows();

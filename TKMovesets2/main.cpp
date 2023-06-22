@@ -274,7 +274,7 @@ static void MoveMovesetFile(const std::wstring& argFile)
 		catch (std::filesystem::filesystem_error const&) {
 			DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", argFile.c_str());
 		}
-		}
+    }
 }
 
 static void MoveAnimationFile(const std::wstring& argFile)

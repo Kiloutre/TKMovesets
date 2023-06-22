@@ -31,6 +31,7 @@
 # define MOVESET_EXTRACTED_NAME_PREFIX   "Tkm:"
 # define MOVESET_CUSTOM_MOVE_NAME_PREFIX "tkm_"
 # define MOVESET_DIRECTORY               "extracted_chars"
+# define MOVESET_AUTO_BACKUPDIRECTORY    "editor_auto_backups"
 # define EDITOR_LIB_DIRECTORY            "editor_library"
 # define MOVESET_FILENAME_EXTENSION      ".tkmvst"
 # define MOVESET_TMPFILENAME_EXTENSION   "._tmp_tkmvst"

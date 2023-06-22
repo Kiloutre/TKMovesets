@@ -173,6 +173,7 @@ edition.explanation = Vous pouvez ici modifier les personnage extraits. Consulte
 edition.select_moveset = Choisissez un personnage
 edition.last_saved = Dernière sauvegarde le:
 edition.save = Sauvegarder
+edition.saving_error = Err. de sauvegarde
 edition.discard_changes = Abandonner les changements ?\nSi l'édition en direct est activée, cela ne remettra pas la structure dans son état original en jeu.
 edition.process_err = Erreur
 edition.live_edition = Édition en direct

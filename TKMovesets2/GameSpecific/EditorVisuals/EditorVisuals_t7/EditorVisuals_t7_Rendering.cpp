@@ -188,7 +188,7 @@ void EditorVisuals_T7::RenderToolBar()
 
 void EditorVisuals_T7::RenderStatusBar()
 {
-	if (ImGuiExtra::RenderButtonEnabled(_("edition.save"), !m_savedLastChange)) {
+	if (ImGuiExtra::RenderButtonEnabled(_(m_savingError ? "edition.saving_error" : "edition.save"), !m_savedLastChange)) {
 		Save();
 	}
 
