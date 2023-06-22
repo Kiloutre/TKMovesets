@@ -466,7 +466,7 @@ void EditorVisuals_T7::Render(int dockid)
 {
 	if (m_lastAutoSave < m_lastChangeDate) {
 		// Auto-save: A change was made since the last auto save
-		if ((m_lastChangeDate - m_lastAutoSave) >= (60 * 30)) {
+		if ((m_lastChangeDate - m_lastAutoSave) >= (60 * EDITOR_BACKUP_FREQUENCY_MINUTES)) {
 			// If the change was made 30 minutes ago or more
 			SaveBackup();
 		}
