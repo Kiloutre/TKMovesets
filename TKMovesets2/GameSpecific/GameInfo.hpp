@@ -94,6 +94,8 @@ struct GameInfo
 	uint64_t(*GetBaseAddressFunc)(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process) = nullptr;
 	// True if game values must be interpreted as big endian
 	bool bigEndian;
+	// If true, the process will be automatically detected at startup and this game will be selected if its process is running
+	bool autoProcessSelection;
 
 
 	bool SupportsGameImport(uint16_t t_gameId) const

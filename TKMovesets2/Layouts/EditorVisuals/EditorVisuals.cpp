@@ -268,6 +268,11 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 	for (unsigned int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
 	{
 		auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+
+		if (!gameInfo->autoProcessSelection) {
+			continue;
+		}
+
 		const char* processName = gameInfo->processName;
 
 		// Detect if the game is running

@@ -37,7 +37,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = new EditorFactory<EditorVisuals_T7>,
 		.onlineHandler = new GameFactory<OnlineT7>,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
-		.bigEndian = false
+		.bigEndian = false,
+		.autoProcessSelection = true,
 	},
 	{
 		.name = "Tekken Tag 2 1.00 (RPCS3)",
@@ -58,7 +59,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
-		.bigEndian = true
+		.bigEndian = true,
+		.autoProcessSelection = false
 	},
 	{
 		.name = "Tekken Tag 2 1.03 (RPCS3)",
@@ -79,7 +81,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
-		.bigEndian = true
+		.bigEndian = true,
+		.autoProcessSelection = true
 	},
 	{
 		.name = "Tekken Revolution (RPCS3)",
@@ -100,7 +103,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
-		.bigEndian = true
+		.bigEndian = true,
+		.autoProcessSelection = false
 	},
 	{
 		.name = "Tekken 6 (RPCS3)",
@@ -121,7 +125,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
-		.bigEndian = true
+		.bigEndian = true,
+		.autoProcessSelection = false
 	},
 	{
 		.name = "Tekken 5 (PCSX2)",
@@ -142,7 +147,8 @@ const GameInfo cg_gamesInfo[] = {
 		.editorVisuals = nullptr,
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
-		.bigEndian = false
+		.bigEndian = false,
+		.autoProcessSelection = true
 	},
 };
 
