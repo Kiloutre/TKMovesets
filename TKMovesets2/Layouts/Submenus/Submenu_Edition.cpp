@@ -176,7 +176,18 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		if (ImGui::Button(_("edition.open_editor_library")))
 		{
 			std::wstring path = std::filesystem::current_path();
-			path += L"/" EDITOR_LIB_DIRECTORY;
+			path += L"\\" EDITOR_LIB_DIRECTORY;
+			DEBUG_LOG("%S\n", path.c_str());
+			CreateDirectoryW(path.c_str(), nullptr);
+			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button(_("edition.open_editor_backups")))
+		{
+			std::wstring path = std::filesystem::current_path();
+			path += L"\\" MOVESET_DIRECTORY L"\\" MOVESET_AUTO_BACKUPDIRECTORY;
+			DEBUG_LOG("%S\n", path.c_str());
 			CreateDirectoryW(path.c_str(), nullptr);
 			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 		}

@@ -151,9 +151,10 @@ public:
 	using value_type = typename std::vector<T>::value_type;
 
 	void push_back(const value_type& val) {
-		auto it = ::std::find(this->begin(), this->end(), val);
-		if (it == this->end()) {
-			it = ::std::vector<T>::insert(this->end(), val);
+		auto end = this->end();
+		auto it = ::std::find(this->begin(), end, val);
+		if (it == end) {
+			it = ::std::vector<T>::insert(end, val);
 		}
 	}
 };
@@ -186,13 +187,13 @@ namespace Helpers
     // Make sure a file's writing cursor is divisble by 8
     void align8Bytes(std::ofstream& file);
 
-	// Calcualte a CRC32 from a list of data blocks. Always skip the first one.
+	// Calculate a CRC32 from a list of data blocks. Always skip the first one.
 	uint32_t CalculateCrc32(const std::vector<std::pair<Byte*, uint64_t>>& blocks);
 	// Calculate a CRC32 from a block of data
 	uint32_t CalculateCrc32(const Byte* data, uint64_t size);
 
     // Formats given date in 'hour:minutes day/month/year'
-    std::string formatDateTime(uint64_t date);
+    std::string formatDateTime(uint64_t date, bool path_compatible=false);
 
 	// Returns the current timestamp as a uint64
 	uint64_t getCurrentTimestamp();
@@ -218,12 +219,14 @@ namespace Helpers
 
 		return true;
 	}
+
 	// Returns true if a string starts with [prefix]
 	template<typename T>
 	bool startsWith(const T& str, const T& prefix)
 	{
-		if (str.length() < prefix.length())
+		if (str.length() < prefix.length()) {
 			return false;
+		}
 
 		for (size_t i = 0; prefix[i]; ++i)
 		{
@@ -247,7 +250,7 @@ namespace Helpers
     bool fileExists(const char* name);
 
     // Update a crc32 with new data
-    uint32_t crc32_update(uint32_t(&table)[256], uint32_t initial, const void* buf, size_t len);
+    uint32_t crc32_update(const uint32_t(&table)[256], uint32_t initial, const void* buf, size_t len);
     // Create a table required for the crc32 generation
     void crc32_generate_table(uint32_t(&table)[256]);
 

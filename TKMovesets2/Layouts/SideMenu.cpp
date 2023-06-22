@@ -123,6 +123,7 @@ static void SetWindowsFileAssociation()
 	std::wstring animation_command = L"\"" + std::wstring(program_path) + L"\" --move-animation \"%1\"";
 
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_FILENAME_EXTENSION, "tkmvst_file");
+	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_TMPFILENAME_EXTENSION, "tkmvst_file");
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanim64", "tkanim_file");
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanimC8", "tkanim_file");
 

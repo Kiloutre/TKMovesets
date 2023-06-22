@@ -16,7 +16,7 @@ struct EditorInfos
 	std::wstring wname;
 	std::string name;
 	std::string lastSavedDate;
-	int32_t gameId;
+	int32_t gameId = -1;
 };
 
 class EditorWindow_MovesetLoadFail : public std::exception
@@ -54,7 +54,7 @@ protected:
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
-	EditorInfos m_loadedCharacter = { .filename = L"", .wname = L"", .name = "", .lastSavedDate = "", .gameId = -1};
+	EditorInfos m_loadedCharacter;
 	// True if we need to enable the save button
 	bool m_savedLastChange = true;
 	// If the moveset can be live edited or not (need to actually code it)
@@ -89,6 +89,15 @@ protected:
 	EditorLogic* m_abstractEditor = nullptr;
 	// Whether to show "Saving error" or not
 	bool m_savingError = false;
+	// Auto backups
+	struct {
+		// Timestamp of the last automatic save
+		uint64_t m_lastAutoSave;
+		// Timestamp o the last change
+		uint64_t m_lastChangeDate;
+		// Maximum amount of auto-saves
+		const unsigned int m_maxAutoSaves = 5;
+	};
 
 	// Render each created subwindows
 	void RenderSubwindows();
@@ -99,6 +108,8 @@ protected:
 
 	// Save the loaded moveset to a file
 	void Save();
+	// Save the loaded moveset to a file in the backup folders
+	void SaveBackup();
 public:
 	// Determines if main window is open or not. If not, this tells the MainWindow parent class to destroy this very class
 	bool popen = true;

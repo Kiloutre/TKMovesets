@@ -82,7 +82,8 @@ void EditorVisuals::Save()
 
 	CreateDirectoryW(L"" MOVESET_DIRECTORY, nullptr);
 	std::ofstream file(tmp_filename, std::ios::binary);
-	if (!file.fail()) {
+	if (!file.fail())
+	{
 		file.write((char*)moveset, movesetSize);
 		file.close();
 
@@ -108,6 +109,80 @@ void EditorVisuals::Save()
 		DEBUG_ERR("Editor: failed to save.");
 		m_savingError = true;
 	}
+}
+
+
+void EditorVisuals::SaveBackup()
+{
+	uint64_t currentTime = Helpers::getCurrentTimestamp();
+	// Get target file name
+
+	std::wstring to_search = m_loadedCharacter.filename.substr(0,  m_loadedCharacter.filename.size() - (sizeof(MOVESET_FILENAME_EXTENSION) - 1)) + L"_[BAK]_";
+	// Insert temp backup path
+	to_search.insert(to_search.find_last_of(L"/\\") + 1, MOVESET_AUTO_BACKUPDIRECTORY L"/");
+
+	std::wstring current_date_str = Helpers::string_to_wstring(Helpers::formatDateTime(currentTime, true));
+	std::wstring dst_filename = to_search + current_date_str + L"" MOVESET_FILENAME_EXTENSION;
+	std::wstring tmp_filename = to_search + current_date_str + L"" MOVESET_TMPFILENAME_EXTENSION;
+
+	const wchar_t* backup_folder = MOVESET_DIRECTORY L"\\" MOVESET_AUTO_BACKUPDIRECTORY;
+	try {
+		// Delete previous backups if the total back count goes over the max amount
+		std::set<std::wstring> matching_names;
+		const std::wstring comp_basename = to_search.c_str() + to_search.find_last_of(L"\\/") + 1;
+		for (const auto& entry : std::filesystem::directory_iterator(backup_folder))
+		{
+			auto filename = entry.path().wstring();
+			const wchar_t* basename = filename.c_str() + filename.find_last_of(L"\\/") + 1;
+
+			if (Helpers::startsWith<std::wstring>(basename, comp_basename)) {
+				matching_names.insert(filename);
+				DEBUG_LOG("Match Basename: '%S'\n", basename);
+			}
+		}
+
+		while (matching_names.size() >= m_maxAutoSaves)
+		{
+			const wchar_t* filename = matching_names.begin()->c_str();
+			try {
+				std::filesystem::remove(filename);
+			} catch (std::filesystem::filesystem_error const&) {
+				DEBUG_ERR("Error while trying to delete previous moveset backups '%S'", filename);
+			}
+			matching_names.erase(matching_names.begin());
+		}
+	}
+	catch (const std::filesystem::filesystem_error&) {
+		// Ignore, most likely the folder just doesn't exist (yet)
+	}
+
+	// Save moveset
+	uint64_t movesetSize;
+	const Byte* moveset = m_abstractEditor->GetMoveset(movesetSize);
+
+	TKMovesetHeader* header = (TKMovesetHeader*)moveset;
+	header->crc32 = m_abstractEditor->CalculateCRC32();
+	header->date = Helpers::getCurrentTimestamp();
+
+	tmp_filename.erase(tmp_filename.find_last_of(L"."));
+	tmp_filename += L"" MOVESET_TMPFILENAME_EXTENSION;
+
+	// Create the folders in case they don't exist anymore / Have not been created yet
+	CreateDirectoryW(L"" MOVESET_DIRECTORY, nullptr);
+	CreateDirectoryW(MOVESET_DIRECTORY L"\\" MOVESET_AUTO_BACKUPDIRECTORY, nullptr);
+
+	std::ofstream file(tmp_filename, std::ios::binary);
+	if (!file.fail())
+	{
+		file.write((char*)moveset, movesetSize);
+		file.close();
+
+		if (!CompressionUtils::FILE::Moveset::Compress(dst_filename, tmp_filename, TKMovesetCompressionType_LZ4)) {
+			std::filesystem::rename(tmp_filename, dst_filename);
+		}
+	}
+
+	m_lastAutoSave = currentTime;
 }
 
 
@@ -207,6 +282,9 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 			break;
 		}
 	}
+
+	m_lastAutoSave = Helpers::getCurrentTimestamp();
+	m_lastChangeDate = m_lastAutoSave;
 }
 
 void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
@@ -229,6 +307,7 @@ void EditorVisuals::RenderSubwindows()
 		if (moveWin->justAppliedChanges)
 		{
 			moveWin->justAppliedChanges = false;
+			m_lastChangeDate = Helpers::getCurrentTimestamp();
 			m_savedLastChange = false;
 			m_importNeeded = true;
 		}

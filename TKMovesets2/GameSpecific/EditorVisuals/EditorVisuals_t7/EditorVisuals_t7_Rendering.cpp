@@ -130,9 +130,11 @@ void EditorVisuals_T7::RenderToolBar()
 		}
 
 
-		if (structType != EditorWindowType_INVALID) {
+		if (structType != EditorWindowType_INVALID)
+		{
 			uint32_t structId = m_editor->CreateNew(structType);
 
+			m_lastChangeDate = Helpers::getCurrentTimestamp();
 			m_savedLastChange = false;
 			m_importNeeded = true;
 			OpenFormWindow(structType, structId, listSize);
@@ -462,6 +464,15 @@ void EditorVisuals_T7::RenderMovelist()
 
 void EditorVisuals_T7::Render(int dockid)
 {
+	if (m_lastAutoSave < m_lastChangeDate) {
+		// Auto-save: A change was made since the last auto save
+		if ((m_lastChangeDate - m_lastAutoSave) >= (60 * 30)) {
+			// If the change was made 30 minutes ago or more
+			SaveBackup();
+		}
+	}
+
+
 	// Many windows rely on movelist data : need to update it early on
 	if (m_editor->mustReloadMovelist) {
 		m_editor->mustReloadMovelist = false;
