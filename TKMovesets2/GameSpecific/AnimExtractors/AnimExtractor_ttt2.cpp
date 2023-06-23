@@ -10,7 +10,7 @@
 
 using namespace StructsTTT2;
 
-void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_extractionStatus& extractionStatus)
+void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_animExtractionControl& extractionControl)
 {
 	const TKMovesetHeader& header = *(TKMovesetHeader*)moveset;
 	const Byte* moveset_data = moveset + header.moveset_data_start;
@@ -24,9 +24,12 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 
 	Move* movelist = (Move*)(moveset_block + (uint64_t)moveset_info.table.move);
 
+	auto& extractionStatus = extractionControl.statuses[extractionControl.current_index];
+	bool& mustInterrupt = extractionControl.must_interrupt;
+
 	// Count unique move animations
 	std::set<decltype(movelist->anim_addr)> extracted_animations;
-	for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
+	for (unsigned int i = 0; i < moveset_info.table.moveCount && !mustInterrupt; ++i)
 	{
 		auto& move = movelist[i];
 
@@ -38,7 +41,7 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 	}
 
 	// Count unique mota animations
-	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
+	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas) && !mustInterrupt; ++i)
 	{
 		if ((gameAddr)moveset_info.motas.motas[i] == MOVESET_ADDR32_MISSING) {
 			continue;
@@ -53,7 +56,7 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 		}
 
 		std::set<uint32_t> extracted_mota_animations;
-		for (unsigned int i = 0; i < mota.anim_count; ++i)
+		for (unsigned int i = 0; i < mota.anim_count && !mustInterrupt; ++i)
 		{
 			uint32_t anim_offset = mota.anim_offset_list[i];
 			if (!extracted_mota_animations.contains(anim_offset))
@@ -69,7 +72,7 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 
 	{
 		std::set<decltype(movelist->anim_addr)> extracted_animations;
-		for (unsigned int i = 0; i < moveset_info.table.moveCount; ++i)
+		for (unsigned int i = 0; i < moveset_info.table.moveCount && !mustInterrupt; ++i)
 		{
 			auto& move = movelist[i];
 
@@ -84,7 +87,7 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 		}
 	}
 
-	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
+	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas) && !mustInterrupt; ++i)
 	{
 		if (moveset_info.motas.motas[i] == MOVESET_ADDR32_MISSING) {
 			continue;
@@ -124,7 +127,7 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 			break;
 		}
 
-		for (unsigned int i = 0; i < mota.anim_count; ++i)
+		for (unsigned int i = 0; i < mota.anim_count && !mustInterrupt; ++i)
 		{
 			uint32_t anim_offset = mota.anim_offset_list[i];
 			if (!extracted_mota_animations.contains(anim_offset))

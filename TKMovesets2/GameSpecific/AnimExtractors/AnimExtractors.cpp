@@ -108,17 +108,17 @@ namespace AnimExtractor
 				switch (m.gameId)
 				{
 				case GameId_T7:
-					_FromT7(moveset, s_moveset, outputFolder, outputFile, extractionStatus);
+					_FromT7(moveset, s_moveset, outputFolder, outputFile, extractionControl);
 					break;
 				case GameId_TTT2:
 				case GameId_TREV:
-					_FromTTT2(moveset, s_moveset, outputFolder, outputFile, extractionStatus);
+					_FromTTT2(moveset, s_moveset, outputFolder, outputFile, extractionControl);
 					break;
 				case GameId_T6:
-					_FromT6(moveset, s_moveset, outputFolder, outputFile, extractionStatus);
+					_FromT6(moveset, s_moveset, outputFolder, outputFile, extractionControl);
 					break;
 				case GameId_T5:
-					_FromT5(moveset, s_moveset, outputFolder, outputFile, extractionStatus);
+					_FromT5(moveset, s_moveset, outputFolder, outputFile, extractionControl);
 					break;
 				}
 

@@ -138,6 +138,9 @@ void Submenu_Edition::RenderConversionPopup()
 
 void Submenu_Edition::ExtractAllAnimations()
 {
+	m_animExtraction.extractionControl.must_interrupt = false;
+	m_animExtraction.extractionControl.current_index = 0;
+
 	std::sort(m_animExtraction.movesets.begin(), m_animExtraction.movesets.end(),
 		[](const movesetInfo& a, const movesetInfo& b) -> bool {
 			return strcmp(a.original_character.c_str(), b.original_character.c_str()) < 0 || a.modified < b.modified;
@@ -169,14 +172,15 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			if (m_animExtraction.started) {
 				m_animExtraction.thread.join();
 			}
+
 			m_animExtraction.started = true;
 			m_animExtraction.extracting = true;
+
 			m_animExtraction.thread = std::thread(&Submenu_Edition::ExtractAllAnimations, this);
 
 
 			ImGui::OpenPopup("AnimExtractionPopup");
 			m_animExtraction.popup = true;
-			m_animExtraction.extractionControl.must_interrupt = false;
 		}
 
 		ImGui::SameLine();
@@ -247,7 +251,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				case AnimExtractionStatus_Finished:
 					total_extracted_count += s.current_animation;
 					total_animations += s.total_animation_count;
-					ImGui::TextUnformatted(std::to_string(s.total_animation_count).c_str());
+					ImGui::TextUnformatted(std::to_string(s.current_animation).c_str());
 					break;
 				}
 			}
