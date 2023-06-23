@@ -167,16 +167,20 @@ void MainWindow::Update()
 		// Editor windows
 		for (unsigned int i = 0; i < editorWindows.size();)
 		{
-			auto& w = editorWindows[i];
+			EditorVisuals* w = editorWindows[i];
 
 			if (w->popen) {
 				const ImU32 colorCount = _countof(editorTitleColors);
-				ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, editorTitleInactiveColors[i % colorCount]);
-				ImGui::PushStyleColor(ImGuiCol_TitleBg, editorTitleInactiveColors[i % colorCount]);
-				ImGui::PushStyleColor(ImGuiCol_TitleBgActive, editorTitleColors[i % colorCount]);
-				ImGui::PushStyleColor(ImGuiCol_TabUnfocused, editorTitleInactiveColors[i % colorCount]);
-				ImGui::PushStyleColor(ImGuiCol_Tab, editorTitleInactiveColors[i % colorCount]);
-				ImGui::PushStyleColor(ImGuiCol_TabActive, editorTitleColors[i % colorCount]);
+
+				auto inactiveTitleCol = editorTitleInactiveColors[i % colorCount];
+				auto titleCol = editorTitleColors[i % colorCount];
+
+				ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, inactiveTitleCol);
+				ImGui::PushStyleColor(ImGuiCol_TitleBg, inactiveTitleCol);
+				ImGui::PushStyleColor(ImGuiCol_TitleBgActive, titleCol);
+				ImGui::PushStyleColor(ImGuiCol_TabUnfocused, inactiveTitleCol);
+				ImGui::PushStyleColor(ImGuiCol_Tab, inactiveTitleCol);
+				ImGui::PushStyleColor(ImGuiCol_TabActive, titleCol);
 				w->Render(i + 2);
 				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
