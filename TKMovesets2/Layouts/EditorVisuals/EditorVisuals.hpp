@@ -110,7 +110,6 @@ protected:
 	virtual void RenderGameSpecific(int dockid) = 0;
 	// Detect keyboard shortcuts
 	void DetectKeyboardShortcuts();
-	// Called when a specific shortcut is pressed
 	virtual void OnKeyboardShortcut() = 0;
 
 	// Save the loaded moveset to a file

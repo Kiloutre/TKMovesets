@@ -20,7 +20,7 @@ namespace Settings
 	T Get(const char* c_stringId, T defaultValue)
 	{
 		static_assert(std::is_integral<T>::value, "Integral required.");
-		auto settings = GetSettingsMap();
+		auto& settings = GetSettingsMap();
 		auto item = settings.find(c_stringId);
 		return item == settings.end() ? defaultValue : (T)atoll(item->second.c_str());
 	}

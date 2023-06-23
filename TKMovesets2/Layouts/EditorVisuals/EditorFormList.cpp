@@ -82,7 +82,7 @@ void EditorFormList::CopyFormToClipboard() const
 	{
 		for (auto& [fieldName, field] : item->identifierMap)
 		{
-			DEBUG_LOG("C: [%s] = [%s]\n", fieldName.c_str(), field->buffer);
+			//DEBUG_LOG("C: [%s] = [%s]\n", fieldName.c_str(), field->buffer);
 			clipboardText += field->buffer;
 			clipboardText += "\n";
 		}
@@ -133,9 +133,8 @@ void EditorFormList::PasteFormFromClipboard()
 
 			item->openStatus = EditorFormTreeview_ForceOpen;
 			field->nextValue = std::string(clipboardText, newlinePos - clipboardText);
-			DEBUG_LOG("P: [%s] -> [%s]\n", fieldName.c_str(), field->nextValue.c_str());
+			//DEBUG_LOG("P: [%s] -> [%s]\n", fieldName.c_str(), field->nextValue.c_str());
 			clipboardText = newlinePos + 1;
-
 
 			if (*newlinePos == '\0') {
 				return;
@@ -295,8 +294,10 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 
 unsigned int EditorFormList::CreateNewItem(int insertionPosition)
 {
-	if (insertionPosition == -1) {
+	int copyFormId = insertionPosition;
+	if (insertionPosition <= -1) {
 		insertionPosition = (int)m_items.size() - 1;
+		copyFormId = 0;
 	}
 
 	VectorSet<std::string> drawOrder;
@@ -304,7 +305,7 @@ unsigned int EditorFormList::CreateNewItem(int insertionPosition)
 	m_items.insert(m_items.begin() + insertionPosition, new FieldItem);
 	auto& item = m_items[insertionPosition];
 
-	item->identifierMap = m_editor->GetListSingleForm(windowType, structureId + insertionPosition, drawOrder);
+	item->identifierMap = m_editor->GetListSingleForm(windowType, structureId + copyFormId, drawOrder);
 	item->openStatus = EditorFormTreeview_ForceOpen;
 
 	for (uint8_t category : m_categories)

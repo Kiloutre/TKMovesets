@@ -11,10 +11,9 @@ std::map<std::string, std::string> g_settings;
 
 namespace Settings
 {
-	const std::map<std::string, std::string>& GetSettingsMap()
-	{
+	const std::map<std::string, std::string>& GetSettingsMap() {
 		return g_settings;
-	}
+	}	
 
 	bool LoadFile()
 	{
