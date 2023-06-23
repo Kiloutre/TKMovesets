@@ -83,7 +83,7 @@ public:
 	// Store move ID aliases
 	std::vector<uint16_t> aliases;
 
-	TEditor(GameProcess* process, GameData* game, const GameInfo* gameInfo);
+	TEditor(GameProcess& process, GameData& game, const GameInfo* gameInfo);
 	virtual ~TEditor();
 
 

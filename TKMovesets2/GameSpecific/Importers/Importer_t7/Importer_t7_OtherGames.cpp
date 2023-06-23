@@ -40,8 +40,8 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	progress = 20;
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
-	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
-	const gameAddr gameMoveset = m_process->allocateMem(s_moveset);
+	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
+	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
 		return ImportationErrcode_GameAllocationErr;
 	}
@@ -98,14 +98,14 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process->writeBytes(gameMoveset, moveset, s_moveset);
+	m_process.writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
 	
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
-		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
+		m_process.writeInt64(playerAddress + m_game.GetValue("motbin_offset"), gameMoveset);
 	}
 	
 	progress = 100;
@@ -159,8 +159,8 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 	progress = 20;
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
-	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
-	const gameAddr gameMoveset = m_process->allocateMem(s_moveset);
+	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
+	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
 		return ImportationErrcode_GameAllocationErr;
 	}
@@ -217,14 +217,14 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process->writeBytes(gameMoveset, moveset, s_moveset);
+	m_process.writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
 
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
-		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
+		m_process.writeInt64(playerAddress + m_game.GetValue("motbin_offset"), gameMoveset);
 	}
 
 	progress = 100;
@@ -279,8 +279,8 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 	progress = 20;
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
-	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
-	const gameAddr gameMoveset = m_process->allocateMem(s_moveset);
+	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
+	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
 		return ImportationErrcode_GameAllocationErr;
 	}
@@ -337,14 +337,14 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process->writeBytes(gameMoveset, moveset, s_moveset);
+	m_process.writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
 
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
-		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
+		m_process.writeInt64(playerAddress + m_game.GetValue("motbin_offset"), gameMoveset);
 	}
 
 	progress = 100;
@@ -399,8 +399,8 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	progress = 20;
 
 	// Allocate our moveset in the game's memory, but we aren't gonna write on that for a while.
-	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process->writeBytes()
-	const gameAddr gameMoveset = m_process->allocateMem(s_moveset);
+	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
+	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
 		return ImportationErrcode_GameAllocationErr;
 	}
@@ -457,14 +457,14 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process->writeBytes(gameMoveset, moveset, s_moveset);
+	m_process.writeBytes(gameMoveset, moveset, s_moveset);
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
 
 	if (!BASIC_LOAD) {
 		// Then write our moveset address to the current player
-		m_process->writeInt64(playerAddress + m_game->GetValue("motbin_offset"), gameMoveset);
+		m_process.writeInt64(playerAddress + m_game.GetValue("motbin_offset"), gameMoveset);
 	}
 
 	progress = 100;

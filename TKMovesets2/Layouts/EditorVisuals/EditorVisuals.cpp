@@ -244,7 +244,7 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 		// Init editor logic class
 		auto gameInfo = Games::GetGameInfoFromIdentifier(movesetInfo->gameId, movesetInfo->minorVersion);
 
-		m_abstractEditor = Games::FactoryGetEditorLogic(gameInfo, &m_importerHelper->process, &m_importerHelper->game);
+		m_abstractEditor = Games::FactoryGetEditorLogic(gameInfo, m_importerHelper->process, m_importerHelper->game);
 		labels = new EditorLabel(gameInfo, addrFile);
 	}
 

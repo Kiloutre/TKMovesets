@@ -49,18 +49,18 @@ namespace TAnimUtils
 	namespace FromProcess
 	{
 		// Returns the size in bytes of a 0xC8 animation 
-		uint64_t getC8AnimSize(GameProcess* process, gameAddr anim);
+		uint64_t getC8AnimSize(const GameProcess& process, gameAddr anim);
 		// Wrapper that calculates the size in bytes of a 0x64 animation (big or little endian)
-		uint64_t get64AnimSize(GameProcess* process, gameAddr anim);
+		uint64_t get64AnimSize(const GameProcess& process, gameAddr anim);
 		// Returns the size in bytes of a 0x64 animation (little endian anim)
-		uint64_t get64AnimSize_LittleEndian(GameProcess* process, gameAddr anim);
+		uint64_t get64AnimSize_LittleEndian(const GameProcess& process, gameAddr anim);
 		// Returns the size in bytes of a 0x64 animation (big endian anim)
-		uint64_t get64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
+		uint64_t get64AnimSize_BigEndian(const GameProcess& process, gameAddr anim);
 
 		// T5 0x64 anims lack anim type, bone count and bone descriptors.
 		// They all are 0x64, 0x17 bones with the same bone descriptors
-		uint64_t getT5_64AnimSize_LittleEndian(GameProcess* process, gameAddr anim);
-		uint64_t getT5_64AnimSize_BigEndian(GameProcess* process, gameAddr anim);
+		uint64_t getT5_64AnimSize_LittleEndian(const GameProcess& process, gameAddr anim);
+		uint64_t getT5_64AnimSize_BigEndian(const GameProcess& process, gameAddr anim);
 	};
 
 	namespace FromFile

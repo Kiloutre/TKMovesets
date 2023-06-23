@@ -252,19 +252,19 @@ namespace Games
 
 	//
 	
-	Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
 		Extractor* ex = (Extractor*)gameInfo->extractor->allocate(process, game, gameInfo);
 		return ex;
 	}
 
-	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
 		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo);
 		return im;
 	}
 
-	EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
 		EditorLogic* ed = (EditorLogic*)gameInfo->editorLogic->allocate(process, game, gameInfo);
 		return ed;
@@ -276,7 +276,7 @@ namespace Games
 		return ed;
 	}
 
-	Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess* process, GameData* game)
+	Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
 		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo);
 		return on;

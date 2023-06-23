@@ -86,7 +86,7 @@ static bool ExtractMovesetLoaderIfNeeded()
 
 // -- Public functions -- //
 
-Online::Online(GameProcess* process, GameData* game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
+Online::Online(GameProcess& process, GameData& game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
 {
     displayedMovesets = new std::vector<movesetInfo>();
     m_dllInjectionThread = new std::thread();
@@ -97,7 +97,7 @@ Online::~Online()
 #ifndef BUILD_TYPE_DEBUG
     // Unload the DLL from the game if in release-mode
     // Todo: test, see if this works
-    if (resetMemOnDestroy && injectedDll && m_process->CheckRunning())
+    if (resetMemOnDestroy && injectedDll && m_process.CheckRunning())
     {
         // Tell the DLL to unload itself
         CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC);
@@ -179,7 +179,7 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
     }
     DEBUG_LOG("%s addr is %llx\n", functionName, startAddr);
 
-    auto errcode = m_process->createRemoteThread(startAddr, 0, waitEnd);
+    auto errcode = m_process.createRemoteThread(startAddr, 0, waitEnd);
     return errcode != GameProcessThreadCreation_Error;
 }
 
@@ -218,7 +218,7 @@ bool Online::InjectDllAndWaitEnd()
 
 
         // Call the functions to initiate and run the moveset loader
-        if (m_process->InjectDll(w_dllPath.c_str()))
+        if (m_process.InjectDll(w_dllPath.c_str()))
         {
             result = CallMovesetLoaderFunction(MOVESET_LOADER_INIT_FUNC, true);
             if (result) {
@@ -237,7 +237,7 @@ bool Online::InjectDllAndWaitEnd()
 
 void Online::CallDebugFunction()
 {
-    if (m_process->IsAttached() && m_process->CheckRunning()) {
+    if (m_process.IsAttached() && m_process.CheckRunning()) {
         CallMovesetLoaderFunction("MovesetLoaderDebug", true);
     }
 }

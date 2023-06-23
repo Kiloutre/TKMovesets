@@ -360,7 +360,7 @@ bool EditorLogic::ValidateFieldType(EditorInput* field)
 	return true;
 }
 
-EditorLogic::EditorLogic(GameProcess* process, GameData* game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
+EditorLogic::EditorLogic(GameProcess& process, GameData& game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
 {
 }
 

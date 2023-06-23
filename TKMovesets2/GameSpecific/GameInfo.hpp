@@ -18,14 +18,14 @@ class GameFactory_Base
 {
 public:
 	virtual ~GameFactory_Base() {}
-	virtual void* allocate(GameProcess* process, GameData* game, const GameInfo* gameInfo) const = 0;
+	virtual void* allocate(GameProcess& process, GameData& game, const GameInfo* gameInfo) const = 0;
 	virtual void* cast(void* obj) const = 0;
 };
 
 template<typename T> class GameFactory : public GameFactory_Base
 {
 public:
-	virtual void* allocate(GameProcess* process, GameData* game, const GameInfo* gameInfo) const { return new T(process, game, gameInfo); }
+	virtual void* allocate(GameProcess& process, GameData& game, const GameInfo* gameInfo) const { return new T(process, game, gameInfo); }
 	virtual void* cast(void* obj) const { return static_cast<T*>(obj); }
 };
 

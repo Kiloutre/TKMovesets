@@ -23,8 +23,8 @@ void GameSharedMem::InstantiateFactory()
 
 	game.SetCurrentGame(currentGame);
 	// Every game has its own subtleties so we use polymorphism to manage that
-	m_importer = Games::FactoryGetImporter(currentGame, &process, &game);
-	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, &process, &game);
+	m_importer = Games::FactoryGetImporter(currentGame, process, game);
+	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
 }
 
 void GameSharedMem::RunningUpdate()

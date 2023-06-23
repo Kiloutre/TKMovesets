@@ -2,7 +2,7 @@
 
 OnlineT7::~OnlineT7()
 {
-    if (resetMemOnDestroy && m_sharedMemPtr && m_process->CheckRunning()) {
+    if (resetMemOnDestroy && m_sharedMemPtr && m_process.CheckRunning()) {
         m_sharedMemPtr->locked_in = false;
     }
 }

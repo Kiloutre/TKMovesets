@@ -43,7 +43,7 @@ public:
 	// Becomes true if the injected DLL version does not match the current program's one
 	bool versionMismatch = false;
 
-	Online(GameProcess* process, GameData* game, const GameInfo* gameInfo);
+	Online(GameProcess& process, GameData& game, const GameInfo* gameInfo);
 	virtual ~Online();
 
 	// Check if the DLL's version does not match the current one, sets .versionMismatch and returns its value

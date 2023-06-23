@@ -98,7 +98,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 
 void ExtractorT5::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movesetHeader)
 {
-	m_game->ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
+	m_game.ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
 
 	// Convert ptrs into offsets
 	movesetHeader->character_name_addr -= (gameAddr32)movesetAddr;
@@ -129,7 +129,7 @@ uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 		}
 
 		MotaHeader header;
-		m_game->ReadBytes(motaAddr, &header, sizeof(MotaHeader));
+		m_game.ReadBytes(motaAddr, &header, sizeof(MotaHeader));
 
 		if (memcmp(header.mota_string, "MOTA", 4) == 0)
 		{
@@ -155,7 +155,7 @@ uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 
 			// Loop through every offset, find the highest
 			// There is no guarantee they are ordered so looking through all of them is quite safe
-			m_game->ReadBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
+			m_game.ReadBytes(motaAddr + offsetof(MotaHeader, anim_offset_list), animOffsetList, sizeof(uint32_t) * animCount);
 			for (size_t animIdx = 0; animIdx < animCount; ++animIdx)
 			{
 				uint32_t animOffset = animOffsetList[animIdx];
@@ -175,7 +175,7 @@ uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 				motaSize = 0x14;
 			}
 			else {
-				uint32_t lastAnimSize = (uint32_t)TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game->baseAddr + motaAddr + lastAnimOffset);
+				uint32_t lastAnimSize = (uint32_t)TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game.baseAddr + motaAddr + lastAnimOffset);
 				motaSize = lastAnimOffset + lastAnimSize;
 			}
 
@@ -230,7 +230,7 @@ Byte* ExtractorT5::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 			if (!exportedMotas.contains(motaAddr[i]))
 			{
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
-				m_game->ReadBytes(motaAddr[i], (char*)motaPtr, motaSize);
+				m_game.ReadBytes(motaAddr[i], (char*)motaPtr, motaSize);
 
 				if (motaPtr->IsValid(motaSize))
 				{
@@ -289,7 +289,7 @@ void ExtractorT5::GetNamesBlockBounds(const Move* move, uint64_t moveCount, game
 
 	// Move to the last string's END instead of staying at the start
 	gameAddr lastItemEnd = (gameAddr)highest;
-	while (m_game->Read<uint8_t>(lastItemEnd) != 0) {
+	while (m_game.Read<uint8_t>(lastItemEnd) != 0) {
 		lastItemEnd += 1;
 	}
 
@@ -325,7 +325,7 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 		uint64_t animSize;
 
 		try {
-			animSize = TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game->baseAddr + animAddr);
+			animSize = TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game.baseAddr + animAddr);
 		}
 		catch (const std::exception&) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
@@ -354,7 +354,7 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 
 		// Write anim data
 		int64_t animSize = animSizes[animAddr];
-		m_game->ReadBytes(animAddr, animationBlockCursor, animSize);
+		m_game.ReadBytes(animAddr, animationBlockCursor, animSize);
 
 		animationBlockCursor += animSize;
 	}
@@ -366,8 +366,8 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
 {
 	// Fill table
-	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game->baseAddr + movesetAddr + offsetof(MovesetInfo, table));
-	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
+	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game.baseAddr + movesetAddr + offsetof(MovesetInfo, table));
+	m_game.ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
 	gameAddr tableStartAddr = table->reactions;
@@ -411,7 +411,7 @@ char* ExtractorT5::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 
 Byte* ExtractorT5::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
-	m_game->ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
+	m_game.ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
@@ -490,7 +490,7 @@ ExtractionErrcode_ ExtractorT5::Extract(gameAddr playerAddress, ExtractSettings 
 
 	// The address of the moveset we will be extracting
 	gameAddr movesetAddr;
-	movesetAddr = m_game->ReadPtr(playerAddress + m_game->GetValue("motbin_offset"));
+	movesetAddr = m_game.ReadPtr(playerAddress + m_game.GetValue("motbin_offset"));
 
 	// Will read the header of the moveset and write it here
 	MovesetInfo movesetHeader{ 0 };
@@ -667,7 +667,7 @@ bool ExtractorT5::CanExtract()
 {
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
-	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
+	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
@@ -678,17 +678,17 @@ bool ExtractorT5::CanExtract()
 
 	for (int i = 0; i < 1; ++i)
 	{
-		gameAddr player = playerAddress + i * m_game->GetValue("playerstruct_size");
+		gameAddr player = playerAddress + i * m_game.GetValue("playerstruct_size");
 
 		// Read into current moveset to see if it has been initialized
 		{
-			gameAddr movesetAddr = m_game->ReadPtr(playerAddress + m_game->GetValue("motbin_offset"));
+			gameAddr movesetAddr = m_game.ReadPtr(playerAddress + m_game.GetValue("motbin_offset"));
 
 			if (movesetAddr == 0 || movesetAddr == -1) {
 				return false;
 			}
 
-			int8_t isInitialized = m_game->Read<int8_t>(movesetAddr + offsetof(MovesetInfo, isInitialized));
+			int8_t isInitialized = m_game.Read<int8_t>(movesetAddr + offsetof(MovesetInfo, isInitialized));
 			if (isInitialized != 1) {
 				return false;
 			}
@@ -700,14 +700,14 @@ bool ExtractorT5::CanExtract()
 
 std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
 {
-	gameAddr movesetAddr = m_game->ReadPtr(playerAddress + m_game->GetValue("motbin_offset"));
+	gameAddr movesetAddr = m_game.ReadPtr(playerAddress + m_game.GetValue("motbin_offset"));
 
 	if (movesetAddr == 0) {
 		return "";
 	}
 
 	char characterName[32];
-	m_game->ReadBytes(movesetAddr + 0x26C, characterName, sizeof(characterName));
+	m_game.ReadBytes(movesetAddr + 0x26C, characterName, sizeof(characterName));
 	characterName[sizeof(characterName) - 1] = '\0';
 
 	auto item = m_characterNamesMap.find(characterName);
@@ -761,22 +761,22 @@ std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
 
 uint32_t ExtractorT5::GetCharacterID(gameAddr playerAddress)
 {
-	return m_game->Read<uint16_t>(playerAddress + m_game->GetValue("chara_id_offset"));
+	return m_game.Read<uint16_t>(playerAddress + m_game.GetValue("chara_id_offset"));
 }
 
 gameAddr ExtractorT5::GetCharacterAddress(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
+	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->GetValue("playerstruct_size");
+		playerAddress += playerId * m_game.GetValue("playerstruct_size");
 	}
 	return playerAddress;
 }
 
 std::vector<gameAddr> ExtractorT5::GetCharacterAddresses()
 {
-	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
-	uint64_t playerstructSize = m_game->GetValue("playerstruct_size");
+	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
+	uint64_t playerstructSize = m_game.GetValue("playerstruct_size");
 	std::vector<gameAddr> addresses;
 
 	for (uint8_t i = 0; i < m_gameInfo.characterCount; ++i) {

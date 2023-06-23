@@ -69,7 +69,7 @@ Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 		return nullptr;
 	}
 
-	m_game->ReadBytes(blockStart, block, blockSize);
+	m_game.ReadBytes(blockStart, block, blockSize);
 	size_out = blockSize;
 
 	return block;
@@ -122,7 +122,7 @@ void Extractor::GetFilepath(const char* characterName, std::wstring& out, std::w
 
 uint64_t Extractor::GetAnimationSize(gameAddr anim)
 {
-	uint16_t animType = m_process->readInt16(anim);
+	uint16_t animType = m_process.readInt16(anim);
 	if ((animType & 0xFF) == 0) {
 		animType = BYTESWAP_INT16(animType);
 	}
@@ -135,7 +135,7 @@ uint64_t Extractor::GetAnimationSize(gameAddr anim)
 	}
 	// Invalid animation type
 
-	DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, m_process->readInt32(anim));
+	DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, m_process.readInt32(anim));
 
 	throw;
 	return 0;

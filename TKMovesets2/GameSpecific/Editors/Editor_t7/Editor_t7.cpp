@@ -255,7 +255,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
 	constants = {
-		{EditorConstants_RequirementEnd, (unsigned int)m_game->GetValue("req_end")},
+		{EditorConstants_RequirementEnd, (unsigned int)m_game.GetValue("req_end")},
 		{EditorConstants_CancelCommandEnd, 0x8000},
 		{EditorConstants_ExtraProperty_Instant, 32769}, // 0x8001
 		{EditorConstants_ExtraPropertyEnd, 0},
@@ -538,12 +538,12 @@ void EditorT7::ReloadDisplayableMoveList()
 
 uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 {
-	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
+	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->GetValue("playerstruct_size");
+		playerAddress += playerId * m_game.GetValue("playerstruct_size");
 	}
 
-	uint16_t moveId = m_process->readInt16(playerAddress + m_game->GetValue("currmove_id"));
+	uint16_t moveId = m_process.readInt16(playerAddress + m_game.GetValue("currmove_id"));
 	if (moveId >= 0x8000) {
 		moveId = aliases[(size_t)(moveId - (uint16_t)0x8000)];
 	}
@@ -553,34 +553,34 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
 
 void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId)
 {
-	gameAddr playerAddress = m_game->ReadPtrPath("p1_addr");
+	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	if (playerId > 0) {
-		playerAddress += playerId * m_game->GetValue("playerstruct_size");
+		playerAddress += playerId * m_game.GetValue("playerstruct_size");
 	}
 
 	{
-		gameAddr movesetOffset = playerAddress + m_game->GetValue("motbin_offset");
+		gameAddr movesetOffset = playerAddress + m_game.GetValue("motbin_offset");
 		// movesetOffset is the one offset we can't touch because it is the moveset the characte reverts to when transitioning to a generic anim
 		// Since we want P2 to be able to play those moves here without changing their moveset, we don't write on it
-		m_process->writeInt64(movesetOffset + 0x8, playerMoveset);
-		m_process->writeInt64(movesetOffset + 0x10, playerMoveset);
-		m_process->writeInt64(movesetOffset + 0x18, playerMoveset);
-		m_process->writeInt64(movesetOffset + 0x20, playerMoveset);
+		m_process.writeInt64(movesetOffset + 0x8, playerMoveset);
+		m_process.writeInt64(movesetOffset + 0x10, playerMoveset);
+		m_process.writeInt64(movesetOffset + 0x18, playerMoveset);
+		m_process.writeInt64(movesetOffset + 0x20, playerMoveset);
 	}
 
 	if (moveId >= 0x8000) {
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
-		moveId = m_process->readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
+		moveId = m_process.readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
 	}
 
-	gameAddr moveAddr = m_process->readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
+	gameAddr moveAddr = m_process.readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
-	m_process->writeInt32(playerAddress + m_game->GetValue("currmove_timer"), 99999);
+	m_process.writeInt32(playerAddress + m_game.GetValue("currmove_timer"), 99999);
 	// Tell the game which move to play NEXT
-	m_process->writeInt64(playerAddress + m_game->GetValue("nextmove_addr"), moveAddr);
+	m_process.writeInt64(playerAddress + m_game.GetValue("nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process->writeInt64(playerAddress + m_game->GetValue("currmove_id"), moveId);
+	m_process.writeInt64(playerAddress + m_game.GetValue("currmove_id"), moveId);
 }
 
 void EditorT7::DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr)
@@ -853,7 +853,7 @@ void EditorT7::SetSharedMemHandler(Online** sharedMemHandler)
 
 void EditorT7::ExecuteExtraprop(EditorInput* idField, EditorInput* valueField)
 {
-	if (m_sharedMemHandler && *m_sharedMemHandler && m_process->IsAttached())
+	if (m_sharedMemHandler && *m_sharedMemHandler && m_process.IsAttached())
 	{
 		if (!(*m_sharedMemHandler)->injectedDll) {
 			if (!(*m_sharedMemHandler)->InjectDllAndWaitEnd()) {

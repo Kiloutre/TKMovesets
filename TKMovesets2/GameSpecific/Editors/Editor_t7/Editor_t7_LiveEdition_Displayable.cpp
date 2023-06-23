@@ -25,31 +25,31 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 	value_u64 = EditorUtils::GetFieldValue(field);
 
 	if (name == "_unk0x40") {
-		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, _unk0x40), value_s32);
+		m_process.writeInt32(structAddr + offsetof(MvlDisplayable, _unk0x40), value_s32);
 	}
 	else if (name == "playable_id") {
-		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, playable_id), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlDisplayable, playable_id), value_s16);
 	}
 	else if (name == "_unk0x46") {
-		m_process->writeInt16(structAddr + offsetof(MvlDisplayable, _unk0x46), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlDisplayable, _unk0x46), value_s16);
 	}
 	else if (name == "type") {
-		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, type), value_s32);
+		m_process.writeInt32(structAddr + offsetof(MvlDisplayable, type), value_s32);
 	}
 	else if (name == "icons") {
-		m_process->writeInt32(structAddr + offsetof(MvlDisplayable, icons), value_s32);
+		m_process.writeInt32(structAddr + offsetof(MvlDisplayable, icons), value_s32);
 	}
 	else if (name == "icons_2") {
-		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlDisplayable, icons_2), value_s8);
 	}
 	else if (name == "combo_damage") {
-		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, combo_damage), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlDisplayable, combo_damage), value_s8);
 	}
 	else if (name == "combo_difficulty") {
-		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, combo_difficulty), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlDisplayable, combo_difficulty), value_s8);
 	}
 	else if (name == "_unk0x153") {
-		m_process->writeInt8(structAddr + offsetof(MvlDisplayable, _unk0x153), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlDisplayable, _unk0x153), value_s8);
 	}
 	else if (name.startsWith("unk_"))
 	{
@@ -57,7 +57,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		{
 			std::string key = std::format("unk_{:x}", ofst);
 			if (name == key) {
-				m_process->writeInt32(structAddr + ofst, value_s32);
+				m_process.writeInt32(structAddr + ofst, value_s32);
 			}
 		}
 	}
@@ -73,7 +73,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 
 		if (newLen <= oldLen) {
 			gameAddr stringAddr = blockStart + translationOffset;
-			m_process->writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
+			m_process.writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
 		}
 		// Bigger length requires re-allocation: no live edition possible
 	}
@@ -89,7 +89,7 @@ void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)
 		
 		if (newLen <= oldLen) {
 			gameAddr stringAddr = blockStart + translationOffset;
-			m_process->writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
+			m_process.writeBytes(stringAddr, (void*)convertedBuffer.c_str(), newLen + 1);
 		}
 		// Bigger length requires re-allocation: no live edition possible
 	}
@@ -114,41 +114,41 @@ void EditorT7::Live_OnMovelistPlayableEdit(int id, EditorInput* field)
 	value_u64 = EditorUtils::GetFieldValue(field);
 
 	if (name == "p2_action") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, p2_action), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, p2_action), value_s16);
 	}
 	else if (name == "distance") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, distance), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, distance), value_s16);
 	}
 	else if (name == "p2_rotation") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, p2_rotation), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, p2_rotation), value_s16);
 	}
 	else if (name == "_unk0x6") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, _unk0x6), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, _unk0x6), value_s16);
 	}
 	else if (name == "_unk0x8") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, _unk0x8), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, _unk0x8), value_s16);
 	}
 	else if (name == "p1_facing_related") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, p1_facing_related), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, p1_facing_related), value_s16);
 	}
 	else if (name == "_unk0xc") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, _unk0xc), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, _unk0xc), value_s16);
 	}
 	else if (name == "input_count") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, input_count), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, input_count), value_s16);
 	}
 	else if (name == "input_sequence_offset") {
 		uint32_t playable_addr = m_mvlHead->playables_offset + (int32_t)(sizeof(MvlPlayable) * id);
 		uint32_t input_sequence_id = value_s16;
 		uint32_t input_sequence_addr = input_sequence_id * sizeof(MvlInput) + m_mvlHead->inputs_offset;
 
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, input_sequence_offset), (int16_t)(input_sequence_addr - playable_addr));
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, input_sequence_offset), (int16_t)(input_sequence_addr - playable_addr));
 	}
 	else if (name == "has_rage") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, has_rage), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, has_rage), value_s16);
 	}
 	else if (name == "_unk0x16") {
-		m_process->writeInt16(structAddr + offsetof(MvlPlayable, _unk0x16), value_s16);
+		m_process.writeInt16(structAddr + offsetof(MvlPlayable, _unk0x16), value_s16);
 	}
 }
 
@@ -172,15 +172,15 @@ void EditorT7::Live_OnMovelistInputEdit(int id, EditorInput* field)
 	value_u64 = EditorUtils::GetFieldValue(field);
 
 	if (name == "directions") {
-		m_process->writeInt8(structAddr + offsetof(MvlInput, directions), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlInput, directions), value_s8);
 	}
 	else if (name == "buttons") {
-		m_process->writeInt8(structAddr + offsetof(MvlInput, buttons), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlInput, buttons), value_s8);
 	}
 	else if (name == "frame_duration") {
-		m_process->writeInt8(structAddr + offsetof(MvlInput, frame_duration), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlInput, frame_duration), value_s8);
 	}
 	else if (name == "trigger_highlight") {
-		m_process->writeInt8(structAddr + offsetof(MvlInput, trigger_highlight), value_s8);
+		m_process.writeInt8(structAddr + offsetof(MvlInput, trigger_highlight), value_s8);
 	}
 }

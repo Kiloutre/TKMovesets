@@ -70,11 +70,11 @@ ImportationErrcode_ Importer::_Import(Byte* moveset, uint64_t s_moveset, gameAdd
 	bool isCompressed = header->isCompressed();
 
 	if (settings & ImportSettings_ImportOriginalData) {
-		const gameAddr gameOriginalMoveset = m_process->allocateMem(s_moveset);
+		const gameAddr gameOriginalMoveset = m_process.allocateMem(s_moveset);
 		if (gameOriginalMoveset == 0) {
 			return ImportationErrcode_GameAllocationErr;
 		}
-		m_process->writeBytes(gameOriginalMoveset, moveset, s_moveset);
+		m_process.writeBytes(gameOriginalMoveset, moveset, s_moveset);
 		lastLoaded.originalDataAddress = gameOriginalMoveset;
 		lastLoaded.originalDataSize = s_moveset;
 	}

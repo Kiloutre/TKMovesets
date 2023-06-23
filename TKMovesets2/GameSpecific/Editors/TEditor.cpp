@@ -34,7 +34,7 @@ namespace TEditorUtils
 	}
 }
 
-TEditor::TEditor(GameProcess* process, GameData* game, const GameInfo* gameInfo) : EditorLogic(process, game, gameInfo)
+TEditor::TEditor(GameProcess& process, GameData& game, const GameInfo* gameInfo) : EditorLogic(process, game, gameInfo)
 {
 }
 
