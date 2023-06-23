@@ -83,8 +83,9 @@ static void RegSetW(HKEY hkeyHive, const wchar_t* pszVar, const wchar_t* pszValu
 	}
 
 	if (!bDidntExist) {
-		if (dwType != REG_SZ)
+		if (dwType != REG_SZ) {
 			DEBUG_ERR("RegGetValue( %S ) found type unhandled %d", pszVar, dwType);
+		}
 
 		if (wcscmp(szValueCurrent, pszValue) == 0) {
 			DEBUG_ERR("RegSet( \"%S\" \"%S\" ): already correct", pszVar, pszValue);
