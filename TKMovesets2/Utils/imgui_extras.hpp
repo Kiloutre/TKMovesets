@@ -33,6 +33,13 @@ namespace ImGuiExtra
 		}
 	};
 
+	// Renders markdown with proper wrapaorund
+	void Markdown(const char* text, size_t text_size);
+	void Markdown(const std::string& text);
+
+	// Inits markdown callbacks and fonts
+	void InitMarkdownConfig();
+
 	// Displays a hoverable text that displays a tootip
 	void HelpMarker(const char* desc, bool greyed=true);
 

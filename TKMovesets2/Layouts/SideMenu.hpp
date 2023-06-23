@@ -15,7 +15,7 @@ struct s_updateStatus {
 	bool verifiedOnce = false; // Used to properly join the thread.
 	std::string tagName;
 	std::string tagNameSeparatorText;
-	std::vector<std::string> changelog;
+	std::string changelog;
 	std::thread thread;
 };
 

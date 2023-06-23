@@ -86,23 +86,9 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 	updateStatus->tagName = tagName;
 	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("sidemenu.changelog"), tagName);
-	{
-		std::vector<std::string> changelogLines;
-		std::string delim = "\n";
+	updateStatus->changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
 
-		changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
-
-		size_t start = 0;
-		size_t end = changelog.find(delim);
-		while (end != std::string::npos)
-		{
-			changelogLines.push_back(changelog.substr(start, end - start));
-			start = end + delim.size();
-			end = changelog.find(delim, start);
-		}
-		changelogLines.push_back(changelog.substr(start, end));
-		updateStatus->changelog = changelogLines;
-	}
+	DEBUG_LOG("'%s'\n", updateStatus->changelog.c_str());
 
 	if (!Helpers::VersionGreater(tagName.c_str(), PROGRAM_VERSION)) {
 		return false;

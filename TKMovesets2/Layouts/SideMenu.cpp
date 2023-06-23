@@ -236,17 +236,12 @@ void SideMenu::Render(float width)
 		ImGui::TextUnformatted(_("sidemenu.update_explanation"));
 		ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
 
-		if (ImGui::BeginTable("table_row_height", 1, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV))
-		{
-			for (auto& line : m_updateStatus.changelog)
-			{
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
-				ImGui::TextUnformatted(line.c_str());
-			}
-			ImGui::EndTable();
-		}
+		ImGui::SameLine();
+		ImGuiExtra::Markdown(m_updateStatus.changelog);
 
+		ImGui::NewLine();
+		// Purposeful empty SeparatorText for the thicker line
+		ImGui::SeparatorText("");
 		if (ImGui::Button(_("yes"))) {
 			if (DownloadProgramUpdate(&m_updateStatus, m_addresses, false)) {
 				*requestedUpdatePtr = true;

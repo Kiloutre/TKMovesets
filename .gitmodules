@@ -1,3 +1,6 @@
 [submodule "Sig"]
 	path = Sig
 	url = https://github.com/HoShiMin/Sig
+[submodule "imgui_markdown"]
+	path = imgui_markdown
+	url = https://github.com/juliettef/imgui_markdown

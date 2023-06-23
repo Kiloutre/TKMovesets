@@ -86,6 +86,8 @@ MainWindow::MainWindow()
 	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
 
 	io.Fonts->Build();
+
+	ImGuiExtra::InitMarkdownConfig();
 }
 
 // Actual rendering function

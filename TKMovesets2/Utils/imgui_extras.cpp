@@ -1,3 +1,7 @@
+#include "imgui.h"
+#include <imgui_markdown.h>       // https://github.com/juliettef/imgui_markdown
+#include <string>
+
 #include "imgui_extras.hpp"
 
 #include "constants.h"
@@ -15,8 +19,34 @@ ImVec2 operator*(const ImVec2& c_self, float value)
 	return ImVec2(c_self.x * value, c_self.y * value);
 }
 
+static struct {
+	ImGui::MarkdownConfig config;
+	ImFont* H1 = NULL;
+	ImFont* H2 = NULL;
+	ImFont* H3 = NULL;
+} s_markdownConfig;
+
 namespace ImGuiExtra
 {
+	void Markdown(const std::string& text)
+	{
+		Markdown(text.c_str(), text.size());
+	}
+
+	void Markdown(const char* text, size_t text_size)
+	{
+		ImGui::Markdown(text, text_size, s_markdownConfig.config);
+	}
+
+	void InitMarkdownConfig()
+	{
+		auto& io = ImGui::GetIO();
+		s_markdownConfig.H1 = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/arial.ttf", 23);
+		s_markdownConfig.H2 = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/arial.ttf", 18);
+		s_markdownConfig.config.headingFormats[0] = { s_markdownConfig.H1, true };
+		s_markdownConfig.config.headingFormats[1] = { s_markdownConfig.H2, true };
+		//s_markdownConfig.config.headingFormats[2] = { s_markdownConfig.H3, false };
+	}
 
 	void HelpMarker(const char* desc, bool greyed)
 	{

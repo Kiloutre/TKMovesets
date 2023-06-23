@@ -57,6 +57,7 @@ set(INCLUDE_FOLDERS
 
                     "${CMAKE_SOURCE_DIR}/Sig/include"
                     "${CMAKE_SOURCE_DIR}/steamapi sdk/public/steam"
+                    "${CMAKE_SOURCE_DIR}/imgui_markdown"
 )
 
 # This will be included in the .exe
