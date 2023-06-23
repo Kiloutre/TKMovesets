@@ -7,6 +7,7 @@
 #include "AnimExtractors.hpp"
 #include "GameIDs.hpp"
 #include "Animations.hpp"
+#include "Compression.hpp"
 
 #include "constants.h"
 #include "MovesetStructs.h"
@@ -65,22 +66,40 @@ namespace AnimExtractor
 
 			uint64_t s_moveset;
 			Byte* moveset;
+			TKMovesetHeader* movesetHeader;
             
             try {
                 moveset = Helpers::ReadMovesetFile(m.filename, s_moveset);
+				movesetHeader = (TKMovesetHeader*)moveset;
             } catch(const std::exception&)
             {
-				extractionStatus.status = AnimExtractionStatus_Skipped;
+				extractionStatus.status = AnimExtractionStatus_Error;
 				continue;
             }
 
-			if (((TKMovesetHeader*)moveset)->conversion_origin != 0)
+			if (movesetHeader->conversion_origin != 0)
 			{
 				// Skip converted movesets
 				extractionStatus.status = AnimExtractionStatus_Skipped;
 			}
 			else
 			{
+
+				if (movesetHeader->isCompressed())
+				{
+					Byte* orig_moveset = moveset;
+
+					int32_t compressed_data_size = (int32_t)(s_moveset - movesetHeader->moveset_data_start);
+					moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(moveset, compressed_data_size, s_moveset);
+
+					delete[] orig_moveset;
+
+					if (moveset == nullptr) {
+						extractionStatus.status = AnimExtractionStatus_Error;
+						continue;
+					}
+				}
+
 				CreateDirectoryW(outputFolder.c_str(), nullptr);
 				std::ofstream outputFile(outputFilename);
 

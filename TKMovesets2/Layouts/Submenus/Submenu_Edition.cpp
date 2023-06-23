@@ -234,6 +234,9 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				case AnimExtractionStatus_Skipped:
 					ImGui::TextUnformatted(_("edition.animation_extraction.skipped"));
 					break;
+				case AnimExtractionStatus_Error:
+					ImGui::TextUnformatted(_("edition.animation_extraction.error"));
+					break;
 				case AnimExtractionStatus_Started:
 					total_extracted_count += s.current_animation;
 					total_animations += s.total_animation_count;

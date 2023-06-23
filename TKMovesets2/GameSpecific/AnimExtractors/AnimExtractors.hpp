@@ -9,6 +9,7 @@ enum AnimExtractionStatus_
 	AnimExtractionStatus_NotStarted,
 	AnimExtractionStatus_Started,
 	AnimExtractionStatus_Skipped,
+	AnimExtractionStatus_Error,
 	AnimExtractionStatus_Finished,
 };
 

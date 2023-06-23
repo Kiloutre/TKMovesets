@@ -202,6 +202,7 @@ edition.extract_animations_finished = Extraction d'animation terminée !
 edition.animation_extraction.extraction_status = Status de l'extraction
 edition.animation_extraction.not_started = Pas commencé
 edition.animation_extraction.skipped = Passé
+edition.animation_extraction.error = Erreur
 edition.open_editor_library = Ouvrir la bibliothèque de l'éditeur
 edition.open_editor_backups = Ouvrir les sauvegardes auto de l'éditeur
 

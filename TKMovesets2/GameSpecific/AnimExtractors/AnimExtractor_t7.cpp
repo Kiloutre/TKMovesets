@@ -30,13 +30,23 @@ void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::
 	{
 		auto& move = movelist[i];
 
+		outputFile << "X";
 		if (!extracted_animations.contains(move.anim_addr))
 		{
+			outputFile << "z";
 			++extractionStatus.total_animation_count;
+			outputFile << "y";
 			extracted_animations.insert(move.anim_addr);
+			outputFile << "!" << std::endl;
+		}
+		else
+		{
+
+			outputFile << std::endl;
 		}
 	}
 
+	outputFile << "1" << std::endl;
 	// Count mota animations
 	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
 	{
@@ -64,6 +74,7 @@ void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::
 		}
 	}
 
+	outputFile << "2" << std::endl;
 	// Extract animations
 	extractionStatus.status = AnimExtractionStatus_Started;
 
@@ -83,6 +94,7 @@ void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::
 		}
 	}
 
+	outputFile << "2" << std::endl;
 	// Extract mota animatio,s
 	for (unsigned int i = 0; i < _countof(moveset_info.motas.motas); ++i)
 	{

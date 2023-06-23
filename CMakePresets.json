@@ -33,25 +33,28 @@
     },
 
     {
-      "name": "x64-debug-light",
+      "name": "x64-debug-logs",
       "displayName": "x64 Debug (Logs only)",
-      "inherits": "windows-base",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
+      "inherits": "x64-debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_TKM_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+
+    {
+      "name": "x64-debug-symbols",
+      "displayName": "x64 Debug (Symbols only)",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "CMAKE_TKM_BUILD_TYPE": "Release"
       }
     },
 
     {
       "name": "x64-release",
       "displayName": "x64 Release",
-      "inherits": "x64-debug",
+      "inherits": "x64-debug-logs",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TKM_BUILD_TYPE": "Release"
       }
     }
