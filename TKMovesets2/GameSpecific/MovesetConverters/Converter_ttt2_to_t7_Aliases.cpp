@@ -14,12 +14,12 @@ const auto cg_odd_hitbox_aliases = std::map<Byte, Byte>{
 	{ 0x41, 0x51 }, // Alisa DES F1
 	//{ 0x44, 0x09 }, // Kunimitsu b+2 right arm, tofix properly
 	//{ 0x45, 0x09 }, // Kunimitsu doton 2 right arm, tofix properly
-	{ 0x40, 0x50 }, // DJ laser
 	{ 0x1E, 0x50 }, // Kunimitsu fire breath
 };
 
 const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 	{ 0x1E, 0x16 }, // Kunimitsu fire breath
+	{ 0x40, 0x50 }, // DJ laser
 };
 
 // Aliases for extraprops andrequirements
@@ -91,13 +91,15 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 	{ 199, {.target_id = 216 }}, // (HEIHACHI) sOKI_00 -> sOKI_C00
 	{ 200, {.target_id = 217 }}, // Player character id
 	{ 201, {.target_id = 218 }}, // Player NOT character id
-	{ 202, {.target_id = 0x99999 }}, // Opponent character id
-	{ 203, {.target_id = 0x99999 }}, // Opponent NOT character id
+	{ 202, {.target_id = 219 }}, // Opponent character id
+	{ 203, {.target_id = 220 }}, // Opponent NOT character id
+	/*
 	{ 204, {.target_id = 0x99999 }}, // Partner character id
 	{ 205, {.target_id = 0x99999 }}, // Partner NOT character id
 	{ 206, {.target_id = 0x99999 }}, // Unknown U/F+4, 3
 	{ 208, {.target_id = 0x99999 }}, // Opponent partner character id
 	{ 209, {.target_id = 0x99999 }}, // Opponent partner NOT character id
+	*/
 	{ 214, {.target_id = 225 }}, // (HEIHACHI) sJUMP_00_ -> Co_sJP_RP
 	{ 228, {.target_id = 234 }}, // (NINA) sDm_KAOBntR -> R_bintrp
 	{ 232, {.target_id = 251 }}, // (HEIHACHI) He_sKAM00_ -> He_sSTEPB
@@ -543,8 +545,8 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 	{ 0x82d6, {.target_id = 0x8429 }}, // (ALISA) Co_sJP_RP
 	{ 0x82d7, {.target_id = 0x842a }}, // (ALISA) Co_sJP_RP
 	{ 0x82d9, {.target_id = 0x842c }}, // (ALISA) Aa_runchop
-	{ 0x82db, {.target_id = 0x842e }}, // MAPPING
-	{ 0x82dc, {.target_id = 0x842f }}, // MAPPING
+	{ 0x82db, {.target_id = 0x842f }}, // ??? hand
+	{ 0x82dc, {.target_id = 0x842e }}, // ??? Hand
 	{ 0x82e9, {.target_id = 0x843c }}, // Throw camera?
 	{ 0x82ea, {.target_id = 0x843d }}, // Throw camera?2
 	{ 0x82ec, {.target_id = 0x843f }}, // (LARS) La_rk00B_n

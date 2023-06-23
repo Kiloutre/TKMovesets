@@ -308,9 +308,9 @@
 0x8442,Camera Zoom Focal Point
 0x8443,Camera Zoom Effect
 0x8444,Move Camera Position
-0x8445,Cinematic Camera (no reset)
-0x8448,Cinematic Camera (no reset)
-0x8449,Cinematic Camera (no reset)
+0x8445,Cinematic Camera 1(no reset)
+0x8448,Cinematic Camera 2(no reset)
+0x8449,Cinematic Camera 3(no reset)
 0x844b,Reset Camera
 0x844e,Camera Movement
 0x844f,Camera Interpolation
