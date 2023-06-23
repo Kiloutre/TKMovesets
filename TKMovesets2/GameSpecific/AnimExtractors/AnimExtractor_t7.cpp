@@ -30,19 +30,10 @@ void AnimExtractor::_FromT7(const Byte* moveset, uint64_t s_moveset, const std::
 	{
 		auto& move = movelist[i];
 
-		outputFile << "X";
 		if (!extracted_animations.contains(move.anim_addr))
 		{
-			outputFile << "z";
 			++extractionStatus.total_animation_count;
-			outputFile << "y";
 			extracted_animations.insert(move.anim_addr);
-			outputFile << "!" << std::endl;
-		}
-		else
-		{
-
-			outputFile << std::endl;
 		}
 	}
 
