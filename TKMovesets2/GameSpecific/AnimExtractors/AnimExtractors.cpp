@@ -139,6 +139,8 @@ namespace AnimExtractor
 						extractionStatus.status = AnimExtractionStatus_Error;
 					}
 				}
+
+				extractionControl.current_index++;
 			}
 
 			free(moveset);
