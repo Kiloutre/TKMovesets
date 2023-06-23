@@ -153,7 +153,7 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 		// Put the focus back on the input as it should be after pasting
 		ImGui::SetKeyboardFocusHere();
 		field->nextValue.clear();
-		DEBUG_LOG("next value = '%s'\n", field->nextValue.c_str());
+		DEBUG_LOG("Field next value = '%s'\n", field->nextValue.c_str());
 	}
 
 	ImGui::PushID(field);

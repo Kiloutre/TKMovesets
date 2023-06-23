@@ -200,7 +200,7 @@ private:
 	void DeleteMovelistPlayable(int id);
 
 	// -- List Creation / Deletion -- //
-	void DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset);
+	void DisplayableMVLTranslationReallocate(int32_t offset, int oldSize, int newSize, uint32_t listStart_offset);
 	//
 	void ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
@@ -220,7 +220,7 @@ private:
 	// Movelist
 	void ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
-	void ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize);
+	void ModifyMovelistDisplayableTextSize(int32_t offset, int oldSize, int newSize);
 
 	// Duplication
 	uint32_t DuplicateMove(uint32_t id, size_t listSize);
@@ -304,6 +304,8 @@ public:
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
 	std::string ImportAnimation(const wchar_t* filepath, int moveid) override;
+	void DeleteAnimation(uint64_t anim_offset);
+	void DeleteNameBlockString(uint64_t string_offset);
 
 	// -- Command Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;

@@ -426,7 +426,7 @@ edition.animation_list.duration = Duration (frames)
 edition.animation_list.size = Size
 edition.animation_list.import = Import in move
 edition.animation_list.search_animation = Search animation name to import in current move...
-edition.animation_list.no_anim = No animation was found in the animation library. Open a character with the editor and click the 'Extract animations' button to add its animations to the library.
+edition.animation_list.no_anim = No animation was found in the animation library. Go to the editor submenu 'Extract animations' button to extract character animations to the library.
 edition.animation_list.loading = Loading animation list...
 edition.animation_list.clear_filter = Clear filter
 

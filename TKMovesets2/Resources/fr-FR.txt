@@ -426,7 +426,7 @@ edition.animation_list.duration = Durée (images)
 edition.animation_list.size = Taille
 edition.animation_list.import = Importer dans move
 edition.animation_list.search_animation = Rechercher le nom de l'animation à importer dans ce move...
-edition.animation_list.no_anim = Aucune animation n'a encore été extraite dans la bibliothèque. Ouvrez un personnage avec l'éditeur et cliquez sur le bouton 'Extraire animations' pour l'ajouter à la bibliothèque.
+edition.animation_list.no_anim = Aucune animation n'a encore été extraite dans la bibliothèque. Allez dans le sous-menu 'Modif. de Perso' pour extraire les animations des personnages.
 edition.animation_list.loading = Chargement de la liste d'animation...
 edition.animation_list.clear_filter = Effacer le filtre
 

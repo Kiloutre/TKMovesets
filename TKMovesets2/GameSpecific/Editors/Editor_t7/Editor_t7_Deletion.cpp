@@ -8,6 +8,8 @@ void EditorT7::DeleteMove(int id)
 	/*
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 	ModifyGenericMovelistListSize<Move>(id, {}, { id }, listHead);
+	// delete move name
+	// delete move anim
 
 	for (auto& cancel : m_iterators.cancels)
 	{

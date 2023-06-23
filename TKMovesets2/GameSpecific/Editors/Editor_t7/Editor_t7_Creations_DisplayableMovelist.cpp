@@ -4,20 +4,19 @@
 #define gAddr StructsT7_gameAddr
 
 // I end up using this only or strings, but it works pretty well
-void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int newSize, uint32_t listStart_offset)
+void EditorT7::DisplayableMVLTranslationReallocate(int32_t offset, int oldSize, int newSize, uint32_t listStart_offset)
 {
 	const int listSizeDiff = newSize - oldSize;
-	const uint64_t structSize = sizeof(char);
-	const int structListSize = structSize * newSize;
-	const int structListSizeDiff = structSize * listSizeDiff;
+	const int structListSize = newSize;
+	const int structListSizeDiff = listSizeDiff;
 
 	uint64_t newMovesetSize = 0;
 	Byte* newMoveset = nullptr;
 
-	const uint64_t listOffset = m_header->moveset_data_start + m_offsets->movelistBlock + listStart_offset + ((uint64_t)listId * structSize);
+	const uint64_t listOffset = m_header->moveset_data_start + m_offsets->movelistBlock + listStart_offset + (uint64_t)offset;
 
-	uint64_t postListOffset = listOffset + structSize * newSize;
-	uint64_t orig_postListOffset = listOffset + structSize * oldSize;
+	uint64_t postListOffset = listOffset + newSize;
+	uint64_t orig_postListOffset = listOffset + oldSize;
 
 	// Compute following m_offsets-> block position. We do this because we want to make sure it always stays 8 bytes aligned
 	uint64_t new_followingBlockStart = m_movesetSize + structListSizeDiff;
@@ -80,17 +79,16 @@ void EditorT7::DisplayableMVLTranslationReallocate(int listId, int oldSize, int 
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 }
 
-void EditorT7::ModifyMovelistDisplayableTextSize(int listId, int oldSize, int newSize)
+void EditorT7::ModifyMovelistDisplayableTextSize(int32_t offset, int oldSize, int newSize)
 {
 	// Might as well use this generic method for strings since we don't care about alignment here
 	const int listSizeDiff = newSize - oldSize;
-	DisplayableMVLTranslationReallocate(listId, oldSize, newSize, 0);
+	DisplayableMVLTranslationReallocate(offset, oldSize, newSize, 0);
 
-	int32_t offset = listId;
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
 		for (int i = 0; i < _countof(displayable.all_translation_offsets); ++i) {
-			if (displayable.all_translation_offsets[i] > listId) {
+			if (displayable.all_translation_offsets[i] > offset) {
 				displayable.all_translation_offsets[i] += listSizeDiff;
 			}
 		}
