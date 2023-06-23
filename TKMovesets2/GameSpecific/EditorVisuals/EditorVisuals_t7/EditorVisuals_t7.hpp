@@ -44,6 +44,9 @@ private:
 	// Populate .m_windowCreatorMap so that windows may get created by type. Can have different contents depending on what the gmae allows.
 	void PopulateWindowCreatorMap() override;
 
+	// Called when a specific shortcut is detected
+	void OnKeyboardShortcut() override;
+
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorVisualsT7::EditorMovelistFilter_ filter);
 	// Returns true if our allocated moveset is still loaded on our character, in-game
@@ -55,7 +58,7 @@ public:
 	// Constructor that loads the moveset
 	EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
 	// Render the window
-	void Render(int dockid) override;
+	void RenderGameSpecific(int dockid) override;
 
 	// Called when a move is created, is used in order to refresh the movelist and scroll to the move inside of it
 	void OnMoveCreate(unsigned int moveId);

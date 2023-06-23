@@ -351,3 +351,13 @@ void EditorVisuals::RenderSubwindows()
 		}
 	}
 }
+
+void EditorVisuals::DetectKeyboardShortcuts()
+{
+	//todo
+}
+
+void EditorVisuals::Render(int dockid)
+{
+	RenderGameSpecific(dockid);
+}

@@ -106,6 +106,13 @@ protected:
 	// Factory instantiating the right class for the right identifier.
 	EditorForm* AllocateFormWindow(EditorWindowType windowType, uint16_t id, int listSize = 0);
 
+	// Render the actual content of the window which is game-specific
+	virtual void RenderGameSpecific(int dockid) = 0;
+	// Detect keyboard shortcuts
+	void DetectKeyboardShortcuts();
+	// Called when a specific shortcut is pressed
+	virtual void OnKeyboardShortcut() = 0;
+
 	// Save the loaded moveset to a file
 	void Save();
 	// Save the loaded moveset to a file in the backup folders
@@ -125,8 +132,8 @@ public:
 	// Destructor that deallocates the resources we allocated
 	virtual ~EditorVisuals();
 	// Render the window
-	virtual void Render(int dockid) = 0;
-
+	void Render(int dockid);
+	
 	// Create a new window containing data about the given move. Can be called by subwidnows.
 	void OpenFormWindow(EditorWindowType windowType, uint16_t structId, int listSize = 0);
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).

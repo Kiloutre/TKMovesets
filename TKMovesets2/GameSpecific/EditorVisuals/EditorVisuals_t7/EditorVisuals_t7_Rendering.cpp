@@ -462,8 +462,9 @@ void EditorVisuals_T7::RenderMovelist()
 	}
 }
 
-void EditorVisuals_T7::Render(int dockid)
+void EditorVisuals_T7::RenderGameSpecific(int dockid)
 {
+
 	if (m_lastAutoSave < m_lastChangeDate) {
 		// Auto-save: A change was made since the last auto save
 		if ((Helpers::getCurrentTimestamp() - m_lastAutoSave) >= (60 * EDITOR_BACKUP_FREQUENCY_MINUTES)) {
@@ -517,6 +518,10 @@ void EditorVisuals_T7::Render(int dockid)
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, windowFlags))
 	{
+		if (ImGui::IsWindowFocused()) {
+			DetectKeyboardShortcuts();
+		}
+
 		m_viewport = ImGui::GetWindowViewport();
 		RenderToolBar();
 

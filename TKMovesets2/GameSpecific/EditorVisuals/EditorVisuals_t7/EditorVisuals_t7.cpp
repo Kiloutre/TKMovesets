@@ -136,6 +136,11 @@ bool EditorVisuals_T7::MovesetStillLoaded()
 	return movesetAddress == m_loadedMoveset;
 }
 
+void EditorVisuals_T7::OnKeyboardShortcut()
+{
+	//todo
+}
+
 // -- Public methods -- //
 
 EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
