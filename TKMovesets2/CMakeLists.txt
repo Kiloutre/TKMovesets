@@ -232,13 +232,13 @@ add_library(TKMovesetLoader SHARED ${MOVESETLOADER_SOURCES} ${EMBEDDED_RESOURCES
 target_include_directories(TKMovesetLoader PRIVATE ${INCLUDE_FOLDERS})
 target_compile_definitions(TKMovesetLoader PUBLIC DLL_EXPORTING)
 add_dependencies(TKMovesetLoader FileEmbedder)
-if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_TKM_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(TKMovesetLoader PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 
 ## Embedded TKMovesetLoader for main binary ##
-if (NOT ${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (NOT ${CMAKE_TKM_BUILD_TYPE} MATCHES "Debug")
     set(MOVESET_LOADER_EMBEDDED "${CMAKE_CURRENT_BINARY_DIR}/../TKMovesetLoader.c")
     set(embed_file_exe_path "${CMAKE_CURRENT_BINARY_DIR}/FileEmbedder.exe")
     # Convert moveset loader into .c that the main program will build
@@ -257,19 +257,19 @@ endif()
 add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES})
 target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS} )
 target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
-if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_TKM_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(GameSpecific PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
 # Build program .exe
 enable_language("RC") # Icon and more resources later, if needed
-if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_TKM_BUILD_TYPE} MATCHES "Debug")
     set(RC_FILE "app_debug.rc")
 else()
     set(RC_FILE "app.rc")
 endif()
 add_executable (TKMovesets2 WIN32 ${BINARY_SOURCES} ${EMBEDDED_RESOURCES} ${MOVESET_LOADER_EMBEDDED} ${RC_FILE})
-if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+if (${CMAKE_TKM_BUILD_TYPE} MATCHES "Debug")
     target_compile_definitions(TKMovesets2 PUBLIC BUILD_TYPE_DEBUG)
 endif()
 
