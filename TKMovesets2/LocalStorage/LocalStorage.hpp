@@ -26,9 +26,11 @@ struct movesetInfo
 
 	std::string hash;
 
+	uint64_t extractionDate;
 	time_t modificationDate;
 	uint16_t gameId;
 	uint16_t minorVersion;
+	bool modified; // Was modified with the editor
 	bool editable;
 	bool onlineImportable; // Moveset over a certain size can't be used online
 

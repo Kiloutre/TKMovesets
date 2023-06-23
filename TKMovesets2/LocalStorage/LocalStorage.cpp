@@ -70,9 +70,11 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.size = totalSize,
 				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
 				.hash = crc32Str,
+				.extractionDate = movesetInfos.extraction_date,
 				.modificationDate = buffer.st_mtime,
 				.gameId = movesetInfos.gameId,
 				.minorVersion = movesetInfos.minorVersion,
+				.modified = (movesetInfos.flags & MovesetFlags_MovesetModified) != 0,
 				.editable = Games::IsGameEditable(movesetInfos.gameId, movesetInfos.minorVersion),
 				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES,
 				.is_valid = true
@@ -147,6 +149,7 @@ void LocalStorage::ReloadMovesetList()
 						.date = 0,
 						.size = 0,
 						.modificationDate = 0,
+						.modified = false,
 						.editable = false,
 						.is_valid = false
 					};

@@ -306,6 +306,7 @@ public:
 	std::string ImportAnimation(const wchar_t* filepath, int moveid) override;
 	void DeleteAnimation(uint64_t anim_offset);
 	void DeleteNameBlockString(uint64_t string_offset);
+	void DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr);
 
 	// -- Command Utils -- //
 	std::string GetCommandStr(const char* direction, const char* button) override;

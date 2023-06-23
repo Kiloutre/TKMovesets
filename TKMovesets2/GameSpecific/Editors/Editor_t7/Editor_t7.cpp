@@ -583,6 +583,36 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 	m_process->writeInt64(playerAddress + m_game->GetValue("currmove_id"), moveId);
 }
 
+void EditorT7::DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr)
+{
+	// Anim was changed, delete the old one if necessary
+
+	bool animationStillInUse = false;
+	bool animationNameStillInUse = false;
+
+	for (auto& m : m_iterators.moves)
+	{
+		char* move_name = (char*)(m_movesetData + m_offsets->nameBlock + m.name_addr);
+		char* anim_name = (char*)(m_movesetData + m_offsets->nameBlock + m.anim_name_addr);
+
+		if (m.anim_addr == anim_addr) {
+			animationStillInUse = true;
+		}
+		if (m.anim_name_addr == anim_name_addr) {
+			animationNameStillInUse = true;
+		}
+	}
+
+	if (!animationStillInUse) {
+		// If the animation is unused then its name also is unused because we ensure every anim has a unique name when loading the moveset
+		DeleteAnimation(anim_addr);
+		DeleteNameBlockString(anim_name_addr);
+	}
+	else if (!animationNameStillInUse) {
+		DeleteNameBlockString(anim_name_addr);
+	}
+}
+
 std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 {
 	// Keep file name only
@@ -649,8 +679,13 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 		{
 			// todo: show popup
 			DEBUG_LOG("(1) Attempted to import duplicate animation: using existing one.\n");
+			auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
+			auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
+
 			m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset->at(anim_offset);
 			m_iterators.moves[moveid]->anim_addr = anim_offset;
+
+			DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 			delete[] anim;
 			return animName_str;
 		}
@@ -682,10 +717,14 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 
 			if (size == realAnimSize && memcmp(anim, anim_block + *offset_cursor, realAnimSize) == 0)
 			{
-				// todo: show popup
 				DEBUG_LOG("(2) Attempted to import duplicate animation: using existing one.\n");
+				auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
+				auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
+
 				m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset->at(*offset_cursor);
 				m_iterators.moves[moveid]->anim_addr = *offset_cursor;
+
+				DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 				delete[] anim;
 				return animName_str;
 			}
@@ -764,8 +803,13 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	free(m_moveset);
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 
+	auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
+	auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
+
 	m_iterators.moves[moveid]->anim_name_addr = relativeName;
 	m_iterators.moves[moveid]->anim_addr = relativeAnim;
+
+	DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 
 	(*m_animNameToOffsetMap)[animName_str] = relativeAnim;
 	(*m_animOffsetToNameOffset)[relativeAnim] = relativeName;
