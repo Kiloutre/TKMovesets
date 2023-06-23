@@ -205,7 +205,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	if (ImGui::BeginPopupModal("AnimExtractionPopup", &m_animExtraction.popup))
 	{
 		uint32_t total_extracted_count = 0;
-		uint32_t total_anlmations = 0;
+		uint32_t total_animations = 0;
 
 		ImVec2 tableSize = ImGui::GetContentRegionAvail();
 		tableSize.y -= ImGui::GetFrameHeightWithSpacing() * 5;
@@ -235,10 +235,14 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 					ImGui::TextUnformatted(_("edition.animation_extraction.skipped"));
 					break;
 				case AnimExtractionStatus_Started:
+					total_extracted_count += s.current_animation;
+					total_animations += s.total_animation_count;
+					ImGui::TextUnformatted(std::format("{}/{}", s.current_animation, s.total_animation_count).c_str());
+					break;
 				case AnimExtractionStatus_Finished:
 					total_extracted_count += s.current_animation;
-					total_anlmations += s.total_animation_count;
-					ImGui::TextUnformatted(std::format("{}/{}", s.current_animation, s.total_animation_count).c_str());
+					total_animations += s.total_animation_count;
+					ImGui::TextUnformatted(std::to_string(s.total_animation_count).c_str());
 					break;
 				}
 			}
@@ -249,17 +253,8 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		if (!m_animExtraction.extracting)
 		{
 
-			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_anlmations).c_str());
-			ImGui::TextUnformatted(_("edition.extract_animations_finished"));
-
-			uint32_t duplicated_anims = total_anlmations - total_extracted_count;
-			if (duplicated_anims) {
-				char n[10];
-				sprintf_s(n, sizeof(n), "%u", duplicated_anims);
-				ImGui::TextUnformatted(n);
-				ImGui::SameLine();
-				ImGui::TextUnformatted(_("edition.animation_extraction.duplicates"));
-			}
+			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_animations).c_str());
+			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("edition.extract_animations_finished"));
 
 			if (ImGui::Button(_("close")))
 			{
@@ -268,7 +263,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			}
 		}
 		else {
-			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_anlmations).c_str());
+			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_animations).c_str());
 			ImGuiExtra::RenderButtonEnabled(_("close"), true);
 		}
 		ImGui::EndPopup();
