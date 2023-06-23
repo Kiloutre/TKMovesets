@@ -244,7 +244,7 @@ void EditorVisuals_T7::RenderStatusBar()
 
 	ImGui::SameLine();
 	// Process error
-	bool isAttached = m_importerHelper->process->IsAttached();
+	bool isAttached = m_importerHelper->process.IsAttached();
 	if (currentGame != nullptr && !isAttached)
 	{
 		// Short process error message

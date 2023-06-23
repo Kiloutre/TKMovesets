@@ -664,3 +664,8 @@ gameAddr GameProcess::AOBScan(unsigned int startingBytes, const char* bytesStrin
 	
 	return 0;
 }
+
+GameProcess::~GameProcess()
+{
+	Detach();
+}

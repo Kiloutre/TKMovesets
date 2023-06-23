@@ -59,7 +59,7 @@ public:
 	// Reads a ptr path
 	gameAddr ReadPtrPath(const char* c_addressId) const;
 
-	GameData(GameProcess* process, GameAddressesFile* t_addrFile)
+	void SetProcess(GameProcess* process, GameAddressesFile* t_addrFile)
 	{
 		m_process = process;
 		addrFile = t_addrFile;

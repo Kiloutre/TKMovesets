@@ -73,6 +73,8 @@ private:
 	// Load informations about the main module in .mainModule
 	bool LoadGameMainModule(const char* processName);
 public:
+	~GameProcess();
+
 	// Status of the process attachment
 	GameProcessErrcode_ status{ GameProcessErrcode_PROC_NOT_ATTACHED };
 	// Determines if a thread with Update() is currently running

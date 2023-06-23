@@ -40,9 +40,9 @@ public:
 	// Used to know which process is currently being searched/opened
 	std::string currentGameProcess;
 	// Currently opened process for extraction.
-	GameProcess* process = nullptr;
+	GameProcess process;
 	// Helper to read on address from their game_addresses.txt identifier
-	GameData* game = nullptr;
+	GameData game;
 	// Progress of the current task (import/export), between 0 and 100. 
 	uint8_t progress = 0;
 	// Timestamp of the current action's start, currently unused but can be used to implement timeout on actions. TODO

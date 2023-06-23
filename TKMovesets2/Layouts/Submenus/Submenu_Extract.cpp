@@ -158,12 +158,12 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		ImGui::EndPopup();
 	}
 
-	GameProcess* p = extractorHelper.process;
+	GameProcess& p = extractorHelper.process;
 
 	{
 		ImGui::SameLine();
 
-		bool canExtract = p->IsAttached() && !busy && extractorHelper.CanStart();
+		bool canExtract = p.IsAttached() && !busy && extractorHelper.CanStart();
 		bool canExtractAll = canExtract;
 
 		// Extraction buttons, will be disabled if we can't extract
@@ -215,7 +215,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 
 
 	// If we can't extract, display a warning detailling why
-	switch (p->status)
+	switch (p.status)
 	{
 	case GameProcessErrcode_PROC_ATTACHED:
 		if (!extractorHelper.CanStart()) {

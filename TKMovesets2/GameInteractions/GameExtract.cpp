@@ -29,8 +29,8 @@ void GameExtract::InstantiateFactory()
 {
 	m_toFree_extractor = m_extractor;
 
-	game->SetCurrentGame(currentGame);
-	m_extractor = Games::FactoryGetExtractor(currentGame, process, game);
+	game.SetCurrentGame(currentGame);
+	m_extractor = Games::FactoryGetExtractor(currentGame, &process, &game);
 }
 
 void GameExtract::RunningUpdate()
@@ -76,9 +76,6 @@ void GameExtract::StopThreadAndCleanup()
 	if (m_extractor != nullptr) {
 		delete m_extractor;
 	}
-
-	delete process;
-	delete game;
 }
 
 bool GameExtract::CanStart(bool cached) const

@@ -203,7 +203,7 @@ void Submenu_PersistentPlay::Render()
 		{
 			RenderGameControls();
 
-			switch (gameHelper->process->status)
+			switch (gameHelper->process.status)
 			{
 				case GameProcessErrcode_PROC_ATTACHED:
 					if (!versionMatches) {

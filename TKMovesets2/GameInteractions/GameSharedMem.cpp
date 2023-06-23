@@ -21,10 +21,10 @@ void GameSharedMem::InstantiateFactory()
 	m_toFree_importer = m_importer;
 	m_toFree_sharedMemHandler = m_sharedMemHandler;
 
-	game->SetCurrentGame(currentGame);
+	game.SetCurrentGame(currentGame);
 	// Every game has its own subtleties so we use polymorphism to manage that
-	m_importer = Games::FactoryGetImporter(currentGame, process, game);
-	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
+	m_importer = Games::FactoryGetImporter(currentGame, &process, &game);
+	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, &process, &game);
 }
 
 void GameSharedMem::RunningUpdate()
@@ -131,15 +131,12 @@ void GameSharedMem::StopThreadAndCleanup()
 	m_t.join();
 
 	if (m_importer != nullptr) {
-		if (process->IsAttached()) {
+		if (process.IsAttached()) {
 			m_importer->CleanupUnusedMovesets();
 		}
 		delete m_sharedMemHandler;
 		delete m_importer;
 	}
-
-	delete process;
-	delete game;
 }
 
 void GameSharedMem::FreeExpiredFactoryClasses()
@@ -162,10 +159,10 @@ void GameSharedMem::FreeExpiredFactoryClasses()
 
 void GameSharedMem::ResetTargetProcess()
 {
-	if (process->IsAttached())
+	if (process.IsAttached())
 	{
 		PreProcessDetach();
-		process->Detach();
+		process.Detach();
 		OnProcessDetach();
 	}
 

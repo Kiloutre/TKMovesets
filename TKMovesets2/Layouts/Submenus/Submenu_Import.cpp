@@ -98,9 +98,9 @@ void Submenu_Import::Render(GameImport& importerHelper)
 	ImGuiExtra::HelpMarker(_("importation.free_unused_movesets_explanation"));
 
 	// If we can't import, display a warning detailling why
-	GameProcess* p = importerHelper.process;
+	GameProcess& p = importerHelper.process;
 
-	bool canImport = p->IsAttached() && !busy && importerHelper.CanStart();
+	bool canImport = p.IsAttached() && !busy && importerHelper.CanStart();
 
 	if (importerHelper.progress > 0) {
 		// Progress text.
@@ -118,7 +118,7 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		}
 	}
 
-	switch (p->status)
+	switch (p.status)
 	{
 	case GameProcessErrcode_PROC_ATTACHED:
 		if (!importerHelper.CanStart()) {

@@ -26,9 +26,9 @@ void GameImport::InstantiateFactory()
 {
 	m_toFree_importer = m_importer;
 
-	game->SetCurrentGame(currentGame);
+	game.SetCurrentGame(currentGame);
 	// Every game has its own importation subtleties so we use polymorphism to manage that
-	m_importer = Games::FactoryGetImporter(currentGame, process, game);
+	m_importer = Games::FactoryGetImporter(currentGame, &process, &game);
 }
 
 void GameImport::PreProcessDetach()
@@ -89,14 +89,11 @@ void GameImport::StopThreadAndCleanup()
 	m_t.join();
 
 	if (m_importer != nullptr) {
-		if (process->IsAttached()) {
+		if (process.IsAttached()) {
 			m_importer->CleanupUnusedMovesets();
 		}
 		delete m_importer;
 	}
-
-	delete process;
-	delete game;
 }
 
 bool GameImport::CanStart(bool cached) const
