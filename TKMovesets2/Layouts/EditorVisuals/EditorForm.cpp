@@ -127,9 +127,11 @@ void EditorForm::RenderLabel(int listIdx, EditorInput* field)
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
 	{
 		ImGui::BeginTooltip();
+		ImGui::NewLine();
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 		ImGui::TextUnformatted(field->hoverDescription.c_str());
 		ImGui::PopTextWrapPos();
+		ImGui::NewLine();
 		ImGui::EndTooltip();
 	}
 
