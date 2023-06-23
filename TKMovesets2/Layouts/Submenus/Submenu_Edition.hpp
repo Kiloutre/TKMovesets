@@ -33,8 +33,8 @@ private:
 		bool started = false;
 		// Thread to extract animation
 		std::thread thread;
-		// Statuses of the extractions
-		std::vector<s_extractionStatus> statuses;
+		// Statuses of the extractions & must_interrupt
+		s_animExtractionControl extractionControl;
 		// Movesets
 		std::vector<movesetInfo> movesets;
 		// True if the extraction popup is currently shown

@@ -20,6 +20,12 @@ struct s_extractionStatus
 	AnimExtractionStatus_ status = AnimExtractionStatus_NotStarted;
 };
 
+struct s_animExtractionControl
+{
+	std::vector<s_extractionStatus> statuses;
+	bool must_interrupt = false;
+};
+
 namespace AnimExtractor
 {
 	void _FromT7(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_extractionStatus& extractionStatus);
@@ -29,7 +35,7 @@ namespace AnimExtractor
 
 	// Extracts the animation of every given movesets in appropriate folders
 	// Does not extract if the moveset's animations have already been extracted (matches by original character name)
-	void ExtractAnimations(const std::vector<movesetInfo> movesets, std::vector<s_extractionStatus>& extractionStatuses);
+	void ExtractAnimations(const std::vector<movesetInfo> movesets, s_animExtractionControl& extractionControl);
 };
 
 namespace TAnimExtractorUtils

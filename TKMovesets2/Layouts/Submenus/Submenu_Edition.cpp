@@ -144,7 +144,7 @@ void Submenu_Edition::ExtractAllAnimations()
 		});
 
 	DEBUG_LOG("Extracting all animations...\n");
-	AnimExtractor::ExtractAnimations(m_animExtraction.movesets, m_animExtraction.statuses);
+	AnimExtractor::ExtractAnimations(m_animExtraction.movesets, m_animExtraction.extractionControl);
 	m_animExtraction.extracting = false;
 }
 
@@ -155,11 +155,12 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	ImGui::SeparatorText(_("edition.tools"));
 	{
 		// Extract all movesets
-		if (ImGuiExtra::RenderButtonEnabled(_("edition.extract_animations"), !m_animExtraction.extracting)) {
-
-			m_animExtraction.statuses = std::vector<s_extractionStatus>(storage.extractedMovesets.size());
+		if (ImGuiExtra::RenderButtonEnabled(_("edition.extract_animations"), !m_animExtraction.extracting))
+		{
+			m_animExtraction.extractionControl.statuses = std::vector<s_extractionStatus>(storage.extractedMovesets.size());
 
 			m_animExtraction.movesets.clear();
+
 			// Createe a copy of extractedMovesets so that there's no problem if it changes while we're extracting stuff
 			for (auto& item : storage.extractedMovesets) {
 				m_animExtraction.movesets.push_back(*item);
@@ -175,6 +176,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 			ImGui::OpenPopup("AnimExtractionPopup");
 			m_animExtraction.popup = true;
+			m_animExtraction.extractionControl.must_interrupt = false;
 		}
 
 		ImGui::SameLine();
@@ -220,7 +222,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::TableNextColumn();
 
 				auto& m = m_animExtraction.movesets[i];
-				auto& s = m_animExtraction.statuses[i];
+				auto& s = m_animExtraction.extractionControl.statuses[i];
 
 				ImGui::TextUnformatted(m.name.c_str());
 
@@ -253,22 +255,25 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			ImGui::EndTable();
 		}
 
-		if (!m_animExtraction.extracting)
-		{
 
-			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_animations).c_str());
+		ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_animations).c_str());
+
+		if (!m_animExtraction.extracting) {
 			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("edition.extract_animations_finished"));
 
 			if (ImGui::Button(_("close")))
 			{
 				ImGui::CloseCurrentPopup();
 				m_animExtraction.popup = false;
+				m_animExtraction.extractionControl.must_interrupt = true;
 			}
 		}
 		else {
-			ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_animations).c_str());
-			ImGuiExtra::RenderButtonEnabled(_("close"), true);
+			if (ImGuiExtra::RenderButtonEnabled(_("edition.animation_extraction.interrupt"), !m_animExtraction.extractionControl.must_interrupt)) {
+				m_animExtraction.extractionControl.must_interrupt = true;
+			}
 		}
+
 		ImGui::EndPopup();
 	}
 	

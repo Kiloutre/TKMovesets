@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 #include <format>
 #include <windows.h>
@@ -14,16 +15,16 @@
 
 namespace AnimExtractor
 {
-	void ExtractAnimations(const std::vector<movesetInfo> movesets, std::vector<s_extractionStatus>& extractionStatuses)
+	void ExtractAnimations(const std::vector<movesetInfo> movesets, s_animExtractionControl& extractionControl)
 	{
 		DEBUG_LOG("ExtractAnimations - %llu movesets.\n", movesets.size());
 
 		CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
 
-		for (unsigned int i = 0; i < movesets.size(); ++i)
+		for (unsigned int i = 0; i < movesets.size() && !extractionControl.must_interrupt; ++i)
 		{	
 			auto& m = movesets[i];
-			auto& extractionStatus = extractionStatuses[i];
+			auto& extractionStatus = extractionControl.statuses[i];
 
 			DEBUG_LOG("%S\n", m.wname.c_str());
 			if (!m.is_valid) {
@@ -56,7 +57,8 @@ namespace AnimExtractor
 			}
 
 			const std::wstring outputFolder = L"" EDITOR_LIB_DIRECTORY "/" + game_prefix + Helpers::string_to_wstring(m.original_character) + L"/";
-			const std::wstring outputFilename = outputFolder + L"anims.txt";
+			const std::wstring outputFilename = outputFolder + L"anims_tmp.txt";
+			const std::wstring outputFinalFilename = outputFolder + L"anims.txt";
 
 			if (Helpers::fileExists(outputFilename.c_str())) {
 				DEBUG_LOG("File '%S' already exists: skipping extraction.\n", outputFilename.c_str());
@@ -118,6 +120,24 @@ namespace AnimExtractor
 				case GameId_T5:
 					_FromT5(moveset, s_moveset, outputFolder, outputFile, extractionStatus);
 					break;
+				}
+
+				outputFile.close();
+
+				if (!extractionControl.must_interrupt) {
+					try {
+						std::filesystem::remove(outputFinalFilename);
+					}
+					catch (std::filesystem::filesystem_error const&) {
+					}
+
+					try {
+						std::filesystem::rename(outputFilename, outputFinalFilename);
+					}
+					catch (const std::exception&) {
+						DEBUG_ERR("Failed to rename '%S' to '%S'", outputFilename.c_str(), outputFinalFilename.c_str());
+						extractionStatus.status = AnimExtractionStatus_Error;
+					}
 				}
 			}
 

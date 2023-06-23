@@ -203,6 +203,7 @@ edition.animation_extraction.extraction_status = Extraction status
 edition.animation_extraction.not_started = Not started
 edition.animation_extraction.skipped = Skipped
 edition.animation_extraction.error = Error
+edition.animation_extraction.interrupt = Interrupt
 edition.open_editor_library = Open editor library
 edition.open_editor_backups = Open editor backups
 
