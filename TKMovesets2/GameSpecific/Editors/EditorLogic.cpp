@@ -362,10 +362,8 @@ bool EditorLogic::ValidateFieldType(EditorInput* field)
 
 EditorLogic::EditorLogic(GameProcess* process, GameData* game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
 {
-	constants = new std::map<EditorConstants_, unsigned int >();
 }
 
 EditorLogic::~EditorLogic()
 {
-	delete constants;
 }

@@ -254,7 +254,7 @@ void EditorT7::LoadMovesetPtr(Byte* t_moveset, uint64_t t_movesetSize)
 
 bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 {
-	*constants = {
+	constants = {
 		{EditorConstants_RequirementEnd, (unsigned int)m_game->GetValue("req_end")},
 		{EditorConstants_CancelCommandEnd, 0x8000},
 		{EditorConstants_ExtraProperty_Instant, 32769}, // 0x8001
@@ -317,13 +317,13 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		std::string animName_str(animName);
 		gameAddr animOffset = movePtr[i].anim_addr;
 
-		if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end() && m_animNameToOffsetMap->at(animName_str) != animOffset) {
+		if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap.at(animName_str) != animOffset) {
 			// Same animation name refers to a different offset. Create a unique animation name for it.
 			// Move names being similar is irrelevant, but i build an anim name -> anim offset map, so i need identical names to point toward the same anim.
 
 			animName_str += " (2)";
 			unsigned int num = 2;
-			while (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
+			while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
 				animName_str = std::format("{} ({})", animName, ++num);
 			}
 
@@ -342,8 +342,8 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 			}
 		}
 
-		(*m_animNameToOffsetMap)[animName_str] = animOffset;
-		(*m_animOffsetToNameOffset)[animOffset] = movePtr[i].anim_name_addr;
+		m_animNameToOffsetMap[animName_str] = animOffset;
+		m_animOffsetToNameOffset[animOffset] = movePtr[i].anim_name_addr;
 	}
 
 	return true;
@@ -379,7 +379,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 	}
 
 	uint16_t aliasId = 0;
-	auto displayedMove = displayableMovelist->at(moveId);
+	auto displayedMove = displayableMovelist[moveId];
 
 	// Mark if default generic moves
 	{
@@ -441,10 +441,10 @@ void EditorT7::ReloadDisplayableMoveList()
 {
 	mustReloadMovelist = true;
 
-	for (auto& move : *displayableMovelist) {
+	for (auto& move : displayableMovelist) {
 		delete move;
 	}
-	displayableMovelist->clear();
+	displayableMovelist.clear();
 
 	uint64_t movesetListOffset = m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
@@ -478,7 +478,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			flags |= EditorMoveFlags_Custom;
 		}
 
-		displayableMovelist->push_back(new DisplayableMove{
+		displayableMovelist.push_back(new DisplayableMove{
 			.moveId_str = std::to_string(moveId),
 			.name = moveName,
 			.alias_str = std::string(),
@@ -499,7 +499,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			uint16_t moveId = aliases[j];
 			uint16_t aliasId = 0x8000 + j;
 
-			auto& move = (*displayableMovelist).at(moveId);
+			auto& move = displayableMovelist[moveId];
 			move->flags |= EditorMoveFlags_Generic;
 
 			if (move->aliasId == 0)
@@ -521,7 +521,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			uint16_t moveId = aliases[j];
 			uint16_t aliasId = 0x8000 + j;
 
-			auto& move = (*displayableMovelist).at(moveId);
+			auto& move = displayableMovelist[moveId];
 			move->flags |= EditorMoveFlags_CurrentGeneric;
 
 			if (move->aliasId == 0)
@@ -669,10 +669,10 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	}
 
 	// Ensure animation name is unique
-	if (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end())
+	if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end())
 	{
 		// An animation with the same name has been found
-		auto anim_offset = m_animNameToOffsetMap->at(animName_str);
+		auto anim_offset = m_animNameToOffsetMap[animName_str];
 		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)anim_offset);
 
 		if (TAnimUtils::FromMemory::GetAnimSize(existing_anim) == realAnimSize && memcmp(anim, existing_anim, realAnimSize) == 0)
@@ -682,7 +682,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 			auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
 			auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
 
-			m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset->at(anim_offset);
+			m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset[anim_offset];
 			m_iterators.moves[moveid]->anim_addr = anim_offset;
 
 			DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
@@ -694,7 +694,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 		std::string animName_orig = animName_str;
 		animName_str += " (2)";
 		unsigned int num = 2;
-		while (m_animNameToOffsetMap->find(animName_str) != m_animNameToOffsetMap->end()) {
+		while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
 			animName_str = std::format("{} {}", animName_orig.c_str(), ++num);
 		}
 	}
@@ -721,7 +721,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 				auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
 				auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
 
-				m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset->at(*offset_cursor);
+				m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset[*offset_cursor];
 				m_iterators.moves[moveid]->anim_addr = *offset_cursor;
 
 				DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
@@ -811,8 +811,8 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 
 	DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 
-	(*m_animNameToOffsetMap)[animName_str] = relativeAnim;
-	(*m_animOffsetToNameOffset)[relativeAnim] = relativeName;
+	m_animNameToOffsetMap[animName_str] = relativeAnim;
+	m_animOffsetToNameOffset[relativeAnim] = relativeName;
 
 	return animName_str;
 }

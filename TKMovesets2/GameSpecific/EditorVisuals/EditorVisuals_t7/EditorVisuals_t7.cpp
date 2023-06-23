@@ -184,7 +184,7 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 	PopulateWindowCreatorMap();
 	// Read what needs to be read and potentially displayed right away
 	m_editor->ReloadDisplayableMoveList();
-	movelist = m_editor->displayableMovelist;
+	movelist = &m_editor->displayableMovelist;
 	ReloadMovelistFilter();
 
 	m_compressionIndex = CompressionUtils::GetDefaultCompressionSetting();

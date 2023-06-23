@@ -83,8 +83,8 @@ uint32_t EditorT7::CreateNewExtraProperties()
 
 	ModifyGenericMovelistListSize<ExtraMoveProperty>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.extra_move_properties[newStructId];
-	newStruct[0].starting_frame = constants->at(EditorConstants_ExtraProperty_Instant);
-	newStruct[1].starting_frame = constants->at(EditorConstants_ExtraPropertyEnd);
+	newStruct[0].starting_frame = constants[EditorConstants_ExtraProperty_Instant];
+	newStruct[1].starting_frame = constants[EditorConstants_ExtraPropertyEnd];
 
 	return newStructId;
 }
@@ -96,7 +96,7 @@ uint32_t EditorT7::CreateNewMoveBeginProperties()
 
 	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
 	auto* newStruct = m_iterators.move_start_properties[newStructId];
-	newStruct->extraprop = constants->at(EditorConstants_RequirementEnd);
+	newStruct->extraprop = constants[EditorConstants_RequirementEnd];
 
 	return newStructId;
 }
@@ -108,7 +108,7 @@ uint32_t EditorT7::CreateNewMoveEndProperties()
 
 	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
 	auto* newStruct = m_iterators.move_end_properties[newStructId];
-	newStruct->extraprop = constants->at(EditorConstants_RequirementEnd);
+	newStruct->extraprop = constants[EditorConstants_RequirementEnd];
 
 	return newStructId;
 }
@@ -120,7 +120,7 @@ uint32_t EditorT7::CreateNewRequirements()
 
 	ModifyGenericMovelistListSize<Requirement>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.requirements[newStructId];
-	newStruct[1].condition = constants->at(EditorConstants_RequirementEnd);
+	newStruct[1].condition = constants[EditorConstants_RequirementEnd];
 
 	return newStructId;
 }
@@ -154,7 +154,7 @@ uint32_t EditorT7::CreateNewCancelList()
 
 	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.cancels[newStructId];
-	newStruct[1].command = constants->at(EditorConstants_CancelCommandEnd);
+	newStruct[1].command = constants[EditorConstants_CancelCommandEnd];
 
 	return newStructId;
 }
@@ -166,7 +166,7 @@ uint32_t EditorT7::CreateNewGroupedCancelList()
 
 	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
 	auto* newStruct = m_iterators.grouped_cancels[newStructId];
-	newStruct[1].command = constants->at(EditorConstants_GroupedCancelCommandEnd);
+	newStruct[1].command = constants[EditorConstants_GroupedCancelCommandEnd];
 
 	return newStructId;
 }

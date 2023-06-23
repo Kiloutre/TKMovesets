@@ -36,19 +36,11 @@ namespace TEditorUtils
 
 TEditor::TEditor(GameProcess* process, GameData* game, const GameInfo* gameInfo) : EditorLogic(process, game, gameInfo)
 {
-	displayableMovelist = new std::vector<DisplayableMove*>;
-
-	m_animNameToOffsetMap = new std::map<std::string, gameAddr>;
-	m_animOffsetToNameOffset = new std::map<gameAddr, gameAddr>;
 }
 
 TEditor::~TEditor()
 {
-	delete m_animNameToOffsetMap;
-	delete m_animOffsetToNameOffset;
-
-	for (auto& move : *displayableMovelist) {
+	for (auto& move : displayableMovelist) {
 		delete move;
 	}
-	delete displayableMovelist;
 }

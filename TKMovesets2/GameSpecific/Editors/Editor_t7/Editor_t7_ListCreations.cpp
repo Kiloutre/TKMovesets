@@ -116,7 +116,7 @@ void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::ve
 	int oldSize = (int)ids.size() - listSizeDiff;
 	for (auto& cancel : m_iterators.cancels)
 	{
-		if (cancel.command == constants->at(EditorConstants_GroupedCancelCommand)) {
+		if (cancel.command == constants[EditorConstants_GroupedCancelCommand]) {
 			if (MUST_SHIFT_ID(cancel.move_id, listSizeDiff, listStart, listStart + oldSize)) {
 				cancel.move_id += listSizeDiff;
 			}

@@ -93,7 +93,7 @@ void EditorT7::DeleteInputSequence(int id)
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (IsCommandInputSequence(cancel.command)) {
-			uint64_t correctedCommand = cancel.command - constants->at(EditorConstants_InputSequenceCommandStart);
+			uint64_t correctedCommand = cancel.command - constants[EditorConstants_InputSequenceCommandStart];
 			if (MUST_SHIFT_ID(correctedCommand, -1, id, id + 1)) {
 				cancel.command -= 1;
 			}
@@ -293,7 +293,7 @@ void EditorT7::DeleteAnimation(uint64_t anim_offset)
 	}
 
 	// Remove anim off map
-	m_animOffsetToNameOffset->erase(m_animOffsetToNameOffset->find(anim_offset));
+	m_animOffsetToNameOffset.erase(m_animOffsetToNameOffset.find(anim_offset));
 
 	// Shift blocks
 	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
@@ -363,13 +363,13 @@ void EditorT7::DeleteNameBlockString(uint64_t string_offset)
 	}
 
 	// Remove name from map
-	m_animNameToOffsetMap->erase(m_animNameToOffsetMap->find(name));
+	m_animNameToOffsetMap.erase(m_animNameToOffsetMap.find(name));
 	// Re-set map with new value if the same name exists multiple times in the name block (that can happen)
 	for (auto& m : m_iterators.moves)
 	{
 		const char* m_name = (char*)(m_movesetData + m_offsets->nameBlock) + m.anim_name_addr;
 		if (strcmp(m_name, name) == 0) {
-			(*m_animNameToOffsetMap)[m_name] = m.anim_addr;
+			m_animNameToOffsetMap[m_name] = m.anim_addr;
 			break;
 		}
 	}

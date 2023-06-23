@@ -245,7 +245,7 @@ protected:
 	bool ValidateFieldType(EditorInput* field);
 public:
 	// Constants useful constant variables, to be set on a per-game basis
-	std::map<EditorConstants_, unsigned int >* constants;
+	std::map<EditorConstants_, unsigned int > constants;
 	// Stores the address of the loaded moveset in-game. Will become 0 if it does not match the current moveset.
 	gameAddr live_loadedMoveset = 0;
 	// Id of the currently selected player, used for extra properties execution

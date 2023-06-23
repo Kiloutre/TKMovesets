@@ -70,14 +70,14 @@ class TEditor : public EditorLogic
 {
 protected:
 	// Stores a <name, offset> animation map
-	std::map<std::string, gameAddr>* m_animNameToOffsetMap = nullptr;
+	std::map<std::string, gameAddr> m_animNameToOffsetMap;
 	// Stores a <offset, offset> animation map
-	std::map<gameAddr, gameAddr>* m_animOffsetToNameOffset = nullptr;
+	std::map<gameAddr, gameAddr> m_animOffsetToNameOffset;
 public:
 	// If moveset posses movelist data
 	bool hasDisplayableMovelist = false;
 	// Contains every move, in a displayable format. Not tied to training mode movelist.
-	std::vector<DisplayableMove*>* displayableMovelist;
+	std::vector<DisplayableMove*> displayableMovelist;
 	// Set to true when updating displayableMovelist in order to tell EditorVisuals to refresh its movelist
 	bool mustReloadMovelist = false;
 	// Store move ID aliases

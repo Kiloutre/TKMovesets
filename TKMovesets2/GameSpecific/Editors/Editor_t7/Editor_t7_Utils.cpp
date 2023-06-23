@@ -3,20 +3,20 @@
 bool EditorT7::IsCommandGroupedCancelReference(const char* buffer)
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return command == constants->at(EditorConstants_GroupedCancelCommand);
+	return command == constants[EditorConstants_GroupedCancelCommand];
 }
 
 int EditorT7::GetCommandInputSequenceID(const char* buffer)
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return (command & 0xFFFFFFFF) - constants->at(EditorConstants_InputSequenceCommandStart);
+	return (command & 0xFFFFFFFF) - constants[EditorConstants_InputSequenceCommandStart];
 }
 
 bool EditorT7::IsCommandInputSequence(uint64_t command)
 {
-	const uint32_t sequenceId = (command & 0xFFFFFFFF);
-	const uint32_t inputSequenceStart = (int)constants->at(EditorConstants_InputSequenceCommandStart);
-	const uint32_t inputSequenceEnd = 0x10000; // Arbitrary number here. Todo: find actual limit
+	uint32_t sequenceId = (command & 0xFFFFFFFF);
+	uint32_t inputSequenceStart = (uint32_t)constants[EditorConstants_InputSequenceCommandStart];
+	uint32_t inputSequenceEnd = 0x10000; // Arbitrary number here. Todo: find actual limit
 	if (inputSequenceStart <= sequenceId && sequenceId < inputSequenceEnd) {
 		return true;
 	}
@@ -46,7 +46,7 @@ bool EditorT7::IsPropertyThrowCameraRef(const char* buffer)
 
 bool EditorT7::IsPropertyProjectileRef(uint32_t id)
 {
-	if (id == constants->at(EditorConstants_ProjectileProperty)) {
+	if (id == constants[EditorConstants_ProjectileProperty]) {
 		return true;
 	}
 	return false;

@@ -511,7 +511,7 @@ std::vector<InputMap> EditorT7::GetHitConditionListInputs(uint16_t id, VectorSet
 		WriteFieldFullname(inputMap, "hit_condition");
 		inputListMap.push_back(inputMap);
 
-		if (req[(unsigned int)hitCondition->requirements_addr].condition == constants->at(EditorConstants_RequirementEnd)) {
+		if (req[(unsigned int)hitCondition->requirements_addr].condition == constants[EditorConstants_RequirementEnd]) {
 			break;
 		}
 
@@ -574,7 +574,7 @@ std::vector<InputMap> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
-	} while ((req++)->condition != constants->at(EditorConstants_RequirementEnd));
+	} while ((req++)->condition != constants[EditorConstants_RequirementEnd]);
 
 	return inputListMap;
 }
@@ -640,7 +640,7 @@ std::vector<InputMap> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::
 
 		WriteFieldFullname(inputMap, "cancel");
 		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != constants->at(EditorConstants_CancelCommandEnd));
+	} while ((cancel++)->command != constants[EditorConstants_CancelCommandEnd]);
 
 	return inputListMap;
 }
@@ -676,8 +676,8 @@ bool EditorT7::ValidateCancelField(EditorInput* field)
 	}
 	else if (name == "command") {
 		uint64_t command = (uint64_t)strtoll(field->buffer, nullptr, 16) & 0xFFFFFFFF;
-		if (command >= constants->at(EditorConstants_InputSequenceCommandStart)) {
-			int listIdx = (unsigned int)(command - constants->at(EditorConstants_InputSequenceCommandStart));
+		if (command >= constants[EditorConstants_InputSequenceCommandStart]) {
+			int listIdx = (unsigned int)(command - constants[EditorConstants_InputSequenceCommandStart]);
 			return listIdx < (int)m_infos->table.inputCount;
 		}
 	}
@@ -712,7 +712,7 @@ std::vector<InputMap> EditorT7::GetGroupedCancelListInputs(uint16_t id, VectorSe
 
 		WriteFieldFullname(inputMap, "grouped_cancel");
 		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != constants->at(EditorConstants_GroupedCancelCommandEnd));
+	} while ((cancel++)->command != constants[EditorConstants_GroupedCancelCommandEnd]);
 
 	return inputListMap;
 }
@@ -792,7 +792,7 @@ std::vector<InputMap> EditorT7::GetMoveStartPropertyListInputs(uint16_t id, Vect
 
 		WriteFieldFullname(inputMap, "move_start_extraprop");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != constants->at(EditorConstants_RequirementEnd));
+	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
 
 	return inputListMap;
 }
@@ -828,7 +828,7 @@ std::vector<InputMap> EditorT7::GetMoveEndPropertyListInputs(uint16_t id, Vector
 
 		WriteFieldFullname(inputMap, "move_end_extraprop");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != constants->at(EditorConstants_RequirementEnd));
+	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
 
 	return inputListMap;
 }
@@ -878,7 +878,7 @@ std::vector<InputMap> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<st
 
 		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
-	} while ((prop++)->starting_frame != constants->at(EditorConstants_ExtraPropertyEnd));
+	} while ((prop++)->starting_frame != constants[EditorConstants_ExtraPropertyEnd]);
 
 	return inputListMap;
 }
@@ -1101,15 +1101,15 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
 	SetMemberValue(&move->_0xAC_int, inputs["_0xAC_int"]);
 
-	if (m_animNameToOffsetMap->find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap->end())
+	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end())
 	{
 		// Anim was changed, delete the old one if necessary
 
 		auto old_anim_addr = move->anim_addr;
 		auto old_anim_name_addr = move->anim_name_addr;
 
-		move->anim_addr = m_animNameToOffsetMap->at(inputs["anim_name"]->buffer);
-		move->anim_name_addr = m_animOffsetToNameOffset->at(move->anim_addr);
+		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
+		move->anim_name_addr = m_animOffsetToNameOffset.at(move->anim_addr);
 
 		DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 		// Reload move pointer because anim/anim name deletion de-allocated it
@@ -1137,7 +1137,7 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 	auto& name = field->name;
 
 	if (name == "anim_name") {
-		return m_animNameToOffsetMap->find(field->buffer) != m_animNameToOffsetMap->end();
+		return m_animNameToOffsetMap.find(field->buffer) != m_animNameToOffsetMap.end();
 	}
 
 	else if (name.startsWith("cancel_addr")) {

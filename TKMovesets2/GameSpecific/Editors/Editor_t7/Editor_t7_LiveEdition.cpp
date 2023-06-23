@@ -25,7 +25,7 @@ void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
 
 	if (name == "anim_name") {
 		uint64_t animBlockStart = live_loadedMoveset + m_offsets->animationBlock;
-		gameAddr animAddr = animBlockStart + m_animNameToOffsetMap->at(field->buffer);
+		gameAddr animAddr = animBlockStart + m_animNameToOffsetMap[field->buffer];
 		m_process->writeInt64(move + offsetof(Move, anim_addr), animAddr);
 	}
 	if (name == "vulnerability") {
