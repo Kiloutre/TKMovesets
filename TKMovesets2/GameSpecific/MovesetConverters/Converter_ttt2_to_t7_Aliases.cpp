@@ -568,12 +568,15 @@ namespace TTT2_T7_Aliases
 	{
 		switch (property)
 		{
+			/*
+			* This is already properly handled
 		case 0x82DB:
 			property = 0x842E;
 			break;
 		case 0x82DC:
 			property = 0x842f;
 			break;
+			*/
 		default:
 			return false;
 		}

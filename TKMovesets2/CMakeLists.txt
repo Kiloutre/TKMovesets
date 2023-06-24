@@ -113,6 +113,7 @@ set(BINARY_SOURCES
 set(GAMESPECIFIC_SOURCES
                     # List of games
                     "GameSpecific/Games.cpp"
+                    "GameSpecific/BaseAddresses.cpp"
                     # Base classes for our game-specific stuff
                     "GameSpecific/Extractors/Extractor.cpp"
                     "GameSpecific/Importers/Importer.cpp"

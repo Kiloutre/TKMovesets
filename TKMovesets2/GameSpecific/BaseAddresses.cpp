@@ -1,10 +1,6 @@
 #pragma once
 
-#include "GameInfo.hpp"
-#include "GameAddressesFile.hpp"
-#include "GameProcess.hpp"
-
-class MissingBaseAddr : public std::exception {};
+#include "BaseAddresses.hpp"
 
 // Get base addr from game_addresses.ini file
 uint64_t GetBaseAddrFromFile(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process)

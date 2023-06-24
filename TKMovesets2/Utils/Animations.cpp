@@ -213,7 +213,7 @@ namespace TAnimUtils
 
 		inline bool IsLittleEndian(const Byte* animAddr)
 		{
-			return animAddr[1] == 0;
+			return animAddr[0] == 0x64 || animAddr[0] == 0xC8;
 		}
 
 
@@ -307,7 +307,7 @@ namespace TAnimUtils
 
 		uint64_t get64AnimSize(const Byte* anim)
 		{
-			bool isSwapped = *anim == 0;
+			bool isSwapped = IsLittleEndian(anim);
 			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
 
 			uint64_t boneCount = READ(anim + 2, uint16_t);
@@ -356,9 +356,15 @@ namespace TAnimUtils
 
 	namespace FromProcess
 	{
+		bool IsLittleEndian(const GameProcess& process, gameAddr anim)
+		{
+			Byte first_byte = process.readInt8(anim);
+			return first_byte == 0x64 || first_byte == 0xC8;
+		}
+
 		uint64_t getC8AnimSize(const GameProcess& process, gameAddr anim)
 		{
-			bool isSwapped = process.readInt8(anim + 0) == 0;
+			bool isSwapped = !IsLittleEndian(process, anim);
 
 			uint8_t bone_count = process.readInt8(anim + (isSwapped ? 3 : 2));
 			uint32_t header_size = bone_count * 0x4 + 0x8;
@@ -374,7 +380,7 @@ namespace TAnimUtils
 
 		uint64_t get64AnimSize(const GameProcess& process, gameAddr anim)
 		{
-			bool isSwapped = process.readInt8(anim + 0) == 0;
+			bool isSwapped = !IsLittleEndian(process, anim);
 			return isSwapped ? get64AnimSize_BigEndian(process, anim) : get64AnimSize_LittleEndian(process, anim);
 		}
 
@@ -557,7 +563,8 @@ namespace TAnimUtils
 			file.seekg(0, std::ios::beg);
 			file.read((char*)buf, animInfo.size);
 
-			bool isBigEndian = buf[0] == 0;
+			bool isLittleEndian = *buf == 0x64 || *buf == 0xC8;
+			bool isBigEndian = !isLittleEndian;
 			Byte animType = isBigEndian ? buf[1] : buf[0];
 			uint32_t boneCount = isBigEndian ? buf[3] : buf[2];
 
@@ -590,7 +597,8 @@ namespace TAnimUtils
 			file.read(buf, 8);
 			if (file.gcount() == 8)
 			{
-				Byte isBigEndian = buf[0] == 0;
+				bool isLittleEndian = *buf == 0x64 || *buf == 0xC8;
+				bool isBigEndian = !isLittleEndian;
 				Byte animType = isBigEndian ? buf[1] : buf[0];
 				Byte boneCount = isBigEndian ? buf[3] : buf[2];
 

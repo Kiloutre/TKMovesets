@@ -1,5 +1,6 @@
 #include "GameInfo.hpp"
 #include "GameData.hpp"
+#include "BaseAddresses.hpp"
 
 #include "GameTypes.h"
 
@@ -100,7 +101,12 @@ void GameData::ReadBytes(gameAddr address, void* buf, size_t readSize) const
 void GameData::SetCurrentGame(const GameInfo* game)
 {
 	// Resets base addr for every game change
-	baseAddr = game->GetBaseAddressFunc == nullptr ? 0 : game->GetBaseAddressFunc(game, addrFile, m_process);
+	try {
+		baseAddr = game->GetBaseAddressFunc == nullptr ? 0 : game->GetBaseAddressFunc(game, addrFile, m_process);
+	}
+	catch (const MissingBaseAddr&) {
+		baseAddr = 0;
+	}
 
 	bigEndian = game->bigEndian;
 	currentGame = game;

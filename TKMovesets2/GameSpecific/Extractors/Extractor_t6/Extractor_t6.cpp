@@ -936,8 +936,6 @@ bool ExtractorT6::CanExtract()
 	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 
-	DEBUG_LOG("Player address: %llx\n", playerAddress);
-
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
@@ -952,7 +950,6 @@ bool ExtractorT6::CanExtract()
 		// Read into current moveset to see if it has been initialized
 		{
 			gameAddr movesetAddr = m_game.ReadPtr(playerAddress + m_game.GetValue("motbin_offset"));
-			DEBUG_LOG("movesetAddr: %llx\n", movesetAddr);
 
 			if (movesetAddr == 0 || movesetAddr == -1) {
 				return false;
@@ -993,9 +990,18 @@ std::string ExtractorT6::GetPlayerCharacterName(gameAddr playerAddress)
 		++character_name_cursor;
 	}
 
-	if (characterName[name_len - 1] == ']') {
+	while (name_len > 0 && characterName[name_len - 1] == ' ') {
 		characterName[name_len - 1] = '\0';
 		--name_len;
+	}
+
+	if (name_len > 0 && characterName[name_len - 1] == ']') {
+		characterName[name_len - 1] = '\0';
+		--name_len;
+	}
+
+	if (name_len == 0) {
+		return "";
 	}
 
 	if (name_len == 1) {

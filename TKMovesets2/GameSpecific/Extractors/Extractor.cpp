@@ -122,15 +122,27 @@ void Extractor::GetFilepath(const char* characterName, std::wstring& out, std::w
 
 uint64_t Extractor::GetAnimationSize(gameAddr anim)
 {
-	uint16_t animType = m_process.readInt16(anim);
-	if ((animType & 0xFF) == 0) {
-		animType = BYTESWAP_INT16(animType);
+	union {
+		struct {
+			Byte first_byte;
+			Byte second_byte;
+		};
+		uint16_t bytes;
+	} animType;
+	animType.bytes = m_process.readInt16(anim);
+
+	// Byteswap
+	if (animType.second_byte == 0x64 || animType.second_byte == 0xC8) {
+		animType.bytes = animType.second_byte;
+	}
+	else {
+		animType.bytes = animType.first_byte;
 	}
 
-	if (animType == 0xC8) {
+	if (animType.first_byte == 0xC8) {
 		return TAnimUtils::FromProcess::getC8AnimSize(m_process, anim);
 	}
-	else if (animType == 0x64) {
+	else if (animType.first_byte == 0x64) {
 		return TAnimUtils::FromProcess::get64AnimSize(m_process, anim);
 	}
 	// Invalid animation type
