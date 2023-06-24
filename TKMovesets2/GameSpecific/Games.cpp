@@ -151,6 +151,28 @@ const GameInfo cg_gamesInfo[] = {
 		.autoProcessSelection = false
 	},
 	{
+		.name = "Tekken 6 (PPSSPP)",
+		.processName = "PPSSPPWindows64.exe",
+		.movesetNamePrefix = "T6_",
+		.gameId = GameId_T6,
+		.minorVersion = 0,
+		.characterCount = 2,
+		.ptrSize = 4,
+		.flags = 0,
+		.dataString = "t6",
+		.minorDataString = "t6-psp",
+		.supportedImports = {},
+		.supportedOnlineImports = {},
+		.extractor = new GameFactory<ExtractorT6>,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetPPSSPPBaseAddr,
+		.bigEndian = false,
+		.autoProcessSelection = true
+	},
+	{
 		.name = "Tekken 5 (PCSX2)",
 		.processName = "pcsx2.exe",
 		.movesetNamePrefix = "T5_",

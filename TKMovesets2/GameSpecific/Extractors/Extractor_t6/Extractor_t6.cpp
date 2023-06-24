@@ -369,20 +369,22 @@ void ExtractorT6::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movese
 {
 	m_game.ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
 
-	// Byteswap data that needs to be swapped
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->character_name_addr);
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->character_creator_addr);
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->date_addr);
-	ByteswapHelpers::SWAP_INT32(&movesetHeader->fulldate_addr);
+	if (m_game.bigEndian) {
+		// Byteswap data that needs to be swapped
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->character_name_addr);
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->character_creator_addr);
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->date_addr);
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->fulldate_addr);
 
-	for (unsigned int i = 0; i < _countof(movesetHeader->orig_aliases); ++i)
-	{
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->orig_aliases[i]);
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->current_aliases[i]);
-	}
+		for (unsigned int i = 0; i < _countof(movesetHeader->orig_aliases); ++i)
+		{
+			ByteswapHelpers::SWAP_INT16(&movesetHeader->orig_aliases[i]);
+			ByteswapHelpers::SWAP_INT16(&movesetHeader->current_aliases[i]);
+		}
 
-	for (unsigned int i = 0; i < _countof(movesetHeader->unknown_values); ++i) {
-		ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_values[i]);
+		for (unsigned int i = 0; i < _countof(movesetHeader->unknown_values); ++i) {
+			ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_values[i]);
+		}
 	}
 
 	// Convert ptrs into offsets
@@ -616,10 +618,12 @@ void ExtractorT6::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, M
 	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game.baseAddr + movesetAddr + offsetof(MovesetInfo, table));
 	m_game.ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 
-	// Byteswap to little endian
-	for (unsigned int i = 0; i < _countof(table->entries); ++i) {
-		ByteswapHelpers::SWAP_INT32(&(table->entries[i].listAddr));
-		ByteswapHelpers::SWAP_INT32(&(table->entries[i].listCount));
+	if (m_game.bigEndian) {
+		// Byteswap to little endian
+		for (unsigned int i = 0; i < _countof(table->entries); ++i) {
+			ByteswapHelpers::SWAP_INT32(&(table->entries[i].listAddr));
+			ByteswapHelpers::SWAP_INT32(&(table->entries[i].listCount));
+		}
 	}
 
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
@@ -637,7 +641,9 @@ Byte* ExtractorT6::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, co
 	if (block == nullptr) {
 		return nullptr;
 	}
-	convertMovesetDataToLittleEndian(block, offsets);
+	if (m_game.bigEndian) {
+		convertMovesetDataToLittleEndian(block, offsets);
+	}
 	return block;
 }
 
@@ -668,9 +674,11 @@ Byte* ExtractorT6::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, Mota
 {
 	m_game.ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 
-	// Byteswap MOTA addresses
-	for (unsigned int i = 0; i < _countof(motasList->motas); ++i) {
-		ByteswapHelpers::SWAP_INT32(&motasList->motas[i]);
+	if (m_game.bigEndian) {
+		// Byteswap MOTA addresses
+		for (unsigned int i = 0; i < _countof(motasList->motas); ++i) {
+			ByteswapHelpers::SWAP_INT32(&motasList->motas[i]);
+		}
 	}
 
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
@@ -928,6 +936,8 @@ bool ExtractorT6::CanExtract()
 	// yes we can import in that case but it will serve zero purpose
 	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 
+	DEBUG_LOG("Player address: %llx\n", playerAddress);
+
 	// We'll just read through a bunch of values that wouldn't be valid if a moveset wasn't loaded
 	// readInt64() may return -1 if the read fails so we have to check for this value as well.
 
@@ -942,6 +952,7 @@ bool ExtractorT6::CanExtract()
 		// Read into current moveset to see if it has been initialized
 		{
 			gameAddr movesetAddr = m_game.ReadPtr(playerAddress + m_game.GetValue("motbin_offset"));
+			DEBUG_LOG("movesetAddr: %llx\n", movesetAddr);
 
 			if (movesetAddr == 0 || movesetAddr == -1) {
 				return false;

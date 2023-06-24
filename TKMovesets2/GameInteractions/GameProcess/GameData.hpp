@@ -15,8 +15,6 @@ private:
 	GameProcess* m_process;
 	// Size of PTRs in remote process. Used to properly read ptr paths.
 	unsigned int m_ptrSize = 8;
-	// True if the memory must be accessed as big endian
-	bool m_bigEndian = false;
 	// Stores current game informations
 	const GameInfo* currentGame = nullptr;
 	
@@ -25,13 +23,15 @@ private:
 public:
 	// For games where PTRs are read from a base memory area (like emulators)
 	uint64_t baseAddr = 0;
+	// True if the memory must be accessed as big endian
+	bool bigEndian = false;
 
 	// Reads a value from the game, applying the base address and the proper endian correction if needed
 	template <typename T>
 	T Read(gameAddr addr) const
 	{
 		T value = m_process->read<T>(baseAddr + addr);
-		if (m_bigEndian) {
+		if (bigEndian) {
 #pragma warning (push)
 #pragma warning (disable:4244)
 			switch (sizeof(T))

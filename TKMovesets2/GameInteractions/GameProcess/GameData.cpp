@@ -9,13 +9,13 @@ gameAddr GameData::ReadPtr(gameAddr address) const
 
 	if (m_ptrSize == 8) {
 		value = m_process->readUInt64(baseAddr + address);
-		if (m_bigEndian) {
+		if (bigEndian) {
 			value = BYTESWAP_INT64(value);
 		}
 	}
 	else {
 		value = m_process->readUInt32(baseAddr + address);
-		if (m_bigEndian) {
+		if (bigEndian) {
 			value = BYTESWAP_INT32(value);
 		}
 	}
@@ -102,7 +102,7 @@ void GameData::SetCurrentGame(const GameInfo* game)
 	// Resets base addr for every game change
 	baseAddr = game->GetBaseAddressFunc == nullptr ? 0 : game->GetBaseAddressFunc(game, addrFile, m_process);
 
-	m_bigEndian = game->bigEndian;
+	bigEndian = game->bigEndian;
 	currentGame = game;
 	m_ptrSize = game->ptrSize;
 }
