@@ -21,6 +21,7 @@ using namespace T7ImportUtils;
 
 namespace TTT2_T7_Aliases
 {
+	bool ApplyBasicPropertyAlias(uint32_t& property);
 	Byte OddHitboxByte(Byte value);
 	Byte EvenHitboxByte(Byte value);
 	unsigned char GetCharacterIdAlias(unsigned char value);
@@ -225,7 +226,9 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->condition = source->condition;
 		target->param_unsigned = source->param_unsigned;
 
-		Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned, propertyAliases);
+		if (!TTT2_T7_Aliases::ApplyBasicPropertyAlias(target->condition)) {
+			Aliases::ApplyPropertyAlias(target->condition, target->param_unsigned, propertyAliases);
+		}
 	}
 
 	for (unsigned int i = 0; i < table.cancelExtradataCount; ++i)
@@ -303,6 +306,7 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->distance = source->distance;
 		target->_0xAC_int = 0; // Does not exist
 	}
+
 	for (unsigned int i = 0; i < table.cancelCount; ++i)
 	{
 		gAddr::Cancel* target = (gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i;
@@ -373,7 +377,9 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->id = source->id;
 		target->value_unsigned = source->value_unsigned;
 
-		Aliases::ApplyPropertyAlias(target->id, target->value_unsigned, propertyAliases);
+		if (!TTT2_T7_Aliases::ApplyBasicPropertyAlias(target->id)) {
+			Aliases::ApplyPropertyAlias(target->id, target->value_unsigned, propertyAliases);
+		}
 	}
 
 	for (unsigned int i = 0; i < table.inputCount; ++i)
@@ -446,7 +452,9 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
-		Aliases::ApplyPropertyAlias(target->extraprop, target->value, propertyAliases);
+		if (!TTT2_T7_Aliases::ApplyBasicPropertyAlias(target->extraprop)) {
+			Aliases::ApplyPropertyAlias(target->extraprop, target->value, propertyAliases);
+		}
 	}
 
 	for (unsigned int i = 0; i < table.moveEndingPropCount; ++i)
@@ -458,7 +466,9 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->extraprop = source->extraprop;
 		target->value = source->value;
 
-		Aliases::ApplyPropertyAlias(target->extraprop, target->value, propertyAliases);
+		if (!TTT2_T7_Aliases::ApplyBasicPropertyAlias(target->extraprop)) {
+			Aliases::ApplyPropertyAlias(target->extraprop, target->value, propertyAliases);
+		}
 	}
 
 

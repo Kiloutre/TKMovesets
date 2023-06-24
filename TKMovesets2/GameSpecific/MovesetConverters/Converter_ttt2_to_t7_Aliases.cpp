@@ -545,8 +545,8 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 	{ 0x82d6, {.target_id = 0x8429 }}, // (ALISA) Co_sJP_RP
 	{ 0x82d7, {.target_id = 0x842a }}, // (ALISA) Co_sJP_RP
 	{ 0x82d9, {.target_id = 0x842c }}, // (ALISA) Aa_runchop
-	{ 0x82db, {.target_id = 0x842f }}, // ??? hand
-	{ 0x82dc, {.target_id = 0x842e }}, // ??? Hand
+	{ 0x82db, {.target_id = 0x842e }}, // ??? hand
+	{ 0x82dc, {.target_id = 0x842f }}, // ??? Hand
 	{ 0x82e9, {.target_id = 0x843c }}, // Throw camera?
 	{ 0x82ea, {.target_id = 0x843d }}, // Throw camera?2
 	{ 0x82ec, {.target_id = 0x843f }}, // (LARS) La_rk00B_n
@@ -565,6 +565,22 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 
 namespace TTT2_T7_Aliases
 {
+	bool ApplyBasicPropertyAlias(uint32_t& property)
+	{
+		switch (property)
+		{
+		case 0x82DB:
+			property = 0x842E;
+			break;
+		case 0x82DC:
+			property = 0x842f;
+			break;
+		default:
+			return false;
+		}
+		return true;
+	}
+
 	Byte OddHitboxByte(Byte value)
 	{
 		auto item = cg_odd_hitbox_aliases.find(value);
