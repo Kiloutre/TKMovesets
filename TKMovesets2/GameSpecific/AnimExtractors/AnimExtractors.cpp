@@ -60,10 +60,13 @@ namespace AnimExtractor
 			const std::wstring outputFilename = outputFolder + L"anims_tmp.txt";
 			const std::wstring outputFinalFilename = outputFolder + L"anims.txt";
 
-			if (Helpers::fileExists(outputFinalFilename.c_str())) {
-				DEBUG_LOG("File '%S' already exists: skipping extraction.\n", outputFinalFilename.c_str());
-				extractionStatus.status = AnimExtractionStatus_Skipped;
-				continue;
+			{
+				struct _stat animCacheFile;
+				if (_wstat(outputFinalFilename.c_str(), &animCacheFile) == 0 && animCacheFile.st_size != 0) {
+					DEBUG_LOG("File '%S' already exists (and is not empty): skipping extraction.\n", outputFinalFilename.c_str());
+					extractionStatus.status = AnimExtractionStatus_Skipped;
+					continue;
+				}
 			}
 
 			uint64_t s_moveset;

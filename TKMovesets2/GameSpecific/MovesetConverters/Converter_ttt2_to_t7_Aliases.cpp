@@ -564,6 +564,22 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 
 namespace TTT2_T7_Aliases
 {
+	bool ApplyBasicPropertyAlias(uint32_t& property)
+	{
+		switch (property)
+		{
+		case 0x82DB:
+			property = 0x842E;
+			break;
+		case 0x82DC:
+			property = 0x842f;
+			break;
+		default:
+			return false;
+		}
+		return true;
+	}
+
 	Byte OddHitboxByte(Byte value)
 	{
 		auto item = cg_odd_hitbox_aliases.find(value);

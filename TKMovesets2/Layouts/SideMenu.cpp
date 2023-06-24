@@ -230,19 +230,14 @@ void SideMenu::Render(float width)
 	// Update popup
 	if (m_updateStatus.programUpdateAvailable) {
 		ImGui::OpenPopup("ProgramUpdatePopup");
-		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
+		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(720, 720));
 	}
+
 	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
 	{
 		ImGui::TextUnformatted(_("sidemenu.update_explanation"));
-		ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
 
-		ImGui::SameLine();
-		ImGuiExtra::Markdown(m_updateStatus.changelog);
-
-		ImGui::NewLine();
-		// Purposeful empty SeparatorText for the thicker line
-		ImGui::SeparatorText("");
+		// Controls
 		if (ImGui::Button(_("yes"))) {
 			if (DownloadProgramUpdate(&m_updateStatus, m_addresses, false)) {
 				*requestedUpdatePtr = true;
@@ -250,8 +245,9 @@ void SideMenu::Render(float width)
 			else {
 				m_updateFileInvalid = true;
 			}
+
 		}
-        ImGui::SameLine();
+		ImGui::SameLine();
 		if (ImGui::Button(_("no")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
 			ImGui::CloseCurrentPopup();
 			m_updateStatus.programUpdateAvailable = false;
@@ -260,6 +256,16 @@ void SideMenu::Render(float width)
 		if (m_updateFileInvalid) {
 			ImGuiExtra_TextboxError(_("sidemenu.update_bad_file"));
 		}
+
+		ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
+
+		// Markdown content
+		ImGui::SameLine();
+		ImGuiExtra::Markdown(m_updateStatus.changelog);
+
+		ImGui::NewLine();
+		// Purposeful empty SeparatorText for the thicker line
+		ImGui::SeparatorText("");
 
 		ImGui::EndPopup();
 	}

@@ -10,7 +10,7 @@
 
 # define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define PROGRAM_TITLE           "TKMovesets - kilo"
-# define PROGRAM_VERSION         "0.9.9"
+# define PROGRAM_VERSION         "0.9.9.2"
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LOCALE  "en-US"
@@ -71,7 +71,7 @@
 # define SETTING_AUTO_ADDR_UPDATE_KEY  ("auto_addresses_update_check")
 # define SETTING_AUTO_ADDR_UPDATE      (true)
 # define SETTING_EXPORT_OVERWRITE_KEY  ("export.overwrite_identical_name")
-# define SETTING_EXPORT_OVERWRITE      (true)
+# define SETTING_EXPORT_OVERWRITE      (false)
 # define SETTING_IMPORT_INSTANT_KEY    ("import.apply_instantly")
 # define SETTING_IMPORT_INSTANT        (true)
 # define SETTING_FREE_UNUSED_KEY       ("import.free_unused")

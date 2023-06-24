@@ -141,7 +141,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 		// Extraction settings
 		ImGui::SameLine();
 		if (ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwriteSameFilename)) {
-			Settings::Set(SETTING_EXPORT_OVERWRITE_KEY, &m_overwriteSameFilename);
+			Settings::Set(SETTING_EXPORT_OVERWRITE_KEY, m_overwriteSameFilename);
 		}
 		ImGui::SameLine();
 		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
