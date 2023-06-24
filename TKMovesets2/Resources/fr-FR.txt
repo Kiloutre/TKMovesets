@@ -206,6 +206,7 @@ edition.animation_extraction.error = Erreur
 edition.animation_extraction.interrupt = Interrompre
 edition.open_editor_library = Ouvrir la bibliothèque de l'éditeur
 edition.open_editor_backups = Ouvrir les sauvegardes auto de l'éditeur
+edition.refresh_movesets = Rafraîchir la liste
 
 edition.form_popup.copy_structure_clipboard = Copier la structure
 edition.form_popup.copy_single_item_clipboard = Copier un seul élément

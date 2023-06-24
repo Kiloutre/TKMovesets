@@ -202,6 +202,11 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			CreateDirectoryW(path.c_str(), nullptr);
 			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 		}
+
+		if (ImGui::Button(_("edition.refresh_movesets")))
+		{
+			storage.RefreshMovesets();
+		}
 	}
 
 	if (m_animExtraction.popup) {

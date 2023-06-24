@@ -286,7 +286,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 			if (moveset->origin == "INVALID") {
 				// Badly formatted file. Display it, but mention it is invalid
 				ImGui::TextUnformatted(_("moveset.invalid"));
-				ImGui::TableSetColumnIndex(6);
+				ImGui::TableSetColumnIndex(7);
 				ImGui::PushID(moveset->filename.c_str());
 				ImGui::PushStyleColor(ImGuiCol_Button, FORM_DELETE_BTN);
 				if (ImGui::Button("X")) {

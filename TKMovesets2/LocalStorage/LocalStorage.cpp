@@ -120,6 +120,18 @@ void LocalStorage::StopThreadAndCleanup()
 
 void LocalStorage::ReloadMovesetList()
 {
+	if (m_refreshMovesets)
+	{
+		for (unsigned int i = 0; i < extractedMovesets.size();)
+		{
+			auto m = extractedMovesets[i];
+			m_garbage.push_back(m);
+			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(m->filename));
+			extractedMovesets.erase(extractedMovesets.begin());
+		}
+		m_refreshMovesets = false;
+	}
+
 	if (Helpers::fileExists(L"" MOVESET_DIRECTORY))
 	{
 		for (const auto& entry : std::filesystem::directory_iterator(L"" MOVESET_DIRECTORY))
@@ -172,7 +184,7 @@ void LocalStorage::ReloadMovesetList()
 			// File does not exist anymore or was recently modified, de-allocate the info we stored about it
 			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
-			extractedMovesets.erase(extractedMovesets.begin() + i, extractedMovesets.begin() + i + 1);
+			extractedMovesets.erase(extractedMovesets.begin() + i);
 			m_garbage.push_back(moveset);
 		}
 		else {
@@ -206,4 +218,19 @@ bool LocalStorage::DeleteMoveset(const wchar_t* filename)
 LocalStorage::~LocalStorage()
 {
 	CleanupUnusedMovesetInfos();
+}
+
+void LocalStorage::RefreshMovesets()
+{
+	if (m_refreshMovesets) return;
+	DEBUG_LOG("RefreshMovesets start\n");
+
+	m_refreshMovesets = true;
+	while (!m_refreshMovesets)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		continue;
+	}
+
+	DEBUG_LOG("RefreshMovesets end\n");
 }

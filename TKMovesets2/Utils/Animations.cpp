@@ -307,7 +307,7 @@ namespace TAnimUtils
 
 		uint64_t get64AnimSize(const Byte* anim)
 		{
-			bool isSwapped = IsLittleEndian(anim);
+			bool isSwapped = !IsLittleEndian(anim);
 			// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
 
 			uint64_t boneCount = READ(anim + 2, uint16_t);
@@ -563,7 +563,7 @@ namespace TAnimUtils
 			file.seekg(0, std::ios::beg);
 			file.read((char*)buf, animInfo.size);
 
-			bool isLittleEndian = *buf == 0x64 || *buf == 0xC8;
+			bool isLittleEndian = FromMemory::IsLittleEndian(buf);
 			bool isBigEndian = !isLittleEndian;
 			Byte animType = isBigEndian ? buf[1] : buf[0];
 			uint32_t boneCount = isBigEndian ? buf[3] : buf[2];

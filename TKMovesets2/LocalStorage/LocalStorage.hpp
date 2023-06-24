@@ -46,6 +46,8 @@ private:
 	std::set<std::wstring> m_extractedMovesetFilenames;
 	// .extractedMovesets garbage, because it can be accessed in another thread while we remove items for it.
 	std::vector<movesetInfo*> m_garbage;
+	// If true, will clear the moveset list and refresh it in the next run
+	bool m_refreshMovesets = false;
 
 	// Function ran in the parallel thread, used to list files regularly
 	void Update() override;
@@ -63,4 +65,6 @@ public:
 	void CleanupUnusedMovesetInfos();
 	// Delete a moveset's file entirely, returns false if deletion failed
 	bool DeleteMoveset(const wchar_t* filename);
+	// Force movesets to refresj
+	void RefreshMovesets();
 };
