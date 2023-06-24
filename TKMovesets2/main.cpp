@@ -22,6 +22,7 @@
 #include "Localization.hpp"
 #include "GameAddressesFile.hpp"
 #include "Settings.hpp"
+#include "AnimExtractors.hpp"
 
 #include "constants.h"
 
@@ -307,6 +308,7 @@ static void MoveAnimationFile(const std::wstring& argFile)
 		CreateDirectoryW(outputFolder.c_str(), nullptr);
 
 		std::wstring outputFile = outputFolder + filename;
+		std::wstring animCache = outputFolder + L"anims.txt";
 
 		if (wcscmp(outputFile.c_str(), argFile.c_str()) == 0 || Helpers::startsWith<std::wstring>(argFile, prefix)) {
 			DEBUG_LOG("Not copying anim file: already in our folders\n");
@@ -325,13 +327,57 @@ static void MoveAnimationFile(const std::wstring& argFile)
 			}
 		}
 
-		DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
-		std::filesystem::copy_file(argFile, outputFile);
+		if (Helpers::fileExists(animCache.c_str()))
+		{
+			Byte* anim;
+			uint64_t s_anim;
+
+			try {
+				std::ifstream animationData(argFile, std::ios::binary);
+
+				if (animationData.fail()) {
+					DEBUG_ERR("Failed to analyze animation data");
+					return;
+				}
+
+				animationData.seekg(0, std::ios::end);
+				s_anim = animationData.tellg();
+				anim = new Byte[s_anim];
+				animationData.seekg(0, std::ios::beg);
+				animationData.read((char*)anim, s_anim);
+			}
+			catch (const std::exception&)
+			{
+				DEBUG_ERR("Failed to allocate %llu bytes to analyze animation data", s_anim);
+			}
+
+			std::ofstream animCacheFile(animCache, std::ios::app);
+			if (animCacheFile.fail()) {
+				try {
+					std::filesystem::remove(animCache);
+				}
+				catch (std::filesystem::filesystem_error const&) {
+					DEBUG_LOG("Deletion of cache '%S' failed.\n", animCache.c_str());
+				}
+			}
+			else {
+				DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
+				TAnimExtractorUtils::ExtractAnimation(Helpers::to_utf8(name).c_str(), anim, outputFolder, animCacheFile, L"" ANIMATION_EXTENSION);
+			}
+
+			delete[] anim;
+		}
+		else
+		{
+			DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
+			std::filesystem::copy_file(argFile, outputFile);
+		}
+
 		try {
 			std::filesystem::remove(argFile);
 		}
 		catch (std::filesystem::filesystem_error const&) {
-			DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", argFile.c_str());
+			DEBUG_LOG("Deletion of animation '%S' after copy failed.\n", argFile.c_str());
 		}
 	}
 }
