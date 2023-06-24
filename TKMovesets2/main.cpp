@@ -346,9 +346,10 @@ static void MoveAnimationFile(const std::wstring& argFile)
 				animationData.seekg(0, std::ios::beg);
 				animationData.read((char*)anim, s_anim);
 			}
-			catch (const std::exception&)
+			catch (const std::bad_alloc&)
 			{
 				DEBUG_ERR("Failed to allocate %llu bytes to analyze animation data", s_anim);
+				return;
 			}
 
 			std::ofstream animCacheFile(animCache, std::ios::app);
