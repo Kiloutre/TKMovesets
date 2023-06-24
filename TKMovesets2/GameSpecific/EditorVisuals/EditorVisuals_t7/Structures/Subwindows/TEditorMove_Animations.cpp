@@ -62,6 +62,14 @@ TEditorMove_Animations::~TEditorMove_Animations()
 	}
 }
 
+static size_t GetFileSize(std::ifstream& file)
+{
+	file.seekg(0, std::ios::end);
+	size_t retVal = file.tellg();
+	file.seekg(0, std::ios::beg);
+	return retVal;
+}
+
 void TEditorMove_Animations::LoadAnimationList()
 {
 	CreateDirectory(EDITOR_LIB_DIRECTORY, nullptr);
@@ -81,7 +89,7 @@ void TEditorMove_Animations::LoadAnimationList()
 		bool addedFile = false;
 		charAnims->name = characterName;
 
-		if (!animListFile.fail())
+		if (!animListFile.fail() && GetFileSize(animListFile) != 0)
 		{
 			// Use pre-computed anims.txt if it exists
 			std::string line;
@@ -173,7 +181,6 @@ void TEditorMove_Animations::LoadAnimationList()
 				}
 
 			}
-
 
 			if (!m_destructionRequested)
 			{
