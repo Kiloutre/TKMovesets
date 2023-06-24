@@ -42,4 +42,13 @@ namespace GameVersions
 			RPCS3_BLES01702_0103 = 1,
 		};
 	}
+
+	namespace T6
+	{
+		enum
+		{
+			RPCS3_BLES00635 = 0,
+			PPSSPP_ULUS10466,
+		};
+	}
 };
