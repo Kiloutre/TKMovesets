@@ -1147,7 +1147,7 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 
 	else if (name == "hit_condition_addr") {
 		int listIdx = atoi(field->buffer);
-		return -1 <= listIdx && listIdx < (int)m_infos->table.hitConditionCount;
+		return 0 <= listIdx && listIdx < (int)m_infos->table.hitConditionCount;
 	}
 
 	else if (name == "extra_properties_addr") {
