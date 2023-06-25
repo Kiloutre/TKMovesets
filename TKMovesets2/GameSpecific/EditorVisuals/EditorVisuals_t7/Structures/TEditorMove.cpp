@@ -177,6 +177,8 @@ void TEditorMove::PostRender()
 	if (m_animationListOpen) {
 		ImGui::OpenPopup("AnimListPopup");
 
+		bool animationListOpen = false;
+
 		if (m_animationList->Render())
 		{
 			const wchar_t* animPath = m_animationList->animationToImport;
@@ -193,17 +195,16 @@ void TEditorMove::PostRender()
 					// Mark changes as applied to tell the editor window to highlight the 'Save' button.
 					// But don't update m_unsavedChanges because these changes do not require the use of the Apply() button
 					justAppliedChanges = true;
-
-					// Close the animation list now that it is not needed
-					m_animationListOpen = false;
-					delete m_animationList;
-					m_animationList = nullptr;
 				}
-
+			}
+			else {
+				animationListOpen = true;
 			}
 		}
-		else
+		
+		if (!animationListOpen)
 		{
+			// Close the animation list now that it is not needed
 			m_animationListOpen = false;
 			delete m_animationList;
 			m_animationList = nullptr;
