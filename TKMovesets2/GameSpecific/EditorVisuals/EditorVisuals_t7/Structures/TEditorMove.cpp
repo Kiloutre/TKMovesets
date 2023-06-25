@@ -189,6 +189,7 @@ void TEditorMove::PostRender()
 					// Update our own field
 					auto& animNameField = m_fieldIdentifierMap["anim_name"];
 					sprintf_s(animNameField->buffer, animNameField->bufsize, animName.c_str());
+					animNameField->errored = false;
 					// Mark changes as applied to tell the editor window to highlight the 'Save' button.
 					// But don't update m_unsavedChanges because these changes do not require the use of the Apply() button
 					justAppliedChanges = true;
