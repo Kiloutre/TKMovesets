@@ -67,6 +67,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.version_string = std::string(movesetInfos.version_string),
 				.date = movesetInfos.date,
 				.date_str = Helpers::formatDateTime(movesetInfos.date),
+				.extraction_date_str = Helpers::formatDateTime(movesetInfos.extraction_date),
 				.size = totalSize,
 				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
 				.hash = crc32Str,

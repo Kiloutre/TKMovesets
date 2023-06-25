@@ -295,13 +295,22 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	auto availableSpace = ImGui::GetContentRegionAvail();
 	ImVec2 tableSize = ImVec2(0, availableSpace.y);
 
-	if (ImGui::BeginTable("MovesetEditionList", 9, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
+#ifdef BUILD_TYPE_DEBUG
+	const unsigned int rowCount = 10;
+	// +1 row for original extraction date
+#else
+	const unsigned int rowCount = 9;
+#endif
+	if (ImGui::BeginTable("MovesetEditionList", rowCount, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
 	{
 		ImGui::TableSetupColumn("##", 0, 5.0f);
 		ImGui::TableSetupColumn(_("moveset.origin"));
 		ImGui::TableSetupColumn(_("moveset.target_character"));
 		ImGui::TableSetupColumn(_("moveset.date"));
+#ifdef BUILD_TYPE_DEBUG
+		ImGui::TableSetupColumn(_("moveset.extraction_date"));
+#endif
 		ImGui::TableSetupColumn(_("moveset.size"));
 		ImGui::TableSetupColumn(_("moveset.convert"));
 		ImGui::TableSetupColumn(_("moveset.duplicate"));
@@ -348,6 +357,11 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->date_str.c_str());
+
+#ifdef BUILD_TYPE_DEBUG
+				ImGui::TableNextColumn();
+				ImGui::TextUnformatted(moveset->extraction_date_str.c_str());
+#endif
 
 				ImGui::TableNextColumn();
 				ImGui::TextUnformatted(moveset->sizeStr.c_str());

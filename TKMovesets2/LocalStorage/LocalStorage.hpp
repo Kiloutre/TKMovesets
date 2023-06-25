@@ -21,6 +21,8 @@ struct movesetInfo
 	uint64_t date;
 	std::string date_str;
 
+	std::string extraction_date_str;
+
 	uint64_t size;
 	std::string sizeStr;
 

@@ -45,6 +45,7 @@ moveset.origin = Origine
 moveset.target_character = Personnage cible
 moveset.original_character = Personnage original
 moveset.date = Date
+moveset.extraction_date = Date d'extraction
 moveset.invalid = INVALIDE
 moveset.size = Taille
 moveset.size_mb = MO
