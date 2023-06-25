@@ -611,6 +611,9 @@ void EditorT7::DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_ad
 	else if (!animationNameStillInUse) {
 		DeleteNameBlockString(anim_name_addr);
 	}
+	else {
+		DEBUG_LOG("Anim still in use: not deleting it.\n");
+	}
 }
 
 std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
@@ -620,7 +623,6 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 	animName_wstr = animName_wstr.substr(animName_wstr.find_last_of(L"/\\") + 1);
 	animName_wstr = animName_wstr.substr(0, animName_wstr.find_last_of(L'.'));
 	std::string animName_str = Helpers::to_utf8(animName_wstr);
-
 
 	Byte* anim;
 	uint64_t animSize;

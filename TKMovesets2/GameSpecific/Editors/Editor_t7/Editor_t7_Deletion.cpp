@@ -413,6 +413,13 @@ void EditorT7::DeleteNameBlockString(uint64_t string_offset)
 		}
 	}
 
+	// Re-adjust mappings
+	for (auto& pair : m_animOffsetToNameOffset) {
+		if (pair.second > string_offset) {
+			pair.second -= data_size;
+		}
+	}
+
 	// Copy all the data up to the animation
 	memcpy(newMoveset, m_moveset, data_absolute_offset);
 

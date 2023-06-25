@@ -1048,7 +1048,10 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 	LoadMovesetPtr(newMoveset, newMovesetSize);
 
 	// Shift moveset name addr offsets
-	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+	const int64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
+
+	DEBUG_LOG("Extra name size: %lld, moveNameOffset: %llx, orig_moveNameEndOffset: %llx\n", extraNameSize, moveNameEndOffset, orig_moveNameEndOffset);
+
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.name_addr > move_name_addr) {
@@ -1056,6 +1059,13 @@ void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
 		}
 		if (move.anim_name_addr > move_name_addr) {
 			move.anim_name_addr += extraNameSize;
+		}
+	}
+
+	// Re-adjust mappings
+	for (auto& pair : m_animOffsetToNameOffset) {
+		if (pair.second > move_name_addr) {
+			pair.second += extraNameSize;
 		}
 	}
 }
@@ -1101,8 +1111,12 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
 	SetMemberValue(&move->_0xAC_int, inputs["_0xAC_int"]);
 
-	if (m_animNameToOffsetMap.find(inputs["anim_name"]->buffer) != m_animNameToOffsetMap.end())
+	char* namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
+	char* newAnimName = inputs["anim_name"]->buffer;
+
+	if (strcmp(newAnimName, namePtr + move->anim_name_addr) != 0)
 	{
+		DEBUG_LOG("Anim name changed\n");
 		// Anim was changed, delete the old one if necessary
 
 		auto old_anim_addr = move->anim_addr;
@@ -1114,11 +1128,11 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 		DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 		// Reload move pointer because anim/anim name deletion de-allocated it
 		move = m_iterators.moves[id];
+		namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
 	}
 
 	// Save move name at the end because it may imply reallocation and invalidation of existing pointers
 	char* newName = inputs["move_name"]->buffer;
-	char* namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
 
 	if (strlen(newName) != strlen(namePtr + move->name_addr)) {
 		// Only re-allocate moveset & shift offsets if the length doesn't match
