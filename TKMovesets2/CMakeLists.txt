@@ -186,10 +186,15 @@ set(GAMESPECIFIC_SOURCES
 
                     # T5
                     "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"
-                    "GameSpecific/Extractors/Extractor_t5/Extractor_t5dr.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5_to_t7.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5_to_t7_Aliases.cpp"
                     "GameSpecific/AnimExtractors/AnimExtractor_t5.cpp"
+
+                    # T5 DR
+                    "GameSpecific/Extractors/Extractor_t5/Extractor_t5dr.cpp"
+                    "GameSpecific/AnimExtractors/AnimExtractor_t5dr.cpp"
+                    "GameSpecific/MovesetConverters/Converter_t5dr_to_t7_Aliases.cpp"
+                    "GameSpecific/MovesetConverters/Converter_t5dr_to_t7.cpp"
 )                   
 
 # This will be included in the .dll and should only be related to the injected DLL

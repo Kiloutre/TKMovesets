@@ -125,7 +125,12 @@ namespace AnimExtractor
 					_FromT6(moveset, s_moveset, outputFolder, outputFile, extractionControl);
 					break;
 				case GameId_T5:
-					_FromT5(moveset, s_moveset, outputFolder, outputFile, extractionControl);
+					if (m.minorVersion == GameVersions::T5::DR_ONLINE) {
+						_FromT5DR(moveset, s_moveset, outputFolder, outputFile, extractionControl);
+					}
+					else {
+						_FromT5(moveset, s_moveset, outputFolder, outputFile, extractionControl);
+					}
 					break;
 				}
 

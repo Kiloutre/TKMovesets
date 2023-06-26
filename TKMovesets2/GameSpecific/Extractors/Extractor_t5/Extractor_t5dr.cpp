@@ -436,10 +436,10 @@ Byte* ExtractorT5DR::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 	std::map<gameAddr32, std::pair<uint32_t, uint32_t>> offsetMap;
 	uint64_t sizeToAllocate = 0;
 
-	size_out = CalculateMotaCustomBlockSize(motas, offsetMap, settings);
+	// Allocate 8 bytes minimum. 
+	size_out = max(8, CalculateMotaCustomBlockSize(motas, offsetMap, settings));
 
-	// Allocate 8 bytes minimum. Allocating 0 might cause problem, so this is safer.
-	Byte* customBlock = (Byte*)malloc(max(8, size_out));
+	Byte* customBlock = (Byte*)malloc(size_out);
 	if (customBlock == nullptr) {
 		size_out = 0;
 		return nullptr;
@@ -546,13 +546,24 @@ Byte* ExtractorT5DR::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	}
 
 	auto prefix_size = TAnimUtils::GetT5AnimPrefixSize();
+	uint64_t (*GetAnimSize)(const GameProcess & process, gameAddr anim);
+
+
+	if (m_game.bigEndian) {
+		GetAnimSize = TAnimUtils::FromProcess::getT5_64AnimSize_BigEndian;
+	}
+	else {
+		GetAnimSize = TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian;
+	}
+
 	// Find anim sizes and establish offsets
 	for (gameAddr animAddr : addrList)
 	{
 		uint64_t animSize;
 
 		try {
-			animSize = TAnimUtils::FromProcess::getT5_64AnimSize_LittleEndian(m_process, m_game.baseAddr + animAddr);
+			
+			animSize = GetAnimSize(m_process, m_game.baseAddr + animAddr);
 		}
 		catch (const std::exception&) {
 			DEBUG_LOG("Animation address %llx does not have a valid size.\n", animAddr);
@@ -576,12 +587,17 @@ Byte* ExtractorT5DR::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	for (gameAddr animAddr : addrList)
 	{
 		// Write prefix
-		TAnimUtils::GetT5AnimPrefix(animationBlockCursor, true);
+		Byte* anim_start = animationBlockCursor;
+		TAnimUtils::GetT5AnimPrefix(animationBlockCursor, !m_game.bigEndian);
 		animationBlockCursor += prefix_size;
 
 		// Write anim data
 		int64_t animSize = animSizes[animAddr];
 		m_game.ReadBytes(animAddr, animationBlockCursor, animSize);
+
+		if (!TAnimUtils::FromMemory::IsLittleEndian(anim_start)) {
+			TAnimUtils::FromMemory::ByteswapAnimation(anim_start);
+		}
 
 		animationBlockCursor += animSize;
 	}

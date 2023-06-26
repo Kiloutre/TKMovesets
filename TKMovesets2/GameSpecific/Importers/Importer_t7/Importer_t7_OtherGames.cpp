@@ -3,6 +3,7 @@
 #include "helpers.hpp"
 #include "Importer_t7.hpp"
 #include "MovesetConverters.hpp"
+#include "GameIDs.hpp"
 
 #include "Structs_t7.h"
 
@@ -383,9 +384,17 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	Byte* orig_moveset = moveset;
 
 	TKMovesetHeaderBlocks t7_offsets;
-	if (!MovesetConverter::T5ToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
-		delete[] moveset;
-		return ImportationErrcode_AllocationErr;
+	if (header->minorVersion == GameVersions::T5::DR_ONLINE) {
+		if (!MovesetConverter::T5DRToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
+			delete[] moveset;
+			return ImportationErrcode_AllocationErr;
+		}
+	}
+	else {
+		if (!MovesetConverter::T5ToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
+			delete[] moveset;
+			return ImportationErrcode_AllocationErr;
+		}
 	}
 
 	// List of data blocks within the moveset

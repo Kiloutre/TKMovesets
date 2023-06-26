@@ -34,6 +34,7 @@ namespace AnimExtractor
 	void _FromTTT2(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_animExtractionControl& extractionControl);
 	void _FromT6(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_animExtractionControl& extractionControl);
 	void _FromT5(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_animExtractionControl& extractionControl);
+	void _FromT5DR(const Byte* moveset, uint64_t s_moveset, const std::wstring& outputFolder, std::ofstream& outputFile, s_animExtractionControl& extractionControl);
 
 	// Extracts the animation of every given movesets in appropriate folders
 	// Does not extract if the moveset's animations have already been extracted (matches by original character name)

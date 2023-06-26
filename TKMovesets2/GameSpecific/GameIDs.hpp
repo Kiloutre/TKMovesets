@@ -31,6 +31,7 @@ namespace GameVersions
 			FROM_TREV,
 			FROM_T6,
 			FROM_T5,
+			FROM_T5DR,
 		};
 	}
 
