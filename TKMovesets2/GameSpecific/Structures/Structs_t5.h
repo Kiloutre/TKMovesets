@@ -204,21 +204,6 @@ namespace StructsT5
 		// 0x48: Probably voiceclip
 	};
 
-	struct CameraData
-	{
-		uint32_t _0x0_int;
-		uint16_t _0x4_short;
-		uint16_t left_side_camera_data;
-		uint16_t right_side_camera_data;
-		uint16_t _0xA_short;
-	};
-
-	struct ThrowCamera
-	{
-		uint32_t _0x0_uint;
-		gameAddr32 cameradata_addr;
-	};
-
 	struct StructA1
 	{
 		uint16_t value;

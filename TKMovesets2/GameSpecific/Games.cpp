@@ -172,12 +172,36 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = false,
 		.autoProcessSelection = true
 	},
+	/*
+	{
+		.name = "Tekken 5 DR (RPCS3)",
+		.processName = "rpcs3.exe",
+		.movesetNamePrefix = "T5_",
+		.gameId = GameId_T5,
+		.minorVersion = GameVersions::T5::DR_ONLINE,
+		.characterCount = 2,
+		.ptrSize = 4,
+		.flags = 0,
+		.dataString = "t5",
+		.minorDataString = "t5dr",
+		.supportedImports = {},
+		.supportedOnlineImports = {},
+		.extractor = new GameFactory<ExtractorT5>,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetRPCS3BaseAddr,
+		.bigEndian = true,
+		.autoProcessSelection = false
+	},
+	*/
 	{
 		.name = "Tekken 5 (PCSX2)",
 		.processName = "pcsx2.exe",
 		.movesetNamePrefix = "T5_",
 		.gameId = GameId_T5,
-		.minorVersion = 0,
+		.minorVersion = GameVersions::T5::DEFAULT,
 		.characterCount = 2,
 		.ptrSize = 4,
 		.flags = 0,

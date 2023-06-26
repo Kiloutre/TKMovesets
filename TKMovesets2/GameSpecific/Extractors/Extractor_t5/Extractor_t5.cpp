@@ -16,6 +16,213 @@ using namespace StructsT5;
 
 // -- Static helpers -- //
 
+static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTable* offsets)
+{
+	for (auto& pushbackExtra : StructIterator<PushbackExtradata>(movesetBlock, offsets->pushbackExtradata, offsets->pushbackExtradataCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&pushbackExtra.horizontal_offset);
+	}
+
+	for (auto& pushback : StructIterator<Pushback>(movesetBlock, offsets->pushback, offsets->pushbackCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&pushback.duration);
+		ByteswapHelpers::SWAP_INT16(&pushback.displacement);
+		ByteswapHelpers::SWAP_INT32(&pushback.num_of_loops);
+		ByteswapHelpers::SWAP_INT32(&pushback.extradata_addr);
+	}
+
+	for (auto& req : StructIterator<Requirement>(movesetBlock, offsets->requirement, offsets->requirementCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&req.condition);
+		ByteswapHelpers::SWAP_INT16(&req.param_unsigned);
+	}
+
+	for (auto& cancelExtra : StructIterator<CancelExtradata>(movesetBlock, offsets->cancelExtradata, offsets->cancelExtradataCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&cancelExtra.value);
+	}
+
+	for (auto& cancel : StructIterator<Cancel>(movesetBlock, offsets->cancel, offsets->cancelCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&cancel.direction);
+		ByteswapHelpers::SWAP_INT16(&cancel.button);
+
+		ByteswapHelpers::SWAP_INT32(&cancel.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&cancel.move_id);
+		ByteswapHelpers::SWAP_INT32(&cancel.extradata_addr);
+		ByteswapHelpers::SWAP_INT16(&cancel.detection_start);
+		ByteswapHelpers::SWAP_INT16(&cancel.detection_end);
+		ByteswapHelpers::SWAP_INT16(&cancel.starting_frame);
+		ByteswapHelpers::SWAP_INT16(&cancel.cancel_option);
+	}
+
+	for (auto& groupCancel : StructIterator<Cancel>(movesetBlock, offsets->groupCancel, offsets->groupCancelCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&groupCancel.direction);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.button);
+
+		ByteswapHelpers::SWAP_INT32(&groupCancel.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.move_id);
+		ByteswapHelpers::SWAP_INT32(&groupCancel.extradata_addr);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.detection_start);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.detection_end);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.starting_frame);
+		ByteswapHelpers::SWAP_INT16(&groupCancel.cancel_option);
+	}
+
+	for (auto& reaction : StructIterator<Reactions>(movesetBlock, offsets->reactions, offsets->reactionsCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&reaction.front_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.backturned_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.left_side_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.right_side_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.front_counterhit_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.downed_pushback);
+		ByteswapHelpers::SWAP_INT32(&reaction.block_pushback);
+
+		ByteswapHelpers::SWAP_INT16(&reaction.front_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.back_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.left_side_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.right_side_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.front_counterhit_direction);
+		ByteswapHelpers::SWAP_INT16(&reaction.downed_direction);
+
+		ByteswapHelpers::SWAP_INT32(&reaction._0x28_int);
+		ByteswapHelpers::SWAP_INT32(&reaction._0x2C_int);
+
+		ByteswapHelpers::SWAP_INT16(&reaction.vertical_pushback);
+		ByteswapHelpers::SWAP_INT16(&reaction.standing_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.default_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.counterhit_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_counterhit_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.left_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_left_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.right_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_right_side_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.backturned_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_backturned_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.block_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.crouch_block_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.wallslump_moveid);
+		ByteswapHelpers::SWAP_INT16(&reaction.downed_moveid);
+	}
+
+	for (auto& hitCondition : StructIterator<HitCondition>(movesetBlock, offsets->hitCondition, offsets->hitConditionCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&hitCondition.requirements_addr);
+		ByteswapHelpers::SWAP_INT32(&hitCondition.damage);
+		ByteswapHelpers::SWAP_INT32(&hitCondition.reactions_addr);
+	}
+
+	for (auto& voiceclip : StructIterator<Voiceclip>(movesetBlock, offsets->voiceclip, offsets->voiceclipCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&voiceclip.id);
+	}
+
+	for (auto& extraProp : StructIterator<ExtraMoveProperty>(movesetBlock, offsets->extraMoveProperty, offsets->extraMovePropertyCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&extraProp.starting_frame);
+		ByteswapHelpers::SWAP_INT16(&extraProp.id);
+		ByteswapHelpers::SWAP_INT32(&extraProp.value_unsigned);
+	}
+
+	for (auto& input : StructIterator<Input>(movesetBlock, offsets->input, offsets->inputCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&input.direction);
+		ByteswapHelpers::SWAP_INT16(&input.button);
+
+	}
+
+	for (auto& inputSequence : StructIterator<InputSequence>(movesetBlock, offsets->inputSequence, offsets->inputSequenceCount))
+	{
+		// 0x0: int8: not swapping
+		// 0x1: int8: not swapping
+		ByteswapHelpers::SWAP_INT16(&inputSequence.input_amount);
+		ByteswapHelpers::SWAP_INT32(&inputSequence.input_addr);
+	}
+
+	/*
+	for (auto& projectile : StructIterator<Projectile>(movesetBlock, offsets->projectile, offsets->projectileCount))
+	{
+		// As of this time, don't do any conversion for projectiles
+		// Its format is different from the T7 format
+		// (The data is still there, in big endian, ready to be parsed by any importer)
+	}
+	*/
+
+	for (auto& moveBeginningProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveBeginningProp, offsets->moveBeginningPropCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&moveBeginningProp.requirements_addr);
+		ByteswapHelpers::SWAP_INT16(&moveBeginningProp.extraprop);
+		ByteswapHelpers::SWAP_INT16(&moveBeginningProp.value);
+	}
+
+	for (auto& moveEndingProp : StructIterator<OtherMoveProperty>(movesetBlock, offsets->moveEndingProp, offsets->moveEndingPropCount))
+	{
+		ByteswapHelpers::SWAP_INT32(&moveEndingProp.requirements_addr);
+		ByteswapHelpers::SWAP_INT16(&moveEndingProp.extraprop);
+		ByteswapHelpers::SWAP_INT16(&moveEndingProp.value);
+	}
+
+	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, offsets->moveCount))
+	{
+		//ByteswapHelpers::SWAP_INT32(&move._0x0_int);
+		//ByteswapHelpers::SWAP_INT32(&move._0x4_int);
+		// todo
+
+		ByteswapHelpers::SWAP_INT32(&move.anim_addr);
+		ByteswapHelpers::SWAP_INT32(&move.vuln);
+		ByteswapHelpers::SWAP_INT32(&move.hitlevel);
+		ByteswapHelpers::SWAP_INT32(&move.cancel_addr);
+
+		ByteswapHelpers::SWAP_INT16(&move.transition);
+
+		ByteswapHelpers::SWAP_INT16(&move.moveId_val1);
+		ByteswapHelpers::SWAP_INT16(&move.moveId_val2);
+
+		ByteswapHelpers::SWAP_INT16(&move._0x1e_short);
+
+		ByteswapHelpers::SWAP_INT32(&move.hit_condition_addr);
+		ByteswapHelpers::SWAP_INT16(&move.anim_len);
+		ByteswapHelpers::SWAP_INT16(&move.airborne_start);
+		ByteswapHelpers::SWAP_INT16(&move.airborne_end);
+		ByteswapHelpers::SWAP_INT16(&move.ground_fall);
+		ByteswapHelpers::SWAP_INT32(&move.voicelip_addr);
+		ByteswapHelpers::SWAP_INT32(&move.extra_move_property_addr);
+		ByteswapHelpers::SWAP_INT32(&move.move_start_extraprop_addr);
+		ByteswapHelpers::SWAP_INT32(&move.move_end_extraprop_addr);
+		ByteswapHelpers::SWAP_INT32(&move._0x98_int);
+
+		//ByteswapHelpers::SWAP_INT32(&move.hitbox_location); // No need to swap this field
+
+		ByteswapHelpers::SWAP_INT16(&move.first_active_frame);
+		ByteswapHelpers::SWAP_INT16(&move.last_active_frame);
+		ByteswapHelpers::SWAP_INT16(&move._0x6c_short);
+		ByteswapHelpers::SWAP_INT16(&move.distance);
+	}
+
+	for (auto& mvlPlayable : StructIterator<MvlPlayable>(movesetBlock, offsets->mvlPlayable, offsets->mvlPlayableCount))
+	{
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.p2_action);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.distance);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.p2_rotation);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable._unk0x6);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable._unk0x8);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.p1_facing_related);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable._unk0xc);
+		ByteswapHelpers::SWAP_INT16(&mvlPlayable.input_count);
+		ByteswapHelpers::SWAP_INT32(&mvlPlayable.input_addr);
+	}
+
+	for (auto& mvlDisplayable : StructIterator<MvlDisplayable>(movesetBlock, offsets->mvlPlayable, offsets->mvlPlayableCount))
+	{
+		for (unsigned int i = 0; i < _countof(mvlDisplayable.all_translation_offsets); ++i) {
+			ByteswapHelpers::SWAP_INT32(&mvlDisplayable.all_translation_offsets[i]);
+		}
+	}
+}
+
 // Converts absolute ptr into indexes before saving to file
 static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTable& table, const MovesetTable* offsets, gameAddr nameStart, std::map<gameAddr, uint64_t>& animOffsetMap)
 {
@@ -99,6 +306,24 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 void ExtractorT5::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movesetHeader)
 {
 	m_game.ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
+
+	if (m_game.bigEndian) {
+		// Byteswap data that needs to be swapped
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->character_name_addr);
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->character_creator_addr);
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->date_addr);
+		ByteswapHelpers::SWAP_INT32(&movesetHeader->fulldate_addr);
+
+		for (unsigned int i = 0; i < _countof(movesetHeader->orig_aliases); ++i)
+		{
+			ByteswapHelpers::SWAP_INT16(&movesetHeader->orig_aliases[i]);
+			ByteswapHelpers::SWAP_INT16(&movesetHeader->current_aliases[i]);
+		}
+
+		for (unsigned int i = 0; i < _countof(movesetHeader->unknown_values); ++i) {
+			ByteswapHelpers::SWAP_INT16(&movesetHeader->unknown_values[i]);
+		}
+	}
 
 	// Convert ptrs into offsets
 	movesetHeader->character_name_addr -= (gameAddr32)movesetAddr;
@@ -369,6 +594,14 @@ void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, M
 	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game.baseAddr + movesetAddr + offsetof(MovesetInfo, table));
 	m_game.ReadBytes(movesetAddr + offsetof(MovesetInfo, table), table, sizeof(MovesetTable));
 
+	if (m_game.bigEndian) {
+		// Byteswap to little endian
+		for (unsigned int i = 0; i < _countof(table->entries); ++i) {
+			ByteswapHelpers::SWAP_INT32(&(table->entries[i].listAddr));
+			ByteswapHelpers::SWAP_INT32(&(table->entries[i].listCount));
+		}
+	}
+
 	// Get the address of the first and last list contained within table. This is used to get the bounds of the movesetBlock
 	gameAddr tableStartAddr = table->reactions;
 	// Convert the list of ptr into a list of offsets relative to the movesetInfoBlock
@@ -379,10 +612,13 @@ void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, M
 Byte* ExtractorT5::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table, const MovesetTable* offsets)
 {
 	gameAddr blockStart = table.reactions;
-	gameAddr blockEnd = table.StructA5 + (sizeof(ThrowCamera) * table.StructA5Count);
+	gameAddr blockEnd = table.StructA5;// +(sizeof(ThrowCamera) * table.StructA5Count);
 	auto block = allocateAndReadBlock(blockStart, blockEnd, size_out);
 	if (block == nullptr) {
 		return nullptr;
+	}
+	if (m_game.bigEndian) {
+		convertMovesetDataToLittleEndian(block, offsets);
 	}
 	return block;
 }

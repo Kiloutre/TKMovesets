@@ -16,7 +16,6 @@ using namespace StructsT6;
 
 // -- Static helpers -- //
 
-// Converts absolute ptr into indexes before saving to file
 static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTable* offsets)
 {
 	for (auto& pushbackExtra : StructIterator<PushbackExtradata>(movesetBlock, offsets->pushbackExtradata, offsets->pushbackExtradataCount))

@@ -51,4 +51,14 @@ namespace GameVersions
 			PPSSPP_ULUS10466,
 		};
 	}
+
+	namespace T5
+	{
+		enum
+		{
+			DEFAULT = 0,
+
+			DR_ONLINE
+		};
+	}
 };
