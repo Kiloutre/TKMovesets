@@ -76,7 +76,7 @@ namespace TAnimUtils
 			// Could get rid of it and directly read the bone descriptors when needed
 			bool isBoneInt16[256];
 
-			bool sourceIsBigEndian = animAddr[0] == 0;
+			bool sourceIsBigEndian = !IsLittleEndian(animAddr);
 			bool targetIsBigEndian = !sourceIsBigEndian;
 
 			// Get important informations
@@ -155,7 +155,7 @@ namespace TAnimUtils
 
 		void ByteswapC8Animation(Byte* animAddr)
 		{
-			bool sourceIsBigEndian = animAddr[0] == 0;
+			bool sourceIsBigEndian = !IsLittleEndian(animAddr);
 			bool targetIsBigEndian = !sourceIsBigEndian;
 
 			uint16_t boneCount = DEREF_UINT16(animAddr + 2);
@@ -193,27 +193,27 @@ namespace TAnimUtils
 			}
 		}
 
-		void ByteswapAnimation(Byte* animAddr)
+		void ByteswapAnimation(Byte* anim)
 		{
-			Byte animType = animAddr[0] == 0 ? animAddr[1] : animAddr[0];
+			Byte animType = IsLittleEndian(anim) ? anim[0] : anim[1];
 			switch (animType)
 			{
 			case 0x64:
-				Byteswap64Animation(animAddr);
+				Byteswap64Animation(anim);
 				break;
 			case 0xC8:
-				ByteswapC8Animation(animAddr);
+				ByteswapC8Animation(anim);
 				break;
 			default:
-				DEBUG_ERR("ByteswapAnimation() ERROR: INVALID ANIMATION TYPE '%x' FOR ADDR '%p'", animType, animAddr);
+				DEBUG_ERR("ByteswapAnimation() ERROR: INVALID ANIMATION TYPE '%x' FOR ADDR '%p'", animType, anim);
 				throw;
 				break;
 			}
 		}
 
-		inline bool IsLittleEndian(const Byte* animAddr)
+		inline bool IsLittleEndian(const Byte* anim)
 		{
-			return animAddr[0] == 0x64 || animAddr[0] == 0xC8;
+			return anim[0] == 0x64 || anim[0] == 0xC8;
 		}
 
 
@@ -272,8 +272,7 @@ namespace TAnimUtils
 
 		uint64_t GetAnimSize(const Byte* anim)
 		{
-			Byte animType = *anim;
-			if (animType == 0) animType = *(anim + 1);
+			Byte animType = IsLittleEndian(anim) ? anim[0] : anim[1];
 
 			switch (animType)
 			{
@@ -352,6 +351,119 @@ namespace TAnimUtils
 
 			return (uint64_t)animPtr_2 - (uint64_t)anim;
 		}
+
+		namespace Safe
+		{
+
+			uint64_t GetAnimSize(const Byte* anim, uint64_t max_size)
+			{
+				if (max_size < 8) {
+					// It's not possible for an animation to be of size 0
+					return 0;
+				}
+
+				Byte animType = IsLittleEndian(anim) ? anim[0] : anim[1];
+
+				switch (animType)
+				{
+				case 0x64:
+					return get64AnimSize(anim, max_size);
+				case 0xC8:
+					return getC8AnimSize(anim, max_size);
+				}
+
+				DEBUG_ERR("Bad animation type: First four bytes 0x%X", READ(anim, uint32_t));
+				return 0;
+			}
+
+
+			uint64_t getC8AnimSize(const Byte* anim, uint64_t max_size)
+			{
+				bool isSwapped = !IsLittleEndian(anim);
+
+				uint8_t bone_count = *(anim + (isSwapped ? 3 : 2));
+				uint32_t header_size = bone_count * 0x4 + 0x8;
+				uint32_t frame_size = bone_count * 0x4 * 3;
+
+				uint32_t length = READ(anim + 4, uint32_t);
+				if (isSwapped) {
+					length = BYTESWAP_INT32(length);
+				}
+
+				uint64_t anim_size = (uint64_t)header_size + (uint64_t)frame_size * (uint64_t)length;
+				return anim_size > max_size ? 0 : anim_size;
+			}
+
+
+			uint64_t get64AnimSize(const Byte* anim, uint64_t max_size)
+			{
+				const Byte* max_anim_ptr = anim + max_size;
+				bool isSwapped = !IsLittleEndian(anim);
+				// Do all calculations in uint64_t that way i don't have to pay attention to possible overflows
+
+				uint64_t boneCount = READ(anim + 2, uint16_t);
+				if (isSwapped) {
+					boneCount = BYTESWAP_INT16(boneCount);
+				}
+
+				uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
+				const Byte* anim_postBoneDescriptorAddr = anim + postBoneDescriptor_offset;
+
+				if ((anim_postBoneDescriptorAddr + 6) > max_anim_ptr) {
+					return 0;
+				}
+
+				uint64_t animLength = READ(anim_postBoneDescriptorAddr, uint16_t);
+				uint64_t __unknown__ = READ(anim_postBoneDescriptorAddr + 4, uint16_t);
+				if (isSwapped) {
+					animLength = BYTESWAP_INT16(animLength);
+					__unknown__ = BYTESWAP_INT16(__unknown__);
+				}
+
+				uint64_t vv73 = 2 * ((4 * __unknown__ + 6) / 2);
+				uint64_t aa4 = 6 * (__unknown__ + boneCount);
+
+				const Byte* animPtr = anim_postBoneDescriptorAddr + vv73 + aa4;
+
+
+
+				unsigned int baseFrame = (unsigned int)animLength - (animLength >= 2 ? 2 : 1);
+				unsigned int keyframe = baseFrame / 16;
+
+				if ((animPtr + 4 * (uint64_t)keyframe) > max_anim_ptr) {
+					return 0;
+				}
+
+				unsigned int _v56_intPtr = READ(animPtr + 4 * (uint64_t)keyframe, unsigned int);
+				if (isSwapped) {
+					_v56_intPtr = BYTESWAP_INT32(_v56_intPtr);
+				}
+
+				const Byte* animPtr_2 = animPtr + _v56_intPtr;
+				int lastArg_copy = (int)boneCount;
+
+				if (animPtr_2 > max_anim_ptr) {
+					return 0;
+				}
+
+				do
+				{
+					for (int i = 0; i < 3; ++i)
+					{
+
+						Byte v58 = *animPtr_2;
+						int offsetStep = v58 / 4;
+						animPtr_2 += offsetStep;
+
+						if (animPtr_2 > max_anim_ptr) {
+							return 0;
+						}
+					}
+				} while (--lastArg_copy != 0);
+
+				return (uint64_t)animPtr_2 - (uint64_t)anim;
+			}
+		};
 	};
 
 	namespace FromProcess

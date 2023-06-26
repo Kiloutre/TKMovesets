@@ -41,6 +41,18 @@ namespace TAnimUtils
 		// Returns the size in bytes of a 0x64 animation
 		uint64_t get64AnimSize(const Byte* anim);
 
+		// Safe animation-size fetching functions that require providing the size of the file / memory area
+		// If the animation data makes the size go above max_size (incomplete animation data), returns 0.
+		namespace Safe
+		{
+			// Returns the size in bytes of an animation.
+			uint64_t GetAnimSize(const Byte* anim, uint64_t max_size);
+			// Returns the size in bytes of a 0xC8 animation.
+			uint64_t getC8AnimSize(const Byte* anim, uint64_t max_size);
+			// Returns the size in bytes of a 0x64 animation.
+			uint64_t get64AnimSize(const Byte* anim, uint64_t max_size);
+		};
+
 		// Parse a specific frame of animation data, filling the float buffer with the appropriate values
 		// Returns the amount of bones the animation contains which you may use to read the pos_out buffer (bone_count * 3 * float)
 		uint16_t ParseAnimation0x64(const Byte* anim, unsigned int frame, float* pos_out);

@@ -647,7 +647,7 @@ std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 		animFile.read((char*)anim, animSize);
 
 		// Ensure old bad animations don't get completely carried over
-		realAnimSize = TAnimUtils::FromMemory::GetAnimSize(anim);
+		realAnimSize = TAnimUtils::FromMemory::Safe::GetAnimSize(anim, animSize);
 
 		if (realAnimSize == 0) {
 			DEBUG_ERR("Bad animation file : %S", filepath);
