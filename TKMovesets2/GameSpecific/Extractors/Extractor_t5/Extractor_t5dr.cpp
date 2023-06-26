@@ -9,10 +9,12 @@
 
 #include "helpers.hpp"
 #include "Compression.hpp"
-#include "Extractor_t5.hpp"
+#include "Extractor_t5dr.hpp"
 #include "Animations.hpp"
 
 using namespace StructsT5;
+
+# define MovesetInfo StructsT5DR::MovesetInfo
 
 // -- Static helpers -- //
 
@@ -167,9 +169,8 @@ static void convertMovesetDataToLittleEndian(Byte* movesetBlock, const MovesetTa
 
 	for (auto& move : StructIterator<Move>(movesetBlock, offsets->move, offsets->moveCount))
 	{
-		//ByteswapHelpers::SWAP_INT32(&move._0x0_int);
-		//ByteswapHelpers::SWAP_INT32(&move._0x4_int);
-		// todo
+		ByteswapHelpers::SWAP_INT32(&move.name_addr);
+		ByteswapHelpers::SWAP_INT32(&move.anim_name_addr);
 
 		ByteswapHelpers::SWAP_INT32(&move.anim_addr);
 		ByteswapHelpers::SWAP_INT32(&move.vuln);
@@ -303,7 +304,7 @@ static void convertMovesetPointersToIndexes(Byte* movesetBlock, const MovesetTab
 
 // -- Private methods - //
 
-void ExtractorT5::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movesetHeader)
+void ExtractorT5DR::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movesetHeader)
 {
 	m_game.ReadBytes(movesetAddr, movesetHeader, offsetof(MovesetInfo, table));
 
@@ -338,7 +339,7 @@ void ExtractorT5::CopyMovesetInfoBlock(gameAddr movesetAddr, MovesetInfo* movese
 	movesetHeader->fulldate_addr += namelength;
 }
 
-uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::map<gameAddr32, std::pair<uint32_t, uint32_t>>& offsetMap, ExtractSettings settings)
+uint64_t ExtractorT5DR::CalculateMotaCustomBlockSize(const MotaList* motas, std::map<gameAddr32, std::pair<uint32_t, uint32_t>>& offsetMap, ExtractSettings settings)
 {
 	uint32_t motaCustomBlockSize = 0;
 
@@ -409,7 +410,8 @@ uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 			motaCustomBlockSize += motaSize;
 
 			DEBUG_LOG("Saved mota %d, size is %d (0x%x)\n", motaId, motaSize, motaSize);
-		} else {
+		}
+		else {
 			// Malformed/Unknown format
 			if (expectedMotaSize != 0 && (settings & ExtractSettings_UnknownMotas))
 			{
@@ -426,7 +428,7 @@ uint64_t ExtractorT5::CalculateMotaCustomBlockSize(const MotaList* motas, std::m
 	return (uint64_t)motaCustomBlockSize;
 }
 
-Byte* ExtractorT5::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, ExtractSettings settings)
+Byte* ExtractorT5DR::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, ExtractSettings settings)
 {
 	// Custom block contains the mota files we want and does not contain the invalid/unwanted ones
 
@@ -487,7 +489,7 @@ Byte* ExtractorT5::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out, 
 	return customBlock;
 }
 
-void ExtractorT5::GetNamesBlockBounds(const Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
+void ExtractorT5DR::GetNamesBlockBounds(const Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end)
 {
 	uint64_t smallest = (uint64_t)move[0].name_addr;
 	uint64_t highest = smallest;
@@ -523,7 +525,7 @@ void ExtractorT5::GetNamesBlockBounds(const Move* move, uint64_t moveCount, game
 }
 
 
-Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets)
+Byte* ExtractorT5DR::CopyAnimations(const Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets)
 {
 	uint64_t totalSize = 0;
 	std::map<gameAddr, uint64_t> animSizes;
@@ -588,7 +590,7 @@ Byte* ExtractorT5::CopyAnimations(const Move* movelist, size_t moveCount, uint64
 	return animationBlock;
 }
 
-void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
+void ExtractorT5DR::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, MovesetTable* offsets)
 {
 	// Fill table
 	DEBUG_LOG("Moveset addr: %llx, table: %llx\n", movesetAddr, m_game.baseAddr + movesetAddr + offsetof(MovesetInfo, table));
@@ -609,7 +611,7 @@ void ExtractorT5::FillMovesetTables(gameAddr movesetAddr, MovesetTable* table, M
 	Helpers::convertPtrsToOffsets(offsets, tableStartAddr, 8, sizeof(MovesetTable) / 4 / 2);
 }
 
-Byte* ExtractorT5::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table, const MovesetTable* offsets)
+Byte* ExtractorT5DR::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const MovesetTable& table, const MovesetTable* offsets)
 {
 	gameAddr blockStart = table.reactions;
 	gameAddr blockEnd = table.StructA5;// +(sizeof(ThrowCamera) * table.StructA5Count);
@@ -623,7 +625,7 @@ Byte* ExtractorT5::CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, co
 	return block;
 }
 
-char* ExtractorT5::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
+char* ExtractorT5DR::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart)
 {
 	gameAddr nameBlockEnd;
 	GetNamesBlockBounds(movelist, moveCount, nameBlockStart, nameBlockEnd);
@@ -633,7 +635,7 @@ char* ExtractorT5::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	size_t toCopy = strlen(namePrefix);
 	size_t charactersToReplace = 1; // Replace the first [
 
-	unsigned int nameOffset = 0x26C;
+	unsigned int nameOffset = 0x274;
 
 	nameBlockStart = movesetAddr + nameOffset - (toCopy - charactersToReplace);
 	char* nameBlock = (char*)allocateAndReadBlock(movesetAddr + nameOffset - (toCopy - charactersToReplace), nameBlockEnd, size_out);
@@ -645,14 +647,14 @@ char* ExtractorT5::CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const
 	return nameBlock;
 }
 
-Byte* ExtractorT5::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
+Byte* ExtractorT5DR::CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, MotaList* motasList, ExtractSettings settings)
 {
 	m_game.ReadBytes(movesetAddr + offsetof(MovesetInfo, motas), motasList, sizeof(MotaList));
 
 	return AllocateMotaCustomBlock(motasList, size_out, settings);
 }
 
-void ExtractorT5::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
+void ExtractorT5DR::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t customPropertyCount)
 {
 	infos.flags = 0;
 	infos.game_specific_flags = 0;
@@ -662,11 +664,11 @@ void ExtractorT5::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 	memset(infos.gameVersionHash, 0, sizeof(infos.gameVersionHash));
 	strcpy_s(infos.version_string, sizeof(infos.version_string), MOVESET_VERSION_STRING);
 	strcpy_s(infos.origin, sizeof(infos.origin), m_gameInfo.name);
-    
-    std::string charName = GetPlayerCharacterName(playerAddress);
+
+	std::string charName = GetPlayerCharacterName(playerAddress);
 	strcpy_s(infos.target_character, sizeof(infos.target_character), charName.c_str());
 	strcpy_s(infos.orig_character_name, sizeof(infos.orig_character_name), charName.c_str());
-    
+
 	infos.date = Helpers::getCurrentTimestamp();
 	infos.extraction_date = infos.date;
 
@@ -687,7 +689,7 @@ void ExtractorT5::FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress
 
 // -- Public methods -- //
 
-ExtractionErrcode_ ExtractorT5::Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress)
+ExtractionErrcode_ ExtractorT5DR::Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress)
 {
 	progress = 0;
 	// These are all the blocks we are going to extract. Most of them will be ripped in one big readBytes()
@@ -869,10 +871,11 @@ ExtractionErrcode_ ExtractorT5::Extract(gameAddr playerAddress, ExtractSettings 
 			else {
 				DEBUG_LOG("Not compressing.\n");
 				try {
-                    std::filesystem::rename(tmp_filepath, filepath);
-                } catch (std::exception&) {
-                    errcode = ExtractionErrcode_FileCreationErr;
-                }
+					std::filesystem::rename(tmp_filepath, filepath);
+				}
+				catch (std::exception&) {
+					errcode = ExtractionErrcode_FileCreationErr;
+				}
 			}
 
 			DEBUG_LOG("- Saved moveset at '%S' -\n", filepath.c_str());
@@ -899,7 +902,7 @@ ExtractionErrcode_ ExtractorT5::Extract(gameAddr playerAddress, ExtractSettings 
 	return errcode;
 }
 
-bool ExtractorT5::CanExtract()
+bool ExtractorT5DR::CanExtract()
 {
 	// todo: this is invalid, because when we import our own moveset and leave back to main menu, it will return true
 	// yes we can import in that case but it will serve zero purpose
@@ -934,7 +937,7 @@ bool ExtractorT5::CanExtract()
 }
 
 
-std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
+std::string ExtractorT5DR::GetPlayerCharacterName(gameAddr playerAddress)
 {
 	gameAddr movesetAddr = m_game.ReadPtr(playerAddress + m_game.GetValue("motbin_offset"));
 
@@ -943,7 +946,7 @@ std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
 	}
 
 	char characterName[32];
-	m_game.ReadBytes(movesetAddr + 0x26C, characterName, sizeof(characterName));
+	m_game.ReadBytes(movesetAddr + 0x274, characterName, sizeof(characterName));
 	characterName[sizeof(characterName) - 1] = '\0';
 
 	auto item = m_characterNamesMap.find(characterName);
@@ -993,12 +996,12 @@ std::string ExtractorT5::GetPlayerCharacterName(gameAddr playerAddress)
 	return character_name_cursor;
 }
 
-uint32_t ExtractorT5::GetCharacterID(gameAddr playerAddress)
+uint32_t ExtractorT5DR::GetCharacterID(gameAddr playerAddress)
 {
 	return m_game.Read<uint16_t>(playerAddress + m_game.GetValue("chara_id_offset"));
 }
 
-gameAddr ExtractorT5::GetCharacterAddress(uint8_t playerId)
+gameAddr ExtractorT5DR::GetCharacterAddress(uint8_t playerId)
 {
 	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	if (playerId > 0) {
@@ -1007,7 +1010,7 @@ gameAddr ExtractorT5::GetCharacterAddress(uint8_t playerId)
 	return playerAddress;
 }
 
-std::vector<gameAddr> ExtractorT5::GetCharacterAddresses()
+std::vector<gameAddr> ExtractorT5DR::GetCharacterAddresses()
 {
 	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	uint64_t playerstructSize = m_game.GetValue("playerstruct_size");

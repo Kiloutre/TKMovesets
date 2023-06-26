@@ -126,7 +126,12 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
             {
                 for (uint8_t gameIdx = 0; gameIdx < gameListCount; ++gameIdx)
                 {
-                    auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+					auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+
+					if (gameInfo->separatorText) {
+						ImGui::SeparatorText(gameInfo->separatorText);
+					}
+
                     if (gameInfo->extractor != nullptr) {
                         if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(200.0f, 0))) {
                             extractorHelper.SetTargetProcess(gameInfo);

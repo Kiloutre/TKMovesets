@@ -6,6 +6,7 @@
 #include "Extractor_ttt2/Extractor_ttt2.hpp"
 #include "Extractor_t6/Extractor_t6.hpp"
 #include "Extractor_t5/Extractor_t5.hpp"
+#include "Extractor_t5/Extractor_t5dr.hpp"
 
 #include "Importer_t7/Importer_t7.hpp"
 
@@ -63,6 +64,7 @@ const GameInfo cg_gamesInfo[] = {
 		.autoProcessSelection = true,
 	},
 	{
+		.separatorText = "Tekken Tag 2",
 		.name = "Tekken Tag 2 1.00 (RPCS3)",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TTT2_",
@@ -129,6 +131,7 @@ const GameInfo cg_gamesInfo[] = {
 		.autoProcessSelection = false
 	},
 	{
+		.separatorText = "Tekken 6",
 		.name = "Tekken 6 (RPCS3)",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "T6_",
@@ -172,8 +175,8 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = false,
 		.autoProcessSelection = true
 	},
-	/*
 	{
+		.separatorText = "Tekken 5",
 		.name = "Tekken 5 DR (RPCS3)",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "T5_",
@@ -186,7 +189,7 @@ const GameInfo cg_gamesInfo[] = {
 		.minorDataString = "t5dr",
 		.supportedImports = {},
 		.supportedOnlineImports = {},
-		.extractor = new GameFactory<ExtractorT5>,
+		.extractor = new GameFactory<ExtractorT5DR>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
@@ -195,7 +198,6 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = true,
 		.autoProcessSelection = false
 	},
-	*/
 	{
 		.name = "Tekken 5 (PCSX2)",
 		.processName = "pcsx2.exe",

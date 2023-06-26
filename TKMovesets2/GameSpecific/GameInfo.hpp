@@ -56,6 +56,9 @@ enum GameFlag_
 #pragma warning (disable:4099)
 struct GameInfo
 {
+	// Separator text to display above the game
+	const char* separatorText = nullptr;
+
 	// Displayed name of the game
 	const char* name;
 	// Process that will be opened and main module name

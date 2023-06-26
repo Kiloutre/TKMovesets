@@ -186,6 +186,7 @@ set(GAMESPECIFIC_SOURCES
 
                     # T5
                     "GameSpecific/Extractors/Extractor_t5/Extractor_t5.cpp"
+                    "GameSpecific/Extractors/Extractor_t5/Extractor_t5dr.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5_to_t7.cpp"
                     "GameSpecific/MovesetConverters/Converter_t5_to_t7_Aliases.cpp"
                     "GameSpecific/AnimExtractors/AnimExtractor_t5.cpp"
