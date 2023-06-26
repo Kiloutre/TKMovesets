@@ -65,7 +65,7 @@ namespace AnimExtractor
 				struct _stat animCacheFile;
 				if (_wstat(outputFinalFilename.c_str(), &animCacheFile) == 0 && animCacheFile.st_size != 0) {
 					DEBUG_LOG("File '%S' already exists (and is not empty): skipping extraction.\n", outputFinalFilename.c_str());
-					extractionStatus.status = AnimExtractionStatus_Skipped;
+					extractionStatus.status = AnimExtractionStatus_SkippedExists;
 					continue;
 				}
 			}

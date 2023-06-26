@@ -245,6 +245,9 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				case AnimExtractionStatus_Skipped:
 					ImGui::TextUnformatted(_("edition.animation_extraction.skipped"));
 					break;
+				case AnimExtractionStatus_SkippedExists:
+					ImGui::TextUnformatted(_("edition.animation_extraction.skipped_exists"));
+					break;
 				case AnimExtractionStatus_Error:
 					ImGui::TextUnformatted(_("edition.animation_extraction.error"));
 					break;
