@@ -709,7 +709,8 @@ namespace TAnimUtils
 			file.read(buf, 8);
 			if (file.gcount() == 8)
 			{
-				bool isLittleEndian = *buf == 0x64 || *buf == 0xC8;
+				
+				bool isLittleEndian = FromMemory::IsLittleEndian((Byte*)buf);
 				bool isBigEndian = !isLittleEndian;
 				Byte animType = isBigEndian ? buf[1] : buf[0];
 				Byte boneCount = isBigEndian ? buf[3] : buf[2];

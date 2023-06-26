@@ -143,7 +143,7 @@ void Submenu_Edition::ExtractAllAnimations()
 
 	std::sort(m_animExtraction.movesets.begin(), m_animExtraction.movesets.end(),
 		[](const movesetInfo& a, const movesetInfo& b) -> bool {
-			return strcmp(a.original_character.c_str(), b.original_character.c_str()) < 0 || a.modified < b.modified;
+			return a.modified < b.modified;
 		});
 
 	DEBUG_LOG("Extracting all animations...\n");
