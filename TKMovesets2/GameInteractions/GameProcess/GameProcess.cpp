@@ -39,6 +39,73 @@ namespace GameProcessUtils
 		}
 		return processList;
 	};
+
+
+	struct t_enumWindowsParams
+	{
+		std::vector <std::string>& names;
+		DWORD pid;
+
+	};
+
+	static void OnWindowEnum(HWND hwnd, t_enumWindowsParams& param)
+	{
+		DWORD pid;
+		GetWindowThreadProcessId(hwnd, &pid);
+		if (pid != param.pid) {
+			return;
+		}
+
+		char windowName[256];
+		if (GetWindowTextA(hwnd, windowName, sizeof(windowName)) == 0) {
+			return;
+		}
+
+		DEBUG_LOG("%s\n", windowName);
+		param.names.push_back(windowName);
+	}
+
+	std::vector<std::string> GetWindowsList(DWORD pid)
+	{
+		std::vector <std::string> names;
+
+		t_enumWindowsParams params = { .names = names, .pid = pid };
+		DEBUG_LOG("-- EnumWindows --\n");
+		EnumWindows((WNDENUMPROC)OnWindowEnum, (LPARAM)&params);
+		DEBUG_LOG("-- EnumWindows END --\n");
+		return names;
+	}
+
+	bool FindWindowText(DWORD pid, const char* substring)
+	{
+		auto windowList = GetWindowsList(pid);
+
+		for (const std::string& wName : windowList)
+		{
+			if (wName.find(substring) != std::string::npos) {
+				DEBUG_LOG("Matched window name '%s'\n", wName.c_str());
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool FindWindowText(DWORD pid, const std::vector<const char*>& substrings)
+	{
+		auto windowList = GetWindowsList(pid);
+
+		for (const std::string& wName : windowList)
+		{
+			for (const auto& substring : substrings)
+			{
+				if (wName.find(substring) != std::string::npos) {
+					DEBUG_LOG("Matched window name '%s'\n", wName.c_str());
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 };
 
 

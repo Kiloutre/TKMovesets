@@ -102,11 +102,8 @@ static void InitMainClasses(MainWindow& program)
 		{
 			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 
-			if (!gameInfo->autoProcessSelection) {
-				continue;
-			}
-
 			const char* processName = gameInfo->processName;
+			processEntry* p;
 
 			// Detect if the game is running
 			{
@@ -115,6 +112,7 @@ static void InitMainClasses(MainWindow& program)
 				{
 					if (process.name == processName)
 					{
+						p = &process;
 						isRunning = true;
 						break;
 					}
@@ -122,6 +120,10 @@ static void InitMainClasses(MainWindow& program)
 				if (!isRunning) {
 					continue;
 				}
+			}
+
+			if (!gameInfo->MatchesProcessWindowName(p->pid)) {
+				continue;
 			}
 
 			if (!attachedExtractor && gameInfo->extractor != nullptr) {

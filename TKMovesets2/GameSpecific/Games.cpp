@@ -39,7 +39,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
-		.autoProcessSelection = true,
+		.matchingProcessSubstrings = {}
 	},
 	{
 		.name = "Tekken 7",
@@ -61,7 +61,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = new GameFactory<OnlineT7>,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
-		.autoProcessSelection = true,
+		.matchingProcessSubstrings = { }
 	},
 	{
 		.separatorText = "Tekken Tag 2",
@@ -84,7 +84,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true,
-		.autoProcessSelection = false
+		.matchingProcessSubstrings = { "BLES01702" }
 	},
 	{
 		.name = "Tekken Tag 2 1.03 (RPCS3)",
@@ -106,7 +106,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true,
-		.autoProcessSelection = true
+		.matchingProcessSubstrings = { "BLES01702" }
 	},
 	{
 		.name = "Tekken Revolution (RPCS3)",
@@ -128,7 +128,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true,
-		.autoProcessSelection = false
+		.matchingProcessSubstrings = { "NPEB01406" }
 	},
 	{
 		.separatorText = "Tekken 6",
@@ -151,7 +151,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true,
-		.autoProcessSelection = false
+		.matchingProcessSubstrings = { "BLES00635" }
 	},
 	{
 		.name = "Tekken 6 (PPSSPP)",
@@ -173,7 +173,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetPPSSPPBaseAddr,
 		.bigEndian = false,
-		.autoProcessSelection = true
+		.matchingProcessSubstrings = {}
 	},
 	{
 		.separatorText = "Tekken 5",
@@ -196,7 +196,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetRPCS3BaseAddr,
 		.bigEndian = true,
-		.autoProcessSelection = false
+		.matchingProcessSubstrings = { "NPEA00019" }
 	},
 	{
 		.name = "Tekken 5 (PCSX2)",
@@ -218,7 +218,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = false,
-		.autoProcessSelection = true
+		.matchingProcessSubstrings = {}
 	},
 };
 

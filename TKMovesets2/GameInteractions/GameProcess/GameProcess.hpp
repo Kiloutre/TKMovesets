@@ -28,6 +28,10 @@ struct moduleEntry
 namespace GameProcessUtils
 {
 	std::vector<processEntry> GetRunningProcessList();
+
+	// Returns true if the process contains a window containing the substring
+	bool FindWindowText(DWORD pid, const char* substring);
+	bool FindWindowText(DWORD pid, const std::vector<const char*>& substrings);
 };
 
 // Thread creation status
@@ -102,6 +106,9 @@ public:
 	void FreeOldGameMemory(bool instant = false);
 	// Returns a list of module currently loaded in the target remote process
 	std::vector<moduleEntry> GetModuleList() const;
+
+	// Returns a list of window names for the windows attached to the process
+	std::vector<std::string> GetWindowsList() const;
 
 
 	// Reads an unsigned byte from the game in little endian

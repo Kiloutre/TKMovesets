@@ -269,11 +269,8 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 	{
 		auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 
-		if (!gameInfo->autoProcessSelection) {
-			continue;
-		}
-
 		const char* processName = gameInfo->processName;
+		processEntry* p;
 
 		// Detect if the game is running
 		{
@@ -282,6 +279,7 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 			{
 				if (process.name == processName)
 				{
+					p = &process;
 					isRunning = true;
 					break;
 				}
@@ -289,6 +287,10 @@ EditorVisuals::EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* 
 			if (!isRunning) {
 				continue;
 			}
+		}
+
+		if (!gameInfo->MatchesProcessWindowName(p->pid)) {
+			continue;
 		}
 
 		if (gameInfo->SupportsGameImport(movesetInfo->gameId))

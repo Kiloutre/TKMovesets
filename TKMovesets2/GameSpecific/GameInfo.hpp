@@ -97,8 +97,8 @@ struct GameInfo
 	uint64_t(*GetBaseAddressFunc)(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process) = nullptr;
 	// True if game values must be interpreted as big endian
 	bool bigEndian;
-	// If true, the process will be automatically detected at startup and this game will be selected if its process is running
-	bool autoProcessSelection;
+	// Substrings that will be searched in process window. Leave empty to match everything.
+	std::vector<const char*> matchingProcessSubstrings;
 
 
 	bool SupportsGameImport(uint16_t t_gameId) const
@@ -115,6 +115,11 @@ struct GameInfo
 	bool IsEditable() const
 	{
 		return editorLogic != nullptr && editorVisuals != nullptr;
+	}
+
+	bool MatchesProcessWindowName(DWORD pid) const
+	{
+		return matchingProcessSubstrings.size() == 0 || GameProcessUtils::FindWindowText(pid, matchingProcessSubstrings);
 	}
 };
 #pragma warning (pop)
