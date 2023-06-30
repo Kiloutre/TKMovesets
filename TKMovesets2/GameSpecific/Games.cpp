@@ -61,7 +61,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = new GameFactory<OnlineT7>,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
-		.matchingProcessSubstrings = { }
+		.matchingProcessSubstrings = { "TEKKEN 7" }
 	},
 	{
 		.separatorText = "Tekken Tag 2",

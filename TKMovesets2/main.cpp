@@ -572,14 +572,15 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 			}
 		}
 
-		DestroyMainClasses(program);
 		// Cleanup what needs to be cleaned up
-		program.Shutdown();
 
 		if (program.requestedUpdate) {
 			program.sideMenu.CleanupThread();
 			StartProcess(UPDATE_TMP_FILENAME ".exe");
 		}
+
+		DestroyMainClasses(program);
+		program.Shutdown();
 	}
 
 	glfwDestroyWindow(window);
