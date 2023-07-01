@@ -25,7 +25,6 @@ Submenu_Extract::Submenu_Extract()
 	m_motaExport[8] = true; // Camera
 	m_motaExport[9] = true; // Camera
 
-	m_overwriteSameFilename = Settings::Get(SETTING_EXPORT_OVERWRITE_KEY, SETTING_EXPORT_OVERWRITE);
 	m_extractDisplayableMovelist = true;
 
 	m_extractUnsupportedMotas = false;
@@ -43,7 +42,7 @@ ExtractSettings Submenu_Extract::GetExtractionSettings()
 		settings |= ExtractSettings_UnknownMotas;
 	}
 
-	if (m_overwriteSameFilename) {
+	if (Settings::Get(SETTING_EXPORT_OVERWRITE_KEY, SETTING_EXPORT_OVERWRITE)) {
 		settings |= ExtractSettings_OVERWRITE_SAME_FILENAME;
 	}
 
@@ -142,16 +141,9 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
             }
             ImGui::PopID();
 		}
-
-		// Extraction settings
-		ImGui::SameLine();
-		if (ImGui::Checkbox(_("extraction.overwrite_duplicate"), &m_overwriteSameFilename)) {
-			Settings::Set(SETTING_EXPORT_OVERWRITE_KEY, m_overwriteSameFilename);
-		}
-		ImGui::SameLine();
-		ImGuiExtra::HelpMarker(_("extraction.overwrite_explanation"));
 	}
 
+	ImGui::SameLine();
 	if (ImGui::Button(_("extraction.settings"))) {
 		ImGui::OpenPopup("ExtractionSettingsPopup");
 	}
@@ -166,7 +158,7 @@ void Submenu_Extract::Render(GameExtract& extractorHelper)
 	GameProcess& p = extractorHelper.process;
 
 	{
-		ImGui::SameLine();
+		ImGui::Separator();
 
 		bool canExtract = p.IsAttached() && !busy && extractorHelper.CanStart();
 		bool canExtractAll = canExtract;

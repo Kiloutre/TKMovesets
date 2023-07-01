@@ -9,23 +9,21 @@
 
 Submenu_Import::Submenu_Import()
 {
-	m_applyInstantly = Settings::Get(SETTING_IMPORT_INSTANT_KEY, SETTING_IMPORT_INSTANT);
-	m_freeUnusedMoveset = Settings::Get(SETTING_FREE_UNUSED_KEY, SETTING_FREE_UNUSED);
 };
 
 ImportSettings Submenu_Import::GetImportationSettings()
 {
-	ImportSettings retVal = 0;
+	ImportSettings settings = 0;
 
-	if (m_applyInstantly) {
-		retVal |= ImportSettings_ApplyInstantly;
+	if (Settings::Get(SETTING_IMPORT_INSTANT_KEY, SETTING_IMPORT_INSTANT)) {
+		settings |= ImportSettings_ApplyInstantly;
 	}
 
-	if (m_freeUnusedMoveset) {
-		retVal |= ImportSettings_FreeUnusedMovesets;
+	if (Settings::Get(SETTING_FREE_UNUSED_KEY, SETTING_FREE_UNUSED)) {
+		settings |= ImportSettings_FreeUnusedMovesets;
 	}
 
-	return retVal;
+	return settings;
 }
 
 void Submenu_Import::Render(GameImport& importerHelper)
@@ -82,21 +80,6 @@ void Submenu_Import::Render(GameImport& importerHelper)
 			ImGui::EndCombo();
 		}
 	}
-
-	// Basic importation settings
-	ImGui::SameLine();
-	if (ImGui::Checkbox(_("importation.apply_instantly"), &m_applyInstantly)) {
-		Settings::Set(SETTING_IMPORT_INSTANT_KEY, m_applyInstantly);
-	}
-	ImGui::SameLine();
-	ImGuiExtra::HelpMarker(_("importation.apply_instantly_explanation"));
-
-	ImGui::SameLine();
-	if (ImGui::Checkbox(_("importation.free_unused_movesets"), &m_freeUnusedMoveset)) {
-		Settings::Set(SETTING_FREE_UNUSED_KEY, m_freeUnusedMoveset);
-	}
-	ImGui::SameLine();
-	ImGuiExtra::HelpMarker(_("importation.free_unused_movesets_explanation"));
 
 	// If we can't import, display a warning detailling why
 	GameProcess& p = importerHelper.process;

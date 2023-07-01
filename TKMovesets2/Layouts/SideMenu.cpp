@@ -151,6 +151,9 @@ SideMenu::SideMenu()
 #endif
 
 	m_vsync_setting = Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER);
+	m_overwriteSameFilename = Settings::Get(SETTING_EXPORT_OVERWRITE_KEY, SETTING_EXPORT_OVERWRITE);
+	m_freeUnusedMoveset = Settings::Get(SETTING_FREE_UNUSED_KEY, SETTING_FREE_UNUSED);
+	m_applyInstantly = Settings::Get(SETTING_IMPORT_INSTANT_KEY, SETTING_IMPORT_INSTANT);
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
 }
@@ -161,26 +164,183 @@ SideMenu::~SideMenu()
 	CleanupThread();
 }
 
+void SideMenu::RenderSettingsMenu()
+{
+	// General settings
+	ImGui::SeparatorText(_("settings.general"));
+	if (ImGui::BeginTable("GeneralSettingsTable", 2, ImGuiTableFlags_RowBg))
+	{
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+
+		// Language list
+		ImGui::TextUnformatted(_("settings.language"));
+		ImGui::PushItemWidth(200.f);
+		if (ImGui::BeginCombo("##", m_translations[m_languageId].displayName))
+		{
+			for (unsigned int i = 0; i < m_translations_count; ++i)
+			{
+				ImGui::PushID(&i);
+				if (ImGui::Selectable(m_translations[i].displayName, i == m_languageId)) {
+					if (Localization::LoadFile(m_translations[i].locale, true)) {
+						m_languageId = Localization::GetCurrLangId();
+						Settings::Set(SETTING_LANG_KEY, m_languageId);
+					}
+				}
+				ImGui::PopID();
+			}
+			ImGui::EndCombo();
+		}
+		ImGui::PopItemWidth();
+
+		// Vsync dropdown
+		ImGui::TableNextColumn();
+		ImGui::TextUnformatted(_("settings.vsync"));
+		char buf[2] = { '0' + m_vsync_setting , 0 };
+		ImGui::PushID(&m_vsync_setting);
+		ImGui::PushItemWidth(100.f);
+		if (ImGui::BeginCombo("##", buf))
+		{
+			for (unsigned int i = 0; i < 5; ++i)
+			{
+				ImGui::PushID(i);
+				buf[0] = '0' + i;
+				if (ImGui::Selectable(buf, i == m_vsync_setting)) {
+					m_vsync_setting = i;
+					glfwSwapInterval(i);
+					Settings::Set(SETTING_VSYNC_BUFFER_KEY, i);
+				}
+				ImGui::PopID();
+			}
+			ImGui::EndCombo();
+		}
+		ImGui::PopID();
+		ImGui::PopItemWidth();
+
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("settings.vsync_explanation"));
+
+		// Auto-update program & addresses
+		{
+#ifdef BUILD_TYPE_DEBUG
+			// Automatic updates are disabled in debug builds
+			ImGuiExtra::DisableBlockIf __(true);
+#endif
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			if (ImGui::Checkbox(_("settings.auto_update_check"), &m_auto_update_check)) {
+				Settings::Set(SETTING_AUTO_UPDATE_KEY, m_auto_update_check);
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::Checkbox(_("settings.auto_addr_update_check"), &m_auto_addr_update_check)) {
+				Settings::Set(SETTING_AUTO_ADDR_UPDATE_KEY, m_auto_addr_update_check);
+			}
+		}
+
+
+		// File association
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		if (ImGui::Button(_("settings.file_association"))) {
+			SetWindowsFileAssociation();
+		}
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("settings.file_association_explanation"));
+
+		ImGui::EndTable();
+	}
+
+	// Importation settings
+	ImGui::SeparatorText(_("settings.importation"));
+	if (ImGui::BeginTable("ImportSettingsTable", 2, ImGuiTableFlags_RowBg))
+	{
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+
+		// Apply movesets instantly
+		if (ImGui::Checkbox(_("settings.apply_instantly"), &m_applyInstantly)) {
+			Settings::Set(SETTING_IMPORT_INSTANT_KEY, m_applyInstantly);
+		}
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("settings.apply_instantly_explanation"));
+
+		// Free old unused movesets when importing new ones
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox(_("settings.free_unused_movesets"), &m_freeUnusedMoveset)) {
+			Settings::Set(SETTING_FREE_UNUSED_KEY, m_freeUnusedMoveset);
+		}
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("settings.free_unused_movesets_explanation"));
+
+		ImGui::EndTable();
+	}
+
+	// Exportation settings
+	ImGui::SeparatorText(_("settings.exportation"));
+	if (ImGui::BeginTable("ExportSettingsTable", 2, ImGuiTableFlags_RowBg))
+	{
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+
+		// Ovewrite movesets with same name
+		if (ImGui::Checkbox(_("settings.overwrite_duplicate"), &m_overwriteSameFilename)) {
+			Settings::Set(SETTING_EXPORT_OVERWRITE_KEY, m_overwriteSameFilename);
+		}
+		ImGui::SameLine();
+		ImGuiExtra::HelpMarker(_("settings.overwrite_explanation"));
+
+		ImGui::EndTable();
+	}
+
+	ImGui::SeparatorText("");
+	if (ImGui::Button(_("close")))
+	{
+		ImGui::CloseCurrentPopup();
+		m_settingsMenuOpen = false;
+	}
+}
+
+void SideMenu::RenderChangelog()
+{
+	ImGui::TextUnformatted(_("sidemenu.update_explanation"));
+
+	// Controls
+	if (ImGui::Button(_("yes"))) {
+		if (DownloadProgramUpdate(&m_updateStatus, m_addresses, false)) {
+			*requestedUpdatePtr = true;
+		}
+		else {
+			m_updateFileInvalid = true;
+		}
+
+	}
+	ImGui::SameLine();
+	if (ImGui::Button(_("no")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
+		ImGui::CloseCurrentPopup();
+		m_updateStatus.programUpdateAvailable = false;
+	}
+
+	if (m_updateFileInvalid) {
+		ImGuiExtra_TextboxError(_("sidemenu.update_bad_file"));
+	}
+
+	ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
+
+	// Markdown content
+	ImGui::SameLine();
+	ImGuiExtra::Markdown(m_updateStatus.changelog);
+
+	ImGui::NewLine();
+	// Purposeful empty SeparatorText for the thicker line
+	ImGui::SeparatorText("");
+}
+
 void SideMenu::Render(float width)
 {
-	// Language list
-	ImGui::PushItemWidth(width);
-	if (ImGui::BeginCombo("##", m_translations[m_languageId].displayName))
-	{
-		for (unsigned int i = 0; i < m_translations_count; ++i)
-		{
-			ImGui::PushID(&i);
-			if (ImGui::Selectable(m_translations[i].displayName, i == m_languageId)) {
-				if (Localization::LoadFile(m_translations[i].locale, true)) {
-					m_languageId = Localization::GetCurrLangId();
-					Settings::Set(SETTING_LANG_KEY, m_languageId);
-				}
-			}
-			ImGui::PopID();
-		}
-		ImGui::EndCombo();
+	if (ImGui::Button(_("sidemenu.settings"), ImVec2(width, 0))) {
+		m_settingsMenuOpen = true;
 	}
-	ImGui::PopItemWidth();
 
 	// Updating
 	ImGui::NewLine();
@@ -207,86 +367,25 @@ void SideMenu::Render(float width)
 
 	}
 
-	ImGui::TextUnformatted(_("sidemenu.vsync"));
-	char buf[2] = { '0' + m_vsync_setting , 0 };
-	ImGui::PushID(&m_vsync_setting);
-	if (ImGui::BeginCombo("##", buf))
-	{
-		for (unsigned int i = 0; i < 5; ++i)
-		{
-			ImGui::PushID(i);
-			buf[0] = '0' + i;
-			if (ImGui::Selectable(buf, i == m_vsync_setting)) {
-				m_vsync_setting = i;
-				glfwSwapInterval(i);
-				Settings::Set(SETTING_VSYNC_BUFFER_KEY, i);
-			}
-			ImGui::PopID();
-		}
-		ImGui::EndCombo();
-	}
-	ImGui::PopID();
-
 	// Update popup
 	if (m_updateStatus.programUpdateAvailable) {
 		ImGui::OpenPopup("ProgramUpdatePopup");
 		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(720, 720));
 	}
-
 	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
 	{
-		ImGui::TextUnformatted(_("sidemenu.update_explanation"));
-
-		// Controls
-		if (ImGui::Button(_("yes"))) {
-			if (DownloadProgramUpdate(&m_updateStatus, m_addresses, false)) {
-				*requestedUpdatePtr = true;
-			}
-			else {
-				m_updateFileInvalid = true;
-			}
-
-		}
-		ImGui::SameLine();
-		if (ImGui::Button(_("no")) || ImGui::IsKeyDown(ImGuiKey_Escape)) {
-			ImGui::CloseCurrentPopup();
-			m_updateStatus.programUpdateAvailable = false;
-		}
-
-		if (m_updateFileInvalid) {
-			ImGuiExtra_TextboxError(_("sidemenu.update_bad_file"));
-		}
-
-		ImGui::SeparatorText(m_updateStatus.tagNameSeparatorText.c_str());
-
-		// Markdown content
-		ImGui::SameLine();
-		ImGuiExtra::Markdown(m_updateStatus.changelog);
-
-		ImGui::NewLine();
-		// Purposeful empty SeparatorText for the thicker line
-		ImGui::SeparatorText("");
-
+		RenderChangelog();
 		ImGui::EndPopup();
 	}
 
-	
-	ImGui::Separator();
-	if (ImGui::Button(_("sidemenu.file_association"))) {
-		SetWindowsFileAssociation();
+	// Update popup
+	if (m_settingsMenuOpen) {
+		ImGui::OpenPopup("SettingsMenu");
+		ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(-1, -1));
 	}
-
+	if (ImGui::BeginPopupModal("SettingsMenu", &m_settingsMenuOpen))
 	{
-#ifdef BUILD_TYPE_DEBUG
-		// Automatic updates are disabled in debug builds
-		ImGuiExtra::DisableBlockIf __(true);
-#endif
-
-		if (ImGui::Checkbox(_("sidemenu.auto_update_check"), &m_auto_update_check)) {
-			Settings::Set(SETTING_AUTO_UPDATE_KEY, m_auto_update_check);
-		}
-		if (ImGui::Checkbox(_("sidemenu.auto_addr_update_check"), &m_auto_addr_update_check)) {
-			Settings::Set(SETTING_AUTO_ADDR_UPDATE_KEY, m_auto_addr_update_check);
-		}
+		RenderSettingsMenu();
+		ImGui::EndPopup();
 	}
 }

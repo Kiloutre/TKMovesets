@@ -22,10 +22,28 @@ struct s_updateStatus {
 class SideMenu
 {
 private:
-	// Currently selected lang ID
-	unsigned int m_languageId = 0;
 	// List of translations to display
 	const TranslationData* m_translations;
+	// Settings
+	struct {
+		// Currently selected lang ID
+		unsigned int m_languageId = 0;
+		// Vsync dropdown index
+		uint8_t m_vsync_setting;
+		// True if the settings menu is open
+		bool m_settingsMenuOpen = false;
+		// Extraction: Whether to overwrite moveset extracted with similar character names or use number suffixes
+		bool m_overwriteSameFilename;
+		// Whether to check for program updates at startup or not
+		bool m_auto_update_check;
+		// Whether to download address updates at startup or not
+		bool m_auto_addr_update_check;
+		// If true, force the current player move to end early
+		bool m_applyInstantly;
+		// If true, old unused movesets will be free whenever a new one is imported
+		bool m_freeUnusedMoveset;
+
+	};
 	// Amount of translations
 	unsigned int m_translations_count;
 	// PTR to addresses file
@@ -34,12 +52,11 @@ private:
 	s_updateStatus m_updateStatus;
 	// If true, there has been an error with the update file
 	bool m_updateFileInvalid = false;
-	// Vsync dropdown index
-	uint8_t m_vsync_setting;
-	// 
-	bool m_auto_update_check;
-	bool m_auto_addr_update_check;
 
+	// Render the changelog that displays when a new update has been detected
+	void RenderChangelog();
+	// Render the settings menu 
+	void RenderSettingsMenu();
 	// Start a thread that will check for updates
 	void RequestCheckForUpdates();
 	// Make a HTTP request to check for a possible new release or more

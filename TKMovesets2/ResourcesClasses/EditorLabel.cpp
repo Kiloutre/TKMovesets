@@ -10,6 +10,7 @@
 #include "Games.hpp"
 #include "EditorLabel.hpp"
 #include "Helpers.hpp"
+#include "Settings.hpp"
 
 #include "constants.h"
 
