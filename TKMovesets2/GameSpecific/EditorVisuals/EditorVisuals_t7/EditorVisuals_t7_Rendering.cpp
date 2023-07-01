@@ -222,7 +222,7 @@ void EditorVisuals_T7::RenderStatusBar()
 			{
 				auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
 
-				if (gameInfo->importer != nullptr) {
+				if (gameInfo->importer != nullptr && gameInfo->SupportsGameImport(m_loadedCharacter.gameId)) {
 					if (ImGui::Selectable(gameInfo->name, currentGame == gameInfo, 0, ImVec2(100.0f, 0))) {
 						m_importerHelper->SetTargetProcess(gameInfo);
 						if (gameInfo->onlineHandler != nullptr) {
@@ -283,8 +283,9 @@ void EditorVisuals_T7::RenderStatusBar()
 	// Import button
 	ImGui::SameLine();
 	bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && m_importNeeded;
-	bool isMovesetCompatible = m_importerHelper->currentGame->SupportsGameImport(m_loadedCharacter.gameId);
-	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
+	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport))
+	{
+		ImportToPlayer(-2);
 		m_importerHelper->lastLoadedMoveset = 0;
 
 		uint64_t movesetSize;

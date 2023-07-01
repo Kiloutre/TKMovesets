@@ -47,6 +47,9 @@ private:
 	// Called when a specific shortcut is detected
 	void OnKeyboardShortcut(const std::string& identifier) override;
 
+	// Imports a moveset to a specific player. -1 for both players, -2 for the currently selected player
+	void ImportToPlayer(int playerid);
+
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorVisualsT7::EditorMovelistFilter_ filter);
 	// Returns true if our allocated moveset is still loaded on our character, in-game

@@ -99,17 +99,21 @@ namespace Settings
 		}
 
 		// Save keybinds
+		const auto& defaultKeybinds = Keybinds::GetDefaultKeybinds();
 		for (const auto& [identifier, keys] : Keybinds::GetKeybinds())
 		{
-			settingsFile.write(identifier.c_str(), identifier.size());
-			settingsFile.write(" = ", 3);
-
-			for (auto cursor = keys.begin();;)
+			if (Keybinds::DifferFromDefault(defaultKeybinds, identifier, keys))
 			{
-				settingsFile << *cursor;
-				++cursor;
-				if (cursor == keys.end()) break;
-				settingsFile << ";";
+				settingsFile.write(identifier.c_str(), identifier.size());
+				settingsFile.write(" = ", 3);
+
+				for (auto cursor = keys.begin();;)
+				{
+					settingsFile << *cursor;
+					++cursor;
+					if (cursor == keys.end()) break;
+					settingsFile << ";";
+				}
 			}
 		}
 	}

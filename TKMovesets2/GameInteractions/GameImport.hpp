@@ -57,6 +57,8 @@ public:
 	virtual void QueueCharacterImportation(std::wstring filename, ImportSettings settings=0);
 	// Queue a character importation from moveset data.
 	virtual void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
+	virtual void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
+	virtual void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
 	// Returns the moveset address of the currently selected player

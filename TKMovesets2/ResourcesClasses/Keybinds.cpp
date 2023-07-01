@@ -2,18 +2,35 @@
 
 #include "constants.h"
 
-std::map<std::string, std::vector<ImGuiKey>> g_keybinds;
+s_Keybinds g_keybinds;
 
 namespace Keybinds
 {
-	void ApplyDefaultKeybinds()
+	s_Keybinds GetDefaultKeybinds()
 	{
-		g_keybinds.clear();
+		s_Keybinds keybinds;
 
 		// https://github.com/ocornut/imgui/blob/docking/imgui.h -> enum ImGuiKey : int
-		g_keybinds["keybind_test"] = std::vector<ImGuiKey>{ ImGuiKey_LeftCtrl, ImGuiKey_A };
+		keybinds["keybind_editor.import_p1"] = { ImGuiKey_F1 };
+		keybinds["keybind_editor.import_p2"] = { ImGuiKey_F2 };
+		keybinds["keybind_editor.import_both"] = { ImGuiKey_F3 };
 
-		DEBUG_LOG("%llu\n", g_keybinds["keybind_test"].size());
+		return keybinds;
+	}
+
+	bool DifferFromDefault(const s_Keybinds& defaultKeybinds, const std::string& identifier, const std::vector<ImGuiKey>& keys)
+	{
+		auto item = defaultKeybinds.find(identifier);
+		if (item == defaultKeybinds.end()) return true;
+
+		const auto& orig_keys = item->second;
+
+		return orig_keys == keys;
+	}
+
+	void ApplyDefaultKeybinds()
+	{
+		g_keybinds = GetDefaultKeybinds();
 	}
 
 	const std::string* DetectKeybindPress()
@@ -43,7 +60,7 @@ namespace Keybinds
 		return nullptr;
 	}
 
-	std::map<std::string, std::vector<ImGuiKey>>& GetKeybinds()
+	const s_Keybinds& GetKeybinds()
 	{
 		return g_keybinds;
 	}

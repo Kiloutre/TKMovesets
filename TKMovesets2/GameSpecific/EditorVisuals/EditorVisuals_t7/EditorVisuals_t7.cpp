@@ -138,7 +138,56 @@ bool EditorVisuals_T7::MovesetStillLoaded()
 
 void EditorVisuals_T7::OnKeyboardShortcut(const std::string& identifier)
 {
-	//todo
+	if (identifier == "keybind_editor.import_p1")
+	{
+		bool isAttached = m_importerHelper->process.IsAttached();
+		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame;
+
+		if (canImport) {
+			ImportToPlayer(0);
+		}
+	}
+	else if (identifier == "keybind_editor.import_p2")
+	{
+		bool isAttached = m_importerHelper->process.IsAttached();
+		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame;
+
+		if (canImport) {
+			ImportToPlayer(1);
+		}
+	}
+	else if (identifier == "keybind_editor.import_both")
+	{
+		bool isAttached = m_importerHelper->process.IsAttached();
+		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame;
+
+		if (canImport) {
+			ImportToPlayer(-1);
+		}
+	}
+}
+
+void EditorVisuals_T7::ImportToPlayer(int playerid)
+{
+	DEBUG_LOG("ImportToPlayer %d\n", playerid);
+
+	m_importerHelper->lastLoadedMoveset = 0;
+
+	uint64_t movesetSize;
+	const Byte* moveset = m_editor->GetMoveset(movesetSize);
+
+	if (playerid == 0 || playerid == 1) {
+		m_importerHelper->QueueCharacterImportation(playerid, moveset, movesetSize, ImportSettings_DEFAULT);
+	}
+	else if (playerid == -2) {
+		m_importerHelper->QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT);
+	}
+	else {
+		m_importerHelper->QueueCharacterImportationOnBothPlayers(moveset, movesetSize, ImportSettings_DEFAULT);
+	}
+	m_editor->live_loadedMoveset = 0;
+	m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
+	m_importNeeded = false;
 }
 
 // -- Public methods -- //

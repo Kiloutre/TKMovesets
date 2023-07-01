@@ -114,6 +114,42 @@ bool GameImport::IsBusy() const
 	return m_plannedImportations.size() > 0;
 }
 
+void GameImport::QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
+{
+	// It is safe to call this function even while an extraction is ongoing
+	gameAddr playerAddress_1 = m_importer->GetCharacterAddress(currentPlayerId);
+	gameAddr playerAddress_2 = m_importer->GetCharacterAddress(!currentPlayerId);
+
+	m_plannedImportations.push_back({
+		.moveset = moveset,
+		.movesetSize = movesetSize,
+		.filename = L"",
+		.playerAddress = playerAddress_1,
+		.settings = settings
+		});
+
+	m_plannedImportations.push_back({
+		.moveset = moveset,
+		.movesetSize = movesetSize,
+		.filename = L"",
+		.playerAddress = playerAddress_2,
+		.settings = settings
+		});
+}
+
+void GameImport::QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
+{
+	// It is safe to call this function even while an extraction is ongoing
+	gameAddr playerAddress = m_importer->GetCharacterAddress(playerid);
+	m_plannedImportations.push_back({
+		.moveset = moveset,
+		.movesetSize = movesetSize,
+		.filename = L"",
+		.playerAddress = playerAddress,
+		.settings = settings
+		});
+}
+
 void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
 {
 	// It is safe to call this function even while an extraction is ongoing
@@ -124,7 +160,7 @@ void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t moveset
 		.filename = L"",
 		.playerAddress = playerAddress,
 		.settings = settings
-	});
+		});
 }
 
 void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings settings)
