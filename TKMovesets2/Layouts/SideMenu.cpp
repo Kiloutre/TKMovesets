@@ -12,6 +12,21 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 // -- Static helpers -- //
 
+// Detects keypresses for setting keybind 
+static void DetectKeypresses(s_Keybind& out)
+{
+	for (int k = ImGuiKey_NamedKey_BEGIN; k < ImGuiKey_NamedKey_END; ++k)
+	{
+		ImGuiKey _k = (ImGuiKey)k;
+		if (ImGui::IsKeyPressed(_k, false) && !out.contains(_k) && !Keybinds::IsForbiddenKey(_k))
+		{
+			// Found new key
+			out.insert(_k);
+		}
+	}
+}
+
+//Sets UTF-8 registry value
 static void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue)
 {
 	HKEY hkey;
@@ -64,6 +79,7 @@ static void RegSet(HKEY hkeyHive, const char* pszVar, const char* pszValue)
 	RegCloseKey(hkey);
 }
 
+//Sets UTF-32 registry value
 static void RegSetW(HKEY hkeyHive, const wchar_t* pszVar, const wchar_t* pszValue)
 {
 	HKEY hkey;
@@ -142,6 +158,8 @@ static void SetWindowsFileAssociation()
 
 SideMenu::SideMenu()
 {
+	m_keybinds = &Keybinds::GetKeybinds();
+
 #ifdef BUILD_TYPE_DEBUG
 	m_auto_update_check = false;
 	m_auto_addr_update_check = false;
@@ -293,8 +311,85 @@ void SideMenu::RenderSettingsMenu()
 		ImGui::EndTable();
 	}
 
+
+	ImGui::SeparatorText(_("settings.keybinds"));
+	if (ImGui::BeginTable("KeybindsSettingsTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoHostExtendY, ImVec2(0, 300)))
+	{
+
+		bool row_end = true;
+		auto key_cursor = m_keybinds->begin();
+		for (unsigned int i = 0; i < m_keybinds->size(); ++i)
+		{
+			auto& [identifier, keys] = *key_cursor;
+
+			if (row_end) {
+				ImGui::TableNextRow();
+			}
+			row_end = !row_end;
+			ImGui::TableNextColumn();
+
+			ImGui::TextUnformatted(identifier.c_str());
+			std::string t;
+			for (auto& k : keys) {
+				t += ImGui::GetKeyName(k);
+			}
+
+			if (m_rebindingIndex == i)
+			{
+				std::string keys_text;
+				for (auto k : m_currentBindingKeys)
+				{
+					if (keys_text.size() != 0) {
+						keys_text += " + ";
+					}
+					keys_text += ImGui::GetKeyName(k);
+				}
+				ImGui::TextUnformatted(keys_text.c_str());
+			}
+			else {
+				std::string keys_text;
+				for (auto k : keys)
+				{
+					if (keys_text.size() != 0) {
+						keys_text += " + ";
+					}
+					keys_text += ImGui::GetKeyName(k);
+				}
+				if (ImGuiExtra::RenderButtonEnabled(keys_text.c_str(), m_rebindingIndex == -1)) {
+					m_currentBindingKeys.clear();
+					m_rebindingIndex = i;
+				}
+			}
+
+			std::advance(key_cursor, 1);
+		}
+
+		ImGui::EndTable();
+	}
+
+	ImGui::Separator();
+	if (ImGuiExtra::RenderButtonEnabled(_("settings.reset_keybinds"), m_rebindingIndex == -1)) {
+		Keybinds::ApplyDefaultKeybinds();
+	}
+
+	if (m_rebindingIndex != -1)
+	{
+		ImGui::SameLine();
+		if (ImGui::Button(_("settings.finish_keybind")))
+		{
+			auto key_cursor = m_keybinds->begin();
+			std::advance(key_cursor, m_rebindingIndex);
+			key_cursor->second = m_currentBindingKeys;
+			m_rebindingIndex = -1;
+		}
+		else {
+			// Only detect keypresses after allowing detecting keybinds end
+			DetectKeypresses(m_currentBindingKeys);
+		}
+	}
+
 	ImGui::SeparatorText("");
-	if (ImGui::Button(_("close")))
+	if (ImGuiExtra::RenderButtonEnabled(_("close"), m_rebindingIndex == -1))
 	{
 		ImGui::CloseCurrentPopup();
 		m_settingsMenuOpen = false;

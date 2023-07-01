@@ -5,6 +5,7 @@
 
 #include "GameAddressesFile.hpp"
 #include "Localization.hpp"
+#include "Keybinds.hpp"
 
 struct s_updateStatus {
 	bool error = false;
@@ -43,6 +44,11 @@ private:
 		// If true, old unused movesets will be free whenever a new one is imported
 		bool m_freeUnusedMoveset;
 
+		// >= 0 if we are currently rebinding a key. -1 is not.
+		int m_rebindingIndex = -1;
+		// Keys of the current ongoing binding
+		s_Keybind m_currentBindingKeys;
+
 	};
 	// Amount of translations
 	unsigned int m_translations_count;
@@ -52,6 +58,8 @@ private:
 	s_updateStatus m_updateStatus;
 	// If true, there has been an error with the update file
 	bool m_updateFileInvalid = false;
+	// List of keybinds
+	s_Keybinds* m_keybinds;
 
 	// Render the changelog that displays when a new update has been detected
 	void RenderChangelog();

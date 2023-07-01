@@ -93,6 +93,14 @@ settings.free_unused_movesets_explanation = If turned on, movesets that were pre
 settings.exportation = Export settings
 settings.overwrite_duplicate = Overwrite moveset with same name
 settings.overwrite_explanation = Enable to overwrite moveset with same names.\nDisable to have name conflicts resolved with number suffixes.\nEx: T7_JIN (2)
+settings.keybinds = Keybinds
+settings.keybind_rebind = Rebind
+settings.reset_keybinds = Reset keybinds
+settings.finish_keybind = Finish keybind
+
+keybind_editor.import_p1 = Import on P1
+keybind_editor.import_p2 = Import on P2
+keybind_editor.import_both = Import on P1 & P2
 
 sidemenu.settings = Settings
 sidemenu.up_to_date = Up to date

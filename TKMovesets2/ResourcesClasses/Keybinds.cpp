@@ -6,6 +6,18 @@ s_Keybinds g_keybinds;
 
 namespace Keybinds
 {
+	bool IsForbiddenKey(ImGuiKey k)
+	{
+		switch (k)
+		{
+		case ImGuiKey_MouseLeft:
+		case ImGuiKey_MouseRight:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	s_Keybinds GetDefaultKeybinds()
 	{
 		s_Keybinds keybinds;
@@ -18,7 +30,7 @@ namespace Keybinds
 		return keybinds;
 	}
 
-	bool DifferFromDefault(const s_Keybinds& defaultKeybinds, const std::string& identifier, const std::vector<ImGuiKey>& keys)
+	bool DifferFromDefault(const s_Keybinds& defaultKeybinds, const std::string& identifier, const s_Keybind& keys)
 	{
 		auto item = defaultKeybinds.find(identifier);
 		if (item == defaultKeybinds.end()) return true;
@@ -60,14 +72,14 @@ namespace Keybinds
 		return nullptr;
 	}
 
-	const s_Keybinds& GetKeybinds()
+	s_Keybinds& GetKeybinds()
 	{
 		return g_keybinds;
 	}
 
 	void RegisterKeybind(const std::string& identifier, const std::string& keys)
 	{
-		std::vector<ImGuiKey> bind_keys;
+		s_Keybind bind_keys;
 
 		const char* prev_cursor = keys.c_str();
 		const char* cursor = strstr(prev_cursor, ",");
@@ -75,7 +87,12 @@ namespace Keybinds
 		while (cursor != nullptr)
 		{
 			ImGuiKey k = (ImGuiKey)atoi(prev_cursor);
-			bind_keys.push_back(k);
+			if (!bind_keys.contains(k)) {
+				bind_keys.insert(k);
+			}
+			else {
+				DEBUG_ERR("Keybind contains the same key multiple times.");
+			}
 			prev_cursor = cursor + 1;
 			cursor = strstr(prev_cursor, ",");
 		}

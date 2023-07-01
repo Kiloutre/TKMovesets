@@ -93,6 +93,15 @@ settings.free_unused_movesets_explanation = オンにすると、使用されて
 #settings.exportation =
 settings.overwrite_duplicate = 同じ名前のMovesetに上書きする
 settings.overwrite_explanation = 同じ名前の末尾に数字を加えたファイル名にするには無効にします。\n例:T7_JIN (2)
+#settings.keybinds =
+#settings.keybind_rebind =
+#settings.reset_keybinds =
+#settings.finish_keybind =
+
+#keybind_editor.import_p1 =
+#keybind_editor.import_p2 =
+#keybind_editor.import_both =
+
 
 #sidemenu.settings = 
 sidemenu.up_to_date = 最新

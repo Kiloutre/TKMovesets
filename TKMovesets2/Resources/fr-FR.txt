@@ -93,6 +93,14 @@ settings.free_unused_movesets_explanation = Si activé, les personnages ancienne
 settings.exportation = Paramètres d'exportation
 settings.overwrite_duplicate = Écraser les personnages avec un nom identique
 settings.overwrite_explanation = Activer pour écraser les personnages présents si ceux extraits ont le même nom.\nDésactiver pour que le conflit de nom soit résolu avec des suffixes.\nExemple: T7_JIN (2)
+settings.keybinds = Raccourcis clavier
+settings.keybind_rebind = Modifier
+settings.reset_keybinds = Réinitialiser les raccourcis
+settings.finish_keybind = Terminer le raccourci
+
+keybind_editor.import_p1 = Importer sur J1
+keybind_editor.import_p2 = Importer sur J2
+keybind_editor.import_both = Importer sur J1 & J2
 
 sidemenu.settings = Paramètres
 sidemenu.up_to_date = À jour
