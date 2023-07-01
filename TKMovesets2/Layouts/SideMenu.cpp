@@ -328,7 +328,7 @@ void SideMenu::RenderSettingsMenu()
 			row_end = !row_end;
 			ImGui::TableNextColumn();
 
-			ImGui::TextUnformatted(identifier.c_str());
+			ImGui::TextUnformatted(_(identifier.c_str()));
 			std::string t;
 			for (auto& k : keys) {
 				t += ImGui::GetKeyName(k);
