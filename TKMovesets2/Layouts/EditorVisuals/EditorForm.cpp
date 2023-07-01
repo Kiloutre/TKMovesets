@@ -351,7 +351,7 @@ void EditorForm::RenderInternal()
 	}
 }
 
-void EditorForm::Render()
+void EditorForm::Render(bool parent_window_focused)
 {
 	if (setFocus) {
 		ImGui::SetNextWindowFocus();
@@ -370,6 +370,7 @@ void EditorForm::Render()
 	ImGui::PushID(structureId);
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, unsavedChanges ? ImGuiWindowFlags_UnsavedDocument : 0))
 	{
+		windowFocused = ImGui::IsWindowFocused();
 		m_winInfo.pos = ImGui::GetWindowPos();
 		m_winInfo.size = ImGui::GetWindowSize();
 
@@ -418,7 +419,7 @@ void EditorForm::Render()
 			}
 
 			// Open popup on right click
-			if (IsWindowRightClicked()) {
+			if (parent_window_focused && IsWindowRightClicked()) {
 				ImGui::OpenPopup("ContextMenuPopup");
 			}
 

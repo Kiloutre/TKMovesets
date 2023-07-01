@@ -129,6 +129,8 @@ public:
 	bool uniqueType = false;
 	// Set to true before pasting in order for the field's visual to be updated
 	bool moveFocusAway = false;
+	// True if this current form's window is focused. Used to know if an editor window or its children have focus / right click behaviour.
+	bool windowFocused = false;
 
 	EditorForm() {};
 	EditorForm(const std::string& parentWindowName, EditorWindowType windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName);
@@ -138,5 +140,5 @@ public:
 	virtual void OnInitEnd() {};
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
 	virtual void RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd) {};
-	void Render();
+	void Render(bool parent_window_focused);
 };

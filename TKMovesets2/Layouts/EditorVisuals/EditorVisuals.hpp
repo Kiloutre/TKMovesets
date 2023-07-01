@@ -98,6 +98,8 @@ protected:
 		// Maximum amount of auto-saves
 		const unsigned int m_maxAutoSaves = 5;
 	};
+	// True if the current editor window or its children have focused. Used for proper handling of right click behaviour.
+	bool m_windowFocused = false;
 
 	// Render each created subwindows
 	void RenderSubwindows();

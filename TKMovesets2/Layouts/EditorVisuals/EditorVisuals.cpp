@@ -324,6 +324,8 @@ void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, 
 
 void EditorVisuals::RenderSubwindows()
 {
+	bool window_focused = false;
+
 	for (size_t i = 0; i < m_structWindows.size();)
 	{
 		EditorForm* moveWin = m_structWindows[i];
@@ -338,7 +340,10 @@ void EditorVisuals::RenderSubwindows()
 
 		if (moveWin->popen)
 		{
-			moveWin->Render();
+			moveWin->Render(m_windowFocused);
+			if (moveWin->windowFocused) {
+				window_focused = true;
+			}
 
 			if (moveWin->moveFocusAway) {
 				moveWin->moveFocusAway = false;
@@ -352,6 +357,8 @@ void EditorVisuals::RenderSubwindows()
 			delete moveWin;
 		}
 	}
+
+	m_windowFocused = window_focused;
 }
 
 void EditorVisuals::DetectKeyboardShortcuts()
