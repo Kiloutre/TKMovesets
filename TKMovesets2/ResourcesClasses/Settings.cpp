@@ -90,12 +90,8 @@ namespace Settings
 		std::ofstream settingsFile(SETTINGS_FILE);
 		
 		// Save settings
-		for (const auto& [key, value] : g_settings)
-		{
-			settingsFile.write(key.c_str(), key.size());
-			settingsFile.write(" = ", 3);
-			settingsFile.write(value.c_str(), value.size());
-			settingsFile.write("\n", 1);
+		for (const auto& [key, value] : g_settings) {
+			settingsFile << key << " = " << value << "\n";
 		}
 
 		// Save keybinds
@@ -104,8 +100,7 @@ namespace Settings
 		{
 			if (Keybinds::DifferFromDefault(defaultKeybinds, identifier, keys))
 			{
-				settingsFile.write(identifier.c_str(), identifier.size());
-				settingsFile.write(" = ", 3);
+				settingsFile << identifier << " = ";
 
 				for (auto cursor = keys.begin();;)
 				{
@@ -114,6 +109,7 @@ namespace Settings
 					if (cursor == keys.end()) break;
 					settingsFile << ";";
 				}
+				settingsFile << "\n";
 			}
 		}
 	}

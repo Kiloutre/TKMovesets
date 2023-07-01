@@ -25,7 +25,7 @@ namespace Keybinds
 
 		const auto& orig_keys = item->second;
 
-		return orig_keys == keys;
+		return orig_keys != keys;
 	}
 
 	void ApplyDefaultKeybinds()

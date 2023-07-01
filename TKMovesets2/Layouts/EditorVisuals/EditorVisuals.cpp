@@ -326,7 +326,7 @@ void EditorVisuals::IssueFieldUpdate(EditorWindowType winType, int valueChange, 
 
 void EditorVisuals::RenderSubwindows()
 {
-	bool window_focused = false;
+	bool window_focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
 	for (size_t i = 0; i < m_structWindows.size();)
 	{
