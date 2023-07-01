@@ -566,9 +566,9 @@ namespace TTT2_T7_Aliases
 {
 	bool ApplyBasicPropertyAlias(uint32_t& property)
 	{
+		/*
 		switch (property)
 		{
-			/*
 			* This is already properly handled
 		case 0x82DB:
 			property = 0x842E;
@@ -576,10 +576,10 @@ namespace TTT2_T7_Aliases
 		case 0x82DC:
 			property = 0x842f;
 			break;
-			*/
 		default:
 			return false;
 		}
+			*/
 		return true;
 	}
 

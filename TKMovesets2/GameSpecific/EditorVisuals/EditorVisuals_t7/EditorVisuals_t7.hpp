@@ -45,7 +45,7 @@ private:
 	void PopulateWindowCreatorMap() override;
 
 	// Called when a specific shortcut is detected
-	void OnKeyboardShortcut() override;
+	void OnKeyboardShortcut(const std::string& identifier) override;
 
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorVisualsT7::EditorMovelistFilter_ filter);

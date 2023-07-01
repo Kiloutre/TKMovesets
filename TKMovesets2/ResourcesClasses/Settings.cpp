@@ -1,8 +1,8 @@
 ﻿#include <fstream>
-#include <map>
 #include <sstream>
 
 #include "Settings.hpp"
+#include "Keybinds.hpp"
 #include "Helpers.hpp"
 
 #include "constants.h"
@@ -13,10 +13,13 @@ namespace Settings
 {
 	const std::map<std::string, std::string>& GetSettingsMap() {
 		return g_settings;
-	}	
+	}
 
 	bool LoadFile()
 	{
+		Keybinds::ApplyDefaultKeybinds();
+		auto& keybinds = Keybinds::GetKeybinds();
+
 		std::ifstream settingsFile(SETTINGS_FILE);
 		std::string line;
 
@@ -66,8 +69,15 @@ namespace Settings
 					newlinePos++;
 				}
 			}
-
-			g_settings[key] = value;
+			
+			if (key.starts_with("keybind_")) {
+				// Load keybind in its own dict
+				Keybinds::RegisterKeybind(key, value);
+			}
+			else {
+				// Load setting in dict
+				g_settings[key] = value;
+			}
 		}
 
 
@@ -78,13 +88,29 @@ namespace Settings
 	void SaveSettingsFile()
 	{
 		std::ofstream settingsFile(SETTINGS_FILE);
-
+		
+		// Save settings
 		for (const auto& [key, value] : g_settings)
 		{
 			settingsFile.write(key.c_str(), key.size());
 			settingsFile.write(" = ", 3);
 			settingsFile.write(value.c_str(), value.size());
 			settingsFile.write("\n", 1);
+		}
+
+		// Save keybinds
+		for (const auto& [identifier, keys] : Keybinds::GetKeybinds())
+		{
+			settingsFile.write(identifier.c_str(), identifier.size());
+			settingsFile.write(" = ", 3);
+
+			for (auto cursor = keys.begin();;)
+			{
+				settingsFile << *cursor;
+				++cursor;
+				if (cursor == keys.end()) break;
+				settingsFile << ";";
+			}
 		}
 	}
 

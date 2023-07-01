@@ -112,7 +112,7 @@ protected:
 	virtual void RenderGameSpecific(int dockid) = 0;
 	// Detect keyboard shortcuts
 	void DetectKeyboardShortcuts();
-	virtual void OnKeyboardShortcut() = 0;
+	virtual void OnKeyboardShortcut(const std::string& identifier) = 0;
 
 	// Save the loaded moveset to a file
 	void Save();

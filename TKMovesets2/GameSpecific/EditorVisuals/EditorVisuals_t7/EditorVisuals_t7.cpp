@@ -136,7 +136,7 @@ bool EditorVisuals_T7::MovesetStillLoaded()
 	return movesetAddress == m_loadedMoveset;
 }
 
-void EditorVisuals_T7::OnKeyboardShortcut()
+void EditorVisuals_T7::OnKeyboardShortcut(const std::string& identifier)
 {
 	//todo
 }

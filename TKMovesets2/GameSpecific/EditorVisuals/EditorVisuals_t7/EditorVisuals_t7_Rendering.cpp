@@ -518,7 +518,7 @@ void EditorVisuals_T7::RenderGameSpecific(int dockid)
 
 	if (ImGui::Begin(m_windowTitle.c_str(), &popen, windowFlags))
 	{
-		if (ImGui::IsWindowFocused()) {
+		if (m_windowFocused) {
 			DetectKeyboardShortcuts();
 		}
 

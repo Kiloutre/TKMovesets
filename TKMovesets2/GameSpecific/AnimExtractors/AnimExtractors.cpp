@@ -80,7 +80,7 @@ namespace AnimExtractor
             } catch(const std::exception&)
             {
 				extractionStatus.status = AnimExtractionStatus_Error;
-				DEBUG_ERR("'%S': Moveset error", m.filename);
+				DEBUG_ERR("'%S': Moveset error", m.filename.c_str());
 				continue;
             }
 
@@ -88,7 +88,7 @@ namespace AnimExtractor
 			{
 				// Skip converted movesets
 				extractionStatus.status = AnimExtractionStatus_Skipped;
-				DEBUG_LOG("'%S': Converted moveset: skipping\n", m.filename);
+				DEBUG_LOG("'%S': Converted moveset: skipping\n", m.filename.c_str());
 			}
 			else
 			{
@@ -103,7 +103,7 @@ namespace AnimExtractor
 					delete[] orig_moveset;
 
 					if (moveset == nullptr) {
-						DEBUG_ERR("Failed decompress moveset '%S''", m.filename);
+						DEBUG_ERR("Failed decompress moveset '%S'", m.filename.c_str());
 						extractionStatus.status = AnimExtractionStatus_Error;
 						continue;
 					}

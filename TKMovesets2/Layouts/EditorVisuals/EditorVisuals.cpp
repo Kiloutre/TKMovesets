@@ -9,6 +9,8 @@
 #include "helpers.hpp"
 #include "EditorVisuals.hpp"
 #include "GameSharedMem.hpp"
+#include "Keybinds.hpp"
+
 // Structures
 
 // -- Private methods -- //
@@ -363,7 +365,10 @@ void EditorVisuals::RenderSubwindows()
 
 void EditorVisuals::DetectKeyboardShortcuts()
 {
-	//todo
+	const std::string* identifier = Keybinds::DetectKeybindPress();
+	if (identifier != nullptr) {
+		OnKeyboardShortcut(*identifier);
+	}
 }
 
 void EditorVisuals::Render(int dockid)
