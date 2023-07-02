@@ -3,7 +3,7 @@
 Tekken mods page:
 https://tekkenmods.com/mod/2429/tkmovesets2
 
-# TKMovesets2 0.6 - Moveset export / import /edit
+# TKMovesets2 0.9 - Moveset export / import /edit
 
 This project is a work in progress and is still lacking many features.
 
