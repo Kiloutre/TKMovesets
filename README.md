@@ -11,8 +11,8 @@ This project is a work in progress and is still lacking many features.
 Tool aimed at replacing and surpassing the old TekkenMovesetExtractor. Extract movesets, edit them to your liking and re-import them on the characters you want.
 The importation is memory based: it does not modify the game files, does not stay after closing the game, and **causes desyncs online if the opponent does not have this tool also running.**
 
-Because this is an early version, so far only Tekken 7 is supported. Online play is supported, but requires the opponent to have this tool.
-The tool is tailored for the latest Tekken 7 version. It can be modified to work with older versions, but won't support them right out of the box.
+For moveset importation, only T7 is supported. Online play is supported, but requires the opponent to have this tool.
+The tool is tailored for the latest Tekken 7 version. It can be modified to work with older versions (*game_addresses.ini*), but won't support them right out of the box.
 
 # Feature set:
 ## - Extractor
@@ -33,6 +33,7 @@ The tool is tailored for the latest Tekken 7 version. It can be modified to work
 - Modify displayed move list in training mode
 - Import animations from other characters
 - Import a moveset and edit it live: small changes made to the moveset are instantly mirrored in-game
+- Keybinds for pre-configured actions such as quick import, more in the future
 
 #### Other
 - Support for multiple translations (help wanted!), for now English, Japanese & French are supported
