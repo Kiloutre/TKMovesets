@@ -105,7 +105,7 @@ namespace Settings
 				for (auto cursor = keys.begin();;)
 				{
 					settingsFile << *cursor;
-					++cursor;
+					std::advance(cursor, 1);
 					if (cursor == keys.end()) break;
 					settingsFile << ";";
 				}

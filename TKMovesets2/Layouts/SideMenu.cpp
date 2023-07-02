@@ -370,6 +370,7 @@ void SideMenu::RenderSettingsMenu()
 	ImGui::Separator();
 	if (ImGuiExtra::RenderButtonEnabled(_("settings.reset_keybinds"), m_rebindingIndex == -1)) {
 		Keybinds::ApplyDefaultKeybinds();
+		Settings::SaveSettingsFile();
 	}
 
 	if (m_rebindingIndex != -1)
@@ -381,6 +382,7 @@ void SideMenu::RenderSettingsMenu()
 			std::advance(key_cursor, m_rebindingIndex);
 			key_cursor->second = m_currentBindingKeys;
 			m_rebindingIndex = -1;
+			Settings::SaveSettingsFile();
 		}
 		else {
 			// Only detect keypresses after allowing detecting keybinds end

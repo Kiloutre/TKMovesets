@@ -37,4 +37,7 @@ namespace Settings
 	void Set(const char* c_stringId, bool value);
 	// Sets a string setting
 	void Set(const char* c_stringId, const char* value);
+
+	// Save all the settings in the settings file (rewriting it from scratch)
+	void SaveSettingsFile();
 }

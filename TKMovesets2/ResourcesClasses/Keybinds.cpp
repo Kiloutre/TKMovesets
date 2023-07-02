@@ -14,7 +14,7 @@ namespace Keybinds
 		case ImGuiKey_MouseRight:
 			return true;
 		default:
-			return false;
+			return !(ImGuiKey_NamedKey_BEGIN <= k && k <= ImGuiKey_NamedKey_END);
 		}
 	}
 
@@ -42,6 +42,7 @@ namespace Keybinds
 
 	void ApplyDefaultKeybinds()
 	{
+		DEBUG_LOG("ApplyDefaultKeybinds\n");
 		g_keybinds = GetDefaultKeybinds();
 	}
 
@@ -79,22 +80,31 @@ namespace Keybinds
 
 	void RegisterKeybind(const std::string& identifier, const std::string& keys)
 	{
+		DEBUG_LOG("RegisterKeybind '%s' '%s'\n", identifier.c_str(), keys.c_str());
 		s_Keybind bind_keys;
 
 		const char* prev_cursor = keys.c_str();
-		const char* cursor = strstr(prev_cursor, ",");
+		const char* cursor = strstr(prev_cursor, ";");
 
 		while (cursor != nullptr)
 		{
 			ImGuiKey k = (ImGuiKey)atoi(prev_cursor);
-			if (!bind_keys.contains(k)) {
+			if (!bind_keys.contains(k) && !IsForbiddenKey(k)) {
 				bind_keys.insert(k);
 			}
 			else {
-				DEBUG_ERR("Keybind contains the same key multiple times.");
+				DEBUG_ERR("Keybind contains the same key multiple times OR forbidden key. (%u)", k);
 			}
 			prev_cursor = cursor + 1;
-			cursor = strstr(prev_cursor, ",");
+			cursor = strstr(prev_cursor, ";");
+		}
+
+		ImGuiKey k = (ImGuiKey)atoi(prev_cursor);
+		if (!IsForbiddenKey(k)) {
+			bind_keys.insert(k);
+		}
+		else {
+			DEBUG_ERR("Keybind contains forbidden key '%u'.", k);
 		}
 
 		if (bind_keys.size() != 0) {
