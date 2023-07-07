@@ -580,7 +580,7 @@ namespace TTT2_T7_Aliases
 			return false;
 		}
 			*/
-		return true;
+		return false;
 	}
 
 	Byte OddHitboxByte(Byte value)
