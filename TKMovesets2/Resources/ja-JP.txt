@@ -93,14 +93,14 @@ settings.free_unused_movesets_explanation = オンにすると、使用されて
 settings.exportation = エクスポート設定
 settings.overwrite_duplicate = 同じ名前のMovesetに上書きする
 settings.overwrite_explanation = 同じ名前の末尾に数字を加えたファイル名にするには無効にします。\n例:T7_JIN (2)
-#settings.keybinds = ######################    I will translate this part after using the new TKMovesets.  ###################
-#settings.keybind_rebind =
-#settings.reset_keybinds = 
+settings.keybinds = ショートカットキー設定
+settings.keybind_rebind = ショートカットキー再設定
+settings.reset_keybinds = ショートカットキーリセット
 
-#settings.finish_keybind = 
-#keybind_editor.import_p1 =
-#keybind_editor.import_p2 =
-#keybind_editor.import_both = ################################################################################################
+settings.finish_keybind = 設定する
+keybind_editor.import_p1 = p1のインポートショートカットキー
+keybind_editor.import_p2 = p2のインポートショートカットキー
+keybind_editor.import_both = p1とp2のインポートショートカットキー
 
 
 sidemenu.settings = サイドメニュー設定
