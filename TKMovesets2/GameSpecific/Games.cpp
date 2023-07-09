@@ -199,7 +199,7 @@ const GameInfo cg_gamesInfo[] = {
 		.matchingProcessSubstrings = { "NPEA00019" }
 	},
 	{
-		.name = "Tekken 5 (PCSX2)",
+		.name = "Tekken 5 (PCSX2, NTSC)",
 		.processName = "pcsx2.exe",
 		.movesetNamePrefix = "T5_",
 		.gameId = GameId_T5,
@@ -218,7 +218,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = false,
-		.matchingProcessSubstrings = {}
+		.matchingProcessSubstrings = { " NTSC "		}
 	},
 };
 

@@ -771,6 +771,7 @@ ExtractionErrcode_ ExtractorT5::Extract(gameAddr playerAddress, ExtractSettings 
 	// Reads block containing names of moves and animations
 	gameAddr nameBlockStart;
 	nameBlock = CopyNameBlock(movesetAddr, s_nameBlock, movelist, table.moveCount, nameBlockStart);
+	progress = 68;
 
 	// Reads block containing basic moveset infos and aliases
 	CopyMovesetInfoBlock(movesetAddr, &movesetHeader);
