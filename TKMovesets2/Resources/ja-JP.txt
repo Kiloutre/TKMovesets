@@ -103,7 +103,7 @@ keybind_editor.import_p2 = p2のインポートショートカットキー
 keybind_editor.import_both = p1とp2のインポートショートカットキー
 
 
-sidemenu.settings = サイドメニュー設定
+sidemenu.settings = 設定
 sidemenu.up_to_date = 最新
 sidemenu.updated_addr = アドレスを更新しました!
 sidemenu.update_check = 更新を確認しています...
@@ -190,7 +190,7 @@ edition.explanation = ここではエクスポートしたMovesetを編集でき
 edition.select_moveset = 編集するMovesetを選択
 edition.last_saved = 最終保存日時:
 edition.save = 保存
-#edition.saving_error =
+edition.saving_error = 保存エラー
 edition.discard_changes = 変更を破棄しますか?\nライブ編集が有効中、保存していない場合は変更内容を失います。
 edition.process_err = エラー
 edition.live_edition = ライブ編集
