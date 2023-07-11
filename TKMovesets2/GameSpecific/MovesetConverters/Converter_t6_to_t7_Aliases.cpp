@@ -27,7 +27,7 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
  std::map<unsigned int, s_propAlias> MovesetConverter::T6ToT7::InitAliasDictionary()
 {
 	return std::map<unsigned int, s_propAlias> {
-        { 0, { .target_id = 0x8261 }},
+        { 0, { .target_id = 0 }},
         { 44, {.target_id = 47 } },
         { 45, {.target_id = 47 } },
         { 46, {.target_id = 48 } },
