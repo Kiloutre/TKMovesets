@@ -28,7 +28,7 @@ const auto cg_even_hitbox_aliases = std::map<Byte, Byte>{
 {
 	return std::map<unsigned int, s_propAlias> {
         { 0, { .target_id = 0 }},
-        { 44, {.target_id = 47 } },
+        { 44, {.target_id = 44 } },
         { 45, {.target_id = 47 } },
         { 46, {.target_id = 48 } },
         { 54, {.target_id = 66 } },
