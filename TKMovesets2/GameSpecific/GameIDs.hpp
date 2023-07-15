@@ -50,6 +50,7 @@ namespace GameVersions
 		{
 			RPCS3_BLES00635 = 0,
 			PPSSPP_ULUS10466,
+			RPCS3_BLUS30369,
 		};
 	}
 

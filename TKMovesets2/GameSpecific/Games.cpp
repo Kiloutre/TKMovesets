@@ -20,6 +20,7 @@
 
 const GameInfo cg_gamesInfo[] = {
 	{
+		// -- T8 -- //
 		.name = "Tekken 8 CNT",
 		.processName = "Tekken8.exe",
 		.movesetNamePrefix = "T8_",
@@ -41,6 +42,8 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = false,
 		.matchingProcessSubstrings = {}
 	},
+
+	// -- T7 -- //
 	{
 		.name = "Tekken 7",
 		.processName = "TekkenGame-Win64-Shipping.exe",
@@ -65,7 +68,7 @@ const GameInfo cg_gamesInfo[] = {
 	},
 	{
 		.separatorText = "Tekken Tag 2",
-		.name = "Tekken Tag 2 1.00 (RPCS3)",
+		.name = "Tekken Tag 2  1.00 RPCS3",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TTT2_",
 		.gameId = GameId_TTT2,
@@ -86,8 +89,10 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = true,
 		.matchingProcessSubstrings = { "BLES01702" }
 	},
+
+	// -- TTT2 -- //
 	{
-		.name = "Tekken Tag 2 1.03 (RPCS3)",
+		.name = "Tekken Tag 2  1.03 RPCS3",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TTT2_",
 		.gameId = GameId_TTT2,
@@ -108,8 +113,10 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = true,
 		.matchingProcessSubstrings = { "BLES01702" }
 	},
+
+	// -- TREV -- //
 	{
-		.name = "Tekken Revolution (RPCS3)",
+		.name = "Tekken Revolution RPCS3",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TREV_",
 		.gameId = GameId_TREV,
@@ -130,9 +137,11 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = true,
 		.matchingProcessSubstrings = { "NPEB01406" }
 	},
+
+	// -- T6 -- //
 	{
 		.separatorText = "Tekken 6",
-		.name = "Tekken 6 (RPCS3)",
+		.name = "Tekken 6  RPCS3 BLES00635 01.03",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "T6_",
 		.gameId = GameId_T6,
@@ -154,7 +163,7 @@ const GameInfo cg_gamesInfo[] = {
 		.matchingProcessSubstrings = { "BLES00635" }
 	},
 	{
-		.name = "Tekken 6 (PPSSPP)",
+		.name = "Tekken 6  PPSSPP",
 		.processName = "PPSSPPWindows64.exe",
 		.movesetNamePrefix = "T6_",
 		.gameId = GameId_T6,
@@ -175,9 +184,11 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = false,
 		.matchingProcessSubstrings = {}
 	},
+
+	// -- T5 -- //
 	{
 		.separatorText = "Tekken 5",
-		.name = "Tekken 5 DR (RPCS3)",
+		.name = "Tekken 5 DR  RPCS3",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "T5_",
 		.gameId = GameId_T5,
@@ -199,7 +210,7 @@ const GameInfo cg_gamesInfo[] = {
 		.matchingProcessSubstrings = { "NPEA00019" }
 	},
 	{
-		.name = "Tekken 5 (PCSX2, NTSC)",
+		.name = "Tekken 5  PCSX2 NTSC",
 		.processName = "pcsx2.exe",
 		.movesetNamePrefix = "T5_",
 		.gameId = GameId_T5,
@@ -218,7 +229,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetPCSX2BaseAddr,
 		.bigEndian = false,
-		.matchingProcessSubstrings = { " NTSC "		}
+		.matchingProcessSubstrings = { " NTSC "	}
 	},
 };
 

@@ -103,23 +103,23 @@ struct GameInfo
 
 	bool SupportsGameImport(uint16_t t_gameId) const
 	{
-		return this != nullptr && (gameId == t_gameId || supportedImports.contains(t_gameId));
+		return this && (gameId == t_gameId || supportedImports.contains(t_gameId));
 	}
 
 
 	bool SupportsOnlineGameImport(uint16_t t_gameId) const
 	{
-		return this != nullptr && (gameId == t_gameId || supportedOnlineImports.contains(t_gameId));
+		return this && (gameId == t_gameId || supportedOnlineImports.contains(t_gameId));
 	}
 
 	bool IsEditable() const
 	{
-		return editorLogic != nullptr && editorVisuals != nullptr;
+		return this && editorLogic != nullptr && editorVisuals != nullptr;
 	}
 
 	bool MatchesProcessWindowName(DWORD pid) const
 	{
-		return matchingProcessSubstrings.size() == 0 || GameProcessUtils::FindWindowText(pid, matchingProcessSubstrings);
+		return this && matchingProcessSubstrings.size() == 0 || GameProcessUtils::FindWindowText(pid, matchingProcessSubstrings);
 	}
 };
 #pragma warning (pop)

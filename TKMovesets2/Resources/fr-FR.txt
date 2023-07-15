@@ -540,4 +540,4 @@ about.ali_explanation = Entre autres, a aidé à la rétro-ingénierie des struc
 about.fletch_explanation = A poussé l'édition de moveset à un niveau supérieur en documentant un nombre important de propriétéss et en créant de nombreux tutoriels et guides.
 about.koenji_explanation = À été un pionnier de la modification de moveset a trouvé de nombreuses techniques, en plus de contribuer à déchiffrer de nombreuses propriétés
 about.sadamitsu_explanation = A aidé à mieux comprendre les animations de différents types, comment elles étaient structurées et où elles étaient stockées
-about.dennis_stanistan_explanation = Sans le savoir,a  aidé par un message de discorde aléatoire qui a ensuite permis au premier extracteur de moveset de démarrer
+about.dennis_stanistan_explanation = Sans le savoir, a aidé par un message de discorde aléatoire qui a ensuite permis au premier extracteur de moveset de démarrer
