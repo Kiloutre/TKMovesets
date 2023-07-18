@@ -42,6 +42,18 @@ void TEditor_MoveReferences::LoadReferenceList(const TEditor* editor, unsigned i
 	}
 
 	m_references.reactions = editor->ListMoveReactionsReferences(moveid);
+	for (auto& reactions : m_references.reactions)
+	{
+		auto& situations_str = reactions.situations_str;
+		for (auto& situation_idx : reactions.situation_ids)
+		{
+			if (situations_str.size() > 0) {
+				situations_str += ", ";
+			}
+
+			situations_str += _(m_reactionLabels[situation_idx].c_str());
+		}
+	}
 
 	m_tabs.cancels = std::format("{} {}", m_references.cancels.size(), _("move_references.cancels"));
 	m_tabs.grouped_cancels = std::format("{} {}", m_references.grouped_cancels.size(), _("move_references.grouped_cancels"));
@@ -54,8 +66,10 @@ void TEditor_MoveReferences::RenderCancelsReferences()
 	const char* cancel_id = _("moveset.size_kb");
 	const char* animation_list__import = _("edition.animation_list.import");
 
-	if (ImGui::BeginTable("##", 5, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImGui::GetContentRegionAvail()))
+	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImGui::GetContentRegionAvail()))
 	{
+		ImGui::PushID(this);
+		ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed, 20.0f);
 		ImGui::TableSetupColumn(_("move_references.cancel_list_start"), ImGuiTableColumnFlags_WidthFixed, 130.0f);
 		ImGui::TableSetupColumn(_("edition.cancel.detection_start"), ImGuiTableColumnFlags_WidthFixed, 50.0f);
 		ImGui::TableSetupColumn(_("edition.cancel.detection_end"), ImGuiTableColumnFlags_WidthFixed, 50.0f);
@@ -63,9 +77,22 @@ void TEditor_MoveReferences::RenderCancelsReferences()
 		ImGui::TableSetupColumn(_("move_references.cancel_conditions"));
 		ImGui::TableHeadersRow();
 
-		for (const auto& c : m_references.cancels)
+		
+		for (unsigned int i = 0; i < m_references.cancels.size(); ++i)
 		{
+			auto& c = m_references.cancels[i];
+			ImGui::PushID(&i);
+
 			ImGui::TableNextRow();
+
+			ImGui::TableNextColumn();
+			if (ImGui::Button(c.details_open ? "^" : "V")) {
+				bool new_value = !c.details_open;
+				for (auto& c : m_references.cancels) {
+					c.details_open = false;
+				}
+				c.details_open = new_value;
+			}
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(c.list_start_id_str.c_str());
@@ -82,7 +109,10 @@ void TEditor_MoveReferences::RenderCancelsReferences()
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(c.conditions_str.c_str());
 			ImGuiExtra::OnHoverTooltip(c.conditions_str.c_str());
+
+			ImGui::PopID();
 		}
+		ImGui::PopID();
 		ImGui::EndTable();
 	}
 }
@@ -90,11 +120,10 @@ void TEditor_MoveReferences::RenderCancelsReferences()
 
 void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 {
-	const char* cancel_id = _("moveset.size_kb");
-	const char* animation_list__import = _("edition.animation_list.import");
-
-	if (ImGui::BeginTable("##", 5, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImGui::GetContentRegionAvail()))
+	if (ImGui::BeginTable("##", 6, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImGui::GetContentRegionAvail()))
 	{
+		ImGui::PushID(this);
+		ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed, 20.0f);
 		ImGui::TableSetupColumn(_("move_references.cancel_list_start"), ImGuiTableColumnFlags_WidthFixed, 130.0f);
 		ImGui::TableSetupColumn(_("edition.cancel.detection_start"), ImGuiTableColumnFlags_WidthFixed, 50.0f);
 		ImGui::TableSetupColumn(_("edition.cancel.detection_end"), ImGuiTableColumnFlags_WidthFixed, 50.0f);
@@ -102,9 +131,21 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 		ImGui::TableSetupColumn(_("move_references.cancel_conditions"));
 		ImGui::TableHeadersRow();
 
-		for (const auto& c : m_references.grouped_cancels)
+		for (unsigned int i = 0; i < m_references.grouped_cancels.size(); ++i)
 		{
+			auto& c = m_references.grouped_cancels[i];
+			ImGui::PushID(&i);
+
 			ImGui::TableNextRow();
+
+			ImGui::TableNextColumn();
+			if (ImGui::Button(c.details_open ? "^" : "V")) {
+				bool new_value = !c.details_open;
+				for (auto& c : m_references.grouped_cancels) {
+					c.details_open = false;
+				}
+				c.details_open = new_value;
+			}
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(c.list_start_id_str.c_str());
@@ -120,7 +161,10 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(c.conditions_str.c_str());
+
+			ImGui::PopID();
 		}
+		ImGui::PopID();
 		ImGui::EndTable();
 	}
 }
@@ -128,7 +172,41 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 
 void TEditor_MoveReferences::RenderReactionsReferences()
 {
+	if (ImGui::BeginTable("##", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY, ImGui::GetContentRegionAvail()))
+	{
+		ImGui::PushID(this);
+		ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed, 20.0f);
+		ImGui::TableSetupColumn(_("move_references.reactions"), ImGuiTableColumnFlags_WidthFixed, 130.0f);
+		ImGui::TableSetupColumn(_("move_references.reactions_situations"));
 
+		for (unsigned int i = 0; i < m_references.reactions.size(); ++i)
+		{
+			auto& r = m_references.reactions[i];
+			ImGui::PushID(&i);
+
+			ImGui::TableNextRow();
+
+			ImGui::TableNextColumn();
+			if (ImGui::Button(r.details_open ? "^" : "V")) {
+				bool new_value = !r.details_open;
+				for (auto& r : m_references.reactions) {
+					r.details_open = false;
+				}
+				r.details_open = new_value;
+			}
+
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(r.id_str.c_str());
+
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(r.situations_str.c_str());
+			ImGuiExtra::OnHoverTooltip(r.situations_str.c_str());
+
+			ImGui::PopID();
+		}
+		ImGui::PopID();
+		ImGui::EndTable();
+	}
 }
 
 // -- Public methods -- //

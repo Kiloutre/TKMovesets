@@ -155,11 +155,15 @@ public:
 		std::string starting_frame;
 		std::vector<MoveCancelReferenceConditions> conditions;
 		std::string conditions_str;
+		bool details_open = false;
 	};
 
 	struct MoveReactionsReference {
 		unsigned int id;
 		std::string id_str;
+		std::vector<unsigned int> situation_ids;
+		std::string situations_str;
+		bool details_open = false;
 	};
 
 	virtual std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const = 0;

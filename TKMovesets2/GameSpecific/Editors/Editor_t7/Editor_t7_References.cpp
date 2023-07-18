@@ -90,15 +90,29 @@ std::vector<TEditor::MoveReactionsReference> EditorT7::ListMoveReactionsReferenc
 	unsigned int ref_id = 0;
 	for (const auto& ref : m_iterators.reactions)
 	{
-		for (auto m : ref.moveids)
-		{
-			if (m == moveid)
-			{
-				references.push_back({
-					.id = ref_id,
-					.id_str = std::to_string(ref_id),
-				});
+		bool found_move = false;
+
+		for (auto m : ref.moveids) {
+			if (m == moveid) {
+				found_move = true;
 			}
+		}
+
+		if (found_move)
+		{
+			std::vector<unsigned int> situation_ids;
+			unsigned int idx = 0;
+			for (auto m : ref.moveids) {
+				if (m == moveid) {
+					situation_ids.push_back(idx);
+				}
+				++idx;
+			}
+			references.push_back({
+				.id = ref_id,
+				.id_str = std::to_string(ref_id),
+				.situation_ids = situation_ids
+			});
 		}
 		++ref_id;
 	}

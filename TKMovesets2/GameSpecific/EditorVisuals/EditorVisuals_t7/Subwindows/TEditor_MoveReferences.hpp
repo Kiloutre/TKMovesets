@@ -11,6 +11,26 @@ class TEditor_MoveReferences : public EditorSubwindow
 private:
 	EditorVisuals* m_baseWindow;
 
+	// Reaction labels
+	const std::vector<std::string> m_reactionLabels = {
+		"edition.reactions.vertical_pushback",
+		"edition.reactions.standing_moveId",
+		"edition.reactions.default_moveid",
+		"edition.reactions.crouch_moveid",
+		"edition.reactions.counterhit_moveid",
+		"edition.reactions.crouch_counterhit_moveid",
+		"edition.reactions.left_side_moveid",
+		"edition.reactions.crouch_left_side_moveid",
+		"edition.reactions.right_side_moveid",
+		"edition.reactions.crouch_right_side_moveid",
+		"edition.reactions.backturned_moveid",
+		"edition.reactions.crouch_backturned_moveid",
+		"edition.reactions.block_moveid",
+		"edition.reactions.crouch_block_moveid",
+		"edition.reactions.wallslump_moveid",
+		"edition.reactions.downed_moveid"
+	};
+
 	// Moveid to search
 	unsigned int m_moveid;
 	// Editor reference
