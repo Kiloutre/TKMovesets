@@ -19,7 +19,6 @@ void EditorVisuals_T7::FilterMovelistIfMoveNotFound(uint16_t moveToSet)
 		return m->moveId == moveToSet;
 		}
 	) != m_filteredMovelist.end();
-	DEBUG_LOG("Found: %u\n", found_in_filter);
 	if (!found_in_filter) {
 		FilterMovelist(EditorMovelistFilter_All);
 	};
@@ -420,12 +419,44 @@ void EditorVisuals_T7::RenderMovelist()
 	// Move search / play
 	ImVec2 buttonSize = ImVec2(ImGui::GetContentRegionAvail().x / 2 - 5, 0);
 	ImGui::PushItemWidth(buttonSize.x);
-	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1, ImGuiInputTextFlags_CharsDecimal)) {
-		m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
+	if (ImGui::InputTextWithHint("##", _("edition.move_id_hint"), m_moveToPlayBuf, sizeof(m_moveToPlayBuf) - 1)) {
+		if (Helpers::is_string_digits(m_moveToPlayBuf)) {
+			m_moveToPlay = ValidateMoveId(m_moveToPlayBuf);
+			if (m_moveToPlay != -1) {
+				FilterMovelistIfMoveNotFound((uint16_t)m_moveToPlay);
+			}
+			DEBUG_LOG("Search: '%s' is digits only, result = %d.\n", m_moveToPlayBuf, m_moveToPlay);
+		}
+		else if (m_moveToPlayBuf[0] != '\0') {
+			std::string buf = m_moveToPlayBuf;
+			std::transform(buf.begin(), buf.end(), buf.begin(), tolower);
+
+			auto iter = std::find_if(m_filteredMovelist.begin(), m_filteredMovelist.end(),
+				[&buf](const DisplayableMove* m) {
+					std::string moveName = m->name;
+					std::transform(moveName.begin(), moveName.end(), moveName.begin(), tolower);
+					return moveName.find(buf) != std::string::npos;
+				}
+			);
+
+			if (iter == m_filteredMovelist.end()) {
+				m_moveToPlay = -1;
+			}
+			else {
+				m_moveToPlay = (*iter)->moveId;
+			}
+
+			DEBUG_LOG("Search: '%s' is text, result = %d.\n", buf.c_str(), m_moveToPlay);
+		}
+		else {
+
+			DEBUG_LOG("Search: Empty.\n");
+			m_moveToPlay = -1;
+		}
+
 		if (m_moveToPlay != -1) {
 			m_moveToScrollTo = m_moveToPlay;
 			m_highlightedMoveId = m_moveToPlay;
-			FilterMovelistIfMoveNotFound((uint16_t)m_moveToPlay);
 		}
 	}
 

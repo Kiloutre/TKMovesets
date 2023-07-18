@@ -48,7 +48,6 @@ void EditorVisuals_T7::PopulateWindowCreatorMap()
 
 void EditorVisuals_T7::FilterMovelist(EditorMovelistFilter_ filter)
 {
-	DEBUG_LOG("FilterMovelist, %u\n", filter);
 	m_filteredMovelist.clear();
 
 	m_movelistFilter = filter;

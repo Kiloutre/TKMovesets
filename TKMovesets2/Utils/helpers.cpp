@@ -369,4 +369,20 @@ namespace Helpers
 
 		return moveset;
 	}
+
+	bool is_string_digits(const char* str)
+	{
+		while (*str == ' ') ++str;
+
+		while (true)
+		{
+			char c = *str;
+			if (c == '\0') return true;
+			if (c < '0' || c > '9') return false;
+			++str;
+		}
+
+		while (*str == ' ') ++str;
+		return *str == '\0';
+	}
 }

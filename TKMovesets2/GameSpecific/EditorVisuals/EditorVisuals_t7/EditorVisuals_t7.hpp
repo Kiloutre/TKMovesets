@@ -25,7 +25,7 @@ class EditorVisuals_T7 : public EditorVisuals
 
 private:
 	// Buffer containing the move to play text
-	char m_moveToPlayBuf[7]{ 0 };
+	char m_moveToPlayBuf[32]{ 0 };
 	// Store the move to play as a int32_t, or -1 if the move id is invalid (checks are made against the moveset data)
 	int32_t m_moveToPlay = -1;
 	// Contains the movelist displayed at all times, may get sorted and/or filtered

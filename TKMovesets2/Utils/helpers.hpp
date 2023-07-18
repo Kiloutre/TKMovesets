@@ -263,4 +263,7 @@ namespace Helpers
 
 	// Read a moveset file, allocate space or it, return allocated memory (or nullptr on error)
 	Byte* ReadMovesetFile(const std::wstring& filename, uint64_t& size_out);
+
+	// Returns true if the string is comprised of digits only. Ignores leading and trailing spaces.
+	bool is_string_digits(const char* str);
 }
