@@ -77,10 +77,10 @@ public:
 	void QueueCharacterImportation(movesetInfo* moveset, unsigned int playerId, ImportSettings settings = 0);
 
 	// Forbid access to these
-	void QueueCharacterImportation(std::wstring filename, ImportSettings settings = 0) override { throw; };
-	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0) override { throw; };
-	void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0) override { throw; };
-	void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0) override { throw; };
+	void QueueCharacterImportation(std::wstring filename, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw; };
+	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw; };
+	void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw; };
+	void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset1 = nullptr, gameAddr* out_moveset2 = nullptr) override { throw; };
 
 	void CallDebugFunction()
 	{

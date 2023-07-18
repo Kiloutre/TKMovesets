@@ -1,6 +1,7 @@
 #include "EditorVisuals_t7.hpp"
 #include "GameSharedMem.hpp"
 #include "Compression.hpp"
+#include "Localization.hpp"
 // Structures
 #include "Structures/TEditorStructures.hpp"
 #include "Structures/DisplayableMovelist/TEditorMovelist.hpp"
@@ -47,6 +48,7 @@ void EditorVisuals_T7::PopulateWindowCreatorMap()
 
 void EditorVisuals_T7::FilterMovelist(EditorMovelistFilter_ filter)
 {
+	DEBUG_LOG("FilterMovelist, %u\n", filter);
 	m_filteredMovelist.clear();
 
 	m_movelistFilter = filter;
@@ -130,7 +132,7 @@ bool EditorVisuals_T7::MovesetStillLoaded()
 	gameAddr movesetAddress = m_importerHelper->GetCurrentPlayerMovesetAddr();
 #ifdef BUILD_TYPE_DEBUG
 	if (movesetAddress != m_loadedMoveset) {
-		DEBUG_LOG("MovesetStillLoaded = false, current is %llx, old was %llx\n", movesetAddress, m_loadedMoveset);
+		DEBUG_LOG("MovesetStillLoaded = false, current is %llx, expected is %llx\n", movesetAddress, m_loadedMoveset);
 	}
 #endif
 	return movesetAddress == m_loadedMoveset;
@@ -171,23 +173,27 @@ void EditorVisuals_T7::ImportToPlayer(int playerid)
 {
 	DEBUG_LOG("ImportToPlayer %d\n", playerid);
 
-	m_importerHelper->lastLoadedMoveset = 0;
-
 	uint64_t movesetSize;
 	const Byte* moveset = m_editor->GetMoveset(movesetSize);
 
+	m_editor->live_loadedMoveset = 0;
+	m_importNeeded = false;
+	m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
+
 	if (playerid == 0 || playerid == 1) {
-		m_importerHelper->QueueCharacterImportation(playerid, moveset, movesetSize, ImportSettings_DEFAULT);
+		// Import on player 0 OR player 1
+		m_importerHelper->QueueCharacterImportation(playerid, moveset, movesetSize, ImportSettings_DEFAULT, playerid == m_importerHelper->currentPlayerId  ? &m_loadedMoveset : nullptr);
 	}
 	else if (playerid == -2) {
-		m_importerHelper->QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT);
+		// Import on currently selected player
+		m_importerHelper->QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT, &m_loadedMoveset);
 	}
 	else {
-		m_importerHelper->QueueCharacterImportationOnBothPlayers(moveset, movesetSize, ImportSettings_DEFAULT);
+		// Import on both players
+		gameAddr* out_moveset1 = m_importerHelper->currentPlayerId == 0 ? &m_loadedMoveset : nullptr;
+		gameAddr* out_moveset2 = m_importerHelper->currentPlayerId == 1 ? &m_loadedMoveset : nullptr;
+		m_importerHelper->QueueCharacterImportationOnBothPlayers(moveset, movesetSize, ImportSettings_DEFAULT, out_moveset1, out_moveset2);
 	}
-	m_editor->live_loadedMoveset = 0;
-	m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
-	m_importNeeded = false;
 }
 
 // -- Public methods -- //
@@ -242,6 +248,10 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 	ReloadMovelistFilter();
 
 	m_compressionIndex = CompressionUtils::GetDefaultCompressionSetting();
+
+	for (auto& tab: m_movelistTabs) {
+		tab.label = _(tab.label.c_str());
+	}
 }
 
 void EditorVisuals_T7::ReloadMovelistFilter()

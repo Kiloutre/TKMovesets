@@ -1,21 +1,26 @@
 #include "Editor_t7.hpp"
 
-bool EditorT7::IsCommandGroupedCancelReference(const char* buffer)
+bool EditorT7::IsCommandGroupedCancelReference(uint64_t command) const
 {
-	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return command == constants[EditorConstants_GroupedCancelCommand];
+	return command == constants.at(EditorConstants_GroupedCancelCommand);
 }
 
-int EditorT7::GetCommandInputSequenceID(const char* buffer)
+bool EditorT7::IsCommandGroupedCancelReference(const char* buffer) const
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
-	return (command & 0xFFFFFFFF) - constants[EditorConstants_InputSequenceCommandStart];
+	return IsCommandGroupedCancelReference(command);
 }
 
-bool EditorT7::IsCommandInputSequence(uint64_t command)
+int EditorT7::GetCommandInputSequenceID(const char* buffer) const
+{
+	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
+	return (command & 0xFFFFFFFF) - constants.at(EditorConstants_InputSequenceCommandStart);
+}
+
+bool EditorT7::IsCommandInputSequence(uint64_t command) const
 {
 	uint32_t sequenceId = (command & 0xFFFFFFFF);
-	uint32_t inputSequenceStart = (uint32_t)constants[EditorConstants_InputSequenceCommandStart];
+	uint32_t inputSequenceStart = (uint32_t)constants.at(EditorConstants_InputSequenceCommandStart);
 	uint32_t inputSequenceEnd = 0x10000; // Arbitrary number here. Todo: find actual limit
 	if (inputSequenceStart <= sequenceId && sequenceId < inputSequenceEnd) {
 		return true;
@@ -23,13 +28,13 @@ bool EditorT7::IsCommandInputSequence(uint64_t command)
 	return false;
 }
 
-bool EditorT7::IsCommandInputSequence(const char* buffer)
+bool EditorT7::IsCommandInputSequence(const char* buffer) const
 {
 	uint64_t command = (uint64_t)strtoll(buffer, nullptr, 16);
 	return IsCommandInputSequence(command);
 }
 
-bool EditorT7::IsPropertyThrowCameraRef(uint32_t id)
+bool EditorT7::IsPropertyThrowCameraRef(uint32_t id) const
 {
 	if (id == 0x843C || id == 0x843D) {
 		return true;
@@ -38,43 +43,43 @@ bool EditorT7::IsPropertyThrowCameraRef(uint32_t id)
 }
 
 	
-bool EditorT7::IsPropertyThrowCameraRef(const char* buffer)
+bool EditorT7::IsPropertyThrowCameraRef(const char* buffer) const
 {
 	uint32_t id = (uint32_t)strtol(buffer, nullptr, 16);
 	return IsPropertyThrowCameraRef(id);
 }
 
-bool EditorT7::IsPropertyProjectileRef(uint32_t id)
+bool EditorT7::IsPropertyProjectileRef(uint32_t id) const
 {
-	if (id == constants[EditorConstants_ProjectileProperty]) {
+	if (id == constants.at(EditorConstants_ProjectileProperty)) {
 		return true;
 	}
 	return false;
 }
 
-bool EditorT7::IsPropertyProjectileRef(const char* buffer)
+bool EditorT7::IsPropertyProjectileRef(const char* buffer) const
 {
 	uint32_t id = (uint32_t)strtol(buffer, nullptr, 16);
 	return IsPropertyProjectileRef(id);
 }
 
-bool EditorT7::IsVoicelipValueEnd(const char* buffer)
+bool EditorT7::IsVoicelipValueEnd(const char* buffer) const
 {
 	return (uint32_t)strtoll(buffer, nullptr, 16) == 0xFFFFFFFF;
 }
 
-unsigned int EditorT7::GetMotaAnimCount(int motaId)
+unsigned int EditorT7::GetMotaAnimCount(int motaId) const
 {
 	// todo
 	return 0;
 }
 
-unsigned int EditorT7::GetMovelistDisplayableInputCount()
+unsigned int EditorT7::GetMovelistDisplayableInputCount() const
 {
 	return (unsigned int)m_iterators.mvl_inputs.size();
 }
 
-unsigned int EditorT7::GetStructureCount(EditorWindowType type)
+unsigned int EditorT7::GetStructureCount(EditorWindowType type) const
 {
 	switch (type)
 	{

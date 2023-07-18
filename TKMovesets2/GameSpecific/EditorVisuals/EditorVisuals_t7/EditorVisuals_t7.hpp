@@ -18,6 +18,11 @@ namespace EditorVisualsT7
 
 class EditorVisuals_T7 : public EditorVisuals
 {
+	struct s_movelistTabs {
+		std::string label;
+		EditorVisualsT7::EditorMovelistFilter_ filter;
+	};
+
 private:
 	// Buffer containing the move to play text
 	char m_moveToPlayBuf[7]{ 0 };
@@ -33,6 +38,15 @@ private:
 	int16_t m_highlightedMoveId = -1;
 	// Access moveset data through this variable. Uses polymorphism.
 	TEditor* m_editor = nullptr;
+	//
+	std::vector<s_movelistTabs> m_movelistTabs{
+		{"edition.moves_all", EditorVisualsT7::EditorMovelistFilter_All},
+		{"edition.moves_attacks", EditorVisualsT7::EditorMovelistFilter_Attacks},
+		{"edition.moves_generic", EditorVisualsT7::EditorMovelistFilter_Generic},
+		{"edition.moves_throws", EditorVisualsT7::EditorMovelistFilter_ThrowCameras},
+		{"edition.moves_custom", EditorVisualsT7::EditorMovelistFilter_Custom},
+		{"edition.moves_char_specific", EditorVisualsT7::EditorMovelistFilter_PostIdle},
+	};
 
 	// Render the top toolbar containing useful moveset editing tools
 	void RenderToolBar();
@@ -50,6 +64,8 @@ private:
 	// Imports a moveset to a specific player. -1 for both players, -2 for the currently selected player
 	void ImportToPlayer(int playerid);
 
+	// If wanting to scorll to a specific move, this function will reset the filter to ALL if needed, and do nothing if not
+	void FilterMovelistIfMoveNotFound(uint16_t moveToSet);
 	// Filters and sort the movelist according to the given argument
 	void FilterMovelist(EditorVisualsT7::EditorMovelistFilter_ filter);
 	// Returns true if our allocated moveset is still loaded on our character, in-game

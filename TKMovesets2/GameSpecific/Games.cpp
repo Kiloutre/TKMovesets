@@ -116,7 +116,7 @@ const GameInfo cg_gamesInfo[] = {
 
 	// -- TREV -- //
 	{
-		.name = "Tekken Revolution RPCS3",
+		.name = "Tekken Revolution  RPCS3",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "TREV_",
 		.gameId = GameId_TREV,
@@ -141,7 +141,7 @@ const GameInfo cg_gamesInfo[] = {
 	// -- T6 -- //
 	{
 		.separatorText = "Tekken 6",
-		.name = "Tekken 6  RPCS3 BLES00635 01.03",
+		.name = "Tekken 6  RPCS3 PAL 01.03",
 		.processName = "rpcs3.exe",
 		.movesetNamePrefix = "T6_",
 		.gameId = GameId_T6,

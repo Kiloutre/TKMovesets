@@ -18,8 +18,6 @@ void GameImport::OnProcessAttach()
 
 void GameImport::OnProcessDetach()
 {
-	// There is no way to know if the moveset is still valid after detaching: reset it
-	lastLoadedMoveset = 0;
 }
 
 void GameImport::InstantiateFactory()
@@ -45,7 +43,7 @@ void GameImport::RunningUpdate()
 		{
 			ImportationErrcode_ err;
 
-			auto& [moveset, movesetSize, filename, playerAddress, settings] = m_plannedImportations[0];
+			auto& [moveset, movesetSize, filename, playerAddress, settings, out_moveset] = m_plannedImportations[0];
 			if (moveset == nullptr) {
 				err = m_importer->Import(filename.c_str(), playerAddress, settings, progress);
 			}
@@ -61,10 +59,10 @@ void GameImport::RunningUpdate()
 			if (err != ImportationErrcode_Successful) {
 				m_errors.push_back(err);
 				m_plannedImportations.clear();
-				lastLoadedMoveset = 0;
+				if (out_moveset) *out_moveset = 0;
 			}
 			else {
-				lastLoadedMoveset = m_importer->lastLoaded.address;
+				if (out_moveset) *out_moveset = m_importer->lastLoaded.address;
 			}
 		}
 	}
@@ -114,7 +112,7 @@ bool GameImport::IsBusy() const
 	return m_plannedImportations.size() > 0;
 }
 
-void GameImport::QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
+void GameImport::QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings, gameAddr* out_moveset1, gameAddr* out_moveset2)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress_1 = m_importer->GetCharacterAddress(currentPlayerId);
@@ -125,7 +123,8 @@ void GameImport::QueueCharacterImportationOnBothPlayers(const Byte* moveset, uin
 		.movesetSize = movesetSize,
 		.filename = L"",
 		.playerAddress = playerAddress_1,
-		.settings = settings
+		.settings = settings,
+		.out_moveset = out_moveset1
 		});
 
 	m_plannedImportations.push_back({
@@ -133,11 +132,12 @@ void GameImport::QueueCharacterImportationOnBothPlayers(const Byte* moveset, uin
 		.movesetSize = movesetSize,
 		.filename = L"",
 		.playerAddress = playerAddress_2,
-		.settings = settings
+		.settings = settings,
+		.out_moveset = out_moveset2
 		});
 }
 
-void GameImport::QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
+void GameImport::QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings, gameAddr* out_moveset)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = m_importer->GetCharacterAddress(playerid);
@@ -146,11 +146,12 @@ void GameImport::QueueCharacterImportation(int playerid, const Byte* moveset, ui
 		.movesetSize = movesetSize,
 		.filename = L"",
 		.playerAddress = playerAddress,
-		.settings = settings
+		.settings = settings,
+		.out_moveset = out_moveset
 		});
 }
 
-void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings)
+void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings, gameAddr* out_moveset)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
@@ -159,11 +160,12 @@ void GameImport::QueueCharacterImportation(const Byte* moveset, uint64_t moveset
 		.movesetSize = movesetSize,
 		.filename = L"",
 		.playerAddress = playerAddress,
-		.settings = settings
+		.settings = settings,
+		.out_moveset = out_moveset
 		});
 }
 
-void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings settings)
+void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings settings, gameAddr* out_moveset)
 {
 	// It is safe to call this function even while an extraction is ongoing
 	gameAddr playerAddress = m_importer->GetCharacterAddress(currentPlayerId);
@@ -172,7 +174,8 @@ void GameImport::QueueCharacterImportation(std::wstring filename, ImportSettings
 		.movesetSize = 0,
 		.filename = filename,
 		.playerAddress = playerAddress,
-		.settings = settings
+		.settings = settings,
+		.out_moveset = out_moveset
 	});
 }
 

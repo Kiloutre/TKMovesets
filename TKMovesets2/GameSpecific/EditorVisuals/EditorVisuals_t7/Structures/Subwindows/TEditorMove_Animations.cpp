@@ -257,7 +257,7 @@ bool TEditorMove_Animations::Render()
 			ImGuiExtra::RenderTextbox(_("edition.animation_list.no_anim"));
 		}
 
-		// Cache these because animation listing might get executed dozens of thousands of time
+		// Cache these because animation listing might get executed dozens of times (once per each moveset with extracted anims)
 		const char* animation_list__anim_name = _("edition.animation_list.anim_name");
 		const char* animation_list__duration = _("edition.animation_list.duration");
 		const char* animation_list__size = _("edition.animation_list.size");

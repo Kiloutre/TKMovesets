@@ -85,7 +85,7 @@ std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 	return convertedString;
 }
 
-std::string EditorT7::GetMovelistDisplayableLabel(InputMap& fieldMap)
+std::string EditorT7::GetMovelistDisplayableLabel(InputMap& fieldMap) const
 {
 	std::string retVal;
 	uint32_t icons_1 = (uint32_t)GetFieldValue(fieldMap["icons"]);
@@ -408,7 +408,7 @@ bool EditorT7::ValidateMovelistPlayableField(EditorInput* field)
 
 // Utils
 
-std::string EditorT7::GetDisplayableMovelistInputStr(const char* directions, const char* buttons)
+std::string EditorT7::GetDisplayableMovelistInputStr(const char* directions, const char* buttons) const
 {
 	std::string retVal;
 
@@ -458,7 +458,7 @@ std::string EditorT7::GetDisplayableMovelistInputStr(const char* directions, con
 	return retVal;
 }
 
-int EditorT7::GetDisplayableMovelistEntryColor(EditorInput* field)
+int EditorT7::GetDisplayableMovelistEntryColor(EditorInput* field) const
 {
 	MvlDisplayableType type = (uint32_t)GetFieldValue(field);
 
@@ -484,13 +484,13 @@ int EditorT7::GetDisplayableMovelistEntryColor(EditorInput* field)
 	}
 }
 
-bool EditorT7::IsMovelistDisplayableEntryCategory(EditorInput* field)
+bool EditorT7::IsMovelistDisplayableEntryCategory(EditorInput* field)const
 {
 	MvlDisplayableType type = (uint32_t)GetFieldValue(field);
 	return type == 8;
 }
 
-bool EditorT7::IsMovelistDisplayableEntryCombo(EditorInput* field)
+bool EditorT7::IsMovelistDisplayableEntryCombo(EditorInput* field) const
 {
 	MvlDisplayableType type = (uint32_t)GetFieldValue(field);
 	return type == 10;

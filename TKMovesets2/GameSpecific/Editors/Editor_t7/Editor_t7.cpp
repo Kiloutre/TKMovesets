@@ -536,7 +536,7 @@ void EditorT7::ReloadDisplayableMoveList()
 
 // ===== Utils ===== //
 
-uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId)
+uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId) const
 {
 	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	if (playerId > 0) {

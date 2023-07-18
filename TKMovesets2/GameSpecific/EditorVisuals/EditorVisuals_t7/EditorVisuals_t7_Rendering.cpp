@@ -1,4 +1,5 @@
 #include <ImGui.h>
+#include <algorithm>
 
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
@@ -10,6 +11,19 @@
 using namespace EditorVisualsT7;
 
 // -- Private methods -- //
+
+void EditorVisuals_T7::FilterMovelistIfMoveNotFound(uint16_t moveToSet)
+{
+	bool found_in_filter = std::find_if(m_filteredMovelist.begin(), m_filteredMovelist.end(),
+		[&moveToSet](const DisplayableMove* m) {
+		return m->moveId == moveToSet;
+		}
+	) != m_filteredMovelist.end();
+	DEBUG_LOG("Found: %u\n", found_in_filter);
+	if (!found_in_filter) {
+		FilterMovelist(EditorMovelistFilter_All);
+	};
+}
 
 void EditorVisuals_T7::RenderToolBar()
 {
@@ -38,6 +52,7 @@ void EditorVisuals_T7::RenderToolBar()
 			sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", moveToSet);
 			OpenFormWindow(TEditorWindowType_Move, moveToSet);
 			m_highlightedMoveId = moveToSet;
+			FilterMovelistIfMoveNotFound((uint16_t)moveToSet);
 		}
 	}
 
@@ -147,6 +162,7 @@ void EditorVisuals_T7::RenderToolBar()
 				ReloadMovelistFilter();
 				m_moveToScrollTo = structId;
 				m_highlightedMoveId = structId;
+				FilterMovelistIfMoveNotFound((uint16_t)structId);
 				break;
 			}
 		}
@@ -273,7 +289,6 @@ void EditorVisuals_T7::RenderStatusBar()
 					m_editor->currentPlayerId = i;
 					m_importerHelper->currentPlayerId = i;
 					m_sharedMemHelper->currentPlayerId = i;
-					m_importerHelper->lastLoadedMoveset = 0;
 				}
 			}
 			ImGui::EndCombo();
@@ -283,24 +298,14 @@ void EditorVisuals_T7::RenderStatusBar()
 	// Import button
 	ImGui::SameLine();
 	bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && m_importNeeded;
-	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport))
-	{
+	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		ImportToPlayer(-2);
-		m_importerHelper->lastLoadedMoveset = 0;
-
-		uint64_t movesetSize;
-		const Byte* moveset = m_editor->GetMoveset(movesetSize);
-
-		m_importerHelper->QueueCharacterImportation(moveset, movesetSize, ImportSettings_DEFAULT);
-		m_editor->live_loadedMoveset = 0;
-		m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
-		m_importNeeded = false;
 	}
 
 	// Live edition. Might not be implemented for every game.
 	if (m_liveEditable)
 	{
-		bool disabled = m_loadedMoveset == 0;
+		bool disabled = (m_loadedMoveset == 0);
 		{
 			ImGuiExtra::DisableBlockIf __(disabled);
 
@@ -332,46 +337,26 @@ void EditorVisuals_T7::RenderStatusBar()
 void EditorVisuals_T7::RenderMovelist()
 {
 	// Filter / Sorting
-	if (ImGui::BeginTabBar("MovelistTabs"))
 	{
-		// Todo: Do not do this using tab bars but buttons
-		if (ImGui::BeginTabItem(_("edition.moves_all"))) {
-			if (m_movelistFilter != EditorMovelistFilter_All) {
-				FilterMovelist(EditorMovelistFilter_All);
+		ImVec2 buttonSize = { ImGui::GetContentRegionAvail().x / 7, 0 };
+
+		for (unsigned int i = 0; i < m_movelistTabs.size(); ++i)
+		{
+			if (i != 0) {
+				ImGui::SameLine();
 			}
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem(_("edition.moves_attacks"))) {
-			if (m_movelistFilter != EditorMovelistFilter_Attacks) {
-				FilterMovelist(EditorMovelistFilter_Attacks);
+
+			const auto& [label, filter] = m_movelistTabs[i];
+
+			ImGuiExtra::PushStyleColorBlockIf __(m_movelistFilter != filter, ImGuiCol_Button, MOVELIST_TAB_INACTIVE);
+			ImGuiExtra::PushStyleColorBlockIf ___(m_movelistFilter == filter, ImGuiCol_Button, MOVELIST_TAB_ACTIVE);
+			if (ImGui::Button(label.c_str(), buttonSize)) {
+				if (m_movelistFilter != filter) {
+					FilterMovelist(filter);
+				}
 			}
-			ImGui::EndTabItem();
+			ImGuiExtra::OnHoverTooltip(label.c_str());
 		}
-		if (ImGui::BeginTabItem(_("edition.moves_generic"))) {
-			if (m_movelistFilter != EditorMovelistFilter_Generic) {
-				FilterMovelist(EditorMovelistFilter_Generic);
-			}
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem(_("edition.moves_throws"))) {
-			if (m_movelistFilter != EditorMovelistFilter_ThrowCameras) {
-				FilterMovelist(EditorMovelistFilter_ThrowCameras);
-			}
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem(_("edition.moves_custom"))) {
-			if (m_movelistFilter != EditorMovelistFilter_Custom) {
-				FilterMovelist(EditorMovelistFilter_Custom);
-			}
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem(_("edition.moves_char_specific"))) {
-			if (m_movelistFilter != EditorMovelistFilter_PostIdle) {
-				FilterMovelist(EditorMovelistFilter_PostIdle);
-			}
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
 	}
 
 	// Movelist. Leave some 80 units of space for buttons & inputs under it
@@ -440,6 +425,7 @@ void EditorVisuals_T7::RenderMovelist()
 		if (m_moveToPlay != -1) {
 			m_moveToScrollTo = m_moveToPlay;
 			m_highlightedMoveId = m_moveToPlay;
+			FilterMovelistIfMoveNotFound((uint16_t)m_moveToPlay);
 		}
 	}
 
@@ -450,6 +436,7 @@ void EditorVisuals_T7::RenderMovelist()
 		sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", m_moveToScrollTo);
 		OpenFormWindow(TEditorWindowType_Move, m_moveToScrollTo);
 		m_highlightedMoveId = m_moveToScrollTo;
+		FilterMovelistIfMoveNotFound((uint16_t)m_moveToPlay);
 	}
 	ImGui::PopItemWidth();
 
@@ -484,21 +471,20 @@ void EditorVisuals_T7::RenderGameSpecific(int dockid)
 	// Check for important changes here
 	m_canInteractWithGame = m_importerHelper->CanStart();
 
+	if (m_loadedMoveset != m_prevLoadedMoveset) {
+		// Only set live_loadedMoveset once per import: That way, setting it to zero anywhere will invalidate the live edition and force the player to re-import
+		m_editor->live_loadedMoveset = m_loadedMoveset;
+		m_prevLoadedMoveset = m_loadedMoveset;
+	}
+
 	if (m_loadedMoveset != 0) {
+		// If the moveset was successfully imported, this will be filled with a nonzero value
 		if (!m_canInteractWithGame || !MovesetStillLoaded())
 		{
 			// Previously loaded moveset is now unreachable
 			m_importNeeded = true;
 			m_loadedMoveset = 0;
 			m_editor->live_loadedMoveset = 0;
-			m_importerHelper->lastLoadedMoveset = 0;
-		}
-	}
-	else {
-		// If the moveset was successfully imported, this will be filled with a nonzero value
-		m_loadedMoveset = m_importerHelper->lastLoadedMoveset;
-		if (m_liveEdition) {
-			m_editor->live_loadedMoveset = m_loadedMoveset;
 		}
 	}
 

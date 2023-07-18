@@ -4,6 +4,7 @@
 #include "EditorLogic.hpp"
 #include "EditorForm.hpp"
 #include "EditorLabel.hpp"
+#include "EditorSubwindow.hpp"
 
 #include "GameTypes.h"
 
@@ -59,14 +60,18 @@ protected:
 	bool m_savedLastChange = true;
 	// If the moveset can be live edited or not (need to actually code it)
 	bool m_liveEditable = true;
+	// Stores the value of m_loadedMoveset on the last render
+	gameAddr m_prevLoadedMoveset = 0;
 	// Stores the address, in-game, of the moveset we loaded. 0 if none loaded.
 	gameAddr m_loadedMoveset = 0;
 	// Contains the window title, contains the build version of the program and more info
 	std::string m_windowTitle;
 	// Contains the window title send to build the subwindows title on
 	std::string m_subwindowsTitle;
-	// Store the list of move windows to render
+	// Store the list of structure windows to render
 	std::vector<EditorForm*> m_structWindows;
+	// List of subwindows to render
+	std::vector<EditorSubwindow*> m_subwindows;
 	// The dock id that new windows might dock on
 	ImGuiID m_dockId;
 	// The viewport of the editor window. Used to know which subwindow is docked or not.
@@ -75,8 +80,6 @@ protected:
 	bool m_liveEdition = false;
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
-	// Access moveset data through this variable. Uses polymorphism.
-	EditorLogic* m_editor = nullptr;
 	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
 	GameImport* m_importerHelper;
 	// Copy of the shared mem helper, used to play extra propreties
@@ -139,4 +142,8 @@ public:
 	void OpenFormWindow(EditorWindowType windowType, uint16_t structId, int listSize = 0);
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
 	void IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart=-1, int listEnd = -1);
+	// Appends a new subwindow to the list of subwindow list to render
+	void AddSubwindow(EditorSubwindow* new_win);
+	// Reloads a subwindow and returns true if the given identifier exists, otherwise returns false
+	bool RefreshSubwindowIfExists(const std::string& identifier);
 };

@@ -12,6 +12,7 @@ struct importEntry
 	std::wstring filename;
 	gameAddr playerAddress;
 	ImportSettings settings;
+	gameAddr* out_moveset = nullptr;
 };
 
 class GameImport : public GameInteraction
@@ -42,8 +43,6 @@ protected:
 public:
 	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
-	// Stores the in-game addresses of the last moveset loaded by the last Queue() call
-	gameAddr lastLoadedMoveset = 0;
 
 	// Default flags are read-only, so the importer needs this
 	GameImport() { m_processExtraFlags = PROCESS_VM_OPERATION | PROCESS_VM_WRITE; }
@@ -54,11 +53,11 @@ public:
 	// Is currently busy with an importation
 	virtual bool IsBusy() const override;
 	// Queue a character importation from file
-	virtual void QueueCharacterImportation(std::wstring filename, ImportSettings settings=0);
+	virtual void QueueCharacterImportation(std::wstring filename, ImportSettings settings=0, gameAddr* out_moveset=nullptr);
 	// Queue a character importation from moveset data.
-	virtual void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
-	virtual void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
-	virtual void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0);
+	virtual void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0, gameAddr* out_moveset = nullptr);
+	virtual void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0, gameAddr* out_moveset = nullptr);
+	virtual void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0, gameAddr* out_moveset1 = nullptr, gameAddr* out_moveset2 = nullptr);
 	// Returns an error code to consume instantly through a popup, sound player or such
 	ImportationErrcode_ GetLastError();
 	// Returns the moveset address of the currently selected player

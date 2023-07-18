@@ -4,6 +4,7 @@
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 #include "imgui_extras.hpp"
+#include "EditorVisuals_t7/Subwindows/TEditor_MoveReferences.hpp"
 
 void TEditorMove::OnInitEnd()
 {
@@ -218,9 +219,10 @@ void TEditorMove::RenderExtraContextMenuItems()
 {
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 
-	ImGuiExtra::DisableBlockIf __(true);
-	if (ImGui::Selectable(_("edition.form_popup.what_cancels_into_this_move"), false, 0, selectableSize))
-	{
-		//todo
+	if (ImGui::Selectable(_("edition.form_popup.what_cancels_into_this_move"), false, 0, selectableSize)) {
+		std::string identifier = TEditor_MoveReferences::identifier_prefix + std::to_string(structureId);
+		if (!m_baseWindow->RefreshSubwindowIfExists(identifier)) {
+			m_baseWindow->AddSubwindow(new TEditor_MoveReferences((TEditor*)m_editor, m_baseWindow, structureId));
+		}
 	}
 }

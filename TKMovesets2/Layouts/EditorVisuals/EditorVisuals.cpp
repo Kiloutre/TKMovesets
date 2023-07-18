@@ -338,6 +338,7 @@ void EditorVisuals::RenderSubwindows()
 			m_lastChangeDate = Helpers::getCurrentTimestamp();
 			m_savedLastChange = false;
 			m_importNeeded = true;
+			m_abstractEditor->live_loadedMoveset = 0;
 		}
 
 		if (moveWin->popen)
@@ -360,6 +361,19 @@ void EditorVisuals::RenderSubwindows()
 		}
 	}
 
+	for (size_t i = 0; i < m_subwindows.size();)
+	{
+		EditorSubwindow* window = m_subwindows[i];
+
+		if (window->Render()) {
+			++i;
+		}
+		else {
+			m_subwindows.erase(m_subwindows.begin() + i);
+			delete window;
+		}
+	}
+
 	m_windowFocused = window_focused;
 }
 
@@ -374,4 +388,23 @@ void EditorVisuals::DetectKeyboardShortcuts()
 void EditorVisuals::Render(int dockid)
 {
 	RenderGameSpecific(dockid);
+}
+
+
+void EditorVisuals::AddSubwindow(EditorSubwindow* new_win)
+{
+	new_win->nextDockId = m_dockId;
+	m_subwindows.push_back(new_win);
+}
+
+bool EditorVisuals::RefreshSubwindowIfExists(const std::string& identifier)
+{
+	for (const auto& win : m_subwindows)
+	{
+		if (win->identifier == identifier) {
+			win->Refresh(m_dockId);
+			return true;
+		}
+	}
+	return false;
 }

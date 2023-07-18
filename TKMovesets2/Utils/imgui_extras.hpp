@@ -33,6 +33,30 @@ namespace ImGuiExtra
 		}
 	};
 
+	// Class that can be created in a block, will disable everything inside of that block
+	class PushStyleColorBlockIf
+	{
+	private:
+		bool m_disabled;
+
+	public:
+		template<typename T>
+		PushStyleColorBlockIf(bool t_disabled, ImGuiCol idx, T col)
+		{
+			m_disabled = t_disabled;
+			if (m_disabled) {
+				ImGui::PushStyleColor(idx, col);
+			}
+		}
+
+		~PushStyleColorBlockIf()
+		{
+			if (m_disabled) {
+				ImGui::PopStyleColor();
+			}
+		}
+	};
+
 	// Renders markdown with proper wrapaorund
 	void Markdown(const char* text, size_t text_size);
 	void Markdown(const std::string& text);
@@ -42,6 +66,9 @@ namespace ImGuiExtra
 
 	// Displays a hoverable text that displays a tootip
 	void HelpMarker(const char* desc, bool greyed=true);
+
+	// Displays a tooltip if the last imgui item has been hovered
+	void OnHoverTooltip(const char* text);
 
 	// Render button that can be disabled (low alpha, always returns false)
 	bool RenderButtonEnabled(const char* c_text, bool c_enabled, ImVec2 c_size=ImVec2(0, 0));

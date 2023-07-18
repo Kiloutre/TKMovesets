@@ -92,7 +92,7 @@ public:
 	// For the movelist displayed to the left
 	virtual void RecomputeDisplayableMoveFlags(uint16_t moveId) = 0;
 	// Returns the given player current move id
-	virtual uint16_t GetCurrentMoveID(uint8_t playerId) = 0;
+	virtual uint16_t GetCurrentMoveID(uint8_t playerId) const = 0;
 
 
 	// -- Iteractions -- //
@@ -101,41 +101,68 @@ public:
 
 	// -- Command Utils -- //
 	// Returns a command string from two seperate direction & button fields
-	virtual std::string GetCommandStr(const char* direction, const char* button) = 0;
+	virtual std::string GetCommandStr(const char* direction, const char* button) const = 0;
 	// Returns a command string from a command field
-	virtual std::string GetCommandStr(const char* commandBuf) = 0;
+	virtual std::string GetCommandStr(const char* commandBuf) const = 0;
 	// Writes the input sequence to string, or writes to outSize if the sequence is over MAX_INPUT_SEQUENCE_SHORT_LEN inputs
-	virtual void GetInputSequenceString(int id, std::string& outStr, int& outSize) = 0;
+	virtual void GetInputSequenceString(int id, std::string& outStr, int& outSize) const = 0;
 	// Returns a command string 
-	virtual std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) = 0;
+	virtual std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) const = 0;
 	// Returns the color of a MvlDisplayable field according to its type
-	virtual int GetDisplayableMovelistEntryColor(EditorInput* field) = 0;
+	virtual int GetDisplayableMovelistEntryColor(EditorInput* field) const = 0;
 	// Returns true if a displayable entry in the movelist is a combo
-	virtual bool IsMovelistDisplayableEntryCombo(EditorInput* field) = 0;
+	virtual bool IsMovelistDisplayableEntryCombo(EditorInput* field) const = 0;
 	// Returns true if a displayable entry in the movelist is a category (don't increment index)
-	virtual	bool IsMovelistDisplayableEntryCategory(EditorInput* field) = 0;
+	virtual	bool IsMovelistDisplayableEntryCategory(EditorInput* field) const = 0;
 
 	// -- Utils -- //
 	// Returns true if the command is an input sequence
-	virtual bool IsCommandInputSequence(const char* buffer) = 0;
+	virtual bool IsCommandInputSequence(const char* buffer) const = 0;
 	// Determines if a command states that the cancel refers to a grouped cancel 
-	virtual bool IsCommandGroupedCancelReference(const char* buffer) = 0;
+	virtual bool IsCommandGroupedCancelReference(const char* buffer) const = 0;
 	// Returns the ID of an input sequence from a (grouped)cancel's command buffer
-	virtual int GetCommandInputSequenceID(const char* buffer) = 0;
+	virtual int GetCommandInputSequenceID(const char* buffer) const = 0;
 	// Returns true if the property ID refers to a throw camera
-	virtual bool IsPropertyThrowCameraRef(const char* buffer) = 0;
+	virtual bool IsPropertyThrowCameraRef(const char* buffer) const = 0;
 	// Returns true if the property ID refers to a projectile
-	virtual bool IsPropertyProjectileRef(const char* buffer) = 0;
+	virtual bool IsPropertyProjectileRef(const char* buffer) const = 0;
 	// Returns true if the voiceclip value indicates the end of the voiceclip list
-	virtual bool IsVoicelipValueEnd(const char* buffer) = 0;
+	virtual bool IsVoicelipValueEnd(const char* buffer) const = 0;
 	// Returns the amount of structure in the given structure list type (move, cancel etc)
-	virtual unsigned int GetStructureCount(EditorWindowType type) = 0;
+	virtual unsigned int GetStructureCount(EditorWindowType type) const = 0;
 	// Returns the amount of MOTA animations inside of a specific MOTA
-	virtual unsigned int GetMotaAnimCount(int motaId) = 0;
+	virtual unsigned int GetMotaAnimCount(int motaId) const = 0;
 	// Returns a string computed based on a movelist displayable's icons value and more
-	virtual std::string GetMovelistDisplayableLabel(InputMap& fieldMap) = 0;
+	virtual std::string GetMovelistDisplayableLabel(InputMap& fieldMap) const = 0;
 	// Returns the list of inputs in the displayable movelist
-	virtual unsigned int GetMovelistDisplayableInputCount() = 0;
+	virtual unsigned int GetMovelistDisplayableInputCount() const = 0;
 
 	virtual void ExecuteExtraprop(EditorInput* idField, EditorInput* valueField) {};
+
+	// -- References -- //
+
+	struct MoveCancelReferenceConditions {
+		unsigned int id;
+		unsigned int value;
+	};
+
+	struct MoveCancelReference {
+		unsigned int id;
+		unsigned int list_start_id;
+		std::string list_start_id_str;
+		std::string detection_start;
+		std::string detection_end;
+		std::string starting_frame;
+		std::vector<MoveCancelReferenceConditions> conditions;
+		std::string conditions_str;
+	};
+
+	struct MoveReactionsReference {
+		unsigned int id;
+		std::string id_str;
+	};
+
+	virtual std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const = 0;
+	virtual std::vector<MoveCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const = 0;
+	virtual std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const = 0;
 };

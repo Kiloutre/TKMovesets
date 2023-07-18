@@ -118,7 +118,6 @@ set(GAMESPECIFIC_SOURCES
                     # Base classes for our game-specific stuff
                     "GameSpecific/Extractors/Extractor.cpp"
                     "GameSpecific/Importers/Importer.cpp"
-                    "GameSpecific/Editors/TEditor.cpp"
                     "GameSpecific/Editors/EditorLogic.cpp"
                     "GameSpecific/Online/Online.cpp"
                     "GameSpecific/MovesetConverters/Aliases.cpp"
@@ -126,6 +125,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/AnimExtractors/AnimExtractors.cpp"
                     
                     # Game-specific
+                    "GameSpecific/Editors/TEditor.cpp"
                     ## T7
                     "GameSpecific/Online/Online_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
@@ -146,9 +146,11 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Utils.cpp"
+                    "GameSpecific/Editors/Editor_t7/Editor_t7_References.cpp"
                     ### Editor layout
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
+                    "GameSpecific/EditorVisuals/EditorVisuals_t7/Subwindows/TEditor_MoveReferences.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/TEditorMove.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/TEditorVoiceclip.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/TEditorExtraproperties.cpp"

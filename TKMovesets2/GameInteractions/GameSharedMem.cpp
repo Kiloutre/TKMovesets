@@ -83,7 +83,6 @@ void GameSharedMem::RunningUpdate()
 				auto& lastLoaded = m_importer->lastLoaded;
 				m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
 				m_plannedImportations.erase(m_plannedImportations.begin());
-				lastLoadedMoveset = 0;
 			} else {
 				m_errors.push_back(errcode);
 				m_plannedImportations.clear();

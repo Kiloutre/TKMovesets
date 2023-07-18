@@ -529,6 +529,14 @@ edition.mvl_input.trigger_highlight = Déclencher son
 edition.mvl_input.frame = Image
 edition.mvl_input.frames = images
 
+move_references.title = Références: Move
+move_references.cancels = Cancels
+move_references.grouped_cancels = Cancels Groupés
+move_references.reactions = Réactions
+move_references.cancel_list_start = Liste (début)
+move_references.grouped_cancel_id = Cancel groupé
+move_references.cancel_conditions = Conditions
+
 # Documentation #
 
 # À propos #

@@ -2,7 +2,7 @@
 
 // -- Static helper -- //
 
-const std::vector<std::string> cg_directionBitLabels = {
+const char cg_directionBitLabels[][8] = {
 	"D/B",
 	"D",
 	"D/F",
@@ -72,13 +72,13 @@ static std::string getCommandString(uint64_t command)
 
 // -- Public methods -- //
 
-std::string EditorT7::GetCommandStr(const char* commandBuf)
+std::string EditorT7::GetCommandStr(const char* commandBuf) const
 {
 	uint64_t command = (uint64_t)strtoll(commandBuf, nullptr, 16);
 	return getCommandString(command);
 }
 
-std::string EditorT7::GetCommandStr(const char* direction, const char* button)
+std::string EditorT7::GetCommandStr(const char* direction, const char* button) const
 {
 	uint64_t command = (uint32_t)strtoll(button, nullptr, 16);
 	command = (command << 32) | (uint32_t)strtoll(direction, nullptr, 16);
@@ -86,7 +86,7 @@ std::string EditorT7::GetCommandStr(const char* direction, const char* button)
 	return getCommandString(command);
 }
 
-void EditorT7::GetInputSequenceString(int id, std::string& outStr, int& outSize)
+void EditorT7::GetInputSequenceString(int id, std::string& outStr, int& outSize) const
 {
 	std::string retVal;
 

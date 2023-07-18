@@ -291,7 +291,7 @@ public:
 	bool LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize) override;
 	void ReloadDisplayableMoveList() override;
 	void RecomputeDisplayableMoveFlags(uint16_t moveId) override;
-	uint16_t GetCurrentMoveID(uint8_t playerId) override;
+	uint16_t GetCurrentMoveID(uint8_t playerId) const override;
 	InputMap GetFormFields(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<InputMap> GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) override;
 	std::vector<InputMap> GetFormFieldsList(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder, int listSize) override;
@@ -309,28 +309,29 @@ public:
 	void DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr);
 
 	// -- Command Utils -- //
-	std::string GetCommandStr(const char* direction, const char* button) override;
-	std::string GetCommandStr(const char* commandBuf) override;
-	void GetInputSequenceString(int id, std::string& outStr, int& outSize) override;
-	std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) override;
-	int GetDisplayableMovelistEntryColor(EditorInput* field) override;
-	bool IsMovelistDisplayableEntryCombo(EditorInput* field) override;
-	bool IsMovelistDisplayableEntryCategory(EditorInput* field) override;
+	std::string GetCommandStr(const char* direction, const char* button) const override;
+	std::string GetCommandStr(const char* commandBuf) const override;
+	void GetInputSequenceString(int id, std::string& outStr, int& outSize) const override;
+	std::string GetDisplayableMovelistInputStr(const char* directions, const char* buttons) const override;
+	int GetDisplayableMovelistEntryColor(EditorInput* field) const override;
+	bool IsMovelistDisplayableEntryCombo(EditorInput* field) const override;
+	bool IsMovelistDisplayableEntryCategory(EditorInput* field) const override;
 	// -- Utils --//
-	bool IsCommandInputSequence(const char* buffer) override;
-	bool IsCommandInputSequence(uint64_t command);
-	bool IsCommandGroupedCancelReference(const char* buffer) override;
-	int GetCommandInputSequenceID(const char* buffer) override;
-	bool IsPropertyThrowCameraRef(const char* buffer) override;
-	bool IsPropertyThrowCameraRef(uint32_t id);
-	bool IsPropertyProjectileRef(const char* buffer) override;
-	bool IsPropertyProjectileRef(uint32_t id);
-	bool IsVoicelipValueEnd(const char* buffer) override;
-	unsigned int GetStructureCount(EditorWindowType type) override;
-	unsigned int GetMotaAnimCount(int motaId) override;
+	bool IsCommandInputSequence(const char* buffer) const override;
+	bool IsCommandInputSequence(uint64_t command) const;
+	bool IsCommandGroupedCancelReference(uint64_t command) const;
+	bool IsCommandGroupedCancelReference(const char* buffer) const override;
+	int GetCommandInputSequenceID(const char* buffer) const override;
+	bool IsPropertyThrowCameraRef(const char* buffer) const override;
+	bool IsPropertyThrowCameraRef(uint32_t id) const;
+	bool IsPropertyProjectileRef(const char* buffer) const override;
+	bool IsPropertyProjectileRef(uint32_t id) const;
+	bool IsVoicelipValueEnd(const char* buffer) const override;
+	unsigned int GetStructureCount(EditorWindowType type) const override;
+	unsigned int GetMotaAnimCount(int motaId) const override;
 	// Movelist
-	std::string GetMovelistDisplayableLabel(InputMap& fieldMap) override;
-	unsigned int GetMovelistDisplayableInputCount() override;
+	std::string GetMovelistDisplayableLabel(InputMap& fieldMap) const override;
+	unsigned int GetMovelistDisplayableInputCount() const override;
 
 	// -- Creation  -- //
 	uint32_t CreateNew(EditorWindowType type) override;
@@ -352,6 +353,11 @@ public:
 	// Shared memory, used for extra properties execution
 	void SetSharedMemHandler(Online** sharedMemHandler) override;
 	void ExecuteExtraprop(EditorInput* idField, EditorInput* valueField) override;
+
+	// References
+	std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const override;
+	std::vector<MoveCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const override;
+	std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const override;
 };
 
 template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
