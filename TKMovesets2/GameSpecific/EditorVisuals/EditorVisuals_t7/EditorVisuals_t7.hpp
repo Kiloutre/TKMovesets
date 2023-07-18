@@ -38,14 +38,14 @@ private:
 	int16_t m_highlightedMoveId = -1;
 	// Access moveset data through this variable. Uses polymorphism.
 	TEditor* m_editor = nullptr;
-	//
+	// List of tabs to display in the move list
 	std::vector<s_movelistTabs> m_movelistTabs{
 		{"edition.moves_all", EditorVisualsT7::EditorMovelistFilter_All},
 		{"edition.moves_attacks", EditorVisualsT7::EditorMovelistFilter_Attacks},
 		{"edition.moves_generic", EditorVisualsT7::EditorMovelistFilter_Generic},
 		{"edition.moves_throws", EditorVisualsT7::EditorMovelistFilter_ThrowCameras},
-		{"edition.moves_custom", EditorVisualsT7::EditorMovelistFilter_Custom},
 		{"edition.moves_char_specific", EditorVisualsT7::EditorMovelistFilter_PostIdle},
+		{"edition.moves_custom", EditorVisualsT7::EditorMovelistFilter_Custom},
 	};
 
 	// Render the top toolbar containing useful moveset editing tools

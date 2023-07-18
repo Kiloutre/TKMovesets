@@ -214,7 +214,7 @@ void TEditor_MoveReferences::RenderReactionsReferences()
 TEditor_MoveReferences::TEditor_MoveReferences(const TEditor* editor, EditorVisuals* baseWindow, unsigned int moveid) : m_editor(editor), m_baseWindow(baseWindow), m_moveid(moveid)
 {
 	m_identifier = std::format("{} {}###{}", _("move_references.title"), moveid, (uint64_t)this);
-	identifier = "move_reference_" + std::to_string(moveid);
+	identifier = TEditor_MoveReferences::identifier_prefix + std::to_string(moveid);
 	LoadReferenceList(m_editor, m_moveid);
 }
 
@@ -283,7 +283,6 @@ bool TEditor_MoveReferences::Render()
 				ImGuiTabItemFlags flags;
 
 				if (m_firstRender && !focused_tab && !is_empty) {
-					DEBUG_LOG("Set selected reactions\n");
 					flags = ImGuiTabItemFlags_SetSelected;
 					focused_tab = true;
 				}
