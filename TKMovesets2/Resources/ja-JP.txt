@@ -530,6 +530,19 @@ edition.mvl_input.trigger_highlight = 入力タイミング音
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 
+#references.used_by =
+#references.no_reference =
+#references.move.title =
+#references.move.view_move = 
+#references.reactions = 
+#references.reactions.situations = 
+#references.list_start =
+#references.moves =
+#references.cancels =
+#references.cancels.view_cancel
+#references.grouped_cancels =
+#references.cancels.requirements =
+
 # Documentation #
 
 # About #

@@ -529,6 +529,19 @@ edition.mvl_input.trigger_highlight = Trigger highlight
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 
+references.used_by = Used by
+references.no_reference = No references found
+references.move.title = Réferences: Move
+references.move.view_move = View move
+references.reactions = Reactions
+references.reactions.situations = Situations
+references.list_start = List (start)
+references.moves = Moves
+references.cancels = Cancels
+references.cancels.view_cancel = View cancel
+references.grouped_cancels = Grouped cancels
+references.cancels.requirements = Requirements
+
 # Documentation #
 
 # About #

@@ -538,7 +538,7 @@ references.reactions.situations = Situations
 references.list_start = Liste (début)
 references.moves = Moves
 references.cancels = Cancels
-references.cancels.view_cancel = View cancel
+references.cancels.view_cancel = Voir Cancel
 references.grouped_cancels = Cancels groupés
 references.cancels.requirements = Conditions
 
