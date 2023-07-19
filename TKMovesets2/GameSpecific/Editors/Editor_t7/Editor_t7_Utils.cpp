@@ -79,6 +79,12 @@ unsigned int EditorT7::GetMovelistDisplayableInputCount() const
 	return (unsigned int)m_iterators.mvl_inputs.size();
 }
 
+
+const char* EditorT7::GetMoveName(uint32_t moveid) const
+{
+	return (char*)(m_movesetData + m_offsets->nameBlock + m_iterators.moves[moveid]->name_addr);
+}
+
 unsigned int EditorT7::GetStructureCount(EditorWindowType type) const
 {
 	switch (type)

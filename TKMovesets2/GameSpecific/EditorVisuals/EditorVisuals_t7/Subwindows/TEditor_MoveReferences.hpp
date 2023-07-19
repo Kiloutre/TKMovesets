@@ -14,7 +14,7 @@ private:
 	// Reaction labels
 	const std::vector<std::string> m_reactionLabels = {
 		"edition.reactions.vertical_pushback",
-		"edition.reactions.standing_moveId",
+		"edition.reactions.standing_moveid",
 		"edition.reactions.default_moveid",
 		"edition.reactions.crouch_moveid",
 		"edition.reactions.counterhit_moveid",
@@ -39,8 +39,18 @@ private:
 	// References lists
 	struct {
 		std::vector<TEditor::MoveCancelReference> cancels;
-		std::vector<TEditor::MoveCancelReference> grouped_cancels;
+		std::vector<TEditor::MoveGroupedCancelReference> grouped_cancels;
 		std::vector<TEditor::MoveReactionsReference> reactions;
+
+		TEditor::MoveCancelReference* current_cancel = nullptr;
+		TEditor::MoveGroupedCancelReference* current_grouped_cancel = nullptr;
+		TEditor::MoveReactionsReference* current_reactions = nullptr;
+
+		struct {
+			std::string cancel;
+			std::string grouped_cancel;
+			std::string reactions;
+		} details_title;
 	} m_references;
 
 	struct {

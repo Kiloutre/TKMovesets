@@ -332,6 +332,8 @@ public:
 	// Movelist
 	std::string GetMovelistDisplayableLabel(InputMap& fieldMap) const override;
 	unsigned int GetMovelistDisplayableInputCount() const override;
+	//
+	const char* GetMoveName(uint32_t moveid) const override;
 
 	// -- Creation  -- //
 	uint32_t CreateNew(EditorWindowType type) override;
@@ -356,7 +358,7 @@ public:
 
 	// References
 	std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const override;
-	std::vector<MoveCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const override;
+	std::vector<MoveGroupedCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const override;
 	std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const override;
 };
 

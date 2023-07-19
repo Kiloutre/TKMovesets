@@ -136,37 +136,88 @@ public:
 	virtual std::string GetMovelistDisplayableLabel(InputMap& fieldMap) const = 0;
 	// Returns the list of inputs in the displayable movelist
 	virtual unsigned int GetMovelistDisplayableInputCount() const = 0;
+	// Returns a move's name from its ID
+	virtual const char* GetMoveName(uint32_t moveid) const = 0;
 
 	virtual void ExecuteExtraprop(EditorInput* idField, EditorInput* valueField) {};
 
 	// -- References -- //
 
-	struct MoveCancelReferenceConditions {
-		unsigned int id;
-		unsigned int value;
-	};
-
 	struct MoveCancelReference {
+		struct Reference {
+			unsigned int move_id;
+			std::string name;
+		};
+
+		struct Requirement {
+			unsigned int id;
+			unsigned int value;
+		};
+
 		unsigned int id;
 		unsigned int list_start_id;
 		std::string list_start_id_str;
+
 		std::string detection_start;
 		std::string detection_end;
 		std::string starting_frame;
-		std::vector<MoveCancelReferenceConditions> conditions;
+
+		std::vector<Requirement> conditions;
 		std::string conditions_str;
-		bool details_open = false;
+
+		std::vector<Reference> move_references;
+		std::vector<unsigned int> projectile_references;
+	};
+
+	struct MoveGroupedCancelReference {
+		struct CancelReference {
+			unsigned int id;
+			unsigned int list_start_id;
+			std::string list_start_id_str;
+
+			std::string starting_frame;
+		};
+
+		struct Reference {
+			unsigned int move_id;
+			std::string name;
+		};
+
+		struct Requirement {
+			unsigned int id;
+			unsigned int value;
+		};
+
+		unsigned int id;
+		unsigned int list_start_id;
+		std::string list_start_id_str;
+
+		std::string detection_start;
+		std::string detection_end;
+		std::string starting_frame;
+
+		std::vector<Requirement> conditions;
+		std::string conditions_str;
+
+		std::vector<Reference> move_references;
+		std::vector<unsigned int> projectile_references;
+		std::vector<CancelReference> cancel_references;
 	};
 
 	struct MoveReactionsReference {
+		struct Reference {
+			unsigned int move_id;
+			std::string name;
+		};
 		unsigned int id;
 		std::string id_str;
 		std::vector<unsigned int> situation_ids;
 		std::string situations_str;
-		bool details_open = false;
+		std::vector<Reference> references;
+		std::string references_count_str;
 	};
 
 	virtual std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const = 0;
-	virtual std::vector<MoveCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const = 0;
+	virtual std::vector<MoveGroupedCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const = 0;
 	virtual std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const = 0;
 };
