@@ -222,6 +222,7 @@ edition.animation_extraction.skipped = Passé
 edition.animation_extraction.skipped_exists = Existe
 edition.animation_extraction.error = Erreur
 edition.animation_extraction.interrupt = Interrompre
+edition.open_characters_directory = Ouvrir le dossier des personnages
 edition.open_editor_library = Ouvrir la bibliothèque de l'éditeur
 edition.open_editor_backups = Ouvrir les sauvegardes auto de l'éditeur
 edition.refresh_movesets = Rafraîchir la liste

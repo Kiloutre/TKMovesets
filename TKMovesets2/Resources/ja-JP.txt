@@ -222,6 +222,7 @@ edition.animation_extraction.skipped = スキップしました。
 edition.animation_extraction.skipped_exists = スキップされたものが在ります。
 edition.animation_extraction.error = エラー
 edition.animation_extraction.interrupt = 割り込み
+#edition.open_characters_directory =
 edition.open_editor_library = エディタライブラリを開く
 edition.open_editor_backups = エディタのバックアップを開く
 edition.refresh_movesets = Movesetを更新

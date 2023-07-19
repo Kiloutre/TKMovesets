@@ -222,6 +222,7 @@ edition.animation_extraction.skipped = Skipped
 edition.animation_extraction.skipped_exists = Exists
 edition.animation_extraction.error = Error
 edition.animation_extraction.interrupt = Interrupt
+edition.open_characters_directory = Open characters directory
 edition.open_editor_library = Open editor library
 edition.open_editor_backups = Open editor backups
 edition.refresh_movesets = Refresh movesets

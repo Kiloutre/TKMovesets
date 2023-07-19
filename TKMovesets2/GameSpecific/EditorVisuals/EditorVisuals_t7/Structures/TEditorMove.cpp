@@ -219,7 +219,7 @@ void TEditorMove::RenderExtraContextMenuItems()
 {
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 
-	if (ImGui::Selectable(_("edition.form_popup.what_references_into_this_move"), false, 0, selectableSize)) {
+	if (ImGui::Selectable(_("edition.form_popup.what_references_this_move"), false, 0, selectableSize)) {
 		std::string identifier = TEditor_MoveReferences::identifier_prefix + std::to_string(structureId);
 		if (!m_baseWindow->RefreshSubwindowIfExists(identifier)) {
 			m_baseWindow->AddSubwindow(new TEditor_MoveReferences((TEditor*)m_editor, m_baseWindow, structureId));
