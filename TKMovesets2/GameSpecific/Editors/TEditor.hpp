@@ -157,6 +157,7 @@ public:
 		unsigned int id;
 		unsigned int list_start_id;
 		std::string list_start_id_str;
+		std::string command_str;
 
 		std::string detection_start;
 		std::string detection_end;
@@ -191,6 +192,7 @@ public:
 		unsigned int id;
 		unsigned int list_start_id;
 		std::string list_start_id_str;
+		std::string command_str;
 
 		std::string detection_start;
 		std::string detection_end;

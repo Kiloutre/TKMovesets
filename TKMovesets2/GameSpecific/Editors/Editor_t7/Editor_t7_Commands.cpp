@@ -72,6 +72,11 @@ static std::string getCommandString(uint64_t command)
 
 // -- Public methods -- //
 
+std::string EditorT7::GetCommandStr(uint64_t command) const
+{
+	return getCommandString(command);
+}
+
 std::string EditorT7::GetCommandStr(const char* commandBuf) const
 {
 	uint64_t command = (uint64_t)strtoll(commandBuf, nullptr, 16);

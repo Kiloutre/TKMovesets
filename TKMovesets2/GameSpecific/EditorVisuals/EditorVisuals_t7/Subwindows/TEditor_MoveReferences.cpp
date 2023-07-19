@@ -100,12 +100,14 @@ void TEditor_MoveReferences::RenderCancelsReferences()
 			}
 
 			ImGui::TableNextColumn();
-			if (ImGui::Button(c.list_start_id_str.c_str())) {
-				m_baseWindow->OpenFormWindow(TEditorWindowType_Cancel, c.list_start_id);
-			}
 			if (details_opened) {
 				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, MOVELIST_TAB_ACTIVE);
 			}
+			if (ImGui::Button(c.list_start_id_str.c_str())) {
+				m_baseWindow->OpenFormWindow(TEditorWindowType_Cancel, c.list_start_id);
+			}
+			ImGui::SameLine();
+			ImGui::TextUnformatted(c.command_str.c_str());
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(c.detection_start.c_str());
@@ -215,12 +217,14 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 			}
 
 			ImGui::TableNextColumn();
-			if (ImGui::Button(c.list_start_id_str.c_str())) {
-				m_baseWindow->OpenFormWindow(TEditorWindowType_GroupedCancel, c.list_start_id);
-			}
 			if (details_opened) {
 				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, MOVELIST_TAB_ACTIVE);
 			}
+			if (ImGui::Button(c.list_start_id_str.c_str())) {
+				m_baseWindow->OpenFormWindow(TEditorWindowType_GroupedCancel, c.list_start_id);
+			}
+			ImGui::SameLine();
+			ImGui::TextUnformatted(c.command_str.c_str());
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(c.detection_start.c_str());
@@ -286,6 +290,7 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 				if (ImGui::Button(_("references.cancel.view_cancel"))) {
 					m_baseWindow->OpenFormWindow(TEditorWindowType_Cancel, cancel_ref.list_start_id);
 				}
+
 				ImGui::PopID();
 				ImGui::SameLine();
 				ImGui::TextUnformatted(cancel_ref.list_start_id_str.c_str());

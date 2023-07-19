@@ -309,6 +309,7 @@ public:
 	void DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr);
 
 	// -- Command Utils -- //
+	std::string GetCommandStr(uint64_t command) const;
 	std::string GetCommandStr(const char* direction, const char* button) const override;
 	std::string GetCommandStr(const char* commandBuf) const override;
 	void GetInputSequenceString(int id, std::string& outStr, int& outSize) const override;
