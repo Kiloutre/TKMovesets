@@ -62,7 +62,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 	std::smatch m;
 	std::regex urlExpr("browser_download_url\" *: *\"([^\"]+)\"");
 	std::regex tagExpr("tag_name\" *: *\"([^\"]+)\"");
-	std::regex bodyExpr("body\" *: *\"([^\"]+)\"");
+	std::regex bodyExpr("(body\" *: *\")");
 	std::string downloadUrl;
 	std::string tagName;
 	std::string changelog;
@@ -74,7 +74,35 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 		tagName = m[1].str();
 	}
 	if (std::regex_search(releasesContent, m, bodyExpr)) {
-		changelog = m[1].str();
+		std::string body_start_str = m[1].str();
+		size_t body_start = releasesContent.find(body_start_str.c_str()) + body_start_str.size();
+		size_t body_end = std::string::npos;
+
+		// Have to factor in double quote escaping as opposed to URL & tag name
+		bool escape = false;
+		for (size_t idx = body_start + 1; idx < releasesContent.size(); ++idx)
+		{
+			if (escape) {
+				escape = false;
+			}
+			else {
+				switch (releasesContent[idx])
+				{
+				case '\\':
+					escape = true;
+					break;
+				case '"':
+					body_end = idx;
+					break;
+				}
+				
+			}
+		}
+
+		if (body_end != std::string::npos) {
+			changelog = releasesContent.substr(body_start, body_end - body_start);
+			changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");;
+		}
 	}
 
 	DEBUG_LOG("Remote URL: [%s]\n", downloadUrl.c_str());
@@ -86,7 +114,7 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 	updateStatus->tagName = tagName;
 	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("sidemenu.changelog"), tagName);
-	updateStatus->changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
+	updateStatus->changelog = changelog;
 
 	DEBUG_LOG("'%s'\n", updateStatus->changelog.c_str());
 
