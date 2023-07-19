@@ -30,6 +30,7 @@ close_window = ウィンドウを閉じる
 3p = Player 3
 4p = Player 4
 select_game = ゲーム選択
+#hash = 
 
 # Process #
 
@@ -96,12 +97,11 @@ settings.overwrite_explanation = 同じ名前の末尾に数字を加えたフ�
 settings.keybinds = ショートカットキー設定
 settings.keybind_rebind = ショートカットキー再設定
 settings.reset_keybinds = ショートカットキーリセット
-
 settings.finish_keybind = 設定する
+
 keybind_editor.import_p1 = p1のインポートショートカットキー
 keybind_editor.import_p2 = p2のインポートショートカットキー
 keybind_editor.import_both = p1とp2のインポートショートカットキー
-
 
 sidemenu.settings = 設定
 sidemenu.up_to_date = 最新
@@ -231,7 +231,7 @@ edition.form_popup.copy_single_item_clipboard = 単一の項目をクリップ
 edition.form_popup.paste_structure_clipboard = クリップを貼り付ける
 edition.form_popup.duplicate_structure = Structureを複製
 edition.form_popup.delete_structure = Structureの削除
-edition.form_popup.what_cancels_into_this_move = このMoveを使用するCancelを検索
+edition.form_popup.what_references_this_move = このMoveを使用するCancelを検索
 edition.form_popup.what_moves_use_this_cancel_list = このcancel listを使用するMoveを検索
 edition.form_popup.deletion_are_you_sure = 本当にStructureを削除しますか?\nこのStructureが他の場所でも使用している場合は、問題を回避するためにStructureを削除しないことをお勧めします。
 edition.form_popup.yes_delete = はい、削除します。
