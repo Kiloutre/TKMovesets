@@ -97,6 +97,7 @@ void TEditor_MoveReferences::RenderCancelsReferences()
 			ImGui::TableNextColumn();
 			if (!details_opened && ImGui::Button("V")) {
 				m_references.current_cancel = &c;
+				m_references.details_title.cancel = std::format("{}:", c.list_start_id_str);
 			}
 
 			ImGui::TableNextColumn();
@@ -214,6 +215,7 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 			ImGui::TableNextColumn();
 			if (!details_opened && ImGui::Button("V")) {
 				m_references.current_grouped_cancel = &c;
+				m_references.details_title.grouped_cancel = std::format(" {}:", c.list_start_id_str);
 			}
 
 			ImGui::TableNextColumn();
@@ -345,7 +347,7 @@ void TEditor_MoveReferences::RenderReactionsReferences()
 			ImGui::TableNextColumn();
 			if (!details_opened && ImGui::Button("V")) {
 				m_references.current_reactions = &r;
-				m_references.details_title.reactions = std::format("{} {}:", _("references.reactions"), r.id_str);
+				m_references.details_title.reactions = std::format(" {} {}:", _("references.reactions"), r.id_str);
 			}
 
 			ImGui::TableNextColumn();
