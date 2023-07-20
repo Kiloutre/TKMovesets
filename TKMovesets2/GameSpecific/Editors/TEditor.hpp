@@ -143,6 +143,22 @@ public:
 
 	// -- References -- //
 
+	struct CancelProjectileReference {
+		struct Reference {
+			unsigned int move_id;
+			std::string name;
+		};
+		unsigned int id;
+		std::string id_str;
+		std::string references_count_str;
+		std::vector<Reference> moves_references;
+	};
+
+	struct CancelMoveReference {
+		unsigned int move_id;
+		std::string name;
+	};
+
 	struct MoveCancelReference {
 		struct Reference {
 			unsigned int move_id;
@@ -219,6 +235,8 @@ public:
 		std::string references_count_str;
 	};
 
+	virtual std::vector<TEditor::CancelProjectileReference> ListCancelsProjectilesReferences(unsigned int cancel_start_id) const = 0;
+	virtual std::vector<TEditor::CancelMoveReference> ListCancelsMoveReferences(unsigned int cancel_start_id) const = 0;
 	virtual std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const = 0;
 	virtual std::vector<MoveGroupedCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const = 0;
 	virtual std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const = 0;

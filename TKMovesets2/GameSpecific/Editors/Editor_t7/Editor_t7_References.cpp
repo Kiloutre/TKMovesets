@@ -2,6 +2,112 @@
 
 #include "Editor_t7.hpp"
 
+// -- Cancels -- //
+
+std::vector<TEditor::CancelMoveReference> EditorT7::ListCancelsMoveReferences(unsigned int cancel_start_id) const
+{
+	std::vector<TEditor::CancelMoveReference> references;
+	unsigned int cancel_end_id = cancel_start_id;
+	while (m_iterators.cancels[cancel_end_id]->command != constants.at(EditorConstants_CancelCommandEnd)) {
+		++cancel_end_id;
+	}
+
+	unsigned int ref_id = 0;
+	for (const auto& move : m_iterators.moves)
+	{
+		// List moves that use this cancel list, even if only a part of it 
+		if (
+			(cancel_start_id <= move.cancel_addr && move.cancel_addr <= cancel_end_id) ||
+			(cancel_start_id <= move._0x28_cancel_addr && move._0x28_cancel_addr <= cancel_end_id) ||
+			(cancel_start_id <= move._0x38_cancel_addr && move._0x38_cancel_addr <= cancel_end_id) ||
+			(cancel_start_id <= move._0x48_cancel_addr && move._0x48_cancel_addr <= cancel_end_id)
+			) {
+			references.push_back({
+				.move_id = ref_id,
+				.name = std::format("{} - {}", ref_id, (char*)(m_movesetData + m_offsets->nameBlock + move.name_addr))
+			});
+		}
+		++ref_id;
+	}
+
+	return references;
+}
+
+std::vector<TEditor::CancelProjectileReference> EditorT7::ListCancelsProjectilesReferences(unsigned int cancel_start_id) const
+{
+	std::vector<TEditor::CancelProjectileReference> references;
+
+	unsigned int cancel_end_id = cancel_start_id;
+	while (m_iterators.cancels[cancel_end_id]->command != constants.at(EditorConstants_CancelCommandEnd)) {
+		++cancel_end_id;
+	}
+
+	unsigned int ref_id = 0;
+	for (const auto& projectile : m_iterators.projectiles)
+	{
+		// List projectiles that use this cancel list, even if only a part f it 
+		if (cancel_start_id <= projectile.cancel_addr && projectile.cancel_addr <= cancel_end_id) {
+			references.push_back({
+				.id = ref_id,
+				.id_str = std::to_string(ref_id)
+			});
+		}
+		++ref_id;
+	}
+
+	struct s_extra_prop_ref {
+		unsigned int list_start_id;
+		unsigned int id;
+		TEditor::CancelProjectileReference& projectile;
+	} ;
+
+	std::vector<s_extra_prop_ref> extra_properties_refs;
+	unsigned int list_start_id = 0;
+	ref_id = 0;
+	for (const auto& extra_property : m_iterators.extra_move_properties)
+	{
+		if (extra_property.id == constants.at(EditorConstants_ProjectileProperty))
+		{
+			for (auto& projectile : references)
+			{
+				if (projectile.id == extra_property.value_unsigned)
+				{
+					extra_properties_refs.push_back({ 
+						.list_start_id = list_start_id,
+						.id = ref_id,
+						.projectile = projectile
+					});
+				}
+			}
+		}
+		++ref_id;
+		if (extra_property.id == constants.at(EditorConstants_ExtraPropertyEnd)) {
+			list_start_id = ref_id;
+		}
+	}
+
+	ref_id = 0;
+	for (const auto& move : m_iterators.moves)
+	{
+		for (auto& prop : extra_properties_refs)
+		{
+			if (prop.list_start_id <= move.extra_move_property_addr && move.extra_move_property_addr <= prop.id)
+			{
+				prop.projectile.moves_references.push_back({
+					.move_id = ref_id,
+					.name = std::format("{} - {}", ref_id, (char*)(m_movesetData + m_offsets->nameBlock + move.name_addr))
+				});
+			}
+		}
+		++ref_id;
+	}
+
+	return references;
+}
+
+
+// -- Moves -- //
+
 std::vector<TEditor::MoveCancelReference> EditorT7::ListMoveCancelsReferences(unsigned int moveid) const
 {
 	std::vector<TEditor::MoveCancelReference> references;
@@ -11,7 +117,7 @@ std::vector<TEditor::MoveCancelReference> EditorT7::ListMoveCancelsReferences(un
 	for (const auto& ref : m_iterators.cancels)
 	{
 		// List cancels that use [moveid]
-		if (!IsCommandInputSequence(ref.command) && !IsCommandGroupedCancelReference(ref.command))
+		if (!IsCommandGroupedCancelReference(ref.command))
 		{
 			if (ref.move_id == moveid)
 			{
@@ -30,7 +136,7 @@ std::vector<TEditor::MoveCancelReference> EditorT7::ListMoveCancelsReferences(un
 					.id = ref_id,
 					.list_start_id = list_start,
 					.list_start_id_str = std::to_string(list_start),
-					.command_str = "[" + GetCommandStr(ref.command) + "]",
+					.command_str = IsCommandInputSequence(ref.command) ? "..." : "[" + GetCommandStr(ref.command) + "]",
 					.detection_start = std::to_string(ref.detection_start),
 					.detection_end = std::to_string(ref.detection_end),
 					.starting_frame = std::to_string(ref.starting_frame),
@@ -105,7 +211,7 @@ std::vector<TEditor::MoveGroupedCancelReference> EditorT7::ListMoveGroupedCancel
 				.id = ref_id,
 				.list_start_id = list_start,
 				.list_start_id_str = std::to_string(list_start),
-				.command_str = "[" + GetCommandStr(ref.command) + "]",
+				.command_str = IsCommandInputSequence(ref.command) ? "..." : "[" + GetCommandStr(ref.command) + "]",
 				.detection_start = std::to_string(ref.detection_start),
 				.detection_end = std::to_string(ref.detection_end),
 				.starting_frame = std::to_string(ref.starting_frame),

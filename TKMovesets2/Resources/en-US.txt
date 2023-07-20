@@ -232,8 +232,8 @@ edition.form_popup.copy_single_item_clipboard = Copy single item
 edition.form_popup.paste_structure_clipboard = Paste structure
 edition.form_popup.duplicate_structure = Duplicate structure
 edition.form_popup.delete_structure = Delete structure
-edition.form_popup.what_references_this_move = What cancels into this move?
-edition.form_popup.what_moves_use_this_cancel_list = What move use this cancel list?
+edition.form_popup.what_references_this_move = What structure uses into this move?
+edition.form_popup.what_references_this_cancel = What move use this cancel list?
 edition.form_popup.deletion_are_you_sure = Are you sure you wish to delete this structure?\nIt is recommended not to delete structures in order to avoid problems when they are referenced in many other places.
 edition.form_popup.yes_delete = Yes, delete.
 
@@ -539,10 +539,12 @@ references.reactions = Reactions
 references.reactions.situations = Situations
 references.list_start = List (start)
 references.moves = Moves
+references.cancel.title = Cancel
 references.cancels = Cancels
 references.cancels.view_cancel = View cancel
-references.grouped_cancels = Grouped cancels
 references.cancels.requirements = Requirements
+references.grouped_cancels = Grouped cancels
+references.projectiles = Projectiles
 
 # Documentation #
 

@@ -203,7 +203,6 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 		}
 
-		ImGui::SameLine();
 		if (ImGui::Button(_("edition.open_characters_directory")))
 		{
 			std::wstring path = std::filesystem::current_path();
@@ -213,6 +212,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 		}
 
+		ImGui::SameLine();
 		if (ImGui::Button(_("edition.refresh_movesets")))
 		{
 			storage.RefreshMovesets();

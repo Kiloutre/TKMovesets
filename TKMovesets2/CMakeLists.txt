@@ -151,6 +151,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Subwindows/TEditor_MoveReferences.cpp"
+                    "GameSpecific/EditorVisuals/EditorVisuals_t7/Subwindows/TEditor_CancelReferences.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/TEditorMove.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/TEditorVoiceclip.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/TEditorExtraproperties.cpp"

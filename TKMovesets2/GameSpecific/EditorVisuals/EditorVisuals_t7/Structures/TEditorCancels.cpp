@@ -4,6 +4,7 @@
 #include "Localization.hpp"
 #include "EditorVisuals_t7.hpp"
 #include "imgui_extras.hpp"
+#include "EditorVisuals_t7/Subwindows/TEditor_CancelReferences.hpp"
 
 // -- Private methods -- //
 
@@ -220,9 +221,11 @@ void TEditorCancels::RenderExtraContextMenuItems()
 {
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 
-	ImGuiExtra::DisableBlockIf __(true);
-	if (ImGui::Selectable(_("edition.form_popup.edition.form_popup.what_moves_use_this_cancel_list "), false, 0, selectableSize))
+	if (ImGui::Selectable(_("edition.form_popup.what_references_this_cancel"), false, 0, selectableSize))
 	{
-		//todo
+		std::string identifier = TEditor_CancelReferences::identifier_prefix + std::to_string(structureId);
+		if (!m_baseWindow->RefreshSubwindowIfExists(identifier)) {
+			m_baseWindow->AddSubwindow(new TEditor_CancelReferences((TEditor*)m_editor, m_baseWindow, structureId));
+		}
 	}
 }

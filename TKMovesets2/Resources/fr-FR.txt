@@ -233,7 +233,7 @@ edition.form_popup.paste_structure_clipboard = Coller la structure
 edition.form_popup.duplicate_structure = Dupliquer la structure
 edition.form_popup.delete_structure = Supprimer la structure
 edition.form_popup.what_references_this_move = Quelles structures utilisent ce Move ?
-edition.form_popup.what_moves_use_this_cancel_list = Quels Moves utilise cette liste de cancel ?
+edition.form_popup.what_references_this_cancel = Quelles structures utilisent cette liste de Cancel ?
 edition.form_popup.deletion_are_you_sure = Êtes-vous sûr de vouloir supprimer cette structure ?\nIl est recommandé d'éviter de supprimer une structure en cas où elle possède de nombreuses références ailleurs.
 edition.form_popup.yes_delete = Oui, supprimez.
 
@@ -539,10 +539,12 @@ references.reactions = Réactions
 references.reactions.situations = Situations
 references.list_start = Liste (début)
 references.moves = Moves
+references.cancel.title = Cancel
 references.cancels = Cancels
 references.cancels.view_cancel = Voir Cancel
-references.grouped_cancels = Cancels groupés
 references.cancels.requirements = Conditions
+references.grouped_cancels = Cancels groupés
+references.projectiles = Projectiles
 
 # Documentation #
 

@@ -358,6 +358,8 @@ public:
 	void ExecuteExtraprop(EditorInput* idField, EditorInput* valueField) override;
 
 	// References
+	std::vector<TEditor::CancelProjectileReference> ListCancelsProjectilesReferences(unsigned int cancel_start_id) const override;
+	std::vector<TEditor::CancelMoveReference> ListCancelsMoveReferences(unsigned int cancel_start_id) const override;
 	std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const override;
 	std::vector<MoveGroupedCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const override;
 	std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const override;

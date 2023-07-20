@@ -233,7 +233,7 @@ edition.form_popup.paste_structure_clipboard = クリップを貼り付ける
 edition.form_popup.duplicate_structure = Structureを複製
 edition.form_popup.delete_structure = Structureの削除
 edition.form_popup.what_references_this_move = このMoveを使用するCancelを検索
-edition.form_popup.what_moves_use_this_cancel_list = このcancel listを使用するMoveを検索
+edition.form_popup.what_references_this_cancel = このcancel listを使用するMoveを検索
 edition.form_popup.deletion_are_you_sure = 本当にStructureを削除しますか?\nこのStructureが他の場所でも使用している場合は、問題を回避するためにStructureを削除しないことをお勧めします。
 edition.form_popup.yes_delete = はい、削除します。
 
@@ -539,10 +539,12 @@ edition.mvl_input.frames = frames
 #references.reactions.situations = 
 #references.list_start =
 #references.moves =
+#references.cancel.title =
 #references.cancels =
 #references.cancels.view_cancel
-#references.grouped_cancels =
 #references.cancels.requirements =
+#references.grouped_cancels =
+#references.projectiles =
 
 # Documentation #
 

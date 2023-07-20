@@ -446,7 +446,7 @@ bool TEditor_MoveReferences::Render()
 	ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(9999, 9999));
 	if (ImGui::Begin(m_identifier.c_str(), &popen))
 	{
-		if (ImGui::BeginTabBar("MovelistTabs"))
+		if (ImGui::BeginTabBar("MoveReferencesTabs"))
 		{
 			bool focused_tab = false;
 
