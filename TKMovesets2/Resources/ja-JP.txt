@@ -80,10 +80,10 @@ navmenu.about = 概要
 
 settings.general = 一般設定
 settings.language = 言語
-sidemenu.vsync = VSync設定
-sidemenu.vsync_explanation = GPUのリフレッシュレートを制限します。
-sidemenu.file_association = Associate .tkmvst / .tkanimXX
-sidemenu.file_association_explanation = Movesetファイル (.tkmvst) とアニメーションファイルをこのツールに関連付け、自動的にこのツールのフォルダにコピーできるようにします。
+settings.vsync = VSync設定
+settings.vsync_explanation = GPUのリフレッシュレートを制限します。
+settings.file_association = Associate .tkmvst / .tkanimXX
+settings.file_association_explanation = Movesetファイル (.tkmvst) とアニメーションファイルをこのツールに関連付け、自動的にこのツールのフォルダにコピーできるようにします。
 settings.auto_update_check = 自動更新チェック
 settings.auto_addr_update_check = アドレスの自動更新
 settings.importation = 設定のインポート
