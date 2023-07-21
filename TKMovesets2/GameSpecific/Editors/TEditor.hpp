@@ -74,7 +74,7 @@ protected:
 	// Stores a <offset, offset> animation map
 	std::map<gameAddr, gameAddr> m_animOffsetToNameOffset;
 public:
-	// If moveset posses movelist data
+	// If moveset possesses movelist data
 	bool hasDisplayableMovelist = false;
 	// Contains every move, in a displayable format. Not tied to training mode movelist.
 	std::vector<DisplayableMove*> displayableMovelist;

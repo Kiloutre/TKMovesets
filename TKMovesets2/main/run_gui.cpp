@@ -1,10 +1,4 @@
-﻿#ifdef BUILD_TYPE_DEBUG
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <stdlib.h>
-#endif
-
-#include "glad/glad.h"
+﻿#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include <imgui.h>
@@ -12,27 +6,17 @@
 #include <imgui_impl_opengl3.h>
 
 #include <stdio.h>
-#include <format>
 #include <windows.h>
-#include <locale>
-#include <filesystem>
-#include <fstream>
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
 #include "GameAddressesFile.hpp"
 #include "Settings.hpp"
-#include "AnimExtractors.hpp"
 
 #include "constants.h"
 
-// -- Errcodes -- //
-# define MAIN_ERR_GLFW_INIT         (1)
-# define MAIN_ERR_WINDOW_CREATION   (2)
-# define MAIN_ERR_OPENGL_CONTEXT    (3)
-# define MAIN_ERR_MOVESET_LOADER    (4)
-# define MAIN_ERR_NO_MOVESET_LOADER (5)
-# define MAIN_ERR_NO_ERR            (0)
+// From UpdateApply.cpp
+void StartProcess(const std::string& file);
 
 // -- Static helpers -- //
 
@@ -228,233 +212,14 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 }
 
 
-void StartProcess(const std::string& file);
-void ApplyUpdate(const std::string& filename);
-void CleanupUpdateFiles(const std::string& filename);
-
-// -- main -- //
-
-static void MoveMovesetFile(const std::wstring& argFile)
+void run_gui()
 {
-	DEBUG_LOG("Argument: '%S'\n", argFile.c_str());
-
-	if (!Helpers::fileExists(argFile.c_str())) {
-		DEBUG_ERR("File does not exist: '%S'", argFile.c_str());
-		return;
-	}
-
-	std::wstring filename = argFile.substr(argFile.find_last_of(L"\\") + 1);
-	std::wstring name = filename.substr(0, filename.find_last_of(L"."));
-
-	DEBUG_LOG("Filename is '%S'\n", filename.c_str());
-
-	if (Helpers::endsWith<std::wstring>(argFile, L"" MOVESET_FILENAME_EXTENSION))
-	{
-		// Moveset file : Move to "extracted_chars" folder
-		std::wstring target = std::wstring(std::filesystem::current_path()) + L"\\extracted_chars\\" + filename;
-
-		if (wcscmp(target.c_str(), argFile.c_str()) == 0) {
-			DEBUG_LOG("Not copying moveset: already in our folders\n");
-			return;
-		}
-
-		if (Helpers::fileExists(target.c_str()))
-		{
-			DEBUG_LOG("File already exists\n");
-			const std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\" MOVESET_DIRECTORY L"\\";
-
-			unsigned int number = 2;
-			target = prefix + name + L" (" + std::to_wstring(number) + L") " MOVESET_FILENAME_EXTENSION;
-			while (Helpers::fileExists(target.c_str()))
-			{
-				++number;
-				target = prefix + name + L" (" + std::to_wstring(number) + L")" MOVESET_FILENAME_EXTENSION;
-			}
-		}
-
-
-		CreateDirectoryW(L"" MOVESET_DIRECTORY, nullptr);
-		DEBUG_LOG("Copying to target '%S'..\n", target.c_str());
-		std::filesystem::copy_file(argFile, target);
-		try {
-			std::filesystem::remove(argFile);
-		}
-		catch (std::filesystem::filesystem_error const&) {
-			DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", argFile.c_str());
-		}
-    }
-}
-
-static void MoveAnimationFile(const std::wstring& argFile)
-{
-	DEBUG_LOG("Argument: '%S'\n", argFile.c_str());
-
-	if (!Helpers::fileExists(argFile.c_str())) {
-		DEBUG_ERR("File does not exist: '%S'", argFile.c_str());
-		return;
-	}
-
-	std::wstring filename = argFile.substr(argFile.find_last_of(L"\\") + 1);
-	std::wstring name = filename.substr(0, filename.find_last_of(L"."));
-
-	DEBUG_LOG("Filename is '%S'\n", filename.c_str());
-
-	if (Helpers::endsWith<std::wstring>(argFile, L"" ANIMATION_EXTENSION L"64")
-	|| Helpers::endsWith<std::wstring>(argFile, L"" ANIMATION_EXTENSION L"C8"))
-	{
-		// Animation file: move to animation library
-		std::wstring prefix = std::wstring(std::filesystem::current_path()) + L"\\" EDITOR_LIB_DIRECTORY "\\";
-		std::wstring outputFolder = prefix + L"EXTERNAL\\";
-
-		CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
-		CreateDirectoryW(outputFolder.c_str(), nullptr);
-
-		std::wstring outputFile = outputFolder + filename;
-		std::wstring animCache = outputFolder + L"anims.txt";
-
-		if (wcscmp(outputFile.c_str(), argFile.c_str()) == 0 || Helpers::startsWith<std::wstring>(argFile, prefix)) {
-			DEBUG_LOG("Not copying anim file: already in our folders\n");
-			return;
-		}
-
-		if (Helpers::fileExists(outputFile.c_str()))
-		{
-			unsigned int number = 2;
-			std::wstring extension = filename.substr(filename.find_last_of(L"."));
-			outputFile = outputFolder + name + L" (" + std::to_wstring(number) + L")" + extension;
-			while (Helpers::fileExists(outputFile.c_str()))
-			{
-				++number;
-				outputFile = outputFolder + name + L" (" + std::to_wstring(number) + L")" + extension;
-			}
-		}
-
-		if (Helpers::fileExists(animCache.c_str()))
-		{
-			Byte* anim;
-			uint64_t s_anim;
-
-			try {
-				std::ifstream animationData(argFile, std::ios::binary);
-
-				if (animationData.fail()) {
-					DEBUG_ERR("Failed to analyze animation data");
-					return;
-				}
-
-				animationData.seekg(0, std::ios::end);
-				s_anim = animationData.tellg();
-				anim = new Byte[s_anim];
-				animationData.seekg(0, std::ios::beg);
-				animationData.read((char*)anim, s_anim);
-			}
-			catch (const std::bad_alloc&)
-			{
-				DEBUG_ERR("Failed to allocate %llu bytes to analyze animation data", s_anim);
-				return;
-			}
-
-			std::ofstream animCacheFile(animCache, std::ios::app);
-			if (animCacheFile.fail()) {
-				try {
-					std::filesystem::remove(animCache);
-				}
-				catch (std::filesystem::filesystem_error const&) {
-					DEBUG_LOG("Deletion of cache '%S' failed.\n", animCache.c_str());
-				}
-			}
-			else {
-				DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
-				TAnimExtractorUtils::ExtractAnimation(Helpers::to_utf8(name).c_str(), anim, outputFolder, animCacheFile, L"" ANIMATION_EXTENSION);
-			}
-
-			delete[] anim;
-		}
-		else
-		{
-			DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
-			std::filesystem::copy_file(argFile, outputFile);
-		}
-
-		try {
-			std::filesystem::remove(argFile);
-		}
-		catch (std::filesystem::filesystem_error const&) {
-			DEBUG_LOG("Deletion of animation '%S' after copy failed.\n", argFile.c_str());
-		}
-	}
-}
-
-int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LPSTR lpCmdLine, _In_  int nShowCmd)
-{
-#ifdef BUILD_TYPE_DEBUG
-	AllocConsole();
-#pragma warning(push)
-#pragma warning(disable:4996)
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
-#pragma warning(pop)
-#endif
-
-	{
-		std::wstring oldWorkingDir = std::filesystem::current_path().wstring();
-
-		// Make sure working dir is same as .exe
-		wchar_t currPath[MAX_PATH] = { 0 };
-		GetModuleFileNameW(nullptr, currPath, MAX_PATH);
-		std::wstring ws(currPath);
-		std::string filename = Helpers::wstring_to_string(ws.substr(ws.find_last_of(L"\\") + 1));
-		ws.erase(ws.find_last_of(L"\\"));
-
-		if (ws != std::filesystem::current_path()) {
-			std::filesystem::current_path(ws);
-		}
-
-		std::string update_file_name = UPDATE_TMP_FILENAME ".exe";
-		if (filename == update_file_name) {
-			// Copy self .exe into TKMovesets.exe
-			ApplyUpdate(update_file_name);
-			return 0;
-		}
-		else if (Helpers::fileExists(update_file_name.c_str())) {
-			CleanupUpdateFiles(update_file_name);
-		}
-	}
-
-	// Handle file arguments
-	{
-		auto cmdLine = GetCommandLineW();
-		int argc;
-		auto argv = CommandLineToArgvW(cmdLine, &argc);
-
-		if (argc != 1) {
-			std::wstring first_arg = argv[1];
-			if (first_arg == L"--move-moveset") {
-				if (argc >= 2) {
-					MoveMovesetFile(argv[2]);
-				}
-			}
-			else if (first_arg == L"--move-animation") {
-				if (argc >= 2) {
-					MoveAnimationFile(argv[2]);
-				}
-			}
-
-			DWORD currPid = GetCurrentProcessId();
-			for (auto& process : GameProcessUtils::GetRunningProcessList())
-			{
-				if (process.name == PROGRAM_FILENAME && process.pid != currPid) {
-					DEBUG_LOG("Not starting another instance of this software if using args.\n");
-					return 0;
-				}
-			}
-		}
-	}
 
 	// Initialize GLFW library
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) {
-		return MAIN_ERR_GLFW_INIT;
+		DEBUG_ERR("MAIN_ERR_GLFW_INIT");
+		return;
 	}
 
 	// GL 3.0 + GLSL 130
@@ -477,7 +242,8 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	}
 
 	if (window == nullptr) {
-		return MAIN_ERR_WINDOW_CREATION;
+		DEBUG_ERR("MAIN_ERR_WINDOW_CREATION");
+		return;
 	}
 
 	// Set window for current thread
@@ -498,8 +264,8 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	ImGui_ImplOpenGL3_Init(c_glsl_version);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		DEBUG_LOG("Unable to context to OpenGL");
-		return MAIN_ERR_OPENGL_CONTEXT;
+		DEBUG_ERR("MAIN_ERR_OPENGL_CONTEXT");
+		return;
 	}
 
 	if (!LoadEmbeddedIcon(window)) {
@@ -587,12 +353,4 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_  LP
 	glfwTerminate();
 
 	Localization::Clear();
-
-#ifdef BUILD_TYPE_DEBUG
-	FreeConsole();
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
-	_CrtDumpMemoryLeaks();
-#endif
-
-	return MAIN_ERR_NO_ERR;
 }

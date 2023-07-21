@@ -40,7 +40,7 @@ static std::string getCommandString(uint64_t command)
 				}
 				retVal += cg_directionBitLabels[(size_t)i - 1];
 			}
-		}
+		}	
 
 		if (directionBits >> 10 || directionBits & 1) {
 			if (retVal.size() != 0) {

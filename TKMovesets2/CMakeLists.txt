@@ -63,7 +63,9 @@ set(INCLUDE_FOLDERS
 # This will be included in the .exe
 set(BINARY_SOURCES
                     # Main sources
-                    "main.cpp"
+                    "main/main.cpp"
+                    "main/run_gui.cpp"
+                    "main/arguments_handling.cpp"
 
                     "Updater/UpdateApply.cpp"
                     "Updater/UpdateCheck.cpp"
