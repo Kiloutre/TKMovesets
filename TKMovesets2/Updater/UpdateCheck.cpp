@@ -73,7 +73,8 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 	if (std::regex_search(releasesContent, m, tagExpr)) {
 		tagName = m[1].str();
 	}
-	if (std::regex_search(releasesContent, m, bodyExpr)) {
+	if (std::regex_search(releasesContent, m, bodyExpr))
+	{
 		std::string body_start_str = m[1].str();
 		size_t body_start = releasesContent.find(body_start_str.c_str()) + body_start_str.size();
 		size_t body_end = std::string::npos;
@@ -101,7 +102,11 @@ bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addr
 
 		if (body_end != std::string::npos) {
 			changelog = releasesContent.substr(body_start, body_end - body_start);
-			changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");;
+
+			// Fix newlines
+			changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
+			// Remove quote escaping
+			changelog = std::regex_replace(changelog, std::regex("\\\\\""), "\"");
 		}
 	}
 
