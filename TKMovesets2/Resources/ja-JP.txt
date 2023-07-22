@@ -30,7 +30,7 @@ close_window = ウィンドウを閉じる
 3p = Player 3
 4p = Player 4
 select_game = ゲーム選択
-#hash = 
+hash = hash
 
 # Process #
 
@@ -222,7 +222,7 @@ edition.animation_extraction.skipped = スキップしました。
 edition.animation_extraction.skipped_exists = スキップされたものが在ります。
 edition.animation_extraction.error = エラー
 edition.animation_extraction.interrupt = 割り込み
-#edition.open_characters_directory =
+edition.open_characters_directory = キャラクターフォルダを開く
 edition.open_editor_library = エディタライブラリを開く
 edition.open_editor_backups = エディタのバックアップを開く
 edition.refresh_movesets = Movesetを更新
@@ -232,8 +232,8 @@ edition.form_popup.copy_single_item_clipboard = 単一の項目をクリップ
 edition.form_popup.paste_structure_clipboard = クリップを貼り付ける
 edition.form_popup.duplicate_structure = Structureを複製
 edition.form_popup.delete_structure = Structureの削除
-edition.form_popup.what_references_this_move = このMoveを使用するCancelを検索
-edition.form_popup.what_references_this_cancel = このcancel listを使用するMoveを検索
+edition.form_popup.what_references_this_move = このMoveを使用するStructureを参照
+edition.form_popup.what_references_this_cancel = このcancel listを使用するMoveを参照
 edition.form_popup.deletion_are_you_sure = 本当にStructureを削除しますか?\nこのStructureが他の場所でも使用している場合は、問題を回避するためにStructureを削除しないことをお勧めします。
 edition.form_popup.yes_delete = はい、削除します。
 
