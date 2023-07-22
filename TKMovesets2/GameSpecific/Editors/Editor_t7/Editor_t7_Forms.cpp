@@ -327,7 +327,7 @@ void EditorT7::SaveThrowCamera(uint16_t id, InputMap& inputs)
 {
 	auto throwCamera = m_iterators.throw_datas[id];
 
-	SetMemberValue(&throwCamera->_0x0_llong, inputs["_0x0_int"]);
+	SetMemberValue(&throwCamera->_0x0_llong, inputs["_0x0_llong"]);
 	SetMemberValue(&throwCamera->cameradata_addr, inputs["cameradata_addr"]);
 }
 
