@@ -252,7 +252,7 @@ namespace StructsT7
 
 	struct ThrowCamera
 	{
-		uint64_t _0x0_llong;
+		uint64_t side;
 		CameraData* cameradata_addr;
 	};
 
@@ -785,7 +785,7 @@ namespace StructsT7_gameAddr
 
 	struct ThrowCamera
 	{
-		uint64_t _0x0_llong;
+		uint64_t side;
 		gameAddr cameradata_addr;
 	};
 

@@ -477,7 +477,7 @@ edition.animation_list.loading = Chargement de la liste d'animation...
 edition.animation_list.clear_filter = Effacer le filtre
 
 edition.throw_camera.window_name = Caméra de prise
-edition.throw_camera._0x0_int = _0x0_int
+edition.throw_camera.side = Côté
 edition.throw_camera.cameradata_addr = ID de donnée de caméra
 
 edition.camera_data.window_name = Donnée de caméra

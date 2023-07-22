@@ -477,7 +477,7 @@ edition.animation_list.loading = アニメーションリストを読み込み�
 edition.animation_list.clear_filter = Clear filter
 
 edition.throw_camera.window_name = Throw Camera
-edition.throw_camera._0x0_int = _0x0_int
+#edition.throw_camera.side = 
 edition.throw_camera.cameradata_addr = Camera data ID番号
 
 edition.camera_data.window_name = Camera data

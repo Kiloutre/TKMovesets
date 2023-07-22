@@ -302,8 +302,8 @@ InputMap EditorT7::GetThrowCameraInputs(uint16_t id, VectorSet<std::string>& dra
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
+	CREATE_FIELD("side", 0, EditorInput_U64_Changeable, throwCamera->side);
 	CREATE_FIELD("cameradata_addr", 0, EditorInput_PTR, throwCamera->cameradata_addr);
-	CREATE_FIELD("_0x0_llong", 0, EditorInput_U64_Changeable, throwCamera->_0x0_llong);
 
 	WriteFieldFullname(inputMap, "throw_camera");
 	return inputMap;
@@ -327,7 +327,7 @@ void EditorT7::SaveThrowCamera(uint16_t id, InputMap& inputs)
 {
 	auto throwCamera = m_iterators.throw_datas[id];
 
-	SetMemberValue(&throwCamera->_0x0_llong, inputs["_0x0_llong"]);
+	SetMemberValue(&throwCamera->side, inputs["side"]);
 	SetMemberValue(&throwCamera->cameradata_addr, inputs["cameradata_addr"]);
 }
 

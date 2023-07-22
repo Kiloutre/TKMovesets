@@ -430,7 +430,7 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		gAddr::ThrowCamera* target = (gAddr::ThrowCamera*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.throwCameras) + i;
 		const TTT2::ThrowCamera* source = (TTT2::ThrowCamera*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.throwCameras) + i;
 
-		target->_0x0_llong = source->_0x0_uint;
+		target->side = source->_0x0_uint;
 		target->cameradata_addr = source->cameradata_addr;
 	}
 

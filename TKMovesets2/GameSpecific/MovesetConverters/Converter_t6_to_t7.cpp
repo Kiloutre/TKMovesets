@@ -447,7 +447,7 @@ bool MovesetConverter::T6ToT7::Convert(const TKMovesetHeader* header, Byte*& mov
 		gAddr::ThrowCamera* target = (gAddr::ThrowCamera*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.throwCameras) + i;
 		const T6::ThrowCamera* source = (T6::ThrowCamera*)(old_blocks->GetBlock(T6::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.throwCameras) + i;
 
-		target->_0x0_llong = source->_0x0_uint;
+		target->side = source->_0x0_uint;
 		target->cameradata_addr = source->cameradata_addr;
 	}
 

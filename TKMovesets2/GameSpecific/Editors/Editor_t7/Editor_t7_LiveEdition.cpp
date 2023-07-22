@@ -702,8 +702,8 @@ void EditorT7::Live_OnThrowCameraEdit(int id, EditorInput* field)
 	};
 	value_u64 = EditorUtils::GetFieldValue(field);
 
-	if (name == "_0x0_llong") {
-		m_process.writeInt64(throwCamera + offsetof(ThrowCamera, _0x0_llong), value_s64);
+	if (name == "side") {
+		m_process.writeInt64(throwCamera + offsetof(ThrowCamera, side), value_s64);
 	}
 	else if (name == "cameradata_addr")
 	{
