@@ -338,7 +338,6 @@ void EditorVisuals::RenderSubwindows()
 			m_lastChangeDate = Helpers::getCurrentTimestamp();
 			m_savedLastChange = false;
 			m_importNeeded = true;
-			m_abstractEditor->live_loadedMoveset = 0;
 		}
 
 		if (moveWin->popen)
