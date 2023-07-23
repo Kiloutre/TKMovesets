@@ -85,7 +85,7 @@ public:
 	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
 
 
-	int64_t GetValueEx(const std::string& gameKey, const char* c_addressId) const;
-	const char* GetStringEx(const std::string& gameKey, const char* c_addressId) const;
-	const std::vector<gameAddr>& GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
+	bool GetValueEx(const std::string& gameKey, const char* c_addressId, int64_t& out) const;
+	bool GetStringEx(const std::string& gameKey, const char* c_addressId, const char*& out) const;
+	bool GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative, const std::vector<gameAddr>*& const out) const;
 };

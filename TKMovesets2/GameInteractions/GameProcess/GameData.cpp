@@ -30,7 +30,7 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId) const
 	}
 
 	bool isRelative;
-	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
+	const std::vector<gameAddr>& ptrPath = *GetPtrPath(c_addressId, isRelative);
 
 	if (ptrPath.size() == 0) {
 		return GAME_ADDR_NULL;
@@ -63,7 +63,7 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId) const
 gameAddr GameData::ReadPtrPath32(const char* c_addressId) const
 {
 	bool isRelative;
-	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
+	const std::vector<gameAddr>& ptrPath = *GetPtrPath(c_addressId, isRelative);
 
 	if (ptrPath.size() == 0) {
 		return GAME_ADDR_NULL;

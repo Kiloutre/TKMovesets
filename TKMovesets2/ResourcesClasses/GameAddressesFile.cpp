@@ -276,7 +276,7 @@ const std::vector<gameAddr>& GameAddressesFile::GetPtrPath(const std::string& ga
 }
 
 
-int64_t GameAddressesFile::GetValueEx(const std::string& gameKey, const char* c_addressId) const
+bool GameAddressesFile::GetValueEx(const std::string& gameKey, const char* c_addressId, int64_t& out) const
 {
 	auto gameEntry = m_entries.find(gameKey);
 	if (gameEntry != m_entries.end())
@@ -284,15 +284,15 @@ int64_t GameAddressesFile::GetValueEx(const std::string& gameKey, const char* c_
 		auto& values = gameEntry->second.values;
 		auto entry = values.find(c_addressId);
 		if (entry != values.end()) {
-			return entry->second;
+			out = entry->second;
+			return true;
 		}
 	}
-
-	throw GameAddressNotFound();
+	return false;
 }
 
 
-const char* GameAddressesFile::GetStringEx(const std::string& gameKey, const char* c_addressId) const
+bool GameAddressesFile::GetStringEx(const std::string& gameKey, const char* c_addressId, const char*& out) const
 {
 	auto gameEntry = m_entries.find(gameKey);
 	if (gameEntry != m_entries.end())
@@ -300,14 +300,14 @@ const char* GameAddressesFile::GetStringEx(const std::string& gameKey, const cha
 		auto& strings = gameEntry->second.strings;
 		auto entry = strings.find(c_addressId);
 		if (entry != strings.end()) {
-			return entry->second.c_str();
+			out = entry->second.c_str();
+			return true;
 		}
 	}
-
-	throw GameAddressNotFound();
+	return false;
 }
 
-const std::vector<gameAddr>& GameAddressesFile::GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative) const
+bool GameAddressesFile::GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative, const std::vector<gameAddr>*& out) const
 {
 	auto gameEntry = m_entries.find(gameKey);
 	if (gameEntry != m_entries.end())
@@ -317,7 +317,8 @@ const std::vector<gameAddr>& GameAddressesFile::GetPtrPathEx(const std::string& 
 			auto entry = relative_pointer_paths.find(c_addressId);
 			if (entry != relative_pointer_paths.end()) {
 				isRelative = true;
-				return entry->second;
+				out = &entry->second;
+				return true;
 			}
 		}
 		{
@@ -325,12 +326,12 @@ const std::vector<gameAddr>& GameAddressesFile::GetPtrPathEx(const std::string& 
 			auto entry = absolute_pointer_paths.find(c_addressId);
 			isRelative = false;
 			if (entry != absolute_pointer_paths.end()) {
-				return entry->second;
+				out = &entry->second;
+				return true;
 			}
 		}
 	}
-
-	throw GameAddressNotFound();
+	return false;
 }
 
 
