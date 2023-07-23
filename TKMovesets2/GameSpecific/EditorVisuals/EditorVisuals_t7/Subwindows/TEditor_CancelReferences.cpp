@@ -119,7 +119,7 @@ void TEditor_CancelReferences::RenderProjectilesReferences()
 	{
 		ImGui::PushID(this);
 		ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed, 20.0f);
-		ImGui::TableSetupColumn(_("references.used_by"), 100.0f);
+		ImGui::TableSetupColumn(_("references.used_by"), 0, 100.0f);
 		ImGui::TableSetupColumn(_("references.projectiles"));
 		ImGui::TableHeadersRow();
 

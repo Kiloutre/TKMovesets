@@ -1,5 +1,4 @@
-﻿#include <stdio.h>
-#include <windows.h>
+﻿#include <windows.h>
 #include <filesystem>
 #include <fstream>
 
@@ -57,7 +56,7 @@ static void MoveMovesetFile(const std::wstring& argFile)
 			std::filesystem::remove(file);
 		}
 		catch (std::filesystem::filesystem_error const&) {
-			DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", file.string().c_str());
+			DEBUG_LOG("Deletion of moveset '%S' after copy failed.\n", file.wstring().c_str());
 		}
 	}
 	else {
