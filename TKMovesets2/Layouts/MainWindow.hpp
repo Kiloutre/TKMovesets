@@ -59,6 +59,8 @@ public:
 	std::vector<EditorVisuals*> editorWindows;
 
 	MainWindow();
+	~MainWindow();
+
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
 	virtual void NewFrame();
 	// Main layout rendering function

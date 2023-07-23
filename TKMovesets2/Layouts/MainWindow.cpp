@@ -74,6 +74,7 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 
 MainWindow::MainWindow()
 {
+	// ImGUI config init
 	ImGuiIO& io = ImGui::GetIO();
 
 	ImFont* font = io.Fonts->AddFontDefault();
@@ -88,6 +89,86 @@ MainWindow::MainWindow()
 	io.Fonts->Build();
 
 	ImGuiExtra::InitMarkdownConfig();
+
+
+	// Program config (various threads, submenus)
+	storage.ReloadMovesetList();
+
+	GameAddressesFile* addrFile = new GameAddressesFile(true);
+	addrFile = addrFile;
+
+	extractor.Init(addrFile, &storage);
+	importer.Init(addrFile, &storage);
+	sharedMem.Init(addrFile, &storage);
+
+	onlineMenu.gameHelper = &sharedMem;
+	persistentPlayMenu.gameHelper = &sharedMem;
+
+	sideMenu.requestedUpdatePtr = &requestedUpdate;
+	sideMenu.SetAddrFile(addrFile);
+
+	{
+		// Detect running games and latch on to them if possible
+		bool attachedExtractor = false;
+		bool attachedImporter = false;
+		bool attachedOnline = false;
+
+		auto processList = GameProcessUtils::GetRunningProcessList();
+
+		// Loop through every game we support
+		for (unsigned int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
+		{
+			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+
+			const char* processName = gameInfo->processName;
+			processEntry* p;
+
+			// Detect if the game is running
+			{
+				bool isRunning = false;
+				for (auto& process : processList)
+				{
+					if (process.name == processName)
+					{
+						p = &process;
+						isRunning = true;
+						break;
+					}
+				}
+				if (!isRunning) {
+					continue;
+				}
+			}
+
+			if (!gameInfo->MatchesProcessWindowName(p->pid)) {
+				continue;
+			}
+
+			if (!attachedExtractor && gameInfo->extractor != nullptr) {
+				extractor.SetTargetProcess(gameInfo);
+				attachedExtractor = true;
+				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+			if (!attachedImporter && gameInfo->importer != nullptr) {
+				importer.SetTargetProcess(gameInfo);
+				attachedImporter = true;
+				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
+				sharedMem.SetTargetProcess(gameInfo);
+				attachedOnline = true;
+				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+		}
+	}
+
+	storage.StartThread();
+	extractor.StartThread();
+	importer.StartThread();
+	sharedMem.StartThread();
 }
 
 // Actual rendering function
@@ -218,9 +299,23 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
-void MainWindow::Shutdown()
+MainWindow::~MainWindow()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	extractor.StopThreadAndCleanup();
+	importer.StopThreadAndCleanup();
+	sharedMem.StopThreadAndCleanup();
+
+	for (auto& win : editorWindows) {
+		delete win;
+	}
+
+	// Now that every thread that uses addrFile has stopped, we can free it
+	delete addrFile;
+
+	// Once every thread that may use storage has been stopped, we can finally stop storage
+	storage.StopThreadAndCleanup();
 }
