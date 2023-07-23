@@ -15,7 +15,7 @@ gameAddr GameData::ReadPtr(gameAddr address) const
 		}
 	}
 	else {
-		value = m_process->readUInt32(baseAddr + address);
+		value = (uint64_t)m_process->readUInt32(baseAddr + address);
 		if (bigEndian) {
 			value = BYTESWAP_INT32(value);
 		}

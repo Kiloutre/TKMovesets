@@ -77,15 +77,14 @@ public:
 
 	// Returns a list of every game_address.txt entry (key only).
 	const std::vector<std::string>& GetAllKeys() const;
+
 	// Returns a single numerical value from the file
 	int64_t GetValue(const std::string& gameKey, const char* c_addressId) const;
+	bool GetValueEx(const std::string& gameKey, const char* c_addressId, int64_t& out) const;
 	// Returns a string from the file
 	const char* GetString(const std::string& gameKey, const char* c_addressId) const;
+	bool GetStringEx(const std::string& gameKey, const char* c_addressId, const char*& out) const;
 	// Returns a pointer path, that may rely on the base address or not.
 	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
-
-
-	bool GetValueEx(const std::string& gameKey, const char* c_addressId, int64_t& out) const;
-	bool GetStringEx(const std::string& gameKey, const char* c_addressId, const char*& out) const;
 	bool GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative, const std::vector<gameAddr>*& out) const;
 };
