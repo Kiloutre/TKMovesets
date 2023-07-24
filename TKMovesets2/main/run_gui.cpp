@@ -184,7 +184,7 @@ void run_gui()
 	// Load translation
 	{
 		int langId = Settings::Get(SETTING_LANG_KEY, SETTING_LANG);
-		if (langId <= -1) {
+		if (langId == SETTING_LANG_INVALID || langId < 0) {
 			// Attempt to load locale from settings
 			if (!Localization::LoadFile(langId)) {
 				Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);

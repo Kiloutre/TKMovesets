@@ -65,7 +65,8 @@
 # define SETTING_VSYNC_BUFFER_KEY      ("vsync_interval")
 # define SETTING_VSYNC_BUFFER          (2) // 0 is no vsync, 1 is one screen refresh, etc
 # define SETTING_LANG_KEY              ("language_id")
-# define SETTING_LANG                  (-1) // -1 means autodetect
+# define SETTING_LANG_INVALID          (-1) // -1 means autodetect
+# define SETTING_LANG                  (SETTING_LANG_INVALID) // Will autodetect by default
 # define SETTING_AUTO_UPDATE_KEY       ("auto_update_check")
 # define SETTING_AUTO_UPDATE           (true)
 # define SETTING_AUTO_ADDR_UPDATE_KEY  ("auto_addresses_update_check")
