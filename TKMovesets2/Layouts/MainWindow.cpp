@@ -35,7 +35,7 @@ const ImU32 editorTitleInactiveColors[] = {
 //
 void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 {
-	for (EditorVisuals* win : editorWindows)
+	for (EditorVisuals* win : m_editorWindows)
 	{
 		if (win->filename == movesetInfos->filename)
 		{
@@ -47,8 +47,8 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 
 	try {
 		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
-		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, m_addrFile, &storage);
-		editorWindows.push_back(newWin);
+		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, m_addrFile, &m_storage);
+		m_editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
         DEBUG_ERR("Failed to load editor for moveset '%S'", movesetInfos->filename.c_str());
@@ -92,16 +92,16 @@ MainWindow::MainWindow()
 
 
 	// Program config (various threads, submenus)
-	storage.ReloadMovesetList();
+	m_storage.ReloadMovesetList();
 
 	m_addrFile = new GameAddressesFile(true);
 
-	extractor.Init(m_addrFile, &storage);
-	importer.Init(m_addrFile, &storage);
-	sharedMem.Init(m_addrFile, &storage);
+	m_extractor.Init(m_addrFile, &m_storage);
+	m_importer.Init(m_addrFile, &m_storage);
+	m_sharedMem.Init(m_addrFile, &m_storage);
 
-	onlineMenu.gameHelper = &sharedMem;
-	persistentPlayMenu.gameHelper = &sharedMem;
+	m_onlineMenu.gameHelper = &m_sharedMem;
+	m_persistentPlayMenu.gameHelper = &m_sharedMem;
 
 	sideMenu.requestedUpdatePtr = &requestedUpdate;
 	sideMenu.SetAddrFile(m_addrFile);
@@ -144,19 +144,19 @@ MainWindow::MainWindow()
 			}
 
 			if (!attachedExtractor && gameInfo->extractor != nullptr) {
-				extractor.SetTargetProcess(gameInfo);
+				m_extractor.SetTargetProcess(gameInfo);
 				attachedExtractor = true;
 				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
 			}
 
 			if (!attachedImporter && gameInfo->importer != nullptr) {
-				importer.SetTargetProcess(gameInfo);
+				m_importer.SetTargetProcess(gameInfo);
 				attachedImporter = true;
 				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
 			}
 
 			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
-				sharedMem.SetTargetProcess(gameInfo);
+				m_sharedMem.SetTargetProcess(gameInfo);
 				attachedOnline = true;
 				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
 			}
@@ -164,10 +164,10 @@ MainWindow::MainWindow()
 		}
 	}
 
-	storage.StartThread();
-	extractor.StartThread();
-	importer.StartThread();
-	sharedMem.StartThread();
+	m_storage.StartThread();
+	m_extractor.StartThread();
+	m_importer.StartThread();
+	m_sharedMem.StartThread();
 }
 
 // Actual rendering function
@@ -192,7 +192,7 @@ void MainWindow::Update()
 			ImGui::BeginChild("SideBar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 			// Render nav menu
-			navMenu.Render(sideMenuWidth, persistentPlayMenu.gameHelper->lockedIn);
+			m_navMenu.Render(sideMenuWidth, m_persistentPlayMenu.gameHelper->lockedIn);
 
 			ImGui::NewLine();
 			ImGui::NewLine();
@@ -210,25 +210,25 @@ void MainWindow::Update()
 			ImGui::SameLine();
 			ImGui::BeginChild("Tools", ImVec2(width - sidebarWidth - 25, 0), false, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
-			switch (navMenu.menuId)
+			switch (m_navMenu.menuId)
 			{
 			case NAV__MENU_EXTRACT:
-				extractMenu.Render(extractor);
+				m_extractMenu.Render(m_extractor);
 				break;
 			case NAV__MENU_IMPORT:
-				importMenu.Render(importer);
+				m_importMenu.Render(m_importer);
 				break;
 			case NAV__MENU_ONLINE_PLAY:
-				onlineMenu.Render();
+				m_onlineMenu.Render();
 				break;
 			case NAV__MENU_PERSISTENT_PLAY:
-				persistentPlayMenu.Render();
+				m_persistentPlayMenu.Render();
 				break;
 			case NAV__MENU_CAMERA:
 				break;
 			case NAV__MENU_EDITION:
 				{
-					movesetInfo* moveset = editionMenu.Render(storage);
+					movesetInfo* moveset = m_editionMenu.Render(m_storage);
 					if (moveset != nullptr) {
 						LoadMovesetEditor(moveset);
 					}
@@ -245,9 +245,9 @@ void MainWindow::Update()
 		}
 
 		// Editor windows
-		for (unsigned int i = 0; i < editorWindows.size();)
+		for (unsigned int i = 0; i < m_editorWindows.size();)
 		{
-			EditorVisuals* w = editorWindows[i];
+			EditorVisuals* w = m_editorWindows[i];
 
 			if (w->popen) {
 				const ImU32 colorCount = _countof(editorTitleColors);
@@ -272,7 +272,7 @@ void MainWindow::Update()
 			}
 			else {
 				// Window was closed, close the associated editor and free its ressources
-				editorWindows.erase(editorWindows.begin() + i);
+				m_editorWindows.erase(m_editorWindows.begin() + i);
 				delete w;
 			}
 		}
@@ -283,10 +283,10 @@ void MainWindow::Update()
 	// -- Rendering end -- //
 	{
 		// Cleanup stuff that we really don't want to clean up during Render()
-		storage.CleanupUnusedMovesetInfos();
-		extractor.FreeExpiredFactoryClasses();
-		importer.FreeExpiredFactoryClasses();
-		sharedMem.FreeExpiredFactoryClasses();
+		m_storage.CleanupUnusedMovesetInfos();
+		m_extractor.FreeExpiredFactoryClasses();
+		m_importer.FreeExpiredFactoryClasses();
+		m_sharedMem.FreeExpiredFactoryClasses();
 	}
 }
 
@@ -304,11 +304,11 @@ MainWindow::~MainWindow()
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	extractor.StopThreadAndCleanup();
-	importer.StopThreadAndCleanup();
-	sharedMem.StopThreadAndCleanup();
+	m_extractor.StopThreadAndCleanup();
+	m_importer.StopThreadAndCleanup();
+	m_sharedMem.StopThreadAndCleanup();
 
-	for (auto& win : editorWindows) {
+	for (auto& win : m_editorWindows) {
 		delete win;
 	}
 
@@ -316,5 +316,5 @@ MainWindow::~MainWindow()
 	delete m_addrFile;
 
 	// Once every thread that may use storage has been stopped, we can finally stop storage
-	storage.StopThreadAndCleanup();
+	m_storage.StopThreadAndCleanup();
 }
