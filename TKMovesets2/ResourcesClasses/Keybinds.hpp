@@ -23,6 +23,8 @@ namespace Keybinds
 	// Resets the keybinds and apply the default ones
 	void ApplyDefaultKeybinds();
 
+	// Returns true if a specific keybind is detected
+	bool IsKeybindPressed(const char* identifier);
 	// Returns a pointer to a keybind identifier string that is being pressed or NULLPTR if none
 	const std::string* DetectKeybindPress();
 

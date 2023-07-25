@@ -5,6 +5,7 @@
 #include "EditorForm.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals.hpp"
+#include "Keybinds.hpp"
 
 // -- Helpers -- //
 
@@ -175,28 +176,32 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 			}
 		}
 	}
-	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	else if (ImGui::IsItemFocused())
 	{
-		// Have to manually implement copying
-		if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
-			ImGui::SetClipboardText(field->buffer);
-		}
-		else if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
-			moveFocusAway = true;
-			field->nextValue = "0";
-			field->nextValue[0] = '\0';
-			ImGui::SetClipboardText(field->buffer);
-		}
-		else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
+		if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 		{
-			// ImGUI can sometimes fail this call and return NULL especially when storing images in the clipboard
-			auto clipboardText = ImGui::GetClipboardText();
-			if (clipboardText != nullptr) {
-				field->nextValue = clipboardText;
+			// Have to manually implement copying
+			if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
+				ImGui::SetClipboardText(field->buffer);
+			}
+			else if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
 				moveFocusAway = true;
+				field->nextValue = "0";
+				field->nextValue[0] = '\0';
+				ImGui::SetClipboardText(field->buffer);
+			}
+			else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
+			{
+				// ImGUI can sometimes fail this call and return NULL especially when storing images in the clipboard
+				auto clipboardText = ImGui::GetClipboardText();
+				if (clipboardText != nullptr) {
+					field->nextValue = clipboardText;
+					moveFocusAway = true;
+				}
 			}
 		}
-		else if ((field->flags & EditorInput_DataChangeable) && ImGui::IsKeyPressed(ImGuiKey_B, false))
+
+		if ((field->flags & EditorInput_DataChangeable) && Keybinds::IsKeybindPressed("keybind_editor.change_data_type"))
 		{
 			if (!unsavedChanges) {
 				// If no changes have been made, changing data type should not trigger the "unsaved changes" flag

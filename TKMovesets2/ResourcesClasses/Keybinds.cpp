@@ -27,6 +27,7 @@ namespace Keybinds
 		keybinds["keybind_editor.import_p2"] = { ImGuiKey_F2 };
 		keybinds["keybind_editor.import_both"] = { ImGuiKey_F3 };
 		keybinds["keybind_editor.save"] = { ImGuiKey_LeftCtrl, ImGuiKey_S };
+		keybinds["keybind_editor.change_data_type"] = { ImGuiKey_LeftCtrl, ImGuiKey_B };
 
 		return keybinds;
 	}
@@ -45,6 +46,31 @@ namespace Keybinds
 	{
 		DEBUG_LOG("ApplyDefaultKeybinds\n");
 		g_keybinds = GetDefaultKeybinds();
+	}
+
+	bool IsKeybindPressed(const char* identifier)
+	{
+		auto& keys = g_keybinds[identifier];
+
+		bool any_pressed = true;
+		bool new_key_down = false;
+
+		for (const auto& key : keys)
+		{
+			if (!ImGui::IsKeyDown(key)) {
+				any_pressed = false;
+				break;
+			}
+			else if (ImGui::IsKeyPressed(key, false)) {
+				new_key_down = true;
+			}
+		}
+
+		if (any_pressed && new_key_down) {
+			DEBUG_LOG("IsKeybindPressed: '%s' = true\n", identifier);
+			return true;
+		}
+		return false;
 	}
 
 	const std::string* DetectKeybindPress()
