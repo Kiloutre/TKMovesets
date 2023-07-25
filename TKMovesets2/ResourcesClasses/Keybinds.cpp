@@ -50,7 +50,7 @@ namespace Keybinds
 
 	bool IsKeybindPressed(const char* identifier)
 	{
-		auto& keys = g_keybinds[identifier];
+		const auto& keys = g_keybinds[identifier];
 
 		bool any_pressed = true;
 		bool new_key_down = false;
