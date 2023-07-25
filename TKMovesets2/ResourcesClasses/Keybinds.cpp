@@ -26,6 +26,7 @@ namespace Keybinds
 		keybinds["keybind_editor.import_p1"] = { ImGuiKey_F1 };
 		keybinds["keybind_editor.import_p2"] = { ImGuiKey_F2 };
 		keybinds["keybind_editor.import_both"] = { ImGuiKey_F3 };
+		keybinds["keybind_editor.save"] = { ImGuiKey_LeftCtrl, ImGuiKey_S };
 
 		return keybinds;
 	}

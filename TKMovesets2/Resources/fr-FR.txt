@@ -102,6 +102,7 @@ settings.finish_keybind = Terminer le raccourci
 keybind_editor.import_p1 = Importer sur J1
 keybind_editor.import_p2 = Importer sur J2
 keybind_editor.import_both = Importer sur J1 & J2
+keybind_editor.save = Sauvegarder
 
 sidemenu.settings = Paramètres
 sidemenu.up_to_date = À jour
