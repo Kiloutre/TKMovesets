@@ -56,6 +56,8 @@ protected:
 	bool m_deletionPopupOpen = false;
 	// Marks if deletion is possible on this structure
 	bool m_isDeletable = true;
+	// Will be set to true when opening the context menu if the clipboard can be pasted
+	bool m_canPaste = false;
 
 	// Copy the entire form, evrey field of every tiem, to the clipboard
 	virtual void CopyFormToClipboard() const;

@@ -426,6 +426,7 @@ void EditorForm::Render(bool parent_window_focused)
 			// Open popup on right click
 			if (parent_window_focused && IsWindowRightClicked()) {
 				ImGui::OpenPopup("ContextMenuPopup");
+				m_canPaste = CanPasteFormFromClipboard();
 			}
 
 			// Context menu popup
@@ -441,8 +442,8 @@ void EditorForm::Render(bool parent_window_focused)
 				}
 
 				{
-					ImGuiExtra::DisableBlockIf __(!CanPasteFormFromClipboard());
-					if (ImGui::Selectable(_("edition.form_popup.paste_structure_clipboard"), false, 0, selectableSize))
+					ImGuiExtra::DisableBlockIf __(!m_canPaste);
+					if (ImGui::Selectable(_("edition.form_popup.paste_structure_clipboard"), false, 0, selectableSize) && CanPasteFormFromClipboard())
 					{
 						PasteFormFromClipboard();
 						ImGui::CloseCurrentPopup();
