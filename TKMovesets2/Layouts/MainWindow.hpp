@@ -23,6 +23,9 @@ class MainWindow {
 private:
 	// Attempt to load a moveset, open a new editor window on success
 	void LoadMovesetEditor(const movesetInfo* movesetInfos);
+
+	// Addrfile to pass to child classes (mainly editorWindows)
+	GameAddressesFile* m_addrFile = nullptr;
 public:
 	// If true, program will exit
 	bool requestedUpdate = false;
@@ -40,9 +43,6 @@ public:
 	GameSharedMem sharedMem;
 	// Storage instance, use to access local moveset list
 	LocalStorage storage;
-
-	// Addrfile to pass to child classes (mainly editorWindows)
-	GameAddressesFile* addrFile = nullptr;
 
 	// Extraction submenu
 	Submenu_Extract extractMenu;

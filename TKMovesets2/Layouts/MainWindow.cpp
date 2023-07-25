@@ -47,7 +47,7 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 
 	try {
 		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
-		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
+		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, m_addrFile, &storage);
 		editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
@@ -94,18 +94,17 @@ MainWindow::MainWindow()
 	// Program config (various threads, submenus)
 	storage.ReloadMovesetList();
 
-	GameAddressesFile* addrFile = new GameAddressesFile(true);
-	addrFile = addrFile;
+	m_addrFile = new GameAddressesFile(true);
 
-	extractor.Init(addrFile, &storage);
-	importer.Init(addrFile, &storage);
-	sharedMem.Init(addrFile, &storage);
+	extractor.Init(m_addrFile, &storage);
+	importer.Init(m_addrFile, &storage);
+	sharedMem.Init(m_addrFile, &storage);
 
 	onlineMenu.gameHelper = &sharedMem;
 	persistentPlayMenu.gameHelper = &sharedMem;
 
 	sideMenu.requestedUpdatePtr = &requestedUpdate;
-	sideMenu.SetAddrFile(addrFile);
+	sideMenu.SetAddrFile(m_addrFile);
 
 	{
 		// Detect running games and latch on to them if possible
@@ -314,7 +313,7 @@ MainWindow::~MainWindow()
 	}
 
 	// Now that every thread that uses addrFile has stopped, we can free it
-	delete addrFile;
+	delete m_addrFile;
 
 	// Once every thread that may use storage has been stopped, we can finally stop storage
 	storage.StopThreadAndCleanup();
