@@ -22,7 +22,7 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		// -- T8 -- //
 		.name = "Tekken 8 CNT",
-		.processName = "Tekken8.exe",
+		.processName = "Polaris-Win64-Shipping.exe",
 		.movesetNamePrefix = "T8_",
 		.gameId = GameId_T8,
 		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
@@ -64,7 +64,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = new GameFactory<OnlineT7>,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
-		.matchingProcessSubstrings = { "TEKKEN 7" }
+		.matchingProcessSubstrings = {}
 	},
 	{
 		.separatorText = "Tekken Tag 2",
