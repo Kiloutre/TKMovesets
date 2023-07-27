@@ -15,6 +15,7 @@
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
 
 #include "Online_t7.hpp"
+#include "Online_t8.hpp"
 
 // -- -- //
 
@@ -37,7 +38,7 @@ const GameInfo cg_gamesInfo[] = {
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
-		.onlineHandler = nullptr,
+		.onlineHandler = new GameFactory<OnlineT8>,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
 		.matchingProcessSubstrings = {}

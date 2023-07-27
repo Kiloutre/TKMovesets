@@ -83,6 +83,11 @@ private:
 	}
 
 public:
+	MovesetLoaderT7()
+	{
+		m_loadSteam = true;
+	}
+
 	// Sale ptr to the shared memory as base class but casted
 	SharedMemT7* sharedMemPtr = nullptr;
 

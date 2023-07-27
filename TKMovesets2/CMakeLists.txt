@@ -129,6 +129,7 @@ set(GAMESPECIFIC_SOURCES
                     # Game-specific
                     "GameSpecific/Editors/TEditor.cpp"
                     ##T8
+                    "GameSpecific/Online/Online_t8.cpp"
                     ### Editor logic
                     "GameSpecific/Editors/Editor_t8/Editor_t8.cpp"
                     "GameSpecific/Editors/Editor_t8/Editor_t8_Forms.cpp"
@@ -222,11 +223,18 @@ set(GAMESPECIFIC_SOURCES
 # This will be included in the .dll and should only be related to the injected DLL
 set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
+
+
+    "Injected/InjectionUtils.cpp"
+    "Injected/steamHelper.cpp"
+
+    #T8
+    "Injected/MovesetLoaders/MovesetLoader_t8.cpp"
+
+    #T7
     "Injected/MovesetLoaders/MovesetLoader_t7.cpp"
     "Injected/MovesetLoaders/MovesetLoader_t7_Importer.cpp"
     "Injected/MovesetLoaders/MovesetLoader_t7_Networking.cpp"
-    "Injected/InjectionUtils.cpp"
-    "Injected/steamHelper.cpp"
 
     "ResourcesClasses/GameAddressesFile.cpp"
     "ResourcesClasses/GameAddressesWrapper.cpp"
