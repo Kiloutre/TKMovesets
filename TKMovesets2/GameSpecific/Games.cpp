@@ -38,7 +38,11 @@ const GameInfo cg_gamesInfo[] = {
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
+#ifdef BUILD_TYPE_DEBUG
 		.onlineHandler = new GameFactory<OnlineT8>,
+#else
+		.onlineHandler = nullptr,
+#endif
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
 		.matchingProcessSubstrings = {}
