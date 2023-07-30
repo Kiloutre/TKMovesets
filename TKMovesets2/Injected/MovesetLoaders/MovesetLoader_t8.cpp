@@ -1,4 +1,7 @@
 #include <stdarg.h>
+#include <fstream>
+#include <string>
+#include <format>
 
 #include "MovesetLoader_t8.hpp"
 #include "Helpers.hpp"
@@ -10,6 +13,7 @@ using namespace StructsT8;
 
 // Reference to the MovesetLoader
 MovesetLoaderT8* g_loader = nullptr;
+std::ofstream* g_log = nullptr;
 
 # define GET_HOOK(x) ((uint64_t)&T8Hooks::x)
 
@@ -17,7 +21,7 @@ MovesetLoaderT8* g_loader = nullptr;
 
 namespace T8Functions
 {
-	typedef void**(*Log)(void** a1, const char* a2, size_t a3, int64 a4);
+	typedef void** (*Log)(void** a1, const char* a2, size_t a3, int64 a4);
 }
 
 // -- Helpers --
@@ -32,10 +36,18 @@ namespace T8Functions
 namespace T8Hooks
 {
 	// Log function 
-	void** Log(void** a1, const char* format, size_t a3, int64 a4)
+	void** Log(void** a1, const char* format, size_t string_length, int64 a4)
 	{
 		printf("%s\n", format);
-		return g_loader->CastTrampoline<T8Functions::Log>("TK__Log")(a1, format, a3, a4);
+		if (g_log) {
+			g_log->write("[", 1);
+			std::string t = Helpers::formatDateTime(Helpers::getCurrentTimestamp(), false);
+			g_log->write(t.c_str(), t.size());
+			g_log->write("] ", 2);
+			g_log->write(format, string_length);
+			g_log->write("\n", 1);
+		}
+		return g_loader->CastTrampoline<T8Functions::Log>("TK__Log")(a1, format, string_length, a4);
 	}
 
 }
@@ -76,6 +88,9 @@ void MovesetLoaderT8::OnInitEnd()
 
 	// Other
 	HookFunction("TK__Log");
+	
+	std::string filename = std::format("G:/Logs_{}.txt", Helpers::formatDateTime(Helpers::getCurrentTimestamp(), true));
+	g_log = new std::ofstream(filename);
 }
 
 // -- Main -- //
@@ -87,6 +102,8 @@ void MovesetLoaderT8::Mainloop()
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
+	g_log->close();
+	DEBUG_LOG("Mainloop - END\n");
 }
 
 // -- Interaction -- //

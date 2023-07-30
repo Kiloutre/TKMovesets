@@ -193,7 +193,7 @@ namespace Helpers
 	uint32_t CalculateCrc32(const Byte* data, uint64_t size);
 
     // Formats given date in 'hour:minutes day/month/year'
-    std::string formatDateTime(uint64_t date, bool path_compatible=false);
+    std::string formatDateTime(uint64_t date, bool path_compatible=false, bool include_seconds=false);
 
 	// Returns the current timestamp as a uint64
 	uint64_t getCurrentTimestamp();

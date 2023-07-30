@@ -359,6 +359,7 @@ void EditorForm::RenderInternal()
 void EditorForm::Render(bool parent_window_focused)
 {
 	if (setFocus) {
+		ImGui::SetNextWindowScroll({ 0, 0 });
 		ImGui::SetNextWindowFocus();
 		setFocus = false;
 	}

@@ -106,14 +106,22 @@ namespace Helpers
 		return crc32;
 	}
 
-	std::string formatDateTime(uint64_t date, bool path_compatible)
+	std::string formatDateTime(uint64_t date, bool path_compatible, bool include_seconds)
 	{
 		time_t     now = date;
 		struct tm  tstruct;
 		char       buf[20];
 
 		if (localtime_s(&tstruct, &now) == 0) {
-			if (strftime(buf, sizeof(buf), path_compatible ? "%d-%m-%y_%Hh%M" : "%d/%m/%Y %H:%M", &tstruct) > 0) {
+			const char* time_format;
+			if (include_seconds) {
+				time_format = path_compatible ? "%d-%m-%y_%Hh%M_%Ss" : "%d/%m/%Y %H:%M:%S";
+			}
+			else {
+				time_format = path_compatible ? "%d-%m-%y_%Hh%M" : "%d/%m/%Y %H:%M";
+			}
+
+			if (strftime(buf, sizeof(buf), time_format, &tstruct) > 0) {
 				return std::string(buf);
 			}
 		}

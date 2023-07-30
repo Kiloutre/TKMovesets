@@ -185,7 +185,7 @@ void MovesetLoader::RegisterHook(const char* functionName, const std::string& mo
 
     if (functionAddr != 0) {
         InitHook(functionName, functionAddr, hookAddr);
-        DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx)\n", functionName, functionAddr, functionAddr - moduleAddr);
+        DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx). Hook address will be %llx.\n", functionName, functionAddr, functionAddr - moduleAddr, hookAddr);
     }
 }
 
