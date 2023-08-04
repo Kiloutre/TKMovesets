@@ -1,1 +1,562 @@
-# Korean
+# English
+# This is a comment
+# key = Text
+# Each line represents a different translation.
+# '\n' can be used for inserting newlines in paragraphs. Leading and trailing spaces of keys and texts are removed.
+# " navmenu =  This  is a    test   " becomes "navmenu=This  is a    test", so feel free to align what needs to be aligned
+
+# Utils #
+
+item=Item
+end=END
+yes=예
+no=아니오
+mota_00=Anims 1
+mota_01=Anims 2
+mota_02=Hands 1
+mota_03=Hands 2
+mota_04=Face 1
+mota_05=Face 2
+mota_06=Wings 1
+mota_07=Wings 2
+mota_08=Camera 1
+mota_09=Camera 2
+mota_10=Unknown 1
+mota_11=Unknown 2
+close=닫기
+close_window=창 닫기
+1p=플레이어 1
+2p=플레이어 2
+3p=플레이어 3
+4p=플레이어 4
+select_game=게임 선택
+hash=Hash
+
+# Process #
+
+process.status=상태:
+process.game_not_attached=연결되고 있지 않습니다. 게임을 선택해 주십시오.
+process.game_not_running=게임이 실행되고 있지 않거나 찾을 수 없습니다.
+process.game_version_mismatch=현재 게임 버전은 game_address.txt에서 지원하지 않습니다.
+process.game_attach_err=게임을 찾았지만 연결할 수 없습니다. 
+process.dll_version_mismatch=현재 주입된 DLL이 프로그램 버전과 일치하지 않습니다. 게임과 이 도구를 다시 시작하십시오.
+
+# Moveset #
+moveset.origin=원본 게임
+moveset.target_character=캐릭터
+moveset.original_character=오리지널 캐릭터
+moveset.date=날짜
+moveset.extraction_date=추출된 날짜
+moveset.invalid=유효하지 않음
+moveset.size=사이즈
+moveset.size_mb=MB
+moveset.size_kb=KB
+moveset.rename=이름변경
+moveset.convert=변환
+moveset.duplicate=복제
+moveset.import=임포트
+moveset.edit=편집
+moveset.delete=제거
+moveset.version=버전
+moveset.hash=Hash
+
+## Main ##
+
+# Navmenu #
+navmenu.category_moveset=무브셋
+navmenu.category_play=플레이
+navmenu.extraction=추출
+navmenu.import=임포트
+navmenu.online=온라인 플레이
+navmenu.persistent_play=오프라인 플레이
+
+navmenu.category_tools=도구
+navmenu.moveset_edit=무브셋 편집
+navmenu.camera=카메라
+
+navmenu.category_other=기타
+navmenu.documentation=문서
+navmenu.about=정보
+
+settings.general=일반 설정
+settings.language=언어
+settings.vsync=수직 동기화
+settings.vsync_explanation=GPU를 너무 많이 사용하는 경우 이 소프트웨어의 재생률을 제한하는 데 유용할 수 있습니다.
+settings.file_association=.tkmvst / .tkanimXX 연결
+settings.file_association_explanation=무브셋 파일 (.tkmvst) 과 애니메이션 파일들을 해당 툴로 연결시켜서,\n실행했을 때 자동으로 해당 툴의 폴더로 복사합니다.
+settings.auto_update_check=자동 업데이트 체크
+settings.auto_addr_update_check=자동 주소 업데이트
+settings.importation=설정 임포트
+settings.apply_instantly=즉시 적용하기
+settings.apply_instantly_explanation=이 옵션을 끄면 새 무브셋으로 교체되기 전에 현재 기술이 종료될 때까지 게임을 기다리게 합니다.\n몇몇 기술들의 경우에 (네간의 대기 애니메이션과 같은), 이 과정은 상당히 오래 걸립니다.
+settings.free_unused_movesets=미사용 무브셋 해제
+settings.free_unused_movesets_explanation=이 옵션이 적용된다면, 과거에 할당됐었지만 지금은 미사용중인 무브셋들이 메모리에서 해제됩니다.\n이 옵션은 이 툴이 당신의 램 용량을 모두 차지하는 것을 방지합니다.
+settings.exportation=설정 내보내기
+settings.overwrite_duplicate=같은 이름의 무브셋 덮어쓰기
+settings.overwrite_explanation=활성화해서 동일 이름의 무브셋을 덮어씁니다.\n비활성화해서 이름이 겹칠 때 뒤에 숫자를 붙여 해결합니다.\n예: T7_JIN (2)
+settings.keybinds=키 바인드
+settings.keybind_rebind=리바인드
+settings.reset_keybinds=키 바인드 리셋
+settings.finish_keybind=키 바인드 완료
+
+keybind_editor.import_p1=P1에 불러오기
+keybind_editor.import_p2=P2에 불러오기
+keybind_editor.import_both=P1 & P2에 불러오기
+keybind_editor.save=저장
+keybind_editor.change_data_type=데이터 타입 변경하기
+
+sidemenu.settings=설정
+sidemenu.up_to_date=최신 버전
+sidemenu.updated_addr=주소를 업데이트했습니다!
+sidemenu.update_check=업데이트 확인 중...
+sidemenu.update=업데이트
+sidemenu.update_error=업데이트 에러
+sidemenu.update_explanation=업데이트가 발견되었습니다.\n지금 다운로드하고 프로그램을 다시 시작하시겠습니까?
+sidemenu.update_bad_file=업데이트를 적용할 수 없습니다.\n수동으로 업데이트하십시오.
+
+sidemenu.changelog=패치노트
+
+## Submenus ##
+
+# Extraction #
+extraction.explanation=무브셋을 처음 사용하기 위해선 게임에서 추출해야합니다. 무브셋에는 모델 혹은 이펙트는 포함되지 않으며 오직 무브셋 데이터만 포함됩니다. \n추출을 하기 위해선 게임이 실행중인 상태여야합니다. 게임 모드(스토리/VS 등)는 중요하지 않습니다. 인-게임이라면 아래 버튼이 갱신됩니다.\n무브셋을 추출중일때는 캐릭터를 움직이지 않는 것을 권장합니다.(게임을 일시정지 해도됩니다.)
+extraction.extraction=추출
+extraction.extract=추출
+extraction.extract_all=추출 (전부)
+extraction.extract_from=추출할 게임 :
+extraction.progress=추출중... (%u%%)
+extraction.progress_error=추출 오류 (%u%%)
+extraction.progress_done=추출중... 완료!
+extraction.extracted_movesets=추출된 무브셋
+extraction.cant_extract=캐릭터가 로드되지 않아 추출할 수 없습니다.
+extraction.error_file_creation=무브셋 파일 생성중 오류가 발생했습니다.
+extraction.error_compression=무브셋 파일을 압축하는 동안 오류가 발생했습니다.
+extraction.error_allocation=무브셋 데이터를 복사하는 동안 메모리 할당 오류가 발생했습니다.
+extraction.mota_explanation=추가 애니메이션
+extraction.settings=설정
+extraction.settings.other=기타
+extraction.settings.displayable_movelist=표시 가능한 무브셋
+extraction.settings.compress_moveset=무브셋 압축
+extraction.settings.compression_type=압축 방식
+extraction.settings.compression_type.none=압축하지 않음
+extraction.settings.extract_unsupported_motas=비주류 MOTA 추출(미지원 형식)
+
+# Importation #
+importation.explanation=무브셋들이 추출되고 당신의 컴퓨터에 저장되고 나서, 그것들은 이 서브메뉴를 통해 인-게임 환경으로 로딩될 수 있습니다 (꼭 온라인일 필요는 없습니다). 이 과정은 처음 한 번만 적용됩니다: 이 곳에 로드된 무브셋들은 당신이 아무 로딩 화면을 거칠 때 언로드되기에, 이것은 주로 트레이닝 모드를 위해 사용됩니다.\n온라인 플레이의 경우, "온라인" 문단을 참고하십시오.
+importation.importation=임포트
+importation.select_moveset=임포트할 무브셋 선택
+importation.cant_import=인-게임이 아니어서 임포트할 수 없습니다. (트레이닝 모드 등)
+importation.import_to=임포트 대상:
+importation.progress=불러오는 중... (%u%%)
+importation.progress_error=임포트 에러 (%u%%)
+importation.progress_done=임포트...완료!
+importation.error_file_reading=무브셋 파일을 읽는 중 에러가 발생했습니다.
+importation.error_allocation=무브셋 파일을 읽는 중 메모리 할당 에러가 발생했습니다.
+importation.error_game_allocation=무브셋 파일을 작성하던 중 게임 메모리 할당 에러가 발생했습니다.
+importation.error_decompression=무브셋 데이터를 압축 해제하던 중 에러가 발생했습니다.
+
+# Persistent play #
+persistent.explanation=오프라인 플레이 모드는 당신이 플레이어들에게 적용시킬 무브셋들을 선택할 수 있게 하며, 당신이 플레이하는 방향을 바꿔도 적용 가능하고, 로딩 화면 사이에 존재하는 무브셋들을 적용시킵니다.\n만약 상대편도 이 툴을 실행시키고 있다면 온라인 환경에서도 사용이 가능하며, 양쪽 모두가 이미 무브셋을 다운로드 및 추출한 상태여야 합니다:\n그 다음, 당신은 당신의 무브셋들을 (혹은 None) "Player 1"로 지정하고, 상대편의 무브셋들을 (혹은 None) "Player 2"로 지정한 다음, 잠그면 (Lock-in) 됩니다. 
+persistent.player_1=플레이어 1:
+persistent.player_2=플레이어 2:
+persistent.player_3=플레이어 3:
+persistent.player_4=플레이어 4:
+persistent.none=무브셋 없음
+persistent.lock=캐릭터 잠금
+persistent.unlock=잠금 해제
+persistent.hash=Hash:
+persistent.select_moveset=무브셋 선택
+persistent.clear_moveset=무브셋 비우기
+
+# Online #
+online.explanation=온라인 플레이를 위해서는 양측 모두가 이 툴을 실행중인 상태여야 합니다.\n양측 모두가 매치의 로딩 화면 전에 무브셋을 선택하면 (원한다면 None도 괜찮습니다), 당신이 반대편으로 무브셋 파일을 보낼 필요 없이 백그라운드에 있는 툴이 동기화시켜줄 것입니다.\n커스텀 무브셋들은 당신이나 상대편이 툴을 실행시키고 있지 않거나 둘 중 아무나 이 툴의 캐릭터 선택창에서 잠금을 하지 않았을 경우 로드되지 않을 것입니다.
+online.select_moveset=무브셋 선택
+online.no_selected_moveset=무브셋이 선택되지 않았습니다.
+online.dll_not_loaded=DLL이 로드되지 않았습니다. 삽입하세요.
+online.inject_dll=삽입
+online.injecting_dll=삽입중...
+online.select_moveset=선택
+online.selected_moveset=선택됨:
+online.lock_to_play=선택 부분을 무브셋이 불러올 수 있게 잠급니다.
+
+# Movest Edition : rename #
+edition.rename.new_moveset_name=새 무브셋 이름
+edition.rename.empty_name=이름이 비어있습니다
+edition.rename.already_exists=이름이 이미 다른 장애에 의해 사용되고 있습니다
+edition.rename.rename_err=이름 재설정 중 오류가 발생했습니다. 사용 불가능한 문자가 있는지 확인해 주십시오.
+edition.rename.invalid_name=이름이 사용 불가능한 문자를 포함하고 있습니다. (/\|<>:"?*)
+edition.convert.format_target=변환할 포맷
+
+# Moveset Edition #
+edition.explanation=여기서는 추출된 무브셋들을 편집할 수 있습니다. 튜토리얼과 유용한 정보들을 위해 문서를 참조하십시오.\n'라이브 편집'을 사용하면 커스텀 무브셋을 빠르게 조정할 수 있습니다: 단순한 값 변경은 로딩 시간 없이 즉시 메모리에 적용될 것입니다.  
+edition.select_moveset=조정할 무브셋을 선택
+edition.last_saved=마지막 저장:
+edition.save=저장
+edition.saving_error=저장 오류
+edition.discard_changes=변경 사항을 파기합니까?\n만약 라이브 편집이 적용되어 있다면, 인-게임 환경에서의 스트럭쳐를 원래 상태로 리셋시키지 않을 것입니다.
+edition.process_err=오류
+edition.live_edition=라이브 편집
+edition.live_edition_explanation=이 옵션을 키면 단순한 값 조정같은 소소한 변경점들이 새로 무브셋 임포트를 할 필요 없이 게임 메모리에 적용되게 합니다.\n목록에 있는 항목들을 추가 및 제거하거나, 새로운 엑스트라 무브셋 사이즈를 요구로 하는 행동들은 새 임포트가 필요합니다.
+edition.move_name=이름
+edition.move_generic_id=통상 ID
+edition.moves_all=모두
+edition.moves_attacks=공격
+edition.moves_generic=일반
+edition.moves_throws=잡기
+edition.moves_custom=커스텀
+edition.moves_char_specific=캐릭터
+edition.move_id_hint=무브 ID/이름...
+edition.move_current=현재
+edition.move_current_1p=현재 (1P)
+edition.move_current_2p=현재 (2P)
+edition.play_move_1p=재생 (1P)
+edition.play_move_2p=재생 (2P)
+edition.window_title=에디터
+edition.apply=적용
+edition.window_controls_explanation=기술표에 있는 기술을 클릭해서 그 기술의 연결된 창을 열 수 있습니다. 새 창은 1) 이전 창에 저장하지 않은 변경사항이 있거나, 2) 기술표에 있는 기술을 클릭할 때 죄측 Ctrl을 누르고 있지 않았다면, 이전에 열었던 창을 대체합니다. 창들은 어디로든 드래그할 수 있고, 서로 합쳐질 수 있으며, 다양한 레이아웃을 형성할 수 있습니다.
+
+edition.tools=도구
+edition.extract_animations=애니메이션 추출
+edition.extract_animations_finished=애니메이션 추출이 완료되었습니다!
+edition.animation_extraction.extraction_status=추출 상태
+edition.animation_extraction.not_started=시작되지 않음
+edition.animation_extraction.skipped=건너뜀
+edition.animation_extraction.skipped_exists=존재함
+edition.animation_extraction.error=오류
+edition.animation_extraction.interrupt=인터럽트
+edition.open_characters_directory=캐릭터 디렉토리 열기
+edition.open_editor_library=에디터 라이브러리 열기
+edition.open_editor_backups=에디터 백업 열기
+edition.refresh_movesets=무브셋 새로고침
+
+edition.form_popup.copy_structure_clipboard=스트럭쳐 복사
+edition.form_popup.copy_single_item_clipboard=단일 아이템 복사
+edition.form_popup.paste_structure_clipboard=스트럭쳐 붙여넣기
+edition.form_popup.duplicate_structure=스트럭쳐 복제
+edition.form_popup.delete_structure=스트럭쳐 삭제
+edition.form_popup.what_references_this_move=어떤 스트럭쳐가 이 기술에서 사용됩니까?
+edition.form_popup.what_references_this_cancel=어떤 기술이 해당 캔슬 목록을 사용합니까?
+edition.form_popup.deletion_are_you_sure=정말 해당 스트럭쳐를 삭제하시겠습니까?\n스트럭쳐를 삭제하는 것은 해당 스트럭쳐를 참조하는 다른 요소들에게 발생할 수 있는 문제들 때문에 권장되지 않습니다. 
+edition.form_popup.yes_delete=네, 삭제합니다.
+
+edition.create_new=새로 만들기
+edition.requirement=요구 사항 목록
+edition.move=이동
+edition.voiceclips=보이스클립
+edition.cancel_list=캔슬 목록
+edition.grouped_cancel_list=그룹화된 캔슬 목록
+edition.cancel_extradata=캔슬 엑스트라 데이터
+edition.extra_properties=엑스트라 프로퍼티
+edition.move_begin_properties=기술 시작 프로퍼티
+edition.move_end_properties=기술 종료 프로퍼티
+edition.hit_conditions=히트 
+edition.reactions=리액션
+edition.pushback=푸시백
+edition.pushback_extra=푸시백 엑스트라
+edition.input_sequence=입력 순서
+edition.inputs=입력
+edition.projectile=투사체
+edition.throw_camera=잡기 카메라
+edition.camera_data=카메라 데이터
+edition.mvl_playable=기술표: 재생 가능
+edition.mvl_inputs=기술표: 입력
+
+edition.update_labels=꼬리표 업데이트
+edition.updating_labels=꼬리표: 업데이트 중...
+edition.updating_labels_err=꼬리표: 오류
+edition.up_to_date_labels=꼬리표: 최신 상태
+edition.updated_labels=꼬리표: 업데이트됨!
+
+edition.open_movelist=기술표 열기
+
+edition.move.window_name=기술
+edition.move.category_2=참조
+edition.move.category_3=엑스트라
+edition.move.category_5=이름이 정해지지 않은 영역
+edition.move.move_name=이름
+edition.move.move_name.description=기술의 이름이며, 게임 플레이에 영향을 주지 않습니다.
+edition.move.anim_name=애니메이션
+edition.move.anim_name.description=이 기술에서 재생될 애니메이션입니다.
+edition.move.vulnerability=Vuln
+edition.move.vulnerability.description=이 공격이 적중하기 위한 히트 레벨을 결정합니다.
+edition.move.hitlevel=히트 레벨
+edition.move.hitlevel.description=공격 유형 (상/중/하단/기타)
+edition.move.transition=전환
+edition.move.transition.description=이 기술의 끝에서 다른 기술로의 시각적 전환
+edition.move.anim_len=애니메이션 길이
+edition.move.hitbox_location=히트박스 위치
+edition.move.hitbox_location.description=기술의 히트박스 위치
+edition.move.first_active_frame=첫 활성 프레임
+edition.move.last_active_frame=마지막 활성 프레임
+edition.move.airborne_start=에어본 시작
+edition.move.airborne_end=에어본 끝
+edition.move.ground_fall=착지
+edition.move.distance=거리
+edition.move.hit_condition_addr=히트 상태 ID
+edition.move.hit_condition_addr.description=대미지 및 히트/방어 상황에서의 상대의 행동
+edition.move.extra_properties_addr=엑스트라 프로퍼티 ID
+edition.move.extra_properties_addr.description=이 기술 중에 실행되는 프로퍼티
+edition.move.move_start_extraprop_addr=시작 엑스트라 프롭 ID
+edition.move.move_end_extraprop_addr=종료 엑스트라 프롭 ID
+edition.move.voiceclip_addr=보이스클립 ID
+edition.move.voiceclip_addr.description=이 기술 중에 재생될 보이스클립
+edition.move.cancel_addr=캔슬 ID
+edition.move.cancel_addr_2=캔슬 ID (2)
+edition.move.cancel_related_id_2=캔슬 ID 2: 연관됨
+edition.move.cancel_addr_3=캔슬 ID (3)
+edition.move.cancel_related_id_3=캔슬 ID 3: 연관됨
+edition.move.cancel_addr_4=캔슬 ID (4)
+edition.move.cancel_related_id_4=캔슬 ID 4: 연관됨
+edition.move._0x98_int=페이셜/엑스트라?
+
+edition.voiceclip.window_name=보이스클립
+edition.voiceclip.id=ID
+edition.voiceclip.limb_swinging=팔/다리 동작 효과음
+edition.voiceclip.hit=히트 효과음
+edition.voiceclip.end=END
+
+edition.extraproperty.window_name=엑스트라 프로퍼티 목록
+edition.extraproperty.starting_frame=시작 프레임
+edition.extraproperty.id=ID
+edition.extraproperty.throw_camera_id=잡기 카메라 ID
+edition.extraproperty.throw_camera_id.description=재생할 카메라 이동의 ID
+edition.extraproperty.projectile_id=투사체 ID
+edition.extraproperty.projectile_id.description=소환할 투사체의 ID
+edition.extraproperty.instant=인스턴트
+edition.extraproperty.every_frame=매 프레임
+edition.extraproperty.every_nth_frame=매 %d 프레임
+edition.extraproperty.value_unsigned=값 (U32)
+edition.extraproperty.value_signed=값 (S32)
+edition.extraproperty.value_hex=값 (H32)
+edition.extraproperty.value_float=값 (Float)
+
+edition.move_start_extraprop.window_name=프로퍼티 목록 실행
+edition.move_start_extraprop.requirements_addr=요구사항 ID
+edition.move_start_extraprop.extraprop=프로퍼티 / 요구사항
+edition.move_start_extraprop.value=값
+
+edition.move_end_extraprop.window_name=프로퍼티 목록 종료
+edition.move_end_extraprop.requirements_addr=요구사항 ID
+edition.move_end_extraprop.extraprop=프로퍼티 / 요구사항
+edition.move_end_extraprop.value=값
+
+edition.cancel.window_name=캔슬 목록
+edition.cancel.command=커맨드
+edition.cancel.requirements_addr=요구사항 ID
+edition.cancel.requirements_addr.description=해당 캔슬이 발생하기 위해 일치해야 하는 상태의 ID
+edition.cancel.extradata_addr=엑스트라 데이터 ID
+edition.cancel.extradata_addr.description=엑스트라 캔슬 ID: 프레임 스킵, 현재 프레임 유지, 호밍과 같은 캔슬에 특정한 프로퍼티를 제공하는 비트 플래그들입니다. 
+edition.cancel.detection_start=감지 시작
+edition.cancel.detection_start.description=캔슬이 시작될 수 있는 첫 프레임 (기술과 요구사항이 일치할 경우)
+edition.cancel.detection_end=감지 종료
+edition.cancel.detection_start.description=캔슬이 시작될 수 있는 마지막 프레임
+edition.cancel.starting_frame=시작 프레임
+edition.cancel.starting_frame.description=커맨드 및 요구사항 감지가 성공적이었을 경우에 캔슬이 시작될 첫 프레임
+edition.cancel.move_id=기술 ID
+edition.cancel.group_id=캔슬 그룹 ID
+edition.cancel.group_id.description=이 캔슬이 참조하는 그룹 캔슬의 ID
+edition.cancel.sequence_id=순서 ID
+edition.cancel.cancel_option=캔슬 옵션
+edition.cancel.invalid_sequence_id=유효하지 않은 ID
+
+edition.grouped_cancel.window_name=그룹화된 캔슬 목록
+edition.grouped_cancel.command=커맨드
+edition.grouped_cancel.requirements_addr=요구사항 ID
+edition.grouped_cancel.requirements_addr.description=이 캔슬이 발생하기 위해 충족되어야 하는 요구사항 ID
+edition.grouped_cancel.extradata_addr=엑스트라 데이터 ID
+edition.grouped_cancel.extradata_addr.description=엑스트라 캔슬 ID: 프레임 스킵, 현재 프레임 유지, 호밍과 같은 캔슬에 특정한 프로퍼티를 제공하는 비트 플래그들입니다. 
+edition.grouped_cancel.detection_start=감지 시작
+edition.grouped_cancel.detection_start.description=캔슬이 시작될 수 있는 첫 프레임 (기술과 요구사항이 일치할 경우)
+edition.grouped_cancel.detection_end=감지 종료
+edition.grouped_cancel.detection_start.description=캔슬이 시작될 수 있는 마지막 프레임
+edition.grouped_cancel.starting_frame=시작 프레임
+edition.grouped_cancel.starting_frame.description=커맨드 및 요구사항 감지가 성공적이었을 경우에 캔슬이 시작될 첫 프레임
+edition.grouped_cancel.move_id=기술 ID
+edition.grouped_cancel.cancel_option=캔슬 옵션
+
+edition.cancel_extra.window_name=캔슬 엑스트라
+edition.cancel_extra.value=값
+
+edition.requirement.window_name=요구사항 목록
+edition.requirement.condition=상태
+edition.requirement.condition.description=검토되어야 하는 상태의 ID
+edition.requirement.param_unsigned=패러미터
+edition.requirement.param_float=패러미터 (Float)
+
+edition.hit_condition.window_name=히트-상태 목록
+edition.hit_condition.requirements_addr=조건 ID
+edition.hit_condition.requirements_addr.description=해당 히트-상태가 발생하기 위해 해당돼야 하는 상태 목록의 ID
+edition.hit_condition.damage=데미지
+edition.hit_condition.reactions_addr=리액션 ID
+edition.hit_condition.reactions_addr.description=상대의 적중/방어 행동을 결정하는 데 사용될 리액션 목록의 ID
+
+edition.reactions.window_name=리액션
+edition.reactions.category_1=푸시백 ID
+edition.reactions.category_3=기술 ID
+edition.reactions.category_5=방향
+edition.reactions.category_7=그 외
+edition.reactions.front_pushback=전면
+edition.reactions.backturned_pushback=뒤 돈 상태
+edition.reactions.left_side_pushback=좌측
+edition.reactions.right_side_pushback=우측
+edition.reactions.front_counterhit_pushback=전면 카운터 히트
+edition.reactions.downed_pushback=다운 상태
+edition.reactions.block_pushback=방어 중
+edition.reactions.front_direction=앞
+edition.reactions.back_direction=뒤
+edition.reactions.left_side_direction=좌측
+edition.reactions.right_side_direction=우측
+edition.reactions.front_counterhit_direction=전면 카운터 히트
+edition.reactions.downed_direction=다운 상태
+edition.reactions.0x44_long=_0x44_long
+edition.reactions.vertical_pushback=수직 푸시백
+edition.reactions.standing_moveid=스탠딩
+edition.reactions.default_moveid=기본
+edition.reactions.crouch_moveid=앉은 상태
+edition.reactions.counterhit_moveid=카운터 히트
+edition.reactions.crouch_counterhit_moveid=앉은 상태 카운터 히트
+edition.reactions.left_side_moveid=좌측
+edition.reactions.crouch_left_side_moveid=좌측 앉은 상태
+edition.reactions.right_side_moveid=우측
+edition.reactions.crouch_right_side_moveid=우측 앉은 상태
+edition.reactions.backturned_moveid=뒤 돈 상태
+edition.reactions.crouch_backturned_moveid=뒤돌아 앉은 상태
+edition.reactions.block_moveid=방어 중
+edition.reactions.crouch_block_moveid=앉은 채로 방어 중
+edition.reactions.wallslump_moveid=벽 상황
+edition.reactions.downed_moveid=다운 상태
+
+edition.input_sequence.window_name=입력 순서
+edition.input_sequence.input_window_frames=프레임 길이
+edition.input_sequence.input_amount=입력 양
+edition.input_sequence.input_addr=입력 ID
+
+edition.input.window_name=입력
+edition.input.direction=방향
+edition.input.button=버튼
+edition.input.inputs=입력
+
+edition.projectile.window_name=투사체
+edition.projectile.category_2=참조
+edition.projectile.category_3=이름 미정
+edition.projectile.vfx_id=시각 효과 ID
+edition.projectile.vfx_variation_id=시각 효과 변형 ID
+edition.projectile.delay=딜레이
+edition.projectile.vertical_velocity=수직 관성
+edition.projectile.horizontal_velocity=수평 관성
+edition.projectile.duration=지속 시간
+edition.projectile.no_collision=충돌 없음
+edition.projectile.size=크기
+edition.projectile.hash=Hash
+edition.projectile.can_hitbox_connect=히트박스 연결 가능
+edition.projectile.gravity=중력
+edition.projectile.hit_level=히트 레벨
+edition.projectile.hit_condition_addr=히트 상태 ID
+edition.projectile.cancel_addr=캔슬 ID
+edition.projectile.voiceclip_on_hit=보이스클립 (히트)
+
+edition.pushback.window_name=푸시백
+edition.pushback.duration=지속 시간
+edition.pushback.num_of_loops=루프 횟수
+edition.pushback.displacement=변위
+edition.pushback.extradata_addr=엑스트라 데이터 ID
+
+edition.pushback_extradata.window_name=푸시백 엑스트라 데이터
+edition.pushback_extradata.horizontal_offset=수평 오프셋
+
+edition.form_list.item=항목
+edition.form_list.end=END
+edition.form_list.invalid=유효하지 않음
+edition.form_list.controls_disabled_explanation=오직 1 이상의 시작 ID를 가진 목록들만이 컨트롤들을 나열할 수 있는 권한을 가집니다
+
+edition.animation_list.anim_name=애니메이션 이름
+edition.animation_list.duration=지속 시간 (프레임)
+edition.animation_list.size=크기
+edition.animation_list.import=기술 내 임포트
+edition.animation_list.search_animation=현재 기술에 임포트하기 위한 애니메이션 이름 검색...
+edition.animation_list.no_anim=현재 애니메이션 라이브러리에 애니메이션이 발견되지 않았습니다. 에디터 서브메뉴의 '애니메이션 추출' 버튼을 눌러 캐릭터 애니메이션을 라이브러리로 추출하십시오.
+edition.animation_list.loading=애니메이션 목록 로딩 중...
+edition.animation_list.clear_filter=필터 비우기
+
+edition.throw_camera.window_name=잡기 카메라
+edition.throw_camera.side=측면
+edition.throw_camera.cameradata_addr=카메라 데이터 ID
+
+edition.camera_data.window_name=카메라 데이터
+edition.camera_data._0x0_int=_0x0_int
+edition.camera_data._0x4_short=_0x4_short
+edition.camera_data.left_side_camera_data=좌측 카메라 데이터
+edition.camera_data.right_side_camera_data=우측 카메라 데이터
+edition.camera_data._0xA_short=_0xA_short
+
+edition.mvl_displayable.window_name=기술표: 표시 가능
+edition.mvl_displayable.type=유형
+edition.mvl_displayable.playable_id=재생 가능 ID
+edition.mvl_displayable.playable=(재생 가능)
+edition.mvl_displayable.not_playable=(재생 불가능)
+edition.mvl_displayable.category_1=불명
+edition.mvl_displayable.title_translation_0=일본어 제목
+edition.mvl_displayable.title_translation_1=제목
+edition.mvl_displayable.title_translation_2=일본어 제목 2
+edition.mvl_displayable.title_translation_3=제목 2
+edition.mvl_displayable.translation_0=일본어
+edition.mvl_displayable.translation_1=영어
+edition.mvl_displayable.translation_2=포르투갈어
+edition.mvl_displayable.translation_3=스페인어
+edition.mvl_displayable.translation_4=프랑스어
+edition.mvl_displayable.translation_5=이탈리아어
+edition.mvl_displayable.translation_6=독일어
+edition.mvl_displayable.translation_7=멕시코어
+edition.mvl_displayable.translation_8=키릴 문자
+edition.mvl_displayable.translation_9=아라비아어
+edition.mvl_displayable.translation_10=중국어
+edition.mvl_displayable.translation_11=한국어
+edition.mvl_displayable.icons=아이콘
+edition.mvl_displayable.icons_2=아이콘 2
+edition.mvl_displayable.combo_difficulty=난이도
+edition.mvl_displayable.combo_damage=대미지
+edition.mvl_displayable.p2_action=P2 행동
+
+edition.mvl_playable.window_name=기술표: 재생 가능
+edition.mvl_playable.distance=거리
+edition.mvl_playable.p2_rotation=P2 회전
+edition.mvl_playable.input_count=입력 횟수
+edition.mvl_playable.input_count.description=순서에서 읽기 위해 필요한 입력의 양
+edition.mvl_playable.input_sequence_id=입력 순서 ID
+edition.mvl_playable.has_rage=레이지 상태 ON
+
+edition.mvl_input.window_name=기술표: 입력
+edition.mvl_input.directions=방향
+edition.mvl_input.buttons=버튼
+edition.mvl_input.frame_duration=지속 시간
+edition.mvl_input.trigger_highlight=트리거 강조
+edition.mvl_input.frame=프레임
+edition.mvl_input.frames=프레임
+
+references.used_by=사용하는 대상:
+references.no_reference=참조 대상 발견되지 않음
+references.move.title=참조: 기술
+references.move.view_move=기술 보기
+references.reactions=리액션
+references.reactions.situations=상황
+references.list_start=목록 (시작)
+references.moves=기술
+references.cancel.title=캔슬
+references.cancels=캔슬
+references.cancels.view_cancel=캔슬 보기
+references.cancels.requirements=요구사항
+references.grouped_cancels=그룹화된 캔슬
+references.projectiles=투사체
+
+# Documentation #
+
+# About #
+about.explanation=TKMovesets은 상호작용되는 모든 게임(Tekken 7, TTT2 등)과 어떤 식으로든 법적으로 관련이 없는 독립 모더가 개발한 소프트웨어입니다.\n이 소프트웨어는 GPLv3에 따라 라이선스가 부여됩니다. 라이센스를 변경하지 않는 한 재배포할 수 있습니다.\n이 소프트웨어에 대해 절대 비용 지불을 요구하지 않습니다. 비용을 지불하였을 경우 사기일 가능성이 높으니 주의하세요.
+																																																																																																	 
+about.credits=크레딧:
+about.kilo_explanation=대부분의 데이터 구조를 리버스 엔지니어링하고 추출/임포트 방안을 모색한 이 무브셋 추출/임포트/편집 소프트웨어의 주요 개발자입니다.
+about.ali_explanation=무엇보다도 무브셋 구조를 리버스 엔지니어링, 무브셋 편집을 위한 ID 파악에 큰 기여를 했으며, 무브셋 편집 가이드를 만들고 카메라 및 손 애니메이션과 같은 많은 기능을 도입했습니다.
+about.fletch_explanation=상당한 수의 무브셋 편집 속성에 대한 문서를 작성하고 이에 대한 많은 가이드를 작성하여 무브셋 편집을 지금까지 이어왔습니다.
+about.koenji_explanation=무브셋 편집을 일찍 시작하여 작업 흐름을 이해하는 데 많은 도움을 주었고 많은 무브셋 속성을 해독하는 데 기여했습니다.
+about.sadamitsu_explanation=다양한 종류의 애니메이션, 구조 및 저장 위치에 대해 더 많이 이해를 하는데 큰 도움이 되어 주셨습니다.
+about.dennis_stanistan_explanation=일상중에도 디스코드 대화를 통해 많은 도움을 주신 덕분에 첫 무브셋 추출기를 제작하게 되었습니다.
