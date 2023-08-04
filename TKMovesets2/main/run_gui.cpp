@@ -31,11 +31,13 @@ static bool LoadLocaleTranslation()
 	wchar_t w_name[LOCALE_NAME_MAX_LENGTH];
 	{
 		if (LCIDToLocaleName(GetThreadLocale(), w_name, LOCALE_NAME_MAX_LENGTH, 0) == 0) {
+			DEBUG_LOG("LCIDToLocaleName fail\n");
 			return false;
 		}
 
 		size_t retval = 0;
 		if (wcstombs_s(&retval, name, LOCALE_NAME_MAX_LENGTH, w_name, LOCALE_NAME_MAX_LENGTH - 1) != 0) {
+			DEBUG_LOG("wcstombs_s fail\n");
 			return false;
 		}
 	}
@@ -184,7 +186,8 @@ void run_gui()
 	// Load translation
 	{
 		int langId = Settings::Get(SETTING_LANG_KEY, SETTING_LANG);
-		if (langId == SETTING_LANG_INVALID || langId < 0) {
+		DEBUG_LOG("Loaded lang id from file is: %d, (%u || %u) {}\n", langId, langId == SETTING_LANG_INVALID, langId < 0);
+		if (langId != SETTING_LANG_INVALID && langId >= 0) {
 			// Attempt to load locale from settings
 			if (!Localization::LoadFile(langId)) {
 				Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
