@@ -2,6 +2,7 @@
 
 #include "GameTypes.h"
 
+
 namespace StructsT8
 {
 	enum TKMovesetHeaderBlocks_
@@ -64,33 +65,34 @@ namespace StructsT8
 		}
 	};
 
+	union Param {
+		uint32_t param_unsigned;
+		int32_t param_signed;
+		float param_float;
+	};
+
 	// -- Main data type -- //
 
-	struct PushbackExtradata //todo
+	struct PushbackExtradata 
 	{
 		uint16_t horizontal_offset;
 	};
 
-	struct Pushback //todo
+	struct Pushback
 	{
 		uint16_t duration;
 		uint16_t displacement;
-		uint32_t num_of_loops;
+		uint32_t offsets_count;
 		PushbackExtradata* extradata_addr;
 	};
 
-	struct Requirement //todo
+	struct Requirement
 	{
 		uint32_t condition;
-		union
-		{
-			uint32_t param_unsigned;
-			int32_t param_signed;
-			float param_float;
-		};
+		Param param[4];
 	};
 
-	struct CancelExtradata //todo
+	struct CancelExtradata
 	{
 		uint32_t value;
 	};
@@ -115,7 +117,7 @@ namespace StructsT8
 		uint16_t cancel_option;
 	};
 
-	struct Reactions //todo
+	struct Reactions
 	{
 		union {
 			struct {
@@ -129,16 +131,20 @@ namespace StructsT8
 			};
 			Pushback* pushbacks[7];
 		};
-
+		// Directions
 		uint16_t front_direction;
 		uint16_t back_direction;
 		uint16_t left_side_direction;
 		uint16_t right_side_direction;
 		uint16_t front_counterhit_direction;
 		uint16_t downed_direction;
-
-		uint32_t _0x44_int; 
-		uint32_t _0x48_int; 
+		// Rotations
+		uint16_t front_rotation;
+		uint16_t back_rotation;
+		uint16_t left_side_rotation;
+		uint16_t right_side_rotation;
+		uint16_t front_counterhit_rotation;
+		uint16_t downed_rotation;
 
 		union {
 			struct {
@@ -163,7 +169,7 @@ namespace StructsT8
 		};
 	};
 
-	struct HitCondition //todo
+	struct HitCondition
 	{
 		Requirement* requirements_addr;
 		uint32_t damage;
@@ -171,24 +177,21 @@ namespace StructsT8
 		Reactions* reactions_addr;
 	};
 
-	struct Voiceclip //todo
+	struct Voiceclip
 	{
 		uint32_t id;
 	};
 
-	struct ExtraMoveProperty //todo
+	struct ExtraMoveProperty
 	{
 		uint32_t starting_frame;
+		uint32_t _0x4_int;
+		Requirement* requirements_addr;
 		uint32_t id;
-		union
-		{
-			uint32_t value_unsigned;
-			int32_t value_signed;
-			float value_float;
-		};
+		Param param[5];
 	};
 
-	struct Input //todo
+	struct Input
 	{
 		union
 		{
@@ -201,7 +204,7 @@ namespace StructsT8
 		};
 	};
 
-	struct InputSequence //todo
+	struct InputSequence
 	{
 		uint16_t input_window_frames; // I assume the max amount of frames between the first &last input
 		uint16_t input_amount; // The amount of input to read from input_addr
@@ -209,7 +212,7 @@ namespace StructsT8
 		Input* input_addr;
 	};
 
-	struct Projectile //todo
+	struct Projectile
 	{
 		uint32_t vfx_id;
 		int32_t _0x4_int;
@@ -241,83 +244,109 @@ namespace StructsT8
 		int32_t _0x88_int[8];
 	};
 
-	struct CameraData //todo
+	struct CameraData
 	{
-		uint32_t _0x0_int;
-		uint16_t _0x4_short;
+		uint32_t pick_probability;
+		uint16_t camera_type;
 		uint16_t left_side_camera_data;
 		uint16_t right_side_camera_data;
-		uint16_t _0xA_short;
+		uint16_t additional_rotation;
 	};
 
-	struct ThrowCamera //todo
+	struct ThrowCamera
 	{
-		uint64_t side;
+		uint64_t side; // Side at which throw recovers
 		CameraData* cameradata_addr;
 	};
 
-	struct UnknownParryRelated //todo
+	struct UnknownParryRelated
 	{
 		uint32_t value;
 	};
 
 	// Struct for Extra Move Properties that play when a move starts or ends
-	struct OtherMoveProperty //todo
+	struct OtherMoveProperty
 	{
 		Requirement* requirements_addr;
 		uint32_t extraprop; // 881 list end value & extraprop values
-		uint32_t value;
+		Param params[5];
+	};
+
+	struct UnknownNew
+	{
+		uint32_t _0x0;
+		uint16_t _0x4;
+		uint16_t _0x6;
+		Requirement* requirements_addr;
+		uint32_t _0xC;
+		uint32_t _0x10;
 	};
 
 	struct Move //todo
 	{
+		Byte move_name_related[4];
+		Byte move_anim_name_related[4];
 		char* name_addr;
 		char* anim_name_addr;
-		void* anim_addr;
+		Byte anim_addr[8]; // now encrypted
 		uint32_t vuln;
 		uint32_t hitlevel;
 		Cancel* cancel_addr;
-		Cancel* _0x28_cancel_addr;
-		int32_t _0x30_int__0x28_related;
-		int32_t _0x34_int;
-		Cancel* _0x38_cancel_addr;
-		int32_t _0x40_int__0x38_related;
-		int32_t _0x44_int;
-		Cancel* _0x48_cancel_addr;
-		uint32_t _0x50_int__0x48_related;
+		Cancel* _0x30_cancel_addr;
+		int32_t _0x38_int__0x30_related;
+		int32_t _0x3C_int;
+		Cancel* _0x40_cancel_addr;
+		int32_t _0x48_int__0x40_related;
+		int32_t _0x4C_int;
+		Cancel* _0x50_cancel_addr;
+		uint32_t _0x58_int__0x50_related;
 		uint16_t transition;
-		int16_t _0x56_short;
+		int16_t _0x5E_short;
 		uint16_t moveId_val1; // Clearly related to move ID
 		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short;
-		HitCondition* hit_condition_addr;
+		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
+		int16_t _0x66_short;
+		HitCondition* hit_condition_addr; // 0x68
+		uint32_t _0x70;
+		uint32_t _0x74;
 		int32_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
-		uint32_t ground_fall;
-		Voiceclip* voicelip_addr; // Can be NULL
+		uint32_t ground_fall; // Not confirmed
+		Voiceclip* voicelip_addr; // Can be NULL // 0x88
 		ExtraMoveProperty* extra_move_property_addr; // Can be NULL
 		OtherMoveProperty* move_start_extraprop_addr; // Can be NULL
 		OtherMoveProperty* move_end_extraprop_addr; // Can be NULL
-		int32_t _0x98_int; // facing/extras
-		uint32_t hitbox_location;
+		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
+		uint32_t _0xAC_int;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _0xA8_short;
+		uint32_t first_active_frame_2;
+		uint32_t last_active_frame_2;
+		uint32_t hitbox_location; // 0xC0
+		uint32_t _0xC4[8]; // 0xC4 - 0xE0
+		uint32_t first_active_frame_3; // 0xE4
+		uint32_t last_active_frame_3; // 0xE8
+		uint32_t hitbox_location_2; // 0xEC
+		uint32_t _0xF0[73]; // 0xF0 - 0x214
+		uint16_t collision;
 		uint16_t distance;
-		int32_t _0xAC_int;
+		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
+			Param values[11];
+		} _0x21C[8];
+		uint32_t _0x37C;
 	};
 
 	// -- Other -- //
 
-	struct MovesetTable //todo
+	struct MovesetTable
 	{
+		Reactions* reactions;
+		uint64_t _0x8; // what if this was wrongly placed?
+		uint64_t reactionsCount;
+
 		union {
 			struct {
-				Reactions* reactions;
-				uint64_t reactionsCount;
-
 				Requirement* requirement;
 				uint64_t requirementCount;
 
@@ -371,12 +400,15 @@ namespace StructsT8
 
 				ThrowCamera* throwCameras;
 				uint64_t throwCamerasCount;
+
+				UnknownNew* _unkown_0x298;
+				uint64_t _unkown_0x298Count;
 			};
-			struct {
-				void* listAddr;
-				uint64_t listCount;
-			} entries[19];
 		};
+		struct {
+			void* listAddr;
+			uint64_t listCount;
+		} entries[19];
 	};
 
 	struct MotaHeader
@@ -410,6 +442,7 @@ namespace StructsT8
 		}
 	};
 
+	// MOTAs appear to be gone in Tk8. For now, this struct is useless :(
 	struct MotaList
 	{
 		union {
@@ -426,24 +459,27 @@ namespace StructsT8
 					MotaHeader* camera_2; // Camera
 					MotaHeader* mota_10; // Unknown
 					MotaHeader* mota_11; // Unknown
-					MotaHeader* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+					MotaHeader* _unknown_; // Points to start of the file that contains all odd-numbered MOTAs
 			};
 			MotaHeader* motas[13];
 		};
 	};
 
-	struct MovesetInfo //todo
+	struct MovesetInfo
 	{
 		char _0x0[2];
 		bool isInitialized;
-		char _0x3[5];
+		bool _0x3;
+		char _0x4[4];
+		char _0x8[4]; // string "TEK\0"
+		uint32_t _0xC;
 		char* character_name_addr;
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t orig_aliases[56];
-		uint16_t current_aliases[56];
-		uint16_t unknown_values[36];
+		uint16_t orig_aliases[57];
+		uint16_t current_aliases[57];
+		uint16_t unknown_values[38];
 		MovesetTable table;
 		MotaList motas;
 	};
@@ -654,11 +690,17 @@ namespace StructsT8
 // Helps reduce the need of casting throughout the code and that is important for code clarity
 namespace StructsT8_gameAddr //todo
 {
+	union Param {
+		uint32_t param_unsigned;
+		int32_t param_signed;
+		float param_float;
+	};
+
 	struct Pushback
 	{
 		uint16_t duration;
 		uint16_t displacement;
-		uint32_t num_of_loops;
+		uint32_t offsets_count;
 		gameAddr extradata_addr;
 	};
 
@@ -704,8 +746,12 @@ namespace StructsT8_gameAddr //todo
 		uint16_t front_counterhit_direction;
 		uint16_t downed_direction;
 
-		uint32_t _0x44_int;
-		uint32_t _0x48_int;
+		uint16_t front_rotation;
+		uint16_t back_rotation;
+		uint16_t left_side_rotation;
+		uint16_t right_side_rotation;
+		uint16_t front_counterhit_rotation;
+		uint16_t downed_rotation;
 
 		union {
 			struct {
@@ -794,58 +840,94 @@ namespace StructsT8_gameAddr //todo
 	{
 		gameAddr requirements_addr;
 		uint32_t extraprop; // 881 list end value & extraprop values
-		uint32_t value; // Often small values
+		Param param[5];
+	};
+
+	struct ExtraMoveProperty //todo
+	{
+		uint32_t starting_frame;
+		uint32_t _0x4_int;
+		gameAddr* requirements_addr;
+		uint32_t id;
+		Param param[5];
+	};
+
+
+	struct UnknownNew
+	{
+		uint32_t _0x0;
+		uint16_t _0x4;
+		uint16_t _0x6;
+		gameAddr* requirements_addr;
+		uint32_t _0xC;
+		uint32_t _0x10;
 	};
 
 	struct Move
 	{
-		gameAddr name_addr;
-		gameAddr anim_name_addr;
-		gameAddr anim_addr;
+		Byte move_name_related[4];
+		Byte move_anim_name_related[4];
+		char* name_addr;
+		char* anim_name_addr;
+		Byte anim_addr[8]; // now encrypted
 		uint32_t vuln;
 		uint32_t hitlevel;
 		gameAddr cancel_addr;
-		gameAddr _0x28_cancel_addr;
-		int32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
-		int32_t _0x34_int;
-		gameAddr _0x38_cancel_addr;
-		int32_t _0x40_int__0x38_related; // i believe this is 2x4 bytes
-		uint32_t _0x44_int;
-		gameAddr _0x48_cancel_addr;
-		int32_t _0x50_int__0x48_related;
+		gameAddr _0x30_cancel_addr;
+		int32_t _0x38_int__0x30_related;
+		int32_t _0x3C_int;
+		gameAddr _0x40_cancel_addr;
+		int32_t _0x48_int__0x40_related;
+		int32_t _0x4C_int;
+		gameAddr _0x50_cancel_addr;
+		uint32_t _0x58_int__0x50_related;
 		uint16_t transition;
-		int16_t _0x56_short;
+		int16_t _0x5E_short;
 		uint16_t moveId_val1; // Clearly related to move ID
 		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short;
-		gameAddr hit_condition_addr;
-		uint32_t anim_len;
+		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
+		int16_t _0x66_short;
+		gameAddr hit_condition_addr; // 0x68
+		uint32_t _0x70;
+		uint32_t _0x74;
+		int32_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
-		uint32_t ground_fall;
-		gameAddr voicelip_addr; // Can be NULL
+		uint32_t ground_fall; // Not confirmed
+		gameAddr voicelip_addr; // Can be NULL // 0x88
 		gameAddr extra_move_property_addr; // Can be NULL
 		gameAddr move_start_extraprop_addr; // Can be NULL
 		gameAddr move_end_extraprop_addr; // Can be NULL
-		int32_t _0x98_int; // facing/extras
-		uint32_t hitbox_location;
+		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
+		uint32_t _0xAC_int;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _0xA8_short;
+		uint32_t first_active_frame_2;
+		uint32_t last_active_frame_2;
+		uint32_t hitbox_location; // 0xC0
+		uint32_t _0xC4[8]; // 0xC4 - 0xE0
+		uint32_t first_active_frame_3; // 0xE4
+		uint32_t last_active_frame_3; // 0xE8
+		uint32_t hitbox_location_2; // 0xEC
+		uint32_t _0xF0[73]; // 0xF0 - 0x214
+		uint16_t collision;
 		uint16_t distance;
-		int32_t _0xAC_int;
+		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
+			Param values[11];
+		} _0x21C[8];
+		uint32_t _0x37C;
 	};
 
 	// -- Other -- //
 
 	struct MovesetTable
 	{
+		gameAddr reactions;
+		uint64_t _0x8; // always 0 so far, goes unused it seems
+		uint64_t reactionsCount;
+
 		union {
 			struct {
-				gameAddr reactions;
-				uint64_t reactionsCount;
-
 				gameAddr requirement;
 				uint64_t requirementCount;
 
@@ -899,6 +981,9 @@ namespace StructsT8_gameAddr //todo
 
 				gameAddr throwCameras;
 				uint64_t throwCamerasCount;
+
+				gameAddr _unkown_0x298;
+				uint64_t _unkown_0x298Count;
 			};
 			struct {
 				gameAddr listAddr;
@@ -907,6 +992,7 @@ namespace StructsT8_gameAddr //todo
 		};
 	};
 
+	// MOTAs appear to be gone in Tk8. For now, this struct is useless :(
 	struct MotaList
 	{
 		union {
@@ -923,7 +1009,7 @@ namespace StructsT8_gameAddr //todo
 				gameAddr mota_9; // Camera
 				gameAddr mota_10; // Unknown
 				gameAddr mota_11; // Unknown
-				gameAddr _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+				gameAddr _unknown_; // Points to start of the file that contains all odd-numbered MOTAs
 			};
 			gameAddr motas[13];
 		};
@@ -933,14 +1019,17 @@ namespace StructsT8_gameAddr //todo
 	{
 		char _0x0[2];
 		bool isInitialized;
-		char _0x3[5];
+		bool _0x3;
+		char _0x4[4];
+		char _0x8[4]; // string "TEK\0"
+		uint32_t _0xC;
 		char* character_name_addr;
 		char* character_creator_addr;
 		char* date_addr;
 		char* fulldate_addr;
-		uint16_t orig_aliases[56];
-		uint16_t current_aliases[56];
-		uint16_t unknown_aliases[36];
+		uint16_t orig_aliases[57];
+		uint16_t current_aliases[57];
+		uint16_t unknown_aliases[38];
 		MovesetTable table;
 		MotaList motas;
 	};
