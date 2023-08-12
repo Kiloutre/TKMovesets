@@ -2,11 +2,6 @@
 
 #include "GameTypes.h"
 
-union Param {
-	uint32_t param_unsigned;
-	int32_t param_signed;
-	float param_float;
-};
 
 namespace StructsT8
 {
@@ -68,6 +63,12 @@ namespace StructsT8
 				return blocks[block + 1] - blocks[block];
 			}
 		}
+	};
+
+	union Param {
+		uint32_t param_unsigned;
+		int32_t param_signed;
+		float param_float;
 	};
 
 	// -- Main data type -- //
