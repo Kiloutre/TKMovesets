@@ -690,6 +690,12 @@ namespace StructsT8
 // Helps reduce the need of casting throughout the code and that is important for code clarity
 namespace StructsT8_gameAddr //todo
 {
+	union Param {
+		uint32_t param_unsigned;
+		int32_t param_signed;
+		float param_float;
+	};
+
 	struct Pushback
 	{
 		uint16_t duration;
