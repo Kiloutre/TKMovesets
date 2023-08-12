@@ -19,15 +19,15 @@ The tool is tailored for the latest Tekken 7 version. It can be modified to work
 
 # Feature set:
 ## - Extractor
-- Extract movesets from memory (game running, characters loaded) (Tekken 7, Tekken Tag2, Tekken Revolution, Tekken 6, Tekken 5)
+- Extract movesets from memory (game running, characters loaded) (Tekken 8, Tekken 7, Tekken Tag2, Tekken Revolution, Tekken 6, Tekken 5)
 - Chose whether or not to carry over camera animations, face animations, hands animations...
 - Movesets are compressed on disk in order for them not to take too much space
 
 ## - Importer
-- Import moveset to any character in memory (game running, characters loaded) (Tekken 7)
+- Import moveset to any character in memory (game running, characters loaded) (Tekken 7, Tekken 8)
 - Unused movesets are automatically freed from memory, but advanced users may disable that option to play with multiple movesets at once
 
-## - Online play
+## - Online play (Tekken 7)
 - 'Persistent play' submenu that allows to choose one/two movesets to apply on the players and to keep even after loading screens
 - 'Online play' menu that allows playing with custom movesets without syncing moveset files with the opponent : The moveset files are automatically sent through the steam networking API to the other player. You only need to select your own moveset. Only works if the opponent also has the tool running. Maximum moveset size to be sent/received is 50MB.
 
@@ -39,7 +39,7 @@ The tool is tailored for the latest Tekken 7 version. It can be modified to work
 - Keybinds for pre-configured actions such as quick import, more in the future
 
 #### Other
-- Support for multiple translations (help wanted!), for now English, Japanese & French are supported
+- Support for multiple translations (help wanted!), for now English, Japanese, Korean & French
 
 
 # Developer readme
