@@ -329,8 +329,8 @@ namespace StructsT8
 		uint32_t last_active_frame_3; // 0xE8
 		uint32_t hitbox_location_2; // 0xEC
 		uint32_t _0xF0[73]; // 0xF0 - 0x214
-		uint16_t _0x218;
-		uint16_t _0x21C;
+		uint16_t collision;
+		uint16_t distance;
 		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
 			Param values[11];
 		} _0x21C[8];
@@ -904,8 +904,8 @@ namespace StructsT8_gameAddr //todo
 		uint32_t last_active_frame_3; // 0xE8
 		uint32_t hitbox_location_2; // 0xEC
 		uint32_t _0xF0[73]; // 0xF0 - 0x214
-		uint16_t _0x218;
-		uint16_t _0x21C;
+		uint16_t collision;
+		uint16_t distance;
 		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
 			Param values[11];
 		} _0x21C[8];
