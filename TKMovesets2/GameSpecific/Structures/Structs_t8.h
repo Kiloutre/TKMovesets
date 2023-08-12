@@ -865,14 +865,14 @@ namespace StructsT8_gameAddr //todo
 		Byte anim_addr[8]; // now encrypted
 		uint32_t vuln;
 		uint32_t hitlevel;
-		gameAddr* cancel_addr;
-		gameAddr* _0x30_cancel_addr;
+		gameAddr cancel_addr;
+		gameAddr _0x30_cancel_addr;
 		int32_t _0x38_int__0x30_related;
 		int32_t _0x3C_int;
-		gameAddr* _0x40_cancel_addr;
+		gameAddr _0x40_cancel_addr;
 		int32_t _0x48_int__0x40_related;
 		int32_t _0x4C_int;
-		gameAddr* _0x50_cancel_addr;
+		gameAddr _0x50_cancel_addr;
 		uint32_t _0x58_int__0x50_related;
 		uint16_t transition;
 		int16_t _0x5E_short;
@@ -880,17 +880,17 @@ namespace StructsT8_gameAddr //todo
 		uint16_t moveId_val2; // Clearly related to current character ID
 		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
 		int16_t _0x66_short;
-		gameAddr* hit_condition_addr; // 0x68
+		gameAddr hit_condition_addr; // 0x68
 		uint32_t _0x70;
 		uint32_t _0x74;
 		int32_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
 		uint32_t ground_fall; // Not confirmed
-		gameAddr* voicelip_addr; // Can be NULL // 0x88
-		gameAddr* extra_move_property_addr; // Can be NULL
-		gameAddr* move_start_extraprop_addr; // Can be NULL
-		gameAddr* move_end_extraprop_addr; // Can be NULL
+		gameAddr voicelip_addr; // Can be NULL // 0x88
+		gameAddr extra_move_property_addr; // Can be NULL
+		gameAddr move_start_extraprop_addr; // Can be NULL
+		gameAddr move_end_extraprop_addr; // Can be NULL
 		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
 		uint32_t _0xAC_int;
 		uint32_t first_active_frame;
