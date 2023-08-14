@@ -56,7 +56,7 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 	}
 }
 
-static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
+static void TryLoadWindowsFont(std::vector<const char*> filenames, float size_pixels, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
 {
 	for (auto& name : filenames)
 	{
@@ -66,7 +66,7 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 		}
 
 		DEBUG_LOG("Loaded font %s\n", full_filename.c_str());
-		io.Fonts->AddFontFromFileTTF(full_filename.c_str(), 15, config, glyphRange);
+		io.Fonts->AddFontFromFileTTF(full_filename.c_str(), size_pixels, config, glyphRange);
 	}
 }
 
@@ -82,9 +82,9 @@ MainWindow::MainWindow()
 	ImFontConfig config;
 	config.MergeMode = true;
 
-	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
-	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
-	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
+	TryLoadWindowsFont({ "msgothic.ttc" }, 15, io, &config, io.Fonts->GetGlyphRangesJapanese());
+	TryLoadWindowsFont({ "CascadiaMono.ttf" }, 15, io, &config, io.Fonts->GetGlyphRangesCyrillic());
+	TryLoadWindowsFont({ "malgun.ttf" }, 16, io, &config, io.Fonts->GetGlyphRangesKorean());
 
 	io.Fonts->Build();
 

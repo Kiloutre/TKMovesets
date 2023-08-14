@@ -2,6 +2,7 @@
 
 #include "GameTypes.h"
 
+
 namespace StructsT8
 {
 	enum TKMovesetHeaderBlocks_
@@ -64,6 +65,12 @@ namespace StructsT8
 		}
 	};
 
+	union Param {
+		uint32_t param_unsigned;
+		int32_t param_signed;
+		float param_float;
+	};
+
 	// -- Main data type -- //
 
 	struct PushbackExtradata 
@@ -82,27 +89,7 @@ namespace StructsT8
 	struct Requirement
 	{
 		uint32_t condition;
-		struct
-		{
-			uint32_t param1_unsigned;
-			uint32_t param2_unsigned;
-			uint32_t param3_unsigned;
-			uint32_t param4_unsigned;
-		};
-		struct
-		{
-			int32_t param1_signed;
-			int32_t param2_signed;
-			int32_t param3_signed;
-			int32_t param4_signed;
-		};
-		struct
-		{
-			float param1_float;
-			float param2_float;
-			float param3_float;
-			float param4_float;
-		};
+		Param param[4];
 	};
 
 	struct CancelExtradata
@@ -201,34 +188,7 @@ namespace StructsT8
 		uint32_t _0x4_int;
 		Requirement* requirements_addr;
 		uint32_t id;
-		union
-		{
-			struct
-			{
-				uint32_t value1_unsigned;
-				uint32_t value2_unsigned;
-				uint32_t value3_unsigned;
-				uint32_t value4_unsigned;
-				uint32_t value5_unsigned;
-			};
-			struct
-			{
-				int32_t value1_signed;
-				int32_t value2_signed;
-				int32_t value3_signed;
-				int32_t value4_signed;
-				int32_t value5_signed;
-			};
-			struct
-			{
-				float value1_float;
-				float value2_float;
-				float value3_float;
-				float value4_float;
-				float value5_float;
-			};
-
-		};
+		Param param[5];
 	};
 
 	struct Input
@@ -309,11 +269,7 @@ namespace StructsT8
 	{
 		Requirement* requirements_addr;
 		uint32_t extraprop; // 881 list end value & extraprop values
-		uint32_t value1;
-		uint32_t value2;
-		uint32_t value3;
-		uint32_t value4;
-		uint32_t value5;
+		Param params[5];
 	};
 
 	struct UnknownNew
@@ -328,43 +284,57 @@ namespace StructsT8
 
 	struct Move //todo
 	{
-		char encyption_key[8]; // not 100% confirmed yet
+		Byte move_name_related[4];
+		Byte move_anim_name_related[4];
 		char* name_addr;
 		char* anim_name_addr;
-		char anim_addr[8]; // now encrypted
+		Byte anim_addr[8]; // now encrypted
 		uint32_t vuln;
 		uint32_t hitlevel;
 		Cancel* cancel_addr;
-		Cancel* _0x28_cancel_addr;
-		int32_t _0x30_int__0x28_related;
-		int32_t _0x34_int;
-		Cancel* _0x38_cancel_addr;
-		int32_t _0x40_int__0x38_related;
-		int32_t _0x44_int;
-		Cancel* _0x48_cancel_addr;
-		uint32_t _0x50_int__0x48_related;
+		Cancel* _0x30_cancel_addr;
+		int32_t _0x38_int__0x30_related;
+		int32_t _0x3C_int;
+		Cancel* _0x40_cancel_addr;
+		int32_t _0x48_int__0x40_related;
+		int32_t _0x4C_int;
+		Cancel* _0x50_cancel_addr;
+		uint32_t _0x58_int__0x50_related;
 		uint16_t transition;
-		int16_t _0x56_short;
+		int16_t _0x5E_short;
 		uint16_t moveId_val1; // Clearly related to move ID
 		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short;
-		HitCondition* hit_condition_addr;
+		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
+		int16_t _0x66_short;
+		HitCondition* hit_condition_addr; // 0x68
+		uint32_t _0x70;
+		uint32_t _0x74;
 		int32_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
-		uint32_t ground_fall;
-		Voiceclip* voicelip_addr; // Can be NULL
+		uint32_t ground_fall; // Not confirmed
+		Voiceclip* voicelip_addr; // Can be NULL // 0x88
 		ExtraMoveProperty* extra_move_property_addr; // Can be NULL
 		OtherMoveProperty* move_start_extraprop_addr; // Can be NULL
 		OtherMoveProperty* move_end_extraprop_addr; // Can be NULL
-		int32_t _0x98_int; // facing/extras
-		uint32_t hitbox_location;
+		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
+		uint32_t _0xAC_int;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _0xA8_short;
+		uint32_t first_active_frame_2;
+		uint32_t last_active_frame_2;
+		uint32_t hitbox_location; // 0xC0
+		uint32_t _0xC4[8]; // 0xC4 - 0xE0
+		uint32_t first_active_frame_3; // 0xE4
+		uint32_t last_active_frame_3; // 0xE8
+		uint32_t hitbox_location_2; // 0xEC
+		uint32_t _0xF0[73]; // 0xF0 - 0x214
+		uint16_t collision;
 		uint16_t distance;
-		int32_t _0xAC_int;
+		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
+			Param values[11];
+		} _0x21C[8];
+		uint32_t _0x37C;
 	};
 
 	// -- Other -- //
@@ -375,62 +345,70 @@ namespace StructsT8
 		uint64_t _0x8; // what if this was wrongly placed?
 		uint64_t reactionsCount;
 
-		Requirement* requirement;
-		uint64_t requirementCount;
+		union {
+			struct {
+				Requirement* requirement;
+				uint64_t requirementCount;
 
-		HitCondition* hitCondition;
-		uint64_t hitConditionCount;
+				HitCondition* hitCondition;
+				uint64_t hitConditionCount;
 
-		Projectile* projectile;
-		uint64_t projectileCount;
+				Projectile* projectile;
+				uint64_t projectileCount;
 
-		Pushback* pushback;
-		uint64_t pushbackCount;
+				Pushback* pushback;
+				uint64_t pushbackCount;
 
-		PushbackExtradata* pushbackExtradata;
-		uint64_t pushbackExtradataCount;
+				PushbackExtradata* pushbackExtradata;
+				uint64_t pushbackExtradataCount;
 
-		Cancel* cancel;
-		uint64_t cancelCount;
+				Cancel* cancel;
+				uint64_t cancelCount;
 
-		Cancel* groupCancel;
-		uint64_t groupCancelCount;
+				Cancel* groupCancel;
+				uint64_t groupCancelCount;
 
-		CancelExtradata* cancelExtradata;
-		uint64_t cancelExtradataCount;
+				CancelExtradata* cancelExtradata;
+				uint64_t cancelExtradataCount;
 
-		ExtraMoveProperty* extraMoveProperty;
-		uint64_t extraMovePropertyCount;
+				ExtraMoveProperty* extraMoveProperty;
+				uint64_t extraMovePropertyCount;
 
-		OtherMoveProperty* moveBeginningProp; // Extraprops that play when a move starts
-		uint64_t moveBeginningPropCount;
+				OtherMoveProperty* moveBeginningProp; // Extraprops that play when a move starts
+				uint64_t moveBeginningPropCount;
 
-		OtherMoveProperty* moveEndingProp; // Extraprops that play when a move ends
-		uint64_t moveEndingPropCount;
+				OtherMoveProperty* moveEndingProp; // Extraprops that play when a move ends
+				uint64_t moveEndingPropCount;
 
-		Move* move;
-		uint64_t moveCount;
+				Move* move;
+				uint64_t moveCount;
 
-		Voiceclip* voiceclip;
-		uint64_t voiceclipCount;
+				Voiceclip* voiceclip;
+				uint64_t voiceclipCount;
 
-		InputSequence* inputSequence;
-		uint64_t inputSequenceCount;
+				InputSequence* inputSequence;
+				uint64_t inputSequenceCount;
 
-		Input* input;
-		uint64_t inputCount;
+				Input* input;
+				uint64_t inputCount;
 
-		UnknownParryRelated* unknownParryRelated;
-		uint64_t unknownParryRelatedCount;
+				UnknownParryRelated* unknownParryRelated;
+				uint64_t unknownParryRelatedCount;
 
-		CameraData* cameraData;
-		uint64_t cameraDataCount;
+				CameraData* cameraData;
+				uint64_t cameraDataCount;
 
-		ThrowCamera* throwCameras;
-		uint64_t throwCamerasCount;
+				ThrowCamera* throwCameras;
+				uint64_t throwCamerasCount;
 
-		UnknownNew* _unkown_0x298;
-		uint64_t _unkown_0x298Count;
+				UnknownNew* _unkown_0x298;
+				uint64_t _unkown_0x298Count;
+			};
+		};
+		struct {
+			void* listAddr;
+			uint64_t listCount;
+		} entries[19];
 	};
 
 	struct MotaHeader
@@ -464,6 +442,7 @@ namespace StructsT8
 		}
 	};
 
+	// MOTAs appear to be gone in Tk8. For now, this struct is useless :(
 	struct MotaList
 	{
 		union {
@@ -480,7 +459,7 @@ namespace StructsT8
 					MotaHeader* camera_2; // Camera
 					MotaHeader* mota_10; // Unknown
 					MotaHeader* mota_11; // Unknown
-					MotaHeader* _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+					MotaHeader* _unknown_; // Points to start of the file that contains all odd-numbered MOTAs
 			};
 			MotaHeader* motas[13];
 		};
@@ -492,7 +471,7 @@ namespace StructsT8
 		bool isInitialized;
 		bool _0x3;
 		char _0x4[4];
-		char _0x8[4];
+		char _0x8[4]; // string "TEK\0"
 		uint32_t _0xC;
 		char* character_name_addr;
 		char* character_creator_addr;
@@ -711,6 +690,12 @@ namespace StructsT8
 // Helps reduce the need of casting throughout the code and that is important for code clarity
 namespace StructsT8_gameAddr //todo
 {
+	union Param {
+		uint32_t param_unsigned;
+		int32_t param_signed;
+		float param_float;
+	};
+
 	struct Pushback
 	{
 		uint16_t duration;
@@ -855,11 +840,7 @@ namespace StructsT8_gameAddr //todo
 	{
 		gameAddr requirements_addr;
 		uint32_t extraprop; // 881 list end value & extraprop values
-		uint32_t value1;
-		uint32_t value2;
-		uint32_t value3;
-		uint32_t value4;
-		uint32_t value5;
+		Param param[5];
 	};
 
 	struct ExtraMoveProperty //todo
@@ -868,34 +849,7 @@ namespace StructsT8_gameAddr //todo
 		uint32_t _0x4_int;
 		gameAddr* requirements_addr;
 		uint32_t id;
-		union
-		{
-			struct
-			{
-				uint32_t value1_unsigned;
-				uint32_t value2_unsigned;
-				uint32_t value3_unsigned;
-				uint32_t value4_unsigned;
-				uint32_t value5_unsigned;
-			};
-			struct
-			{
-				int32_t value1_signed;
-				int32_t value2_signed;
-				int32_t value3_signed;
-				int32_t value4_signed;
-				int32_t value5_signed;
-			};
-			struct
-			{
-				float value1_float;
-				float value2_float;
-				float value3_float;
-				float value4_float;
-				float value5_float;
-			};
-
-		};
+		Param param[5];
 	};
 
 
@@ -911,43 +865,57 @@ namespace StructsT8_gameAddr //todo
 
 	struct Move
 	{
-		char encyption_key[8]; // not 100% confirmed yet
-		gameAddr name_addr;
-		gameAddr anim_name_addr;
-		char anim_addr[8]; // now encrypted
+		Byte move_name_related[4];
+		Byte move_anim_name_related[4];
+		char* name_addr;
+		char* anim_name_addr;
+		Byte anim_addr[8]; // now encrypted
 		uint32_t vuln;
 		uint32_t hitlevel;
 		gameAddr cancel_addr;
-		gameAddr _0x28_cancel_addr;
-		int32_t _0x30_int__0x28_related; // i believe this is 2x4 bytes
-		int32_t _0x34_int;
-		gameAddr _0x38_cancel_addr;
-		int32_t _0x40_int__0x38_related; // i believe this is 2x4 bytes
-		uint32_t _0x44_int;
-		gameAddr _0x48_cancel_addr;
-		int32_t _0x50_int__0x48_related;
+		gameAddr _0x30_cancel_addr;
+		int32_t _0x38_int__0x30_related;
+		int32_t _0x3C_int;
+		gameAddr _0x40_cancel_addr;
+		int32_t _0x48_int__0x40_related;
+		int32_t _0x4C_int;
+		gameAddr _0x50_cancel_addr;
+		uint32_t _0x58_int__0x50_related;
 		uint16_t transition;
-		int16_t _0x56_short;
+		int16_t _0x5E_short;
 		uint16_t moveId_val1; // Clearly related to move ID
 		uint16_t moveId_val2; // Clearly related to current character ID
-		int16_t _0x5C_short; // Might be the same member as 0x5e (int32)
-		int16_t _0x5E_short;
-		gameAddr hit_condition_addr;
-		uint32_t anim_len;
+		int16_t _0x64_short; // Might be the same member as 0x66 (int32)
+		int16_t _0x66_short;
+		gameAddr hit_condition_addr; // 0x68
+		uint32_t _0x70;
+		uint32_t _0x74;
+		int32_t anim_len;
 		uint32_t airborne_start;
 		uint32_t airborne_end;
-		uint32_t ground_fall;
-		gameAddr voicelip_addr; // Can be NULL
+		uint32_t ground_fall; // Not confirmed
+		gameAddr voicelip_addr; // Can be NULL // 0x88
 		gameAddr extra_move_property_addr; // Can be NULL
 		gameAddr move_start_extraprop_addr; // Can be NULL
 		gameAddr move_end_extraprop_addr; // Can be NULL
-		int32_t _0x98_int; // facing/extras
-		uint32_t hitbox_location;
+		int32_t _0xA8_int; // extra body properties such as neck tracking/combo counter etc....
+		uint32_t _0xAC_int;
 		uint32_t first_active_frame;
 		uint32_t last_active_frame;
-		int16_t _0xA8_short;
+		uint32_t first_active_frame_2;
+		uint32_t last_active_frame_2;
+		uint32_t hitbox_location; // 0xC0
+		uint32_t _0xC4[8]; // 0xC4 - 0xE0
+		uint32_t first_active_frame_3; // 0xE4
+		uint32_t last_active_frame_3; // 0xE8
+		uint32_t hitbox_location_2; // 0xEC
+		uint32_t _0xF0[73]; // 0xF0 - 0x214
+		uint16_t collision;
 		uint16_t distance;
-		int32_t _0xAC_int;
+		struct { // First 3 values always are -1, next 3 are 1.00 and next 5 are always 0
+			Param values[11];
+		} _0x21C[8];
+		uint32_t _0x37C;
 	};
 
 	// -- Other -- //
@@ -958,64 +926,73 @@ namespace StructsT8_gameAddr //todo
 		uint64_t _0x8; // always 0 so far, goes unused it seems
 		uint64_t reactionsCount;
 
-		gameAddr requirement;
-		uint64_t requirementCount;
+		union {
+			struct {
+				gameAddr requirement;
+				uint64_t requirementCount;
 
-		gameAddr hitCondition;
-		uint64_t hitConditionCount;
+				gameAddr hitCondition;
+				uint64_t hitConditionCount;
 
-		gameAddr projectile;
-		uint64_t projectileCount;
+				gameAddr projectile;
+				uint64_t projectileCount;
 
-		gameAddr pushback;
-		uint64_t pushbackCount;
+				gameAddr pushback;
+				uint64_t pushbackCount;
 
-		gameAddr pushbackExtradata;
-		uint64_t pushbackExtradataCount;
+				gameAddr pushbackExtradata;
+				uint64_t pushbackExtradataCount;
 
-		gameAddr cancel;
-		uint64_t cancelCount;
+				gameAddr cancel;
+				uint64_t cancelCount;
 
-		gameAddr groupCancel;
-		uint64_t groupCancelCount;
+				gameAddr groupCancel;
+				uint64_t groupCancelCount;
 
-		gameAddr cancelExtradata;
-		uint64_t cancelExtradataCount;
+				gameAddr cancelExtradata;
+				uint64_t cancelExtradataCount;
 
-		gameAddr extraMoveProperty;
-		uint64_t extraMovePropertyCount;
+				gameAddr extraMoveProperty;
+				uint64_t extraMovePropertyCount;
 
-		gameAddr moveBeginningProp; // Extraprops that play when a move starts
-		uint64_t moveBeginningPropCount;
+				gameAddr moveBeginningProp; // Extraprops that play when a move starts
+				uint64_t moveBeginningPropCount;
 
-		gameAddr moveEndingProp; // Extraprops that play when a move ends
-		uint64_t moveEndingPropCount;
+				gameAddr moveEndingProp; // Extraprops that play when a move ends
+				uint64_t moveEndingPropCount;
 
-		gameAddr move;
-		uint64_t moveCount;
+				gameAddr move;
+				uint64_t moveCount;
 
-		gameAddr voiceclip;
-		uint64_t voiceclipCount;
+				gameAddr voiceclip;
+				uint64_t voiceclipCount;
 
-		gameAddr inputSequence;
-		uint64_t inputSequenceCount;
+				gameAddr inputSequence;
+				uint64_t inputSequenceCount;
 
-		gameAddr input;
-		uint64_t inputCount;
+				gameAddr input;
+				uint64_t inputCount;
 
-		gameAddr unknownParryRelated;
-		uint64_t unknownParryRelatedCount;
+				gameAddr unknownParryRelated;
+				uint64_t unknownParryRelatedCount;
 
-		gameAddr cameraData;
-		uint64_t cameraDataCount;
+				gameAddr cameraData;
+				uint64_t cameraDataCount;
 
-		gameAddr throwCameras;
-		uint64_t throwCamerasCount;
+				gameAddr throwCameras;
+				uint64_t throwCamerasCount;
 
-		gameAddr _unkown_0x298;
-		uint64_t _unkown_0x298Count;
+				gameAddr _unkown_0x298;
+				uint64_t _unkown_0x298Count;
+			};
+			struct {
+				gameAddr listAddr;
+				uint64_t listCount;
+			} entries[19];
+		};
 	};
 
+	// MOTAs appear to be gone in Tk8. For now, this struct is useless :(
 	struct MotaList
 	{
 		union {
@@ -1032,7 +1009,7 @@ namespace StructsT8_gameAddr //todo
 				gameAddr mota_9; // Camera
 				gameAddr mota_10; // Unknown
 				gameAddr mota_11; // Unknown
-				gameAddr _unknown_; // Unknown, but clearly a pointer too, sometimes point to stuff right before a MOTA
+				gameAddr _unknown_; // Points to start of the file that contains all odd-numbered MOTAs
 			};
 			gameAddr motas[13];
 		};
@@ -1044,7 +1021,7 @@ namespace StructsT8_gameAddr //todo
 		bool isInitialized;
 		bool _0x3;
 		char _0x4[4];
-		char _0x8[4];
+		char _0x8[4]; // string "TEK\0"
 		uint32_t _0xC;
 		char* character_name_addr;
 		char* character_creator_addr;
