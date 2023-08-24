@@ -42,6 +42,8 @@ protected:
 	std::map<std::string, uint64_t> m_functions;
 	// List of modules with their name, size and addresses in the current process
 	std::map<std::string, moduleEntry> m_modules;
+	// Set to true in inherited classes constructors in order to init steam on startup
+	bool m_loadSteam = false;
 
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;

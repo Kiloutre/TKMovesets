@@ -16,7 +16,7 @@ public:
 	// -- Game addresses interfaces -- //
 	int64_t GetValue(const char* c_addressId) const;
 	const char* GetString(const char* c_addressId) const;
-	const std::vector<gameAddr>& GetPtrPath(const char* c_addressId, bool& isRelative) const;
+	const std::vector<gameAddr>* GetPtrPath(const char* c_addressId, bool& isRelative) const;
 	bool HasKey(const char* key) const;
 
 	// Reads a ptr path, not in the remote process but in the local une. Used by injected DLL.

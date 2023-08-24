@@ -4,38 +4,43 @@
 
 int64_t GameAddressesWrapper::GetValue(const char* c_addressId) const
 {
-	try {
-		return addrFile->GetValueEx(minorGameKey, c_addressId);
-	}
-	catch (GameAddressNotFound&) {
+	int64_t out;
+
+	if (!addrFile->GetValueEx(minorGameKey, c_addressId, out)) {
 		return addrFile->GetValue(gameKey, c_addressId);
+	}
+	else {
+		return out;
 	}
 }
 
 const char* GameAddressesWrapper::GetString(const char* c_addressId) const
 {
-	try {
-		return addrFile->GetStringEx(minorGameKey, c_addressId);
-	}
-	catch (GameAddressNotFound&) {
+	const char* out;
+
+	if (!addrFile->GetStringEx(minorGameKey, c_addressId, out)) {
 		return addrFile->GetString(gameKey, c_addressId);
+	}
+	else {
+		return out;
 	}
 }
 
-const std::vector<gameAddr>& GameAddressesWrapper::GetPtrPath(const char* c_addressId, bool& isRelative) const
+const std::vector<gameAddr>* GameAddressesWrapper::GetPtrPath(const char* c_addressId, bool& isRelative) const
 {
-	try {
-		return addrFile->GetPtrPathEx(minorGameKey, c_addressId, isRelative);
+	const std::vector<gameAddr>* out = nullptr;
+	if (!addrFile->GetPtrPathEx(minorGameKey, c_addressId, isRelative, out)) {
+		return &addrFile->GetPtrPath(gameKey, c_addressId, isRelative);
 	}
-	catch (GameAddressNotFound&) {
-		return addrFile->GetPtrPath(gameKey, c_addressId, isRelative);
+	else {
+		return out;
 	}
 }
 
 uint64_t GameAddressesWrapper::ReadPtrPathInCurrProcess(const char* c_addressId, uint64_t moduleAddress) const
 {
 	bool isRelative;
-	const std::vector<gameAddr>& ptrPath = GetPtrPath(c_addressId, isRelative);
+	const std::vector<gameAddr>& ptrPath = *GetPtrPath(c_addressId, isRelative);
 
 	if (ptrPath.size() == 0) {
 		return GAME_ADDR_NULL;

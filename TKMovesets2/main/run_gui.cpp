@@ -10,7 +10,6 @@
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
-#include "GameAddressesFile.hpp"
 #include "Settings.hpp"
 
 #include "constants.h"
@@ -32,11 +31,13 @@ static bool LoadLocaleTranslation()
 	wchar_t w_name[LOCALE_NAME_MAX_LENGTH];
 	{
 		if (LCIDToLocaleName(GetThreadLocale(), w_name, LOCALE_NAME_MAX_LENGTH, 0) == 0) {
+			DEBUG_LOG("LCIDToLocaleName fail\n");
 			return false;
 		}
 
 		size_t retval = 0;
 		if (wcstombs_s(&retval, name, LOCALE_NAME_MAX_LENGTH, w_name, LOCALE_NAME_MAX_LENGTH - 1) != 0) {
+			DEBUG_LOG("wcstombs_s fail\n");
 			return false;
 		}
 	}
@@ -53,106 +54,6 @@ static bool LoadLocaleTranslation()
 		return true;
 	}
 	return false;
-}
-
-// Initialize the important members of mainwindow. I prefer doing it here because it is mostly a layout and GUI-related class
-static void InitMainClasses(MainWindow& program)
-{
-	program.storage.ReloadMovesetList();
-
-	GameAddressesFile* addrFile = new GameAddressesFile(true);
-	program.addrFile = addrFile;
-
-	program.extractor.Init(addrFile, &program.storage);
-	program.importer.Init(addrFile, &program.storage);
-	program.sharedMem.Init(addrFile, &program.storage);
-
-	program.onlineMenu.gameHelper = &program.sharedMem;
-	program.persistentPlayMenu.gameHelper = &program.sharedMem;
-
-	program.sideMenu.requestedUpdatePtr = &program.requestedUpdate;
-	program.sideMenu.SetAddrFile(addrFile);
-
-	{
-		// Detect running games and latch on to them if possible
-		bool attachedExtractor = false;
-		bool attachedImporter = false;
-		bool attachedOnline = false;
-
-		auto processList = GameProcessUtils::GetRunningProcessList();
-
-		// Loop through every game we support
-		for (unsigned int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
-		{
-			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
-
-			const char* processName = gameInfo->processName;
-			processEntry* p;
-
-			// Detect if the game is running
-			{
-				bool isRunning = false;
-				for (auto& process : processList)
-				{
-					if (process.name == processName)
-					{
-						p = &process;
-						isRunning = true;
-						break;
-					}
-				}
-				if (!isRunning) {
-					continue;
-				}
-			}
-
-			if (!gameInfo->MatchesProcessWindowName(p->pid)) {
-				continue;
-			}
-
-			if (!attachedExtractor && gameInfo->extractor != nullptr) {
-				program.extractor.SetTargetProcess(gameInfo);
-				attachedExtractor = true;
-				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
-			}
-
-			if (!attachedImporter && gameInfo->importer != nullptr) {
-				program.importer.SetTargetProcess(gameInfo);
-				attachedImporter = true;
-				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
-			}
-
-			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
-				program.sharedMem.SetTargetProcess(gameInfo);
-				attachedOnline = true;
-				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
-			}
-
-		}
-	}
-
-	program.storage.StartThread();
-	program.extractor.StartThread();
-	program.importer.StartThread();
-	program.sharedMem.StartThread();
-}
-
-// Free up memory and stop threads cleanly before exiting the program
-static void DestroyMainClasses(MainWindow& program)
-{
-	program.extractor.StopThreadAndCleanup();
-	program.importer.StopThreadAndCleanup();
-	program.sharedMem.StopThreadAndCleanup();
-
-	for (auto& win : program.editorWindows) {
-		delete win;
-	}
-
-	// Now that every thread that uses addrFile has stopped, we can free it
-	delete program.addrFile;
-
-	// Once every thread that may use storage has been stopped, we can finally stop storage
-	program.storage.StopThreadAndCleanup();
 }
 
 static bool LoadEmbeddedIcon(GLFWwindow* window)
@@ -285,7 +186,8 @@ void run_gui()
 	// Load translation
 	{
 		int langId = Settings::Get(SETTING_LANG_KEY, SETTING_LANG);
-		if (langId != -1) {
+		DEBUG_LOG("Loaded lang id from file is: %d, (%u || %u) {}\n", langId, langId == SETTING_LANG_INVALID, langId < 0);
+		if (langId != SETTING_LANG_INVALID && langId >= 0) {
 			// Attempt to load locale from settings
 			if (!Localization::LoadFile(langId)) {
 				Localization::LoadFile(PROGRAM_DEFAULT_LOCALE);
@@ -300,7 +202,6 @@ void run_gui()
 	{
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program;
-		InitMainClasses(program);
 
 		while (!glfwWindowShouldClose(window) && !program.requestedUpdate)
 		{
@@ -338,15 +239,10 @@ void run_gui()
 			}
 		}
 
-		// Cleanup what needs to be cleaned up
-
 		if (program.requestedUpdate) {
 			program.sideMenu.CleanupThread();
 			StartProcess(UPDATE_TMP_FILENAME ".exe");
 		}
-
-		DestroyMainClasses(program);
-		program.Shutdown();
 	}
 
 	glfwDestroyWindow(window);

@@ -35,7 +35,7 @@ const ImU32 editorTitleInactiveColors[] = {
 //
 void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 {
-	for (EditorVisuals* win : editorWindows)
+	for (EditorVisuals* win : m_editorWindows)
 	{
 		if (win->filename == movesetInfos->filename)
 		{
@@ -47,8 +47,8 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 
 	try {
 		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
-		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, addrFile, &storage);
-		editorWindows.push_back(newWin);
+		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, m_addrFile, &m_storage);
+		m_editorWindows.push_back(newWin);
 	}
 	catch(EditorWindow_MovesetLoadFail) {
         DEBUG_ERR("Failed to load editor for moveset '%S'", movesetInfos->filename.c_str());
@@ -56,7 +56,7 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 	}
 }
 
-static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
+static void TryLoadWindowsFont(std::vector<const char*> filenames, float size_pixels, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
 {
 	for (auto& name : filenames)
 	{
@@ -66,7 +66,7 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 		}
 
 		DEBUG_LOG("Loaded font %s\n", full_filename.c_str());
-		io.Fonts->AddFontFromFileTTF(full_filename.c_str(), 15, config, glyphRange);
+		io.Fonts->AddFontFromFileTTF(full_filename.c_str(), size_pixels, config, glyphRange);
 	}
 }
 
@@ -74,6 +74,7 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, ImGuiIO& io, 
 
 MainWindow::MainWindow()
 {
+	// ImGUI config init
 	ImGuiIO& io = ImGui::GetIO();
 
 	ImFont* font = io.Fonts->AddFontDefault();
@@ -81,13 +82,92 @@ MainWindow::MainWindow()
 	ImFontConfig config;
 	config.MergeMode = true;
 
-	TryLoadWindowsFont({ "msgothic.ttc" }, io, &config, io.Fonts->GetGlyphRangesJapanese());
-	TryLoadWindowsFont({ "CascadiaMono.ttf" }, io, &config, io.Fonts->GetGlyphRangesCyrillic());
-	TryLoadWindowsFont({ "malgun.ttf" }, io, &config, io.Fonts->GetGlyphRangesKorean());
+	TryLoadWindowsFont({ "msgothic.ttc" }, 15, io, &config, io.Fonts->GetGlyphRangesJapanese());
+	TryLoadWindowsFont({ "CascadiaMono.ttf" }, 15, io, &config, io.Fonts->GetGlyphRangesCyrillic());
+	TryLoadWindowsFont({ "malgun.ttf" }, 16, io, &config, io.Fonts->GetGlyphRangesKorean());
 
 	io.Fonts->Build();
 
 	ImGuiExtra::InitMarkdownConfig();
+
+
+	// Program config (various threads, submenus)
+	m_storage.ReloadMovesetList();
+
+	m_addrFile = new GameAddressesFile(true);
+
+	m_extractor.Init(m_addrFile, &m_storage);
+	m_importer.Init(m_addrFile, &m_storage);
+	m_sharedMem.Init(m_addrFile, &m_storage);
+
+	m_onlineMenu.gameHelper = &m_sharedMem;
+	m_persistentPlayMenu.gameHelper = &m_sharedMem;
+
+	sideMenu.requestedUpdatePtr = &requestedUpdate;
+	sideMenu.SetAddrFile(m_addrFile);
+
+	{
+		// Detect running games and latch on to them if possible
+		bool attachedExtractor = false;
+		bool attachedImporter = false;
+		bool attachedOnline = false;
+
+		auto processList = GameProcessUtils::GetRunningProcessList();
+
+		// Loop through every game we support
+		for (unsigned int gameIdx = 0; gameIdx < Games::GetGamesCount(); ++gameIdx)
+		{
+			auto gameInfo = Games::GetGameInfoFromIndex(gameIdx);
+
+			const char* processName = gameInfo->processName;
+			processEntry* p;
+
+			// Detect if the game is running
+			{
+				bool isRunning = false;
+				for (auto& process : processList)
+				{
+					if (process.name == processName)
+					{
+						p = &process;
+						isRunning = true;
+						break;
+					}
+				}
+				if (!isRunning) {
+					continue;
+				}
+			}
+
+			if (!gameInfo->MatchesProcessWindowName(p->pid)) {
+				continue;
+			}
+
+			if (!attachedExtractor && gameInfo->extractor != nullptr) {
+				m_extractor.SetTargetProcess(gameInfo);
+				attachedExtractor = true;
+				DEBUG_LOG("Extraction-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+			if (!attachedImporter && gameInfo->importer != nullptr) {
+				m_importer.SetTargetProcess(gameInfo);
+				attachedImporter = true;
+				DEBUG_LOG("Importation-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+			if (!attachedOnline && gameInfo->onlineHandler != nullptr) {
+				m_sharedMem.SetTargetProcess(gameInfo);
+				attachedOnline = true;
+				DEBUG_LOG("Online-compatible game '%s' already running: attaching.\n", processName);
+			}
+
+		}
+	}
+
+	m_storage.StartThread();
+	m_extractor.StartThread();
+	m_importer.StartThread();
+	m_sharedMem.StartThread();
 }
 
 // Actual rendering function
@@ -112,7 +192,7 @@ void MainWindow::Update()
 			ImGui::BeginChild("SideBar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
 			// Render nav menu
-			navMenu.Render(sideMenuWidth, persistentPlayMenu.gameHelper->lockedIn);
+			m_navMenu.Render(sideMenuWidth, m_persistentPlayMenu.gameHelper->lockedIn);
 
 			ImGui::NewLine();
 			ImGui::NewLine();
@@ -130,25 +210,25 @@ void MainWindow::Update()
 			ImGui::SameLine();
 			ImGui::BeginChild("Tools", ImVec2(width - sidebarWidth - 25, 0), false, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking);
 
-			switch (navMenu.menuId)
+			switch (m_navMenu.menuId)
 			{
 			case NAV__MENU_EXTRACT:
-				extractMenu.Render(extractor);
+				m_extractMenu.Render(m_extractor);
 				break;
 			case NAV__MENU_IMPORT:
-				importMenu.Render(importer);
+				m_importMenu.Render(m_importer);
 				break;
 			case NAV__MENU_ONLINE_PLAY:
-				onlineMenu.Render();
+				m_onlineMenu.Render();
 				break;
 			case NAV__MENU_PERSISTENT_PLAY:
-				persistentPlayMenu.Render();
+				m_persistentPlayMenu.Render();
 				break;
 			case NAV__MENU_CAMERA:
 				break;
 			case NAV__MENU_EDITION:
 				{
-					movesetInfo* moveset = editionMenu.Render(storage);
+					movesetInfo* moveset = m_editionMenu.Render(m_storage);
 					if (moveset != nullptr) {
 						LoadMovesetEditor(moveset);
 					}
@@ -165,9 +245,9 @@ void MainWindow::Update()
 		}
 
 		// Editor windows
-		for (unsigned int i = 0; i < editorWindows.size();)
+		for (unsigned int i = 0; i < m_editorWindows.size();)
 		{
-			EditorVisuals* w = editorWindows[i];
+			EditorVisuals* w = m_editorWindows[i];
 
 			if (w->popen) {
 				const ImU32 colorCount = _countof(editorTitleColors);
@@ -192,7 +272,7 @@ void MainWindow::Update()
 			}
 			else {
 				// Window was closed, close the associated editor and free its ressources
-				editorWindows.erase(editorWindows.begin() + i);
+				m_editorWindows.erase(m_editorWindows.begin() + i);
 				delete w;
 			}
 		}
@@ -203,10 +283,10 @@ void MainWindow::Update()
 	// -- Rendering end -- //
 	{
 		// Cleanup stuff that we really don't want to clean up during Render()
-		storage.CleanupUnusedMovesetInfos();
-		extractor.FreeExpiredFactoryClasses();
-		importer.FreeExpiredFactoryClasses();
-		sharedMem.FreeExpiredFactoryClasses();
+		m_storage.CleanupUnusedMovesetInfos();
+		m_extractor.FreeExpiredFactoryClasses();
+		m_importer.FreeExpiredFactoryClasses();
+		m_sharedMem.FreeExpiredFactoryClasses();
 	}
 }
 
@@ -218,9 +298,23 @@ void MainWindow::NewFrame()
 	ImGui::NewFrame();
 }
 
-void MainWindow::Shutdown()
+MainWindow::~MainWindow()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	m_extractor.StopThreadAndCleanup();
+	m_importer.StopThreadAndCleanup();
+	m_sharedMem.StopThreadAndCleanup();
+
+	for (auto& win : m_editorWindows) {
+		delete win;
+	}
+
+	// Now that every thread that uses addrFile has stopped, we can free it
+	delete m_addrFile;
+
+	// Once every thread that may use storage has been stopped, we can finally stop storage
+	m_storage.StopThreadAndCleanup();
 }

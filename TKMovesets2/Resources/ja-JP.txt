@@ -102,6 +102,8 @@ settings.finish_keybind = 設定する
 keybind_editor.import_p1 = p1のインポートショートカットキー
 keybind_editor.import_p2 = p2のインポートショートカットキー
 keybind_editor.import_both = p1とp2のインポートショートカットキー
+#keybind_editor.save =
+#keybind_editor.change_data_type =
 
 sidemenu.settings = 設定
 sidemenu.up_to_date = 最新

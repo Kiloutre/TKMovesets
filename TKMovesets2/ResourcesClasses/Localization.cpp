@@ -13,7 +13,7 @@ extern "C" const char fr_FR_txt[];
 extern "C" const char de_DE_txt[];
 extern "C" const char es_ES_txt[];
 extern "C" const char ja_JP_txt[];
-extern "C" const char ko_txt[];
+extern "C" const char ko_KR_txt[];
 // --
 
 const TranslationData g_translation_datas[] = {
@@ -35,12 +35,13 @@ const TranslationData g_translation_datas[] = {
 		.data = ja_JP_txt,
 		.matchingLocale = { "ja" }
 	},
-	/*
 	{
 		.displayName = (const char*)u8"한국인",
-		.locale = "ko",
-		.data = ko_txt
+		.locale = "ko-KR",
+		.data = ko_KR_txt,
+		.matchingLocale = { "ko" }
 	},
+	/*
 	{
 		.displayName = "Español",
 		.locale = "es-ES",

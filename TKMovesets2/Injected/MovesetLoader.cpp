@@ -1,5 +1,6 @@
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
+#include "MovesetLoader_t8.hpp"
 #include "steamHelper.hpp"
 
 #include "constants.h"
@@ -70,10 +71,15 @@ bool MovesetLoader::Init()
     addresses.addrFile = new GameAddressesFile;
 
     // Init steam api functions (if the game does not have this module, this does not matter)
-    SteamHelper::Init(GetModuleHandleA("steam_api64.dll"));
+    if (m_loadSteam)
+    {
+        DEBUG_LOG("Initializing steam API...\n");
+        SteamHelper::Init(GetModuleHandleA("steam_api64.dll"));
+    }
 
     // Initialize the list of hooks and error out if a required one is not found
     {
+        DEBUG_LOG("Initializing hooks...\n");
         InitHooks();
 
         bool requiredHookErr = false;
@@ -179,7 +185,7 @@ void MovesetLoader::RegisterHook(const char* functionName, const std::string& mo
 
     if (functionAddr != 0) {
         InitHook(functionName, functionAddr, hookAddr);
-        DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx)\n", functionName, functionAddr, functionAddr - moduleAddr);
+        DEBUG_LOG("RegisterHook(%s): Found function at %llx (+%llx). Hook address will be %llx.\n", functionName, functionAddr, functionAddr - moduleAddr, hookAddr);
     }
 }
 
@@ -249,7 +255,11 @@ static bool Init()
         if (processName == "TekkenGame-Win64-Shipping.exe") {
             g_loader = new MovesetLoaderT7;
         }
+        else if (processName == "Polaris-Win64-Shipping.exe") {
+                g_loader = new MovesetLoaderT8;
+            }
         else {
+            DEBUG_LOG("Unknown process name: '%s'\n", processName.c_str());
             g_loading = false;
             return false;
         }

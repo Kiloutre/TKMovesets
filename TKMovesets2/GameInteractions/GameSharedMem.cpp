@@ -23,7 +23,7 @@ void GameSharedMem::InstantiateFactory()
 
 	game.SetCurrentGame(currentGame);
 	// Every game has its own subtleties so we use polymorphism to manage that
-	m_importer = Games::FactoryGetImporter(currentGame, process, game);
+	m_importer = currentGame->importer == nullptr ? nullptr : Games::FactoryGetImporter(currentGame, process, game);
 	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
 }
 
@@ -129,8 +129,8 @@ void GameSharedMem::StopThreadAndCleanup()
 	m_threadStarted = false;
 	m_t.join();
 
-	if (m_importer != nullptr) {
-		if (process.IsAttached()) {
+	if (m_sharedMemHandler != nullptr) {
+		if (process.IsAttached() && m_importer != nullptr) {
 			m_importer->CleanupUnusedMovesets();
 		}
 		delete m_sharedMemHandler;

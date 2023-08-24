@@ -128,6 +128,23 @@ set(GAMESPECIFIC_SOURCES
                     
                     # Game-specific
                     "GameSpecific/Editors/TEditor.cpp"
+                    ##T8
+                    "GameSpecific/Online/Online_t8.cpp"
+                    ### Editor logic
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Forms.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Forms_DisplayableMovelist.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Creations_DisplayableMovelist.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Commands.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Creations.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Deletion.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Duplication.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_ListCreations.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_LiveEdition.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_LiveEdition_Displayable.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_Utils.cpp"
+                    #"GameSpecific/Editors/Editor_t8/Editor_t8_References.cpp"
+
                     ## T7
                     "GameSpecific/Online/Online_t7.cpp"
                     "GameSpecific/Extractors/Extractor_t7/Extractor_t7.cpp"
@@ -206,11 +223,18 @@ set(GAMESPECIFIC_SOURCES
 # This will be included in the .dll and should only be related to the injected DLL
 set(MOVESETLOADER_SOURCES
     "Injected/MovesetLoader.cpp"
+
+
+    "Injected/InjectionUtils.cpp"
+    "Injected/steamHelper.cpp"
+
+    #T8
+    "Injected/MovesetLoaders/MovesetLoader_t8.cpp"
+
+    #T7
     "Injected/MovesetLoaders/MovesetLoader_t7.cpp"
     "Injected/MovesetLoaders/MovesetLoader_t7_Importer.cpp"
     "Injected/MovesetLoaders/MovesetLoader_t7_Networking.cpp"
-    "Injected/InjectionUtils.cpp"
-    "Injected/steamHelper.cpp"
 
     "ResourcesClasses/GameAddressesFile.cpp"
     "ResourcesClasses/GameAddressesWrapper.cpp"

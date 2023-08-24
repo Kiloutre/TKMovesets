@@ -5,6 +5,7 @@
 #include "EditorForm.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals.hpp"
+#include "Keybinds.hpp"
 
 // -- Helpers -- //
 
@@ -175,28 +176,32 @@ void EditorForm::RenderInput(int listIdx, EditorInput* field)
 			}
 		}
 	}
-	else if (ImGui::IsItemFocused() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+	else if (ImGui::IsItemFocused())
 	{
-		// Have to manually implement copying
-		if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
-			ImGui::SetClipboardText(field->buffer);
-		}
-		else if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
-			moveFocusAway = true;
-			field->nextValue = "0";
-			field->nextValue[0] = '\0';
-			ImGui::SetClipboardText(field->buffer);
-		}
-		else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
+		if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
 		{
-			// ImGUI can sometimes fail this call and return NULL especially when storing images in the clipboard
-			auto clipboardText = ImGui::GetClipboardText();
-			if (clipboardText != nullptr) {
-				field->nextValue = clipboardText;
+			// Have to manually implement copying
+			if (ImGui::IsKeyPressed(ImGuiKey_C, false)) {
+				ImGui::SetClipboardText(field->buffer);
+			}
+			else if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
 				moveFocusAway = true;
+				field->nextValue = "0";
+				field->nextValue[0] = '\0';
+				ImGui::SetClipboardText(field->buffer);
+			}
+			else if (ImGui::IsKeyPressed(ImGuiKey_V, false))
+			{
+				// ImGUI can sometimes fail this call and return NULL especially when storing images in the clipboard
+				auto clipboardText = ImGui::GetClipboardText();
+				if (clipboardText != nullptr) {
+					field->nextValue = clipboardText;
+					moveFocusAway = true;
+				}
 			}
 		}
-		else if ((field->flags & EditorInput_DataChangeable) && ImGui::IsKeyPressed(ImGuiKey_B, false))
+
+		if ((field->flags & EditorInput_DataChangeable) && Keybinds::IsKeybindPressed("keybind_editor.change_data_type"))
 		{
 			if (!unsavedChanges) {
 				// If no changes have been made, changing data type should not trigger the "unsaved changes" flag
@@ -354,6 +359,7 @@ void EditorForm::RenderInternal()
 void EditorForm::Render(bool parent_window_focused)
 {
 	if (setFocus) {
+		ImGui::SetNextWindowScroll({ 0, 0 });
 		ImGui::SetNextWindowFocus();
 		setFocus = false;
 	}
@@ -421,6 +427,7 @@ void EditorForm::Render(bool parent_window_focused)
 			// Open popup on right click
 			if (parent_window_focused && IsWindowRightClicked()) {
 				ImGui::OpenPopup("ContextMenuPopup");
+				m_canPaste = CanPasteFormFromClipboard();
 			}
 
 			// Context menu popup
@@ -436,8 +443,8 @@ void EditorForm::Render(bool parent_window_focused)
 				}
 
 				{
-					ImGuiExtra::DisableBlockIf __(!CanPasteFormFromClipboard());
-					if (ImGui::Selectable(_("edition.form_popup.paste_structure_clipboard"), false, 0, selectableSize))
+					ImGuiExtra::DisableBlockIf __(!m_canPaste);
+					if (ImGui::Selectable(_("edition.form_popup.paste_structure_clipboard"), false, 0, selectableSize) && CanPasteFormFromClipboard())
 					{
 						PasteFormFromClipboard();
 						ImGui::CloseCurrentPopup();

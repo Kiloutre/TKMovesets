@@ -61,7 +61,7 @@ public:
 	Iterator end() const { return Iterator(&m_ptr[m_size]); }
 	uint64_t size() const { return m_size; }
 	void set_size(uint64_t new_size) { m_size = new_size; }
-	T* operator[](int n) const { return &m_ptr[n]; }
+	T* operator[](size_t n) const { return &m_ptr[n]; }
 
 	StructIterator() { m_ptr = nullptr, m_size = 0; }
 	StructIterator(void* ptr, size_t size) { Set(ptr, size); }
@@ -193,7 +193,7 @@ namespace Helpers
 	uint32_t CalculateCrc32(const Byte* data, uint64_t size);
 
     // Formats given date in 'hour:minutes day/month/year'
-    std::string formatDateTime(uint64_t date, bool path_compatible=false);
+    std::string formatDateTime(uint64_t date, bool path_compatible=false, bool include_seconds=false);
 
 	// Returns the current timestamp as a uint64
 	uint64_t getCurrentTimestamp();

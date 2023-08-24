@@ -15,6 +15,7 @@
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
 
 #include "Online_t7.hpp"
+#include "Online_t8.hpp"
 
 // -- -- //
 
@@ -22,7 +23,7 @@ const GameInfo cg_gamesInfo[] = {
 	{
 		// -- T8 -- //
 		.name = "Tekken 8 CNT",
-		.processName = "Tekken8.exe",
+		.processName = "Polaris-Win64-Shipping.exe",
 		.movesetNamePrefix = "T8_",
 		.gameId = GameId_T8,
 		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
@@ -37,7 +38,11 @@ const GameInfo cg_gamesInfo[] = {
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
+#ifdef BUILD_TYPE_DEBUG
+		.onlineHandler = new GameFactory<OnlineT8>,
+#else
 		.onlineHandler = nullptr,
+#endif
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
 		.matchingProcessSubstrings = {}
@@ -64,7 +69,7 @@ const GameInfo cg_gamesInfo[] = {
 		.onlineHandler = new GameFactory<OnlineT7>,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
-		.matchingProcessSubstrings = { "TEKKEN 7" }
+		.matchingProcessSubstrings = {}
 	},
 	{
 		.separatorText = "Tekken Tag 2",

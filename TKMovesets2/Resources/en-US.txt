@@ -102,6 +102,8 @@ settings.finish_keybind = Finish keybind
 keybind_editor.import_p1 = Import on P1
 keybind_editor.import_p2 = Import on P2
 keybind_editor.import_both = Import on P1 & P2
+keybind_editor.save = Save
+keybind_editor.change_data_type = Change data type
 
 sidemenu.settings = Settings
 sidemenu.up_to_date = Up to date

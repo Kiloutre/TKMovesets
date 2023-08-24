@@ -71,6 +71,8 @@ static bool ExtractMovesetLoaderIfNeeded()
         }
     }
 
+
+#endif
     if (GetModuleHandleA(MOVESET_LOADER_NAME) == nullptr) {
         // Load the MovesetLoader in our own process so that we can know its function addresses
         HMODULE movesetLoaderLib = LoadLibraryW(L"" MOVESET_LOADER_NAME);
@@ -80,7 +82,6 @@ static bool ExtractMovesetLoaderIfNeeded()
         }
     }
 
-#endif
     return true;
 }
 

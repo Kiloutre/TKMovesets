@@ -166,6 +166,13 @@ void EditorVisuals_T7::OnKeyboardShortcut(const std::string& identifier)
 			ImportToPlayer(-1);
 		}
 	}
+	else if (identifier == "keybind_editor.save")
+	{
+		if (!m_savedLastChange)
+		{
+			Save();
+		}
+	}
 }
 
 void EditorVisuals_T7::ImportToPlayer(int playerid)
