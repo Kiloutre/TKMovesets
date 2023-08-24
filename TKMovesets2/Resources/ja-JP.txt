@@ -99,11 +99,11 @@ settings.keybind_rebind = ショートカットキー再設定
 settings.reset_keybinds = ショートカットキーリセット
 settings.finish_keybind = 設定する
 
-keybind_editor.import_p1 = p1のインポートショートカットキー
-keybind_editor.import_p2 = p2のインポートショートカットキー
-keybind_editor.import_both = p1とp2のインポートショートカットキー
-#keybind_editor.save =
-#keybind_editor.change_data_type =
+keybind_editor.import_p1 = p1のインポート
+keybind_editor.import_p2 = p2のインポート
+keybind_editor.import_both = p1とp2のインポート
+keybind_editor.save = ショートカットを保存
+keybind_editor.change_data_type = change data type
 
 sidemenu.settings = 設定
 sidemenu.up_to_date = 最新
@@ -533,20 +533,22 @@ edition.mvl_input.trigger_highlight = 入力タイミング音
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 
-#references.used_by =
-#references.no_reference =
-#references.move.title =
-#references.move.view_move = 
-#references.reactions = 
-#references.reactions.situations = 
-#references.list_start =
-#references.moves =
-#references.cancel.title =
-#references.cancels =
-#references.cancels.view_cancel
-#references.cancels.requirements =
-#references.grouped_cancels =
-#references.projectiles =
+####
+references.used_by = Used by
+references.no_reference = No references found
+references.move.title = References: Move
+references.move.view_move = View move
+references.reactions = Reactions
+references.reactions.situations = Situations
+references.list_start = List (start)
+references.moves = Moves
+references.cancel.title = Cancel
+references.cancels = Cancels
+references.cancels.view_cancel = View cancel
+references.cancels.requirements = Requirements
+references.grouped_cancels = Grouped cancels
+references.projectiles = Projectiles
+####
 
 # Documentation #
 
