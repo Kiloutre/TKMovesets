@@ -246,8 +246,8 @@ namespace StructsT8
 
 	struct CameraData
 	{
-		uint32_t pick_probability;
-		uint16_t camera_type;
+		uint32_t pick_probability; // Values: 1 or 2
+		uint16_t camera_type; // 15 = animation, 16 = custom
 		uint16_t left_side_camera_data;
 		uint16_t right_side_camera_data;
 		uint16_t additional_rotation;
@@ -255,7 +255,7 @@ namespace StructsT8
 
 	struct ThrowCamera
 	{
-		uint64_t side; // Side at which throw recovers
+		uint64_t side; // Side at which throw recovers. 0 = same, 1 = opposite, 2 = any
 		CameraData* cameradata_addr;
 	};
 
@@ -268,7 +268,7 @@ namespace StructsT8
 	struct OtherMoveProperty
 	{
 		Requirement* requirements_addr;
-		uint32_t extraprop; // 881 list end value & extraprop values
+		uint32_t extraprop; // 894 list end value & extraprop values
 		Param params[5];
 	};
 
@@ -839,7 +839,7 @@ namespace StructsT8_gameAddr //todo
 	struct OtherMoveProperty
 	{
 		gameAddr requirements_addr;
-		uint32_t extraprop; // 881 list end value & extraprop values
+		uint32_t extraprop; // 894 list end value & extraprop values
 		Param param[5];
 	};
 
