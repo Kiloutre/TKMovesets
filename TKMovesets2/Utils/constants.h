@@ -26,7 +26,7 @@
 # define HTTP_REQUEST_TIMEOUT    10
 
 // Arbitrary max block size in case something bad happened during extraction and we get a very invalid block
-# define MOVESET_MAX_BLOCK_SIZE_MB       (50)
+# define MOVESET_MAX_BLOCK_SIZE_MB       (100)
 
 # define MOVESET_EXTRACTED_NAME_PREFIX   "Tkm:"
 # define MOVESET_CUSTOM_MOVE_NAME_PREFIX "tkm_"

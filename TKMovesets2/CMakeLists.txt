@@ -130,6 +130,8 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/TEditor.cpp"
                     ##T8
                     "GameSpecific/Online/Online_t8.cpp"
+                    "GameSpecific/Extractors/Extractor_t8/Extractor_t8.cpp"
+
                     ### Editor logic
                     #"GameSpecific/Editors/Editor_t8/Editor_t8.cpp"
                     #"GameSpecific/Editors/Editor_t8/Editor_t8_Forms.cpp"

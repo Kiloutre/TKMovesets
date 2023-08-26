@@ -133,7 +133,7 @@ void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64
 
     // Initialize the original function's hook
     hook.originalAddress = originalAddr;
-    hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline, m_disassembler);
+    hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline);
 }
 
 void MovesetLoader::SetMainModule(const char* name)

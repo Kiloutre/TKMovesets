@@ -199,7 +199,7 @@ namespace Helpers
 	uint64_t getCurrentTimestamp();
 
     // In a (moveset) list, can convert ptr members of every structure in the list into offsets
-    void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount);
+    void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount, bool isT8 = false);
 
     // Returns true if a string ends with [suffix]
 	template<typename T>

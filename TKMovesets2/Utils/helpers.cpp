@@ -133,7 +133,7 @@ namespace Helpers
 		return duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
-	void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount)
+	void convertPtrsToOffsets(void* listAddr, uint64_t to_substract, uint64_t struct_size, uint64_t amount, bool isT8)
 	{
 		uint64_t listCursor = (uint64_t)listAddr;
 		while (amount-- > 0)
@@ -141,6 +141,10 @@ namespace Helpers
 			uint64_t* structMember = (uint64_t*)listCursor;
 			*structMember -= to_substract;
 			listCursor += struct_size;
+			if (isT8) {
+				listCursor += 8;
+				isT8 = false;
+			}
 		}
 	}
 

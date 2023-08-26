@@ -847,7 +847,7 @@ namespace StructsT8_gameAddr //todo
 	{
 		uint32_t starting_frame;
 		uint32_t _0x4_int;
-		gameAddr* requirements_addr;
+		gameAddr requirements_addr;
 		uint32_t id;
 		Param param[5];
 	};
@@ -1029,7 +1029,7 @@ namespace StructsT8_gameAddr //todo
 		char* fulldate_addr;
 		uint16_t orig_aliases[57];
 		uint16_t current_aliases[57];
-		uint16_t unknown_aliases[38];
+		uint16_t unknown_values[38];
 		MovesetTable table;
 		MotaList motas;
 	};

@@ -1,7 +1,7 @@
 #include "Games.hpp"
 #include "BaseAddresses.hpp"
 
-
+#include "Extractor_t8/Extractor_t8.hpp"
 #include "Extractor_t7/Extractor_t7.hpp"
 #include "Extractor_ttt2/Extractor_ttt2.hpp"
 #include "Extractor_t6/Extractor_t6.hpp"
@@ -34,7 +34,7 @@ const GameInfo cg_gamesInfo[] = {
 		.minorDataString = "t8",
 		.supportedImports = { },
 		.supportedOnlineImports = { },
-		.extractor = nullptr,
+		.extractor = new GameFactory<ExtractorT8>,
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
