@@ -409,6 +409,12 @@ edition.reactions.right_side_direction = Côté droit
 edition.reactions.front_counterhit_direction = Face (contre attaque)
 edition.reactions.downed_direction = À terre
 edition.reactions.0x44_long = _0x44_long
+edition.reactions.front_rotation = Face
+edition.reactions.back_rotation = Retourné
+edition.reactions.left_side_rotation = Côté gauche
+edition.reactions.right_side_rotation = Côté droit
+edition.reactions.front_counterhit_rotation = Face (contre attaque)
+edition.reactions.downed_rotation = À terre
 edition.reactions.vertical_pushback = Poussée verticale
 edition.reactions.standing_moveid = Debout
 edition.reactions.default_moveid = Générique
@@ -457,9 +463,15 @@ edition.projectile.voiceclip_on_hit = Voiceclip (HIT)
 
 edition.pushback.window_name = Poussé
 edition.pushback.duration = Durée
+edition.pushback.duration.description =
 edition.pushback.num_of_loops = Nombre de boucles
+edition.pushback.num_of_loops.description =
+edition.pushback.offsets_count =
+edition.pushback.offsets_count.description =
 edition.pushback.displacement = Déplacement
+edition.pushback.displacement.description =
 edition.pushback.extradata_addr = Poussée Extra ID
+edition.pushback.extradata_addr.description =
 
 edition.pushback_extradata.window_name = Poussée Extra
 edition.pushback_extradata.horizontal_offset = Valeur horizontale
@@ -484,10 +496,17 @@ edition.throw_camera.cameradata_addr = ID de donnée de caméra
 
 edition.camera_data.window_name = Donnée de caméra
 edition.camera_data._0x0_int = _0x0_int
+edition.camera_data._0x0_int.description =
+edition.camera_data.pick_probability =
+edition.camera_data.pick_probability.description
 edition.camera_data._0x4_short = _0x4_short
+edition.camera_data._0x4_short.description
+edition.camera_data.camera_type =
+edition.camera_data.camera_type.description =
 edition.camera_data.left_side_camera_data = Côté gauche
 edition.camera_data.right_side_camera_data = Côté droit
 edition.camera_data._0xA_short = _0xA_short
+edition.camera_data.additional_rotation =
 
 edition.mvl_displayable.window_name = Liste de coups: Entrée
 edition.mvl_displayable.type = Type
