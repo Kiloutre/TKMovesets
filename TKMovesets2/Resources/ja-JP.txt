@@ -30,7 +30,7 @@ close_window = ウィンドウを閉じる
 3p = Player 3
 4p = Player 4
 select_game = ゲーム選択
-#hash = 
+hash = hash
 
 # Process #
 
@@ -99,11 +99,11 @@ settings.keybind_rebind = ショートカットキー再設定
 settings.reset_keybinds = ショートカットキーリセット
 settings.finish_keybind = 設定する
 
-keybind_editor.import_p1 = p1のインポートショートカットキー
-keybind_editor.import_p2 = p2のインポートショートカットキー
-keybind_editor.import_both = p1とp2のインポートショートカットキー
-#keybind_editor.save =
-#keybind_editor.change_data_type =
+keybind_editor.import_p1 = p1のインポート
+keybind_editor.import_p2 = p2のインポート
+keybind_editor.import_both = p1とp2のインポート
+keybind_editor.save = ショートカットを保存
+keybind_editor.change_data_type = change data type
 
 sidemenu.settings = 設定
 sidemenu.up_to_date = 最新
@@ -224,7 +224,7 @@ edition.animation_extraction.skipped = スキップしました。
 edition.animation_extraction.skipped_exists = スキップされたものが在ります。
 edition.animation_extraction.error = エラー
 edition.animation_extraction.interrupt = 割り込み
-#edition.open_characters_directory =
+edition.open_characters_directory = キャラクターフォルダを開く
 edition.open_editor_library = エディタライブラリを開く
 edition.open_editor_backups = エディタのバックアップを開く
 edition.refresh_movesets = Movesetを更新
@@ -234,8 +234,8 @@ edition.form_popup.copy_single_item_clipboard = 単一の項目をクリップ
 edition.form_popup.paste_structure_clipboard = クリップを貼り付ける
 edition.form_popup.duplicate_structure = Structureを複製
 edition.form_popup.delete_structure = Structureの削除
-edition.form_popup.what_references_this_move = このMoveを使用するCancelを検索
-edition.form_popup.what_references_this_cancel = このcancel listを使用するMoveを検索
+edition.form_popup.what_references_this_move = このMoveを使用するStructureを参照
+edition.form_popup.what_references_this_cancel = このcancel listを使用するMoveを参照
 edition.form_popup.deletion_are_you_sure = 本当にStructureを削除しますか?\nこのStructureが他の場所でも使用している場合は、問題を回避するためにStructureを削除しないことをお勧めします。
 edition.form_popup.yes_delete = はい、削除します。
 
@@ -533,20 +533,22 @@ edition.mvl_input.trigger_highlight = 入力タイミング音
 edition.mvl_input.frame = Frame
 edition.mvl_input.frames = frames
 
-#references.used_by =
-#references.no_reference =
-#references.move.title =
-#references.move.view_move = 
-#references.reactions = 
-#references.reactions.situations = 
-#references.list_start =
-#references.moves =
-#references.cancel.title =
-#references.cancels =
-#references.cancels.view_cancel
-#references.cancels.requirements =
-#references.grouped_cancels =
-#references.projectiles =
+####
+references.used_by = Used by
+references.no_reference = No references found
+references.move.title = References: Move
+references.move.view_move = View move
+references.reactions = Reactions
+references.reactions.situations = Situations
+references.list_start = List (start)
+references.moves = Moves
+references.cancel.title = Cancel
+references.cancels = Cancels
+references.cancels.view_cancel = View cancel
+references.cancels.requirements = Requirements
+references.grouped_cancels = Grouped cancels
+references.projectiles = Projectiles
+####
 
 # Documentation #
 
