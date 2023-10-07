@@ -4,11 +4,9 @@
 
 #include "TEditor.hpp"
 #include "Helpers.hpp"
-//#include "Online_t8.hpp"
+#include "Online_t8.hpp"
 
 #include "Structs_t8.h"
-
-using namespace StructsT8;
 
 namespace EditorT8Utils
 {
@@ -22,39 +20,40 @@ class EditorT8 : public TEditor
 {
 private:
 	// Contains a ptr to the offset list
-	TKMovesetHeaderBlocks* m_offsets;
+	StructsT8::TKMovesetHeaderBlocks* m_offsets;
 	// Stores a ptr to the moveset table containing lists offsets & count, aliases too
-	MovesetInfo* m_infos = nullptr;
+	StructsT8::MovesetInfo* m_infos = nullptr;
 	// Contains a ptr to the head of the displayable movelist
-	MvlHead* m_mvlHead = nullptr;
+	StructsT8::MvlHead* m_mvlHead = nullptr;
 	// Contains iterators for the various structure lists
 	struct
 	{
 		StructIterator<StructsT8_gameAddr::Move> moves;
-		StructIterator<Requirement> requirements;
+		StructIterator<StructsT8::Requirement> requirements;
 		StructIterator<StructsT8_gameAddr::HitCondition> hit_conditions;
 		StructIterator<StructsT8_gameAddr::Cancel> cancels;
 		StructIterator<StructsT8_gameAddr::Cancel> grouped_cancels;
 		StructIterator<StructsT8_gameAddr::Reactions> reactions;
 		StructIterator<StructsT8_gameAddr::Pushback> pushbacks;
-		StructIterator<PushbackExtradata> pushback_extras;
-		StructIterator<CancelExtradata> cancel_extras;
-		StructIterator<ExtraMoveProperty> extra_move_properties;
+		StructIterator<StructsT8::PushbackExtradata> pushback_extras;
+		StructIterator<StructsT8::CancelExtradata> cancel_extras;
+		StructIterator<StructsT8::ExtraMoveProperty> extra_move_properties;
 		StructIterator<StructsT8_gameAddr::OtherMoveProperty> move_start_properties;
 		StructIterator<StructsT8_gameAddr::OtherMoveProperty> move_end_properties;
 		StructIterator<StructsT8_gameAddr::Projectile> projectiles;
 		StructIterator<StructsT8_gameAddr::InputSequence> input_sequences;
 		StructIterator<StructsT8_gameAddr::ThrowCamera> throw_datas;
-		StructIterator<Input> inputs;
-		StructIterator<Voiceclip> voiceclips;
-		StructIterator<CameraData> camera_datas;
+		StructIterator<StructsT8::Input> inputs;
+		StructIterator<StructsT8::Voiceclip> voiceclips;
+		StructIterator<StructsT8::CameraData> camera_datas;
+		StructIterator<StructsT8::UnknownNew> unknown_new;
 
-		StructIterator<MvlDisplayable> mvl_displayables;
-		StructIterator<MvlPlayable> mvl_playables;
-		StructIterator<MvlInput> mvl_inputs;
+		StructIterator<StructsT8::MvlDisplayable> mvl_displayables;
+		StructIterator<StructsT8::MvlPlayable> mvl_playables;
+		StructIterator<StructsT8::MvlInput> mvl_inputs;
 	} m_iterators;
 	// Used to execute extra properties if handled by the game
-	//OnlineT8** m_sharedMemHandler = nullptr;
+	OnlineT8** m_sharedMemHandler = nullptr;
 
 
 	// Extra iterators setup
@@ -145,7 +144,7 @@ private:
 	void SaveCameraData(uint16_t id, InputMap& inputs);
 
 	//  Movelist : Displayables
-	std::vector<InputMap> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder, bool singleItem=false);
+	std::vector<InputMap> GetMovelistDisplayablesInputs(uint16_t id, VectorSet<std::string>& drawOrder, bool singleItem = false);
 	void SaveMovelistDisplayable(uint16_t id, InputMap& inputs);
 	bool ValidateMovelistDisplayableField(EditorInput* field);
 
@@ -426,7 +425,7 @@ template<typename T> int EditorT8::ModifyGenericMovelistListSize(unsigned int li
 		{
 			unsigned int tableEntryCount = _countof(m_infos->table.entries);
 			for (size_t i = 0; i < tableEntryCount; ++i)
-			{	
+			{
 				auto& currentEntry = m_infos->table.entries[i];
 				gameAddr absolute_entryStartAddr = movesetBlockStart + (uint64_t)currentEntry.listAddr;
 
@@ -469,7 +468,7 @@ template<typename T> int EditorT8::ModifyGenericMovelistListSize(unsigned int li
 	if (hasDisplayableMovelist)
 	{
 		uint64_t movelistBlockStart = (m_header->moveset_data_start + m_offsets->movelistBlock);
-		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
+		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(StructsT8::MvlInput) * m_iterators.mvl_inputs.size();
 
 		//DEBUG_LOG("%llx < %llx < %llx\n", movelistBlockStart, listPosition, movelistBlockEnd);
 

@@ -8,8 +8,6 @@
 
 #include "Structs_t7.h"
 
-using namespace StructsT7;
-
 namespace EditorT7Utils
 {
 	const extern std::map<unsigned char, std::string> mvlDisplay_characterConversion;
@@ -22,36 +20,36 @@ class EditorT7 : public TEditor
 {
 private:
 	// Contains a ptr to the offset list
-	TKMovesetHeaderBlocks* m_offsets;
+	StructsT7::TKMovesetHeaderBlocks* m_offsets;
 	// Stores a ptr to the moveset table containing lists offsets & count, aliases too
-	MovesetInfo* m_infos = nullptr;
+	StructsT7::MovesetInfo* m_infos = nullptr;
 	// Contains a ptr to the head of the displayable movelist
-	MvlHead* m_mvlHead = nullptr;
+	StructsT7::MvlHead* m_mvlHead = nullptr;
 	// Contains iterators for the various structure lists
 	struct
 	{
 		StructIterator<StructsT7_gameAddr::Move> moves;
-		StructIterator<Requirement> requirements;
+		StructIterator<StructsT7::Requirement> requirements;
 		StructIterator<StructsT7_gameAddr::HitCondition> hit_conditions;
 		StructIterator<StructsT7_gameAddr::Cancel> cancels;
 		StructIterator<StructsT7_gameAddr::Cancel> grouped_cancels;
 		StructIterator<StructsT7_gameAddr::Reactions> reactions;
 		StructIterator<StructsT7_gameAddr::Pushback> pushbacks;
-		StructIterator<PushbackExtradata> pushback_extras;
-		StructIterator<CancelExtradata> cancel_extras;
-		StructIterator<ExtraMoveProperty> extra_move_properties;
+		StructIterator<StructsT7::PushbackExtradata> pushback_extras;
+		StructIterator<StructsT7::CancelExtradata> cancel_extras;
+		StructIterator<StructsT7::ExtraMoveProperty> extra_move_properties;
 		StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_start_properties;
 		StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
 		StructIterator<StructsT7_gameAddr::Projectile> projectiles;
 		StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
 		StructIterator<StructsT7_gameAddr::ThrowCamera> throw_datas;
-		StructIterator<Input> inputs;
-		StructIterator<Voiceclip> voiceclips;
-		StructIterator<CameraData> camera_datas;
+		StructIterator<StructsT7::Input> inputs;
+		StructIterator<StructsT7::Voiceclip> voiceclips;
+		StructIterator<StructsT7::CameraData> camera_datas;
 
-		StructIterator<MvlDisplayable> mvl_displayables;
-		StructIterator<MvlPlayable> mvl_playables;
-		StructIterator<MvlInput> mvl_inputs;
+		StructIterator<StructsT7::MvlDisplayable> mvl_displayables;
+		StructIterator<StructsT7::MvlPlayable> mvl_playables;
+		StructIterator<StructsT7::MvlInput> mvl_inputs;
 	} m_iterators;
 	// Used to execute extra properties if handled by the game
 	OnlineT7** m_sharedMemHandler = nullptr;
@@ -469,7 +467,7 @@ template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int li
 	if (hasDisplayableMovelist)
 	{
 		uint64_t movelistBlockStart = (m_header->moveset_data_start + m_offsets->movelistBlock);
-		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
+		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(StructsT7::MvlInput) * m_iterators.mvl_inputs.size();
 
 		//DEBUG_LOG("%llx < %llx < %llx\n", movelistBlockStart, listPosition, movelistBlockEnd);
 

@@ -453,7 +453,9 @@ void MovesetLoaderT7::OnInitEnd()
 	//HookFunction("TK__ExecuteExtraprop");
 
 	// Other
+#ifdef BUILD_TYPE_DEBUG
 	//HookFunction("TK__Log");
+#endif
 }
 
 // -- Main -- //

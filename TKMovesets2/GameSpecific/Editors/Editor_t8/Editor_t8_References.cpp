@@ -2,6 +2,8 @@
 
 #include "Editor_t8.hpp"
 
+using namespace StructsT8;
+
 // -- Cancels -- //
 
 std::vector<TEditor::CancelMoveReference> EditorT8::ListCancelsMoveReferences(unsigned int cancel_start_id) const
@@ -18,9 +20,9 @@ std::vector<TEditor::CancelMoveReference> EditorT8::ListCancelsMoveReferences(un
 		// List moves that use this cancel list, even if only a part of it 
 		if (
 			(cancel_start_id <= move.cancel_addr && move.cancel_addr <= cancel_end_id) ||
-			(cancel_start_id <= move._0x28_cancel_addr && move._0x28_cancel_addr <= cancel_end_id) ||
-			(cancel_start_id <= move._0x38_cancel_addr && move._0x38_cancel_addr <= cancel_end_id) ||
-			(cancel_start_id <= move._0x48_cancel_addr && move._0x48_cancel_addr <= cancel_end_id)
+			(cancel_start_id <= move._0x30_cancel_addr && move._0x30_cancel_addr <= cancel_end_id) ||
+			(cancel_start_id <= move._0x40_cancel_addr && move._0x40_cancel_addr <= cancel_end_id) ||
+			(cancel_start_id <= move._0x50_cancel_addr && move._0x50_cancel_addr <= cancel_end_id)
 			) {
 			references.push_back({
 				.move_id = ref_id,
@@ -70,6 +72,7 @@ std::vector<TEditor::CancelProjectileReference> EditorT8::ListCancelsProjectiles
 		{
 			for (auto& projectile : references)
 			{
+				/*
 				if (projectile.id == extra_property.value_unsigned)
 				{
 					extra_properties_refs.push_back({ 
@@ -78,6 +81,7 @@ std::vector<TEditor::CancelProjectileReference> EditorT8::ListCancelsProjectiles
 						.projectile = projectile
 					});
 				}
+				*/
 			}
 		}
 		++ref_id;
@@ -128,7 +132,7 @@ std::vector<TEditor::MoveCancelReference> EditorT8::ListMoveCancelsReferences(un
 					++cond_idx) {
 					const auto& req = m_iterators.requirements[cond_idx];
 					if (req->condition != 0) {
-						conditions.push_back({ .id = req->condition, .value = req->param_unsigned });
+						//conditions.push_back({ .id = req->condition, .value = req->param_unsigned });
 					}
 				}
 
@@ -158,9 +162,9 @@ std::vector<TEditor::MoveCancelReference> EditorT8::ListMoveCancelsReferences(un
 		{
 				if (
 					(cancel.list_start_id <= move.cancel_addr && move.cancel_addr <= cancel.id) ||
-					(cancel.list_start_id <= move._0x28_cancel_addr && move._0x28_cancel_addr <= cancel.id) ||
-					(cancel.list_start_id <= move._0x38_cancel_addr && move._0x38_cancel_addr <= cancel.id) ||
-					(cancel.list_start_id <= move._0x48_cancel_addr && move._0x48_cancel_addr <= cancel.id)
+					(cancel.list_start_id <= move._0x30_cancel_addr && move._0x30_cancel_addr <= cancel.id) ||
+					(cancel.list_start_id <= move._0x40_cancel_addr && move._0x40_cancel_addr <= cancel.id) ||
+					(cancel.list_start_id <= move._0x50_cancel_addr && move._0x50_cancel_addr <= cancel.id)
 					) {
 					cancel.move_references.push_back({
 						.move_id = ref_id,
@@ -203,7 +207,7 @@ std::vector<TEditor::MoveGroupedCancelReference> EditorT8::ListMoveGroupedCancel
 
 				const auto& req = m_iterators.requirements[cond_idx];
 				if (req->condition != 0) {
-					conditions.push_back({ .id = req->condition, .value = req->param_unsigned });
+					//conditions.push_back({ .id = req->condition, .value = req->param_unsigned });
 				}
 			}
 
@@ -260,9 +264,9 @@ std::vector<TEditor::MoveGroupedCancelReference> EditorT8::ListMoveGroupedCancel
 			{
 				if (
 					(cancel.list_start_id <= move.cancel_addr && move.cancel_addr <= cancel.id) ||
-					(cancel.list_start_id <= move._0x28_cancel_addr && move._0x28_cancel_addr <= cancel.id) ||
-					(cancel.list_start_id <= move._0x38_cancel_addr && move._0x38_cancel_addr <= cancel.id) ||
-					(cancel.list_start_id <= move._0x48_cancel_addr && move._0x48_cancel_addr <= cancel.id)
+					(cancel.list_start_id <= move._0x30_cancel_addr && move._0x30_cancel_addr <= cancel.id) ||
+					(cancel.list_start_id <= move._0x40_cancel_addr && move._0x40_cancel_addr <= cancel.id) ||
+					(cancel.list_start_id <= move._0x50_cancel_addr && move._0x50_cancel_addr <= cancel.id)
 					) {
 					grouped_cancel.move_references.push_back({
 						.move_id = ref_id,

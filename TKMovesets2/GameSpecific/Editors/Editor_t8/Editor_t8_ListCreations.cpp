@@ -1,6 +1,7 @@
 # include "Editor_t8.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT8;
 #define gAddr StructsT8_gameAddr
 
 void EditorT8::ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
@@ -103,7 +104,7 @@ void EditorT8::ModifyPushbackExtraListSize(unsigned int listStart, const std::ve
 			pushback.extradata_addr += listSizeDiff;
 		}
 		else if (pushback.extradata_addr >= listStart && pushback.extradata_addr <= ((uint64_t)listStart + oldSize)) {
-			pushback.num_of_loops += listSizeDiff;
+			pushback.offsets_count += listSizeDiff;
 		}
 	}
 }

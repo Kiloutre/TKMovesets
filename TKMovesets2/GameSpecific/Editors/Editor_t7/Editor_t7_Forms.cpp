@@ -1,6 +1,8 @@
 #include "Editor_t7.hpp"
 
 #include <type_traits>
+
+using namespace StructsT7;
 using namespace EditorUtils;
 
 #define CREATE_FIELD(k, c, f, v) CreateField<decltype(v)>(k, drawOrder, inputMap, c, f, v)

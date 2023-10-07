@@ -1,5 +1,7 @@
 #include "Editor_t8.hpp"
 
+using namespace StructsT8;
+
 bool EditorT8::IsCommandGroupedCancelReference(uint64_t command) const
 {
 	return command == constants.at(EditorConstants_GroupedCancelCommand);

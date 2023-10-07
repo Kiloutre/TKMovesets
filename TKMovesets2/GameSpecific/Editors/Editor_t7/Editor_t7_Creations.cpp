@@ -1,6 +1,7 @@
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT7;
 #define gAddr StructsT7_gameAddr
 
 uint32_t EditorT7::CreateNewProjectile()

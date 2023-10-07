@@ -13,6 +13,7 @@ void GameSharedMem::OnProcessDetach()
 	m_requestedInjection = false;
 	lockedIn = false;
 	displayedMovesets.clear();
+	m_sharedMemHandler->FreeSharedMemory();
 }
 
 void GameSharedMem::InstantiateFactory()
@@ -22,7 +23,7 @@ void GameSharedMem::InstantiateFactory()
 	m_toFree_sharedMemHandler = m_sharedMemHandler;
 
 	game.SetCurrentGame(currentGame);
-	// Every game has its own subtleties so we use polymorphism to manage that
+	// Game might not have an importer, but it does not matter.
 	m_importer = currentGame->importer == nullptr ? nullptr : Games::FactoryGetImporter(currentGame, process, game);
 	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
 }

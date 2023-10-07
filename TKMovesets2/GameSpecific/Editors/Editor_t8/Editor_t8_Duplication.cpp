@@ -1,6 +1,8 @@
 # include "Editor_t8.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT8;
+
 #define gAddr StructsT8_gameAddr
 
 // -- Structures -- //

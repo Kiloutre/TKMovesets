@@ -52,7 +52,7 @@ InputMap EditorT8::GetPushbackInputs(uint16_t id, VectorSet<std::string>& drawOr
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
 	CREATE_FIELD("duration", 0, EditorInput_U16, pushback->duration);
 	CREATE_FIELD("displacement", 0, EditorInput_U16_Changeable, pushback->displacement);
-	CREATE_FIELD("num_of_loops", 0, EditorInput_U32, pushback->num_of_loops);
+	CREATE_FIELD("num_of_loops", 0, EditorInput_U32, pushback->offsets_count);
 	CREATE_FIELD("extradata_addr", 0, EditorInput_PTR, pushback->extradata_addr);
 
 	WriteFieldFullname(inputMap, "pushback");
@@ -79,7 +79,7 @@ void EditorT8::SavePushback(uint16_t id, InputMap& inputs)
 
 	SetMemberValue(&pushback->duration, inputs["duration"]);
 	SetMemberValue(&pushback->displacement, inputs["displacement"]);
-	SetMemberValue(&pushback->num_of_loops, inputs["num_of_loops"]);
+	SetMemberValue(&pushback->offsets_count, inputs["num_of_loops"]);
 	SetMemberValue(&pushback->extradata_addr, inputs["extradata_addr"]);
 }
 
@@ -343,11 +343,11 @@ InputMap EditorT8::GetCameraDataInputs(uint16_t id, VectorSet<std::string>& draw
 	// Default value is written from the last two arguments, also thanks to the macro
 	// (fieldName, category, EditorInputFlag, value)
 	// 0 has no category name. Even categories are open by default, odd categories are hidden by default.
-	CREATE_FIELD("_0x0_int", 0, EditorInput_U32_Changeable, cameraData->_0x0_int);
-	CREATE_FIELD("_0x4_short", 0, EditorInput_U16_Changeable, cameraData->_0x4_short);
+	CREATE_FIELD("pick_probability", 0, EditorInput_U32_Changeable, cameraData->pick_probability);
+	CREATE_FIELD("camera_type", 0, EditorInput_U16_Changeable, cameraData->camera_type);
 	CREATE_FIELD("left_side_camera_data", 0, EditorInput_U16_Changeable, cameraData->left_side_camera_data);
 	CREATE_FIELD("right_side_camera_data", 0, EditorInput_U16_Changeable, cameraData->right_side_camera_data);
-	CREATE_FIELD("_0xA_short", 0, EditorInput_U16_Changeable, cameraData->_0xA_short);
+	CREATE_FIELD("additional_rotation", 0, EditorInput_U16_Changeable, cameraData->additional_rotation);
 
 	WriteFieldFullname(inputMap, "camera_data");
 	return inputMap;
@@ -358,11 +358,11 @@ void EditorT8::SaveCameraData(uint16_t id, InputMap& inputs)
 {
 	auto cameraData = m_iterators.camera_datas[id];
 
-	SetMemberValue(&cameraData->_0x0_int, inputs["_0x0_int"]);
-	SetMemberValue(&cameraData->_0x4_short, inputs["_0x4_short"]);
+	SetMemberValue(&cameraData->pick_probability, inputs["pick_probability"]);
+	SetMemberValue(&cameraData->camera_type, inputs["camera_type"]);
 	SetMemberValue(&cameraData->left_side_camera_data, inputs["left_side_camera_data"]);
 	SetMemberValue(&cameraData->right_side_camera_data, inputs["right_side_camera_data"]);
-	SetMemberValue(&cameraData->_0xA_short, inputs["_0xA_short"]);
+	SetMemberValue(&cameraData->additional_rotation, inputs["additional_rotation"]);
 }
 
 
@@ -410,8 +410,6 @@ InputMap EditorT8::GetReactionsInputs(uint16_t id, VectorSet<std::string>& drawO
 	CREATE_FIELD("downed_direction", 5, EditorInput_U16_Changeable, reaction->downed_direction);
 
 	CREATE_FIELD("vertical_pushback", 7, EditorInput_U16_Changeable, reaction->vertical_pushback);
-	CREATE_FIELD("_0x44_int", 7, EditorInput_U32_Changeable, reaction->_0x44_int);
-	CREATE_FIELD("_0x48_int", 7, EditorInput_U32_Changeable, reaction->_0x48_int);
 
 	WriteFieldFullname(inputMap, "reactions");
 	return inputMap;
@@ -482,8 +480,6 @@ void EditorT8::SaveReactions(uint16_t id, InputMap& inputs)
 	SetMemberValue(&reaction->downed_moveid, inputs["downed_moveid"]);
 
 	SetMemberValue(&reaction->vertical_pushback, inputs["vertical_pushback"]);
-	SetMemberValue(&reaction->_0x44_int, inputs["_0x44_int"]);
-	SetMemberValue(&reaction->_0x48_int, inputs["_0x48_int"]);
 }
 
 // ===== Hit conditions ===== //
@@ -569,8 +565,8 @@ std::vector<InputMap> EditorT8::GetRequirementListInputs(uint16_t id, VectorSet<
 			(req->condition >= 0x8000 ? EditorInput_H32_Changeable : EditorInput_U32_Changeable);
 
 		CREATE_FIELD("condition", 0, conditionType, req->condition);
-		CREATE_FIELD("param_unsigned", 0, EditorInput_U32_Changeable, req->param_unsigned);
-		CREATE_FIELD("param_float", 0, EditorInput_Float, req->param_float);
+		//CREATE_FIELD("param_unsigned", 0, EditorInput_U32_Changeable, req->param_unsigned);
+		//CREATE_FIELD("param_float", 0, EditorInput_Float, req->param_float);
 
 		WriteFieldFullname(inputMap, "requirement");
 		inputListMap.push_back(inputMap);
@@ -585,7 +581,7 @@ void EditorT8::SaveRequirement(uint16_t id, InputMap& inputs)
 	auto req = m_iterators.requirements[id];
 
 	SetMemberValue(&req->condition, inputs["condition"]);
-	SetMemberValue(&req->param_unsigned, inputs["param_unsigned"]);
+	//SetMemberValue(&req->param_unsigned, inputs["param_unsigned"]);
 }
 
 // ===== Cancel Extradata ===== //
@@ -788,7 +784,7 @@ std::vector<InputMap> EditorT8::GetMoveStartPropertyListInputs(uint16_t id, Vect
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
 		CREATE_FIELD("extraprop", 0, EditorInput_H32_Changeable, prop->extraprop);
-		CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
+		//CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
 
 		WriteFieldFullname(inputMap, "move_start_extraprop");
 		inputListMap.push_back(inputMap);
@@ -803,7 +799,7 @@ void EditorT8::SaveMoveStartProperty(uint16_t id, InputMap& inputs)
 
 	SetMemberValue(&prop->requirements_addr, inputs["requirements_addr"]);
 	SetMemberValue(&prop->extraprop, inputs["extraprop"]);
-	SetMemberValue(&prop->value, inputs["value"]);
+	//SetMemberValue(&prop->value, inputs["value"]);
 }
 
 // ===== Other move properties (end) ===== //
@@ -824,7 +820,7 @@ std::vector<InputMap> EditorT8::GetMoveEndPropertyListInputs(uint16_t id, Vector
 
 		CREATE_FIELD("requirements_addr", 0, EditorInput_PTR, prop->requirements_addr);
 		CREATE_FIELD("extraprop", 0, EditorInput_H32_Changeable, prop->extraprop);
-		CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
+		//CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
 
 		WriteFieldFullname(inputMap, "move_end_extraprop");
 		inputListMap.push_back(inputMap);
@@ -839,7 +835,7 @@ void EditorT8::SaveMoveEndProperty(uint16_t id, InputMap& inputs)
 
 	SetMemberValue(&prop->requirements_addr, inputs["requirements_addr"]);
 	SetMemberValue(&prop->extraprop, inputs["extraprop"]);
-	SetMemberValue(&prop->value, inputs["value"]);
+	//SetMemberValue(&prop->value, inputs["value"]);
 }
 
 bool EditorT8::ValidateOtherMoveProperty(EditorInput* field)
@@ -871,10 +867,12 @@ std::vector<InputMap> EditorT8::GetExtrapropListInputs(uint16_t id, VectorSet<st
 
 		CREATE_FIELD("starting_frame", 0, EditorInput_U32_Changeable, prop->starting_frame);
 		CREATE_FIELD("id", 0, EditorInput_H32, prop->id);
+		/*
 		CREATE_FIELD("value_signed", 0, EditorInput_S32, prop->value_signed);
 		CREATE_FIELD("value_unsigned", 0, EditorInput_U32, prop->value_unsigned);
 		CREATE_FIELD("value_hex", 0, EditorInput_H32, prop->value_unsigned);
 		CREATE_FIELD("value_float", 0, EditorInput_Float, prop->value_float);
+		*/
 
 		WriteFieldFullname(inputMap, "extraproperty");
 		inputListMap.push_back(inputMap);
@@ -889,7 +887,7 @@ void EditorT8::SaveExtraproperty(uint16_t id, InputMap& inputs)
 
 	SetMemberValue(&prop->starting_frame, inputs["starting_frame"]);
 	SetMemberValue(&prop->id, inputs["id"]);
-	SetMemberValue(&prop->value_unsigned, inputs["value_unsigned"]);
+	//SetMemberValue(&prop->value_unsigned, inputs["value_unsigned"]);
 }
 
 // ===== Voiceclips ===== //
@@ -962,6 +960,7 @@ InputMap EditorT8::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 	CREATE_FIELD("move_end_extraprop_addr", 2, EditorInput_PTR, move->move_end_extraprop_addr);
 	CREATE_FIELD("voiceclip_addr", 2, EditorInput_PTR, move->voicelip_addr);
 
+	/*
 	CREATE_FIELD("cancel_addr_2", 3, EditorInput_PTR, move->_0x28_cancel_addr);
 	CREATE_FIELD("cancel_related_id_2", 3, EditorInput_U32, move->_0x30_int__0x28_related);
 	CREATE_FIELD("cancel_addr_3", 3, EditorInput_PTR, move->_0x38_cancel_addr);
@@ -977,6 +976,7 @@ InputMap EditorT8::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 	CREATE_FIELD("_0x98_int", 5, EditorInput_H32_Changeable, move->_0x98_int);
 	CREATE_FIELD("_0xA8_short", 5, EditorInput_U16_Changeable, move->_0xA8_short);
 	CREATE_FIELD("_0xAC_int", 5, EditorInput_S32_Changeable, move->_0xAC_int);
+	*/
 
 	WriteFieldFullname(inputMap, "move");
 	return inputMap;
@@ -1095,6 +1095,7 @@ void EditorT8::SaveMove(uint16_t id, InputMap& inputs)
 	SetMemberValue(&move->move_end_extraprop_addr, inputs["move_end_extraprop_addr"]);
 	SetMemberValue(&move->voicelip_addr, inputs["voiceclip_addr"]);
 
+	/*
 	SetMemberValue(&move->_0x28_cancel_addr, inputs["cancel_addr_2"]);
 	SetMemberValue(&move->_0x30_int__0x28_related, inputs["cancel_related_id_2"]);
 	SetMemberValue(&move->_0x38_cancel_addr, inputs["cancel_addr_3"]);
@@ -1110,7 +1111,9 @@ void EditorT8::SaveMove(uint16_t id, InputMap& inputs)
 	SetMemberValue(&move->_0x98_int, inputs["_0x98_int"]);
 	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
 	SetMemberValue(&move->_0xAC_int, inputs["_0xAC_int"]);
+	*/
 
+	
 	char* namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
 	char* newAnimName = inputs["anim_name"]->buffer;
 
@@ -1122,10 +1125,10 @@ void EditorT8::SaveMove(uint16_t id, InputMap& inputs)
 		auto old_anim_addr = move->anim_addr;
 		auto old_anim_name_addr = move->anim_name_addr;
 
-		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
-		move->anim_name_addr = m_animOffsetToNameOffset.at(move->anim_addr);
+		//move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
+		//move->anim_name_addr = m_animOffsetToNameOffset.at(move->anim_addr);
 
-		DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
+		//DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 		// Reload move pointer because anim/anim name deletion de-allocated it
 		move = m_iterators.moves[id];
 		namePtr = (char*)(m_movesetData + m_offsets->nameBlock);

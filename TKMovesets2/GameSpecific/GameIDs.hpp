@@ -18,6 +18,7 @@ namespace GameVersions
 		enum
 		{
 			CLOSED_NETWORK_TEST,
+			CLOSED_BETA_TEST,
 		};
 	}
 
