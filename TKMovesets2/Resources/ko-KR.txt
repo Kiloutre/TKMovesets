@@ -409,6 +409,12 @@ edition.reactions.right_side_direction=우측
 edition.reactions.front_counterhit_direction=전면 카운터 히트
 edition.reactions.downed_direction=다운 상태
 edition.reactions.0x44_long=_0x44_long
+edition.reactions.front_rotation=앞
+edition.reactions.back_rotation=뒤
+edition.reactions.left_side_rotation=좌측
+edition.reactions.right_side_rotation=우측
+edition.reactions.front_counterhit_rotation=전면 카운터 히트
+edition.reactions.downed_rotation=다운 상태
 edition.reactions.vertical_pushback=수직 푸시백
 edition.reactions.standing_moveid=스탠딩
 edition.reactions.default_moveid=기본
@@ -457,9 +463,15 @@ edition.projectile.voiceclip_on_hit=보이스클립 (히트)
 
 edition.pushback.window_name=푸시백
 edition.pushback.duration=지속 시간
+edition.pushback.duration.description=
 edition.pushback.num_of_loops=루프 횟수
+edition.pushback.num_of_loops.description=
+edition.pushback.offsets_count=
+edition.pushback.offsets_count.description=
 edition.pushback.displacement=변위
+edition.pushback.displacement.description=
 edition.pushback.extradata_addr=엑스트라 데이터 ID
+edition.pushback.extradata_addr.description=
 
 edition.pushback_extradata.window_name=푸시백 엑스트라 데이터
 edition.pushback_extradata.horizontal_offset=수평 오프셋
@@ -484,10 +496,17 @@ edition.throw_camera.cameradata_addr=카메라 데이터 ID
 
 edition.camera_data.window_name=카메라 데이터
 edition.camera_data._0x0_int=_0x0_int
+edition.camera_data._0x0_int.description=
+edition.camera_data.pick_probability=
+edition.camera_data.pick_probability.description=
 edition.camera_data._0x4_short=_0x4_short
+edition.camera_data._0x4_short.description=
+edition.camera_data.camera_type=
+edition.camera_data.camera_type.description=
 edition.camera_data.left_side_camera_data=좌측 카메라 데이터
 edition.camera_data.right_side_camera_data=우측 카메라 데이터
 edition.camera_data._0xA_short=_0xA_short
+edition.camera_data.additional_rotation=
 
 edition.mvl_displayable.window_name=기술표: 표시 가능
 edition.mvl_displayable.type=유형
