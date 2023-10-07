@@ -2,6 +2,7 @@
 
 #include <format>
 
+using namespace StructsT8;
 using namespace EditorUtils;
 
 #define CREATE_STRING_FIELD(k, c, f, v, s) CreateField<decltype(v)>(k, drawOrder, inputMap, c, EditorInput_String | f, v, s)

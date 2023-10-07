@@ -23,6 +23,7 @@ unsigned int g_roundType = 0;
 namespace T8Functions
 {
 	typedef void** (*Log)(void** a1, const char* a2, size_t a3, int64 a4);
+	typedef void* (*Format)(void* a1, const char** format, void* a3, void* a4);
 
 	typedef char (*ResetRound)(unsigned int a1);
 }
@@ -35,22 +36,47 @@ namespace T8Functions
 
 
 // -- Hook functions --
+int filterException(int code, PEXCEPTION_POINTERS ex) {
+	return EXCEPTION_EXECUTE_HANDLER;
+}
 
 namespace T8Hooks
 {
 	// Log function 
 	void** Log(void** a1, const char* format, size_t string_length, int64 a4)
 	{
-		printf("%s\n", format);
+		std::string t = Helpers::formatDateTime(Helpers::getCurrentTimestamp(), false);
+		/*
+		if (strcmp(format, "exchangeId") == 0) {
+			while (true) {
+				;
+			}
+		}
+		*/
 		if (g_log) {
 			g_log->write("[", 1);
-			std::string t = Helpers::formatDateTime(Helpers::getCurrentTimestamp(), false);
 			g_log->write(t.c_str(), t.size());
 			g_log->write("] ", 2);
 			g_log->write(format, string_length);
 			g_log->write("\n", 1);
 		}
+		printf("[%s] %s\n", t.c_str(), format);
 		return g_loader->CastTrampoline<T8Functions::Log>("TK__Log")(a1, format, string_length, a4);
+	}
+
+	void* Format(void* a1, const char** format, void* a3, void* a4)
+	{
+		printf("----> %s\n", format[0]);
+		char** retval = (char**)g_loader->CastTrampoline<T8Functions::Format>("TK__Format")(a1, format, a3, a4);
+		/*
+		__try {
+			printf(" = %s\n", retval[0]);
+		}
+		__except (filterException(GetExceptionCode(), GetExceptionInformation())) {
+			printf("\n");
+		}
+		*/
+		return (void*)retval;
 	}
 }
 
@@ -67,7 +93,6 @@ void MovesetLoaderT8::InitHooks()
 	m_requiredSymbols = {
 		// Hooks
 		// Functions
-		"TK__ResetRound"
 	};
 
 	// Crucial functions / hooks
@@ -77,8 +102,8 @@ void MovesetLoaderT8::InitHooks()
 #ifdef BUILD_TYPE_DEBUG
 	// Find TK__Log
 	RegisterHook("TK__Log", m_moduleName, "f_Log", GET_HOOK(Log));
-#endif sk
-	RegisterFunction("TK__ResetRound", m_moduleName, "f_ResetRound");
+	RegisterHook("TK__Format", m_moduleName, "f_format", GET_HOOK(Format));
+#endif 
 
 }
 void MovesetLoaderT8::OnInitEnd()
@@ -92,6 +117,7 @@ void MovesetLoaderT8::OnInitEnd()
 	// Other
 #ifdef BUILD_TYPE_DEBUG
 	HookFunction("TK__Log");
+	HookFunction("TK__Format");
 #endif
 	
 	DEBUG_LOG("g_roundType = %p\n", &g_roundType);

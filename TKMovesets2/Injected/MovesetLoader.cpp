@@ -1,6 +1,7 @@
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
 #include "MovesetLoader_t8.hpp"
+#include "PaydayLoader.hpp"
 #include "steamHelper.hpp"
 
 #include "constants.h"
@@ -203,7 +204,7 @@ void MovesetLoader::HookFunction(const char* functionName)
 {
     auto hook = m_hooks.find(functionName);
     if (hook != m_hooks.end() && !hook->second.isHooked) {
-        DEBUG_LOG("Hook %s\n", functionName);
+        DEBUG_LOG("Hook %s (orig addr %llx)\n", functionName, hook->second.originalAddress);
         hook->second.detour->hook();
         hook->second.isHooked = true;
     }
@@ -256,8 +257,11 @@ static bool Init()
             g_loader = new MovesetLoaderT7;
         }
         else if (processName == "Polaris-Win64-Shipping.exe") {
-                g_loader = new MovesetLoaderT8;
-            }
+            g_loader = new MovesetLoaderT8;
+        }
+        else if (processName == "PAYDAY3-Win64-Shipping.exe") {
+            g_loader = new PaydayLoader;
+        }
         else {
             DEBUG_LOG("Unknown process name: '%s'\n", processName.c_str());
             g_loading = false;

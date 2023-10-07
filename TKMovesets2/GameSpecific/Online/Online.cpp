@@ -105,18 +105,25 @@ Online::~Online()
     }
 #endif
 
-    if (m_orig_sharedMemPtr != nullptr) {
-        UnmapViewOfFile(m_orig_sharedMemPtr);
-    }
-
-    if (m_memoryHandle != nullptr) {
-        CloseHandle(m_memoryHandle);
-    }
+    FreeSharedMemory();
 
     if (m_startedThread) {
         m_dllInjectionThread->join();
     }
     delete displayedMovesets;
+}
+
+void Online::FreeSharedMemory()
+{
+    if (m_orig_sharedMemPtr != nullptr) {
+        UnmapViewOfFile(m_orig_sharedMemPtr);
+        m_orig_sharedMemPtr = nullptr;
+    }
+
+    if (m_memoryHandle != nullptr) {
+        CloseHandle(m_memoryHandle);
+        m_memoryHandle = nullptr;
+    }
 }
 
 bool Online::LoadSharedMemory()

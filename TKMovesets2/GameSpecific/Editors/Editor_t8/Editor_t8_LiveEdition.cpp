@@ -2,6 +2,8 @@
 
 #include "helpers.hpp"
 
+using namespace StructsT8;
+
 // Live edition callbacks that will only be called if live edition is enabled, the moveset is loaded in memory AND if the modified field is valid
 
 void EditorT8::Live_OnMoveEdit(int id, EditorInput* field)
@@ -102,19 +104,20 @@ void EditorT8::Live_OnMoveEdit(int id, EditorInput* field)
 	else if (name == "cancel_addr_2") {
 		int id = atoi(field->buffer);
 		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
-		m_process.writeInt64(move + offsetof(Move, _0x28_cancel_addr), cancelAddr);
+		m_process.writeInt64(move + offsetof(Move, _0x30_cancel_addr), cancelAddr);
 	}
 	else if (name == "cancel_addr_3") {
 		int id = atoi(field->buffer);
 		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
-		m_process.writeInt64(move + offsetof(Move, _0x38_cancel_addr), cancelAddr);
+		m_process.writeInt64(move + offsetof(Move, _0x40_cancel_addr), cancelAddr);
 	}
 	else if (name == "cancel_addr_4") {
 		int id = atoi(field->buffer);
 		gameAddr cancelAddr = blockStart + (uint64_t)m_infos->table.cancel + id * sizeof(Cancel);
-		m_process.writeInt64(move + offsetof(Move, _0x48_cancel_addr), cancelAddr);
+		m_process.writeInt64(move + offsetof(Move, _0x50_cancel_addr), cancelAddr);
 	}
 
+	/*
 	else if (name == "_0x34_int") {
 		m_process.writeInt32(move + offsetof(Move, _0x34_int), value_s32);
 	}
@@ -139,6 +142,7 @@ void EditorT8::Live_OnMoveEdit(int id, EditorInput* field)
 	else if (name == "_0xAC_int") {
 		m_process.writeInt32(move + offsetof(Move, _0xAC_int), value_s32);
 	}
+	*/
 }
 
 void EditorT8::Live_OnCancelEdit(int id, EditorInput* field)
@@ -305,6 +309,7 @@ void EditorT8::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 	}
 	else
 	{
+		/*
 		if (name == "value_hex") {
 			m_process.writeInt32(prop + offsetof(ExtraMoveProperty, value_unsigned), value_s32);
 		}
@@ -317,6 +322,7 @@ void EditorT8::Live_OnExtrapropertyEdit(int id, EditorInput* field)
 		else if (name == "value_float") {
 			m_process.writeFloat(prop + offsetof(ExtraMoveProperty, value_unsigned), value_float);
 		}
+		*/
 	}
 }
 
@@ -345,9 +351,11 @@ void EditorT8::Live_OnMoveBeginPropEdit(int id, EditorInput* field)
 	else if (name == "extraprop") {
 		m_process.writeInt32(prop + offsetof(OtherMoveProperty, extraprop), value_s32);
 	}
+	/*
 	else if (name == "value") {
 		m_process.writeInt32(prop + offsetof(OtherMoveProperty, value), value_s32);
 	}
+	*/
 }
 
 void EditorT8::Live_OnMoveEndPropEdit(int id, EditorInput* field)
@@ -375,9 +383,11 @@ void EditorT8::Live_OnMoveEndPropEdit(int id, EditorInput* field)
 	else if (name == "extraprop") {
 		m_process.writeInt32(prop + offsetof(OtherMoveProperty, extraprop), value_s32);
 	}
+	/*
 	else if (name == "value") {
 		m_process.writeInt32(prop + offsetof(OtherMoveProperty, value), value_s32);
 	}
+	*/
 }
 
 void EditorT8::Live_OnRequirementEdit(int id, EditorInput* field)
@@ -401,12 +411,14 @@ void EditorT8::Live_OnRequirementEdit(int id, EditorInput* field)
 	if (name == "condition") {
 		m_process.writeInt32(requirement + offsetof(Requirement, condition), value_s32);
 	}
+	/*
 	else if (name == "param_unsigned") {
 		m_process.writeInt32(requirement + offsetof(Requirement, param_unsigned), value_s32);
 	}
 	else if (name == "param_float") {
 		m_process.writeFloat(requirement + offsetof(Requirement, param_float), value_float);
 	}
+	*/
 }
 
 void EditorT8::Live_OnHitConditionPropEdit(int id, EditorInput* field)
@@ -559,12 +571,14 @@ void EditorT8::Live_OnReactionsEdit(int id, EditorInput* field)
 	else if (name == "vertical_pushback") {
 		m_process.writeInt16(reactions + offsetof(Reactions, vertical_pushback), value_s16);
 	}
+	/*
 	else if (name == "_0x44_int") {
 		m_process.writeInt32(reactions + offsetof(Reactions, _0x44_int), value_s32);
 	}
 	else if (name == "_0x48_int") {
 		m_process.writeInt32(reactions + offsetof(Reactions, _0x48_int), value_s32);
 	}
+	*/
 }
 
 void EditorT8::Live_OnPushbackEdit(int id, EditorInput* field)
@@ -591,9 +605,11 @@ void EditorT8::Live_OnPushbackEdit(int id, EditorInput* field)
 	else if (name == "displacement") {
 		m_process.writeInt16(pushback + offsetof(Pushback, displacement), value_s16);
 	}
+	/*
 	else if (name == "num_of_loops") {
 		m_process.writeInt32(pushback + offsetof(Pushback, num_of_loops), value_s32);
 	}
+	*/
 	else if (name == "extradata_addr") {
 		gameAddr extraAddr = blockStart + (uint64_t)m_infos->table.pushbackExtradata + value_s64 * sizeof(PushbackExtradata);
 		m_process.writeInt64(pushback + offsetof(Pushback, extradata_addr), extraAddr);
@@ -730,21 +746,25 @@ void EditorT8::Live_OnCameraDataEdit(int id, EditorInput* field)
 	};
 	value_u64 = EditorUtils::GetFieldValue(field);
 
+	/*
 	if (name == "_0x0_int") {
 		m_process.writeInt32(cameraData + offsetof(CameraData, _0x0_int), value_s32);
 	}
 	else if (name == "_0x4_short") {
 		m_process.writeInt16(cameraData + offsetof(CameraData, _0x4_short), value_s16);
 	}
-	else if (name == "left_side_camera_data") {
+	else
+	*/ if (name == "left_side_camera_data") {
 		m_process.writeInt16(cameraData + offsetof(CameraData, left_side_camera_data), value_s16);
 	}
 	else if (name == "right_side_camera_data") {
 		m_process.writeInt16(cameraData + offsetof(CameraData, right_side_camera_data), value_s16);
 	}
+	/*
 	else if (name == "_0xA_short") {
 		m_process.writeInt16(cameraData + offsetof(CameraData, _0xA_short), value_s16);
 	}
+	*/
 }
 
 void EditorT8::Live_OnProjectileEdit(int id, EditorInput* field)

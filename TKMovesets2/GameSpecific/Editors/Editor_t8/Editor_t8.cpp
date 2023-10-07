@@ -9,6 +9,7 @@
 #include "Animations.hpp"
 
 using namespace EditorUtils;
+using namespace StructsT8;
 
 #define gAddr StructsT8_gameAddr
 
@@ -315,8 +316,9 @@ bool EditorT8::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 	{
 		const char* animName = namePtr + movePtr[i].anim_name_addr;
 		std::string animName_str(animName);
-		gameAddr animOffset = movePtr[i].anim_addr;
+		gameAddr animOffset = *(uint64_t*)&movePtr[i].anim_addr;
 
+		/*
 		if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end() && m_animNameToOffsetMap.at(animName_str) != animOffset) {
 			// Same animation name refers to a different offset. Create a unique animation name for it.
 			// Move names being similar is irrelevant, but i build an anim name -> anim offset map, so i need identical names to point toward the same anim.
@@ -341,6 +343,7 @@ bool EditorT8::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 				throw std::exception();
 			}
 		}
+		*/
 
 		m_animNameToOffsetMap[animName_str] = animOffset;
 		m_animOffsetToNameOffset[animOffset] = movePtr[i].anim_name_addr;
@@ -486,7 +489,7 @@ void EditorT8::ReloadDisplayableMoveList()
 			.moveId = moveId,
 			.aliasId = 0,
 			.flags = flags,
-		});
+			});
 	}
 
 	// Mark default generic moves
@@ -595,9 +598,11 @@ void EditorT8::DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_ad
 		char* move_name = (char*)(m_movesetData + m_offsets->nameBlock + m.name_addr);
 		char* anim_name = (char*)(m_movesetData + m_offsets->nameBlock + m.anim_name_addr);
 
+		/*
 		if (m.anim_addr == anim_addr) {
 			animationStillInUse = true;
 		}
+		*/
 		if (m.anim_name_addr == anim_name_addr) {
 			animationNameStillInUse = true;
 		}
@@ -637,12 +642,13 @@ std::string EditorT8::ImportAnimation(const wchar_t* filepath, int moveid)
 
 		animFile.seekg(0, std::ios::end);
 		animSize = animFile.tellg();
-        try {
-            anim = new Byte[animSize];
-        } catch (std::bad_alloc) {
-            DEBUG_ERR("Failed to allocate anim size %llun", animSize);
-            return "";
-        }
+		try {
+			anim = new Byte[animSize];
+		}
+		catch (std::bad_alloc) {
+			DEBUG_ERR("Failed to allocate anim size %llun", animSize);
+			return "";
+		}
 		animFile.seekg(0, std::ios::beg);
 		animFile.read((char*)anim, animSize);
 
@@ -685,9 +691,9 @@ std::string EditorT8::ImportAnimation(const wchar_t* filepath, int moveid)
 			auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
 
 			m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset[anim_offset];
-			m_iterators.moves[moveid]->anim_addr = anim_offset;
+			//m_iterators.moves[moveid]->anim_addr = anim_offset;
 
-			DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
+			//DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 			delete[] anim;
 			return animName_str;
 		}
@@ -707,7 +713,7 @@ std::string EditorT8::ImportAnimation(const wchar_t* filepath, int moveid)
 
 		std::set<gameAddr> animOffsets;
 		for (auto& move : m_iterators.moves) {
-			animOffsets.insert(move.anim_addr);
+			//animOffsets.insert(move.anim_addr);
 		}
 
 		auto offset_cursor = animOffsets.begin();
@@ -724,9 +730,9 @@ std::string EditorT8::ImportAnimation(const wchar_t* filepath, int moveid)
 				auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
 
 				m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset[*offset_cursor];
-				m_iterators.moves[moveid]->anim_addr = *offset_cursor;
+				//m_iterators.moves[moveid]->anim_addr = *offset_cursor;
 
-				DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
+				//DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 				delete[] anim;
 				return animName_str;
 			}
@@ -809,9 +815,9 @@ std::string EditorT8::ImportAnimation(const wchar_t* filepath, int moveid)
 	auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
 
 	m_iterators.moves[moveid]->anim_name_addr = relativeName;
-	m_iterators.moves[moveid]->anim_addr = relativeAnim;
+	//m_iterators.moves[moveid]->anim_addr = relativeAnim;
 
-	DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
+	//DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 
 	m_animNameToOffsetMap[animName_str] = relativeAnim;
 	m_animOffsetToNameOffset[relativeAnim] = relativeName;
@@ -850,13 +856,11 @@ uint32_t EditorT8::CalculateCRC32()
 
 void EditorT8::SetSharedMemHandler(Online** sharedMemHandler)
 {
-	//m_sharedMemHandler = (OnlineT8**)sharedMemHandler;
-	//todo
+	m_sharedMemHandler = (OnlineT8**)sharedMemHandler;
 }
 
 void EditorT8::ExecuteExtraprop(EditorInput* idField, EditorInput* valueField)
 {
-	/*
 	if (m_sharedMemHandler && *m_sharedMemHandler && m_process.IsAttached())
 	{
 		if (!(*m_sharedMemHandler)->injectedDll) {
@@ -869,6 +873,4 @@ void EditorT8::ExecuteExtraprop(EditorInput* idField, EditorInput* valueField)
 		uint32_t value = (uint32_t)EditorUtils::GetFieldValue(valueField);
 		(*m_sharedMemHandler)->ExecuteExtraprop(currentPlayerId, (uint32_t)id, (uint32_t)value);
 	}
-	*/
-	//todo
 }

@@ -3,6 +3,7 @@
 
 
 #include "Extractor_t7/Extractor_t7.hpp"
+#include "Extractor_t8/Extractor_t8.hpp"
 #include "Extractor_ttt2/Extractor_ttt2.hpp"
 #include "Extractor_t6/Extractor_t6.hpp"
 #include "Extractor_t5/Extractor_t5.hpp"
@@ -11,6 +12,7 @@
 #include "Importer_t7/Importer_t7.hpp"
 
 #include "Editor_t7/Editor_t7.hpp"
+#include "Editor_t8/Editor_t8.hpp"
 
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
 
@@ -20,24 +22,25 @@
 // -- -- //
 
 const GameInfo cg_gamesInfo[] = {
+
 	{
 		// -- T8 -- //
 		.name = "Tekken 8 CNT",
 		.processName = "Polaris-Win64-Shipping.exe",
-		.movesetNamePrefix = "T8_",
+		.movesetNamePrefix = "T8CNT_",
 		.gameId = GameId_T8,
 		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
 		.characterCount = 2,
 		.ptrSize = 8,
 		.flags = 0,
-		.dataString = "t8",
-		.minorDataString = "t8",
+		.dataString = "t8cnt",
+		.minorDataString = "t8cnt",
 		.supportedImports = { },
 		.supportedOnlineImports = { },
-		.extractor = nullptr,
+		.extractor = new GameFactory<ExtractorT8>,
 		.importer = nullptr,
-		.editorLogic = nullptr,
-		.editorVisuals = nullptr,
+		.editorLogic = new GameFactory<EditorT8>,
+		.editorVisuals = new EditorFactory<EditorVisuals_T7>,
 #ifdef BUILD_TYPE_DEBUG
 		.onlineHandler = new GameFactory<OnlineT8>,
 #else
@@ -324,6 +327,9 @@ namespace Games
 
 	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
+		if (gameInfo->importer == nullptr) {
+			return nullptr;
+		}
 		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo);
 		return im;
 	}
@@ -342,6 +348,9 @@ namespace Games
 
 	Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
+		if (gameInfo->onlineHandler == nullptr) {
+			return nullptr;
+		}
 		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo);
 		return on;
 	}

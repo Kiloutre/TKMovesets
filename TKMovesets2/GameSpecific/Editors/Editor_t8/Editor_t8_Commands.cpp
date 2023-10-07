@@ -1,5 +1,7 @@
 #include "Editor_t8.hpp"
 
+using namespace StructsT8;
+
 // -- Static helper -- //
 
 const char cg_directionBitLabels[][8] = {

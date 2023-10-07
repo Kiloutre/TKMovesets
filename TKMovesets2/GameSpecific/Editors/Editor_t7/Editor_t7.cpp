@@ -8,6 +8,7 @@
 #include "Editor_t7.hpp"
 #include "Animations.hpp"
 
+using namespace StructsT7;
 using namespace EditorUtils;
 
 #define gAddr StructsT7_gameAddr

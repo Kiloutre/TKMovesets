@@ -404,11 +404,11 @@ namespace StructsT8
 				UnknownNew* _unkown_0x298;
 				uint64_t _unkown_0x298Count;
 			};
+			struct {
+				void* listAddr;
+				uint64_t listCount;
+			} entries[19];
 		};
-		struct {
-			void* listAddr;
-			uint64_t listCount;
-		} entries[19];
 	};
 
 	struct MotaHeader
@@ -847,7 +847,7 @@ namespace StructsT8_gameAddr //todo
 	{
 		uint32_t starting_frame;
 		uint32_t _0x4_int;
-		gameAddr* requirements_addr;
+		gameAddr requirements_addr;
 		uint32_t id;
 		Param param[5];
 	};
@@ -858,7 +858,7 @@ namespace StructsT8_gameAddr //todo
 		uint32_t _0x0;
 		uint16_t _0x4;
 		uint16_t _0x6;
-		gameAddr* requirements_addr;
+		gameAddr requirements_addr;
 		uint32_t _0xC;
 		uint32_t _0x10;
 	};
@@ -867,8 +867,8 @@ namespace StructsT8_gameAddr //todo
 	{
 		Byte move_name_related[4];
 		Byte move_anim_name_related[4];
-		char* name_addr;
-		char* anim_name_addr;
+		gameAddr name_addr;
+		gameAddr anim_name_addr;
 		Byte anim_addr[8]; // now encrypted
 		uint32_t vuln;
 		uint32_t hitlevel;

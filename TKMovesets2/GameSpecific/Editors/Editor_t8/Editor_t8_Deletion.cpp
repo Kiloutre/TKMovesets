@@ -1,6 +1,8 @@
 # include "Editor_t8.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT8;
+
 #define gAddr StructsT8_gameAddr
 
 void EditorT8::DeleteMove(int id)
@@ -109,9 +111,11 @@ void EditorT8::DeleteProjectile(int id)
 	for (auto& extraProp : m_iterators.extra_move_properties)
 	{
 		if (IsPropertyProjectileRef(extraProp.id)) {
+			/*
 			if (MUST_SHIFT_ID(extraProp.value_unsigned, -1, id, id + 1)) {
 				extraProp.value_unsigned -= 1;
 			}
+			*/
 		}
 	}
 }
@@ -124,9 +128,11 @@ void EditorT8::DeleteThrowCamera(int id)
 	for (auto& extraProp : m_iterators.extra_move_properties)
 	{
 		if (IsPropertyThrowCameraRef(extraProp.id)) {
+			/*
 			if (MUST_SHIFT_ID(extraProp.value_unsigned, -1, id, id + 1)) {
 				extraProp.value_unsigned -= 1;
 			}
+			*/
 		}
 	}
 }
@@ -258,9 +264,11 @@ void EditorT8::DeleteAnimation(uint64_t anim_offset)
 
 	// Get animation end position
 	for (const auto& move : m_iterators.moves) {
+		/*
 		if (anim_offset < move.anim_addr && move.anim_addr < anim_end_addr) {
 			anim_end_addr = move.anim_addr;
 		}
+		*/
 	}
 
 	uint64_t anim_size = anim_end_addr - anim_offset;
@@ -316,9 +324,11 @@ void EditorT8::DeleteAnimation(uint64_t anim_offset)
 	// Shift move anim addresses
 	for (auto& m : m_iterators.moves)
 	{
+		/*
 		if (m.anim_addr > anim_offset) {
 			m.anim_addr -= anim_size;
 		}
+		*/
 	}
 
 	// Copy all the data up to the animation
@@ -388,7 +398,7 @@ void EditorT8::DeleteNameBlockString(uint64_t string_offset)
 	{
 		const char* m_name = (char*)(m_movesetData + m_offsets->nameBlock) + m.anim_name_addr;
 		if (strcmp(m_name, name) == 0) {
-			m_animNameToOffsetMap[m_name] = m.anim_addr;
+			//m_animNameToOffsetMap[m_name] = m.anim_addr;
 			break;
 		}
 	}
