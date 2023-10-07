@@ -1,7 +1,6 @@
 #include "MovesetLoader.hpp"
 #include "MovesetLoader_t7.hpp"
 #include "MovesetLoader_t8.hpp"
-#include "PaydayLoader.hpp"
 #include "steamHelper.hpp"
 
 #include "constants.h"
@@ -258,9 +257,6 @@ static bool Init()
         }
         else if (processName == "Polaris-Win64-Shipping.exe") {
             g_loader = new MovesetLoaderT8;
-        }
-        else if (processName == "PAYDAY3-Win64-Shipping.exe") {
-            g_loader = new PaydayLoader;
         }
         else {
             DEBUG_LOG("Unknown process name: '%s'\n", processName.c_str());
