@@ -6,7 +6,7 @@ https://tekkenmods.com/mod/2429/tkmovesets2
 Releases page / Download link(s):
 https://github.com/Kiloutre/TKMovesets/releases
 
-# TKMovesets2 1.0 - Moveset export / import / edit
+# TKMovesets2 1.1 - Moveset export / import / edit
 
 Tool aimed at replacing and surpassing the old TekkenMovesetExtractor. Extract movesets, edit them to your liking and re-import them on the characters you want.
 The importation is memory based: it does not modify the game files, does not stay after closing the game, and **causes desyncs online if the opponent does not have this tool also running.**

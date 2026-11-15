@@ -136,6 +136,8 @@ protected:
 	void SaveBackup(bool saveOnlyIfNoneExist=false);
 public:
 	// Determines if main window is open or not. If not, this tells the MainWindow parent class to destroy this very class
+    // An open form of that structure has edits not applied yet.
+    bool FormHasUnsavedChanges(EditorWindowType type, uint32_t id) const { for (auto* f : m_structWindows) if (f->popen && f->windowType == type && f->structureId == id && f->unsavedChanges) return true; return false; }
     bool HasPendingEdits() const { for (auto* f:m_structWindows) if (f->unsavedChanges || f->justAppliedChanges) return true; return !m_savedLastChange; }
     bool SaveBusy() const { return m_saveJob.Busy(); }
 	bool popen = true;

@@ -36,6 +36,7 @@ User interface (Dear ImGui).
 | `Submenus/Submenu_About.cpp`, `MovesetListSort.hpp` | About page; moveset list sorting |
 | `EditorVisuals/EditorVisuals.cpp` | `EditorVisuals`: base editor window (form windows, subwindows, save, live edit) |
 | `EditorVisuals/EditorForm.cpp`, `EditorFormList.cpp`, `EditorSubwindow.hpp`, `EditorClipboard.hpp` | Base classes for record forms, list forms, subwindows; clipboard |
+| `EditorVisuals/AnimationPreview.cpp` | `AnimationPreview`: the move forms' 3D animation preview (OpenGL into a texture, orbit camera, timeline with the active frames in red); used by `TEditorMove` (T7) and the retail moves form |
 
 ## `TKMovesets2/GameInteractions/`
 
@@ -155,6 +156,7 @@ See [conversion.md](conversion.md) and [conversion-rules.md](conversion-rules.md
 
 | Folder | Contents |
 | --- | --- |
+| `AnimationPreview/` | `AnimPreview::Model` (the mannequin, built from scratch, embedded from `Resources/AnimPreview/mannequin.bin`, written by `tools/build_preview_mannequin.py`), `Pose` (T7 body channels -> bones, BlenderTekkenDirect's mapping), `Skin`; `DecodeClip` (T7 0xC8 / 0x64 and T8 PANM -> T7 body channels); `ApplyDisplacements` (the move's known displacement properties on the root motion); `HitShapes` (approximate hitbox capsules on the mannequin) |
 | `AnimExtractors/` | `AnimExtractor`: animation extraction per game (`AnimExtractor_t7.cpp` ... `_t8.cpp`); `RetailT8Animations` (`Extract`, `ExtractArchive`) |
 | `AddressScanner/` | `ExeSignatures`: scan the exe file for address patterns (`ScanGame`, `FindT8Executable`), `ApplyScan` (`AddressUpdate.cpp`) |
 | `Online/` | `Online` base (shared memory, DLL injection thread), `OnlineT7`, `OnlineT8` (loader commands such as Tag) |

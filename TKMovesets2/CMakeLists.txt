@@ -136,6 +136,12 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/EditorVisuals/EditorVisuals_t8Retail/EditorVisuals_t8Retail.cpp"
                     "ResourcesClasses/GameStaticData.cpp"
                     "GameSpecific/Editors/RecordEdit.cpp"
+                    # Animation preview of the move forms (model, poses, OpenGL view)
+                    "GameSpecific/AnimationPreview/PreviewModel.cpp"
+                    "GameSpecific/AnimationPreview/PreviewClip.cpp"
+                    "GameSpecific/AnimationPreview/PreviewDisplacement.cpp"
+                    "GameSpecific/AnimationPreview/PreviewHitbox.cpp"
+                    "Layouts/EditorVisuals/AnimationPreview.cpp"
                     "LocalStorage/MovesetFile.cpp"
                     "LocalStorage/ImportProfile.cpp"
                     "LocalStorage/FileJob.cpp"
@@ -425,8 +431,13 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/../TKMInterfaceTable.c.in"
 configure_file("${CMAKE_CURRENT_BINARY_DIR}/../TKMInterfaceTable.c.in" "${CMAKE_CURRENT_BINARY_DIR}/../TKMInterfaceTable.c" COPYONLY)
 list(APPEND TKM_INTERFACE_EMBEDDED "${CMAKE_CURRENT_BINARY_DIR}/../TKMInterfaceTable.c")
 
+## Animation preview model (Resources/AnimPreview, from tools/build_preview_mannequin.py). Separate from
+## EMBEDDED_RESOURCES so that the injected DLL does not carry it.
+set(ANIM_PREVIEW_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/../AnimPreviewResources.c")
+create_resources("${CMAKE_CURRENT_SOURCE_DIR}/Resources/AnimPreview" ${ANIM_PREVIEW_RESOURCES})
+
 # Build lib containing per-game Import/Export movesets functions
-add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES} ${TKM_INTERFACE_EMBEDDED} "ResourcesClasses/EmbeddedInterface.cpp")
+add_library(GameSpecific STATIC ${GAMESPECIFIC_SOURCES} ${EMBEDDED_RESOURCES} ${TKM_INTERFACE_EMBEDDED} ${ANIM_PREVIEW_RESOURCES} "ResourcesClasses/EmbeddedInterface.cpp")
 target_include_directories(GameSpecific PRIVATE ${INCLUDE_FOLDERS} )
 target_compile_definitions(GameSpecific PUBLIC DLL_EXPORTING)
 if (${CMAKE_TKM_BUILD_TYPE} MATCHES "Debug")
@@ -471,6 +482,7 @@ add_dependencies(TKMovesets2 GameStaticDataResources)
 # OpenGL (Renderer)
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(TKMovesets2 PRIVATE glad::glad)
+target_link_libraries(GameSpecific PUBLIC glad::glad opengl32) # animation preview (Layouts/EditorVisuals/AnimationPreview.cpp)
 
 # GLFW (Renderer)
 find_package(glfw3 CONFIG REQUIRED)
@@ -517,7 +529,7 @@ if(BUILD_TESTING)
     target_compile_definitions(TagT8GrowTests PRIVATE TAGT8GROW_NO_RESOLVER)
     target_include_directories(TagT8GrowTests PRIVATE "Injected/MovesetLoaders")
     add_test(NAME tag-t8-grow COMMAND TagT8GrowTests)
-    target_sources(TKMovesets2 PRIVATE "../tests/EditorFormTests.cpp" "../tests/RetailEditorTests.cpp")
+    target_sources(TKMovesets2 PRIVATE "../tests/EditorFormTests.cpp" "../tests/RetailEditorTests.cpp" "../tests/AnimationPreviewTests.cpp")
     target_compile_definitions(TKMovesets2 PRIVATE TKM_EDITOR_FORM_TESTS)
     add_test(NAME headless-editor-smoke COMMAND TKMovesets2 --headless editor-smoke)
     add_executable(MovesetRegressionTests
@@ -571,6 +583,8 @@ if(BUILD_TESTING)
     set_tests_properties(headless-ui-smoke PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/headless-smoke" TIMEOUT 30)
     # Dear ImGui Test Engine (vcpkg imgui[test-engine]) drives the retail editor: popups, tabs, typing, hover.
     add_test(NAME retail-editor-ui COMMAND TKMovesets2 --headless retail-editor-ui-test)
+    # Animation preview: mannequin pose and skinning against Blender (tools/build_preview_mannequin.py writes the reference).
+    add_test(NAME animation-preview-pose COMMAND TKMovesets2 --headless anim-preview-check "${CMAKE_SOURCE_DIR}/tests/data/anim_preview_blender_reference.json")
     set_tests_properties(retail-editor-ui PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/headless-smoke" TIMEOUT 120)
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_Interpreter_FOUND)

@@ -133,6 +133,8 @@ MainWindow::MainWindow(bool offline)
 	// Program config (various threads, submenus)
 	m_storage.ReloadMovesetList();
 	m_storage.CleanupUnusedMovesetInfos();
+	// Start in the editor when there is a moveset to edit, else in the extractor to get one.
+	SetActiveMenu(m_storage.extractedMovesets.empty() ? NAV__MENU_EXTRACT : NAV__MENU_EDITION);
 
 	m_addrFile = std::make_unique<GameAddressesFile>(!offline);
 

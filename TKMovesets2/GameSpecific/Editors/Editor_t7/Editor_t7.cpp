@@ -381,6 +381,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 	displayedMove->color = TEditorUtils::GetMoveColorFromFlag(flags);
 	displayedMove->aliasId = aliasId;
 	displayedMove->flags = flags;
+	displayedMove->screw = MoveUsesScrew(moveId);
 }
 
 void EditorT7::ReloadDisplayableMoveList()
@@ -431,6 +432,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			.moveId = static_cast<uint16_t>(moveId),
 			.aliasId = 0,
 			.flags = flags,
+			.screw = MoveUsesScrew(static_cast<uint16_t>(moveId)),
 		}));
         newRows.push_back(ownedRows.back().get());
 	}
@@ -547,6 +549,130 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
         throw std::runtime_error(result.rollbackComplete ? "Could not play move; previous game values were restored." :
             "Could not play move; rollback was incomplete. Re-import before live editing.");
     }
+}
+
+std::vector<Byte> EditorT7::MoveAnimation(uint16_t moveId)
+{
+	if (moveId >= m_iterators.moves.size()) throw std::out_of_range("Move outside the move list");
+	const uint64_t offset = m_iterators.moves[moveId]->anim_addr;
+	const uint64_t blockSize = m_offsets->motaBlock - m_offsets->animationBlock;
+	if (offset >= blockSize) throw std::out_of_range("Animation offset outside its section");
+	const Byte* animation = m_movesetData + m_offsets->animationBlock + offset;
+	const uint64_t size = TAnimUtils::FromMemory::Safe::GetAnimSize(animation, blockSize - offset);
+	if (!size || size > blockSize - offset) throw std::runtime_error("Cannot read the move's animation");
+	return std::vector<Byte>(animation, animation + size);
+}
+
+uint64_t EditorT7::MoveAnimationToken(uint16_t moveId)
+{
+	if (moveId >= m_iterators.moves.size()) return 0;
+	return (static_cast<uint64_t>(m_iterators.moves[moveId]->anim_addr) << 1) | 1;
+}
+
+std::vector<AnimPreview::Displacement> EditorT7::MoveDisplacements(uint16_t moveId)
+{
+	std::vector<AnimPreview::Displacement> result;
+	if (moveId >= m_iterators.moves.size()) return result;
+	const uint64_t first = m_iterators.moves[moveId]->extra_move_property_addr;
+	const uint64_t count = m_iterators.extra_move_properties.size();
+	if (first == MOVESET_ADDR_MISSING || first >= count) return result;
+	for (uint64_t row = first; row < count; ++row) {
+		const auto* property = m_iterators.extra_move_properties[row];
+		if (property->id == 0) break;
+		if (auto kind = AnimPreview::T7DisplacementKind(property->id))
+			result.push_back({AnimPreview::DisplacementFrame(property->starting_frame), *kind,
+				AnimPreview::DisplacementValue(*kind, property->value_unsigned, false), property->id});
+	}
+	return result;
+}
+
+bool EditorT7::MoveUsesScrew(uint16_t moveId) const
+{
+	if (moveId >= m_iterators.moves.size()) return false;
+	const uint64_t first = m_iterators.moves[moveId]->hit_condition_addr;
+	if (first == MOVESET_ADDR_MISSING) return false;
+	const uint32_t end = constants.at(EditorConstants_RequirementEnd);
+	for (uint64_t row = first; row < m_iterators.hit_conditions.size() && row < first + 64; ++row) {
+		const uint64_t list = m_iterators.hit_conditions[row]->requirements_addr;
+		bool isDefault = true;
+		for (uint64_t q = list; q < m_iterators.requirements.size() && q < list + 64; ++q) {
+			const uint32_t condition = m_iterators.requirements[q]->condition;
+			if (condition == end) break;
+			isDefault = false;
+			if (condition == 615) return true;
+		}
+		if (isDefault) break; // the list's default entry ends it
+	}
+	return false;
+}
+
+int32_t EditorT7::ResolveMoveId(uint32_t moveId) const
+{
+	if (moveId >= 0x8000) {
+		if (moveId - 0x8000 >= aliases.size()) return -1;
+		moveId = aliases[moveId - 0x8000];
+	}
+	return moveId < m_iterators.moves.size() ? static_cast<int32_t>(moveId) : -1;
+}
+
+AnimPreview::ReactionMoves EditorT7::MoveHitReactions(uint16_t moveId, bool opponentAirborne)
+{
+	AnimPreview::ReactionMoves result;
+	if (moveId >= m_iterators.moves.size()) return result;
+	const uint64_t first = m_iterators.moves[moveId]->hit_condition_addr;
+	const uint64_t count = m_iterators.hit_conditions.size();
+	if (first == MOVESET_ADDR_MISSING || first >= count) return result;
+	const uint32_t requirementEnd = constants[EditorConstants_RequirementEnd];
+	// Requirements judged for the preview's opponent: 0 (always), 607 opponent airborne, 608 not airborne, 614 in a
+	// juggle. Any other requirement counts as unmet.
+	auto met = [&](uint32_t condition) {
+		switch (condition) {
+		case 0: return true;
+		case 607: case 614: return opponentAirborne;
+		case 608: return !opponentAirborne;
+		default: return false;
+		}
+	};
+	uint64_t chosen = first;
+	// The game takes the first entry whose requirements all hold; the list ends with its default entry (none), so a
+	// list that never matches keeps its first entry.
+	for (uint64_t row = first; row < count && row < first + 64; ++row) {
+		bool all = true, isDefault = false;
+		for (uint64_t q = m_iterators.hit_conditions[row]->requirements_addr; q < m_iterators.requirements.size(); ++q) {
+			const uint32_t condition = m_iterators.requirements[q]->condition;
+			if (condition == requirementEnd) { isDefault = q == m_iterators.hit_conditions[row]->requirements_addr; break; }
+			if (!met(condition)) { all = false; break; }
+		}
+		if (all) { chosen = row; break; }
+		if (isDefault) break;
+	}
+	result.damage = static_cast<int>(m_iterators.hit_conditions[chosen]->damage);
+	const uint64_t reactions = m_iterators.hit_conditions[chosen]->reactions_addr;
+	if (reactions >= m_iterators.reactions.size()) return result;
+	const auto* reaction = m_iterators.reactions[reactions];
+	// The game's move ids start at 0x50 (as in retail T8): the field named default_moveid holds the standing
+	// reaction, and the one named standing_moveid (0x4E) is 0 in the game's movesets. There is no airborne slot.
+	result.standing = ResolveMoveId(reaction->default_moveid);
+	result.counterhit = ResolveMoveId(reaction->counterhit_moveid);
+	result.leftSide = ResolveMoveId(reaction->left_side_moveid);
+	result.rightSide = ResolveMoveId(reaction->right_side_moveid);
+	result.backturned = ResolveMoveId(reaction->backturned_moveid);
+	auto pushback = [&](uint64_t index) {
+		AnimPreview::Pushback out;
+		if (index >= m_iterators.pushbacks.size()) return out;
+		const auto* p = m_iterators.pushbacks[index];
+		out.duration = p->duration;
+		out.displacement = p->displacement;
+		for (uint64_t i = 0; i < p->num_of_loops && i < 256 && p->extradata_addr + i < m_iterators.pushback_extras.size(); ++i)
+			out.offsets.push_back(m_iterators.pushback_extras[p->extradata_addr + i]->horizontal_offset);
+		return out;
+	};
+	result.frontPushback = pushback(reaction->front_pushback);
+	result.counterhitPushback = pushback(reaction->front_counterhit_pushback);
+	result.leftPushback = pushback(reaction->left_side_pushback);
+	result.rightPushback = pushback(reaction->right_side_pushback);
+	result.backPushback = pushback(reaction->backturned_pushback);
+	return result;
 }
 
 void EditorT7::DeleteAnimationIfUnused(uint64_t animation, uint64_t name)

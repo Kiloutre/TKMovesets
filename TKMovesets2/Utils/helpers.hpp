@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 #include <iterator>
 #include <algorithm>
 #include <vector>
@@ -268,4 +269,9 @@ namespace Helpers
 
 	// Returns true if the string is comprised of digits only. Ignores leading and trailing spaces.
 	bool is_string_digits(const char* str);
+
+	// Text search of names (move lists): true when `query` is a case-insensitive substring of `name`, or, for queries of
+	// 3 characters and more, when it is similar enough to some part of `name` (at most one edit per 4 characters of the
+	// query: typos, a missing or extra character). An empty query matches everything.
+	bool name_matches_search(std::string_view name, std::string_view query);
 }

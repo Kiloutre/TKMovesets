@@ -72,6 +72,12 @@ protected:
 	} m_winInfo;
 	// Used for alignment calculations
 	float m_labelWidthHalf = 0.0f;
+	// Set by RenderInternal when the pointer is over an area with its own right-click use (the animation preview's
+	// view pans with right drag): no context menu then.
+	bool m_ignoreRightClick = false;
+	// Draws the fields in a child of the given size (the animation preview beside them), with the form's column layout
+	// computed for that width.
+	void RenderFieldsInChild(const char* id, ImVec2 size);
 	// Used with changing data types to prevent .unsavedChanges from being set to true
 	bool m_ignoreNextChange = false;
 	// True if the deletion popup is open
@@ -126,7 +132,7 @@ protected:
 	// Render a single input field in the form. Game-specific forms may draw a decoded widget (combo) first.
 	virtual void RenderInput(int listIdx, EditorInput* field);
 	// Render a single input label in the form
-	void RenderLabel(int listIdx, EditorInput* field);
+	virtual void RenderLabel(int listIdx, EditorInput* field);
 	// Called when clicking the apply button, will check for field errors, set variables and then save the data
 	virtual void Apply();
 	// Returns false if any field has an error state

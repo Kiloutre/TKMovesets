@@ -9,6 +9,17 @@
 #include "Extractor_t8/RetailRuntime.hpp"
 
 namespace RetailT8Resources {
+EngineAddresses ReadEngineAddresses(const GameAddressesWrapper& game, gameAddr module) {
+    auto at = [&](const char* key) {
+        const auto rva = game.GetValue(key);
+        if (rva <= 0) throw std::runtime_error(std::string("game_addresses.ini has no t8-retail_") + key + ": update the addresses file");
+        return module + static_cast<gameAddr>(rva);
+    };
+    if (!module) throw std::runtime_error("Retail game module is not known");
+    return {at("anim_compiled_vtable_rva"), at("anim_empty_bucket_rva"), at("anim_resource_vtable_rva"),
+        at("anim_resource_ref_vtable_rva"), at("anim_noop_rva")};
+}
+
 gameAddr FindAnimationResource(const GameProcess& process, gameAddr container, uint32_t character, uint32_t instance) {
     namespace RT = RetailT8Runtime;
     auto q = [&](gameAddr address) { return RT::Read<uint64_t>(process, address); };
@@ -162,7 +173,7 @@ struct Image {
 
 namespace {
 // Appends the PANM and its compiled animation to `image`; returns the object's offset (the PANM is at offset 0).
-size_t BuildCompiledInto(Image& image, std::span<const Byte> panm, gameAddr module) {
+size_t BuildCompiledInto(Image& image, std::span<const Byte> panm, const EngineAddresses& engine) {
     if (panm.size() < 8 || memcmp(panm.data() + 4, "PANM", 4)) throw std::invalid_argument("Invalid custom PANM");
     if (image.base % 16 || !image.bytes.empty()) throw std::invalid_argument("Unaligned compiled animation address");
     Fb fb{panm};
@@ -210,12 +221,12 @@ size_t BuildCompiledInto(Image& image, std::span<const Byte> panm, gameAddr modu
     const auto source = image.Alloc(panm.size());
     memcpy(image.bytes.data() + source, panm.data(), panm.size());
     const auto object = image.Alloc(0xF0);
-    image.Put<uint64_t>(object, module + CompiledVtableRva);
+    image.Put<uint64_t>(object, engine.compiledVtable);
     image.Put<uint32_t>(object + 0x08, fb.Value<uint32_t>(anim, 1)); // frames - 1
     image.Put<float>(object + 0x0C, fb.Value<float>(anim, 2));       // fps
     image.Put<uint8_t>(object + 0x10, Enum(fb.Value<uint32_t>(anim, 3), 3));
     image.Put<uint8_t>(object + 0x18, modeFlag); image.Put<float>(object + 0x1C, modeRate);
-    image.EmptyHash(object + 0x20, module + EmptyBucketRva); image.EmptyHash(object + 0x50, module + EmptyBucketRva);
+    image.EmptyHash(object + 0x20, engine.emptyBucket); image.EmptyHash(object + 0x50, engine.emptyBucket);
     const auto samples = image.Remote(source) + sampleBase;
     image.Put<uint64_t>(object + 0xB0, samples);
     for (unsigned field = 6; field <= 9; ++field) image.Put<uint64_t>(object + 0xB8 + (field - 6) * 8, fb.Value<uint32_t>(anim, field));
@@ -248,19 +259,19 @@ size_t BuildCompiledInto(Image& image, std::span<const Byte> panm, gameAddr modu
 }
 }
 
-CompiledAnimation BuildCompiledAnimation(std::span<const Byte> panm, gameAddr base, gameAddr module) {
+CompiledAnimation BuildCompiledAnimation(std::span<const Byte> panm, gameAddr base, const EngineAddresses& engine) {
     Image image{{}, base};
-    const auto object = BuildCompiledInto(image, panm, module);
+    const auto object = BuildCompiledInto(image, panm, engine);
     return {std::move(image.bytes), image.Remote(object)};
 }
 
-RegisteredAnimation BuildRegisteredAnimation(std::span<const Byte> panm, gameAddr base, gameAddr module, uint32_t id) {
+RegisteredAnimation BuildRegisteredAnimation(std::span<const Byte> panm, gameAddr base, const EngineAddresses& engine, uint32_t id) {
     Image image{{}, base};
-    const auto object = BuildCompiledInto(image, panm, module);
+    const auto object = BuildCompiledInto(image, panm, engine);
     // Shared-pointer control block that never reaches zero: readers take weak/strong references through it, and
     // its vtable (only reached at zero) points at a side-effect-free game function. Nothing here is ever freed.
     const auto vtable = image.Alloc(0x30, 8);
-    for (size_t slot = 0; slot < 6; ++slot) image.Put<uint64_t>(vtable + slot * 8, module + NoOpRva);
+    for (size_t slot = 0; slot < 6; ++slot) image.Put<uint64_t>(vtable + slot * 8, engine.noOp);
     const auto ctrl = image.Alloc(0x20, 8);
     image.Put<uint64_t>(ctrl, image.Remote(vtable)); image.Put<uint32_t>(ctrl + 8, 0x40000000); image.Put<uint32_t>(ctrl + 0x0C, 0x40000000);
     image.Put<uint64_t>(ctrl + 0x10, image.Remote(object));
@@ -269,12 +280,12 @@ RegisteredAnimation BuildRegisteredAnimation(std::span<const Byte> panm, gameAdd
     image.Put<uint32_t>(request + 0x30, 2);
     // AnimResource with the game's own vtable; only its IsDone slot is ever called (it is in no manager or list).
     const auto resource = image.Alloc(0x1A8, 16);
-    image.Put<uint64_t>(resource, module + AnimResourceVtableRva); image.Put<uint64_t>(resource + 0x08, id);
+    image.Put<uint64_t>(resource, engine.animResourceVtable); image.Put<uint64_t>(resource + 0x08, id);
     image.Put<uint32_t>(resource + 0x10, 3); image.Put<uint64_t>(resource + 0x140, image.Remote(request));
     image.Put<uint64_t>(resource + 0x190, image.Remote(object)); image.Put<uint64_t>(resource + 0x198, image.Remote(ctrl));
     image.Put<uint64_t>(resource + 0x1A0, image.Remote(0)); // the PANM copy, for byte checks and exports
     const auto ref = image.Alloc(0x20, 8);
-    image.Put<uint64_t>(ref, module + ResourceRefVtableRva); image.Put<uint64_t>(ref + 8, image.Remote(resource));
+    image.Put<uint64_t>(ref, engine.resourceRefVtable); image.Put<uint64_t>(ref + 8, image.Remote(resource));
     image.Put<uint64_t>(ref + 0x18, id);
     const auto node = image.Alloc(0x20, 8); // next/prev are written by PublishAnimations
     image.Put<uint32_t>(node + 0x10, id); image.Put<uint64_t>(node + 0x18, image.Remote(ref));
@@ -282,7 +293,7 @@ RegisteredAnimation BuildRegisteredAnimation(std::span<const Byte> panm, gameAdd
 }
 
 AnimationId ChooseAnimationId(const GameProcess& process, gameAddr container, uint32_t domain, std::span<const Byte> panm,
-    gameAddr module, const std::set<uint32_t>& taken) {
+    const EngineAddresses& engine, const std::set<uint32_t>& taken) {
     namespace RT = RetailT8Runtime;
     uint32_t hash = 0x811c9dc5;
     for (auto byte : panm) { hash ^= byte; hash *= 0x01000193; }
@@ -298,7 +309,7 @@ AnimationId ChooseAnimationId(const GameProcess& process, gameAddr container, ui
         try {
             const auto entry = RT::Read<uint64_t>(process, node + 0x18);
             const auto resource = entry ? RT::Read<uint64_t>(process, entry + 8) : 0;
-            if (!resource || RT::Read<uint64_t>(process, resource) != module + AnimResourceVtableRva ||
+            if (!resource || RT::Read<uint64_t>(process, resource) != engine.animResourceVtable ||
                 !RT::Read<uint64_t>(process, resource + 0x190)) continue;
             const auto copy = RT::Read<uint64_t>(process, resource + 0x1A0);
             bool same = copy != 0;
@@ -353,7 +364,8 @@ size_t PublishAnimations(GameProcess& process, gameAddr map, std::span<const Pub
     return entries.size();
 }
 
-gameAddr AttachCustomAnimation(GameProcess& source, gameAddr resource, std::span<const Byte> panm, gameAddr owner) {
+gameAddr AttachCustomAnimation(GameProcess& source, const EngineAddresses& engine, gameAddr resource, std::span<const Byte> panm,
+    gameAddr owner) {
     if (!resource) throw std::invalid_argument("Missing carrier resource");
     // Everything goes through `source`: inside the import's WriteBatch the upload is a batch allocation (released if
     // the import fails or rolls back) and the +0x190 store is staged with the moveset, guarded and published at Commit.
@@ -363,16 +375,15 @@ gameAddr AttachCustomAnimation(GameProcess& source, gameAddr resource, std::span
     // Route 1b: build the compiled animation locally instead of running the engine decoder. Only for the profiled
     // build: the carrier must hold a compiled animation with the expected vtable, and the empty-bucket sentinel
     // must look like EASTL's.
-    const auto module = source.mainModule.address;
     uint64_t vtable = 0, sentinel[2]{};
-    if (!module || !current || !process.readBytes(current, &vtable, sizeof(vtable)) || vtable != module + CompiledVtableRva ||
-        !process.readBytes(module + EmptyBucketRva, sentinel, sizeof(sentinel)) || sentinel[0] != 0 || sentinel[1] != UINT64_MAX)
+    if (!engine.compiledVtable || !current || !process.readBytes(current, &vtable, sizeof(vtable)) || vtable != engine.compiledVtable ||
+        !process.readBytes(engine.emptyBucket, sentinel, sizeof(sentinel)) || sentinel[0] != 0 || sentinel[1] != UINT64_MAX)
         throw std::runtime_error("Carrier is not a compiled animation of the supported retail build");
-    const auto size = BuildCompiledAnimation(panm, 0, module).image.size(); // layout size does not depend on the address
+    const auto size = BuildCompiledAnimation(panm, 0, engine).image.size(); // layout size does not depend on the address
     const auto region = process.allocateMem(size);
     if (!region) throw std::runtime_error("Cannot allocate converted animation");
     // Never freed once committed: players keep pointers into it after binding (the engine's own compile leaked the same way).
-    const auto built = BuildCompiledAnimation(panm, region, module);
+    const auto built = BuildCompiledAnimation(panm, region, engine);
     if (built.image.size() != size || !process.writeBytes(region, built.image.data(), built.image.size()))
         throw std::runtime_error("Cannot upload converted animation");
     const auto compiled = built.object;

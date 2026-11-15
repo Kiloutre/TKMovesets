@@ -9,12 +9,23 @@
 #include "AnimExtractors/AnimExtractor_t8.hpp"
 #include "FileIO.hpp"
 #include "Extractor_t8/RetailRuntime.hpp"
+#include "helpers.hpp"
 #include <charconv>
 #include <format>
+#include <optional>
 
 namespace {
 template<class T>T At(std::span<const Byte> bytes,size_t offset){T v{};if(offset+sizeof(v)>bytes.size())throw std::out_of_range("Truncated move");memcpy(&v,bytes.data()+offset,sizeof(v));return v;}
 uint32_t Crc(std::span<const Byte> bytes){return Helpers::CalculateCrc32(bytes.data(),bytes.size());}
+// Move id typed in the move search box (decimal, or hex with 0x); nullopt for text, which filters the list by name.
+std::optional<uint32_t> TypedMoveId(std::string_view text){
+    int base=10;if(text.starts_with("0x")||text.starts_with("0X")){text.remove_prefix(2);base=16;}
+    uint32_t id=0;auto value=std::from_chars(text.data(),text.data()+text.size(),id,base);
+    if(text.empty() || value.ec!=std::errc{} || value.ptr!=text.data()+text.size())return std::nullopt;
+    return id;
+}
+// Text of the move search box when it filters the list by name (not empty, not a move id).
+std::string_view MoveNameQuery(const char* box){std::string_view text=box;return text.empty() || TypedMoveId(text) ? std::string_view{} : text;}
 }
 void EditorVisualsT8Retail::RebuildBrowser() {
     if(m_indexTable!=m_table || m_indexRevision!=m_editRevision) {
@@ -37,16 +48,18 @@ void EditorVisualsT8Retail::RebuildBrowser() {
             if(move.name.ends_with("_y"))move.flags|=EditorMoveFlags_Throw;
             else if(move.name.ends_with("_n"))move.flags|=EditorMoveFlags_ThrowReaction;
             if(move.name.starts_with(MOVESET_CUSTOM_MOVE_NAME_PREFIX) || (row>=m_originalMoveCrc.size() || m_editor->MoveFingerprint(row)!=m_originalMoveCrc[row]))move.flags|=EditorMoveFlags_Custom;
+            move.tornado=m_editor->MoveUsesTornado(row);
             move.colour=TEditorUtils::GetMoveColorFromFlag(move.flags);m_moveRows.push_back(std::move(move));
         }
         m_indexTable=m_table;m_indexRevision=m_editRevision;m_filterDirty=true;
     }
     if(!m_filterDirty)return;
-    m_filtered.clear();const auto query=NormalizeSearch(m_search);
+    m_filtered.clear();const auto query=NormalizeSearch(m_search);const auto nameQuery=MoveNameQuery(m_moveId);
     uint32_t idle=0;try{idle=m_editor->ResolveMove(0x8001);}catch(const std::exception&){}
     for(uint32_t row=0;row<m_editor->Count(m_table);++row) {
         if(!query.empty() && m_searchIndex[row].find(query)==std::string::npos)continue;
         if(m_table==12) {
+            if(!nameQuery.empty() && !Helpers::name_matches_search(m_moveRows[row].name,nameQuery))continue;
             const auto flags=m_moveRows[row].flags;
             if(m_moveFilter==1 && !(flags&(EditorMoveFlags_Attack|EditorMoveFlags_OtherAttack)))continue;
             if(m_moveFilter==2 && !(flags&EditorMoveFlags_Generic))continue;
@@ -90,9 +103,12 @@ void EditorVisualsT8Retail::RenderBrowser() {
             if(m_table==12 && m_moveRows[row].colour)ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0,m_moveRows[row].colour);
             ImGui::TableNextColumn();ImGui::Text("%u",row);ImGui::TableNextColumn();
             auto label=m_table==12?m_moveRows[row].name:RecordLabel(m_table,row);
+            const ImVec2 nameCell=ImGui::GetCursorScreenPos();const float nameWidth=ImGui::GetContentRegionAvail().x;
             if(ImGui::Selectable(label.c_str(),m_table==12 && m_selectedMove==row,ImGuiSelectableFlags_SpanAllColumns)) {
-                try {if(m_table==12){m_selectedMove=row;snprintf(m_moveId,sizeof(m_moveId),"%u",row);}OpenRecord(m_table,row);}catch(const std::exception& e){m_previewMessage=e.what();}
+                // A name search stays in the box (and keeps filtering) when a listed move is clicked.
+                try {if(m_table==12){m_selectedMove=row;m_browserKeepFocus=3;}OpenRecord(m_table,row);}catch(const std::exception& e){m_previewMessage=e.what();}
             }
+            if(m_table==12 && m_moveRows[row].tornado){const float size=ImGui::GetTextLineHeight();ImGuiExtra::ScrewIcon(ImVec2(nameCell.x+nameWidth-size-2,nameCell.y),size,_("edition.move_tornado"));}
             if(ImGui::BeginPopupContextItem("Record actions")) {
                 if(ImGui::MenuItem(_("edition.t8.open")))OpenRecord(m_table,row);
                 if(ImGui::MenuItem(_("edition.t8.find_references")))FindReferences(m_table,row);
@@ -105,22 +121,40 @@ void EditorVisualsT8Retail::RenderBrowser() {
             }
             ImGui::PopID();
         }
+        // Up / down arrows while the move list has the focus: open the previous / next listed move, unless the open
+        // move has edits not applied yet. The list keeps the focus after opening a move (by key or click).
+        if(m_table==12) {
+            if(m_browserKeepFocus>0){--m_browserKeepFocus;ImGui::SetWindowFocus();}
+            const int delta=ImGui::IsKeyPressed(ImGuiKey_DownArrow)?1:ImGui::IsKeyPressed(ImGuiKey_UpArrow)?-1:0;
+            if(delta && ImGui::IsWindowFocused() && !ImGui::GetIO().WantTextInput && !m_filtered.empty()
+               && !(m_selectedMove>=0 && FormHasUnsavedChanges(EditorT8Retail::Type(12),uint32_t(m_selectedMove)))) {
+                const auto current=std::find(m_filtered.begin(),m_filtered.end(),uint32_t(m_selectedMove>=0?m_selectedMove:0));
+                const int last=int(m_filtered.size())-1;
+                const int index=current==m_filtered.end()||m_selectedMove<0?(delta>0?0:last):std::clamp(int(current-m_filtered.begin())+delta,0,last);
+                const uint32_t row=m_filtered[index];
+                if(int64_t(row)!=m_selectedMove) {
+                    try{OpenRecord(12,row);m_scrollMove=row;m_browserKeepFocus=3;}catch(const std::exception& e){m_previewMessage=e.what();}
+                }
+            }
+        }
         ImGui::EndTable();
     }
     if(m_table==12) {
         auto half=(ImGui::GetContentRegionAvail().x-ImGui::GetStyle().ItemSpacing.x)/2;
         ImGui::SetNextItemWidth(half);
         if(m_focusSearch){ImGui::SetKeyboardFocusHere();m_focusSearch=false;}
-        if(ImGui::InputTextWithHint("##moveId",_("edition.move_id_hint"),m_moveId,sizeof(m_moveId),ImGuiInputTextFlags_EnterReturnsTrue)) {
+        // Text filters the list by name as it is typed (RebuildBrowser); Enter opens a typed id or the first listed match.
+        const bool entered=ImGui::InputTextWithHint("##moveId",_("edition.move_id_hint"),m_moveId,sizeof(m_moveId),ImGuiInputTextFlags_EnterReturnsTrue);
+        if(ImGui::IsItemEdited())m_filterDirty=true;
+        if(entered) {
             try {
-                std::string_view text=m_moveId;int base=10;if(text.starts_with("0x")||text.starts_with("0X")){text.remove_prefix(2);base=16;}
-                uint32_t id=0;auto value=std::from_chars(text.data(),text.data()+text.size(),id,base);
-                if(value.ec!=std::errc{} || value.ptr!=text.data()+text.size()){
-                    const auto query=NormalizeSearch(m_moveId);auto found=std::find_if(m_moveRows.begin(),m_moveRows.end(),[&](const auto& row){return NormalizeSearch(row.name).find(query)!=std::string::npos;});
-                    if(query.empty() || found==m_moveRows.end())throw std::invalid_argument(_("edition.t8.no_matching_move"));
-                    id=static_cast<uint32_t>(found-m_moveRows.begin());
+                auto id=TypedMoveId(m_moveId);
+                if(!id){
+                    RebuildBrowser();
+                    if(MoveNameQuery(m_moveId).empty() || m_filtered.empty())throw std::invalid_argument(_("edition.t8.no_matching_move"));
+                    id=m_filtered.front();
                 }
-                SelectMove(id);m_previewMessage.clear();
+                SelectMove(*id);m_previewMessage.clear();
             }catch(const std::exception& e){m_previewMessage=e.what();}
         }
         ImGui::SameLine();if(ImGui::Button(_("edition.move_current"),ImVec2(half,0)))CurrentMove(m_previewPlayer);

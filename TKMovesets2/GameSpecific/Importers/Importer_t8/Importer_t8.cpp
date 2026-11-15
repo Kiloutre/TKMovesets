@@ -171,6 +171,10 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
                     targetMap = targetMapSlot ? RT::Read<uint64_t>(m_process, targetMapSlot) : 0;
                     // Every animation comes from the file or the game's archive (checked per move before any write).
                     m_memoryOnly = targetMap && RT::Read<uint8_t>(m_process, targetMap + 0x48) == 1;
+                    // The entries point at game objects listed in game_addresses.ini; without them this route is off.
+                    if (m_memoryOnly) try { Engine(); } catch (const std::exception& error) {
+                        DEBUG_ERR("Retail T8 import: memory-only route unavailable: %s", error.what()); m_memoryOnly = false;
+                    }
                     // Every external cancel list the move table points at must have been captured.
                     if (m_memoryOnly && m_native) {
                         const auto& cancels = entries[6];
@@ -367,7 +371,7 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
         phase("prepare");
         if (m_memoryOnly) {
             namespace RS = RetailT8Resources;
-            const auto module = m_process.mainModule.address;
+            const auto engine = Engine();
             if (!m_process.ExpectBytes(targetMapSlot, &targetMap, sizeof(targetMap)))
                 throw std::runtime_error("Cannot guard the target animation map");
             std::set<uint32_t> taken;
@@ -395,7 +399,7 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
                         at += length;
                     }
                     // ...and only if the game would use that copy (its resolver skips a shared entry that is not ready).
-                    same = same && RetailT8Import::ReadyAnimation(m_process, animContainer, m_memoryOnlyDomain, instance) != 0;
+                    same = same && RetailT8Import::ReadyAnimation(m_process, animContainer, m_memoryOnlyDomain, instance, engine.compiledVtable) != 0;
                     if (same) {
                         memoryOnlyHandles[instance] = 0xef00000000000000ULL | (uint64_t(m_memoryOnlyDomain & 0xff) << 40) | instance;
                         ++m_nativeBoundAnimations;
@@ -407,7 +411,7 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
                 uint32_t id = 0;
                 for (const auto& [bytes, existing] : same) if (std::equal(bytes.begin(), bytes.end(), panm.begin())) id = existing;
                 if (!id) {
-                    const auto chosen = RS::ChooseAnimationId(m_process, animContainer, m_memoryOnlyDomain, panm, module, taken);
+                    const auto chosen = RS::ChooseAnimationId(m_process, animContainer, m_memoryOnlyDomain, panm, engine, taken);
                     id = chosen.id; taken.insert(id); same.push_back({panm, id});
                     if (chosen.registered) ++m_reusedAnimations;
                     else uploads.push_back({id, panm});
@@ -419,13 +423,13 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
             std::vector<uint64_t> offsets; uint64_t total = 0;
             for (const auto& [id, panm] : uploads) {
                 offsets.push_back(total);
-                total = (total + RS::BuildRegisteredAnimation(panm, 0, module, id).image.size() + 15) & ~uint64_t(15);
+                total = (total + RS::BuildRegisteredAnimation(panm, 0, engine, id).image.size() + 15) & ~uint64_t(15);
             }
             if (total) {
                 const auto region = m_process.allocateMem(total);
                 if (!region) return ImportationErrcode_GameAllocationErr;
                 for (size_t i = 0; i < uploads.size(); ++i) {
-                    const auto entry = RS::BuildRegisteredAnimation(uploads[i].second, region + offsets[i], module, uploads[i].first);
+                    const auto entry = RS::BuildRegisteredAnimation(uploads[i].second, region + offsets[i], engine, uploads[i].first);
                     if (offsets[i] + entry.image.size() > total || !m_process.writeBytes(region + offsets[i], entry.image.data(), entry.image.size()))
                         return ImportationErrcode_GameWriteError;
                     publish.push_back({uploads[i].first, entry.node});
@@ -443,7 +447,7 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
                 // No carrier for it in the game: its moves play the idle animation (FallBackMissingCarriers below).
                 if (!resource) { m_missingCarriers.insert(asset.instance); ++m_customAnimationsMissing; continue; }
                 // Upload and +0x190 store go through m_process: staged in this import's batch, undone if it fails.
-                RetailT8Resources::AttachCustomAnimation(m_process, resource, payload.subspan(asset.offset, asset.size), player);
+                RetailT8Resources::AttachCustomAnimation(m_process, Engine(), resource, payload.subspan(asset.offset, asset.size), player);
                 attachedCarriers.push_back(resource);
             }
             ++m_customAnimations;

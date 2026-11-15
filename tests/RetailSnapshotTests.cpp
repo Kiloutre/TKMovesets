@@ -42,6 +42,12 @@ GameInfo RetailInfo() {
     return info;
 }
 void Check(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
+// The game objects our animation entries point at, read from the shipped game_addresses.ini (t8-retail).
+RetailT8Resources::EngineAddresses ShippedEngine(uint64_t module) {
+    GameAddressesFile file; file.Reload();
+    GameAddressesWrapper game; game.addrFile=&file; game.gameKey="t8-retail"; game.minorGameKey="t8-retail";
+    return RetailT8Resources::ReadEngineAddresses(game,module);
+}
 // The Memory fixture's player layout (matches t8-retail_motbin_offset / chara_id_offset).
 constexpr RetailT8Runtime::PlayerOffsets FixtureOffsets{0x3b50, 0x168};
 class Memory : public GameProcess {
@@ -182,11 +188,11 @@ void RunMemoryOnlyRegistrationTests() {
     Check(nativeBucket.lo==native && nativeBucket.hi==native && !nativeBucket.Empty(),"Bucket helper changed");
     RetailPanm::Animation animation{2,{{"Top",std::vector<RetailPanm::Sample>(2)},{"Hip",std::vector<RetailPanm::Sample>(1)}}};
     const auto panm=RetailPanm::Encode(animation);
-    const auto module=m.mainModule.address;
+    const auto engine=ShippedEngine(m.mainModule.address);
     // Unpopulated maps are refused; then mark it populated like the engine (map+0x48).
     {
-        auto base=m.Alloc(RS::BuildRegisteredAnimation(panm,0,module,1).image.size());
-        auto entry=RS::BuildRegisteredAnimation(panm,base,module,0x80000001);
+        auto base=m.Alloc(RS::BuildRegisteredAnimation(panm,0,engine,1).image.size());
+        auto entry=RS::BuildRegisteredAnimation(panm,base,engine,0x80000001);
         m.writeBytes(base,entry.image.data(),entry.image.size());
         bool refused=false;try{RS::PublishAnimations(m,map,std::vector<RS::PublishedAnimation>{{0x80000001,entry.node}});}catch(const std::exception&){refused=true;}
         Check(refused,"Published into an unpopulated map");
@@ -203,8 +209,8 @@ void RunMemoryOnlyRegistrationTests() {
     }
     std::vector<RS::PublishedAnimation> published;std::vector<RS::RegisteredAnimation> entries;
     for(auto id:ids){
-        auto size=RS::BuildRegisteredAnimation(panm,0,module,id).image.size();
-        auto base=m.Alloc(size);auto entry=RS::BuildRegisteredAnimation(panm,base,module,id);
+        auto size=RS::BuildRegisteredAnimation(panm,0,engine,id).image.size();
+        auto base=m.Alloc(size);auto entry=RS::BuildRegisteredAnimation(panm,base,engine,id);
         Check(entry.image.size()==size && m.writeBytes(base,entry.image.data(),entry.image.size()),"Entry upload failed");
         published.push_back({id,entry.node});entries.push_back(std::move(entry));
     }
@@ -217,10 +223,10 @@ void RunMemoryOnlyRegistrationTests() {
         std::vector<Byte> bytes(panm.size());m.readBytes(copy,bytes.data(),bytes.size());
         Check(bytes==panm,"Published entry does not expose its PANM");
         const auto resource=entries[i].resource;
-        Check(m.readUInt64(resource)==module+RS::AnimResourceVtableRva && m.readUInt64(resource+0x190)==entries[i].object &&
+        Check(m.readUInt64(resource)==engine.animResourceVtable && m.readUInt64(resource+0x190)==entries[i].object &&
             m.readUInt32(m.readUInt64(resource+0x140)+0x30)==2,"Registered resource fields changed");
         const auto ctrl=m.readUInt64(resource+0x198);
-        Check(m.readUInt32(ctrl+8)==0x40000000 && m.readUInt32(ctrl+0xc)==0x40000000 && m.readUInt64(m.readUInt64(ctrl)+8)==module+RS::NoOpRva,
+        Check(m.readUInt32(ctrl+8)==0x40000000 && m.readUInt32(ctrl+0xc)==0x40000000 && m.readUInt64(m.readUInt64(ctrl)+8)==engine.noOp,
             "Control block can reach zero or calls game code");
     }
     Check(RT::MapNode(m,map,0x12345678)==native,"Native entry lost after publication");
@@ -230,23 +236,23 @@ void RunMemoryOnlyRegistrationTests() {
     bool duplicate=false;try{RS::PublishAnimations(m,map,std::vector<RS::PublishedAnimation>{published[0]});}catch(const std::exception&){duplicate=true;}
     Check(duplicate,"Duplicate id accepted");
     // Content ids: a fresh id for new bytes, the earlier entry for identical bytes.
-    auto chosen=RS::ChooseAnimationId(m,m.container,28,panm,module);
+    auto chosen=RS::ChooseAnimationId(m,m.container,28,panm,engine);
     Check(chosen.id&0x80000000U,"Content id lost its marker bit");
-    const auto stored=RS::ChooseAnimationId(m,m.container,28,panm,module,{});
+    const auto stored=RS::ChooseAnimationId(m,m.container,28,panm,engine,{});
     Check(stored.id==chosen.id,"Content id is not deterministic");
     {
-        auto base=m.Alloc(RS::BuildRegisteredAnimation(panm,0,module,chosen.id).image.size());
-        auto entry=RS::BuildRegisteredAnimation(panm,base,module,chosen.id);
+        auto base=m.Alloc(RS::BuildRegisteredAnimation(panm,0,engine,chosen.id).image.size());
+        auto entry=RS::BuildRegisteredAnimation(panm,base,engine,chosen.id);
         m.writeBytes(base,entry.image.data(),entry.image.size());
         RS::PublishAnimations(m,map,std::vector<RS::PublishedAnimation>{{chosen.id,entry.node}});
     }
     if(!chosen.registered){
-        auto again=RS::ChooseAnimationId(m,m.container,28,panm,module);
+        auto again=RS::ChooseAnimationId(m,m.container,28,panm,engine);
         Check(again.registered && again.id==chosen.id,"Identical PANM was not reused");
         auto other=panm;other[other.size()-1]^=1;
-        auto different=RS::ChooseAnimationId(m,m.container,28,other,module,{again.id});
+        auto different=RS::ChooseAnimationId(m,m.container,28,other,engine,{again.id});
         Check(!different.registered && different.id!=again.id,"Different PANM reused an entry");
-        Check(RS::ChooseAnimationId(m,m.container,28,panm,module,{again.id}).id!=again.id,"Taken id was reused");
+        Check(RS::ChooseAnimationId(m,m.container,28,panm,engine,{again.id}).id!=again.id,"Taken id was reused");
     }
 }
 }
@@ -874,6 +880,7 @@ void RunRetailImportTests() {
             Check(resource && target.readBytes(RT::Panm(target,m.container,28,static_cast<uint32_t>(handle),0,panm.size()),copy.data(),copy.size()) && copy==panm,
                 "Registered animation does not resolve to the file's PANM");
             RetailT8Import::MemoryOnlyAudit expected{importer.MemoryOnlyContainer(),importer.MemoryOnlyDomain(),importer.MemoryOnlyStringRow(),importer.MemoryOnlyHandles()};
+            expected.compiledVtable=importer.Engine().compiledVtable;
             const auto audit=I::AuditImage(payload,target,importer.lastLoaded.address,importer.lastLoaded.size,m,Memory::Root,h.characterId,28,true,nullptr,nullptr,&expected);
             Check(audit.animations==1 && audit.bytes>0,"Memory-only import failed its image audit");
             std::vector<gameAddr> list;for(auto n=target.readUInt64(head);n!=head;n=target.readUInt64(n))list.push_back(n);
@@ -913,7 +920,7 @@ void RunRetailImportTests() {
         { // a finished native resource, as in the live game (check L1): compiled object, control block, done request
             const auto resource=RT::ResolveAnimation(m,m.container,28,0x12345678);
             const auto object=m.Alloc(0xf0),ctrl=m.Alloc(0x20),request=m.Alloc(0x40);
-            m.Put<uint64_t>(object,m.mainModule.address+RetailT8Resources::CompiledVtableRva);m.Put<uint32_t>(request+0x30,2);
+            m.Put<uint64_t>(object,ShippedEngine(m.mainModule.address).compiledVtable);m.Put<uint32_t>(request+0x30,2);
             m.Put<uint64_t>(resource+0x190,object);m.Put<uint64_t>(resource+0x198,ctrl);m.Put<uint64_t>(resource+0x140,request);
         }
         auto payload=R::CaptureComplete(m,Memory::Root,m.manager,m.container,28);
@@ -975,6 +982,7 @@ void RunRetailImportTests() {
                 target.readUInt64(list)==0x123,"External cancel list was not taken from the file");
             RetailT8Import::MemoryOnlyAudit expected{importer.MemoryOnlyContainer(),importer.MemoryOnlyDomain(),importer.MemoryOnlyStringRow(),
                 importer.MemoryOnlyHandles(),importer.MemoryOnlyNames(),importer.MemoryOnlyAnimations(),&importer.Native()->cancels};
+            expected.compiledVtable=importer.Engine().compiledVtable;
             const auto audit=I::AuditImage(payload,target,importer.lastLoaded.address,importer.lastLoaded.size,m,Memory::Root,28,28,false,nullptr,nullptr,&expected);
             Check(audit.animations==1 && audit.externalLists==1,"v4 native memory-only import failed its image audit");
         };

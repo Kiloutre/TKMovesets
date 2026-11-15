@@ -1,5 +1,7 @@
 #pragma once
 #include "EditorLogic.hpp"
+#include "AnimationPreview/PreviewDisplacement.hpp"
+#include "AnimationPreview/PreviewHitbox.hpp"
 #include "Extractor_t8/RetailSnapshot.hpp"
 #include <array>
 #include <filesystem>
@@ -59,6 +61,19 @@ public:
     std::vector<Byte> RewritePanm(std::span<const Byte> panm) const;
     std::optional<uint32_t> AnimationInstance(uint32_t row) const;
     std::vector<Byte> MoveAnimation(uint32_t row) const;
+    // The move's extra properties that the animation preview applies (AnimPreview::T8DisplacementKind), as saved.
+    // Properties with conditions (a requirement other than 0, which is always true) are counted in `conditional`, not
+    // returned.
+    std::vector<AnimPreview::Displacement> MoveDisplacements(uint32_t row, int* conditional = nullptr) const;
+    // The move's used hitbox slots (location != 0), as saved, for the animation preview.
+    std::vector<AnimPreview::HitboxSlot> MoveHitboxes(uint32_t row) const;
+    // Reaction moves (rows, aliases resolved) of the move's hit on the animation preview's opponent: the first hit
+    // condition whose requirements hold for an opponent airborne or not (only "opponent airborne / not airborne / in a
+    // juggle" are judged, other requirements count as unmet), down to the list's default entry. All -1 when the move
+    // has no hit condition.
+    AnimPreview::ReactionMoves MoveHitReactions(uint32_t row, bool opponentAirborne) const;
+    // The move's hit uses the tornado: one of its hit conditions requires 724 "Tornado Available".
+    bool MoveUsesTornado(uint32_t row) const;
     // A move already bound to these exact bytes (native or custom asset).
     std::optional<uint32_t> FindBoundAnimation(std::span<const Byte> panm) const;
     // Writes every distinct embedded body animation used by a move plus animations.json.

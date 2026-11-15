@@ -24,11 +24,13 @@ class EditorVisualsT8Retail final : public EditorVisuals {
     uint64_t m_indexRevision=UINT64_MAX, m_savedRevision=0;
     size_t m_indexTable=SIZE_MAX;
     std::vector<std::string> m_searchIndex;
-    struct MoveRow {std::string name,aliases;uint32_t flags=0;ImU32 colour=0;};
+    struct MoveRow {std::string name,aliases;uint32_t flags=0;ImU32 colour=0;bool tornado=false;};
     std::vector<MoveRow> m_moveRows;
     std::vector<uint32_t> m_originalMoveCrc;
     int m_moveFilter=0;
     int64_t m_selectedMove=-1,m_scrollMove=-1;
+    // Frames left during which the move list takes the focus back (after it opened a move, which focuses its form).
+    int m_browserKeepFocus=0;
     char m_moveId[32]{};
     // Row typed in the menu bar's "Go to" menu.
     int m_gotoId=0;

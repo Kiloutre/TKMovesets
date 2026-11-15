@@ -438,4 +438,30 @@ namespace Helpers
 		while (*str == ' ') ++str;
 		return *str == '\0';
 	}
+
+	bool name_matches_search(std::string_view name, std::string_view query)
+	{
+		auto lower = [](std::string_view text) {
+			std::string result(text);
+			for (auto& c : result) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+			return result;
+		};
+		const std::string q = lower(query), n = lower(name);
+		if (q.empty() || n.find(q) != std::string::npos) return true;
+		if (q.size() < 3) return false;
+		// Smallest edit distance between the query and any substring of the name (Sellers): the first row is all zeros,
+		// so the match may start anywhere in the name, and the minimum of the last row lets it end anywhere.
+		const size_t maxEdits = q.size() / 4;
+		if (maxEdits == 0) return false;
+		std::vector<size_t> previous(n.size() + 1, 0), current(n.size() + 1);
+		for (size_t i = 1; i <= q.size(); ++i) {
+			current[0] = i;
+			for (size_t j = 1; j <= n.size(); ++j) {
+				const size_t substitution = previous[j - 1] + (q[i - 1] == n[j - 1] ? 0 : 1);
+				current[j] = (std::min)({substitution, previous[j] + 1, current[j - 1] + 1});
+			}
+			std::swap(previous, current);
+		}
+		return *std::min_element(previous.begin(), previous.end()) <= maxEdits;
+	}
 }

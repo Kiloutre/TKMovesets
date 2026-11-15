@@ -119,8 +119,9 @@ std::vector<Byte> TerminatorCancel(std::span<const Byte> payload, std::span<cons
     Write(bare, 0, uint64_t(0x8000));
     return bare;
 }
-gameAddr ReadyAnimation(const GameProcess& process, gameAddr container, uint32_t domain, uint32_t id) {
+gameAddr ReadyAnimation(const GameProcess& process, gameAddr container, uint32_t domain, uint32_t id, gameAddr compiledVtable) {
     namespace RT = RetailT8Runtime;
+    if (!compiledVtable) throw std::invalid_argument("Missing the compiled animation vtable");
     for (const uint32_t key : {uint32_t(0x81), domain}) {
         try {
             const auto map = RT::DomainMap(process, container, key);
@@ -130,7 +131,7 @@ gameAddr ReadyAnimation(const GameProcess& process, gameAddr container, uint32_t
             if (!resource) continue;
             const auto compiled = RT::Read<uint64_t>(process, resource + 0x190), request = RT::Read<uint64_t>(process, resource + 0x140);
             if (compiled && RT::Read<uint64_t>(process, resource + 0x198) && request && RT::Read<uint32_t>(process, request + 0x30) == 2 &&
-                RT::Read<uint64_t>(process, compiled) == process.mainModule.address + RetailT8Resources::CompiledVtableRva) return resource;
+                RT::Read<uint64_t>(process, compiled) == compiledVtable) return resource;
         } catch (const std::exception&) {}
     }
     return 0;
@@ -491,7 +492,7 @@ Audit AuditImage(std::span<const Byte> payload, const GameProcess& image, gameAd
                     // Each body handle must resolve, for the game's readers, to a finished resource with its animation. The
                     // game's resolver (0x145A9ADD0, docs: retail-anim-lookup) takes the shared domain 0x81 only when its
                     // entry is ready, else the character's domain: a declared but unloaded shared entry falls through.
-                    const bool resolved = ReadyAnimation(image, memoryOnly->container, memoryOnly->domain, static_cast<uint32_t>(handle)) != 0;
+                    const bool resolved = ReadyAnimation(image, memoryOnly->container, memoryOnly->domain, static_cast<uint32_t>(handle), memoryOnly->compiledVtable) != 0;
                     if (!resolved && memoryOnly->dataless && memoryOnly->dataless->count(static_cast<uint32_t>(handle))) continue;
                     if (!resolved)
                         throw std::runtime_error("Memory-only animation does not resolve to a finished resource (move " + std::to_string(row) + ", handle " + std::format("{:016X}", handle) + ")");

@@ -441,3 +441,161 @@ const std::vector<EditorT8Retail::Field>& EditorT8Retail::Schema(size_t table) {
     static const auto schemas=[] { std::array<std::vector<Field>,20> result; for(size_t i=0;i<result.size();++i) result[i]=BuildSchema(i); return result; }();
     return schemas[table];
 }
+
+std::vector<AnimPreview::Displacement> EditorT8Retail::MoveDisplacements(uint32_t row, int* conditional) const
+{
+    std::vector<AnimPreview::Displacement> result;
+    if (conditional) *conditional = 0;
+    auto field = [](size_t table, std::string_view name) -> const Field* {
+        for (const auto& f : Schema(table)) if (f.name == name) return &f;
+        return nullptr;
+    };
+    auto u32 = [](std::span<const Byte> record, uint32_t offset) {
+        uint32_t value = 0;
+        if (offset + 4 <= record.size()) memcpy(&value, record.data() + offset, 4);
+        return value;
+    };
+    const Field* properties = field(12, "properties");
+    const Field *frame = field(9, "frame"), *requirements = field(9, "requirements"), *id = field(9, "property"), *condition = field(1, "condition");
+    if (!properties || !frame || !requirements || !id || !condition || row >= Count(12)) return result;
+    const auto first = ReferenceIndex(12, row, *properties);
+    if (!first) return result;
+    // Parameter 1 follows the property id (params[0]).
+    const uint32_t parameter = id->offset + 4;
+    for (uint64_t at = *first; at < Count(9); ++at) {
+        const auto record = Record(9, uint32_t(at));
+        const uint32_t property = u32(record, id->offset);
+        if (property == 0) break;
+        const auto kind = AnimPreview::T8DisplacementKind(property);
+        if (!kind) continue;
+        // Unconditional: no requirement list, or one with only condition 0 (always true) before its terminator 1100.
+        bool always = true;
+        if (const auto list = ReferenceIndex(9, uint32_t(at), *requirements))
+            for (uint64_t q = *list; q < Count(1); ++q) {
+                const uint32_t c = u32(Record(1, uint32_t(q)), condition->offset);
+                if (c == 1100) break;
+                if (c != 0) { always = false; break; }
+            }
+        if (!always) { if (conditional) ++*conditional; continue; }
+        result.push_back({AnimPreview::DisplacementFrame(u32(record, frame->offset)), *kind,
+            AnimPreview::DisplacementValue(*kind, u32(record, parameter), true), property});
+    }
+    return result;
+}
+
+bool EditorT8Retail::MoveUsesTornado(uint32_t row) const
+{
+    auto field = [](size_t table, std::string_view name) -> const Field* {
+        for (const auto& f : Schema(table)) if (f.name == name) return &f;
+        return nullptr;
+    };
+    const Field *hitConditions = field(12, "hit_conditions"), *requirements = field(2, "requirements"), *condition = field(1, "condition");
+    if (!hitConditions || !requirements || !condition || row >= Count(12)) return false;
+    const auto first = ReferenceIndex(12, row, *hitConditions);
+    if (!first) return false;
+    for (uint32_t at = *first; at < Count(2) && at < *first + 64; ++at) {
+        bool isDefault = true;
+        if (const auto list = ReferenceIndex(2, at, *requirements))
+            for (uint32_t q = *list; q < Count(1) && q < *list + 64; ++q) {
+                uint32_t c = 0;
+                const auto record = Record(1, q);
+                if (condition->offset + 4 <= record.size()) memcpy(&c, record.data() + condition->offset, 4);
+                if (c == 1100) break;
+                if (c != 0) isDefault = false;
+                if (c == 724) return true;
+            }
+        if (isDefault) break; // the list's default entry ends it
+    }
+    return false;
+}
+
+AnimPreview::ReactionMoves EditorT8Retail::MoveHitReactions(uint32_t row, bool opponentAirborne) const
+{
+    AnimPreview::ReactionMoves result;
+    auto field = [](size_t table, std::string_view name) -> const Field* {
+        for (const auto& f : Schema(table)) if (f.name == name) return &f;
+        return nullptr;
+    };
+    auto read = [](std::span<const Byte> record, uint32_t offset, auto value) {
+        if (offset + sizeof(value) <= record.size()) memcpy(&value, record.data() + offset, sizeof(value));
+        return value;
+    };
+    const Field *hitConditions = field(12, "hit_conditions"), *requirements = field(2, "requirements"), *reactions = field(2, "reactions");
+    const Field* condition = field(1, "condition");
+    if (!hitConditions || !requirements || !reactions || !condition || row >= Count(12)) return result;
+    const auto first = ReferenceIndex(12, row, *hitConditions);
+    if (!first || *first >= Count(2)) return result;
+    // Requirements judged for the preview's opponent: 0 (always), 716 opponent airborne, 717 not airborne, 723 in a
+    // juggle. Any other requirement counts as unmet. The game takes the first entry whose requirements all hold.
+    auto met = [&](uint32_t c) { return c == 0 || ((c == 716 || c == 723) && opponentAirborne) || (c == 717 && !opponentAirborne); };
+    uint32_t chosen = *first;
+    for (uint32_t at = *first; at < Count(2) && at < *first + 64; ++at) {
+        bool all = true, isDefault = true;
+        if (const auto list = ReferenceIndex(2, at, *requirements))
+            for (uint32_t q = *list; q < Count(1); ++q) {
+                const uint32_t c = read(Record(1, q), condition->offset, uint32_t(0));
+                if (c == 1100) break;
+                if (c != 0) isDefault = false;
+                if (!met(c)) { all = false; break; }
+            }
+        if (all) { chosen = at; break; }
+        if (isDefault) break;
+    }
+    if (const Field* damage = field(2, "damage")) result.damage = int(read(Record(2, chosen), damage->offset, uint32_t(0)));
+    const auto reaction = ReferenceIndex(2, chosen, *reactions);
+    if (!reaction || *reaction >= Count(0)) return result;
+    const auto record = Record(0, *reaction);
+    auto move = [&](std::string_view name) -> int32_t {
+        const Field* f = field(0, name);
+        if (!f) return -1;
+        try { return int32_t(ResolveMove(read(record, f->offset, uint16_t(0)))); }
+        catch (const std::exception&) { return -1; }
+    };
+    result.standing = move("standing_moveid");
+    result.counterhit = move("counterhit_moveid");
+    result.leftSide = move("left_side_moveid");
+    result.rightSide = move("right_side_moveid");
+    result.backturned = move("backturned_moveid");
+    auto pushback = [&](std::string_view name) {
+        AnimPreview::Pushback out;
+        const Field* f = field(0, name);
+        const Field *duration = field(4, "duration"), *displacement = field(4, "displacement"), *count = field(4, "extra_count"), *extra = field(4, "extra"), *value = field(5, "value");
+        if (!f || !duration || !displacement || !count || !extra || !value) return out;
+        const auto index = ReferenceIndex(0, *reaction, *f);
+        if (!index || *index >= Count(4)) return out;
+        const auto p = Record(4, *index);
+        out.duration = read(p, duration->offset, uint16_t(0));
+        out.displacement = read(p, displacement->offset, uint16_t(0));
+        const uint32_t n = read(p, count->offset, uint32_t(0));
+        if (const auto first = ReferenceIndex(4, *index, *extra))
+            for (uint32_t i = 0; i < n && i < 256 && *first + i < Count(5); ++i) out.offsets.push_back(read(Record(5, *first + i), value->offset, uint16_t(0)));
+        return out;
+    };
+    result.frontPushback = pushback("front_pushback");
+    result.counterhitPushback = pushback("front_counterhit_pushback");
+    result.leftPushback = pushback("left_side_pushback");
+    result.rightPushback = pushback("right_side_pushback");
+    result.backPushback = pushback("backturned_pushback");
+    return result;
+}
+
+std::vector<AnimPreview::HitboxSlot> EditorT8Retail::MoveHitboxes(uint32_t row) const
+{
+    std::vector<AnimPreview::HitboxSlot> slots;
+    if (row >= Count(12)) return slots;
+    const auto record = Record(12, row);
+    auto read = [&](const std::string& name, auto& out) {
+        for (const auto& f : Schema(12)) if (f.name == name) {
+            if (f.offset + sizeof(out) <= record.size()) memcpy(&out, record.data() + f.offset, sizeof(out));
+            return;
+        }
+    };
+    for (int i = 0; i < 8; ++i) {
+        const auto prefix = "hitbox_" + std::to_string(i) + "_";
+        uint32_t start = 0, last = 0, location = 0; float radius = 0, height = 0;
+        read(prefix + "start", start); read(prefix + "last", last); read(prefix + "location", location);
+        read(prefix + "radius", radius); read(prefix + "vertical_height", height);
+        if (location) slots.push_back({int(start), int(last), location, radius, height});
+    }
+    return slots;
+}

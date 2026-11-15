@@ -192,6 +192,8 @@ struct DisplayableMove
 	uint16_t aliasId;
 	// Store useful flags for quick filtering / coloring
 	EditorMoveFlags flags;
+	// The move's hit uses the screw (tornado): a hit condition requires "screw available". Shown as an icon.
+	bool screw = false;
 };
 
 struct DeleteEditorInput {

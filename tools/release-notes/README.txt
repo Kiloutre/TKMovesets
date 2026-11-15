@@ -1,4 +1,4 @@
-TKMovesets2 1.0
+TKMovesets2 1.1
 ===============
 
 Moveset export, import and editing tool for Tekken, now with retail Tekken 8

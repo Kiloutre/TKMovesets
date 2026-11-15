@@ -14,6 +14,7 @@
 #include "imgui_extras.hpp"
 #include <imgui_internal.h>
 #include "FileIO.hpp"
+#include "AnimationPreview.hpp"
 #include <optional>
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -231,6 +232,49 @@ class RetailRecordForm final : public EditorForm {
     std::vector<Byte> m_pendingPanm;
     std::string m_pendingName;
     std::string m_pendingNote;
+    // 3D preview of the move's animation (moves table only): the pending PANM once one is picked, else the applied one.
+    AnimationPreview m_preview;
+    AnimationPreview::Input PreviewInput() {
+        auto number=[&](const std::string& name)->int64_t{
+            auto found=m_fieldIdentifierMap.find(name);
+            if(found==m_fieldIdentifierMap.end() || found->second->errored)return 0;
+            return strtoll(found->second->buffer,nullptr,0);
+        };
+        AnimationPreview::Input input;
+        uint64_t token=0;
+        if(structureId<m_retail->Count(12)){auto record=m_retail->Record(12,structureId);uint64_t value=0,key=0;memcpy(&value,record.data()+0x20,8);memcpy(&key,record.data()+0x28,8);token=value*0x9E3779B97F4A7C15ULL^key;}
+        if(!m_pendingPanm.empty())token^=(uint64_t(uintptr_t(m_pendingPanm.data()))<<1)^(uint64_t(m_pendingPanm.size())<<40)^1;
+        input.token=token|1;
+        input.load=[this]{return m_pendingPanm.empty()?m_retail->MoveAnimation(structureId):m_pendingPanm;};
+        // Overall active window, then the hitbox slots (each its own range; most lie inside the window).
+        const auto first=number("active_start"),last=number("active_end");
+        if(first>0 && last>=first)input.active.emplace_back(int(first),int(last));
+        for(int i=0;i<8;++i){const auto a=number("hitbox_"+std::to_string(i)+"_start"),b=number("hitbox_"+std::to_string(i)+"_last");if(a>0 && b>=a && !(a>=first && b<=last))input.active.emplace_back(int(a),int(b));}
+        if(structureId<m_retail->Count(12))input.displacements=m_retail->MoveDisplacements(structureId,&input.conditional);
+        // Opponent mannequin: the reactions of the move's likely hit, and any move's animation (idle, reactions, pose).
+        if(structureId<m_retail->Count(12)){input.opponent.reactions=m_retail->MoveHitReactions(structureId,false);input.opponent.airReactions=m_retail->MoveHitReactions(structureId,true);}
+        input.opponent.move=[retail=m_retail](int id)->AnimationPreview::Input::Animation{
+            if(id<0)return {};
+            uint32_t row=0;
+            try{row=retail->ResolveMove(uint32_t(id));}catch(const std::exception&){return {};}
+            const auto record=retail->Record(12,row);uint64_t value=0,key=0;memcpy(&value,record.data()+0x20,8);memcpy(&key,record.data()+0x28,8);
+            return {(value*0x9E3779B97F4A7C15ULL^key)|1,[retail,row]{return retail->MoveAnimation(row);}};
+        };
+        // Hitbox slots as typed, inside the move's active window (0 = no hitboxes).
+        auto real=[&](const std::string& name)->float{
+            auto found=m_fieldIdentifierMap.find(name);
+            if(found==m_fieldIdentifierMap.end() || found->second->errored)return 0;
+            return strtof(found->second->buffer,nullptr);
+        };
+        if(first>0)for(int i=0;i<8;++i){
+            const auto prefix="hitbox_"+std::to_string(i)+"_";
+            const auto location=uint32_t(number(prefix+"location"));
+            if(!location)continue;
+            const int a=int((std::max)(number(prefix+"start"),first)),b=int((std::min)(number(prefix+"last"),last>=first?last:INT64_MAX));
+            if(b>=a)input.hitboxes.push_back({a,b,location,real(prefix+"radius"),real(prefix+"vertical_height")});
+        }
+        return input;
+    }
     // Fields drawn with a decoder combo (RetailFieldCodecs.hpp) before their raw input, by field name: every committed
     // transaction replaces the form's EditorInput objects with clones, so their addresses are not stable.
     enum class Codec { HitLevel, HitboxLocation, Vulnerability };
@@ -340,15 +384,27 @@ class RetailRecordForm final : public EditorForm {
         }
     }
     void RenderInternal() override {
-        // Reserve the footer for Apply; long groups scroll independently.
-        ImGui::BeginChild("##RetailFields",ImVec2(0,(std::max)(1.0f,ImGui::GetContentRegionAvail().y-30.0f)));
+        // Reserve the footer for Apply; long groups scroll independently. Wide move forms with the preview shown: the
+        // fields on the left half and the preview on the right half, filling the height. Otherwise the preview is
+        // stacked above the fields and scrolls with them. The icon next to the Animation button shows / hides it.
+        const bool sideBySide=m_table==12 && m_preview.IsOpen() && AnimationPreview::SideBySide();
+        const bool previewOpen=sideBySide;
+        const float fieldsHeight=(std::max)(1.0f,ImGui::GetContentRegionAvail().y-30.0f);
+        const float half=(ImGui::GetContentRegionAvail().x-ImGui::GetStyle().ItemSpacing.x)/2;
+        const float savedWidth=m_winInfo.size.x;
+        ImGui::BeginChild("##RetailFields",ImVec2(previewOpen?half:0,fieldsHeight));
+        if(previewOpen)m_winInfo.size.x=ImGui::GetWindowWidth();
         if (m_table==12 && ImGui::BeginTable("Names",4)) {
             ImGui::TableNextRow();
             for (int i=0;i<2;++i) {
                 ImGui::TableNextColumn();
                 const char* label=i ? _("edition.move.anim_name") : _("edition.move.move_name");
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX()+(std::max)(0.0f,(ImGui::GetContentRegionAvail().x-ImGui::CalcTextSize(label).x)/2));
-                if(i){if(ImGui::Button(label,ImVec2(-1,0)))m_openAnimationPicker=true;}
+                if(i){
+                    const float spacing=ImGui::GetStyle().ItemSpacing.x/2;
+                    if(ImGui::Button(label,ImVec2((std::max)(1.0f,ImGui::GetContentRegionAvail().x-AnimationPreview::ToggleButtonWidth()-spacing),0)))m_openAnimationPicker=true;
+                    ImGui::SameLine(0,spacing);m_preview.ToggleButton();
+                }
                 else ImGui::TextUnformatted(label);
                 ImGui::TableNextColumn(); ImGui::SetNextItemWidth(-1);
                 ImGui::PushStyleColor(ImGuiCol_FrameBg,m_names[i].data()!=m_savedNames[i]?ImU32(FORM_INPUT_CHANGED):AppTheme::Input);
@@ -357,6 +413,7 @@ class RetailRecordForm final : public EditorForm {
             }
             ImGui::EndTable();
         }
+        if(m_table==12 && !sideBySide)m_preview.Render(PreviewInput());
         if(m_openAnimationPicker){m_openAnimationPicker=false;RetailAnimationLibrary::Get().EnsureLoaded();ImGui::OpenPopup("Animation library");}
         // Modal: clicking outside must not dismiss it (a pending import would be lost). Closed by its X or Close button.
         bool animationPickerOpen=true;
@@ -389,6 +446,14 @@ class RetailRecordForm final : public EditorForm {
         }
         EditorForm::RenderInternal();
         ImGui::EndChild();
+        m_winInfo.size.x=savedWidth;
+        if(previewOpen){
+            ImGui::SameLine();
+            ImGui::BeginChild("##RetailPreview",ImVec2(0,fieldsHeight),0,ImGuiWindowFlags_NoScrollbar|ImGuiWindowFlags_NoScrollWithMouse);
+            m_preview.Body(PreviewInput(),ImGui::GetContentRegionAvail().y);
+            ImGui::EndChild();
+        }
+        m_ignoreRightClick=m_table==12 && m_preview.IsOpen() && m_preview.ViewportHovered();
     }
 public:
     std::unique_ptr<TransactionState> BeginTransaction(size_t& budget) override {
@@ -752,7 +817,8 @@ bool EditorVisualsT8Retail::OpenRecord(size_t table,uint32_t row) {
     // Example: rows after the last terminator of a list table (native Kuma start_properties 405) have no list bound.
     try {
     if (!m_editor || table>=RetailT8Snapshot::Tables.size() || row>=m_editor->Count(table)) throw std::out_of_range("Retail record outside table");
-    if(table==12){m_selectedMove=row;snprintf(m_moveId,sizeof(m_moveId),"%u",row);}
+    // A name typed in the move search box stays (it filters the list); an id or an empty box shows the opened row.
+    if(table==12){m_selectedMove=row;const std::string_view typed=m_moveId;if(typed.empty() || Helpers::is_string_digits(m_moveId) || typed.starts_with("0x") || typed.starts_with("0X"))snprintf(m_moveId,sizeof(m_moveId),"%u",row);}
     for (auto* form:m_structWindows) if (form->popen && form->windowType==EditorT8Retail::Type(table) && form->structureId==row) { form->setFocus=true; return true; }
     ConsumePendingChanges();
     EditorForm* replace=nullptr;

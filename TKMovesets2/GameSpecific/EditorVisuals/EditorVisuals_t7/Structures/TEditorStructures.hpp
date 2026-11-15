@@ -2,6 +2,7 @@
 
 #include "EditorFormList.hpp"
 #include "EditorVisuals_t7/Structures/Subwindows/TEditorMove_Animations.hpp"
+#include "AnimationPreview.hpp"
 
 class TEditorCancels : public EditorFormList
 {
@@ -80,6 +81,12 @@ private:
 	bool m_renamed = false;
 	// Window containing the animation list to choose from
 	TEditorMove_Animations* m_animationList = nullptr;
+	// 3D preview of the move's animation, drawn above the fields
+	AnimationPreview m_preview;
+
+	void RenderInternal() override;
+	// The Animation label also gets the preview's show / hide icon.
+	void RenderLabel(int listIdx, EditorInput* field) override;
 
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;
 	void OnApply() override;

@@ -108,6 +108,16 @@ void RunConversionRulesTests() {
         "Throw break button requirement");
     Check(rules.ToT7(0x1FD, {0xB}, id, v) == C::Rules::Applied::Mapped && id == 0x5C && rules.ToT7(0x1FD, {3}, id, v) == C::Rules::Applied::Drop,
         "Opponent facing requirement");
+    // Second player sound (0x84C5 <-> 0x87F1) splits like the other three.
+    Check(rules.ToT8(0x84C5, 0x07000123, id, p) == C::Rules::Applied::Mapped && id == 0x87F1 && p[0] == 7 && p[1] == 0 && p[2] == 0x123 &&
+        rules.ToT7(0x87F1, {7, 0, 0x123, 0, 0}, id, v) == C::Rules::Applied::Mapped && id == 0x84C5 && v == 0x07000123, "Sound 0x84C5 transform");
+    // Wall-hit counter checks: T7's threshold becomes retail {counter 1, threshold}; retail counter 2 has no T7 row.
+    for (auto [t7, t8] : {std::pair{283u, 287u}, {320u, 325u}, {358u, 364u}}) {
+        p = {};
+        Check(rules.ToT8(t7, 3, id, p) == C::Rules::Applied::Mapped && id == t8 && p[0] == 1 && p[1] == 3, "Wall-hit counter to T8");
+        Check(rules.ToT7(t8, {1, 3, 0, 0, 0}, id, v) == C::Rules::Applied::Mapped && id == t7 && v == 3 &&
+            rules.ToT7(t8, {2, 3, 0, 0, 0}, id, v) == C::Rules::Applied::Drop, "Wall-hit counter to T7");
+    }
     Check(rules.t8MoveDefaults.size() == 50, "Retail move field defaults");
     // Requirement conditions: 777 Story Flag == X holds only for versus (0; 4 is Devil Jin's story chapter); flag
     // comparisons 476/439 with 0 hold (flags clear in normal play).

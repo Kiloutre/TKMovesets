@@ -6,6 +6,9 @@
 
 namespace ImGuiExtra
 {
+	// Screw (tornado) icon of the move lists: a spiral in a square of side `size` at `min`, drawn over the last item.
+	// Shows `tooltip` when the pointer is over it.
+	void ScrewIcon(ImVec2 min, float size, const char* tooltip);
 	// Class that can be created in a block, will disable everything inside of that block
 	class DisableBlockIf
 	{

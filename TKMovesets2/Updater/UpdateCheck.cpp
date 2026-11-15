@@ -18,6 +18,9 @@ bool DownloadProgramUpdate(s_updateStatus* status, GameAddressesFile*, bool veri
 			status->tagName = tag;
 			status->tagNameSeparatorText = std::format("{} - {}", _("sidemenu.changelog"), tag);
 			status->changelog = release["body"].is_string() ? release["body"].get<std::string>() : "";
+			// The markdown renderer can't display HTML images: drop <img> tags
+			static const std::regex imgTag(R"(<img\b[^>]*>(\s*</img>)?)", std::regex::icase);
+			status->changelog = std::regex_replace(status->changelog, imgTag, "");
 			if (verifyOnly) return true;
 			auto digest = asset.at("digest").get<std::string>();
 			auto bytes = Http::Get(asset.at("browser_download_url").get<std::string>(), 256 << 20);

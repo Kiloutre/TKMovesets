@@ -1,4 +1,6 @@
 #pragma once
+#include "AnimationPreview/PreviewDisplacement.hpp"
+#include "AnimationPreview/PreviewHitbox.hpp"
 #include "RecordEdit.hpp"
 #include <memory>
 
@@ -304,6 +306,22 @@ public:
 	void SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId) override;
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
 	std::string ImportAnimation(const wchar_t* filepath, int moveid) override;
+	// Copy of a move's body animation (T7 0x64 / 0xC8 bytes), for the animation preview. Throws when it cannot be read.
+	std::vector<Byte> MoveAnimation(uint16_t moveId);
+	// Changes when the move uses another animation (its offset in the animation block).
+	uint64_t MoveAnimationToken(uint16_t moveId);
+	// The move's extra properties that the animation preview applies (AnimPreview::T7DisplacementKind), as saved.
+	std::vector<AnimPreview::Displacement> MoveDisplacements(uint16_t moveId);
+	// Reaction moves of the move's hit on the animation preview's opponent: the first hit condition whose requirements
+	// hold for an opponent airborne or not (only "opponent airborne / not airborne / in a juggle" are judged, other
+	// requirements count as unmet), down to the list's default entry. Move ids resolved (aliases), -1 when none.
+	AnimPreview::ReactionMoves MoveHitReactions(uint16_t moveId, bool opponentAirborne);
+	// The move's hit uses the screw: one of its hit conditions requires 615 "Screw available".
+	bool MoveUsesScrew(uint16_t moveId) const;
+	// Move id with aliases (0x8000 + n) resolved; -1 when out of range.
+	int32_t ResolveMoveId(uint32_t moveId) const;
+	uint32_t MoveHitboxLocation(uint16_t moveId) { return moveId < m_iterators.moves.size() ? m_iterators.moves[moveId]->hitbox_location : 0; }
+	uint32_t MoveCount() const { return static_cast<uint32_t>(m_iterators.moves.size()); }
 	void DeleteAnimation(uint64_t anim_offset);
 	void DeleteNameBlockString(uint64_t string_offset);
 	void DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr);

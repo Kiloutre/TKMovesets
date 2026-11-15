@@ -16,6 +16,12 @@
 
 namespace {
 void Check(bool value,const char* reason) { if(!value)throw std::runtime_error(reason); }
+// The game objects our animation entries point at, read from the shipped game_addresses.ini (t8-retail).
+RetailT8Resources::EngineAddresses ShippedEngine(uint64_t module) {
+    GameAddressesFile file; file.Reload();
+    GameAddressesWrapper game; game.addrFile=&file; game.gameKey="t8-retail"; game.minorGameKey="t8-retail";
+    return RetailT8Resources::ReadEngineAddresses(game,module);
+}
 template<class F> void Reject(F&& callback) { bool failed=false;try{callback();}catch(const std::exception&){failed=true;}Check(failed,"Invalid animation accepted"); }
 template<class T> void Put(std::vector<Byte>& bytes,size_t offset,T value) { memcpy(bytes.data()+offset,&value,sizeof(value)); }
 
@@ -86,13 +92,17 @@ void RunCompiledAnimationTests() {
     {
         // QA 1.0 (CompiledPanmAliasedVectorsBounded): aliased group/bone vectors would make the compile walk
         // groups x bones x tracks nodes (up to 65536^3); the walk is bounded by MaxCompiledNodes.
-        const auto modest=R::BuildCompiledAnimation(AliasedPanm(4,4),0,0x140000000ULL);
+        const auto modest=R::BuildCompiledAnimation(AliasedPanm(4,4),0,ShippedEngine(0x140000000ULL));
         Check(!modest.image.empty(),"Aliased PANM fixture does not compile");
         std::string error;
-        try { R::BuildCompiledAnimation(AliasedPanm(1024,1024),0,0x140000000ULL); } catch(const std::exception& e) { error=e.what(); }
+        try { R::BuildCompiledAnimation(AliasedPanm(1024,1024),0,ShippedEngine(0x140000000ULL)); } catch(const std::exception& e) { error=e.what(); }
         Check(error.find("too many bones or tracks")!=std::string::npos,("Aliased PANM vectors were walked unbounded: "+error).c_str());
     }
     constexpr uint64_t module=0x140000000ULL,base=0x7ff000010000ULL;
+    const auto engine=ShippedEngine(module);
+    // The shipped addresses are those of retail 26155785 (exe patterns in game_addresses.ini find the same values).
+    Check(engine.compiledVtable==module+0x75C32F0 && engine.emptyBucket==module+0x959ABD0 && engine.animResourceVtable==module+0x85A59C0 &&
+        engine.resourceRefVtable==module+0x858A9C0 && engine.noOp==module+0xA6E230,"game_addresses.ini animation objects changed");
     // 40 bones, including a name too long for the in-place string, built in reverse order to exercise sorting.
     P::Animation animation{4,{}};
     for(int i=39;i>=0;--i) {
@@ -102,13 +112,13 @@ void RunCompiledAnimationTests() {
         animation.tracks.push_back(track);
     }
     const auto panm=P::Encode(animation);
-    const auto built=R::BuildCompiledAnimation(panm,base,module);
-    Check(R::BuildCompiledAnimation(panm,0x20000,module).image.size()==built.image.size(),"Compiled layout depends on its address");
+    const auto built=R::BuildCompiledAnimation(panm,base,engine);
+    Check(R::BuildCompiledAnimation(panm,0x20000,engine).image.size()==built.image.size(),"Compiled layout depends on its address");
     Remote r{built.image,base};const auto o=built.object;
-    Check(r.Get<uint64_t>(o)==module+R::CompiledVtableRva && r.Get<uint32_t>(o+8)==3 && r.Get<float>(o+0xC)==60.0f &&
+    Check(r.Get<uint64_t>(o)==engine.compiledVtable && r.Get<uint32_t>(o+8)==3 && r.Get<float>(o+0xC)==60.0f &&
         r.Get<uint8_t>(o+0x10)==1 && r.Get<uint8_t>(o+0x18)==0 && r.Get<float>(o+0x1C)==1.0f,"Compiled animation header changed");
     for(uint64_t hash:{o+0x20,o+0x50})
-        Check(r.Get<uint64_t>(hash+8)==module+R::EmptyBucketRva && r.Get<uint64_t>(hash+0x10)==1 && !r.Get<uint64_t>(hash+0x18),"Hash map is not the empty EASTL map");
+        Check(r.Get<uint64_t>(hash+8)==engine.emptyBucket && r.Get<uint64_t>(hash+0x10)==1 && !r.Get<uint64_t>(hash+0x18),"Hash map is not the empty EASTL map");
     const auto data=r.Get<uint64_t>(o+0xD8);
     Check(data==r.Get<uint64_t>(o+0xB0) && !r.Get<uint64_t>(o+0xE0) && !r.Get<uint64_t>(o+0xE8),"Sample base or owner changed");
     // The PANM is the start of the image; the sample base is its animation field 5.
@@ -138,15 +148,15 @@ void RunCompiledAnimationTests() {
     for(size_t n=1;n<=33;++n) {
         P::Animation tiny{1,{}};
         for(size_t i=0;i<n;++i)tiny.tracks.push_back({"B"+std::to_string(100+i),std::vector<P::Sample>(1)});
-        const auto image=R::BuildCompiledAnimation(P::Encode(tiny),base,module);
+        const auto image=R::BuildCompiledAnimation(P::Encode(tiny),base,engine);
         Remote s{image.image,base};
         const auto group=s.Tree(image.object+0x80,[](uint64_t,uint64_t){return true;});
         Check(s.Tree(group[0]+0x28,[&](uint64_t a,uint64_t b){return s.String(a+0x20)<s.String(b+0x20);}).size()==n,"Small tree lost bones");
     }
     // Inputs the engine or the upload cannot take.
-    for(size_t size=0;size+28<=panm.size();size+=97)Reject([&]{R::BuildCompiledAnimation({panm.data(),size},base,module);});
-    Reject([&]{R::BuildCompiledAnimation(panm,base+8,module);});
-    auto changed=panm;changed[4]='X';Reject([&]{R::BuildCompiledAnimation(changed,base,module);});
+    for(size_t size=0;size+28<=panm.size();size+=97)Reject([&]{R::BuildCompiledAnimation({panm.data(),size},base,engine);});
+    Reject([&]{R::BuildCompiledAnimation(panm,base+8,engine);});
+    auto changed=panm;changed[4]='X';Reject([&]{R::BuildCompiledAnimation(changed,base,engine);});
 }
 
 // PANM -> T7 0xC8 / 0x64 (RetailT8AnimToT7): a synthetic T7 animation in the T8->T7 convention converts to PANM,

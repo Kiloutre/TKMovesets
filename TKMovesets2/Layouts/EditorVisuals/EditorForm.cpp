@@ -604,9 +604,19 @@ void EditorForm::DeleteStructure()
     });
 }
 
+void EditorForm::RenderFieldsInChild(const char* id, ImVec2 size)
+{
+	ImGui::BeginChild(id, size);
+	const float width = m_winInfo.size.x;
+	m_winInfo.size.x = ImGui::GetWindowWidth();
+	EditorForm::RenderInternal();
+	m_winInfo.size.x = width;
+	ImGui::EndChild();
+}
+
 bool EditorForm::IsWindowRightClicked() const
 {
-	if (!ImGui::GetIO().MouseClicked[1]) return false;
+	if (!ImGui::GetIO().MouseClicked[1] || m_ignoreRightClick) return false;
 
 	auto cursorPos = ImGui::GetMousePos();
 	auto& boundStart = m_winInfo.pos;

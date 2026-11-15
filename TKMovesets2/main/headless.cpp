@@ -55,6 +55,11 @@ int RenderRetailEditorFile(const std::wstring& input, const std::wstring& output
 int RunRetailEditorUiTests();
 int VerifyRetailEditorStructure(const std::wstring& input,const std::wstring& output);
 int WriteRetailPanmFixture(const std::wstring& output);
+int CheckAnimationPreview(const std::wstring& reference);
+int ShootAnimationPreview(std::span<const std::wstring> arguments);
+int DumpAnimationPreviewJoints(const std::wstring& animation, const std::wstring& output);
+int ExportAnimationPreviewSource(std::span<const std::wstring> arguments);
+int ScanAnimationPreview(const std::wstring& file);
 #endif
 
 static TKMovesetCompressionType_ Codec(const std::wstring& name)
@@ -360,7 +365,12 @@ int RunHeadless(std::span<const std::wstring> arguments)
                 "  retail-editor-structure-smoke INPUT OUTPUT\n"
                 "  retail-editor-render INPUT OUTPUT.json [references|lists]\n"
                 "  retail-editor-ui-test\n"
-                "  retail-panm-fixture OUTPUT_DIRECTORY\n";
+                "  retail-panm-fixture OUTPUT_DIRECTORY\n"
+                "  anim-preview-check REFERENCE.json               animation preview pose against Blender\n"
+                "  anim-preview-shot FILE MOVE OUT_DIR [FRAMES] [yaw=R] [size=WxH]  move form with its preview, as PNG\n"
+                "  anim-preview-joints ANIMATION OUT.json          preview joint positions per frame\n"
+                "  anim-preview-export T7_FILE MOVE OUT [panm]     a T7 move's animation (or its PANM conversion)\n"
+                "  anim-preview-scan FILE                          decode and pose every move animation\n";
 #endif
             std::cout.flush();
             return arguments.empty() ? 2 : 0;
@@ -814,6 +824,7 @@ int RunHeadless(std::span<const std::wstring> arguments)
                     RetailT8Import::MemoryOnlyAudit memoryOnly{importer.MemoryOnlyContainer(), importer.MemoryOnlyDomain(),
                         importer.MemoryOnlyStringRow(), importer.MemoryOnlyHandles(), importer.MemoryOnlyNames(), importer.MemoryOnlyAnimations(),
                         importer.Native() ? &importer.Native()->cancels : nullptr, &importer.DatalessAnimations()};
+                    if (importer.MemoryOnly()) memoryOnly.compiledVtable = importer.Engine().compiledVtable;
                     const auto importProfile = ImportProfile::Read(importHeader);
                     auto audit = RetailT8Import::AuditImage(importPayload, shadow, importer.lastLoaded.address,
                         importer.lastLoaded.size, process, importer.BindingRoot(), importHeader.characterId, targetCharacter,
@@ -869,7 +880,8 @@ int RunHeadless(std::span<const std::wstring> arguments)
             std::vector<Byte> moves(count * 0x448);
             if (!process.readBytes(q(root + 0x230), moves.data(), moves.size())) throw std::runtime_error("Cannot read moves");
             const auto domain = RT::AnimationCharacter(moves, RT::Read<uint32_t>(process, player + importer.Offsets().character));
-            const auto container = game.ReadPtrPath("anim_container"), module = process.mainModule.address;
+            const auto container = game.ReadPtrPath("anim_container");
+            const auto engine = importer.Engine();
             const auto map = RT::DomainMap(process, container, domain);
             if (!map) throw std::runtime_error("Player domain has no animation map");
             static constexpr gameAddr localBase = 0x10000;
@@ -931,8 +943,8 @@ int RunHeadless(std::span<const std::wstring> arguments)
                 const auto id = RT::Read<uint32_t>(process, node + 0x10);
                 const auto ref = q(node + 0x18);
                 const auto resource = ref ? q(ref + 8) : 0;
-                const auto object = resource && q(resource) == module + RS::AnimResourceVtableRva ? q(resource + 0x190) : 0;
-                if (!object || q(object) != module + RS::CompiledVtableRva) { ++skipped; continue; }
+                const auto object = resource && q(resource) == engine.animResourceVtable ? q(resource + 0x190) : 0;
+                if (!object || q(object) != engine.compiledVtable) { ++skipped; continue; }
                 // The PANM the engine compiled from: its sample block is where the object's +0xB0 points.
                 const auto panm = q(resource + 0x1A0);
                 if (!panm || RT::Read<uint32_t>(process, panm + 4) != 0x4d4e4150) { ++skipped; continue; }
@@ -948,9 +960,9 @@ int RunHeadless(std::span<const std::wstring> arguments)
                 if (!process.readBytes(panm, bytes.data(), bytes.size())) { ++skipped; continue; }
                 ++compared;
                 try {
-                    const auto built = RS::BuildCompiledAnimation(bytes, localBase, module);
-                    const auto native = View{&process, nullptr}.Describe(object, panm, module + RS::EmptyBucketRva);
-                    const auto local = View{nullptr, &built.image}.Describe(built.object, localBase, module + RS::EmptyBucketRva);
+                    const auto built = RS::BuildCompiledAnimation(bytes, localBase, engine);
+                    const auto native = View{&process, nullptr}.Describe(object, panm, engine.emptyBucket);
+                    const auto local = View{nullptr, &built.image}.Describe(built.object, localBase, engine.emptyBucket);
                     if (native == local) { ++matched; continue; }
                     size_t at = 0; while (at < native.size() && at < local.size() && native[at] == local[at]) ++at;
                     const auto from = at > 80 ? at - 80 : 0;
@@ -1079,6 +1091,17 @@ int RunHeadless(std::span<const std::wstring> arguments)
             // Dear ImGui Test Engine drives the retail editor on a synthetic document (tests/RetailEditorTests.cpp).
             if(arguments.size()!=1)throw std::invalid_argument("retail-editor-ui-test takes no arguments");
             return RunRetailEditorUiTests();
+        }
+        if(command==L"anim-preview-check"){
+            if(arguments.size()!=2)throw std::invalid_argument("anim-preview-check takes REFERENCE.json");
+            return CheckAnimationPreview(arguments[1]);
+        }
+        if(command==L"anim-preview-shot")return ShootAnimationPreview(arguments.subspan(1));
+        if(command==L"anim-preview-scan"){if(arguments.size()!=2)throw std::invalid_argument("anim-preview-scan takes FILE");return ScanAnimationPreview(arguments[1]);}
+        if(command==L"anim-preview-export")return ExportAnimationPreviewSource(arguments.subspan(1));
+        if(command==L"anim-preview-joints"){
+            if(arguments.size()!=3)throw std::invalid_argument("anim-preview-joints takes ANIMATION OUT.json");
+            return DumpAnimationPreviewJoints(arguments[1],arguments[2]);
         }
         if(command==L"retail-panm-fixture"){
             if(arguments.size()!=2)throw std::invalid_argument("retail-panm-fixture takes OUTPUT_DIRECTORY");
@@ -1260,6 +1283,7 @@ int RunHeadless(std::span<const std::wstring> arguments)
                     RetailT8Import::MemoryOnlyAudit memoryOnly{importer.MemoryOnlyContainer(), importer.MemoryOnlyDomain(),
                         importer.MemoryOnlyStringRow(), handles, importer.MemoryOnlyNames(), importer.MemoryOnlyAnimations(),
                         importer.Native() ? &importer.Native()->cancels : nullptr, &importer.DatalessAnimations()};
+                    if (importer.MemoryOnly()) memoryOnly.compiledVtable = importer.Engine().compiledVtable;
                     const auto headerProfile = ImportProfile::Read(header);
                     auto result = RetailT8Import::AuditImage(payload, process, root, size, process, bindingRoot, header.characterId, targetCharacter,
                         header.GetConversionOrigin() == GameVersions::T8::FROM_T7, metadata.stored ? &metadata : nullptr, &importer.MissingCarriers(),

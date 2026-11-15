@@ -2,6 +2,7 @@
 
 #include "TEditorStructures.hpp"
 #include "Localization.hpp"
+#include "constants.h"
 #include "EditorVisuals_t7.hpp"
 #include "imgui_extras.hpp"
 #include "EditorVisuals_t7/Subwindows/TEditor_MoveReferences.hpp"
@@ -26,6 +27,74 @@ void TEditorMove::OnInitEnd()
 	if (strncmp(m_fieldIdentifierMap["move_name"]->buffer, "c_", 2) != 0) {
 		m_isDeletable = false;
 	}
+}
+
+void TEditorMove::RenderInternal()
+{
+	auto editor = Editor<EditorT7>();
+	// Values typed in the form show at once (before Apply); unparsable fields count as 0.
+	auto number = [&](const char* name) -> int {
+		auto found = m_fieldIdentifierMap.find(name);
+		if (found == m_fieldIdentifierMap.end() || found->second->errored) return 0;
+		return static_cast<int>(strtoll(found->second->buffer, nullptr, 0));
+	};
+	AnimationPreview::Input input;
+	const uint16_t moveId = static_cast<uint16_t>(structureId);
+	input.token = editor->MoveAnimationToken(moveId);
+	input.load = [editor, moveId] { return editor->MoveAnimation(moveId); };
+	const int first = number("first_active_frame"), last = number("last_active_frame");
+	if (first > 0 && last >= first) input.active.emplace_back(first, last);
+	input.moveFrames = number("anim_len");
+	input.displacements = editor->MoveDisplacements(moveId);
+	// Opponent mannequin: the reactions of the move's likely hit, and any move's animation (idle, reactions, pose).
+	input.opponent.reactions = editor->MoveHitReactions(moveId, false);
+	input.opponent.airReactions = editor->MoveHitReactions(moveId, true);
+	input.opponent.move = [editor](int id) -> AnimationPreview::Input::Animation {
+		const int32_t resolved = id < 0 ? -1 : editor->ResolveMoveId(static_cast<uint32_t>(id));
+		if (resolved < 0) return {};
+		const uint16_t move = static_cast<uint16_t>(resolved);
+		return {editor->MoveAnimationToken(move), [editor, move] { return editor->MoveAnimation(move); }};
+	};
+	// T7 hitbox_location: two hit lines, low and high 16 bits, each limb A (byte 0) and limb B (byte 1), live on the
+	// move's active frames.
+	if (first > 0 && last >= first) {
+		const uint32_t location = static_cast<uint32_t>(strtoull(m_fieldIdentifierMap["hitbox_location"]->buffer, nullptr, 16));
+		for (uint32_t line : {location & 0xFFFF, location >> 16})
+			if (line) input.hitboxes.push_back({first, last, line, 0, 0});
+	}
+	// Wide form with the preview shown: the fields on the left half and the preview on the right half, filling the
+	// height (the fields scroll on their own). Otherwise the preview is stacked above the fields. It is shown and
+	// hidden with the icon next to the Animation button (RenderLabel).
+	if (m_preview.IsOpen() && AnimationPreview::SideBySide()) {
+		const float height = (std::max)(1.0f, ImGui::GetContentRegionAvail().y - 30.0f);
+		const float half = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) / 2;
+		RenderFieldsInChild("##moveFields", ImVec2(half, height));
+		if (m_preview.IsOpen()) {
+			ImGui::SameLine();
+			ImGui::BeginChild("##movePreview", ImVec2(0, height), 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			m_preview.Body(input, ImGui::GetContentRegionAvail().y);
+			ImGui::EndChild();
+		}
+	}
+	else {
+		m_preview.Render(input);
+		EditorForm::RenderInternal();
+	}
+	m_ignoreRightClick = m_preview.IsOpen() && m_preview.ViewportHovered();
+}
+
+void TEditorMove::RenderLabel(int listIdx, EditorInput* field)
+{
+	if (!(field->name == "anim_name")) { EditorForm::RenderLabel(listIdx, field); return; }
+	// The Animation button, with the preview's show / hide icon at its right.
+	const float icon = AnimationPreview::ToggleButtonWidth(), spacing = ImGui::GetStyle().ItemSpacing.x / 2;
+	const char* label = _(field->displayName.c_str());
+	ImGui::PushStyleColor(ImGuiCol_Header, FORM_LABEL_CLICKABLE);
+	if (ImGui::Selectable(label, true, 0, ImVec2((std::max)(1.0f, ImGui::GetContentRegionAvail().x - icon - spacing), 0)))
+		OnFieldLabelClick(listIdx, field);
+	ImGui::PopStyleColor();
+	ImGui::SameLine(0, spacing);
+	m_preview.ToggleButton();
 }
 
 void TEditorMove::PrepareDuplication(unsigned int moveId, unsigned int listSize)

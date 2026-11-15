@@ -32,12 +32,19 @@ private:
 	int32_t m_moveToPlay = -1;
 	// Contains the movelist displayed at all times, may get sorted and/or filtered
 	std::vector<DisplayableMove*> m_filteredMovelist;
+	// Moves of m_filteredMovelist whose name matches the text typed in the move search box (Helpers::name_matches_search),
+	// rebuilt when the text or m_filteredMovelist changes. A move id (digits) or an empty box does not filter.
+	std::vector<DisplayableMove*> m_searchedMovelist, m_searchSource;
+	std::string m_searchQuery;
+	const std::vector<DisplayableMove*>& VisibleMovelist();
 	// Contains the current display filter of the displayed movelist
 	EditorVisualsT7::EditorMovelistFilter_ m_movelistFilter = EditorVisualsT7::EditorMovelistFilter_All;
 	// The move to scroll to in the next frame
 	int32_t m_moveToScrollTo = -1;
 	// id of the highlithed move in the movelist
 	int16_t m_highlightedMoveId = -1;
+	// Frames left during which the move list takes the focus back (after it opened a move, which focuses its form).
+	int m_movelistKeepFocus = 0;
 	// Index typed in the toolbar's Go to menu
 	int m_gotoId = 0;
 	// Access moveset data through this variable. Uses polymorphism.
@@ -77,6 +84,8 @@ private:
 	// Returns true if our allocated moveset is still loaded on our character, in-game
 	bool MovesetStillLoaded();
 public:
+	// Highlights a move in the move list and scrolls the list to it (captures).
+	void ShowMoveInList(uint16_t moveId) { m_highlightedMoveId = static_cast<int16_t>(moveId); m_moveToScrollTo = moveId; }
 	// Contains the movelist displayed at all times
 	std::vector<DisplayableMove*>* movelist = nullptr;
 

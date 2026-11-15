@@ -209,13 +209,14 @@
       "code": "got",
       "id": 37,
       "chr_id": "chr_0037",
-      "name": "",
+      "name": "Azazel",
       "name_jp": "",
-      "playable": false,
+      "playable": true,
       "evidence": "",
       "note": "non-playable chr_0037 (moves G_; not in movelists)",
       "move_count": 1805,
-      "named_move_count": 1780
+      "named_move_count": 1780,
+      "runtime_id": 32
     },
     {
       "code": "grf",
@@ -284,7 +285,7 @@
       "chr_id": "",
       "name": "",
       "name_jp": "",
-      "playable": null,
+      "playable": true,
       "evidence": "",
       "note": "other format (SBK signature), not decoded",
       "move_count": null,
@@ -504,13 +505,14 @@
       "code": "test",
       "id": null,
       "chr_id": "",
-      "name": "",
+      "name": "Dummy",
       "name_jp": "",
-      "playable": null,
+      "playable": true,
       "evidence": "",
       "note": "test moveset (= live \"chara 116\")",
       "move_count": 836,
-      "named_move_count": 836
+      "named_move_count": 836,
+      "runtime_id": 116
     },
     {
       "code": "tgr",
@@ -579,85 +581,92 @@
       "code": "xxa",
       "id": 1001,
       "chr_id": "chr_1001",
-      "name": "",
+      "name": "Angel Jin",
       "name_jp": "",
-      "playable": false,
+      "playable": true,
       "evidence": "",
       "note": "variant (body SWL = Devil Jin; moves Dj_)",
       "move_count": 2409,
-      "named_move_count": 2353
+      "named_move_count": 2353,
+      "runtime_id": 117
     },
     {
       "code": "xxb",
       "id": 1002,
       "chr_id": "chr_1002",
-      "name": "",
+      "name": "True Devil Kazuya",
       "name_jp": "",
-      "playable": false,
+      "playable": true,
       "evidence": "T7 t7_KAZUYA (180, next 7)",
       "note": "variant (body GRL = Kazuya; moves Kz_)",
       "move_count": 2571,
-      "named_move_count": 2474
+      "named_move_count": 2474,
+      "runtime_id": 118
     },
     {
       "code": "xxc",
       "id": 1003,
       "chr_id": "chr_1003",
-      "name": "",
+      "name": "Jack-7",
       "name_jp": "",
-      "playable": false,
+      "playable": true,
       "evidence": "T7 t7_JACK (167, next 144)",
       "note": "variant (body CCN = Jack-8; moves Jc_)",
       "move_count": 2487,
-      "named_move_count": 2423
+      "named_move_count": 2423,
+      "runtime_id": 119
     },
     {
       "code": "xxd",
       "id": 1004,
       "chr_id": "chr_1004",
-      "name": "",
+      "name": "Soldier",
       "name_jp": "",
-      "playable": false,
+      "playable": true,
       "evidence": "",
       "note": "variant (body GRF = Paul; mixed Bx_/Zk_ moves)",
       "move_count": 1904,
-      "named_move_count": 1846
+      "named_move_count": 1846,
+      "runtime_id": 120
     },
     {
       "code": "xxe",
       "id": 1005,
       "chr_id": "chr_1005",
-      "name": "",
+      "name": "Devil Jin (Story)",
       "name_jp": "デビル仁",
-      "playable": false,
+      "playable": true,
       "evidence": "",
       "note": "variant of Devil Jin (movelist \"デビル仁\"; body SWL)",
       "move_count": 2385,
-      "named_move_count": 2330
+      "named_move_count": 2330,
+      "runtime_id": 121
     },
     {
       "code": "xxf",
       "id": null,
       "chr_id": "",
-      "name": "",
+      "name": "Tekken Monk",
       "name_jp": "",
-      "playable": null,
+      "playable": true,
       "evidence": "",
       "note": "variant (moves He_ = Heihachi; not in character_list)",
       "move_count": 1959,
-      "named_move_count": 1903
+      "named_move_count": 1903,
+      "runtime_id": 122
     },
     {
       "code": "xxg",
       "id": null,
       "chr_id": "",
-      "name": "",
+      "name": "Seiryu",
       "name_jp": "",
-      "playable": null,
+      "playable": true,
       "evidence": "",
       "note": "variant (moves He_ = Heihachi; not in character_list)",
       "move_count": 1952,
-      "named_move_count": 1898
+      "named_move_count": 1898,
+      "runtime_id": 123
     },
     {
       "code": "zbr",

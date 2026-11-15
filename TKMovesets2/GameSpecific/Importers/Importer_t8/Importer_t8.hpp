@@ -3,6 +3,7 @@
 #include "Extractor_t8/RetailSnapshot.hpp"
 #include "Extractor_t8/RetailRuntime.hpp"
 #include "T7ToRetailT8.hpp"
+#include "RetailResourceLoader.hpp"
 #include "GameStaticData.hpp"
 #include <map>
 #include <optional>
@@ -53,6 +54,8 @@ public:
         return { value("motbin_offset"), value("chara_id_offset"), value("currmove"), value("currmove_timer"),
             value("nextmove_addr"), value("nextmove_id") };
     }
+    // Game objects our animation entries point at (game_addresses.ini t8-retail_anim_*_rva). Throws when missing.
+    RetailT8Resources::EngineAddresses Engine() const { return RetailT8Resources::ReadEngineAddresses(m_game, m_process.mainModule.address); }
     uint64_t CharacterFixes() const { return m_characterFixes; }
     uint32_t TargetSecondary() const { return m_targetSecondary; }
     // Converted T7 animations compiled and attached to carrier resources (counted only in read-only audits).

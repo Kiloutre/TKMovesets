@@ -1,3 +1,5 @@
+#include <cmath>
+#include <algorithm>
 #include "imgui.h"
 #include <imgui_markdown.h>       // https://github.com/juliettef/imgui_markdown
 #include <string>
@@ -125,4 +127,20 @@ namespace ImGuiExtra
             ImVec2(viewport->WorkSize.x * 0.95f, viewport->WorkSize.y * 0.95f));
         return ImGui::BeginPopupModal(label.c_str(), open, ImGuiWindowFlags_HorizontalScrollbar);
     }
+}
+
+void ImGuiExtra::ScrewIcon(ImVec2 min, float size, const char* tooltip)
+{
+	auto* draw = ImGui::GetWindowDrawList();
+	const ImVec2 centre(min.x + size / 2, min.y + size / 2);
+	const ImU32 ink = IM_COL32(255, 196, 70, 255);
+	// Spiral: two and a half turns, from the centre outwards.
+	constexpr int Points = 40;
+	const float turns = 2.5f, radius = size * 0.42f;
+	for (int i = 0; i <= Points; ++i) {
+		const float t = float(i) / Points, a = t * turns * 6.2831853f;
+		draw->PathLineTo(ImVec2(centre.x + std::cos(a) * radius * t, centre.y + std::sin(a) * radius * t));
+	}
+	draw->PathStroke(ink, 0, (std::max)(1.5f, size * 0.11f));
+	if (tooltip && ImGui::IsMouseHoveringRect(min, ImVec2(min.x + size, min.y + size)) && ImGui::IsWindowHovered()) ImGui::SetTooltip("%s", tooltip);
 }

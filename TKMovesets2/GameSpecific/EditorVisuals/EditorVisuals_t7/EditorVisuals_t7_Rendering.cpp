@@ -24,6 +24,20 @@ void EditorVisuals_T7::FilterMovelistIfMoveNotFound(uint16_t moveToSet)
 	};
 }
 
+const std::vector<DisplayableMove*>& EditorVisuals_T7::VisibleMovelist()
+{
+	if (m_moveToPlayBuf[0] == '\0' || Helpers::is_string_digits(m_moveToPlayBuf)) return m_filteredMovelist;
+	if (m_searchQuery != m_moveToPlayBuf || m_searchSource != m_filteredMovelist) {
+		m_searchQuery = m_moveToPlayBuf;
+		m_searchSource = m_filteredMovelist;
+		m_searchedMovelist.clear();
+		for (DisplayableMove* move : m_filteredMovelist) {
+			if (Helpers::name_matches_search(move->name, m_searchQuery)) m_searchedMovelist.push_back(move);
+		}
+	}
+	return m_searchedMovelist;
+}
+
 void EditorVisuals_T7::RenderToolBar()
 {
 	// todo: ImGuiWindowFlags_MenuBar ?
@@ -416,7 +430,7 @@ void EditorVisuals_T7::RenderMovelist()
 			ImDrawList* drawlist = ImGui::GetWindowDrawList();
 			auto windowPos = ImGui::GetWindowPos();
 
-			for (const auto& move : m_filteredMovelist)
+			for (const auto& move : VisibleMovelist())
 			{
 				ImGui::TableNextRow();
 				ImGui::TableNextColumn();
@@ -434,12 +448,22 @@ void EditorVisuals_T7::RenderMovelist()
 
 				ImGui::TableNextColumn();
 				ImGui::PushID(move->moveId);
+				const ImVec2 nameCell = ImGui::GetCursorScreenPos();
+				const float nameWidth = ImGui::GetContentRegionAvail().x, iconSize = ImGui::GetTextLineHeight();
 				if (ImGui::Selectable(move->name.c_str(), move->moveId == m_highlightedMoveId)) {
 					// If clicked on the move
 					m_highlightedMoveId = move->moveId;
 					m_moveToPlay = move->moveId;
-					sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
+					// A name search stays in the box (and keeps filtering) when a listed move is clicked.
+					if (m_moveToPlayBuf[0] == '\0' || Helpers::is_string_digits(m_moveToPlayBuf)) {
+						sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
+					}
 					OpenFormWindow(TEditorWindowType_Move, move->moveId);
+					m_movelistKeepFocus = 3;
+				}
+				// Over the row (and its selection highlight), at the right of the name cell.
+				if (move->screw) {
+					ImGuiExtra::ScrewIcon(ImVec2(nameCell.x + nameWidth - iconSize - 2, nameCell.y), iconSize, _("edition.move_screw"));
 				}
 				ImGui::PopID();
 
@@ -451,6 +475,33 @@ void EditorVisuals_T7::RenderMovelist()
 				if (m_moveToScrollTo == move->moveId) {
 					ImGui::SetScrollHereY();
 					m_moveToScrollTo = -1;
+				}
+			}
+
+			// Up / down arrows while the list has the focus: open the previous / next listed move, unless the open move
+			// has edits not applied yet. The list keeps the focus after opening a move (by key or click).
+			if (m_movelistKeepFocus > 0) {
+				--m_movelistKeepFocus;
+				ImGui::SetWindowFocus();
+			}
+			if (ImGui::IsWindowFocused() && !ImGui::GetIO().WantTextInput) {
+				const int delta = ImGui::IsKeyPressed(ImGuiKey_DownArrow) ? 1 : ImGui::IsKeyPressed(ImGuiKey_UpArrow) ? -1 : 0;
+				const auto& listed = VisibleMovelist();
+				if (delta != 0 && !listed.empty() && !FormHasUnsavedChanges(TEditorWindowType_Move, static_cast<uint16_t>(m_highlightedMoveId))) {
+					const auto current = std::find_if(listed.begin(), listed.end(), [&](const DisplayableMove* m) { return m->moveId == m_highlightedMoveId; });
+					const int last = static_cast<int>(listed.size()) - 1;
+					const int index = current == listed.end() ? (delta > 0 ? 0 : last) : std::clamp(static_cast<int>(current - listed.begin()) + delta, 0, last);
+					const DisplayableMove* move = listed[index];
+					if (move->moveId != m_highlightedMoveId) {
+						m_highlightedMoveId = move->moveId;
+						m_moveToPlay = move->moveId;
+						if (m_moveToPlayBuf[0] == '\0' || Helpers::is_string_digits(m_moveToPlayBuf)) {
+							sprintf_s(m_moveToPlayBuf, sizeof(m_moveToPlayBuf), "%d", move->moveId);
+						}
+						OpenFormWindow(TEditorWindowType_Move, move->moveId);
+						m_moveToScrollTo = move->moveId;
+						m_movelistKeepFocus = 3;
+					}
 				}
 			}
 
@@ -470,25 +521,11 @@ void EditorVisuals_T7::RenderMovelist()
 			DEBUG_LOG("Search: '%s' is digits only, result = %d.\n", m_moveToPlayBuf, m_moveToPlay);
 		}
 		else if (m_moveToPlayBuf[0] != '\0') {
-			std::string buf = m_moveToPlayBuf;
-			std::transform(buf.begin(), buf.end(), buf.begin(), tolower);
+			// Text filters the list (VisibleMovelist); the first matching move is the one to play.
+			const auto& matches = VisibleMovelist();
+			m_moveToPlay = matches.empty() ? -1 : matches.front()->moveId;
 
-			auto iter = std::find_if(m_filteredMovelist.begin(), m_filteredMovelist.end(),
-				[&buf](const DisplayableMove* m) {
-					std::string moveName = m->name;
-					std::transform(moveName.begin(), moveName.end(), moveName.begin(), tolower);
-					return moveName.find(buf) != std::string::npos;
-				}
-			);
-
-			if (iter == m_filteredMovelist.end()) {
-				m_moveToPlay = -1;
-			}
-			else {
-				m_moveToPlay = (*iter)->moveId;
-			}
-
-			DEBUG_LOG("Search: '%s' is text, result = %d.\n", buf.c_str(), m_moveToPlay);
+			DEBUG_LOG("Search: '%s' is text, result = %d.\n", m_moveToPlayBuf, m_moveToPlay);
 		}
 		else {
 

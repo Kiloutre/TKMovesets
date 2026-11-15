@@ -69,7 +69,8 @@ std::vector<size_t> BindAnimations(std::span<const Byte> captured, std::span<con
 // is ready, else the `domain` entry when ready; 0 when neither is. Ready = finished compiled animation (request done,
 // compiled object with the game's vtable). Binding and the image audit both use it, so a move is never bound to an
 // entry the game would skip.
-gameAddr ReadyAnimation(const GameProcess& process, gameAddr container, uint32_t domain, uint32_t id);
+// `compiledVtable`: the game's compiled animation vtable (RetailT8Resources::EngineAddresses).
+gameAddr ReadyAnimation(const GameProcess& process, gameAddr container, uint32_t domain, uint32_t id, gameAddr compiledVtable);
 uint64_t FallBackMissingCarriers(std::vector<size_t>& rows, std::span<const Byte> payload, const std::set<uint32_t>& missing);
 Plan Prepare(const TKMovesetHeader& header, std::span<const Byte> payload, const ExternalCancels& external = {});
 struct Audit { uint64_t bytes = 0, externalLists = 0, animations = 0; };
@@ -83,6 +84,8 @@ struct MemoryOnlyAudit {
     const std::map<std::pair<uint32_t, uint32_t>, std::vector<Byte>>* cancels = nullptr;
     // Ids the game's archives declare without data: the only handles allowed not to resolve.
     const std::set<uint32_t>* dataless = nullptr;
+    // The game's compiled animation vtable (ImporterT8::Engine()); required.
+    gameAddr compiledVtable = 0;
 };
 // Swaps the source and target identities in self-character checks: primary checks (220/221, 499/500) use `target`
 // (player +0x168), secondary checks (224/225, 503/504) use `targetSecondary` (player +0x16c; UINT32_MAX = `target`).
