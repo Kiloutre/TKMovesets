@@ -1,0 +1,40 @@
+Value,Function,Extra Prop in Requirement,Notes
+336,Automatic Cancel / End of a cancel list,,
+1,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self (?),"Used to activate flags
+Always uses extradata 10240.
+Always has the move ID set to 32769."
+3,"No canceling, invoke Extra Properties upon meeting Requirements (contains parry requirements)",Invoked on self (?),Automatic cancel. Same as opt=1 but requirements contain parry requirements (req ≥ 1031)
+16,"No canceling, invoke Extra Properties upon meeting Requirements and Command",Invoked on self (?),Input Based cancel. Same as opt=272 but move_id is in the excluded sentinel range (0x8021–0x802A)
+64,Cancel into a move by Command and meeting Requirements (if any),Invoked on move being cancelled into,Input Based cancel
+65,Cancel into a move by meeting Requirements,Invoked on move being cancelled into,Standard Automatic cancel
+67,Cancel into a move by Requirements (contains parry requirements),Invoked on move being cancelled into (?),Automatic cancel. Same as opt=65 but requirements contain parry requirements (req ≥ 1031)
+71,"Cancel into a move by Requirements (contains parry requirements, higher range)",Invoked on move being cancelled into (?),Automatic cancel. Same as opt=67 but requirements also contain req ≥ 1060 (higher parry range)
+80,Cancel into a move by Command and meeting Requirements (if any),Invoked on move being cancelled into,Standard input based cancel
+81,Cancel into a move by meeting Requirements,Invoked on move being cancelled into (?),"Used in throw breaks. This cancel option does use commands 
+but not in the cancel itself, rather the requirements"
+88,Cancel into a move by Command and meeting Requirements (contains req 0x87FB — unknown),Invoked on move being cancelled into (?),Input Based cancel. Same as opt=80 but requirements contain prop 0x87FB (unknown)
+192,Cancel into a move by Command and meeting Requirements,Invoked on move being cancelled into (?),Input Based cancel. Side-specific (extradata low 6 bits = 0x16). Requirements contain story reqs which suppress bit 4
+193,Cancel into a move by Requirements,Invoked on move being cancelled into (?),Automatic cancel. Side-specific (extradata low 6 bits = 0x16)
+208,Cancel into a move by Command and meeting Requirements,Invoked on move being cancelled into (?),Input Based cancel. Side-specific (extradata low 6 bits = 0x16)
+256,"No canceling, invoke Extra Properties upon meeting Requirements
+and Command",Invoked on self (?),"Used in automatic basic combos.
+By Default, input is 0x2000000F00000000.
+Always uses extradata 10240.
+Always has the move ID set to 32769."
+257,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self,"Always uses extradata 10240.
+Always has the move ID set to 32769."
+259,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self,Automatic cancel. Same as opt=257 but requirements contain parry requirements (req ≥ 1031)
+263,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self,Automatic cancel. Same as opt=259 but requirements also contain req ≥ 1060 (higher parry range)
+272,"No canceling, invoke Extra Properties upon meeting Requirements
+and Command",Invoked on self,"Always uses extradata 10240.
+Always has the move ID set to 32769."
+273,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self,Automatic cancel. Requirements contain throw-break reqs 131–135 (enables bit 4 despite no command)
+320,"No canceling, invoke Extra Properties upon meeting Requirements and Command",Invoked on self,Input Based cancel. Sentinel move_id. Requirements contain story reqs which suppress bit 4
+321,Cancel into a move by Requirements,Invoked on self,Automatic cancel. move_id is a non-airborne sentinel (state machine transition)
+464,Cancel into a move by Command and meeting Requirements,Invoked on self,Input Based cancel. Side-specific (extradata low 6 bits = 0x16). Sentinel move_id
+ADDITIONAL NOTES,,,
+- Bit 8 sentinel range excludes 0x8021–0x8026 and 0x8028–0x802A because those are airborne aliases,,,
+"- Extradata 0x2800 (10240) and 0x2C00 (11264) are the ""no cancel into move"" extradata values — when a cancel uses these, bit 6 is suppressed",,,
+"- Extradata value 150 (""Heavy Tracking Both Sides"") has low 6 bits = 0x16, which sets bit 7 (side-specific)",,,
+- Reqs 85/86 — suspected side conditions but unconfirmed in testing,,,
+"- Req 0x87FB — unknown, sets bit 3",,,

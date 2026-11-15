@@ -4,10 +4,6 @@
 
 #include "constants.h"
 
-ImVec2 operator+(const ImVec2& c_self, const ImVec2& c_other);
-ImVec2 operator-(const ImVec2& c_self, const ImVec2& c_other);
-ImVec2 operator*(const ImVec2& c_self, float value);
-
 namespace ImGuiExtra
 {
 	// Class that can be created in a block, will disable everything inside of that block
@@ -75,6 +71,12 @@ namespace ImGuiExtra
 
 	// Renders a textbox with padding, border and filling color
 	void RenderTextbox(const char* c_text, ImU32 c_borderColor=TEXTBOX_BORDER_COLOR, ImU32 c_fillColor=0, float padding=-1);
+
+	// Modal used by every dialog: opens centered at 1.25 x `widthEm` font sizes (at least 46, capped to the screen)
+	// with its height fitted to the content (at least ~14 lines), then resizable; content wider than the window
+	// scrolls. Shown with `title`.
+	// `id` is the identifier passed to ImGui::OpenPopup.
+	bool BeginFittedModal(const char* id, const char* title, bool* open = nullptr, float widthEm = 34.0f);
 }
 
 # define ImGuiExtra_TextboxWarning(text) ImGuiExtra::RenderTextbox(text, TEXTBOX_BORDER_WARNING, TEXTBOX_BORDER_WARNING)

@@ -1,0 +1,34 @@
+Value,Function,Extra Prop in Requirement,Notes
+336,Automatic Cancel / End of a cancel list,,
+1,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self (?),"Used to activate flags
+Always uses extradata 10240.
+Always has the move ID set to 32769."
+3,Requires Research,,Automatic cancel
+16,Requires Research,,Input Based cancel
+64,Cancel into a move by Command and meeting Requirements (if any),Invoked on move being cancelled into,Input Based cancel
+65,Cancel into a move by meeting Requirements,Invoked on move being cancelled into,Standard Automatic cancel
+67,Requires Research,,Automatic cancel
+71,Requires Research,,Automatic cancel
+80,Cancel into a move by Command and meeting Requirements (if any),Invoked on move being cancelled into,Standard input based cancel
+81,Cancel into a move by meeting Requirements,Invoked on move being cancelled into (?),"Used in throw breaks. This cancel option does use commands 
+but not in the cancel itself, rather the requirements"
+88,Requires Research,,Input Based cancel
+192,Requires Research,,Input Based cancel
+193,Requires Research,,Automatic cancel
+208,Requires Research,,Input Based cancel
+256,"No canceling, invoke Extra Properties upon meeting Requirements
+and Command",Invoked on self (?),"Used in automatic basic combos.
+By Default, input is 0x2000000F00000000.
+Always uses extradata 10240.
+Always has the move ID set to 32769."
+257,"No canceling, invoke Extra Properties upon meeting Requirements",Invoked on self,"Always uses extradata 10240.
+Always has the move ID set to 32769."
+259,Requires Research,,Automatic cancel
+263,Requires Research,,Automatic cancel
+272,"No canceling, invoke Extra Properties upon meeting Requirements
+and Command",Invoked on self,"Always uses extradata 10240.
+Always has the move ID set to 32769."
+273,Requires Research,,Automatic cancel
+320,Requires Research,,Input Based cancel
+321,Requires Research,,Automatic cancel
+464,Requires Research,,Input Based cancel

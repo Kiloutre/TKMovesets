@@ -289,7 +289,7 @@ void TEditor_MoveReferences::RenderGroupedCancelsReferences()
 				ImGui::TableNextColumn();
 
 				ImGui::PushID(cancel_ref.list_start_id);
-				if (ImGui::Button(_("references.cancel.view_cancel"))) {
+				if (ImGui::Button(_("references.cancels.view_cancel"))) {
 					m_baseWindow->OpenFormWindow(TEditorWindowType_Cancel, cancel_ref.list_start_id);
 				}
 

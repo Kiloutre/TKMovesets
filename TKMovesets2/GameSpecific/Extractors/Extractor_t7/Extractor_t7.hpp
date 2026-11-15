@@ -15,33 +15,7 @@
 class ExtractorT7 : public Extractor
 {
 private:
-	/// Main functions
-
-	// Fill the moveset table & its corresponding offset table brother.
-	void FillMovesetTables(gameAddr movesetAddr, StructsT7_gameAddr::MovesetTable* table, StructsT7_gameAddr::MovesetTable* offsets);
-	// Fill moveset header with our own various useful informations
-	void FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, uint64_t propertyCount);
-	// Allocate and copy the contents of the moveset block
-	Byte* CopyMovesetBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT7_gameAddr::MovesetTable& table);
-	// Allocate and copy the contents of the name block
-	char* CopyNameBlock(gameAddr movesetAddr, uint64_t& size_out, const StructsT7_gameAddr::Move* movelist, uint64_t moveCount, gameAddr& nameBlockStart);
-	// Fill motalist struct, build list of anims within the mota file, allocate and copy contents of the mota block
-	Byte* CopyMotaBlocks(gameAddr movesetAddr, uint64_t& size_out, StructsT7::MotaList* motasList, ExtractSettings settings);
-	// Returns an allocated block containing animations that weren't in the main animation block. Also builds a map to convert anim addresses to offsets.
-	Byte* CopyAnimations(const StructsT7_gameAddr::Move* movelist, size_t moveCount, uint64_t& size_out, std::map<gameAddr, uint64_t>& offsets);
-	// Copies the moveset info block (aliases, couple strings)
-	void CopyMovesetInfoBlock(gameAddr movesetAddr, StructsT7_gameAddr::MovesetInfo* movesetHeader);
-	// Copies the displayable movelist, visible in training mode and maybe elsewhere
-	Byte* CopyDisplayableMovelist(gameAddr movesetAddr, gameAddr playerAddress, uint64_t& size_out, ExtractSettings settings);
-
-	/// Helpers
-
-	// Writes bounds of the block containing anim and move names
-	void GetNamesBlockBounds(const StructsT7_gameAddr::Move* move, uint64_t moveCount, gameAddr& start, gameAddr& end);
-	// Returns an allocated block containing mota block offsets followed by mota blocks
-	Byte* AllocateMotaCustomBlock(StructsT7::MotaList* motas, uint64_t& size_out, ExtractSettings settings);
-	// Calculate the size of the mota custom block we will build, and also fill boundaries with every animation address we can find
-	uint64_t CalculateMotaCustomBlockSize(const StructsT7::MotaList* motas, std::map<gameAddr, std::pair<gameAddr, uint64_t>>& offsetMap, ExtractSettings settings);
+    void FillHeaderInfos(TKMovesetHeader& infos, gameAddr playerAddress, const std::string& characterName);
 
 public:
 	using Extractor::Extractor; // Inherit constructor too

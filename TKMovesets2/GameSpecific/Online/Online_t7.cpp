@@ -2,7 +2,8 @@
 
 OnlineT7::~OnlineT7()
 {
-    if (resetMemOnDestroy && m_sharedMemPtr && m_process.CheckRunning()) {
+    // FreeSharedMemory() unmaps the view and nulls m_orig_sharedMemPtr, not our derived copy: check the base pointer
+    if (resetMemOnDestroy && m_orig_sharedMemPtr && m_sharedMemPtr && m_process.CheckRunning()) {
         m_sharedMemPtr->locked_in = false;
     }
 }
@@ -24,6 +25,11 @@ void OnlineT7::OnMovesetImport(movesetInfo* displayedMoveset, unsigned int playe
 
     (*displayedMovesets)[playerid] = *displayedMoveset;
 
+    if (m_orig_sharedMemPtr == nullptr || m_sharedMemPtr == nullptr) {
+        // Shared memory not loaded, or already unmapped
+        return;
+    }
+
     m_sharedMemPtr->players[playerid].crc32 = lastLoadedMoveset.crc32;
     m_sharedMemPtr->players[playerid].custom_moveset_addr = lastLoadedMoveset.address;
     m_sharedMemPtr->players[playerid].custom_moveset_size = lastLoadedMoveset.size;
@@ -42,18 +48,24 @@ void OnlineT7::ClearMovesetSelection(unsigned int playerid)
     }
 
     (*displayedMovesets)[playerid] = emptyMoveset;
+    if (m_orig_sharedMemPtr == nullptr || m_sharedMemPtr == nullptr) {
+        return;
+    }
     m_sharedMemPtr->players[playerid].custom_moveset_addr = 0;
 }
 
 void OnlineT7::SetLockIn(bool locked, MovesetLoaderMode_ movesetLoaderMode)
 {
+    if (m_orig_sharedMemPtr == nullptr || m_sharedMemPtr == nullptr) {
+        return;
+    }
     m_sharedMemPtr->locked_in = locked;
     m_sharedMemPtr->moveset_loader_mode = movesetLoaderMode;
 }
 
 void OnlineT7::ExecuteExtraprop(uint32_t playerid, uint32_t id, uint32_t value)
 {
-    if (m_sharedMemPtr != nullptr) {
+    if (m_orig_sharedMemPtr != nullptr && m_sharedMemPtr != nullptr) {
         m_sharedMemPtr->propToPlay = {
             .playerid = playerid,
             .id = id,

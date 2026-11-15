@@ -1,23 +1,26 @@
-#pragma once
-
 #include "ThreadedClass.hpp"
 
-// -- Public functions -- //
+ThreadedClass::~ThreadedClass()
+{
+    StopThreadAndCleanup();
+}
 
 void ThreadedClass::StartThread()
 {
-	if (!m_threadStarted)
-	{
-		m_threadStarted = true;
-		m_t = std::thread(&ThreadedClass::Update, this);
-	}
+    std::lock_guard lock(m_lifecycleMutex);
+    if (m_t.joinable()) return;
+    m_threadStarted = true;
+    try {
+        m_t = std::thread(&ThreadedClass::Update, this);
+    } catch (...) {
+        m_threadStarted = false;
+        throw;
+    }
 }
 
 void ThreadedClass::StopThreadAndCleanup()
 {
-	if (m_threadStarted)
-	{
-		m_threadStarted = false;
-		m_t.join();
-	}
+    std::lock_guard lock(m_lifecycleMutex);
+    m_threadStarted = false;
+    if (m_t.joinable()) m_t.join();
 }

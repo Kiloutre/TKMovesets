@@ -2,6 +2,8 @@
 
 #include "helpers.hpp"
 
+using namespace StructsT7;
+
 // Live edition callbacks that will only be called if live edition is enabled, the moveset is loaded in memory AND if the modified field is valid
 
 void EditorT7::Live_OnMoveEdit(int id, EditorInput* field)
@@ -896,6 +898,7 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* fiel
 	if (live_loadedMoveset == 0) {
 		return;
 	}
+    GameProcess::WriteBatch transaction(m_process);
 	DEBUG_LOG("Applying live edit: window type %d, item id %d, field name '%s', buffer [%s]\n", type, id, field->name.c_str(), field->buffer);
 
 	switch (type)
@@ -972,5 +975,10 @@ void EditorT7::Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* fiel
 		Live_OnMovelistInputEdit(id, field);
 		break;
 	}
-	return;
+    const auto result = transaction.Commit();
+    if (!result.ok) {
+        live_loadedMoveset = 0;
+        throw std::runtime_error(result.rollbackComplete ? "Live edit failed; the previous values were restored." :
+            "Live edit failed and rollback was incomplete. Re-import before editing live.");
+    }
 }

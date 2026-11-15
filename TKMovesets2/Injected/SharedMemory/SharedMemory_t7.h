@@ -14,7 +14,7 @@ struct SharedMemT7_Player
 	uint64_t custom_moveset_original_data_addr;
 	// Original moveset data size
 	uint64_t custom_moveset_original_data_size = 0;
-	// Nth bit set = Nth bit mota missing
+	// Nth bit set = Nth bit mota missing. Rebuilt from scratch by the loader whenever .is_initialized is false.
 	uint16_t missingMotas;
 	// True if moveset is ready to apply, false if moveset needs initialization
 	bool is_initialized;

@@ -28,7 +28,7 @@ void TEditorMove::OnInitEnd()
 	}
 }
 
-void TEditorMove::OnDuplication(unsigned int moveId, unsigned int listSize)
+void TEditorMove::PrepareDuplication(unsigned int moveId, unsigned int listSize)
 {
 	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 	baseWindow->OnMoveCreate(moveId);
@@ -91,10 +91,9 @@ void TEditorMove::OnFieldLabelClick(int listIdx, EditorInput* field)
 void TEditorMove::OnApply()
 {
 	auto editor = Editor<EditorT7>();
-	auto baseWindow = BaseWindow<EditorVisuals_T7>();
 
 	editor->RecomputeDisplayableMoveFlags(structureId);
-	baseWindow->ReloadMovelistFilter();
+	// Mutation commit requests the next-frame filter refresh; do not publish working-row pointers here.
 	if (m_renamed) {
 		// todo: re-compute displayable color of this move according ot its new properties
 		ApplyWindowName();
@@ -191,7 +190,7 @@ void TEditorMove::PostRender()
 				if (!animName.empty()) {
 					// Update our own field
 					auto& animNameField = m_fieldIdentifierMap["anim_name"];
-					sprintf_s(animNameField->buffer, animNameField->bufsize, animName.c_str());
+					sprintf_s(animNameField->buffer, animNameField->bufsize, "%s", animName.c_str());
 					animNameField->errored = false;
 					// Mark changes as applied to tell the editor window to highlight the 'Save' button.
 					// But don't update m_unsavedChanges because these changes do not require the use of the Apply() button
@@ -226,4 +225,16 @@ void TEditorMove::RenderExtraContextMenuItems()
 			m_baseWindow->AddSubwindow(new TEditor_MoveReferences((TEditor*)m_editor, m_baseWindow, structureId));
 		}
 	}
+}
+struct TEditorMove::RenameState final : EditorForm::TransactionState {
+    std::unique_ptr<TransactionState> base;
+    TEditorMove& form;
+    bool renamed, committed = false;
+    RenameState(TEditorMove& target, size_t& budget)
+        : base(target.EditorForm::BeginTransaction(budget)), form(target), renamed(target.m_renamed) {}
+    ~RenameState() override { if (!committed) form.m_renamed = renamed; }
+    void Commit() noexcept override { base->Commit(); committed = true; }
+};
+std::unique_ptr<EditorForm::TransactionState> TEditorMove::BeginTransaction(size_t& budget) {
+    return std::make_unique<RenameState>(*this, budget);
 }

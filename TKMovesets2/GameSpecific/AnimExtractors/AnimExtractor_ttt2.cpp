@@ -15,13 +15,17 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 	const TKMovesetHeader& header = *(TKMovesetHeader*)moveset;
 	const Byte* moveset_data = moveset + header.moveset_data_start;
 	const TKMovesetHeaderBlocks& blocks = *(TKMovesetHeaderBlocks*)(moveset + header.block_list);
+	// The file is untrusted: every block, table, string and MOTA walked below is bounds-checked first
+	const auto blockSizes = TAnimExtractorUtils::BlockSizes(moveset, s_moveset, sizeof(blocks.blocks) / sizeof(uint64_t));
+	TAnimExtractorUtils::RequireTable(blocks.nameBlock - blocks.movesetInfoBlock, 0, 1, sizeof(MovesetInfo), "Moveset info");
 
 	MovesetInfo& moveset_info = *(MovesetInfo*)blocks.GetBlock(TKMovesetHeaderBlocks_MovesetInfo, moveset_data);
-	char* name_block = (char*)blocks.GetBlock(TKMovesetHeaderBlocks_Name, moveset_data);
+	const Byte* name_block = blocks.GetBlock(TKMovesetHeaderBlocks_Name, moveset_data);
 	auto moveset_block = blocks.GetBlock(TKMovesetHeaderBlocks_Moveset, moveset_data);
 	auto animation_block = blocks.GetBlock(TKMovesetHeaderBlocks_Animation, moveset_data);
 	auto mota_block = blocks.GetBlock(TKMovesetHeaderBlocks_Mota, moveset_data);
 
+	TAnimExtractorUtils::RequireTable(blockSizes[TKMovesetHeaderBlocks_Moveset], (uint64_t)moveset_info.table.move, moveset_info.table.moveCount, sizeof(Move), "Move table");
 	Move* movelist = (Move*)(moveset_block + (uint64_t)moveset_info.table.move);
 
 	auto& extractionStatus = extractionControl.statuses[extractionControl.current_index];
@@ -47,13 +51,11 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 			continue;
 		}
 
-		const MotaHeader& mota = *(MotaHeader*)(mota_block + (uint64_t)moveset_info.motas.motas[i]);
-
-		uint32_t mota_size = (uint32_t)(s_moveset - (((Byte*)&mota) - moveset));
-
-		if (!mota.IsValid(mota_size)) {
+		const uint64_t mota_size = TAnimExtractorUtils::MotaSize<MotaHeader>(moveset, s_moveset, mota_block, blockSizes[TKMovesetHeaderBlocks_Mota], (uint64_t)moveset_info.motas.motas[i]);
+		if (mota_size == 0) {
 			continue;
 		}
+		const MotaHeader& mota = *(const MotaHeader*)(mota_block + (uint64_t)moveset_info.motas.motas[i]);
 
 		std::set<uint32_t> extracted_mota_animations;
 		for (unsigned int i = 0; i < mota.anim_count && !mustInterrupt; ++i)
@@ -78,10 +80,11 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 
 			if (!extracted_animations.contains(move.anim_addr))
 			{
-				char* anim_name = name_block + (uint64_t)move.anim_name_addr;
-				const Byte* anim = animation_block + (uint64_t)move.anim_addr;
+				const std::string anim_name = TAnimExtractorUtils::BlockString(name_block, blockSizes[TKMovesetHeaderBlocks_Name], (uint64_t)move.anim_name_addr, "anim_" + std::to_string(i + 1));
+				if ((uint64_t)move.anim_addr >= blocks.motaBlock - blocks.animationBlock) continue;
+			const Byte* anim = animation_block + (uint64_t)move.anim_addr;
 				extracted_animations.insert(move.anim_addr);
-				TAnimExtractorUtils::ExtractAnimation(anim_name, anim, outputFolder, outputFile, L"" ANIMATION_EXTENSION);
+				TAnimExtractorUtils::ExtractAnimation(anim_name, anim, static_cast<uint64_t>(mota_block - anim), outputFolder, outputFile, L"" ANIMATION_EXTENSION);
 				extractionStatus.current_animation++;
 			}
 		}
@@ -97,14 +100,13 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 		CreateDirectoryW(motaOutputFolder.c_str(), nullptr);
 
 		std::set<uint32_t> extracted_mota_animations;
-		const MotaHeader& mota = *(MotaHeader*)(mota_block + (uint64_t)moveset_info.motas.motas[i]);
 		std::ofstream motaOutputFile(motaOutputFolder + L"anims.txt");
 
-		uint32_t mota_size = (uint32_t)(s_moveset - (((Byte*)&mota) - moveset));
-
-		if (!mota.IsValid(mota_size)) {
+		const uint64_t mota_size = TAnimExtractorUtils::MotaSize<MotaHeader>(moveset, s_moveset, mota_block, blockSizes[TKMovesetHeaderBlocks_Mota], (uint64_t)moveset_info.motas.motas[i]);
+		if (mota_size == 0) {
 			continue;
 		}
+		const MotaHeader& mota = *(const MotaHeader*)(mota_block + (uint64_t)moveset_info.motas.motas[i]);
 
 		const wchar_t* extension;
 
@@ -133,8 +135,9 @@ void AnimExtractor::_FromTTT2(const Byte* moveset, uint64_t s_moveset, const std
 			if (!extracted_mota_animations.contains(anim_offset))
 			{
 				extracted_mota_animations.insert(anim_offset);
+				if (anim_offset >= mota_size) continue;
 				const Byte* anim = (Byte*)&mota + anim_offset;
-				TAnimExtractorUtils::ExtractAnimation(std::to_string(i).c_str(), anim, motaOutputFolder, motaOutputFile, extension);
+				TAnimExtractorUtils::ExtractAnimation(std::to_string(i).c_str(), anim, mota_size - anim_offset, motaOutputFolder, motaOutputFile, extension);
 				extractionStatus.current_animation++;
 			}
 		}

@@ -12,6 +12,26 @@
 class GameInteraction : public ThreadedClass
 {
 protected:
+	mutable std::recursive_mutex m_stateMutex;
+    const GameInfo* m_pendingGame = nullptr;
+    bool m_resetRequested = false;
+    bool m_executingOperation = false;
+    // Only the worker owns factories/process lifetime. Publish small UI updates
+    // under the state lock; do slow I/O without holding the rendering lock.
+    template<class Work> auto RunOutsideState(std::unique_lock<std::recursive_mutex>& state, Work work) {
+        m_executingOperation = true;
+        state.unlock();
+        try {
+            auto result = work();
+            state.lock();
+            m_executingOperation = false;
+            return result;
+        } catch (...) {
+            state.lock();
+            m_executingOperation = false;
+            throw;
+        }
+    }
 	// Flags that will be used to open the process with
 	DWORD m_processExtraFlags = 0;
 	// Last status of the process, used to detect status change and trigger appropriate events
@@ -33,6 +53,9 @@ protected:
 	// Function ran in the parallel thread, executed regularly
 	void Update();
 public:
+	// Hold while accessing the legacy public view of process and game state.
+	std::unique_lock<std::recursive_mutex> LockState() const { return std::unique_lock(m_stateMutex); }
+	std::unique_lock<std::recursive_mutex> TryLockState() const { return std::unique_lock(m_stateMutex, std::try_to_lock); }
 	// Everything that is related to files is done through .storage. Listing, deleting, etc. We store this here because GameData* needs a storage copy anyway.
 	LocalStorage* storage = nullptr;
 	// Stores the currently selected game's info
@@ -65,5 +88,10 @@ public:
 	// Frees the factory-obtained class we allocated earlier
 	virtual void FreeExpiredFactoryClasses() = 0;
 	// Deattach the current process if attached
-	virtual void ResetTargetProcess() {};
+	virtual void ResetTargetProcess() {
+        auto state = LockState();
+        m_pendingGame = nullptr;
+        m_canStart = false;
+        m_resetRequested = true;
+    };
 };

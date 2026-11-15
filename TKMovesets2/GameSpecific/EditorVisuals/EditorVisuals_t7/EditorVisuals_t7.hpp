@@ -24,6 +24,8 @@ class EditorVisuals_T7 : public EditorVisuals
 	};
 
 private:
+    struct ViewState;
+    std::unique_ptr<EditorForm::TransactionState> BeginWindowTransaction() override;
 	// Buffer containing the move to play text
 	char m_moveToPlayBuf[32]{ 0 };
 	// Store the move to play as a int32_t, or -1 if the move id is invalid (checks are made against the moveset data)
@@ -36,8 +38,12 @@ private:
 	int32_t m_moveToScrollTo = -1;
 	// id of the highlithed move in the movelist
 	int16_t m_highlightedMoveId = -1;
+	// Index typed in the toolbar's Go to menu
+	int m_gotoId = 0;
 	// Access moveset data through this variable. Uses polymorphism.
 	TEditor* m_editor = nullptr;
+	// Ask about unsaved edits on the next frame (closing the window with unsaved or unapplied edits)
+	bool m_closePrompt = false;
 	// List of tabs to display in the move list
 	std::vector<s_movelistTabs> m_movelistTabs{
 		{"edition.moves_all", EditorVisualsT7::EditorMovelistFilter_All},

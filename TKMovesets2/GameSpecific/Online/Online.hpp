@@ -2,6 +2,8 @@
 
 #include <windows.h>
 #include <thread>
+#include <atomic>
+#include <mutex>
 
 #include "GameProcess.hpp"
 #include "GameData.hpp"
@@ -20,12 +22,15 @@ protected:
 	// Ptr to the shared memory
 	SharedMemBase* m_orig_sharedMemPtr = nullptr;
 	// Thread that will run the DLL injection
-	std::thread* m_dllInjectionThread;
-	// True if dllInjection thread has been started at least once and must be joined
-	bool m_startedThread = false;
+	std::thread m_dllInjectionThread;
+	// Serializes InjectDllAndWaitEnd() between the injection thread and direct callers
+	std::mutex m_injectionMutex;
 
 	// Calls a function of the MovesetLoader inside of the remote process. Returns false if failure was encountered somewhere.
-	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false);
+	// Refuses to call anything once .versionMismatch is set. [outExitCode] receives the remote thread's exit code if [waitEnd] is true.
+	bool CallMovesetLoaderFunction(const char* functionName, bool waitEnd=false, uint32_t* outExitCode=nullptr);
+	// Opens its own read-only view of the shared memory (if a loader already created it) and returns true if its version does not match ours
+	bool PeekDllVersionMismatch();
 	// Returns the name of the shared memory to look after
 	virtual const TCHAR* GetSharedMemoryName() = 0;
 	// Called after the shared memory has been successfully initialized
@@ -34,18 +39,20 @@ public:
 	// Contains a copy of the basic moveset informations we have loaded
 	std::vector<movesetInfo>* displayedMovesets;
 	// True if we are currently injecting a DLL
-	bool isInjecting = false;
+	std::atomic_bool isInjecting = false;
 	// Contains whether or not we have injected our DLL
-	bool injectedDll = false;
+	std::atomic_bool injectedDll = false;
 	// If the shared memory is to be reseted && the injected DLL freed when this instance gets deleted.
 	// If you have multiple instances of sharedMem, it might be good to only have one reset the shared memory & free the dll
 	bool resetMemOnDestroy = false;
-	// Becomes true if the injected DLL version does not match the current program's one
-	bool versionMismatch = false;
+	// Becomes true if the injected DLL version does not match the current program's one. Loader functions are not called anymore once set.
+	std::atomic_bool versionMismatch = false;
 
 	Online(GameProcess& process, GameData& game, const GameInfo* gameInfo);
 	virtual ~Online();
 
+	// Free the shared memory
+	void FreeSharedMemory();
 	// Check if the DLL's version does not match the current one, sets .versionMismatch and returns its value
 	bool VerifyDllVersionMismatch();
 	// Load the shared memory handle

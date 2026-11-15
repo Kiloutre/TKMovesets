@@ -33,7 +33,6 @@ protected:
 	// List of hooked functions. Do not use this directly, use CastTrampoline(), UnhookFunction(), HookFunction()
 	std::map<std::string, functionHook> m_hooks;
 	// Disassembler that must be passed to any hook creation
-	PLH::ZydisDisassembler m_disassembler = PLH::ZydisDisassembler(PLH::Mode::x64);
 	// Contains the module name
 	std::string m_moduleName;
 	// List of required function/variables/ hooks, will error out if one of them isn't found

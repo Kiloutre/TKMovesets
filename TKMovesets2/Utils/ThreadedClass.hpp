@@ -1,17 +1,19 @@
 #pragma once
 
 #include <thread>
+#include <atomic>
+#include <mutex>
 
 class ThreadedClass
 {
+private:
+    std::mutex m_lifecycleMutex;
 protected:
-	// Is a thread running
-	bool m_threadStarted = false;
-	// The thread that will run the Update() function regularly
-	std::thread m_t;
-
+    std::atomic_bool m_threadStarted = false;
+    std::thread m_t;
 public:
-	virtual void StartThread();
-	virtual void Update() = 0;
-	virtual void StopThreadAndCleanup();
+    virtual ~ThreadedClass();
+    virtual void StartThread();
+    virtual void Update() = 0;
+    virtual void StopThreadAndCleanup();
 };

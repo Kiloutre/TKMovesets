@@ -1064,3 +1064,9 @@ dkms.conf
 *.uf2
 # Raspberry Pi Pico disassembler file
 *.dis
+
+
+# Dev
+.dev
+#### Local notes (not tracked)
+.docs/

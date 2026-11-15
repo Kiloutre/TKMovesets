@@ -1,7 +1,10 @@
 #include <string>
+#include <stdexcept>
 
 #include "helpers.hpp"
 #include "Importer_t7.hpp"
+#include "ImportProfile.hpp"
+#include "ConversionRules.hpp"
 #include "GameIDs.hpp"
 
 #include "Structs_t7.h"
@@ -31,7 +34,7 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 
 	if (moveId >= 0x8000) {
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
-		moveId = m_process.readInt16(playerMoveset + offsetof(MovesetInfo, current_aliases) + (0x2 * (moveId - 0x8000)));
+		moveId = m_process.readUInt16(playerMoveset + offsetof(MovesetInfo, current_aliases) + (0x2 * (moveId - 0x8000)));
 	}
 
 	uint64_t movesOffset = offsetof(MovesetInfo, table) + offsetof(MovesetTable, move);
@@ -42,7 +45,7 @@ void ImporterT7::ForcePlayerMove(gameAddr playerAddress, gameAddr playerMoveset,
 	// Tell the game which move to play NEXT
 	m_process.writeInt64(playerAddress + m_game.GetValue("nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process.writeInt64(playerAddress + m_game.GetValue("currmove_id"), moveId);
+	m_process.writeUInt16(playerAddress + m_game.GetValue("currmove_id"), static_cast<uint16_t>(moveId));
 }
 
 
@@ -59,11 +62,16 @@ void ImporterT7::WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerA
 }
 
 
-void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress, bool replaceEmpty)
+void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress, bool replaceEmpty, ImportSettings settings)
 {
 	MotaList currentMotasList{};
-	gameAddr currentMovesetAddr = m_process.readInt64(playerAddress + m_game.GetValue("motbin_offset"));
-	m_process.readBytes(currentMovesetAddr + offsetof(MovesetInfo, motas), &currentMotasList, sizeof(MotaList));
+    if (replaceEmpty) {
+        gameAddr currentMovesetAddr = 0;
+        if (!m_process.readBytes(playerAddress + m_game.GetValue("motbin_offset"), &currentMovesetAddr, sizeof(currentMovesetAddr)) ||
+            !currentMovesetAddr || currentMovesetAddr == UINT64_MAX ||
+            !m_process.readBytes(currentMovesetAddr + offsetof(MovesetInfo, motas), &currentMotasList, sizeof(MotaList)))
+            throw std::runtime_error("Cannot retain current MOTA archives");
+    }
 
 	MotaList* motaList = (MotaList*)(moveset + offsets->motalistsBlock);
 
@@ -73,6 +81,10 @@ void ImporterT7::ConvertMotaListOffsets(const TKMovesetHeaderBlocks* offsets, By
 	// This is just a list of uint64_t anyway so might as well do this
 	for (size_t i = 0; i <= 12; ++i)
 	{
+        if (i < 12 && !(ImportSettingsUtils::MotaMask(settings) & (1U << i))) {
+            fileMotas[i] = replaceEmpty ? gameMotas[i] : MOVESET_ADDR_MISSING;
+            continue;
+        }
 		if (fileMotas[i] != MOVESET_ADDR_MISSING)
 		{
 			MotaHeader* mota = (MotaHeader*)(offsets->GetBlock(TKMovesetHeaderBlocks_Mota, moveset) + fileMotas[i]);
@@ -97,53 +109,53 @@ void ImporterT7::ApplyCharacterIDFixes(Byte* moveset, gameAddr playerAddress, co
 	// I am taking about mundane moves such as EWHF not working where WHF does
 	// The why is hard to understand and might possibly be linked to Mokujin/Combot, but anyway, this fixes things
 
-	uint16_t movesetCharacterId = header->characterId;
+	// Import profile (docs/import-profile.md): by default the moveset adopts the target character; a fixed identity
+	// makes it act as that character (its checks hold, its own extracted id's do not).
+	const auto profile = ImportProfile::Read(*header);
+	uint16_t movesetCharacterId = profile.identity == ImportProfile::Profile::Identity::Fixed ?
+		static_cast<uint16_t>(profile.character) : static_cast<uint16_t>(header->characterId);
 	uint16_t currentCharacterId = m_process.readInt16(playerAddress + m_game.GetValue("chara_id_offset"));
 
-	Requirement* requirement = (Requirement*)(moveset + offsets->movesetBlock + table->requirement);
-	const int c_characterIdCondition = (int)m_game.GetValue("character_id_condition");
-
-	for (size_t i = 0; i < table->requirementCount; ++i)
+	// Requirements the profile decides (gender, story, special modes, items, stage: ImportProfile::RequirementOverride)
+	// become always true (0) or never true (an id without an evaluator case). The defaults decide nothing.
 	{
-		// When the requirement ask "am i X character ID", X = extracted character ID
-		// i will change that X character ID to be the one of the current character, to make it always true.
-		// When the requirement ask for any other character ID, i will supply a character ID that ISN'T the current one, to make it always false.
-
-		if (requirement[i].condition == c_characterIdCondition) {
-			requirement[i].param_unsigned = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 10;
+		Requirement* rows = (Requirement*)(moveset + offsets->movesetBlock + table->requirement);
+		const uint32_t neverTrue = ConversionRules::Current().Value("t8_to_t7_req_never_true");
+		for (size_t i = 0; i < table->requirementCount; ++i) {
+			const auto holds = ImportProfile::RequirementOverride(profile, ImportProfile::Game::T7, rows[i].condition, {rows[i].param_unsigned, 0, 0, 0});
+			if (!holds) continue;
+			rows[i].condition = *holds ? 0 : neverTrue; rows[i].param_unsigned = 0;
 		}
+		// Stripped properties (story presentation): moved to a frame no move reaches, so they never fire.
+		ExtraMoveProperty* extra = (ExtraMoveProperty*)(moveset + offsets->movesetBlock + table->extraMoveProperty);
+		for (size_t i = 0; i < table->extraMovePropertyCount; ++i)
+			if (extra[i].id != 0 && ImportProfile::StripsProperty(profile, ImportProfile::Game::T7, extra[i].id))
+				extra[i].starting_frame = ImportProfile::StrippedFrame;
 	}
 
-	OtherMoveProperty* prop = (OtherMoveProperty*)(moveset + offsets->movesetBlock + table->moveBeginningProp);
-	for (size_t i = 0; i < table->moveBeginningPropCount; ++i)
-	{
-		if (prop->extraprop == c_characterIdCondition) {
-			prop[i].extraprop = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 10;
-		}
-	}
-
-	prop = (OtherMoveProperty*)(moveset + offsets->movesetBlock + table->moveEndingProp);
-	for (size_t i = 0; i < table->moveEndingPropCount; ++i)
-	{
-		if (prop->extraprop == c_characterIdCondition) {
-			prop[i].extraprop = requirement[i].param_unsigned == movesetCharacterId ? currentCharacterId : currentCharacterId + 10;
-		}
-	}
+	// "Am I character X" checks on the moveset's own id now check the current character (always true); checks on any
+	// other id become never true. The in-game moveset loader applies the same rule (StructsT7::RetargetCharacterIdChecks).
+	RetargetCharacterIdChecks((uint32_t)m_game.GetValue("character_id_condition"), movesetCharacterId, currentCharacterId,
+		(Requirement*)(moveset + offsets->movesetBlock + table->requirement), table->requirementCount,
+		(OtherMoveProperty*)(moveset + offsets->movesetBlock + table->moveBeginningProp), table->moveBeginningPropCount,
+		(OtherMoveProperty*)(moveset + offsets->movesetBlock + table->moveEndingProp), table->moveEndingPropCount);
 }
 
 
 void ImporterT7::ImportMovelist(MvlHead* mvlHead, gameAddr game_mlvHead, gameAddr playerAddress)
 {
 	gameAddr managerAddr = m_game.ReadPtrPath("movelist_manager_addr");
+    if (managerAddr == 0) return; // Training UI may not exist in the current game mode.
 
 	int playerId = m_process.readInt32(playerAddress + m_game.GetValue("playerid_offset"));
 
+    if (playerId < 0 || playerId > 1) throw std::runtime_error("Invalid player for training movelist");
 	if (playerId == 1) {
 		managerAddr += sizeof(MvlManager);
 	}
 
 	m_process.writeInt64(managerAddr + offsetof(MvlManager, mvlHead), game_mlvHead);
-	m_process.writeInt64(managerAddr + offsetof(MvlManager, displayableEntriesCount), mvlHead->displayables_count);
+	m_process.writeUInt32(managerAddr + offsetof(MvlManager, displayableEntriesCount), mvlHead->displayables_count);
 	m_process.writeInt64(managerAddr + offsetof(MvlManager, mvlDisplayableBlock), game_mlvHead + mvlHead->displayables_offset);
 }
 
@@ -156,6 +168,9 @@ ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, By
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = (const TKMovesetHeaderBlocks*)((char*)header + header->block_list);
+	if (header->block_list_size < std::size(offsets->blocks) || !ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		return ImportationErrcode_MovesetDataError;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -180,7 +195,10 @@ ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, By
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		m_process.freeMem(gameMoveset);
+		return ImportationErrcode_MovesetDataError;
+	}
 	progress = 70;
 
 	if (!BASIC_LOAD) {
@@ -194,11 +212,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, By
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD, settings);
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + offsets->movelistBlock);
-	bool hasDisplayableMovelist = ((header->moveset_data_start + offsets->movelistBlock + 4) < s_moveset) &&
+	bool hasDisplayableMovelist = (s_moveset - offsets->movelistBlock >= 4) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
@@ -207,7 +225,7 @@ ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, By
 
 	// -- Allocation & Conversion finished -- //
 
-	if (hasDisplayableMovelist)
+	if (hasDisplayableMovelist && !BASIC_LOAD)
 	{
 		gameAddr game_mvlHead = (gameAddr)gameMoveset + offsets->movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
@@ -221,7 +239,10 @@ ImportationErrcode_ ImporterT7::_Import_FromT7(const TKMovesetHeader* header, By
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process.writeBytes(gameMoveset, moveset, s_moveset);
+	if (!m_process.writeBytes(gameMoveset, moveset, s_moveset)) {
+		m_process.freeMem(gameMoveset);
+		return ImportationErrcode_GameAllocationErr;
+	}
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
@@ -271,22 +292,24 @@ void ImporterT7::CleanupUnusedMovesets()
 	};
 	*/
 
-	// Call CanImport() because it's a quick way to see if players are loaded.
-	// If they're not, we can free memory worry-free.
-	if (!CanImport()) {
-		for (size_t i = 0; i < m_process.allocatedMemory.size(); ++i) {
-			std::pair<gameAddr, uint64_t> block = m_process.allocatedMemory[i];
-			gameAddr movesetAddress = block.first;
-			m_process.freeMem(movesetAddress);
-		}
-		return;
-	}
+    // A failed read is not proof that the allocations are unused.
+    if (!m_process.IsAttached() || !CanImport()) return;
+
+    // A newly installed moveset may retain MOTAs owned by an earlier allocation.
+    // Keep those allocations alive until neither player's active MOTA list uses them.
+    uint64_t retainedMotas[2][13]{};
+    for (size_t player = 0; player < 2; ++player) {
+        gameAddr root = 0;
+        if (!m_process.readBytes(playerAddress + player * playerstructSize + motbinOffset, &root, sizeof(root)) ||
+            !root || root == UINT64_MAX ||
+            !m_process.readBytes(root + offsetof(MovesetInfo, motas), retainedMotas[player], sizeof(retainedMotas[player]))) return;
+    }
 
 	// Check mvl manager
 	MvlManager mvlManager[2];
 	uint64_t mvlManagerAddr = m_game.ReadPtrPath("movelist_manager_addr");
 	if (mvlManagerAddr != 0) {
-		m_process.readBytes(mvlManagerAddr, mvlManager, sizeof(mvlManager));
+        if (!m_process.readBytes(mvlManagerAddr, mvlManager, sizeof(mvlManager))) return;
 	}
 	else {
 		memset(mvlManager, 0, sizeof(mvlManager));
@@ -299,6 +322,9 @@ void ImporterT7::CleanupUnusedMovesets()
 		gameAddr movesetAddress = block.first;
 		uint64_t movesetEnd = movesetAddress + block.second;
 		bool isUsed = false;
+        for (const auto& playerMotas : retainedMotas) {
+            for (auto mota : playerMotas) if (movesetAddress <= mota && mota < movesetEnd) isUsed = true;
+        }
 
 		for (int j = 0; j < 2; ++j) {
 			if (
@@ -336,9 +362,11 @@ void ImporterT7::CleanupUnusedMovesets()
 			// Skip
 			++i;
 		}
-		else {
-			m_process.freeMem(movesetAddress);
-		}
+        else {
+            const auto count = m_process.allocatedMemory.size();
+            m_process.freeMem(movesetAddress);
+            if (count == m_process.allocatedMemory.size()) ++i;
+        }
 
 	}
 }
@@ -402,6 +430,7 @@ ImportationErrcode_ ImporterT7::ImportMovesetData(const TKMovesetHeader* header,
 {
 	auto gameId = header->gameId;
 	auto minorVersion = header->minorVersion;
+	m_lastError.clear();
 
 	ImportationErrcode_(ImporterT7::*importFunc)( const TKMovesetHeader * header, Byte * moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t & progress);
 
@@ -421,6 +450,9 @@ ImportationErrcode_ ImporterT7::ImportMovesetData(const TKMovesetHeader* header,
 		break;
 	case GameId_T5:
 		importFunc = &ImporterT7::_Import_FromT5;
+		break;
+	case GameId_T8:
+		importFunc = &ImporterT7::_Import_FromT8;
 		break;
 	default:
 		DEBUG_ERR("IMPORT: Unsupported game version %u", gameId);

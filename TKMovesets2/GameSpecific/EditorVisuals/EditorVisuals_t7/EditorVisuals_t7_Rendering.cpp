@@ -1,11 +1,11 @@
 #include <ImGui.h>
 #include <algorithm>
+#include "AppTheme.hpp"
 
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "EditorVisuals_t7.hpp"
-#include "Compression.hpp"
 #include "GameSharedMem.hpp"
 
 using namespace EditorVisualsT7;
@@ -148,9 +148,7 @@ void EditorVisuals_T7::RenderToolBar()
 		{
 			uint32_t structId = m_editor->CreateNew(structType);
 
-			m_lastChangeDate = Helpers::getCurrentTimestamp();
-			m_savedLastChange = false;
-			m_importNeeded = true;
+			MarkDirty();
 			OpenFormWindow(structType, structId, listSize);
 
 			// Custom pre-creation behaviour implementations
@@ -166,6 +164,57 @@ void EditorVisuals_T7::RenderToolBar()
 			}
 		}
 
+		ImGui::EndMenu();
+	}
+
+	// Open any structure by type and index: type the index, then Enter or the open button (as in the T8 editor).
+	// Lists whose size must be known when opening (pushback extra, inputs, movelist inputs) are not offered.
+	if (ImGui::BeginMenu(_("edition.goto")))
+	{
+		const std::pair<const char*, EditorWindowType> gotoTypes[] = {
+			{"edition.move", TEditorWindowType_Move},
+			{"edition.requirement", TEditorWindowType_Requirement},
+			{"edition.voiceclips", TEditorWindowType_Voiceclip},
+			{"edition.cancel_list", TEditorWindowType_Cancel},
+			{"edition.grouped_cancel_list", TEditorWindowType_GroupedCancel},
+			{"edition.cancel_extradata", TEditorWindowType_CancelExtradata},
+			{"edition.extra_properties", TEditorWindowType_Extraproperty},
+			{"edition.move_begin_properties", TEditorWindowType_MoveBeginProperty},
+			{"edition.move_end_properties", TEditorWindowType_MoveEndProperty},
+			{"edition.hit_conditions", TEditorWindowType_HitCondition},
+			{"edition.reactions", TEditorWindowType_Reactions},
+			{"edition.pushback", TEditorWindowType_Pushback},
+			{"edition.projectile", TEditorWindowType_Projectile},
+			{"edition.input_sequence", TEditorWindowType_InputSequence},
+			{"edition.throw_camera", TEditorWindowType_ThrowCamera},
+			{"edition.camera_data", TEditorWindowType_CameraData},
+			{"edition.mvl_playable", TEditorWindowType_MovelistPlayable},
+		};
+		for (const auto& [label, type] : gotoTypes)
+		{
+			const int count = static_cast<int>(m_editor->GetStructureCount(type));
+			if (ImGui::BeginMenu(_(label), count > 0))
+			{
+				ImGui::TextDisabled("0 - %d", count - 1);
+				ImGui::SetNextItemWidth(120);
+				if (ImGui::IsWindowAppearing()) ImGui::SetKeyboardFocusHere();
+				bool open = ImGui::InputInt("##goto", &m_gotoId, 1, 10, ImGuiInputTextFlags_EnterReturnsTrue);
+				m_gotoId = std::clamp(m_gotoId, 0, count - 1);
+				ImGui::SameLine();
+				open |= ImGui::Button(_("edition.goto_open"));
+				if (open)
+				{
+					OpenFormWindow(type, static_cast<uint16_t>(m_gotoId));
+					if (type == TEditorWindowType_Move) {
+						m_moveToScrollTo = m_gotoId;
+						m_highlightedMoveId = static_cast<int16_t>(m_gotoId);
+						FilterMovelistIfMoveNotFound(static_cast<uint16_t>(m_gotoId));
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndMenu();
+			}
+		}
 		ImGui::EndMenu();
 	}
 
@@ -205,7 +254,14 @@ void EditorVisuals_T7::RenderToolBar()
 
 void EditorVisuals_T7::RenderStatusBar()
 {
-	if (ImGuiExtra::RenderButtonEnabled(_(m_savingError ? "edition.saving_error" : "edition.save"), !m_savedLastChange)) {
+    if (!m_localProcessError.empty()) ImGui::TextUnformatted(m_localProcessError.c_str());
+    if (m_saveJob.Busy()) {
+        ImGui::TextUnformatted(FileJobStageText(m_saveJob.Stage()));
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Cancel save")) m_saveJob.Cancel();
+    } else if (!m_saveMessage.empty()) ImGui::TextUnformatted(m_saveMessage.c_str());
+
+	if (ImGuiExtra::RenderButtonEnabled(_(m_savingError ? "edition.saving_error" : "edition.save"), !m_savedLastChange && !m_saveJob.Busy())) {
 		Save();
 	}
 
@@ -317,20 +373,6 @@ void EditorVisuals_T7::RenderStatusBar()
 		// Highlight only if live edition is enabled & live_moveset is zero
 		ImGuiExtra::HelpMarker(_("edition.live_edition_explanation"), m_liveEdition == false || m_editor->live_loadedMoveset != 0);
 	}
-
-	ImGui::SameLine();
-
-	ImGui::PushID(&CompressionUtils::GetCompressionSetting(0));
-	if (ImGui::BeginCombo("##", m_compressionIndex == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(m_compressionIndex).name))
-	{
-		for (unsigned int i = 0; i < CompressionUtils::GetCompressionSettingCount(); ++i) {
-			if (ImGui::Selectable(i == 0 ? _("extraction.settings.compression_type.none") : CompressionUtils::GetCompressionSetting(i).name, i == m_compressionIndex, 0, ImVec2(140.0f, 0))) {
-				m_compressionIndex = i;
-			}
-		}
-		ImGui::EndCombo();
-	}
-	ImGui::PopID();
 }
 
 void EditorVisuals_T7::RenderMovelist()
@@ -473,18 +515,30 @@ void EditorVisuals_T7::RenderMovelist()
 
 	// Set player move
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_1p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize)) {
-		m_editor->SetCurrentMove(0, m_loadedMoveset, m_moveToPlay);
+        try {
+            m_editor->SetCurrentMove(0, m_loadedMoveset, m_moveToPlay);
+            m_localProcessError.clear();
+        } catch (const std::exception& error) {
+            m_editor->live_loadedMoveset = 0;
+            m_localProcessError = error.what();
+        }
 	}
 	ImGui::SameLine();
 	if (ImGuiExtra::RenderButtonEnabled(_("edition.play_move_2p"), m_loadedMoveset != 0 && m_moveToPlay != -1, buttonSize)) {
-		m_editor->SetCurrentMove(1, m_loadedMoveset, m_moveToPlay);
+        try {
+            m_editor->SetCurrentMove(1, m_loadedMoveset, m_moveToPlay);
+            m_localProcessError.clear();
+        } catch (const std::exception& error) {
+            m_editor->live_loadedMoveset = 0;
+            m_localProcessError = error.what();
+        }
 	}
 }
 
 void EditorVisuals_T7::RenderGameSpecific(int dockid)
 {
 
-	if (m_lastAutoSave < m_lastChangeDate) {
+	if (m_backedUpRevision < m_editRevision && !m_saveJob.Busy()) {
 		// Auto-save: A change was made since the last auto save
 		if ((Helpers::getCurrentTimestamp() - m_lastAutoSave) >= (60 * EDITOR_BACKUP_FREQUENCY_MINUTES)) {
 			// If the change was made 30 minutes ago or more
@@ -560,7 +614,7 @@ void EditorVisuals_T7::RenderGameSpecific(int dockid)
 
 			ImGui::TableNextColumn();
 			// The dockspace loves to overflow past the table end for some reason so we have to re-substract FrameHeight.
-			m_dockId = ImGui::DockSpace(dockid + 2, ImVec2(0, Size.y - ImGui::GetFrameHeightWithSpacing()));
+			m_dockId = AppTheme::DockSpace(dockid + 2, ImVec2(0, Size.y - ImGui::GetFrameHeightWithSpacing()));
 			RenderSubwindows();
 
 			ImGui::EndTable();
@@ -571,11 +625,30 @@ void EditorVisuals_T7::RenderGameSpecific(int dockid)
 	ImGui::End();
 
 
-	// todo: if unsaved changes, prevent closure, popup to force saving
-	if (!popen && !m_savedLastChange)
-	{
-		//popen = true;
-	}
+    // Closing waits for a running save; unsaved or unapplied edits ask first (as the retail T8 editor does).
+    const bool unapplied = std::any_of(m_structWindows.begin(), m_structWindows.end(), [](auto* form) { return form->unsavedChanges; });
+    if (!popen && m_saveJob.Busy()) {
+        popen = true;
+        m_closeAfterSave = true;
+    }
+    else if (!popen && !m_closeAfterSave && (unapplied || !m_savedLastChange)) {
+        popen = true;
+        m_closePrompt = true;
+    }
+    ImGui::PushID(this);
+    if (m_closePrompt) { ImGui::OpenPopup("###UnsavedT7Edits"); m_closePrompt = false; }
+    if (ImGuiExtra::BeginFittedModal("UnsavedT7Edits", _("edition.t8.unsaved_title"), nullptr, 30.0f)) {
+        ImGui::TextUnformatted(_(unapplied ? "edition.t8.unsaved_unapplied" : "edition.t8.unsaved_question"));
+        ImGui::BeginDisabled(unapplied || m_saveJob.Busy());
+        if (ImGui::Button(_("edition.t8.save_and_close"))) { Save(); if (m_saveJob.Busy()) { m_closeAfterSave = true; ImGui::CloseCurrentPopup(); } }
+        ImGui::EndDisabled(); ImGui::SameLine();
+        ImGui::BeginDisabled(m_saveJob.Busy());
+        if (ImGui::Button(_("edition.t8.discard_and_close"))) { popen = false; ImGui::CloseCurrentPopup(); }
+        ImGui::EndDisabled(); ImGui::SameLine();
+        if (ImGui::Button(_("edition.t8.keep_editing"))) ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    ImGui::PopID();
 
 	// -- Now that rendering is done, we can clean up what needs to be cleaned up -- //
 	m_importerHelper->FreeExpiredFactoryClasses();

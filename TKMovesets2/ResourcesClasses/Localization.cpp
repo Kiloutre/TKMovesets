@@ -36,7 +36,7 @@ const TranslationData g_translation_datas[] = {
 		.matchingLocale = { "ja" }
 	},
 	{
-		.displayName = (const char*)u8"한국인",
+		.displayName = (const char*)u8"한국어",
 		.locale = "ko-KR",
 		.data = ko_KR_txt,
 		.matchingLocale = { "ko" }
@@ -68,7 +68,7 @@ namespace Localization
 		if (locale_index < 0 || locale_index >= _countof(g_translation_datas)) {
 			return false;
 		}
-		return LoadFile(g_translation_datas[locale_index].locale);
+		return LoadFile(g_translation_datas[locale_index].locale, unloadPrevious);
 	}
 
 	bool LoadFile(const char* locale, bool unloadPrevious)
@@ -109,6 +109,8 @@ namespace Localization
 
 		while (std::getline(inputData, line))
 		{
+			// The translation files use CRLF: drop the carriage return, or every value ends with '\r'.
+			if (!line.empty() && line.back() == '\r') line.pop_back();
 			size_t commentStart = line.find_first_of('#');
 
 			size_t idStart = line.find_first_not_of(' ', 0);
@@ -125,7 +127,8 @@ namespace Localization
 				line = line.substr(0, commentStart);
 			}
 
-			std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
+			if (idStart == std::string::npos || idStart >= separator) continue;
+		std::string key = line.substr(idStart, line.find_first_of(" =", idStart) - idStart);
 			std::string value;
 			{
 				size_t value_start = line.find_first_not_of(" =", separator);

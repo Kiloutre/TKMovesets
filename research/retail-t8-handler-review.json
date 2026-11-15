@@ -1,0 +1,1232 @@
+{
+  "schema_version": 1,
+  "target_game": "t8-retail",
+  "target_build": "26155785",
+  "source_build": null,
+  "archive_build": null,
+  "runtime_enabled": false,
+  "parameter_transform": null,
+  "policy": "Manual offline handler review. Preserve historical asset votes and aliases. Fill missing editor labels only; do not infer runtime conversion or parameter transforms.",
+  "evidence": {
+    "path": "research/retail-t8-handler-evidence.json",
+    "sha256": "bed6426a8c681b94fa3e6e53ebdaf497932cdb12f73823932f9c6b3d6a24bc87"
+  },
+  "entries": [
+    {
+      "category": "properties",
+      "source_id": 32771,
+      "candidate_id": 32770,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 calls camera shake preset 5. Retail 0x8003 passes 5; asset alternatives 0x8002 and 0x8006 pass 4 and 3. Shared zero property values do not preserve preset strength.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8003",
+        "candidate": "retail:prop:0x8002",
+        "previous": "retail:prop:0x8003",
+        "t7": "t7:prop:0x8003"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32771,
+      "selected_retail_id": 32771
+    },
+    {
+      "category": "properties",
+      "source_id": 32771,
+      "candidate_id": 32774,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 calls camera shake preset 5. Retail 0x8003 passes 5; asset alternatives 0x8002 and 0x8006 pass 4 and 3. Shared zero property values do not preserve preset strength.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8003",
+        "candidate": "retail:prop:0x8006",
+        "previous": "retail:prop:0x8003",
+        "t7": "t7:prop:0x8003"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32771,
+      "selected_retail_id": 32771
+    },
+    {
+      "category": "properties",
+      "source_id": 32779,
+      "candidate_id": 32810,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "Both retail variants issue effect 0x72, but 0x800B also makes the secondary 0x1418B4400 call. T7 0x800B similarly issues an effect then calls sub_14071E940. 0x802A omits that second operation: a related asset replacement, not full-handler equivalence.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x800B",
+        "candidate": "retail:prop:0x802A",
+        "previous": "retail:prop:0x800B",
+        "t7": "t7:prop:0x800B"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32779,
+      "selected_retail_id": 32779
+    },
+    {
+      "category": "properties",
+      "source_id": 32798,
+      "candidate_id": 32798,
+      "original_comparison": "agrees",
+      "status": "insufficient_semantic_evidence",
+      "decision": "retain_existing_id",
+      "reason": "Both call a player-effect helper, but neither wrapper establishes Mouth Fog VFX without callee review. Existing alias retained; no semantic label promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x801E",
+        "candidate": "retail:prop:0x801E",
+        "previous": "retail:prop:0x801E",
+        "t7": "t7:prop:0x801E"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32798,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 32825,
+      "candidate_id": 32828,
+      "original_comparison": "agrees",
+      "status": "insufficient_handler_evidence",
+      "decision": "hold",
+      "reason": "No source case is present in the available T7 decompile for this VFX wrapper. Existing alias is retained, but no new semantic label is promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x803C",
+        "candidate": "retail:prop:0x803C",
+        "previous": "retail:prop:0x803C",
+        "t7": "t7:prop:0x8039"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32828,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 32834,
+      "candidate_id": 32837,
+      "original_comparison": "agrees",
+      "status": "insufficient_handler_evidence",
+      "decision": "hold",
+      "reason": "No source case is present in the available T7 decompile for this VFX wrapper. Existing alias is retained, but no new semantic label is promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8045",
+        "candidate": "retail:prop:0x8045",
+        "previous": "retail:prop:0x8045",
+        "t7": "t7:prop:0x8042"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32837,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 32836,
+      "candidate_id": 32839,
+      "original_comparison": "agrees",
+      "status": "insufficient_handler_evidence",
+      "decision": "hold",
+      "reason": "No source case is present in the available T7 decompile for this VFX wrapper. Existing alias is retained, but no new semantic label is promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8047",
+        "candidate": "retail:prop:0x8047",
+        "previous": "retail:prop:0x8047",
+        "t7": "t7:prop:0x8044"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32839,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 33020,
+      "candidate_id": 33054,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both conditionally store the parameter in opponent state (T7 +0x91C, retail +0x15E4). Supplemental bytes include the untaken non-null write. T7 truncates to 16 bits; retail stores a dword, so only the operation/ID correspondence is supported.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8118",
+        "candidate": "retail:prop:0x811E",
+        "t7": "t7:prop:0x80FC"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 33054
+    },
+    {
+      "category": "properties",
+      "source_id": 33191,
+      "candidate_id": 33303,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 sets four adjacent flag bytes to 1 via 0x01010101; retail explicitly stores 1 in +0x6EE..+0x6F1. Purpose unknown; old wall-alignment guess is not promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x81AD",
+        "candidate": "retail:prop:0x8217",
+        "previous": "retail:prop:0x8217",
+        "t7": "t7:prop:0x81A7"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33303,
+      "selected_retail_id": 33303
+    },
+    {
+      "category": "properties",
+      "source_id": 33193,
+      "candidate_id": 33305,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both assign flag bit 3 from parameter bit 0 (T7 primary flag +0x49C, retail +0x710). The old CNT route selected a different field operation; direct T7 comparison supports the new ID.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8349",
+        "candidate": "retail:prop:0x8219",
+        "t7": "t7:prop:0x81A9"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 33305
+    },
+    {
+      "category": "properties",
+      "source_id": 33197,
+      "candidate_id": 33309,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "Both assign a parameter-driven primary flag bit; mask moves from T7 bit 28 to retail bit 30. Label only the observed retail bit assignment, not the unproven player-position interpretation.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x81B3",
+        "candidate": "retail:prop:0x821D",
+        "previous": "retail:prop:0x821D",
+        "t7": "t7:prop:0x81AD"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33309,
+      "selected_retail_id": 33309
+    },
+    {
+      "category": "properties",
+      "source_id": 33245,
+      "candidate_id": 33357,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "Both store the parameter byte in the blending-related player-state flag (T7 +0x460, retail +0x6C0). ID and simple store agree with existing aliases and matched move properties.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x81E3",
+        "candidate": "retail:prop:0x824D",
+        "previous": "retail:prop:0x824D",
+        "t7": "t7:prop:0x81DD"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33357,
+      "selected_retail_id": 33357
+    },
+    {
+      "category": "properties",
+      "source_id": 33246,
+      "candidate_id": 33358,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "Both obtain a move pointer from the parameter, store it in player state, then copy the current frame byte. This supports the blending-move selection label, not a frame/parameter conversion rule.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x81E4",
+        "candidate": "retail:prop:0x824E",
+        "previous": "retail:prop:0x824E",
+        "t7": "t7:prop:0x81DE"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33358,
+      "selected_retail_id": 33358
+    },
+    {
+      "category": "properties",
+      "source_id": 33248,
+      "candidate_id": 33360,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "Both store a duration-like parameter value in player state (T7 +0x398, retail +0x5E0). Source blending-duration label and broad asset agreement support a label only; T7 truncation versus retail dword remains unvalidated.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x81E6",
+        "candidate": "retail:prop:0x8250",
+        "previous": "retail:prop:0x8250",
+        "t7": "t7:prop:0x81E0"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33360,
+      "selected_retail_id": 33360
+    },
+    {
+      "category": "properties",
+      "source_id": 33315,
+      "candidate_id": 33427,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both self-select the player in the damage packet path and compute scaled damage, with parallel override and global modifier branches. Retail sets damage packet fields +0xBD8/+0xBDC/+0xBE0/+0xBE4. This supports the self-damage label, not equivalence of all damage scaling or recoverable-health behavior.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8140",
+        "candidate": "retail:prop:0x8293",
+        "t7": "t7:prop:0x8223"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 33427
+    },
+    {
+      "category": "properties",
+      "source_id": 33350,
+      "candidate_id": 33462,
+      "original_comparison": "agrees",
+      "status": "insufficient_semantic_evidence",
+      "decision": "retain_existing_id",
+      "reason": "Both delegate to a helper with opponent pointer and signed parameter. Generic wrapper plus existing ID agreement cannot establish combo-counter semantics without helper review; no label promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x824C",
+        "candidate": "retail:prop:0x82B6",
+        "previous": "retail:prop:0x82B6",
+        "t7": "t7:prop:0x8246"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33462,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 33354,
+      "candidate_id": 33466,
+      "original_comparison": "agrees",
+      "status": "insufficient_handler_evidence",
+      "decision": "hold",
+      "reason": "No source case is present in the available T7 decompile for this VFX wrapper. Existing alias is retained, but no new semantic label is promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8250",
+        "candidate": "retail:prop:0x82BA",
+        "previous": "retail:prop:0x82BA",
+        "t7": "t7:prop:0x824A"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33466,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 33357,
+      "candidate_id": 33469,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 assigns flag bit 14; retail assigns player+0x704 bit 17 from parameter bit 0. Label uses observed operation, not the tentative AI Input description.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8253",
+        "candidate": "retail:prop:0x82BD",
+        "previous": "retail:prop:0x82BD",
+        "t7": "t7:prop:0x824D"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33469,
+      "selected_retail_id": 33469
+    },
+    {
+      "category": "properties",
+      "source_id": 33367,
+      "candidate_id": 33479,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 assigns primary flag bit 22; retail assigns primary bit 24 from parameter bit 0. Label uses observed bit operation, not unverified shoulder-hurtbox meaning.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x825D",
+        "candidate": "retail:prop:0x82C7",
+        "previous": "retail:prop:0x82C7",
+        "t7": "t7:prop:0x8257"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33479,
+      "selected_retail_id": 33479
+    },
+    {
+      "category": "properties",
+      "source_id": 33381,
+      "candidate_id": 33493,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both require character ID 3 and store parameter != 0 in a character-state byte (T7 +0xBE7, retail +0x1C1F). T7 shared LABEL_1092 and retail untaken write are archived. Existing retail sword label is retained.",
+      "evidence_handlers": {
+        "candidate": "retail:prop:0x82D5",
+        "t7": "t7:prop:0x8265"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 33493
+    },
+    {
+      "category": "properties",
+      "source_id": 33406,
+      "candidate_id": 33518,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "T7 assigns character-state flag bit 10 from parameter bit 0; retail 0x82EE assigns character-state bit 9 the same way. Multiple character witnesses support this ID correspondence. Consumer meaning and changed flag mask remain unvalidated.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8284",
+        "candidate": "retail:prop:0x82EE",
+        "t7": "t7:prop:0x827E"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 33518
+    },
+    {
+      "category": "properties",
+      "source_id": 33406,
+      "candidate_id": 33519,
+      "original_comparison": "previously_unselected",
+      "status": "rejected_different_operation",
+      "decision": "reject_candidate",
+      "reason": "Retail 0x82EF unconditionally ORs secondary flag 0x20000 and calls a frame helper. It does not assign a character-state flag from parameter bit 0 as T7 0x827E does.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8284",
+        "candidate": "retail:prop:0x82EF",
+        "t7": "t7:prop:0x827E"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 33482,
+      "candidate_id": 33594,
+      "original_comparison": "agrees",
+      "status": "insufficient_semantic_evidence",
+      "decision": "retain_existing_id",
+      "reason": "Both call a helper with two player-state addresses. Source Startup frames related label is explicitly tentative and the helper consumer is not established; no label promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x82D0",
+        "candidate": "retail:prop:0x833A",
+        "previous": "retail:prop:0x833A",
+        "t7": "t7:prop:0x82CA"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33594,
+      "selected_retail_id": null
+    },
+    {
+      "category": "properties",
+      "source_id": 33483,
+      "candidate_id": 33595,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 and retail branch on parameter 0/1/2 and update analogous state bytes. Retail parameter-1 path is archived; source decompile covers the branch family. Tentative special-cancel meaning remains unlabelled.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x82D1",
+        "candidate": "retail:prop:0x833B",
+        "previous": "retail:prop:0x833B",
+        "t7": "t7:prop:0x82CB"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33595,
+      "selected_retail_id": 33595
+    },
+    {
+      "category": "properties",
+      "source_id": 33539,
+      "candidate_id": 33651,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both guard on the Fahkumram technical character ID (T7 54; retail 38) and store a float parameter in player state (T7 +0x664, retail +0x94C). Meaning of the float is unknown. Supplemental bytes include the write skipped by zeroed synthetic player state.",
+      "evidence_handlers": {
+        "candidate": "retail:prop:0x8373",
+        "t7": "t7:prop:0x8303"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 33651
+    },
+    {
+      "category": "properties",
+      "source_id": 33698,
+      "candidate_id": 34027,
+      "original_comparison": "disagrees",
+      "status": "difference_corrected",
+      "decision": "select_candidate",
+      "reason": "T7 calls a global camera routine with a parameter-derived Boolean and player identity. Retail 0x84EB calls camera accessor 0x1417ECD70 then 0x1417EF6E0 with Boolean and player identity. Old 0x821D only updates player+0x710 bit 30. Direct handler structure supports 0x84EB; camera consumer behavior remains offline.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x81B3",
+        "candidate": "retail:prop:0x84EB",
+        "previous": "retail:prop:0x821D",
+        "t7": "t7:prop:0x83A2"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33309,
+      "selected_retail_id": 34027
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 72,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:req:0x0048",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 73,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:req:0x0049",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 84,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:req:0x0054",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 352,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:req:0x0160",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 507,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:req:0x01FB",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 33605,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:prop:0x8345",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 0,
+      "candidate_id": 33744,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 zero is in the unconditional-true group; retail zero explicitly sets the result true. Candidate handlers perform facing/stored-value checks or property writes. Equal zero parameters and list positions do not establish an alias.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0000",
+        "candidate": "retail:prop:0x83D0",
+        "previous": "retail:req:0x0000",
+        "t7": "t7:req:0x0000"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 0,
+      "selected_retail_id": 0
+    },
+    {
+      "category": "requirements",
+      "source_id": 80,
+      "candidate_id": 72,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 uses an unsigned 16-bit wraparound interval: (angle+0xC001) < 0x4001. Retail 0x50 implements (angle-0x3FFF) <= 0x4000, the same interval. Candidate 0x48 instead uses a signed comparison with 0x4000 on a different angle field.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0050",
+        "candidate": "retail:req:0x0048",
+        "previous": "retail:req:0x0050",
+        "t7": "t7:req:0x0050"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 80,
+      "selected_retail_id": 80
+    },
+    {
+      "category": "requirements",
+      "source_id": 84,
+      "candidate_id": 0,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 checks a facing state for zero; retail 0x54 checks player+0xED0 for zero. Candidate retail zero is unconditional true.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0054",
+        "candidate": "retail:req:0x0000",
+        "previous": "retail:req:0x0054",
+        "t7": "t7:req:0x0054"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 84,
+      "selected_retail_id": 84
+    },
+    {
+      "category": "requirements",
+      "source_id": 96,
+      "candidate_id": 92,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 checks the first opponent facing-state word. Retail 0x60 checks [opponent_state+0], while 0x5C checks [opponent_state+4]. The two retail sheet descriptions overlap but the field selection differs.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0060",
+        "candidate": "retail:req:0x005C",
+        "previous": "retail:req:0x0060",
+        "t7": "t7:req:0x0060"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 96,
+      "selected_retail_id": 96
+    },
+    {
+      "category": "requirements",
+      "source_id": 124,
+      "candidate_id": 124,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 and retail test whether any of three adjacent float components is nonzero. Retail supplemental branch confirms true/false paths. The old opponent-airborne/up-close guess is not copied; only the observed vector test is labelled.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x007C",
+        "candidate": "retail:req:0x007C",
+        "previous": "retail:req:0x007C",
+        "t7": "t7:req:0x007C"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 124,
+      "selected_retail_id": 124
+    },
+    {
+      "category": "requirements",
+      "source_id": 131,
+      "candidate_id": 131,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "T7 chooses input mask 1, updates input bookkeeping and compares the active button state. Retail calls shared input helper 0x14187B530 with mask 1; its input mask and state accesses are archived. Existing label is retained; helper behavior is not reduced to a pure side-effect-free predicate.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0083",
+        "candidate": "retail:req:0x0083",
+        "t7": "t7:req:0x0083"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 131
+    },
+    {
+      "category": "requirements",
+      "source_id": 132,
+      "candidate_id": 132,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "As for 0x83, with input mask 2. Shared helper includes input-state checks and bookkeeping. Existing right-punch label retained.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0084",
+        "candidate": "retail:req:0x0084",
+        "t7": "t7:req:0x0084"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 132
+    },
+    {
+      "category": "requirements",
+      "source_id": 225,
+      "candidate_id": 0,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 branches on controller state and a nonzero parameter; retail 0xE4 has the corresponding controller/mode and parameter branch. Retail zero is unconditional and cannot substitute for it.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x00E4",
+        "candidate": "retail:req:0x0000",
+        "previous": "retail:req:0x00E4",
+        "t7": "t7:req:0x00E1"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 228,
+      "selected_retail_id": 228
+    },
+    {
+      "category": "requirements",
+      "source_id": 351,
+      "candidate_id": 357,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 tests its Starburst state and parameter Boolean; retail obtains the corresponding state through an encrypted accessor, then tests state and parameter. Claudio asset witnesses corroborate the source label. No full parameter-domain guarantee.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0162",
+        "candidate": "retail:req:0x0165",
+        "previous": "retail:req:0x0165",
+        "t7": "t7:req:0x015F"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 357,
+      "selected_retail_id": 357
+    },
+    {
+      "category": "requirements",
+      "source_id": 352,
+      "candidate_id": 360,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "Three neighbouring banks resolve the ambiguity: T7 reads 0x160/0x161/0x162 at +0x380/+0x384/+0x388 and writes 0x80A6/0x80A9/0x80AC. Retail reads 0x166/0x167/0x168 at +0x584/+0x588/+0x58C and writes 0x80C5/0x80C8/0x80CB. The existing first-bank mapping has 337 independent read contexts across 34 T7 families, parameters 0..7, and 320 setter contexts. The alternative is one Armor King Ak_PoiKick_y context switching both read and write from the first to the third bank. Reject a global alias change; retain the old first-bank IDs. Bank consumer meaning and parameter widths are not asserted equivalent.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0163",
+        "candidate": "retail:req:0x0168",
+        "previous": "retail:req:0x0166",
+        "t7": "t7:req:0x0160",
+        "bank2_read": "retail:req:0x0167",
+        "bank2_write": "retail:prop:0x80C8",
+        "t7_bank2_read": "t7:req:0x0161",
+        "t7_bank3_read": "t7:req:0x0162",
+        "t7_bank2_write": "t7:prop:0x80A9",
+        "t7_bank3_write": "t7:prop:0x80AC"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 358,
+      "selected_retail_id": 358
+    },
+    {
+      "category": "requirements",
+      "source_id": 553,
+      "candidate_id": 661,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both compare a 12-bit random sample with (low16(parameter)<<12)/1000. Retail replaces the inline RNG with a helper called with 0x1000. Probability scale correspondence is supported, not identical random sequences or distribution.",
+      "evidence_handlers": {
+        "candidate": "retail:req:0x0295",
+        "t7": "t7:req:0x0229"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 661
+    },
+    {
+      "category": "requirements",
+      "source_id": 611,
+      "candidate_id": 720,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 and retail return whether the Yoshimitsu sword-state byte is zero. Character-specific state setter and matched asset context support the sword-sheathed description.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0266",
+        "candidate": "retail:req:0x02D0",
+        "previous": "retail:req:0x02D0",
+        "t7": "t7:req:0x0263"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 720,
+      "selected_retail_id": 720
+    },
+    {
+      "category": "requirements",
+      "source_id": 620,
+      "candidate_id": 729,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both return whether a player-state byte is zero (T7 +0xB0E, retail +0x1ACE). Existing heat/wallsplat-related label remains uncertain; handlers alone do not establish the gameplay meaning.",
+      "evidence_handlers": {
+        "candidate": "retail:req:0x02D9",
+        "t7": "t7:req:0x026C"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 729
+    },
+    {
+      "category": "requirements",
+      "source_id": 642,
+      "candidate_id": 751,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Both consult a global mode/count; return a player-state byte in one mode and true in the other. T7 +0xCDC corresponds structurally to retail +0x1D1F. Existing Leroy label is not strengthened into a universal meaning.",
+      "evidence_handlers": {
+        "candidate": "retail:req:0x02EF",
+        "t7": "t7:req:0x0282"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 751
+    },
+    {
+      "category": "requirements",
+      "source_id": 807,
+      "candidate_id": 1019,
+      "original_comparison": "agrees",
+      "status": "handler_supported_operation",
+      "decision": "retain_existing_id",
+      "reason": "T7 compares an unsigned stored dword >= parameter; retail uses CMP/SETAE on +0x1604. Label describes that operation without importing the T7 embedded property ID 0x8414.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x032D",
+        "candidate": "retail:req:0x03FB",
+        "previous": "retail:req:0x03FB",
+        "t7": "t7:req:0x0327"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 1019,
+      "selected_retail_id": 1019
+    },
+    {
+      "category": "requirements",
+      "source_id": 813,
+      "candidate_id": 1032,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "T7 shared high-parry block tests opponent attack flags, player/opponent facing and attack classification. Retail has the same checks, including angle threshold 0x2AAA and high attack classes 0x512/0x806. Supports the existing facing-qualified high-parry label; extra parameter behavior remains unvalidated.",
+      "evidence_handlers": {
+        "candidate": "retail:req:0x0408",
+        "t7": "t7:req:0x032D"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 1032
+    },
+    {
+      "category": "requirements",
+      "source_id": 814,
+      "candidate_id": 1033,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "T7 shared mid-parry block and retail both test opponent attack flags, both facing angles and mid attack classification (retail 0x217/0x31F family). Existing facing-qualified mid-parry label retained.",
+      "evidence_handlers": {
+        "candidate": "retail:req:0x0409",
+        "t7": "t7:req:0x032E"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 1033
+    },
+    {
+      "category": "requirements",
+      "source_id": 901,
+      "candidate_id": 1120,
+      "original_comparison": "previously_unselected",
+      "status": "unresolved_build_gap",
+      "decision": "hold",
+      "reason": "Source ID 901 has no case in the available older T7 decompile; target 1120 is beyond the archived retail requirement trace range ending at 1100. Asset witnesses are real, but these executable/decompile profiles cannot validate this ID. No label or alias promoted.",
+      "evidence_handlers": {
+        "cnt": "cnt:req:0x0392",
+        "candidate": "retail:req:0x0460",
+        "t7": "t7:req:0x0385"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": null
+    },
+    {
+      "category": "requirements",
+      "source_id": 32769,
+      "candidate_id": 32770,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 property action uses camera preset 3. Retail 0x8001 and 0x8006 share the preset-3 handler; proposed 0x8002 uses preset 4. Requirement category is retained despite the property ID namespace.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8001",
+        "candidate": "retail:prop:0x8002",
+        "previous": "retail:prop:0x8001",
+        "t7": "t7:prop:0x8001"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32769,
+      "selected_retail_id": 32769
+    },
+    {
+      "category": "requirements",
+      "source_id": 32875,
+      "candidate_id": 32903,
+      "original_comparison": "previously_unselected",
+      "status": "handler_supported_alignment",
+      "decision": "select_candidate",
+      "reason": "Property action writes state mode 2 plus parameter (T7 +0x7A8/+0x7AC; retail +0x103C/+0x1040), with retail additionally consuming the second parameter at +8 and resetting bytes +0x1048/+0x1049. ID/operation alignment only; no one-parameter transform inferred.",
+      "evidence_handlers": {
+        "candidate": "retail:prop:0x8087",
+        "t7": "t7:prop:0x806B"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": null,
+      "selected_retail_id": 32903
+    },
+    {
+      "category": "requirements",
+      "source_id": 32934,
+      "candidate_id": 32971,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "Three neighbouring banks resolve the ambiguity: T7 reads 0x160/0x161/0x162 at +0x380/+0x384/+0x388 and writes 0x80A6/0x80A9/0x80AC. Retail reads 0x166/0x167/0x168 at +0x584/+0x588/+0x58C and writes 0x80C5/0x80C8/0x80CB. The existing first-bank mapping has 337 independent read contexts across 34 T7 families, parameters 0..7, and 320 setter contexts. The alternative is one Armor King Ak_PoiKick_y context switching both read and write from the first to the third bank. Reject a global alias change; retain the old first-bank IDs. Bank consumer meaning and parameter widths are not asserted equivalent.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x80C2",
+        "candidate": "retail:prop:0x80CB",
+        "previous": "retail:prop:0x80C5",
+        "t7": "t7:prop:0x80A6",
+        "bank2_read": "retail:req:0x0167",
+        "bank2_write": "retail:prop:0x80C8",
+        "t7_bank2_read": "t7:req:0x0161",
+        "t7_bank3_read": "t7:req:0x0162",
+        "t7_bank2_write": "t7:prop:0x80A9",
+        "t7_bank3_write": "t7:prop:0x80AC"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 32965,
+      "selected_retail_id": 32965
+    },
+    {
+      "category": "requirements",
+      "source_id": 33377,
+      "candidate_id": 0,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 changes flag bit 31 from the parameter; existing retail 0x82D1 changes secondary flag bit 1. Proposed zero is unconditional, and proposed 0x8352 calls a state helper and refreshes opponent state. Neither candidate implements the parameter-driven flag assignment.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8267",
+        "candidate": "retail:req:0x0000",
+        "previous": "retail:prop:0x82D1",
+        "t7": "t7:prop:0x8261"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33489,
+      "selected_retail_id": 33489
+    },
+    {
+      "category": "requirements",
+      "source_id": 33377,
+      "candidate_id": 33618,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 changes flag bit 31 from the parameter; existing retail 0x82D1 changes secondary flag bit 1. Proposed zero is unconditional, and proposed 0x8352 calls a state helper and refreshes opponent state. Neither candidate implements the parameter-driven flag assignment.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x8267",
+        "candidate": "retail:prop:0x8352",
+        "previous": "retail:prop:0x82D1",
+        "t7": "t7:prop:0x8261"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33489,
+      "selected_retail_id": 33489
+    },
+    {
+      "category": "requirements",
+      "source_id": 33483,
+      "candidate_id": 1028,
+      "original_comparison": "disagrees",
+      "status": "difference_rejected",
+      "decision": "retain_previous",
+      "reason": "T7 property action sets state bytes according to parameter 0/1/2; retail 0x833B has that branch family. Proposed ordinary requirement 0x404 tests Heat and mode conditions, not those state writes.",
+      "evidence_handlers": {
+        "cnt": "cnt:prop:0x82D1",
+        "candidate": "retail:req:0x0404",
+        "previous": "retail:prop:0x833B",
+        "t7": "t7:prop:0x82CB"
+      },
+      "runtime_enabled": false,
+      "parameter_transform": null,
+      "previous_retail_id": 33595,
+      "selected_retail_id": 33595
+    }
+  ],
+  "labels": [
+    {
+      "game": "t8-retail",
+      "category": "requirements",
+      "id": 124,
+      "label": "Check nonzero player vector (purpose unknown)",
+      "review_index": 36,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "requirements",
+      "id": 357,
+      "label": "Claudio Starburst",
+      "review_index": 40,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "requirements",
+      "id": 720,
+      "label": "Yoshimitsu Sword Sheathed",
+      "review_index": 43,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "requirements",
+      "id": 1019,
+      "label": "Stored player value >= parameter (unsigned; purpose unknown)",
+      "review_index": 46,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "requirements",
+      "id": 32903,
+      "label": "Property action: set player state mode 2 and parameters (purpose unknown)",
+      "review_index": 51,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33054,
+      "label": "Store Value on Opponent (purpose unknown)",
+      "review_index": 7,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33303,
+      "label": "Enable four adjacent player state flags (purpose unknown)",
+      "review_index": 8,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33305,
+      "label": "Set primary player flag bit 3 from parameter bit 0 (purpose unknown)",
+      "review_index": 9,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33309,
+      "label": "Set primary player flag bit 30 from parameter bit 0 (purpose unknown)",
+      "review_index": 10,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33357,
+      "label": "Blend With Move (parameter byte)",
+      "review_index": 11,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33358,
+      "label": "Select blending move",
+      "review_index": 12,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33360,
+      "label": "Blending Duration",
+      "review_index": 13,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33427,
+      "label": "Inflict Self Damage",
+      "review_index": 14,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33469,
+      "label": "Set player flag at +0x704, bit 17 from parameter bit 0 (purpose unknown)",
+      "review_index": 17,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33479,
+      "label": "Set primary player flag bit 24 from parameter bit 0 (purpose unknown)",
+      "review_index": 18,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33518,
+      "label": "Set character-state flag bit 9 from parameter bit 0 (purpose unknown)",
+      "review_index": 20,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 33651,
+      "label": "Fahkumram: store character state float (purpose unknown)",
+      "review_index": 24,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    },
+    {
+      "game": "t8-retail",
+      "category": "properties",
+      "id": 34027,
+      "label": "Camera control toggle (T7 Lazy Camera-man)",
+      "review_index": 25,
+      "mode": "fill_missing",
+      "runtime_enabled": false
+    }
+  ]
+}

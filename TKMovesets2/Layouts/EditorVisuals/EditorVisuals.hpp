@@ -1,7 +1,9 @@
+#include <memory>
 #pragma once
 
 #include "LocalStorage.hpp"
 #include "EditorLogic.hpp"
+#include "FileJob.hpp"
 #include "EditorForm.hpp"
 #include "EditorLabel.hpp"
 #include "EditorSubwindow.hpp"
@@ -52,6 +54,10 @@ struct WindowCreator
 class EditorVisuals
 {
 protected:
+    EditorVisuals();
+    struct WindowState;
+    virtual void PublishFormWindow(std::unique_ptr<EditorForm> form);
+    virtual std::unique_ptr<EditorForm::TransactionState> BeginWindowTransaction();
 	// True if the game and characters are loaded and we can start interacting with it
 	bool m_canInteractWithGame = true;
 	// Contains basic informations about the currently loaded character
@@ -73,7 +79,7 @@ protected:
 	// List of subwindows to render
 	std::vector<EditorSubwindow*> m_subwindows;
 	// The dock id that new windows might dock on
-	ImGuiID m_dockId;
+	ImGuiID m_dockId = 0;
 	// The viewport of the editor window. Used to know which subwindow is docked or not.
 	ImGuiViewport* m_viewport = nullptr;
 	// True if moveset changes are to be applied to the game instantly
@@ -81,17 +87,24 @@ protected:
 	// Stores whether or not importation is required (if live edition is on, importation is not always needed)
 	bool m_importNeeded = true;
 	// Store our own copy of the importer to not interfere with the other one. Not important but less prone to problems, really.
-	GameImport* m_importerHelper;
+	std::unique_ptr<GameImport> m_importerHelper;
 	// Copy of the shared mem helper, used to play extra propreties
-	GameSharedMem* m_sharedMemHelper;
+	std::unique_ptr<GameSharedMem> m_sharedMemHelper;
 	// Map that will determine which window type to allocate depending on the given type
 	std::map<EditorWindowType, WindowCreator> m_windowCreatorMap;
-	// Index of the compression setting to use when saving
+	// Index of the compression setting used when saving, fixed per editor type
 	unsigned int m_compressionIndex = 0;
 	// Contains a ptr to the editor logic class
-	EditorLogic* m_abstractEditor = nullptr;
+	std::unique_ptr<EditorLogic> m_abstractEditor;
 	// Whether to show "Saving error" or not
-	bool m_savingError = false;
+    bool m_savingError = false;
+    FileJob m_saveJob;
+    std::string m_saveMessage, m_localProcessError;
+    uint64_t m_editRevision = 0, m_jobRevision = 0, m_backedUpRevision = 0;
+    bool m_jobIsBackup = false, m_closeAfterSave = false;
+    void PollSaveJob();
+    void MarkDirty();
+    void ConsumePendingChanges();
 	// Auto backups
 	struct {
 		// Timestamp of the last automatic save
@@ -123,13 +136,15 @@ protected:
 	void SaveBackup(bool saveOnlyIfNoneExist=false);
 public:
 	// Determines if main window is open or not. If not, this tells the MainWindow parent class to destroy this very class
+    bool HasPendingEdits() const { for (auto* f:m_structWindows) if (f->unsavedChanges || f->justAppliedChanges) return true; return !m_savedLastChange; }
+    bool SaveBusy() const { return m_saveJob.Busy(); }
 	bool popen = true;
 	// True is we need to call SetNextWindowFocus() before rendering our own window
 	bool setFocus = false;
 	// Expose filename specifically and not the full editorInfos. Used to avoid editing the same moveset twice.
-	const wchar_t* filename;
+	const wchar_t* filename = nullptr;
 	// Contains the labels to display in the editor
-	EditorLabel* labels = nullptr;
+	std::unique_ptr<EditorLabel> labels;
 
 	// Constructor that loads the moveset and starts its own importer
 	EditorVisuals(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage);
@@ -138,8 +153,10 @@ public:
 	// Render the window
 	void Render(int dockid);
 	
+    std::unique_ptr<EditorForm::TransactionState> BeginFormTransaction(EditorForm& source);
+    static std::unique_ptr<EditorForm::TransactionState> BeginFormTransaction(std::span<EditorForm* const> forms);
 	// Create a new window containing data about the given move. Can be called by subwidnows.
-	void OpenFormWindow(EditorWindowType windowType, uint16_t structId, int listSize = 0);
+	bool OpenFormWindow(EditorWindowType windowType, uint16_t structId, int listSize = 0);
 	// Issue an integer field update by adding 'valueChange' to the existing field's value (if not errored).
 	void IssueFieldUpdate(EditorWindowType winType, int valueChange, int listStart=-1, int listEnd = -1);
 	// Appends a new subwindow to the list of subwindow list to render

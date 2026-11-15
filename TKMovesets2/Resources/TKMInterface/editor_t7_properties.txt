@@ -1,327 +1,379 @@
-0x0,Properties end
-0x8001,Lightest camera shake
-0x8002,Light camera shake
-0x8003,Moderate camera shake
-0x8004,Heavy camera shake
-0x8006,Lightest camera shake
-0x8007,Light camera shake
-0x8008,Moderate camera shake
-0x8009,Heavy camera shake
-0x800b,Ground Ripple
-0x800e,Break Tile
-0x8011,Fire burn VFX (self)
-0x8012,Fire burn VFX (opponent)
-0x8017,Hit spark (self)
-0x8019,Electric Effect (self)
-0x801a,Electric Effect (opponent)
-0x801b,Rage Drive VFX
-0x801e,Mouth Fog VFX
-0x8021,Hit spark (self)
-0x8023,Hit spark (opponent)
-0x802e,Char hit spark (self)
-0x802f,Char hit spark (self)
-0x8032,Hit Sparks(?)
-0x8034,Hit spark (self)
-0x8035,Hit spark (opponent)
-0x8036,Char trail VFX (self)
-0x8037,Char trail VFX????
-0x8038,Special trail VFX (self)
-0x8039,Opp hit spark (self)
-0x803a,Opp trail VFX (self)
-0x803b,Hit spark (self)
-0x803c,Hit spark (opponent)
-0x803d,Heavy hit sparks (self)
-0x803e,Heavy hit sparks (opponent)
-0x803f,Heavy + char hit spark (self)
-0x8040,Heavy + char hit spark (opponent)
-0x8041,Throw VFX
-0x8042,Smoke VFX
-0x8043,Faint Smoke VFX
-0x8044,Block VFX
-0x8046,Common VFX (Armored, sparks...)
-0x8047,Common VFX (Armored, sparks...)
-0x8049,Item VFX
-0x804c,Fire explosion VFX (self)
-0x805c,Hit spark (self)
-0x805d,Throw VFX
-0x805e,Smoke VFX
-0x8060,Block VFX
-0x8063,Small Spark
-0x8068,Reset cloth physics
-0x8069,Reset cloth physics
-0x806a,Inflict damage to opponent
-0x806b,Inflict self Damage
-0x806e,Inflict self Damage
-0x8071,Inflict self Damage (no scale)
-0x8072,Inflict self Damage (no scale)
-0x8078,Give Bryan taunt properties
-0x807c,Value Store (uses req 329)
-0x807d,Add value to 0x807c
-0x807e,Sub value from 0x807c
-0x80a6,Value Store (uses req 352)
-0x80a7,Add value to 0x80a6
-0x80a8,Sub value from 0x80a6
-0x80a9,Value Store (uses req 353)
-0x80aa,Add value to 0x80a9
-0x80ab,Sub value from 0x80a9
-0x80bd,Kazuya devil flag
-0x80be,Add to devil flag
-0x80bf,Sub from devil flag
-0x80c0,AND with devil flag
-0x80c1,OR with devil flag
-0x80c2,Store Chloe points
-0x80c3,Add Chloe points
-0x80c4,Sub Chloe points
-0x80c5,Value Store (2D cancel|uses req 346)
-0x80c6,Add to 0x80c5
-0x80c7,Sub from 0x80c5
-0x80c8,Value Store (uses req 347)
-0x80c9,Add to 0x80c8
-0x80ca,Sub from 0x80c8
-0x80cb,Value Store (uses req 348)
-0x80cc,Add to 0x80cb
-0x80ce,Sub from 0x80cb
-0x80db,Set Wallcombo counter
-0x80dc,Add to wallcombo counter
-0x80dd,Sub from wallcombo counter
-0x80ed,Store Combo Route Value
-0x8106,Activate Player Flag
-0x8107,Add value to 0x8106
-0x8108,Sub value from 0x8106
-0x8109,Activate Opponent Flag
-0x810a,Add value to 0x8109
-0x810b,Sub value from 0x8109
-0x810c,Activate Player Flag#2
-0x810d,Add value to 0x810c
-0x810e,Sub value from 0x810c
-0x810f,Activate Opponent Flag#2
-0x8110,Add value to 0x810f
-0x8111,Sub value from 0x810f
-0x8112,Add value to prop 0x80ed
-0x8113,Sub value from prop 0x80ed
-0x817c,Allow player to block
-0x817d,Give CH property
-0x8181,Stop pushback
-0x818a,Add Tracking/Alignment
-0x818c,Add Tracking/Alignment (opp)
-0x818c,Change player status/vulnerability
-0x818e,Change collision status
-0x8193,Footstep SFX + VFX
-0x81a7,Align Player To Wall (?)
-0x81ad,Reset player position
-0x81bd,Power Crush
-0x81be,Rage Art FX
-0x81bf,Give Claudio starbust
-0x81c2,Give meter (signed int)
-0x81c7,Fill meter
-0x81c8,Skip move frame (=N)
-0x81c9,Skip move frame (+N)
-0x81ca,Skip move frame (-N)
-0x81cb,Skip move frame (=N+0x1000)
-0x81cc,Skip move frame (=N+0x2000)
-0x81d4,Force move on opponent
-0x81d5,Force move on opponent
-0x81d6,Player speed (4096 = 100%)
-0x81d7,Activate Speed modifier
-0x81db,Charge speed
-0x81e0,Blending duration
-0x81e4,Break floor
-0x81e8,Pushback-related
-0x81ec,Set Gravity (0/1)
-0x81ed,Inflict pushback
-0x81f0,Repeat current pushback
-0x81f2,Laser related(?)
-0x81f3,Activate laser
-0x81f4,Disable laser
-0x81fe,Reset upwards vector
-0x81ff,Slide player
-0x8200,Rotate player axis
-0x8202,Rotate player
-0x8203,Rotate opponent
-0x8205,Push player in z-axis
-0x8206,Push player in x-axis
-0x8208,Push player in y-axis
-0x820b,Spawn projectile
-0x820c,Projectile spawn limb
-0x820d,Projectile spawn x-axis
-0x820e,Projectile spawn y-axis
-0x820f,Projectile spawn z-axis
-0x8213,Attack destroys projectile
-0x8214,Attack deflects projectile
-0x821b,Enable scaled damage
-0x821c,Inflict scaled damage to opponent
-0x821d,Inflict scaled damage to self
-0x8223,Inflict self damage
-0x8226,2D Jump Height
-0x8229,EX Effect
-0x8233,Set Rage Drive BG color
-0x8234,Rage drive BG effect
-0x823e,Set character visible (0/1)
-0x8243,Play attached subtitles
-0x824a,AI Input (DVK reverse transform)
-0x824c,AI input
-0x824d,AI input
-0x8251,Player visibility
-0x8255,Spend screw
-0x8257,Extend left shoulder hurtbox
-0x8262,wing flap anim
-0x826a,Homing VFX (Left Hand)
-0x826b,Homing VFX (Right Hand)
-0x826c,Homing VFX (Left foot)
-0x826d,Homing VFX (Right Foot)
-0x8270,Activate rage
-0x8272,Spend rage
-0x8280,Set neck tracking (0/1)
-0x828b,Game speed%
-0x828c,Slow down Effect
-0x828d,Slow down Effect immunity
-0x828f,Kazumi's tiger animation
-0x8292,Player Stop Motion Effect
-0x8293,Opponent Stop Motion Effect
-0x829d,Set HUD visibility
-0x829e,Screen Transition VFX
-0x829f,Play subtitles
-0x82a0,Skin shine effect
-0x82a9,Fill Geese max mode meter
-0x82ae,Noctis warp effect
-0x82bf,Assist Button Pressed VFX
-0x82c8,Use fake frame advantage
-0x82c9,Use fake startup frame
-0x82ca,Startup frames related (?)
-0x82cb,Special Cancellable (?)
-0x82cc,Activate Azazel hand
-0x82cd,Spend Azazel hand
-0x82d8,Set partner's move (Sugar)
-0x82eb,Spend once per match move
-0x82fa,Fahkumram skin pulse
-0x8300,Spawn Kuni item
-0x8301,De-spawn Kuni item
-0x8302,Kuni item VFX?
-0x832c,Projectile lifespan(in frames)
-0x832d,Projectile damage
-0x832e,Projectile hit-level
-0x8330,Projectile hit recovery
-0x8331,Projectile grounded reaction list
-0x8332,Projectile airborne reaction list
-0x8333,Set limb for attaching item
-0x8336,Projectile 30 degrees flag
-0x8337,Projectile horizontal speed
-0x8338,Projectile vertical speed
-0x833e,Projectile spawn position
-0x8340,Projectile grounded flag
-0x8343,Attach item to limb
-0x8344,Detach item to limb
-0x837e,Select limb to resize
-0x837f,Resize player/limb
-0x83a2,Toggle lazy camera-man
-0x83c2,Set opponent's floor level
-0x83c3,Set opponent's move
-0x83c4,Force new default stance (32768)
-0x83c5,Force new standing move (32769)
-0x83c6,Force new crouching move (32770)
-0x83c7,Force new death move (32771)
-0x83c8,Change alias (32772)
-0x83c9,Change alias (32773)
-0x83ca,Change alias (32774)
-0x83cb,Change alias (32775)
-0x83cc,Change alias (32776)
-0x83cd,Change alias (32777)
-0x83ce,Change alias (32778)
-0x83cf,Change alias (32779)
-0x83d0,Change alias (32780)
-0x83d1,Change alias (32781)
-0x83d2,Change alias (32782)
-0x83d3,Change alias (32783)
-0x83d4,Change alias (32784)
-0x83d5,Change alias (32785)
-0x83d6,Change alias (32786)
-0x83d7,Change alias (32787)
-0x83d8,Change alias (32788)
-0x83d9,Change alias (32789)
-0x83da,Change alias (32790)
-0x83db,Change alias (32791)
-0x83dc,Change alias (32792)
-0x83dd,Change alias (32793)
-0x83de,Change alias (32794)
-0x83df,Change alias (32795)
-0x83e0,Change alias (32796)
-0x83e1,Change alias (32797)
-0x83e2,Change alias (32798)
-0x83e3,Change alias (32799)
-0x83e4,Change alias (32800)
-0x83e5,Restore default stance (32768)
-0x83e6,Restore standing move (32769)
-0x83e7,Restore crouching move (32770)
-0x83e8,Restore death move (32771)
-0x83e9,Restore alias (32772)
-0x83ea,Restore alias (32773)
-0x83eb,Restore alias (32774)
-0x83ec,Restore alias (32775)
-0x83ed,Restore alias (32776)
-0x83ee,Restore alias (32777)
-0x83ef,Restore alias (32778)
-0x83f0,Restore alias (32779)
-0x83f1,Restore alias (32780)
-0x83f2,Restore alias (32781)
-0x83f3,Restore alias (32782)
-0x83f4,Restore alias (32783)
-0x83f5,Restore alias (32784)
-0x83f6,Restore alias (32785)
-0x83f7,Restore alias (32786)
-0x83f8,Restore alias (32787)
-0x83f9,Restore alias (32788)
-0x83fa,Restore alias (32789)
-0x83fb,Restore alias (32790)
-0x83fc,Restore alias (32791)
-0x83fd,Restore alias (32792)
-0x83fe,Restore alias (32793)
-0x83ff,Restore alias (32794)
-0x8400,Restore alias (32795)
-0x8401,Restore alias (32796)
-0x8402,Restore alias (32797)
-0x8403,Restore alias (32798)
-0x8404,Restore alias (32799)
-0x8405,Restore alias (32800)
-0x8406,Rotate Player
-0x8407,Put opponent next to player
-0x840f,Play midbattle cutscene
-0x8410,Story Power Crush
-0x8414,Store Assist Combo Value
-0x8415,Add to 0x8414
-0x8416,Sub from 0x8414
-0x8428,Both Hands pose
-0x8429,Left hand pose
-0x842a,Right hand pose
-0x842c,Both Hands Mot Related(?)
-0x842d,Play both hand anim
-0x842e,Play left hand anim
-0x842f,Play right hand anim
-0x8430,Devil Kazuya wing animations
-0x8435,Cinematic Camera (no reset)
-0x8436,Cinematic Camera (no reset, mirror)
-0x8437,Cinematic Camera (no reset, mirror)
-0x8438,Cinematic Camera (no reset, mirror)
-0x8439,Cinematic Camera Left side
-0x843a,Cinematic Camera Right side
-0x843c,Throw camera
-0x843d,Rage Art camera
-0x8442,Camera Zoom Focal Point
-0x8443,Camera Zoom Effect
-0x8444,Move Camera Position
-0x8445,Cinematic Camera 1(no reset)
-0x8448,Cinematic Camera 2(no reset)
-0x8449,Cinematic Camera 3(no reset)
-0x844b,Reset Camera
-0x844e,Camera Movement
-0x844f,Camera Interpolation
-0x8450,Camera Rotation
-0x8454,Something used in Rage Art Camera (?)
-0x84c1,Set facial expression
-0x84c2,Play facial anim sequence
-0x84c3,Play system sound
-0x84c4,Play player sound
-0x84c5,Play player sound
-0x84c6,Play opponent sound
-0x84ca,Announcer says 'Fight'
-0x84cb,Play attached audio
-0x84cc,Preset Camera Zoom
+0, End of Extra Properties
+32769, Camera Shake: Lightest
+32770, Camera Shake: Light
+32771, Camera Shake: Medium
+32772, Camera Shake: Heavy
+32773, Camera Shake: Custom
+32774, Camera Shake: Lightest
+32775, Camera Shake: Light
+32776, Camera Shake: Medium
+32777, Camera Shake: Heavy
+32778, Camera Shake: Custom
+32779, Ground Ripple
+32782, Break Tile
+32785, Fire Burn Effect on self
+32786, Fire Burn Effect on opponent
+32791, Hit Effect on self
+32793, Electric Effect on self
+32794, Electric Effect on opponent
+32795, Rage Drive Visual Effects
+32798, Mouth Fog VFX
+32801, Hit Effect on self
+32803, Hit Effect on opponent
+32814, Char Hit Spark on Self
+32815, Char Hit Spark on Self
+32818, Hit Sparks (?)
+32820, Hit Effect on self
+32821, Hit Effect on opponent
+32822, Play Character Trail VFX
+32823, Player Hit Sparks
+32824, Special Trail VFX (?)
+32825, Opponent Hit Spark VFX on Player
+32826, Opponent char Trail VFX on Player
+32827, Hit Spark on Self
+32828, Hit Spark on Opponent
+32829, Heavy Sparks on Self
+32830, Heavy Sparks on Opponent
+32831, Heavy Spark w/ char Hit Spark (self)
+32832, Heavy Spark w/ char Hit Spark (opp)
+32833, Throw Effect on self
+32834, Smoke Effect on self
+32835, Faint Smoke Effect on self
+32836, Block Effect on self
+32838, Common VFX\n(Blue sparks, powercrush)
+32839, Common VFX\n(Blue sparks, powercrush)
+32841, VFX on Items
+32844, Fire Explosion Effect on self
+32860, Hit Spark on Self
+32861, Throw Effect on self
+32862, Smoke Effect on self
+32864, Block Effect on self
+32867, Small Sparks on self
+32872, Reset Cloth Physics?
+32873, Reset Cloth Physics?
+32874, Hit with Fixed Damage
+32875, Inflict self damage
+32876, Increase Health
+32878, Inflict self damage
+32881, Inflict Self Damage (unscaled)
+32882, Inflict Self Damage (unscaled)
+32887, Store Value
+32888, Set "Buffed" Frame Counter\n(Player)
+32891, Set "Buffed" Frame Counter\n(Opponent)
+32892, Move Value Store
+32893, Add Value into 0x807c
+32894, Substract Value from 0x807c
+32895, Store Value
+32896, Add to prop 0x807f
+32897, Subtract from prop 0x807f
+32934, Input Value Store
+32935, Add value into Input Flag
+32936, Substract value from Input Flag
+32937, Input Value Store\n(Input Flag # 2)
+32938, Add value into Input Flag
+32939, Substract value from Input Flag
+32957, Kazuya Devil State
+32958, Add to Devil Flag
+32959, Subtract from Devil Flag
+32960, Bitwise OR from Devil Flag
+32961, Bitwise AND from Devil Flag
+32962, Store Chloe Points
+32963, Add Chloe Points
+32964, Subtract Chloe Points
+32965, 2D Cancel Value Store
+32966, Add Value to 0x80c5
+32967, Subtract from 0x80c5
+32968, Value Store
+32969, Add Value to 0x80c8
+32970, Subtract from 0x80c8
+32971, Value Store
+32972, Add Value to 0x80cb
+32973, Subtract from 0x80cb
+32974, Sub from 0x80cb
+32987, Set wall combo counter
+32988, Add to wall combo counter
+32989, Remove from wall combo counter
+33005, Store Combo Route Value
+33025, Kazuya Devil State (Opponent)
+33026, Add to Devil State (Opp.)
+33027, Sub from Devil State (Opp.)
+33028, Bitwise OR from Devil Flag (Opp.)
+33029, Bitwise AND from Devil Flag (Opp.)
+33030, Activate Player Flags
+33031, Add Value to Player Flags
+33032, Sub value from Player Flags
+33033, Activate Opponent Flags
+33034, Add value to Opponent Flags
+33035, Sub value from Opponent Flags
+33036, Activate Player Flags # 2
+33037, Add Value to Player Flags # 2
+33038, Sub value from Player Flags # 2
+33039, Activate Opponent Flags # 2
+33040, Add Value to Opponent Flags # 2
+33041, Sub value from Opponent Flags # 2
+33042, Add to Combo Route Value
+33043, Subtract from Combo Route Value
+33148, Allow Player To Block
+33149, Give CH property
+33153, Stop Pushback
+33162, Add Tracking/Alignment (Player)
+33163, Add Tracking/Alignment (Opponent)
+33164, Change Player Status/Vulnerability
+33166, Change Collision Status
+33171, Footstep SFX & VFX
+33188, Change Collision Status
+33191, Align Player To Wall (?)
+33196, Trigger Wall / Balcony break
+33197, Put Player at Position 0
+33213, Power Crush Properties
+33214, Rage Art FX
+33215, Claudio Starbust Properties
+33218, Modify Meter
+33219, Set Player Origin
+33220, Start Player Backturned
+33222, Disable Meter Build
+33223, Modify Meter
+33224, Skip Frames of Move (=N)
+33225, Skip Frames of Move (+N)
+33226, Skip Frames of move (-N)
+33227, Skip frames of move (= N + 0x1000)
+33228, Skip frames of move (= N + 0x2000)
+33231, Skip frames of move (= N + 0x4000)
+33232, Skip frames of move (= N + 0x8000)
+33236, Force Move on Opponent
+33237, Force Move on Opponent
+33238, Set Player Speed
+33239, Add to Player Speed (modifier)
+33240, Set Opponent Speed
+33241, Add to Opponent Speed (modifier)
+33242, Set Maximum Player Speed
+33243, Set Minimum Player Speed
+33244, Change Animation
+33245, Blend With Move
+33246, Blend With Move Each Frame
+33248, Blending Duration
+33249, Horizontal Animation Distance Multiplier\n(Eased Horizontal Movement)
+33250, Vertical Animation Distance Multiplier\n(Eased Vertical Movement)
+33252, Break Floor Function
+33256, Inflict Pushback
+33260, Enable/Disable Gravity
+33261, Inflict Pushback
+33264, Inflict Pushback
+33266, Select VFX for Laser
+33267,  Activate Laser
+33268, Deactivate Laser
+33278, Reset Upwards Vector
+33279, Slide Player
+33280, Set Player Sliding Direction
+33282, Rotate Player
+33283, Rotate Opponent
+33285, Push Player in Z-axis
+33286, Push Player in X-axis
+33288, Push Player in Y-axis (height)
+33289, Push Player in Y-axis (height)
+33291, Spawn Projectile
+33292, Projectile Spawn Limb
+33293, Projectile Spawn Horizontal Distance
+33294, Projectile Spawn Vertical Distance
+33295, Projectile Spawn Lateral Distance
+33299, Neutralising Projectile
+33300, Neutralising Projectile-related / Deflect Projecile
+33307, Enable Scaled Damage
+33308, Hit with Scaled Damage (Opponent)
+33309, Hit with Scaled Damage (Self)
+33315, Inflict Self Damage
+33318, 2D Jump Height
+33321, EX Effect
+33330, EX Effect Enabled
+33331, Set Rage Drive Background Effect Color
+33332, Rage Drive Background Effect
+33342, Set character visible
+33343, Set opponent visible
+33347, Play Attached Subtitles
+33348, Subtitles-related
+33350, Add to Combo Counter
+33354, AI Input (Practice Mode Only) 
+33355, Ai Input(?)
+33356, Reset Combo Meter
+33357, AI Input(?)
+33361, Player Visibilty
+33362, Opponent Visibilty
+33365, Spend Screw
+33366, Reset Combo Damage Scaling
+33367, Extend Left Shoulder Hurtbox
+33378, Wing Flap Animation
+33380, Yoshimitsu's Sword Related?
+33381, Yoshimitsu's Sword Related?
+33382, Master Raven's Sword Related?
+33383, Master Raven's Sword Related?
+33386, Homing Particle (Left Hand)
+33387, Homing Particle (Right Hand)
+33388, Homing Particle Effect (Left Foot)
+33389, Homing Particle Effect (Right Foot)
+33392, Activates Rage
+33394, Spend Rage
+33408, Enable/Disable Neck Tracking
+33419, Adjust Game Speed
+33420, Slow Down Effect
+33421, Slow Down Effect Immunity
+33423, Play Kazumi's tiger anim
+33426, Player Stop Motion Effect
+33427, Opponent Stop Motion Effect
+33437, Toggle Hud
+33438, Screen Transition VFX
+33439, Play Subtitles Text
+33440, Skin shine VFX
+33449, Fill Geese max-mode meter
+33454, Noctis Warp Effect
+33471, Assist Button Pressed VFX
+33480, Use "Fake" Frame Advantage
+33481, Add "Fake" Startup Frames
+33482, Startup frames related (?)
+33483, Special Cancellable (?)
+33484, Activate Azazel hand
+33485, Spend Azazel hand
+33496, Set partner's move (Sugar)
+33515, Spend One Per Match Move
+33530, Fahkumram Skin Pulse
+33536, Attach Kunimitsu's Items
+33537, De-attach Kunimitsu's Items
+33538, Kunimitsu Throwing Knife Trail VFX (?)
+33580, Projectile Draw / Lifespan
+33581, Projectile Damage
+33582, Projectile Hit Level
+33584, Projectile Hit Recovery(?)
+33585, Projectile Grounded Reaction List
+33586, Projectile Airborne Reaction List
+33587, Attach Item to Limb
+33590, Projectile 30 Degrees
+33591, Projectile Horizontal Velocity
+33592, Projectile Vertical Velocity
+33598, Projectile Spawn
+33600, Grounded Projectile
+33603, Attach Item(?)
+33604, Detach Item(?)
+33631, Set secondary player flag bit 2 (purpose unknown)
+33662, Select Limb for Resizing
+33663, Set Player Model Size
+33698, Lazy Camera-man Toggle
+33730, Set opponent's floor level
+33731, Set opponent's move
+33732, Force New Default Stance (32768)
+33733, Force New Standing Move (32769)
+33734, Force New Crouching Move (32770)
+33735, Force New Death Move (32771)
+33736, Change alias (32772)
+33737, Change alias (32773)
+33738, Change alias (32774)
+33739, Change alias (32775)
+33740, Change alias (32776)
+33741, Change alias (32777)
+33742, Change alias (32778)
+33743, Change alias (32779)
+33744, Change alias (32780)
+33745, Change alias (32781)
+33746, Change alias (32782)
+33747, Change alias (32783)
+33748, Change alias (32784)
+33749, Change alias (32785)
+33750, Change alias (32786)
+33751, Change alias (32787)
+33752, Change alias (32788)
+33753, Change alias (32789)
+33754, Change alias (32790)
+33755, Change alias (32791)
+33756, Change alias (32792)
+33757, Change alias (32793)
+33758, Change alias (32794)
+33759, Change alias (32795)
+33760, Change alias (32796)
+33761, Change alias (32797)
+33762, Change alias (32798)
+33763, Change alias (32799)
+33764, Change alias (32800)
+33765, Restore default stance (32768)
+33766, Restore standing move (32769)
+33767, Restore crouching move (32770)
+33768, Restore death move (32771)
+33769, Restore alias (32772)
+33770, Restore alias (32773)
+33771, Restore alias (32774)
+33772, Restore alias (32775)
+33773, Restore alias (32776)
+33774, Restore alias (32777)
+33775, Restore alias (32778)
+33776, Restore alias (32779)
+33777, Restore alias (32780)
+33778, Restore alias (32781)
+33779, Restore alias (32782)
+33780, Restore alias (32783)
+33781, Restore alias (32784)
+33782, Restore alias (32785)
+33783, Restore alias (32786)
+33784, Restore alias (32787)
+33785, Restore alias (32788)
+33786, Restore alias (32789)
+33787, Restore alias (32790)
+33788, Restore alias (32791)
+33789, Restore alias (32792)
+33790, Restore alias (32793)
+33791, Restore alias (32794)
+33792, Restore alias (32795)
+33793, Restore alias (32796)
+33794, Restore alias (32797)
+33795, Restore alias (32798)
+33796, Restore alias (32799)
+33797, Restore alias (32800)
+33798, Rotate Player's Direction
+33799, Put Opponent Next to Player
+33801, Set Once per match Flags
+33803, Depth of Field VFX
+33807, Play mid-battle cutscene VFX
+33808, Story Mode Power Crush
+33812, Store Assist Combo Value
+33813, Add to Assist Combo Value
+33814, Sub from Assist Combo Value
+33832, Both Hands Pose
+33833, Left Hand Pose
+33834, Right Hand Pose
+33836, Both Hands Mot Related
+33837, Play Both Hands Animation
+33838, Play Left Hand Animation
+33839, Play Right Hand Animation
+33840, Play Wing Animations
+33841, Play Wing Animations
+33842, Play Wing anim + affect neck tracking
+33843, Play Wing anim + affect neck tracking
+33845, Cinematic Camera
+33846, Cinematic Camera (mirror position)
+33847, Cinematic Camera (mirror position)
+33848, Cinematic Camera (mirror position)
+33849, Cinematic Camera for Left Side
+33850, Cinematic Camera for Right Side
+33852, Throw Camera
+33853, Throw Camera (for Rage Arts only)
+33854, Forced Throw Camera
+33858, Camera Zoom Focal Point
+33859, Camera Zoom Effect
+33860, Move Camera Position
+33861, Cinematic Camera
+33864, Cinematic Camera
+33865, Cinematic Camera
+33867, Restore Camera
+33870, Camera Movement (?)
+33871, Camera Interpolation
+33872, Camera Rotation
+33876, Something used in Rage Art Camera (?)
+33877, Special Camera (Over the Shoulder)
+33883, Focus Camera on Player
+33884, Unfocus Camera on Player
+33885, Preset Angled Camera
+33985, Facial Expression
+33986, Play Facial Animation Sequence
+33987, Play Sound from System
+33988, Play Sound from Player
+33989, Play Sound from Player
+33990, Play Sound from Opponent
+33994, Announcer says "Fight"
+33995, Plays the attached Audio
+33996, Camera Zoom

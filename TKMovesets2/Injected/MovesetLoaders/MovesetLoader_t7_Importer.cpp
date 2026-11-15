@@ -50,7 +50,8 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 	// Header of the moveset that will contain our own information about it
 	const TKMovesetHeader* header = (TKMovesetHeader*)moveset;
 
-	if (s_moveset < sizeof(header) || !header->ValidateHeader()) {
+	if (!moveset || s_moveset < sizeof(*header) || !header->ValidateHeader(s_moveset) ||
+		header->moveset_data_size > (256ULL << 20)) {
 		DEBUG_ERR("Failed to validate header of incoming online moveset.");
 		delete[] moveset;
 		return nullptr;
@@ -74,12 +75,14 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 		// Not compressed
 		// Go past the header now that we have a ptr to the header. This will be what is sent to the game.
 		s_moveset -= header->moveset_data_start;
-		moveset += header->moveset_data_start;
+		moveset = new (std::nothrow) Byte[s_moveset];
+		if (!moveset) {
+			delete[] orig_moveset;
+			return nullptr;
+		}
+		memcpy(moveset, orig_moveset + header->moveset_data_start, s_moveset);
 	}
 
-	player.crc32 = header->crc32;
-	player.moveset_character_id = header->characterId;
-	player.previous_character_id = header->characterId;
 
 	Byte* final_moveset = nullptr;
 
@@ -102,29 +105,13 @@ Byte* MovesetLoaderT7::ImportForOnline(SharedMemT7_Player& player, Byte* moveset
 		break;
 	}
 
-	if (isCompressed) {
-		DEBUG_LOG("Moveset was compressed, deleting compressed version from memory\n");
-		delete[] orig_moveset;
+	if (final_moveset) {
+		player.crc32 = header->crc32;
+		player.moveset_character_id = header->characterId;
+		player.previous_character_id = header->characterId;
 	}
-
-	if (final_moveset == nullptr) {
-		DEBUG_ERR("ImportForOnline: Result was zero.");
-		delete[] moveset;
-		return nullptr;
-
-	}
-	else if (final_moveset != moveset) {
-		DEBUG_LOG("Moveset underwent an extra conversion, freeing original version\n");
-		if (isCompressed) {
-			// Free the decompressed copy that we converted
-			delete[] moveset;
-		}
-		else {
-			// Free the original moveset data
-			// delete[] moveset; Would crash because it doesn't point exactly to the start of the allocated area
-			delete[] orig_moveset;
-		}
-	}
+	delete[] orig_moveset;
+	if (final_moveset != moveset) delete[] moveset;
 
 	return final_moveset;
 }
@@ -136,6 +123,9 @@ Byte* MovesetLoaderT7::ImportForOnline_FromT7(const TKMovesetHeader* header, Byt
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = (const TKMovesetHeaderBlocks*)((char*)header + header->block_list);
+	if (header->block_list_size < std::size(offsets->blocks) || !ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		return nullptr;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -154,7 +144,9 @@ Byte* MovesetLoaderT7::ImportForOnline_FromT7(const TKMovesetHeader* header, Byt
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		return nullptr;
+	}
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);
@@ -183,6 +175,10 @@ Byte* MovesetLoaderT7::ImportForOnline_FromTTT2(const TKMovesetHeader* header, B
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return nullptr;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -201,7 +197,10 @@ Byte* MovesetLoaderT7::ImportForOnline_FromTTT2(const TKMovesetHeader* header, B
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		delete[] moveset;
+		return nullptr;
+	}
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);
@@ -229,6 +228,10 @@ Byte* MovesetLoaderT7::ImportForOnline_FromTREV(const TKMovesetHeader* header, B
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return nullptr;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -247,7 +250,10 @@ Byte* MovesetLoaderT7::ImportForOnline_FromTREV(const TKMovesetHeader* header, B
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		delete[] moveset;
+		return nullptr;
+	}
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);
@@ -275,6 +281,10 @@ Byte* MovesetLoaderT7::ImportForOnline_FromT6(const TKMovesetHeader* header, Byt
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return nullptr;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -293,7 +303,10 @@ Byte* MovesetLoaderT7::ImportForOnline_FromT6(const TKMovesetHeader* header, Byt
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		delete[] moveset;
+		return nullptr;
+	}
 
 	// Turn our table offsets into ptrs. Do this only at the end because we actually need those offsets above
 	ConvertMovesetTableOffsets(offsets, moveset, gameMoveset);

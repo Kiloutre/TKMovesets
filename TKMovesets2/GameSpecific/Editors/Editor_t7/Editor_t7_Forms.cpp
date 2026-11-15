@@ -1,9 +1,20 @@
 #include "Editor_t7.hpp"
 
 #include <type_traits>
+#include <stdexcept>
+
+using namespace StructsT7;
 using namespace EditorUtils;
 
 #define CREATE_FIELD(k, c, f, v) CreateField<decltype(v)>(k, drawOrder, inputMap, c, f, v)
+
+// The list walkers below never read past their table, even when a list misses its terminator or starts out of range
+template<class Table> static void RequireListRange(const Table& table, uint64_t id, uint64_t count = 1)
+{
+	if (id >= table.size() || count > table.size() - id) {
+		throw std::out_of_range("Editor list exceeds its table.");
+	}
+}
 
 // ===== Pushback Extra ===== //
 
@@ -11,6 +22,7 @@ std::vector<InputMap> EditorT7::GetPushbackExtraListInputs(uint16_t id, int list
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.pushback_extras, id, listSize > 0 ? listSize : 1);
 	auto pushbackExtra = m_iterators.pushback_extras.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -24,7 +36,7 @@ std::vector<InputMap> EditorT7::GetPushbackExtraListInputs(uint16_t id, int list
 		CREATE_FIELD("horizontal_offset", 0, EditorInput_U16_Changeable, pushbackExtra->horizontal_offset);
 
 		WriteFieldFullname(inputMap, "pushback_extradata");
-		inputListMap.push_back(inputMap);
+		inputListMap.push_back(std::move(inputMap));
 		pushbackExtra++;
 	} while (--listSize > 0);
 
@@ -35,7 +47,7 @@ void EditorT7::SavePushbackExtra(uint16_t id, InputMap& inputs)
 {
 	auto pushbackExtra = m_iterators.pushback_extras[id];
 
-	SetMemberValue(&pushbackExtra->horizontal_offset, inputs["horizontal_offset"]);
+	SetMemberValue(&pushbackExtra->horizontal_offset, inputs.at("horizontal_offset"));
 }
 
 // ===== Pushback ===== //
@@ -77,10 +89,10 @@ void EditorT7::SavePushback(uint16_t id, InputMap& inputs)
 {
 	auto pushback = m_iterators.pushbacks[id];
 
-	SetMemberValue(&pushback->duration, inputs["duration"]);
-	SetMemberValue(&pushback->displacement, inputs["displacement"]);
-	SetMemberValue(&pushback->num_of_loops, inputs["num_of_loops"]);
-	SetMemberValue(&pushback->extradata_addr, inputs["extradata_addr"]);
+	SetMemberValue(&pushback->duration, inputs.at("duration"));
+	SetMemberValue(&pushback->displacement, inputs.at("displacement"));
+	SetMemberValue(&pushback->num_of_loops, inputs.at("num_of_loops"));
+	SetMemberValue(&pushback->extradata_addr, inputs.at("extradata_addr"));
 }
 
 // ===== Projectile ===== //
@@ -166,48 +178,48 @@ void EditorT7::SaveProjectile(uint16_t id, InputMap& inputs)
 {
 	auto projectile = m_iterators.projectiles[id];
 
-	SetMemberValue(&projectile->vfx_id, inputs["vfx_id"]);
-	SetMemberValue(&projectile->vfx_variation_id, inputs["vfx_variation_id"]);
-	SetMemberValue(&projectile->delay, inputs["delay"]);
-	SetMemberValue(&projectile->vertical_velocity, inputs["vertical_velocity"]);
-	SetMemberValue(&projectile->horizontal_velocity, inputs["horizontal_velocity"]);
-	SetMemberValue(&projectile->duration, inputs["duration"]);
-	SetMemberValue(&projectile->no_collision, inputs["no_collision"]);
-	SetMemberValue(&projectile->size, inputs["size"]);
-	SetMemberValue(&projectile->hit_level, inputs["hit_level"]);
-	SetMemberValue(&projectile->voiceclip_on_hit, inputs["voiceclip_on_hit"]);
-	SetMemberValue(&projectile->can_hitbox_connect, inputs["can_hitbox_connect"]);
-	SetMemberValue(&projectile->gravity, inputs["gravity"]);
+	SetMemberValue(&projectile->vfx_id, inputs.at("vfx_id"));
+	SetMemberValue(&projectile->vfx_variation_id, inputs.at("vfx_variation_id"));
+	SetMemberValue(&projectile->delay, inputs.at("delay"));
+	SetMemberValue(&projectile->vertical_velocity, inputs.at("vertical_velocity"));
+	SetMemberValue(&projectile->horizontal_velocity, inputs.at("horizontal_velocity"));
+	SetMemberValue(&projectile->duration, inputs.at("duration"));
+	SetMemberValue(&projectile->no_collision, inputs.at("no_collision"));
+	SetMemberValue(&projectile->size, inputs.at("size"));
+	SetMemberValue(&projectile->hit_level, inputs.at("hit_level"));
+	SetMemberValue(&projectile->voiceclip_on_hit, inputs.at("voiceclip_on_hit"));
+	SetMemberValue(&projectile->can_hitbox_connect, inputs.at("can_hitbox_connect"));
+	SetMemberValue(&projectile->gravity, inputs.at("gravity"));
 
-	SetMemberValue(&projectile->hit_condition_addr, inputs["hit_condition_addr"]);
-	SetMemberValue(&projectile->cancel_addr, inputs["cancel_addr"]);
+	SetMemberValue(&projectile->hit_condition_addr, inputs.at("hit_condition_addr"));
+	SetMemberValue(&projectile->cancel_addr, inputs.at("cancel_addr"));
 
-	SetMemberValue(&projectile->_0x34_int, inputs["_0x34_int"]);
-	SetMemberValue(&projectile->_0x4_int, inputs["_0x4_int"]);
-	SetMemberValue(&projectile->_0xC_int, inputs["_0xC_int"]);
-	SetMemberValue(&projectile->_0x10_int, inputs["_0x10_int"]);
-	SetMemberValue(&projectile->_0x14_int, inputs["_0x14_int"]);
-	SetMemberValue(&projectile->_0x24_int, inputs["_0x24_int"]);
-	SetMemberValue(&projectile->_0x3C_int[0], inputs["_0x3C_int_1"]);
-	SetMemberValue(&projectile->_0x3C_int[1], inputs["_0x3C_int_2"]);
-	SetMemberValue(&projectile->_0x3C_int[2], inputs["_0x3C_int_3"]);
-	SetMemberValue(&projectile->_0x3C_int[3], inputs["_0x3C_int_4"]);
-	SetMemberValue(&projectile->_0x3C_int[4], inputs["_0x3C_int_5"]);
-	SetMemberValue(&projectile->_0x3C_int[5], inputs["_0x3C_int_6"]);
-	SetMemberValue(&projectile->_0x58_int, inputs["_0x58_int"]);
-	SetMemberValue(&projectile->_0x5C_int, inputs["_0x5C_int"]);
-	SetMemberValue(&projectile->_0x70_int, inputs["_0x70_int"]);
-	SetMemberValue(&projectile->_0x74_int, inputs["_0x74_int"]);
-	SetMemberValue(&projectile->_0x7C_int, inputs["_0x7C_int"]);
-	SetMemberValue(&projectile->_0x80_int, inputs["_0x80_int"]);
-	SetMemberValue(&projectile->_0x88_int[0], inputs["_0x88_int_1"]);
-	SetMemberValue(&projectile->_0x88_int[1], inputs["_0x88_int_2"]);
-	SetMemberValue(&projectile->_0x88_int[2], inputs["_0x88_int_3"]);
-	SetMemberValue(&projectile->_0x88_int[3], inputs["_0x88_int_4"]);
-	SetMemberValue(&projectile->_0x88_int[4], inputs["_0x88_int_5"]);
-	SetMemberValue(&projectile->_0x88_int[5], inputs["_0x88_int_6"]);
-	SetMemberValue(&projectile->_0x88_int[6], inputs["_0x88_int_7"]);
-	SetMemberValue(&projectile->_0x88_int[7], inputs["_0x88_int_8"]);
+	SetMemberValue(&projectile->_0x34_int, inputs.at("_0x34_int"));
+	SetMemberValue(&projectile->_0x4_int, inputs.at("_0x4_int"));
+	SetMemberValue(&projectile->_0xC_int, inputs.at("_0xC_int"));
+	SetMemberValue(&projectile->_0x10_int, inputs.at("_0x10_int"));
+	SetMemberValue(&projectile->_0x14_int, inputs.at("_0x14_int"));
+	SetMemberValue(&projectile->_0x24_int, inputs.at("_0x24_int"));
+	SetMemberValue(&projectile->_0x3C_int[0], inputs.at("_0x3C_int_1"));
+	SetMemberValue(&projectile->_0x3C_int[1], inputs.at("_0x3C_int_2"));
+	SetMemberValue(&projectile->_0x3C_int[2], inputs.at("_0x3C_int_3"));
+	SetMemberValue(&projectile->_0x3C_int[3], inputs.at("_0x3C_int_4"));
+	SetMemberValue(&projectile->_0x3C_int[4], inputs.at("_0x3C_int_5"));
+	SetMemberValue(&projectile->_0x3C_int[5], inputs.at("_0x3C_int_6"));
+	SetMemberValue(&projectile->_0x58_int, inputs.at("_0x58_int"));
+	SetMemberValue(&projectile->_0x5C_int, inputs.at("_0x5C_int"));
+	SetMemberValue(&projectile->_0x70_int, inputs.at("_0x70_int"));
+	SetMemberValue(&projectile->_0x74_int, inputs.at("_0x74_int"));
+	SetMemberValue(&projectile->_0x7C_int, inputs.at("_0x7C_int"));
+	SetMemberValue(&projectile->_0x80_int, inputs.at("_0x80_int"));
+	SetMemberValue(&projectile->_0x88_int[0], inputs.at("_0x88_int_1"));
+	SetMemberValue(&projectile->_0x88_int[1], inputs.at("_0x88_int_2"));
+	SetMemberValue(&projectile->_0x88_int[2], inputs.at("_0x88_int_3"));
+	SetMemberValue(&projectile->_0x88_int[3], inputs.at("_0x88_int_4"));
+	SetMemberValue(&projectile->_0x88_int[4], inputs.at("_0x88_int_5"));
+	SetMemberValue(&projectile->_0x88_int[5], inputs.at("_0x88_int_6"));
+	SetMemberValue(&projectile->_0x88_int[6], inputs.at("_0x88_int_7"));
+	SetMemberValue(&projectile->_0x88_int[7], inputs.at("_0x88_int_8"));
 }
 
 // ===== Input Sequence  ===== //
@@ -249,10 +261,10 @@ void EditorT7::SaveInputSequence(uint16_t id, InputMap& inputs)
 {
 	auto sequence = m_iterators.input_sequences[id];
 
-	SetMemberValue(&sequence->input_window_frames, inputs["input_window_frames"]);
-	SetMemberValue(&sequence->input_amount, inputs["input_amount"]);
-	SetMemberValue(&sequence->_0x4_int, inputs["_0x4_int"]);
-	SetMemberValue(&sequence->input_addr, inputs["input_addr"]);
+	SetMemberValue(&sequence->input_window_frames, inputs.at("input_window_frames"));
+	SetMemberValue(&sequence->input_amount, inputs.at("input_amount"));
+	SetMemberValue(&sequence->_0x4_int, inputs.at("_0x4_int"));
+	SetMemberValue(&sequence->input_addr, inputs.at("input_addr"));
 }
 
 // ===== Inputs ===== //
@@ -261,6 +273,7 @@ std::vector<InputMap> EditorT7::GetInputListInputs(uint16_t id, int listSize, Ve
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.inputs, id, listSize > 0 ? listSize : 1);
 	auto input = m_iterators.inputs.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -275,7 +288,7 @@ std::vector<InputMap> EditorT7::GetInputListInputs(uint16_t id, int listSize, Ve
 		CREATE_FIELD("button", 0, EditorInput_H32, input->button);
 
 		WriteFieldFullname(inputMap, "input");
-		inputListMap.push_back(inputMap);
+		inputListMap.push_back(std::move(inputMap));
 		input++;
 	} while (--listSize > 0);
 
@@ -286,8 +299,8 @@ void EditorT7::SaveInput(uint16_t id, InputMap& inputs)
 {
 	auto input = m_iterators.inputs.begin() + id;
 
-	SetMemberValue(&input->direction, inputs["direction"]);
-	SetMemberValue(&input->button, inputs["button"]);
+	SetMemberValue(&input->direction, inputs.at("direction"));
+	SetMemberValue(&input->button, inputs.at("button"));
 }
 
 // ===== Throw cameras ===== //
@@ -327,8 +340,8 @@ void EditorT7::SaveThrowCamera(uint16_t id, InputMap& inputs)
 {
 	auto throwCamera = m_iterators.throw_datas[id];
 
-	SetMemberValue(&throwCamera->side, inputs["side"]);
-	SetMemberValue(&throwCamera->cameradata_addr, inputs["cameradata_addr"]);
+	SetMemberValue(&throwCamera->side, inputs.at("side"));
+	SetMemberValue(&throwCamera->cameradata_addr, inputs.at("cameradata_addr"));
 }
 
 // ===== Camera data ===== //
@@ -358,11 +371,11 @@ void EditorT7::SaveCameraData(uint16_t id, InputMap& inputs)
 {
 	auto cameraData = m_iterators.camera_datas[id];
 
-	SetMemberValue(&cameraData->_0x0_int, inputs["_0x0_int"]);
-	SetMemberValue(&cameraData->_0x4_short, inputs["_0x4_short"]);
-	SetMemberValue(&cameraData->left_side_camera_data, inputs["left_side_camera_data"]);
-	SetMemberValue(&cameraData->right_side_camera_data, inputs["right_side_camera_data"]);
-	SetMemberValue(&cameraData->_0xA_short, inputs["_0xA_short"]);
+	SetMemberValue(&cameraData->_0x0_int, inputs.at("_0x0_int"));
+	SetMemberValue(&cameraData->_0x4_short, inputs.at("_0x4_short"));
+	SetMemberValue(&cameraData->left_side_camera_data, inputs.at("left_side_camera_data"));
+	SetMemberValue(&cameraData->right_side_camera_data, inputs.at("right_side_camera_data"));
+	SetMemberValue(&cameraData->_0xA_short, inputs.at("_0xA_short"));
 }
 
 
@@ -450,40 +463,40 @@ void EditorT7::SaveReactions(uint16_t id, InputMap& inputs)
 {
 	auto reaction = m_iterators.reactions[id];
 
-	SetMemberValue(&reaction->front_pushback, inputs["front_pushback"]);
-	SetMemberValue(&reaction->backturned_pushback, inputs["backturned_pushback"]);
-	SetMemberValue(&reaction->left_side_pushback, inputs["left_side_pushback"]);
-	SetMemberValue(&reaction->right_side_pushback, inputs["right_side_pushback"]);
-	SetMemberValue(&reaction->front_counterhit_pushback, inputs["front_counterhit_pushback"]);
-	SetMemberValue(&reaction->downed_pushback, inputs["downed_pushback"]);
-	SetMemberValue(&reaction->block_pushback, inputs["block_pushback"]);
+	SetMemberValue(&reaction->front_pushback, inputs.at("front_pushback"));
+	SetMemberValue(&reaction->backturned_pushback, inputs.at("backturned_pushback"));
+	SetMemberValue(&reaction->left_side_pushback, inputs.at("left_side_pushback"));
+	SetMemberValue(&reaction->right_side_pushback, inputs.at("right_side_pushback"));
+	SetMemberValue(&reaction->front_counterhit_pushback, inputs.at("front_counterhit_pushback"));
+	SetMemberValue(&reaction->downed_pushback, inputs.at("downed_pushback"));
+	SetMemberValue(&reaction->block_pushback, inputs.at("block_pushback"));
 
-	SetMemberValue(&reaction->front_direction, inputs["front_direction"]);
-	SetMemberValue(&reaction->back_direction, inputs["back_direction"]);
-	SetMemberValue(&reaction->left_side_direction, inputs["left_side_direction"]);
-	SetMemberValue(&reaction->right_side_direction, inputs["right_side_direction"]);
-	SetMemberValue(&reaction->front_counterhit_direction, inputs["front_counterhit_direction"]);
-	SetMemberValue(&reaction->downed_direction, inputs["downed_direction"]);
+	SetMemberValue(&reaction->front_direction, inputs.at("front_direction"));
+	SetMemberValue(&reaction->back_direction, inputs.at("back_direction"));
+	SetMemberValue(&reaction->left_side_direction, inputs.at("left_side_direction"));
+	SetMemberValue(&reaction->right_side_direction, inputs.at("right_side_direction"));
+	SetMemberValue(&reaction->front_counterhit_direction, inputs.at("front_counterhit_direction"));
+	SetMemberValue(&reaction->downed_direction, inputs.at("downed_direction"));
 
-	SetMemberValue(&reaction->default_moveid, inputs["default_moveid"]);
-	SetMemberValue(&reaction->standing_moveid, inputs["standing_moveid"]);
-	SetMemberValue(&reaction->crouch_moveid, inputs["crouch_moveid"]);
-	SetMemberValue(&reaction->counterhit_moveid, inputs["counterhit_moveid"]);
-	SetMemberValue(&reaction->crouch_counterhit_moveid, inputs["crouch_counterhit_moveid"]);
-	SetMemberValue(&reaction->left_side_moveid, inputs["left_side_moveid"]);
-	SetMemberValue(&reaction->crouch_left_side_moveid, inputs["crouch_left_side_moveid"]);
-	SetMemberValue(&reaction->right_side_moveid, inputs["right_side_moveid"]);
-	SetMemberValue(&reaction->crouch_right_side_moveid, inputs["crouch_right_side_moveid"]);
-	SetMemberValue(&reaction->backturned_moveid, inputs["backturned_moveid"]);
-	SetMemberValue(&reaction->crouch_backturned_moveid, inputs["crouch_backturned_moveid"]);
-	SetMemberValue(&reaction->block_moveid, inputs["block_moveid"]);
-	SetMemberValue(&reaction->crouch_block_moveid, inputs["crouch_block_moveid"]);
-	SetMemberValue(&reaction->wallslump_moveid, inputs["wallslump_moveid"]);
-	SetMemberValue(&reaction->downed_moveid, inputs["downed_moveid"]);
+	SetMemberValue(&reaction->default_moveid, inputs.at("default_moveid"));
+	SetMemberValue(&reaction->standing_moveid, inputs.at("standing_moveid"));
+	SetMemberValue(&reaction->crouch_moveid, inputs.at("crouch_moveid"));
+	SetMemberValue(&reaction->counterhit_moveid, inputs.at("counterhit_moveid"));
+	SetMemberValue(&reaction->crouch_counterhit_moveid, inputs.at("crouch_counterhit_moveid"));
+	SetMemberValue(&reaction->left_side_moveid, inputs.at("left_side_moveid"));
+	SetMemberValue(&reaction->crouch_left_side_moveid, inputs.at("crouch_left_side_moveid"));
+	SetMemberValue(&reaction->right_side_moveid, inputs.at("right_side_moveid"));
+	SetMemberValue(&reaction->crouch_right_side_moveid, inputs.at("crouch_right_side_moveid"));
+	SetMemberValue(&reaction->backturned_moveid, inputs.at("backturned_moveid"));
+	SetMemberValue(&reaction->crouch_backturned_moveid, inputs.at("crouch_backturned_moveid"));
+	SetMemberValue(&reaction->block_moveid, inputs.at("block_moveid"));
+	SetMemberValue(&reaction->crouch_block_moveid, inputs.at("crouch_block_moveid"));
+	SetMemberValue(&reaction->wallslump_moveid, inputs.at("wallslump_moveid"));
+	SetMemberValue(&reaction->downed_moveid, inputs.at("downed_moveid"));
 
-	SetMemberValue(&reaction->vertical_pushback, inputs["vertical_pushback"]);
-	SetMemberValue(&reaction->_0x44_int, inputs["_0x44_int"]);
-	SetMemberValue(&reaction->_0x48_int, inputs["_0x48_int"]);
+	SetMemberValue(&reaction->vertical_pushback, inputs.at("vertical_pushback"));
+	SetMemberValue(&reaction->_0x44_int, inputs.at("_0x44_int"));
+	SetMemberValue(&reaction->_0x48_int, inputs.at("_0x48_int"));
 }
 
 // ===== Hit conditions ===== //
@@ -492,6 +505,8 @@ std::vector<InputMap> EditorT7::GetHitConditionListInputs(uint16_t id, VectorSet
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.hit_conditions, id);
+	uint64_t remaining = m_iterators.hit_conditions.size() - id;
 	auto hitCondition = m_iterators.hit_conditions.begin() + id;
 	auto req = m_iterators.requirements.begin();
 
@@ -509,9 +524,15 @@ std::vector<InputMap> EditorT7::GetHitConditionListInputs(uint16_t id, VectorSet
 		CREATE_FIELD("reactions_addr", 0, EditorInput_PTR, hitCondition->reactions_addr);
 
 		WriteFieldFullname(inputMap, "hit_condition");
-		inputListMap.push_back(inputMap);
+		inputListMap.push_back(std::move(inputMap));
 
-		if (req[(unsigned int)hitCondition->requirements_addr].condition == constants[EditorConstants_RequirementEnd]) {
+		// An out-of-range requirement list or the end of the table also ends the list
+		const uint64_t requirementId = (uint64_t)hitCondition->requirements_addr;
+		if (requirementId >= m_iterators.requirements.size() ||
+			req[(unsigned int)requirementId].condition == constants[EditorConstants_RequirementEnd]) {
+			break;
+		}
+		if (--remaining == 0) {
 			break;
 		}
 
@@ -525,10 +546,10 @@ void EditorT7::SaveHitCondition(uint16_t id, InputMap& inputs)
 {
 	auto hitCondition = m_iterators.hit_conditions[id];
 
-	SetMemberValue(&hitCondition->requirements_addr, inputs["requirements_addr"]);
-	SetMemberValue(&hitCondition->damage, inputs["damage"]);
-	SetMemberValue(&hitCondition->_0xC_int, inputs["_0xC_int"]);
-	SetMemberValue(&hitCondition->reactions_addr, inputs["reactions_addr"]);
+	SetMemberValue(&hitCondition->requirements_addr, inputs.at("requirements_addr"));
+	SetMemberValue(&hitCondition->damage, inputs.at("damage"));
+	SetMemberValue(&hitCondition->_0xC_int, inputs.at("_0xC_int"));
+	SetMemberValue(&hitCondition->reactions_addr, inputs.at("reactions_addr"));
 }
 
 bool EditorT7::ValidateHitConditionField(EditorInput* field)
@@ -555,6 +576,8 @@ std::vector<InputMap> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.requirements, id);
+	uint64_t remaining = m_iterators.requirements.size() - id;
 	auto req = m_iterators.requirements.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -573,8 +596,8 @@ std::vector<InputMap> EditorT7::GetRequirementListInputs(uint16_t id, VectorSet<
 		CREATE_FIELD("param_float", 0, EditorInput_Float, req->param_float);
 
 		WriteFieldFullname(inputMap, "requirement");
-		inputListMap.push_back(inputMap);
-	} while ((req++)->condition != constants[EditorConstants_RequirementEnd]);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((req++)->condition != constants[EditorConstants_RequirementEnd] && --remaining > 0);
 
 	return inputListMap;
 }
@@ -584,8 +607,8 @@ void EditorT7::SaveRequirement(uint16_t id, InputMap& inputs)
 {
 	auto req = m_iterators.requirements[id];
 
-	SetMemberValue(&req->condition, inputs["condition"]);
-	SetMemberValue(&req->param_unsigned, inputs["param_unsigned"]);
+	SetMemberValue(&req->condition, inputs.at("condition"));
+	SetMemberValue(&req->param_unsigned, inputs.at("param_unsigned"));
 }
 
 // ===== Cancel Extradata ===== //
@@ -610,7 +633,7 @@ void EditorT7::SaveCancelExtra(uint16_t id, InputMap& inputs)
 {
 	auto cancelExtra = m_iterators.cancel_extras[id];
 
-	SetMemberValue(&cancelExtra->value, inputs["value"]);
+	SetMemberValue(&cancelExtra->value, inputs.at("value"));
 }
 
 // ===== Cancel ===== //
@@ -619,6 +642,8 @@ std::vector<InputMap> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.cancels, id);
+	uint64_t remaining = m_iterators.cancels.size() - id;
 	auto cancel = m_iterators.cancels.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -639,8 +664,8 @@ std::vector<InputMap> EditorT7::GetCancelListInputs(uint16_t id, VectorSet<std::
 		CREATE_FIELD("cancel_option", 0, EditorInput_U16_Changeable, cancel->cancel_option);
 
 		WriteFieldFullname(inputMap, "cancel");
-		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != constants[EditorConstants_CancelCommandEnd]);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((cancel++)->command != constants[EditorConstants_CancelCommandEnd] && --remaining > 0);
 
 	return inputListMap;
 }
@@ -649,14 +674,14 @@ void EditorT7::SaveCancel(uint16_t id, InputMap& inputs)
 {
 	auto cancel = m_iterators.cancels[id];
 
-	SetMemberValue(&cancel->command, inputs["command"]);
-	SetMemberValue(&cancel->requirements_addr, inputs["requirements_addr"]);
-	SetMemberValue(&cancel->extradata_addr, inputs["extradata_addr"]);
-	SetMemberValue(&cancel->detection_start, inputs["detection_start"]);
-	SetMemberValue(&cancel->detection_end, inputs["detection_end"]);
-	SetMemberValue(&cancel->starting_frame, inputs["starting_frame"]);
-	SetMemberValue(&cancel->move_id, inputs["move_id"]);
-	SetMemberValue(&cancel->cancel_option, inputs["cancel_option"]);
+	SetMemberValue(&cancel->command, inputs.at("command"));
+	SetMemberValue(&cancel->requirements_addr, inputs.at("requirements_addr"));
+	SetMemberValue(&cancel->extradata_addr, inputs.at("extradata_addr"));
+	SetMemberValue(&cancel->detection_start, inputs.at("detection_start"));
+	SetMemberValue(&cancel->detection_end, inputs.at("detection_end"));
+	SetMemberValue(&cancel->starting_frame, inputs.at("starting_frame"));
+	SetMemberValue(&cancel->move_id, inputs.at("move_id"));
+	SetMemberValue(&cancel->cancel_option, inputs.at("cancel_option"));
 }
 
 bool EditorT7::ValidateCancelField(EditorInput* field)
@@ -691,6 +716,8 @@ std::vector<InputMap> EditorT7::GetGroupedCancelListInputs(uint16_t id, VectorSe
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.grouped_cancels, id);
+	uint64_t remaining = m_iterators.grouped_cancels.size() - id;
 	auto cancel = m_iterators.grouped_cancels.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -711,8 +738,8 @@ std::vector<InputMap> EditorT7::GetGroupedCancelListInputs(uint16_t id, VectorSe
 		CREATE_FIELD("cancel_option", 0, EditorInput_U16_Changeable, cancel->cancel_option);
 
 		WriteFieldFullname(inputMap, "grouped_cancel");
-		inputListMap.push_back(inputMap);
-	} while ((cancel++)->command != constants[EditorConstants_GroupedCancelCommandEnd]);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((cancel++)->command != constants[EditorConstants_GroupedCancelCommandEnd] && --remaining > 0);
 
 	return inputListMap;
 }
@@ -721,14 +748,14 @@ void EditorT7::SaveGroupedCancel(uint16_t id, InputMap& inputs)
 {
 	auto cancel = m_iterators.grouped_cancels[id];
 
-	SetMemberValue(&cancel->command, inputs["command"]);
-	SetMemberValue(&cancel->requirements_addr, inputs["requirements_addr"]);
-	SetMemberValue(&cancel->extradata_addr, inputs["extradata_addr"]);
-	SetMemberValue(&cancel->detection_start, inputs["detection_start"]);
-	SetMemberValue(&cancel->detection_end, inputs["detection_end"]);
-	SetMemberValue(&cancel->starting_frame, inputs["starting_frame"]);
-	SetMemberValue(&cancel->move_id, inputs["move_id"]);
-	SetMemberValue(&cancel->cancel_option, inputs["cancel_option"]);
+	SetMemberValue(&cancel->command, inputs.at("command"));
+	SetMemberValue(&cancel->requirements_addr, inputs.at("requirements_addr"));
+	SetMemberValue(&cancel->extradata_addr, inputs.at("extradata_addr"));
+	SetMemberValue(&cancel->detection_start, inputs.at("detection_start"));
+	SetMemberValue(&cancel->detection_end, inputs.at("detection_end"));
+	SetMemberValue(&cancel->starting_frame, inputs.at("starting_frame"));
+	SetMemberValue(&cancel->move_id, inputs.at("move_id"));
+	SetMemberValue(&cancel->cancel_option, inputs.at("cancel_option"));
 }
 
 bool EditorT7::ValidateGroupedCancelField(EditorInput* field)
@@ -776,6 +803,8 @@ std::vector<InputMap> EditorT7::GetMoveStartPropertyListInputs(uint16_t id, Vect
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.move_start_properties, id);
+	uint64_t remaining = m_iterators.move_start_properties.size() - id;
 	auto prop = m_iterators.move_start_properties.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -791,8 +820,8 @@ std::vector<InputMap> EditorT7::GetMoveStartPropertyListInputs(uint16_t id, Vect
 		CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
 
 		WriteFieldFullname(inputMap, "move_start_extraprop");
-		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd] && --remaining > 0);
 
 	return inputListMap;
 }
@@ -801,9 +830,9 @@ void EditorT7::SaveMoveStartProperty(uint16_t id, InputMap& inputs)
 {
 	auto prop = m_iterators.move_start_properties[id];
 
-	SetMemberValue(&prop->requirements_addr, inputs["requirements_addr"]);
-	SetMemberValue(&prop->extraprop, inputs["extraprop"]);
-	SetMemberValue(&prop->value, inputs["value"]);
+	SetMemberValue(&prop->requirements_addr, inputs.at("requirements_addr"));
+	SetMemberValue(&prop->extraprop, inputs.at("extraprop"));
+	SetMemberValue(&prop->value, inputs.at("value"));
 }
 
 // ===== Other move properties (end) ===== //
@@ -812,6 +841,8 @@ std::vector<InputMap> EditorT7::GetMoveEndPropertyListInputs(uint16_t id, Vector
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.move_end_properties, id);
+	uint64_t remaining = m_iterators.move_end_properties.size() - id;
 	auto prop = m_iterators.move_end_properties.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -827,8 +858,8 @@ std::vector<InputMap> EditorT7::GetMoveEndPropertyListInputs(uint16_t id, Vector
 		CREATE_FIELD("value", 0, EditorInput_U32_Changeable, prop->value);
 
 		WriteFieldFullname(inputMap, "move_end_extraprop");
-		inputListMap.push_back(inputMap);
-	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd]);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((prop++)->extraprop != constants[EditorConstants_RequirementEnd] && --remaining > 0);
 
 	return inputListMap;
 }
@@ -837,9 +868,9 @@ void EditorT7::SaveMoveEndProperty(uint16_t id, InputMap& inputs)
 {
 	auto prop = m_iterators.move_end_properties[id];
 
-	SetMemberValue(&prop->requirements_addr, inputs["requirements_addr"]);
-	SetMemberValue(&prop->extraprop, inputs["extraprop"]);
-	SetMemberValue(&prop->value, inputs["value"]);
+	SetMemberValue(&prop->requirements_addr, inputs.at("requirements_addr"));
+	SetMemberValue(&prop->extraprop, inputs.at("extraprop"));
+	SetMemberValue(&prop->value, inputs.at("value"));
 }
 
 bool EditorT7::ValidateOtherMoveProperty(EditorInput* field)
@@ -859,6 +890,8 @@ std::vector<InputMap> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<st
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.extra_move_properties, id);
+	uint64_t remaining = m_iterators.extra_move_properties.size() - id;
 	auto prop = m_iterators.extra_move_properties.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -877,8 +910,8 @@ std::vector<InputMap> EditorT7::GetExtrapropListInputs(uint16_t id, VectorSet<st
 		CREATE_FIELD("value_float", 0, EditorInput_Float, prop->value_float);
 
 		WriteFieldFullname(inputMap, "extraproperty");
-		inputListMap.push_back(inputMap);
-	} while ((prop++)->starting_frame != constants[EditorConstants_ExtraPropertyEnd]);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((prop++)->id != constants[EditorConstants_ExtraPropertyEnd] && --remaining > 0); // Property id 0 ends the list
 
 	return inputListMap;
 }
@@ -887,9 +920,9 @@ void EditorT7::SaveExtraproperty(uint16_t id, InputMap& inputs)
 {
 	auto prop = m_iterators.extra_move_properties[id];
 
-	SetMemberValue(&prop->starting_frame, inputs["starting_frame"]);
-	SetMemberValue(&prop->id, inputs["id"]);
-	SetMemberValue(&prop->value_unsigned, inputs["value_unsigned"]);
+	SetMemberValue(&prop->starting_frame, inputs.at("starting_frame"));
+	SetMemberValue(&prop->id, inputs.at("id"));
+	SetMemberValue(&prop->value_unsigned, inputs.at("value_unsigned"));
 }
 
 // ===== Voiceclips ===== //
@@ -898,6 +931,8 @@ std::vector<InputMap> EditorT7::GetVoiceclipListInputs(uint16_t id, VectorSet<st
 {
 	std::vector<InputMap> inputListMap;
 
+	RequireListRange(m_iterators.voiceclips, id);
+	uint64_t remaining = m_iterators.voiceclips.size() - id;
 	auto voiceclip = m_iterators.voiceclips.begin() + id;
 
 	// Set up fields. Draw order is same as declaration order because of macro.
@@ -911,8 +946,8 @@ std::vector<InputMap> EditorT7::GetVoiceclipListInputs(uint16_t id, VectorSet<st
 		CREATE_FIELD("id", 0, EditorInput_H32, voiceclip->id);
 
 		WriteFieldFullname(inputMap, "voiceclip");
-		inputListMap.push_back(inputMap);
-	} while ((voiceclip++)->id != (uint32_t)-1);
+		inputListMap.push_back(std::move(inputMap));
+	} while ((voiceclip++)->id != (uint32_t)-1 && --remaining > 0);
 
 	return inputListMap;
 }
@@ -922,7 +957,7 @@ void EditorT7::SaveVoiceclip(uint16_t id, InputMap& inputs)
 {
 	auto voiceclip = m_iterators.voiceclips[id];
 
-	SetMemberValue(&voiceclip->id, inputs["id"]);
+	SetMemberValue(&voiceclip->id, inputs.at("id"));
 }
 
 // ===== MOVES ===== //
@@ -983,138 +1018,57 @@ InputMap EditorT7::GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder)
 }
 
 
-void EditorT7::SaveMoveName(const char* moveName, gameAddr move_name_addr)
+uint64_t EditorT7::SaveMoveName(const char* name, gameAddr offset)
 {
-	const size_t moveNameSize = strlen(moveName) + 1;
-
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	// Find position where to insert new name
-	const uint64_t moveNameOffset = m_header->moveset_data_start + m_offsets->nameBlock + move_name_addr;
-	const uint64_t moveNameEndOffset = moveNameOffset + moveNameSize;
-	const uint64_t orig_moveNameEndOffset = moveNameOffset + strlen((char*)m_moveset + moveNameOffset) + 1;
-
-	// Find the very last move name ending offset
-	uint64_t lastNameEndOffset = m_header->moveset_data_start + m_offsets->movesetBlock;
-	while (*(m_moveset + (lastNameEndOffset - 2)) == 0)
-	{
-		// Because the block after the nameBlock needs to be aligned, we also have to find the last offset and see
-		// - the impact of our insertion, see if it misaligns the ending position
-		lastNameEndOffset--;
-	}
-	// Shift by the new size difference
-	const uint64_t orig_moveNameSize = strlen((char*)m_moveset + moveNameOffset) + 1;
-	const uint64_t orig_movelistStartOffset = m_header->moveset_data_start + m_offsets->movesetBlock;
-	lastNameEndOffset += moveNameSize - orig_moveNameSize;
-
-	// Align the end of the name block to 8 bytes to get the start of the movelist block
-	const uint64_t movelistStartOffset = Helpers::align8Bytes(lastNameEndOffset);
-
-	// Now that we know the aligned size of the name block, we can finally allocate
-	newMovesetSize = movelistStartOffset + (m_movesetSize - orig_movelistStartOffset);
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return;
-	}
-
-	// Shift offsets in the moveset table & in our header
-	const uint64_t extraBlockSize = movelistStartOffset - orig_movelistStartOffset;
-
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		if ((m_header->moveset_data_start + m_offsets->blocks[i]) >= orig_movelistStartOffset) {
-			m_offsets->blocks[i] += extraBlockSize;
-		}
-	}
-
-	memset(newMoveset, 0, newMovesetSize);
-
-	// Copy start //
-
-	memcpy(newMoveset, m_moveset, moveNameOffset);
-
-	// Write our new name
-	strcpy_s((char*)newMoveset + moveNameOffset, strlen(moveName) + 1, moveName);
-
-	// Copy all the data after new name until the end of the name block
-	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, orig_movelistStartOffset - orig_moveNameEndOffset);
-
-	// Copy all the data from the start of the moveset block to the end
-	memcpy(newMoveset + movelistStartOffset, m_moveset + orig_movelistStartOffset, m_movesetSize - orig_movelistStartOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	// Shift moveset name addr offsets
-	const int64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
-
-	DEBUG_LOG("Extra name size: %lld, moveNameOffset: %llx, orig_moveNameEndOffset: %llx\n", extraNameSize, moveNameEndOffset, orig_moveNameEndOffset);
-
-	for (auto& move : m_iterators.moves)
-	{
-		if (move.name_addr > move_name_addr) {
-			move.name_addr += extraNameSize;
-		}
-		if (move.anim_name_addr > move_name_addr) {
-			move.anim_name_addr += extraNameSize;
-		}
-	}
-
-	// Re-adjust mappings
-	for (auto& pair : m_animOffsetToNameOffset) {
-		if (pair.second > move_name_addr) {
-			pair.second += extraNameSize;
-		}
-	}
+    if (BlockString(StructsT7::TKMovesetHeaderBlocks_Name, offset) == name) return offset;
+    // Names may share storage with other moves, animation names or metadata.
+    return CreateMoveName(name);
 }
 
 void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 {
 	auto move = m_iterators.moves[id];
 
-	SetMemberValue(&move->vuln, inputs["vulnerability"]);
-	SetMemberValue(&move->hitlevel, inputs["hitlevel"]);
-	SetMemberValue(&move->transition, inputs["transition"]);
-	SetMemberValue(&move->moveId_val1, inputs["moveId_val1"]);
-	SetMemberValue(&move->moveId_val2, inputs["moveId_val2"]);
-	SetMemberValue(&move->anim_len, inputs["anim_len"]);
-	SetMemberValue(&move->airborne_start, inputs["airborne_start"]);
-	SetMemberValue(&move->airborne_end, inputs["airborne_end"]);
-	SetMemberValue(&move->ground_fall, inputs["ground_fall"]);
-	SetMemberValue(&move->hitbox_location, inputs["hitbox_location"]);
-	SetMemberValue(&move->first_active_frame, inputs["first_active_frame"]);
-	SetMemberValue(&move->last_active_frame, inputs["last_active_frame"]);
-	SetMemberValue(&move->distance, inputs["distance"]);
+	SetMemberValue(&move->vuln, inputs.at("vulnerability"));
+	SetMemberValue(&move->hitlevel, inputs.at("hitlevel"));
+	SetMemberValue(&move->transition, inputs.at("transition"));
+	SetMemberValue(&move->moveId_val1, inputs.at("moveId_val1"));
+	SetMemberValue(&move->moveId_val2, inputs.at("moveId_val2"));
+	SetMemberValue(&move->anim_len, inputs.at("anim_len"));
+	SetMemberValue(&move->airborne_start, inputs.at("airborne_start"));
+	SetMemberValue(&move->airborne_end, inputs.at("airborne_end"));
+	SetMemberValue(&move->ground_fall, inputs.at("ground_fall"));
+	SetMemberValue(&move->hitbox_location, inputs.at("hitbox_location"));
+	SetMemberValue(&move->first_active_frame, inputs.at("first_active_frame"));
+	SetMemberValue(&move->last_active_frame, inputs.at("last_active_frame"));
+	SetMemberValue(&move->distance, inputs.at("distance"));
 
-	SetMemberValue(&move->cancel_addr, inputs["cancel_addr"]);
-	SetMemberValue(&move->hit_condition_addr, inputs["hit_condition_addr"]);
-	SetMemberValue(&move->extra_move_property_addr, inputs["extra_properties_addr"]);
-	SetMemberValue(&move->move_start_extraprop_addr, inputs["move_start_extraprop_addr"]);
-	SetMemberValue(&move->move_end_extraprop_addr, inputs["move_end_extraprop_addr"]);
-	SetMemberValue(&move->voicelip_addr, inputs["voiceclip_addr"]);
+	SetMemberValue(&move->cancel_addr, inputs.at("cancel_addr"));
+	SetMemberValue(&move->hit_condition_addr, inputs.at("hit_condition_addr"));
+	SetMemberValue(&move->extra_move_property_addr, inputs.at("extra_properties_addr"));
+	SetMemberValue(&move->move_start_extraprop_addr, inputs.at("move_start_extraprop_addr"));
+	SetMemberValue(&move->move_end_extraprop_addr, inputs.at("move_end_extraprop_addr"));
+	SetMemberValue(&move->voicelip_addr, inputs.at("voiceclip_addr"));
 
-	SetMemberValue(&move->_0x28_cancel_addr, inputs["cancel_addr_2"]);
-	SetMemberValue(&move->_0x30_int__0x28_related, inputs["cancel_related_id_2"]);
-	SetMemberValue(&move->_0x38_cancel_addr, inputs["cancel_addr_3"]);
-	SetMemberValue(&move->_0x40_int__0x38_related, inputs["cancel_related_id_3"]);
-	SetMemberValue(&move->_0x48_cancel_addr, inputs["cancel_addr_4"]);
-	SetMemberValue(&move->_0x50_int__0x48_related, inputs["cancel_related_id_4"]);
+	SetMemberValue(&move->_0x28_cancel_addr, inputs.at("cancel_addr_2"));
+	SetMemberValue(&move->_0x30_int__0x28_related, inputs.at("cancel_related_id_2"));
+	SetMemberValue(&move->_0x38_cancel_addr, inputs.at("cancel_addr_3"));
+	SetMemberValue(&move->_0x40_int__0x38_related, inputs.at("cancel_related_id_3"));
+	SetMemberValue(&move->_0x48_cancel_addr, inputs.at("cancel_addr_4"));
+	SetMemberValue(&move->_0x50_int__0x48_related, inputs.at("cancel_related_id_4"));
 
-	SetMemberValue(&move->_0x34_int, inputs["_0x34_int"]);
-	SetMemberValue(&move->_0x44_int, inputs["_0x44_int"]);
-	SetMemberValue(&move->_0x56_short, inputs["_0x56_short"]);
-	SetMemberValue(&move->_0x5C_short, inputs["_0x5C_short"]);
-	SetMemberValue(&move->_0x5E_short, inputs["_0x5E_short"]);
-	SetMemberValue(&move->_0x98_int, inputs["_0x98_int"]);
-	SetMemberValue(&move->_0xA8_short, inputs["_0xA8_short"]);
-	SetMemberValue(&move->_0xAC_int, inputs["_0xAC_int"]);
+	SetMemberValue(&move->_0x34_int, inputs.at("_0x34_int"));
+	SetMemberValue(&move->_0x44_int, inputs.at("_0x44_int"));
+	SetMemberValue(&move->_0x56_short, inputs.at("_0x56_short"));
+	SetMemberValue(&move->_0x5C_short, inputs.at("_0x5C_short"));
+	SetMemberValue(&move->_0x5E_short, inputs.at("_0x5E_short"));
+	SetMemberValue(&move->_0x98_int, inputs.at("_0x98_int"));
+	SetMemberValue(&move->_0xA8_short, inputs.at("_0xA8_short"));
+	SetMemberValue(&move->_0xAC_int, inputs.at("_0xAC_int"));
 
-	char* namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
-	char* newAnimName = inputs["anim_name"]->buffer;
+	char* newAnimName = inputs.at("anim_name")->buffer;
 
-	if (strcmp(newAnimName, namePtr + move->anim_name_addr) != 0)
+	if (BlockString(TKMovesetHeaderBlocks_Name, move->anim_name_addr) != newAnimName)
 	{
 		DEBUG_LOG("Anim name changed\n");
 		// Anim was changed, delete the old one if necessary
@@ -1122,25 +1076,19 @@ void EditorT7::SaveMove(uint16_t id, InputMap& inputs)
 		auto old_anim_addr = move->anim_addr;
 		auto old_anim_name_addr = move->anim_name_addr;
 
-		move->anim_addr = m_animNameToOffsetMap[inputs["anim_name"]->buffer];
+		move->anim_addr = m_animNameToOffsetMap.at(inputs.at("anim_name")->buffer);
 		move->anim_name_addr = m_animOffsetToNameOffset.at(move->anim_addr);
 
 		DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
 		// Reload move pointer because anim/anim name deletion de-allocated it
 		move = m_iterators.moves[id];
-		namePtr = (char*)(m_movesetData + m_offsets->nameBlock);
 	}
 
 	// Save move name at the end because it may imply reallocation and invalidation of existing pointers
-	char* newName = inputs["move_name"]->buffer;
+	char* newName = inputs.at("move_name")->buffer;
 
-	if (strlen(newName) != strlen(namePtr + move->name_addr)) {
-		// Only re-allocate moveset & shift offsets if the length doesn't match
-		SaveMoveName(newName, move->name_addr);
-	}
-	else {
-		strcpy_s(namePtr + move->name_addr, strlen(newName) + 1, newName);
-	}
+    const auto nameOffset = SaveMoveName(newName, move->name_addr);
+    m_iterators.moves[id]->name_addr = nameOffset;
 
 	// In case we updated the name, reload the movelist display
 	ReloadDisplayableMoveList();
@@ -1206,6 +1154,10 @@ bool EditorT7::ValidateMoveField(EditorInput* field)
 
 void EditorT7::SaveItem(EditorWindowType type, uint16_t id, InputMap& inputs)
 {
+    MutateBatch([&] {
+        if (id >= GetStructureCount(type)) throw std::out_of_range("Invalid record ID");
+        for (const auto& [key, field] : inputs) InputString(field);
+
 	// Saving is one on an individual item basis, even for lists
 	switch (type)
 	{
@@ -1273,6 +1225,7 @@ void EditorT7::SaveItem(EditorWindowType type, uint16_t id, InputMap& inputs)
 		SaveMovelistInput(id, inputs);
 		break;
 	}
+    });
 }
 
 InputMap EditorT7::GetFormFields(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder)
@@ -1382,14 +1335,8 @@ InputMap EditorT7::GetListSingleForm(EditorWindowType type, uint16_t id, VectorS
 		break;
 	}
 
-	for (int i = 1; i < list.size(); ++i) {
-		for (auto& [key, fieldPtr] : list[i]) {
-			delete fieldPtr->buffer;
-			delete fieldPtr;
-		}
-	}
-
-	return list[0];
+    if (list.empty()) throw std::invalid_argument("Editor field factory returned no rows.");
+    return std::move(list.front());
 }
 
 bool EditorT7::ValidateField(EditorWindowType fieldType, EditorInput* field)

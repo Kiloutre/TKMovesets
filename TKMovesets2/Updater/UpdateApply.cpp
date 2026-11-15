@@ -108,19 +108,10 @@ void ApplyUpdate(const std::string& filename)
 	}
 
 	DEBUG_LOG("ApplyUpdate() - Copying file\n");
-	try {
-		std::filesystem::remove(PROGRAM_FILENAME);
-	}
-	catch (std::exception&) {
-		DEBUG_ERR("Failed to remove original file for update");
-		return;
-	}
-
-	try {
-		std::filesystem::copy_file(filename, PROGRAM_FILENAME);
-	}
-	catch (std::exception&) {
-		DEBUG_ERR("Failed to replace original file for update");
+	const char* staged = PROGRAM_FILENAME ".installing";
+	if (!CopyFileA(filename.c_str(), staged, FALSE)) return;
+	if (!MoveFileExA(staged, PROGRAM_FILENAME, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
+		DeleteFileA(staged);
 		return;
 	}
 

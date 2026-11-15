@@ -22,10 +22,16 @@ static bool ExtractMovesetLoaderIfNeeded()
         struct _stat dll_buffer;
         if (_wstat(L"" MOVESET_LOADER_NAME, &dll_buffer) == 0) {
 
-            struct _stat program_buffer;
-            _wstat(L"" PROGRAM_FILENAME, &program_buffer);
+            // Stat the running executable itself (it may have been renamed). If that fails, consider the DLL out of date.
+            struct _stat program_buffer {};
+            bool programStatOk = false;
+            {
+                wchar_t programPath[MAX_PATH] = { 0 };
+                DWORD programPathLength = GetModuleFileNameW(nullptr, programPath, MAX_PATH);
+                programStatOk = programPathLength != 0 && programPathLength < MAX_PATH && _wstat(programPath, &program_buffer) == 0;
+            }
 
-            if (dll_buffer.st_mtime < program_buffer.st_mtime || dll_buffer.st_size != TKMovesetLoader_orig_len) {
+            if (!programStatOk || dll_buffer.st_mtime < program_buffer.st_mtime || dll_buffer.st_size != TKMovesetLoader_orig_len) {
                 DEBUG_LOG("- .dll out of date, deleting it -\n");
                 // DLL was created before this .exe, which means it is not up to date
                 
@@ -90,11 +96,12 @@ static bool ExtractMovesetLoaderIfNeeded()
 Online::Online(GameProcess& process, GameData& game, const GameInfo* gameInfo) : BaseGameSpecificClass(process, game, gameInfo)
 {
     displayedMovesets = new std::vector<movesetInfo>();
-    m_dllInjectionThread = new std::thread();
 }
 
 Online::~Online()
 {
+    if (m_dllInjectionThread.joinable()) m_dllInjectionThread.join();
+    if (m_dllInjectionThread.joinable()) m_dllInjectionThread.join();
 #ifndef BUILD_TYPE_DEBUG
     // Unload the DLL from the game if in release-mode
     // Todo: test, see if this works
@@ -105,18 +112,22 @@ Online::~Online()
     }
 #endif
 
+    FreeSharedMemory();
+
+    delete displayedMovesets;
+}
+
+void Online::FreeSharedMemory()
+{
     if (m_orig_sharedMemPtr != nullptr) {
         UnmapViewOfFile(m_orig_sharedMemPtr);
+        m_orig_sharedMemPtr = nullptr;
     }
 
     if (m_memoryHandle != nullptr) {
         CloseHandle(m_memoryHandle);
+        m_memoryHandle = nullptr;
     }
-
-    if (m_startedThread) {
-        m_dllInjectionThread->join();
-    }
-    delete displayedMovesets;
 }
 
 bool Online::LoadSharedMemory()
@@ -154,16 +165,51 @@ bool Online::IsMemoryLoaded()
     return m_memoryHandle != nullptr;
 }
 
+// Compares a (possibly unterminated) shared memory version string with ours. Empty = loader still initializing, not a mismatch yet.
+static bool IsLoaderVersionMismatching(const SharedMemBase* sharedMem)
+{
+    const char* version = sharedMem->moveset_loader_version;
+    if (version[0] == '\0') {
+        return false;
+    }
+    return strncmp(version, PROGRAM_VERSION, sizeof(sharedMem->moveset_loader_version)) != 0;
+}
+
 bool Online::VerifyDllVersionMismatch()
 {
-    if (m_orig_sharedMemPtr != nullptr) {
-        versionMismatch = strcmp(m_orig_sharedMemPtr->moveset_loader_version, PROGRAM_VERSION) != 0;
+    if (m_orig_sharedMemPtr != nullptr && IsLoaderVersionMismatching(m_orig_sharedMemPtr)) {
+        DEBUG_LOG("VerifyDllVersionMismatch(): the moveset loader in the game is not from version " PROGRAM_VERSION "\n");
+        versionMismatch = true;
     }
     return versionMismatch;
 }
 
-bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
+bool Online::PeekDllVersionMismatch()
 {
+    HANDLE memoryHandle = OpenFileMapping(FILE_MAP_READ, FALSE, GetSharedMemoryName());
+    if (memoryHandle == nullptr) {
+        // No loader has initialized the shared memory yet
+        return false;
+    }
+
+    bool mismatch = false;
+    auto sharedMem = (const SharedMemBase*)MapViewOfFile(memoryHandle, FILE_MAP_READ, 0, 0, sizeof(SharedMemBase));
+    if (sharedMem != nullptr) {
+        mismatch = IsLoaderVersionMismatching(sharedMem);
+        UnmapViewOfFile(sharedMem);
+    }
+    CloseHandle(memoryHandle);
+    return mismatch;
+}
+
+bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd, uint32_t* outExitCode)
+{
+    if (versionMismatch) {
+        // A loader from another build has other export offsets than our local copy: never call into it
+        DEBUG_LOG("Not calling '%s': moveset loader version mismatch\n", functionName);
+        return false;
+    }
+
     DEBUG_LOG("Caling remote process '%s'...\n", functionName);
     auto moduleHandle = GetModuleHandleA(MOVESET_LOADER_NAME);
     if (moduleHandle == 0) {
@@ -180,24 +226,31 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd)
     }
     DEBUG_LOG("%s addr is %llx\n", functionName, startAddr);
 
-    auto errcode = m_process.createRemoteThread(startAddr, 0, waitEnd);
-    return errcode != GameProcessThreadCreation_Error;
+    auto remote = m_process.ResolveRemoteFunction(reinterpret_cast<FARPROC>(startAddr));
+    if (!remote) return false;
+    int32_t exitCode = 0;
+    auto result = m_process.createRemoteThread(remote, 0, waitEnd, &exitCode);
+    if (outExitCode != nullptr) {
+        *outExitCode = (uint32_t)exitCode;
+    }
+    return result == GameProcessThreadCreation_Started || result == GameProcessThreadCreation_FinishedCleanly;
 }
 
 void Online::InjectDll()
 {
-    if (m_startedThread) {
+    if (m_dllInjectionThread.joinable()) {
         // Ensure that the previous injection attempt was finished before trying a new one
-        m_dllInjectionThread->join();
+        m_dllInjectionThread.join();
     }
 
     isInjecting = true;
-    *m_dllInjectionThread = std::thread(&Online::InjectDllAndWaitEnd, this);
-    m_startedThread = true;
+    m_dllInjectionThread = std::thread(&Online::InjectDllAndWaitEnd, this);
 }
 
 bool Online::InjectDllAndWaitEnd()
 {
+    // The injection thread and direct callers (editors) must never initialize the loader concurrently
+    std::lock_guard injectionLock(m_injectionMutex);
     bool result = false;
 
     if (ExtractMovesetLoaderIfNeeded())
@@ -221,12 +274,32 @@ bool Online::InjectDllAndWaitEnd()
         // Call the functions to initiate and run the moveset loader
         if (m_process.InjectDll(w_dllPath.c_str()))
         {
-            result = CallMovesetLoaderFunction(MOVESET_LOADER_INIT_FUNC, true);
-            if (result) {
-                result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
+            // A loader that already initialized the shared memory tells its version: refuse to call into another build
+            if (PeekDllVersionMismatch()) {
+                DEBUG_LOG("Online::InjectDll(): the moveset loader in the game is not from version " PROGRAM_VERSION ", not calling it\n");
+                versionMismatch = true;
             }
 
-            injectedDll = true;
+            uint32_t initStatus = MovesetLoaderInitStatus_Failed;
+            result = CallMovesetLoaderFunction(MOVESET_LOADER_INIT_FUNC, true, &initStatus);
+            if (result) {
+                // Older loaders returned a bool, of which only the low byte is defined
+                switch (initStatus & 0xFF)
+                {
+                case MovesetLoaderInitStatus_Started:
+                    result = CallMovesetLoaderFunction(MOVESET_LOADER_RUN_FUNC);
+                    break;
+                case MovesetLoaderInitStatus_AlreadyRunning:
+                    // Usable, and its main loop already runs: do not start a second one
+                    result = true;
+                    break;
+                default:
+                    result = false;
+                    break;
+                }
+            }
+
+            injectedDll = result;
         }
     }
 

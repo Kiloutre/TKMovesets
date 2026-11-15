@@ -2,16 +2,20 @@
 
   "name": "tkmovesets2",
   "version": "0.6",
+  "builtin-baseline": "177e8175121536d414f405ed8b3099b325a42638",
   "dependencies": [
     {
       "name": "imgui",
-      "features": [ "glfw-binding", "opengl3-binding", "docking-experimental" ]
+      "features": [ "glfw-binding", "opengl3-binding", "docking-experimental", "test-engine" ]
     },
     "glfw3",
     "glad",
     "polyhook2",
     "lz4",
     "liblzma",
-    "curlpp"
+    "curl",
+    "nlohmann-json",
+    "openssl",
+    "zstd"
   ]
 }

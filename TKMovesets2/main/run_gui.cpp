@@ -1,16 +1,21 @@
-﻿#include "glad/glad.h"
+#include "AppTheme.hpp"
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include "GLFW/glfw3native.h"
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
 #include <stdio.h>
+#include <memory>
 #include <windows.h>
 
 #include "MainWindow.hpp"
 #include "Localization.hpp"
 #include "Settings.hpp"
+#include "OpenRequests.hpp"
 
 #include "constants.h"
 
@@ -88,16 +93,20 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 	bitmapInfo.bmiHeader.biBitCount = 32;
 
 	uint64_t allocSize = bitmapInfo.bmiHeader.biWidth * (uint64_t)abs(bitmapInfo.bmiHeader.biHeight) * 4;
-	BYTE* bitmapData = new BYTE[allocSize];
+	auto bitmapOwner = std::make_unique<BYTE[]>(allocSize);
+	BYTE* bitmapData = bitmapOwner.get();
 	ZeroMemory(bitmapData, allocSize);
 
-	GetDIBits(GetDC(NULL), iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
+	HDC screen = GetDC(nullptr);
+	GetDIBits(screen, iconInfo.hbmColor, 0, iconInfo.yHotspot * 2, bitmapData, &bitmapInfo, DIB_RGB_COLORS);
 
 	GLFWimage image{
 		.width = (int)(iconInfo.xHotspot * 2),
 		.height = (int)(iconInfo.yHotspot * 2),
 		.pixels = bitmapData
 	};
+
+	ReleaseDC(nullptr, screen);
 
 	// Set the window icon
 	glfwSetWindowIcon(window, 1, &image);
@@ -113,14 +122,31 @@ static bool LoadEmbeddedIcon(GLFWwindow* window)
 }
 
 
-void run_gui()
+class GuiRuntime
 {
+public:
+    GLFWwindow* window = nullptr;
+    bool platformInitialized = false;
+    bool rendererInitialized = false;
+    ~GuiRuntime()
+    {
+        if (rendererInitialized) ImGui_ImplOpenGL3_Shutdown();
+        if (platformInitialized) ImGui_ImplGlfw_Shutdown();
+        if (ImGui::GetCurrentContext()) ImGui::DestroyContext();
+        if (window) glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+};
+
+int run_gui()
+{
+	GuiRuntime runtime;
 
 	// Initialize GLFW library
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) {
 		DEBUG_ERR("MAIN_ERR_GLFW_INIT");
-		return;
+		return 1;
 	}
 
 	// GL 3.0 + GLSL 130
@@ -142,10 +168,14 @@ void run_gui()
 		window = glfwCreateWindow(PROGRAM_WIN_WIDTH, PROGRAM_WIN_HEIGHT, windowTitle, nullptr, nullptr);
 	}
 
+	runtime.window = window;
 	if (window == nullptr) {
 		DEBUG_ERR("MAIN_ERR_WINDOW_CREATION");
-		return;
+		return 1;
 	}
+
+	// Movesets opened from Explorer while this instance runs arrive through the main window
+	OpenRequests::Listen(glfwGetWin32Window(window));
 
 	// Set window for current thread
 	glfwMakeContextCurrent(window);
@@ -154,19 +184,21 @@ void run_gui()
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
+	AppTheme::Apply();
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr; //I don't want to save settings (for now). Perhaps save in appdata later.
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	// Initialize backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(c_glsl_version);
+	runtime.platformInitialized = ImGui_ImplGlfw_InitForOpenGL(window, true);
+    if (!runtime.platformInitialized) return 1;
+    runtime.rendererInitialized = ImGui_ImplOpenGL3_Init(c_glsl_version);
+    if (!runtime.rendererInitialized) return 1;
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		DEBUG_ERR("MAIN_ERR_OPENGL_CONTEXT");
-		return;
+		return 1;
 	}
 
 	if (!LoadEmbeddedIcon(window)) {
@@ -203,7 +235,7 @@ void run_gui()
 		// Init main program. This will get most things going and create the important threads
 		MainWindow program;
 
-		while (!glfwWindowShouldClose(window) && !program.requestedUpdate)
+		while (true)
 		{
 			// Poll and handle events such as MKB inputs, window resize. Required
 			glfwPollEvents();
@@ -213,6 +245,9 @@ void run_gui()
 
 			// Main layout function : everything we display is in there
 			program.Update();
+            const bool exitRequested=glfwWindowShouldClose(window);
+            glfwSetWindowShouldClose(window,GLFW_FALSE);
+            if (program.ConfirmExit(exitRequested)) { ImGui::EndFrame(); break; }
 
 			// Let imgui do its stuff
 			ImGui::Render();
@@ -221,7 +256,7 @@ void run_gui()
 				glfwGetFramebufferSize(window, &display_w, &display_h);
 				glViewport(0, 0, display_w, display_h);
 			}
-			glClearColor(0.0f, 0.0f, 0.0f, 1.00f);
+			glClearColor(15 / 255.0f, 15 / 255.0f, 15 / 255.0f, 1.00f); // AppTheme::Background
 			glClear(GL_COLOR_BUFFER_BIT);
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -245,8 +280,7 @@ void run_gui()
 		}
 	}
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
 
 	Localization::Clear();
+	return 0;
 }

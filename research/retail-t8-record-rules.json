@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "target_game": "t8-retail",
+  "stage": "offline_records_only",
+  "rules": [
+    {
+      "category": "requirement",
+      "t7_id": 0,
+      "retail_id": 0,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Canonical zero-parameter always-true entry.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 3,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A3:E3"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 3,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A3:E3"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 881,
+      "retail_id": 1100,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented requirement list terminators.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 2,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A2:E2"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 2,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A2:E2"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 35,
+      "retail_id": 35,
+      "param_min": 0,
+      "param_max": 4294967295,
+      "reason": "Distance comparator with identical documented units.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 34,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A34:E34"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 34,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A34:E34"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 49,
+      "retail_id": 49,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Matching documented post-active-frame hit/block check.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 40,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A40:E40"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 41,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A41:E41"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 51,
+      "retail_id": 51,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Matching documented post-active-frame story contact check.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 42,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A42:E42"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 43,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A43:E43"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 0,
+      "retail_id": 0,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Extra-property list terminator.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 2,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A2:E2"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 2,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A2:E2"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32769,
+      "retail_id": 32769,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 3,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A3:E3"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 3,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A3:E3"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32770,
+      "retail_id": 32770,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 4,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A4:E4"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 4,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A4:E4"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32771,
+      "retail_id": 32771,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 5,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A5:E5"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 5,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A5:E5"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32772,
+      "retail_id": 32772,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 6,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A6:E6"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 6,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A6:E6"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32774,
+      "retail_id": 32774,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 8,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A8:E8"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 8,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A8:E8"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32775,
+      "retail_id": 32775,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 9,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A9:E9"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 9,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A9:E9"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32776,
+      "retail_id": 32776,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 10,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A10:E10"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 10,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A10:E10"
+      },
+      "verification": "offline_documented_domain_only"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32777,
+      "retail_id": 32777,
+      "param_min": 0,
+      "param_max": 0,
+      "reason": "Documented zero-parameter camera-shake variant.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 11,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A11:E11"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 11,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A11:E11"
+      },
+      "verification": "offline_documented_domain_only"
+    }
+  ]
+}

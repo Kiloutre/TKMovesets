@@ -361,8 +361,8 @@ namespace StructsTTT2
 		uint32_t anim_count;
 		char unk0x10;
 		bool is_little_endian; // When the game checks for Mota endian, it checks this byte specifically and not the one above
+		char unk0x12;
 		char unk0x13;
-		char unk0x14;
 		unsigned int anim_offset_list[1];
 
 		bool IsValid() const

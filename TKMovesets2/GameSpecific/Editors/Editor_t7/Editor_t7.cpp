@@ -1,3 +1,4 @@
+#include "Importer_t7/Importer_t7_Utils.hpp"
 #include <map>
 #include <format>
 #include <fstream>
@@ -7,7 +8,9 @@
 #include "Importer.hpp"
 #include "Editor_t7.hpp"
 #include "Animations.hpp"
+#include "RetailT8AnimToT7.hpp"
 
+using namespace StructsT7;
 using namespace EditorUtils;
 
 #define gAddr StructsT7_gameAddr
@@ -134,58 +137,12 @@ namespace EditorT7Utils
 
 uint64_t EditorT7::CreateMoveName(const char* moveName)
 {
-	const size_t moveNameSize = strlen(moveName) + 1;
-
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	// Find position where to insert new name
-	uint64_t moveNameOffset = m_header->moveset_data_start + m_offsets->movesetBlock;
-	const uint64_t orig_moveNameEndOffset = moveNameOffset;
-	while (*(m_moveset + (moveNameOffset - 2)) == 0)
-	{
-		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
-		// We want to erase as many empty bytes because of past alignment and then re-align to 8 bytes
-		moveNameOffset--;
-	}
-
-	const uint64_t relativeMoveNameOffset = moveNameOffset - m_offsets->nameBlock - m_header->moveset_data_start;
-	const uint64_t moveNameEndOffset = Helpers::align8Bytes(moveNameOffset + moveNameSize);
-
-	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
-	newMovesetSize = moveNameEndOffset + (m_movesetSize - orig_moveNameEndOffset);
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		return 0;
-	}
-
-	// Shift offsets now that we know the extra allocated size. Need to do it before LoadMovesetPtr.
-	const uint64_t extraNameSize = moveNameEndOffset - orig_moveNameEndOffset;
-
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		if ((m_header->moveset_data_start + m_offsets->blocks[i]) >= orig_moveNameEndOffset)
-		{
-			m_offsets->blocks[i] += extraNameSize;
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx\n", i, extraNameSize);
-		}
-	}
-
-	// Copy start //
-
-	memcpy(newMoveset, m_moveset, moveNameOffset);
-
-	// Write our new name
-	memcpy(newMoveset + moveNameOffset, moveName, moveNameSize);
-
-	// Copy all the data after our name
-	memcpy(newMoveset + moveNameEndOffset, m_moveset + orig_moveNameEndOffset, m_movesetSize - orig_moveNameEndOffset);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	return relativeMoveNameOffset;
+    if (!moveName) throw std::invalid_argument("Missing name");
+    const std::string name(moveName);
+    const auto offset = m_offsets->movesetBlock - m_offsets->nameBlock;
+    ReplaceBlockRange(StructsT7::TKMovesetHeaderBlocks_Name, offset, 0,
+        {reinterpret_cast<const Byte*>(name.c_str()), name.size() + 1});
+    return offset;
 }
 
 
@@ -265,30 +222,23 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 		{EditorConstants_ProjectileProperty, 0x820B},
 	};
 
-	{
-		// Uncompress if needed
-		TKMovesetHeader* header = (TKMovesetHeader*)t_moveset;
-		if (header->isCompressed()) {
-			// Compressed moveset data, must decompress
-			Byte* new_moveset = t_moveset;
-			int32_t compressed_data_size = (int32_t)(t_movesetSize - header->moveset_data_start);
-
-			new_moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(new_moveset, compressed_data_size, t_movesetSize);
-			delete[] t_moveset;
-
-			if (new_moveset == nullptr) {
-				return false;
-			}
-
-			t_moveset = new_moveset;
-		}
+	if (!CompressionUtils::RAW::Moveset::ExpandFileBuffer(t_moveset, t_movesetSize)) {
+		free(t_moveset);
+		return false;
+	}
+	auto header = reinterpret_cast<const TKMovesetHeader*>(t_moveset);
+	auto offsets = reinterpret_cast<const TKMovesetHeaderBlocks*>(t_moveset + header->block_list);
+	if (header->block_list_size < std::size(offsets->blocks) ||
+		!T7ImportUtils::ValidateT7Semantics(*offsets, t_moveset + header->moveset_data_start, t_movesetSize - header->moveset_data_start)) {
+		free(t_moveset);
+		return false;
 	}
 
 	LoadMovesetPtr(t_moveset, t_movesetSize);
 
 	if ((m_header->flags & MovesetFlags_MovesetModified) == 0) {
 		// First time this moveset is edited
-		strcat_s(m_header->origin, sizeof(m_header->origin), " (M)");
+		strncat_s(m_header->origin, sizeof(m_header->origin), " (M)", _TRUNCATE); // a full origin field is left as is
 		m_header->flags |= MovesetFlags_MovesetModified;
 	}
 
@@ -328,17 +278,13 @@ bool EditorT7::LoadMoveset(Byte* t_moveset, uint64_t t_movesetSize)
 			}
 
 			uint64_t newNameOffset = CreateMoveName(animName_str.c_str());
-			if (newNameOffset != 0) {
+			{
 				// Reallocation was done, update the pointers we are using
 				movesetListOffset = m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 				movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
 				namePtr = (char const*)(m_movesetData + m_offsets->nameBlock);
 				movePtr[i].anim_name_addr = newNameOffset;
 				animName = namePtr + movePtr[i].anim_name_addr;
-			}
-			else {
-				// Could not generate new name
-				throw std::exception();
 			}
 		}
 
@@ -439,22 +385,21 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 
 void EditorT7::ReloadDisplayableMoveList()
 {
-	mustReloadMovelist = true;
-
-	for (auto& move : displayableMovelist) {
-		delete move;
-	}
-	displayableMovelist.clear();
+    if (m_infos->table.moveCount > uint64_t(UINT16_MAX) + 1)
+        throw std::length_error("Move IDs exceed the editor's 16-bit range");
+    std::vector<DisplayableMove*> newRows;
+    std::vector<std::unique_ptr<DisplayableMove>> ownedRows;
+    newRows.reserve(m_infos->table.moveCount);
+    ownedRows.reserve(m_infos->table.moveCount);
 
 	uint64_t movesetListOffset = m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 	gAddr::Move* movePtr = (gAddr::Move*)(m_movesetData + movesetListOffset);
-	char const* namePtr = (char const*)(m_movesetData + m_offsets->nameBlock);
 
 
-	uint16_t moveId = 0;
+	size_t moveId = 0;
 	for (gAddr::Move* move = movePtr; moveId < m_infos->table.moveCount; ++moveId, ++move)
 	{
-		std::string moveName = std::string(namePtr + move->name_addr);
+		std::string moveName(BlockString(StructsT7::TKMovesetHeaderBlocks_Name, move->name_addr));
 
 		EditorMoveFlags flags = 0;
 
@@ -478,15 +423,16 @@ void EditorT7::ReloadDisplayableMoveList()
 			flags |= EditorMoveFlags_Custom;
 		}
 
-		displayableMovelist.push_back(new DisplayableMove{
+		ownedRows.emplace_back(std::make_unique<DisplayableMove>(DisplayableMove{
 			.moveId_str = std::to_string(moveId),
 			.name = moveName,
 			.alias_str = std::string(),
 			.color = TEditorUtils::GetMoveColorFromFlag(flags),
-			.moveId = moveId,
+			.moveId = static_cast<uint16_t>(moveId),
 			.aliasId = 0,
 			.flags = flags,
-		});
+		}));
+        newRows.push_back(ownedRows.back().get());
 	}
 
 	// Mark default generic moves
@@ -499,7 +445,8 @@ void EditorT7::ReloadDisplayableMoveList()
 			uint16_t moveId = aliases[j];
 			uint16_t aliasId = 0x8000 + j;
 
-			auto& move = displayableMovelist[moveId];
+			if (moveId >= newRows.size()) continue;
+            auto& move = newRows[moveId];
 			move->flags |= EditorMoveFlags_Generic;
 
 			if (move->aliasId == 0)
@@ -521,7 +468,8 @@ void EditorT7::ReloadDisplayableMoveList()
 			uint16_t moveId = aliases[j];
 			uint16_t aliasId = 0x8000 + j;
 
-			auto& move = displayableMovelist[moveId];
+			if (moveId >= newRows.size()) continue;
+            auto& move = newRows[moveId];
 			move->flags |= EditorMoveFlags_CurrentGeneric;
 
 			if (move->aliasId == 0)
@@ -532,6 +480,10 @@ void EditorT7::ReloadDisplayableMoveList()
 			}
 		}
 	}
+    newRows.swap(displayableMovelist);
+    for (auto& row : ownedRows) row.release();
+    for (auto row : newRows) delete row;
+    mustReloadMovelist = true;
 }
 
 // ===== Utils ===== //
@@ -545,14 +497,18 @@ uint16_t EditorT7::GetCurrentMoveID(uint8_t playerId) const
 
 	uint16_t moveId = m_process.readInt16(playerAddress + m_game.GetValue("currmove_id"));
 	if (moveId >= 0x8000) {
-		moveId = aliases[(size_t)(moveId - (uint16_t)0x8000)];
+        const auto alias = static_cast<size_t>(moveId - 0x8000);
+        if (alias >= aliases.size()) return 0;
+        moveId = aliases[alias];
 	}
 
-	return moveId;
+	return moveId < m_infos->table.moveCount ? moveId : 0;
 }
 
 void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t moveId)
 {
+    if (playerId > 1 || moveId > UINT16_MAX) throw std::out_of_range("Invalid player or move ID");
+    GameProcess::WriteBatch transaction(m_process);
 	gameAddr playerAddress = m_game.ReadPtrPath("p1_addr");
 	if (playerId > 0) {
 		playerAddress += playerId * m_game.GetValue("playerstruct_size");
@@ -570,269 +526,115 @@ void EditorT7::SetCurrentMove(uint8_t playerId, gameAddr playerMoveset, size_t m
 
 	if (moveId >= 0x8000) {
 		// If is alias, convert it to its regular move id thanks to the alias list (uint16_t each) starting at 0x28
-		moveId = m_process.readInt16(playerMoveset + 0x28 + (0x2 * (moveId - 0x8000)));
+        if (moveId - 0x8000 >= std::size(m_infos->current_aliases)) throw std::out_of_range("Invalid move alias");
+        moveId = m_process.readUInt16(playerMoveset + offsetof(MovesetInfo, current_aliases) + 2 * (moveId - 0x8000));
 	}
 
-	gameAddr moveAddr = m_process.readInt64(playerMoveset + 0x210) + moveId * sizeof(Move);
+    const auto tableAddress = playerMoveset + offsetof(MovesetInfo, table);
+    const auto count = m_process.readUInt64(tableAddress + offsetof(MovesetTable, moveCount));
+    if (moveId >= count) throw std::out_of_range("Move does not exist in the imported moveset");
+    gameAddr moveAddr = m_process.readUInt64(tableAddress + offsetof(MovesetTable, move)) + moveId * sizeof(Move);
 
 	// Write a big number to the frame timer to force the current move end
 	m_process.writeInt32(playerAddress + m_game.GetValue("currmove_timer"), 99999);
 	// Tell the game which move to play NEXT
 	m_process.writeInt64(playerAddress + m_game.GetValue("nextmove_addr"), moveAddr);
 	// Also tell the ID of the current move. This isn't required per se, but not doing that would make the current move ID 0, which i don't like.
-	m_process.writeInt64(playerAddress + m_game.GetValue("currmove_id"), moveId);
+    m_process.writeUInt16(playerAddress + m_game.GetValue("currmove_id"), static_cast<uint16_t>(moveId));
+    const auto result = transaction.Commit();
+    if (!result.ok) {
+        live_loadedMoveset = 0;
+        throw std::runtime_error(result.rollbackComplete ? "Could not play move; previous game values were restored." :
+            "Could not play move; rollback was incomplete. Re-import before live editing.");
+    }
 }
 
-void EditorT7::DeleteAnimationIfUnused(uint64_t anim_addr, uint64_t anim_name_addr)
+void EditorT7::DeleteAnimationIfUnused(uint64_t animation, uint64_t name)
 {
-	// Anim was changed, delete the old one if necessary
-
-	bool animationStillInUse = false;
-	bool animationNameStillInUse = false;
-
-	for (auto& m : m_iterators.moves)
-	{
-		char* move_name = (char*)(m_movesetData + m_offsets->nameBlock + m.name_addr);
-		char* anim_name = (char*)(m_movesetData + m_offsets->nameBlock + m.anim_name_addr);
-
-		if (m.anim_addr == anim_addr) {
-			animationStillInUse = true;
-		}
-		if (m.anim_name_addr == anim_name_addr) {
-			animationNameStillInUse = true;
-		}
-	}
-
-	if (!animationStillInUse) {
-		// If the animation is unused then its name also is unused because we ensure every anim has a unique name when loading the moveset
-		DeleteAnimation(anim_addr);
-		DeleteNameBlockString(anim_name_addr);
-	}
-	else if (!animationNameStillInUse) {
-		DeleteNameBlockString(anim_name_addr);
-	}
-	else {
-		DEBUG_LOG("Anim still in use: not deleting it.\n");
-	}
+    MutateBatch([&] {
+        bool inUse = false;
+        for (const auto& move : m_iterators.moves) if (move.anim_addr == animation) inUse = true;
+        if (!inUse) DeleteAnimation(animation);
+        const auto size = BlockString(TKMovesetHeaderBlocks_Name, name).size() + 1;
+        if (!NameRangeReferenced(name, size)) DeleteNameBlockString(name);
+    });
 }
 
 std::string EditorT7::ImportAnimation(const wchar_t* filepath, int moveid)
 {
-	// Keep file name only
-	std::wstring animName_wstr = filepath;
-	animName_wstr = animName_wstr.substr(animName_wstr.find_last_of(L"/\\") + 1);
-	animName_wstr = animName_wstr.substr(0, animName_wstr.find_last_of(L'.'));
-	std::string animName_str = Helpers::to_utf8(animName_wstr);
+    // Keep the GUI's empty-string failure contract, with all failures outside the transaction.
+    try {
+        if (!filepath || moveid < 0 || static_cast<uint64_t>(moveid) >= m_iterators.moves.size()) return {};
+        std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+        const auto size = file.tellg();
+        if (!file || size < 8 || size > (256LL << 20)) return {};
+        std::vector<Byte> animation(static_cast<size_t>(size));
+        file.seekg(0);
+        if (!file.read(reinterpret_cast<char*>(animation.data()), animation.size())) return {};
+        // Retail T8 PANM (raw/static tracks): converted to a T7 0xC8 body animation (RetailT8AnimToT7).
+        if (!memcmp(animation.data() + 4, "PANM", 4))
+            animation = RetailT8AnimToT7::Convert(animation, RetailT8AnimToT7::Format::Frames);
+        const auto actual = TAnimUtils::FromMemory::Safe::GetAnimSize(animation.data(), animation.size());
+        if (!actual) return {};
+        animation.resize(static_cast<size_t>(actual));
+        if (!TAnimUtils::FromMemory::IsLittleEndian(animation.data()) &&
+            !TAnimUtils::FromMemory::ByteswapAnimation(animation.data(), animation.size())) return {};
+        std::wstring filename(filepath);
+        filename = filename.substr(filename.find_last_of(L"/\\") + 1);
+        filename = filename.substr(0, filename.find_last_of(L'.'));
+        auto requestedName = Helpers::to_utf8(filename);
+        if (requestedName.empty()) requestedName = "animation";
 
-	Byte* anim;
-	uint64_t animSize;
-	uint64_t realAnimSize;
-	{
-		std::ifstream animFile(filepath, std::ios::binary);
-
-		if (animFile.fail()) {
-			DEBUG_ERR("Failed to read anim file '%S'", filepath);
-			return "";
-		}
-
-		animFile.seekg(0, std::ios::end);
-		animSize = animFile.tellg();
-        try {
-            anim = new Byte[animSize];
-        } catch (std::bad_alloc) {
-            DEBUG_ERR("Failed to allocate anim size %llun", animSize);
-            return "";
-        }
-		animFile.seekg(0, std::ios::beg);
-		animFile.read((char*)anim, animSize);
-
-		// Ensure old bad animations don't get completely carried over
-		realAnimSize = TAnimUtils::FromMemory::Safe::GetAnimSize(anim, animSize);
-
-		if (realAnimSize == 0) {
-			DEBUG_ERR("Bad animation file : %S", filepath);
-			delete[] anim;
-			return "";
-		}
-
-		if (realAnimSize < animSize) {
-			animSize = realAnimSize;
-			DEBUG_LOG("Imported animation is too big (useless bytes): shrinking its size\n");
-		}
-		else if (realAnimSize > animSize) {
-			// todo: Display a warning to the user
-			DEBUG_ERR("Imported animation is missing bytes. (file %llu, real %llu)", animSize, realAnimSize);
-		}
-	}
-
-	// Byteswap the animation in little endian if needed
-	if (!TAnimUtils::FromMemory::IsLittleEndian(anim)) {
-		TAnimUtils::FromMemory::ByteswapAnimation(anim);
-	}
-
-	// Ensure animation name is unique
-	if (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end())
-	{
-		// An animation with the same name has been found
-		auto anim_offset = m_animNameToOffsetMap[animName_str];
-		Byte* existing_anim = (Byte*)(m_movesetData + m_offsets->animationBlock + (uint64_t)anim_offset);
-
-		if (TAnimUtils::FromMemory::GetAnimSize(existing_anim) == realAnimSize && memcmp(anim, existing_anim, realAnimSize) == 0)
-		{
-			// todo: show popup
-			DEBUG_LOG("(1) Attempted to import duplicate animation: using existing one.\n");
-			auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
-			auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
-
-			m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset[anim_offset];
-			m_iterators.moves[moveid]->anim_addr = anim_offset;
-
-			DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
-			delete[] anim;
-			return animName_str;
-		}
-
-
-		std::string animName_orig = animName_str;
-		animName_str += " (2)";
-		unsigned int num = 2;
-		while (m_animNameToOffsetMap.find(animName_str) != m_animNameToOffsetMap.end()) {
-			animName_str = std::format("{} {}", animName_orig.c_str(), ++num);
-		}
-	}
-	else
-	{
-		// Name is unique, but will still (quickly) try to assert if the animation exists under a different name
-		Byte* anim_block = (Byte*)(m_movesetData + m_offsets->animationBlock);
-
-		std::set<gameAddr> animOffsets;
-		for (auto& move : m_iterators.moves) {
-			animOffsets.insert(move.anim_addr);
-		}
-
-		auto offset_cursor = animOffsets.begin();
-		auto offset_cursor_2 = animOffsets.begin();
-		std::advance(offset_cursor_2, 1);
-		while (offset_cursor_2 != animOffsets.end())
-		{
-			uint64_t size = (*offset_cursor_2) - (*offset_cursor);
-
-			if (size == realAnimSize && memcmp(anim, anim_block + *offset_cursor, realAnimSize) == 0)
-			{
-				DEBUG_LOG("(2) Attempted to import duplicate animation: using existing one.\n");
-				auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
-				auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
-
-				m_iterators.moves[moveid]->anim_name_addr = m_animOffsetToNameOffset[*offset_cursor];
-				m_iterators.moves[moveid]->anim_addr = *offset_cursor;
-
-				DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
-				delete[] anim;
-				return animName_str;
-			}
-
-			std::advance(offset_cursor, 1);
-			std::advance(offset_cursor_2, 1);
-		}
-	}
-
-	// Importation start
-	const char* animName = animName_str.c_str();
-	const size_t animNameSize = strlen(animName) + 1;
-
-	uint64_t newMovesetSize = 0;
-	Byte* newMoveset = nullptr;
-
-	// Find position where to insert new name
-	uint64_t moveNameOffset = m_header->moveset_data_start + m_offsets->movesetBlock;
-	const uint64_t orig_nameBlockEnd = moveNameOffset;
-	while (*(m_moveset + (moveNameOffset - 2)) == 0)
-	{
-		// Have to find the insert offset backward because the name block is always aligned to 8 bytes
-		// We want to erase as many empty bytes for writing because of past alignment and then re-align to 8 bytes for the next bllock
-		moveNameOffset--;
-	}
-
-	const uint64_t nameBlockEnd = Helpers::align8Bytes(moveNameOffset + animNameSize);
-	const uint64_t orig_animBlockEnd = m_header->moveset_data_start + m_offsets->motaBlock;
-	const uint64_t newAnimOffset = nameBlockEnd + m_offsets->motaBlock - m_offsets->movesetBlock;
-	const uint64_t animBlockEnd = Helpers::align8Bytes(newAnimOffset + animSize);
-	const uint64_t movesetAndAnimBlockSize = m_offsets->motaBlock - m_offsets->movesetBlock;
-
-	// Because of 8 bytes alignment, we can only calcualte the new size after knowing where to write everything
-	newMovesetSize = m_movesetSize + (animBlockEnd - orig_animBlockEnd);
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		// Return empty string to indicate error
-		return std::string();
-	}
-
-	// Shift offsets in the moveset table & in our header
-	const uint64_t extraNameSize = nameBlockEnd - orig_nameBlockEnd;
-	const uint64_t extraAnimSize = Helpers::align8Bytes(animSize);
-
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		uint64_t blockOffset = (m_header->moveset_data_start + m_offsets->blocks[i]);
-		if (blockOffset >= orig_animBlockEnd) {
-			m_offsets->blocks[i] += extraNameSize + extraAnimSize;
-		}
-		else if (blockOffset >= orig_nameBlockEnd) {
-			m_offsets->blocks[i] += extraNameSize;
-		}
-	}
-
-	const uint64_t relativeName = moveNameOffset - m_offsets->nameBlock - m_header->moveset_data_start;
-	const uint64_t relativeAnim = newAnimOffset - m_offsets->animationBlock - m_header->moveset_data_start;
-
-	// Copy start //
-	memcpy(newMoveset, m_moveset, moveNameOffset);
-
-	// Write our new name
-	memcpy(newMoveset + moveNameOffset, animName, animNameSize);
-
-	// Copy all the data up to the animation (from name block end, which is moveset block start, to anim block end, which is mota block start)
-	memcpy(newMoveset + nameBlockEnd, m_moveset + orig_nameBlockEnd, movesetAndAnimBlockSize);
-
-	// Write our animation
-	memcpy(newMoveset + newAnimOffset, anim, animSize);
-	delete[] anim;
-
-	// Copy all the data after the animation
-	memcpy(newMoveset + animBlockEnd, m_moveset + orig_animBlockEnd, m_movesetSize - orig_animBlockEnd);
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	auto old_anim_addr = m_iterators.moves[moveid]->anim_addr;
-	auto old_anim_name_addr = m_iterators.moves[moveid]->anim_name_addr;
-
-	m_iterators.moves[moveid]->anim_name_addr = relativeName;
-	m_iterators.moves[moveid]->anim_addr = relativeAnim;
-
-	DeleteAnimationIfUnused(old_anim_addr, old_anim_name_addr);
-
-	m_animNameToOffsetMap[animName_str] = relativeAnim;
-	m_animOffsetToNameOffset[relativeAnim] = relativeName;
-
-	return animName_str;
+        return MutateBatch([&]() -> std::string {
+            RebuildAnimationMaps();
+            const auto oldAnimation = m_iterators.moves[moveid]->anim_addr;
+            const auto oldName = m_iterators.moves[moveid]->anim_name_addr;
+            gameAddr target = UINT64_MAX, targetName = 0;
+            std::string canonicalName;
+            // Include the final/only animation and compare real bytes, ignoring alignment padding.
+            const auto blockSize = m_offsets->motaBlock - m_offsets->animationBlock;
+            for (const auto& [offset, name] : m_animOffsetToNameOffset) {
+                if (offset >= blockSize) throw std::out_of_range("Animation offset outside its section");
+                auto next = m_animOffsetToNameOffset.upper_bound(offset);
+                const auto end = next == m_animOffsetToNameOffset.end() ? blockSize : next->first;
+                auto existing = m_movesetData + m_offsets->animationBlock + offset;
+                if (TAnimUtils::FromMemory::Safe::GetAnimSize(existing, end - offset) == animation.size() &&
+                    memcmp(existing, animation.data(), animation.size()) == 0) {
+                    target = offset;
+                    targetName = name;
+                    canonicalName = BlockString(TKMovesetHeaderBlocks_Name, name);
+                    break;
+                }
+            }
+            if (target == UINT64_MAX) {
+                canonicalName = requestedName;
+                unsigned suffix = 2;
+                while (m_animNameToOffsetMap.contains(canonicalName))
+                    canonicalName = std::format("{} ({})", requestedName, suffix++);
+                targetName = CreateMoveName(canonicalName.c_str());
+                target = m_offsets->motaBlock - m_offsets->animationBlock;
+                ReplaceBlockRange(TKMovesetHeaderBlocks_Animation, target, 0, animation);
+            }
+            m_iterators.moves[moveid]->anim_addr = target;
+            m_iterators.moves[moveid]->anim_name_addr = targetName;
+            DeleteAnimationIfUnused(oldAnimation, oldName);
+            RebuildAnimationMaps();
+            return canonicalName;
+        });
+    } catch (const std::exception& error) {
+        DEBUG_ERR("Animation import failed: %s", error.what());
+        return {};
+    }
 }
 
 uint32_t EditorT7::CalculateCRC32()
 {
-	// Get list of properties and its count
-	TKMovesetProperty* customPropertyList = (TKMovesetProperty*)(m_moveset + Helpers::align8Bytes(m_header->header_size));
-	uint64_t customPropertyCount = 0;
-
-	while (customPropertyList[customPropertyCount].id != TKMovesetProperty_END) {
-		++customPropertyCount;
-	}
-
-	++customPropertyCount;
+	// The checksum identifies the moveset data: like the exporter (T7ExportSnapshot) and the converters
+	// (MovesetFile), it covers an empty property list whatever import profile the file carries.
+	TKMovesetProperty end{ .id = TKMovesetProperty_END, .value = 0 };
 
 	std::vector<std::pair<Byte*, uint64_t>> hashedFileBlocks{
-		{(Byte*)customPropertyList, customPropertyCount * sizeof(TKMovesetProperty)},
+		{reinterpret_cast<Byte*>(&end), sizeof(end)},
 
 		{m_movesetData + m_offsets->movesetInfoBlock, m_offsets->tableBlock - m_offsets->movesetInfoBlock },
 		{m_movesetData + m_offsets->tableBlock, m_offsets->motalistsBlock - m_offsets->tableBlock },
@@ -867,4 +669,33 @@ void EditorT7::ExecuteExtraprop(EditorInput* idField, EditorInput* valueField)
 		uint32_t value = (uint32_t)EditorUtils::GetFieldValue(valueField);
 		(*m_sharedMemHandler)->ExecuteExtraprop(currentPlayerId, (uint32_t)id, (uint32_t)value);
 	}
+}
+void EditorT7::RebuildAnimationMaps()
+{
+    decltype(m_animNameToOffsetMap) names;
+    decltype(m_animOffsetToNameOffset) offsets;
+    const auto blockSize = m_offsets->motaBlock - m_offsets->animationBlock;
+    for (const auto& move : m_iterators.moves) {
+        if (move.anim_addr >= blockSize) throw std::out_of_range("Animation offset outside its section");
+        const std::string name(BlockString(TKMovesetHeaderBlocks_Name, move.anim_name_addr));
+        auto [entry, inserted] = names.emplace(name, move.anim_addr);
+        if (!inserted && entry->second != move.anim_addr) throw std::invalid_argument("Ambiguous animation name");
+        offsets.try_emplace(move.anim_addr, move.anim_name_addr);
+    }
+    names.swap(m_animNameToOffsetMap);
+    offsets.swap(m_animOffsetToNameOffset);
+}
+
+bool EditorT7::NameRangeReferenced(uint64_t offset, uint64_t size) const
+{
+    auto overlaps = [&](uint64_t ref) {
+        const auto length = BlockString(TKMovesetHeaderBlocks_Name, ref).size() + 1;
+        return ref < offset + size && offset < ref + length;
+    };
+    for (const auto& move : m_iterators.moves)
+        if (overlaps(move.name_addr) || overlaps(move.anim_name_addr)) return true;
+    for (auto ref : {m_infos->character_name_addr, m_infos->character_creator_addr, m_infos->date_addr, m_infos->fulldate_addr})
+        if (auto value = reinterpret_cast<uint64_t>(ref);
+            value >= m_offsets->nameBlock && value < m_offsets->movesetBlock && overlaps(value - m_offsets->nameBlock)) return true;
+    return false;
 }

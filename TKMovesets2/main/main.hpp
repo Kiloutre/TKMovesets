@@ -2,7 +2,7 @@
 
 // -- Behaviour -- //
 
-void run_gui();
+int run_gui();
 bool handle_arguments();
 
 // -- Other -- //

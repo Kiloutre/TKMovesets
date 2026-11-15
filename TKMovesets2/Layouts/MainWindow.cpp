@@ -1,4 +1,5 @@
-﻿#include <ImGui.h>
+#include <ImGui.h>
+#include "Localization.hpp"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
@@ -11,6 +12,9 @@
 // Other
 #include "Helpers.hpp"
 #include "imgui_extras.hpp"
+#include "OpenRequests.hpp"
+#include <filesystem>
+#include <system_error>
 
 // todo: fix inactive/collapsed tabs looking too similar to active ones
 const ImU32 editorTitleColors[] = {
@@ -35,7 +39,7 @@ const ImU32 editorTitleInactiveColors[] = {
 //
 void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 {
-	for (EditorVisuals* win : m_editorWindows)
+	for (const auto& win : m_editorWindows)
 	{
 		if (win->filename == movesetInfos->filename)
 		{
@@ -47,13 +51,48 @@ void MainWindow::LoadMovesetEditor(const movesetInfo* movesetInfos)
 
 	try {
 		auto game = Games::GetGameInfoFromIdentifier(movesetInfos->gameId, movesetInfos->minorVersion);
-		EditorVisuals* newWin = Games::FactoryGetEditorVisuals(game, movesetInfos, m_addrFile, &m_storage);
-		m_editorWindows.push_back(newWin);
+		auto newWin = std::unique_ptr<EditorVisuals>(Games::FactoryGetEditorVisuals(game, movesetInfos, m_addrFile.get(), &m_storage));
+		m_editorWindows.push_back(std::move(newWin));
 	}
 	catch(EditorWindow_MovesetLoadFail) {
         DEBUG_ERR("Failed to load editor for moveset '%S'", movesetInfos->filename.c_str());
 		// A throw in a constructor frees its memory so no need to do anything
 	}
+}
+
+bool MainWindow::IsMovesetOpenInEditor(const std::wstring& filename) const
+{
+	for (const auto& win : m_editorWindows)
+	{
+		if (!win || !win->filename) continue;
+		if (_wcsicmp(win->filename, filename.c_str()) == 0) return true;
+		std::error_code error;
+		if (std::filesystem::equivalent(std::filesystem::path(win->filename), std::filesystem::path(filename), error) && !error) return true;
+	}
+	return false;
+}
+
+void MainWindow::HandleOpenRequests()
+{
+	const auto now = std::chrono::steady_clock::now();
+	for (auto& path : OpenRequests::Take()) {
+		m_pendingOpens.push_back({ std::move(path), now + std::chrono::seconds(10) });
+	}
+	if (m_pendingOpens.empty()) return;
+
+	// The moveset list fills in from its own thread, so a request may wait a few frames for its file to be listed
+	std::erase_if(m_pendingOpens, [&](const PendingOpen& request) {
+		for (movesetInfo* moveset : m_storage.extractedMovesets) {
+			if (_wcsicmp(moveset->filename.c_str(), request.path.c_str()) != 0) continue;
+			SetActiveMenu(NAV__MENU_EDITION);
+			// Same rule as the edition menu's Edit button
+			if (moveset->editable) LoadMovesetEditor(moveset);
+			return true;
+		}
+		if (now < request.deadline) return false;
+		DEBUG_ERR("Moveset '%S' never appeared in the moveset list, not opening it", request.path.c_str());
+		return true;
+	});
 }
 
 static void TryLoadWindowsFont(std::vector<const char*> filenames, float size_pixels, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
@@ -72,7 +111,7 @@ static void TryLoadWindowsFont(std::vector<const char*> filenames, float size_pi
 
 // -- Public methods -- //
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(bool offline)
 {
 	// ImGUI config init
 	ImGuiIO& io = ImGui::GetIO();
@@ -86,27 +125,31 @@ MainWindow::MainWindow()
 	TryLoadWindowsFont({ "CascadiaMono.ttf" }, 15, io, &config, io.Fonts->GetGlyphRangesCyrillic());
 	TryLoadWindowsFont({ "malgun.ttf" }, 16, io, &config, io.Fonts->GetGlyphRangesKorean());
 
-	io.Fonts->Build();
 
 	ImGuiExtra::InitMarkdownConfig();
+	if (!(io.BackendFlags & ImGuiBackendFlags_RendererHasTextures)) io.Fonts->Build();
 
 
 	// Program config (various threads, submenus)
 	m_storage.ReloadMovesetList();
+	m_storage.CleanupUnusedMovesetInfos();
 
-	m_addrFile = new GameAddressesFile(true);
+	m_addrFile = std::make_unique<GameAddressesFile>(!offline);
 
-	m_extractor.Init(m_addrFile, &m_storage);
-	m_importer.Init(m_addrFile, &m_storage);
-	m_sharedMem.Init(m_addrFile, &m_storage);
+	m_extractor.Init(m_addrFile.get(), &m_storage);
+	m_importer.Init(m_addrFile.get(), &m_storage);
+	m_sharedMem.Init(m_addrFile.get(), &m_storage);
 
 	m_onlineMenu.gameHelper = &m_sharedMem;
 	m_persistentPlayMenu.gameHelper = &m_sharedMem;
+	m_editionMenu.isOpenInEditor = [this](const std::wstring& filename) { return IsMovesetOpenInEditor(filename); };
 
 	sideMenu.requestedUpdatePtr = &requestedUpdate;
-	sideMenu.SetAddrFile(m_addrFile);
+	sideMenu.storage = &m_storage;
+	if (!offline) sideMenu.SetAddrFile(m_addrFile.get());
 
 	{
+		if (offline) return;
 		// Detect running games and latch on to them if possible
 		bool attachedExtractor = false;
 		bool attachedImporter = false;
@@ -173,12 +216,18 @@ MainWindow::MainWindow()
 // Actual rendering function
 void MainWindow::Update()
 {
+	HandleOpenRequests();
+
+	auto state0 = m_extractor.LockState();
+	auto state1 = m_importer.LockState();
+	auto state2 = m_sharedMem.LockState();
 	// Main window rendering
 	ImGuiViewport* mainView = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(mainView->Pos);
 	ImGui::SetNextWindowSize(mainView->Size);
 
-	if (ImGui::Begin("###", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking))
+
+	if (ImGui::Begin("###MainWindow", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDocking))
 	{
 		const int sidebarWidth = 160;
 
@@ -236,6 +285,12 @@ void MainWindow::Update()
 				break;
 			case NAV__MENU_DOCUMENTATION:
 				break;
+			case NAV__MENU_ADDRESSES:
+				if (m_addrFile) m_addressesMenu.Render(*m_addrFile, m_extractor.IsBusy() || m_importer.IsBusy() || m_sharedMem.IsBusy());
+				break;
+			case NAV__MENU_EXTRA:
+				if (m_addrFile) m_extraMenu.Render(*m_addrFile);
+				break;
 			case NAV__MENU_ABOUT:
 				RenderSubmenu_About();
 				break;
@@ -247,7 +302,7 @@ void MainWindow::Update()
 		// Editor windows
 		for (unsigned int i = 0; i < m_editorWindows.size();)
 		{
-			EditorVisuals* w = m_editorWindows[i];
+			EditorVisuals* w = m_editorWindows[i].get();
 
 			if (w->popen) {
 				const ImU32 colorCount = _countof(editorTitleColors);
@@ -273,7 +328,6 @@ void MainWindow::Update()
 			else {
 				// Window was closed, close the associated editor and free its ressources
 				m_editorWindows.erase(m_editorWindows.begin() + i);
-				delete w;
 			}
 		}
 
@@ -300,21 +354,32 @@ void MainWindow::NewFrame()
 
 MainWindow::~MainWindow()
 {
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	sideMenu.CleanupThread();
 
 	m_extractor.StopThreadAndCleanup();
 	m_importer.StopThreadAndCleanup();
 	m_sharedMem.StopThreadAndCleanup();
 
-	for (auto& win : m_editorWindows) {
-		delete win;
-	}
-
-	// Now that every thread that uses addrFile has stopped, we can free it
-	delete m_addrFile;
+	m_editorWindows.clear();
 
 	// Once every thread that may use storage has been stopped, we can finally stop storage
 	m_storage.StopThreadAndCleanup();
+}
+bool MainWindow::ConfirmExit(bool requested) {
+    if (requested || requestedUpdate) { m_exitPending=true; m_exitUpdate|=requestedUpdate; requestedUpdate=false; }
+    if (!m_exitPending) return false;
+    bool dirty=false,busy=false;
+    for (const auto& editor:m_editorWindows) { dirty|=editor->HasPendingEdits(); busy|=editor->SaveBusy(); }
+    if (!dirty && !busy) { requestedUpdate=m_exitUpdate; return true; }
+    ImGui::OpenPopup("###CloseApplication");
+    bool approved=false;
+    if (ImGuiExtra::BeginFittedModal("CloseApplication",_("close.title"),nullptr,30.0f)) {
+        ImGui::TextUnformatted(busy?_("close.busy"):_("close.unsaved"));
+        ImGui::BeginDisabled(busy);
+        if (ImGui::Button(_("close.discard"))) { requestedUpdate=m_exitUpdate; approved=true; ImGui::CloseCurrentPopup(); }
+        ImGui::EndDisabled(); ImGui::SameLine();
+        if (ImGui::Button(_("close.keep_editing"))) { m_exitPending=m_exitUpdate=false; ImGui::CloseCurrentPopup(); }
+        ImGui::EndPopup();
+    }
+    return approved;
 }

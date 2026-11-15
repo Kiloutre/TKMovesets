@@ -1,4 +1,6 @@
 #pragma once
+#include "RecordEdit.hpp"
+#include <memory>
 
 #include <vector>
 
@@ -7,8 +9,6 @@
 #include "Online_t7.hpp"
 
 #include "Structs_t7.h"
-
-using namespace StructsT7;
 
 namespace EditorT7Utils
 {
@@ -22,36 +22,36 @@ class EditorT7 : public TEditor
 {
 private:
 	// Contains a ptr to the offset list
-	TKMovesetHeaderBlocks* m_offsets;
+	StructsT7::TKMovesetHeaderBlocks* m_offsets;
 	// Stores a ptr to the moveset table containing lists offsets & count, aliases too
-	MovesetInfo* m_infos = nullptr;
+	StructsT7::MovesetInfo* m_infos = nullptr;
 	// Contains a ptr to the head of the displayable movelist
-	MvlHead* m_mvlHead = nullptr;
+	StructsT7::MvlHead* m_mvlHead = nullptr;
 	// Contains iterators for the various structure lists
 	struct
 	{
 		StructIterator<StructsT7_gameAddr::Move> moves;
-		StructIterator<Requirement> requirements;
+		StructIterator<StructsT7::Requirement> requirements;
 		StructIterator<StructsT7_gameAddr::HitCondition> hit_conditions;
 		StructIterator<StructsT7_gameAddr::Cancel> cancels;
 		StructIterator<StructsT7_gameAddr::Cancel> grouped_cancels;
 		StructIterator<StructsT7_gameAddr::Reactions> reactions;
 		StructIterator<StructsT7_gameAddr::Pushback> pushbacks;
-		StructIterator<PushbackExtradata> pushback_extras;
-		StructIterator<CancelExtradata> cancel_extras;
-		StructIterator<ExtraMoveProperty> extra_move_properties;
+		StructIterator<StructsT7::PushbackExtradata> pushback_extras;
+		StructIterator<StructsT7::CancelExtradata> cancel_extras;
+		StructIterator<StructsT7::ExtraMoveProperty> extra_move_properties;
 		StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_start_properties;
 		StructIterator<StructsT7_gameAddr::OtherMoveProperty> move_end_properties;
 		StructIterator<StructsT7_gameAddr::Projectile> projectiles;
 		StructIterator<StructsT7_gameAddr::InputSequence> input_sequences;
 		StructIterator<StructsT7_gameAddr::ThrowCamera> throw_datas;
-		StructIterator<Input> inputs;
-		StructIterator<Voiceclip> voiceclips;
-		StructIterator<CameraData> camera_datas;
+		StructIterator<StructsT7::Input> inputs;
+		StructIterator<StructsT7::Voiceclip> voiceclips;
+		StructIterator<StructsT7::CameraData> camera_datas;
 
-		StructIterator<MvlDisplayable> mvl_displayables;
-		StructIterator<MvlPlayable> mvl_playables;
-		StructIterator<MvlInput> mvl_inputs;
+		StructIterator<StructsT7::MvlDisplayable> mvl_displayables;
+		StructIterator<StructsT7::MvlPlayable> mvl_playables;
+		StructIterator<StructsT7::MvlInput> mvl_inputs;
 	} m_iterators;
 	// Used to execute extra properties if handled by the game
 	OnlineT7** m_sharedMemHandler = nullptr;
@@ -61,9 +61,11 @@ private:
 	void SetupIterators_DisplayableMovelist();
 
 	// Moves
+    void RebuildAnimationMaps();
+    bool NameRangeReferenced(uint64_t offset, uint64_t size) const;
 	InputMap GetMoveInputs(uint16_t id, VectorSet<std::string>& drawOrder);
 	uint64_t CreateMoveName(const char* newName);
-	void SaveMoveName(const char* newName, gameAddr move_name_addr);
+	uint64_t SaveMoveName(const char* newName, gameAddr move_name_addr);
 	void SaveMove(uint16_t id, InputMap& inputs);
 	bool ValidateMoveField(EditorInput* field);
 
@@ -200,7 +202,6 @@ private:
 	void DeleteMovelistPlayable(int id);
 
 	// -- List Creation / Deletion -- //
-	void DisplayableMVLTranslationReallocate(int32_t offset, int oldSize, int newSize, uint32_t listStart_offset);
 	//
 	void ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	//
@@ -220,7 +221,6 @@ private:
 	// Movelist
 	void ModifyMovelistInputSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
 	void ModifyMovelistDisplayableSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds);
-	void ModifyMovelistDisplayableTextSize(int32_t offset, int oldSize, int newSize);
 
 	// Duplication
 	uint32_t DuplicateMove(uint32_t id, size_t listSize);
@@ -282,7 +282,7 @@ private:
 	std::string GetMovelistDisplayableText(uint32_t offset);
 
 	// Templates
-	template<typename T> int ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset);
+	template<typename T> int ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset, RecordListCount count);
 
 public:
 	using TEditor::TEditor;
@@ -365,193 +365,46 @@ public:
 	std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const override;
 };
 
-template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listStart_offset)
+template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int listStart,
+    const std::vector<int>& ids, const std::set<int>& deletedIds, uint64_t listHead,
+    RecordListCount count)
 {
-	// Compute list old and new sizes
-	int newSize = (int)ids.size();
-	int sizeDiff;
-	int oldSize;
-	{
-		int newItemCount = 0;
-		for (auto& id : ids)
-		{
-			if (id == -1) {
-				newItemCount += 1;
-			}
-		}
-		oldSize = ((int)ids.size() - newItemCount) + (int)deletedIds.size();
-		sizeDiff = newSize - oldSize;
-		DEBUG_LOG("ModifyGenericMovelistListSize(%u, , , %llx) - Diff is %d\n", listStart, listStart_offset, sizeDiff);
-	}
+    const auto [listCount, countField, countWidth] = count;
+    const auto dataStart = m_header->moveset_data_start;
+    const bool movelist = countWidth == 0 || countField >= dataStart + m_offsets->movelistBlock;
+    std::vector<size_t> structureFields;
+    std::vector<size_t> movelistFields;
+    if (!movelist) {
+        for (auto& entry : m_infos->table.entries)
+            structureFields.push_back(reinterpret_cast<Byte*>(&entry.listAddr) - m_moveset);
 
-	// Compute positions that will be used for copying
-	int structSizeDiff = sizeof(T) * sizeDiff;
-	uint64_t listPosition = listStart_offset + (sizeof(T) * listStart);
-	uint64_t new_listEndPosition = listPosition + sizeof(T) * newSize;
-	uint64_t old_listEndPosition = listPosition + sizeof(T) * oldSize;
-
-	// Compute following m_offsets-> block position. We do this because we want to make sure it always stays 8 bytes aligned
-	uint64_t new_followingBlockStart = m_movesetSize + structSizeDiff;
-	uint64_t old_followingBlockStart = m_movesetSize;
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		uint64_t absoluteBlockAddr = (m_header->moveset_data_start + m_offsets->blocks[i]);
-		if (absoluteBlockAddr >= old_listEndPosition) {
-			old_followingBlockStart = absoluteBlockAddr;
-			new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart + structSizeDiff);
-			break;
-		}
-	}
-
-	// ------------------------------------------------
-	// Compute new moveset size
-	uint64_t newMovesetSize = new_followingBlockStart + (m_movesetSize - old_followingBlockStart);
-
-	// Allocate new moveset
-	Byte* newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		DEBUG_ERR("Failed to allocate new moveset of size %llu", newMovesetSize);
-		return 0;
-	}
-
-	// ------------------------------------------------
-	// Before we begin copying, there are a few values we want updated in the new moveset before it gets copied loaded up
-
-	// Update count & table offsets right now so that iterators built from LoadMovesetPtr() are up to date
-	{
-		uint64_t movesetBlockStart = (m_header->moveset_data_start + m_offsets->movesetBlock);
-		uint64_t movesetBlockEnd = movesetBlockStart + (m_offsets->animationBlock - m_offsets->movesetBlock);
-
-		if (movesetBlockStart < listPosition && listPosition < movesetBlockEnd)
-		{
-			unsigned int tableEntryCount = _countof(m_infos->table.entries);
-			for (size_t i = 0; i < tableEntryCount; ++i)
-			{	
-				auto& currentEntry = m_infos->table.entries[i];
-				gameAddr absolute_entryStartAddr = movesetBlockStart + (uint64_t)currentEntry.listAddr;
-
-				// listPosition be equal to a list's start both with and and without belonging to the list
-				// Rule out the case where an empty structure list (count = 0) is resized into more
-				// This is overkill and not likely to happen since ModifyListSize() is never called for list creations but modification of existing ones
-				if (listPosition < absolute_entryStartAddr
-					|| (listPosition == absolute_entryStartAddr && currentEntry.listCount != 0)
-					|| (absolute_entryStartAddr > listStart_offset)) {
-					*(uint64_t*)&currentEntry.listAddr += structSizeDiff;
-					DEBUG_LOG("Shifting movesetblock entry %lld's offset\n", i);
-				}
-				else {
-					bool isPartOfCurrentList = false;
-
-					if (i + 1 == tableEntryCount) {
-						isPartOfCurrentList = true;
-					}
-					else {
-						auto& nextEntry = m_infos->table.entries[i + 1];
-						gameAddr absolute_nextEntryStartAddr = movesetBlockStart + (uint64_t)nextEntry.listAddr;
-
-						if (listPosition < absolute_nextEntryStartAddr
-							|| (listPosition == absolute_nextEntryStartAddr && nextEntry.listCount != 0)
-							|| (absolute_nextEntryStartAddr > listStart_offset)) {
-							isPartOfCurrentList = true;
-						}
-					}
-
-					if (isPartOfCurrentList) {
-						currentEntry.listCount += sizeDiff;
-						DEBUG_LOG("Table: Adding movelist entry %llu count += %d, total is %llu\n", i, sizeDiff, currentEntry.listCount);
-					}
-				}
-			}
-		}
-	}
-
-	// There are blocks to shift in the displayble movelist block
-	if (hasDisplayableMovelist)
-	{
-		uint64_t movelistBlockStart = (m_header->moveset_data_start + m_offsets->movelistBlock);
-		uint64_t movelistBlockEnd = movelistBlockStart + m_mvlHead->inputs_offset + sizeof(MvlInput) * m_iterators.mvl_inputs.size();
-
-		//DEBUG_LOG("%llx < %llx < %llx\n", movelistBlockStart, listPosition, movelistBlockEnd);
-
-		if (movelistBlockStart < listPosition && listPosition < movelistBlockEnd)
-		{
-			uint64_t relativeOffset = listPosition - movelistBlockStart;
-
-			if ((m_mvlHead->inputs_offset > relativeOffset) || (listStart != 0 && m_mvlHead->inputs_offset == relativeOffset)) {
-				m_mvlHead->inputs_offset += structSizeDiff;
-				DEBUG_LOG("MVLT: Shifted mvl_inputs block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
-
-				if ((m_mvlHead->playables_offset > relativeOffset) || (listStart != 0 && m_mvlHead->playables_offset == relativeOffset)) {
-					m_mvlHead->playables_offset += structSizeDiff;
-					DEBUG_LOG("MVLT: Shifted mvl_playable block by %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
-
-					if ((m_mvlHead->displayables_offset > relativeOffset) || (listStart != 0 && m_mvlHead->displayables_offset == relativeOffset)) {
-						m_mvlHead->displayables_offset += structSizeDiff;
-						DEBUG_LOG("MVLT: Shifted mvl_displayable block %d (0x%x) bytes\n", structSizeDiff, structSizeDiff);
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		DEBUG_LOG("No m_mvlHead to modify.\n");
-	}
-
-	// Global moveset blocks must be shifted, better here than later
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		if ((m_header->moveset_data_start + m_offsets->blocks[i]) >= listPosition) {
-			m_offsets->blocks[i] = Helpers::align8Bytes(m_offsets->blocks[i] + structSizeDiff);
-			DEBUG_LOG("Shifted moveset block %d by 0x%x (before alignment)\n", i, structSizeDiff);
-		}
-	}
-
-	// ------------------------------------------------
-	// Copy up to list start
-	memcpy(newMoveset, m_moveset, listPosition);
-
-	// Copy list items, one by one
-	// That way mere reordering + resize technically don't need SaveItem() to be re-applied
-	{
-		uint64_t writeOffset = listPosition - sizeof(T);
-		uint64_t readOffset;
-		auto it = deletedIds.begin();
-		for (auto id : ids)
-		{
-			writeOffset += sizeof(T);
-
-			if (id != -1) {
-				// Copy old structure data from its previous position (likely to be unchanged, but this handles reordering just fine)
-				readOffset = listPosition + (sizeof(T) * (id - listStart));
-			}
-			else {
-				// Try to use existing data from deleted lists. This can be useful in rare cases like MvlDisplayables.
-				if (it != deletedIds.end()) {
-					readOffset = listPosition + (sizeof(T) * *it);
-					std::advance(it, 1);
-				}
-				else {
-					// Don't bother copying anything. Calloc() implies that every byte of this struct will be at 0 anyway, so rely on that and do not change it.
-					continue;
-				}
-			}
-
-			memcpy(newMoveset + writeOffset, m_moveset + readOffset, sizeof(T));
-		}
-	}
-
-	// Copy everything after the list up to the next block
-	memcpy(newMoveset + new_listEndPosition, m_moveset + old_listEndPosition, old_followingBlockStart - old_listEndPosition);
-
-	// If there is a block afterward and not just the moveset end, copy everything from that block to the moveset end
-	if (old_followingBlockStart != m_movesetSize) {
-		memcpy(newMoveset + new_followingBlockStart, m_moveset + old_followingBlockStart, m_movesetSize - old_followingBlockStart);
-	}
-
-	// Free up old moveset from memory and assign the new one
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
-
-	return sizeDiff;
-};
+    } else {
+        movelistFields = {
+            static_cast<size_t>(reinterpret_cast<Byte*>(&m_mvlHead->displayables_offset) - m_moveset),
+            static_cast<size_t>(reinterpret_cast<Byte*>(&m_mvlHead->playables_offset) - m_moveset),
+            static_cast<size_t>(reinterpret_cast<Byte*>(&m_mvlHead->inputs_offset) - m_moveset)};
+    }
+    size_t targetMovelistField = 0;
+    if (movelist) {
+        const auto displayableCount = reinterpret_cast<Byte*>(&m_mvlHead->displayables_count) - m_moveset;
+        targetMovelistField = movelistFields[countWidth == 0 ? 2 : countField == displayableCount ? 0 : 1];
+    }
+    auto result = BuildRecordEdit({m_moveset, static_cast<size_t>(m_movesetSize)}, sizeof(T), listHead,
+        listCount, countField, countWidth, listStart, ids, deletedIds,
+        m_header->block_list, m_header->block_list_size, dataStart,
+        movelist ? StructsT7::TKMovesetHeaderBlocks_Movelist : StructsT7::TKMovesetHeaderBlocks_Moveset,
+        structureFields, dataStart + (movelist ? m_offsets->movelistBlock : m_offsets->movesetBlock), movelistFields, targetMovelistField);
+    if (movelist) {
+        RecordEdit edit(listStart, ids, deletedIds, listCount);
+        const auto oldEnd = listHead + (listStart + edit.oldCount) * sizeof(T) - dataStart - m_offsets->movelistBlock;
+        const int64_t delta = static_cast<int64_t>(edit.difference) * sizeof(T);
+        auto mvl = reinterpret_cast<StructsT7::MvlHead*>(result.bytes.get() + dataStart + m_offsets->movelistBlock);
+        auto rows = reinterpret_cast<StructsT7::MvlDisplayable*>(reinterpret_cast<Byte*>(mvl) + mvl->displayables_offset);
+        for (int i = 0; i < mvl->displayables_count; ++i)
+            for (auto& offset : rows[i].all_translation_offsets)
+                if (offset >= 0 && static_cast<uint64_t>(offset) >= oldEnd) offset += static_cast<int32_t>(delta);
+    }
+    free(m_moveset);
+    LoadMovesetPtr(result.bytes.release(), result.size);
+    return result.difference;
+}

@@ -194,6 +194,8 @@ namespace Helpers
 
     // Formats given date in 'hour:minutes day/month/year'
     std::string formatDateTime(uint64_t date, bool path_compatible=false, bool include_seconds=false);
+	// Formats given date in 'day/month/year hour:minutes:sec:ms'
+    std::string formatDateTimeMs(uint64_t date);
 
 	// Returns the current timestamp as a uint64
 	uint64_t getCurrentTimestamp();

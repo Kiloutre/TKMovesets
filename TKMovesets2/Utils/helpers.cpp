@@ -3,12 +3,17 @@
 #include <chrono>
 #include <codecvt>
 #include <cctype>
+#include <time.h>
+#include <chrono>
+#include <iomanip>
+#include <windows.h>
 
 #include "helpers.hpp"
 
 #include "constants.h"
 #include "GameTypes.h"
 #include "MovesetStructs.h"
+#include "MovesetLimits.hpp"
 
 // -- -- //
 
@@ -128,6 +133,39 @@ namespace Helpers
 		return std::string();
 	}
 
+	std::string formatDateTimeMs(uint64_t date)
+	{
+		SYSTEMTIME st;
+		GetSystemTime(&st);
+
+		FILETIME ft;
+		SystemTimeToFileTime(&st, &ft);
+
+		ULARGE_INTEGER time;
+		time.LowPart = ft.dwLowDateTime;
+		time.HighPart = ft.dwHighDateTime;
+
+		// Convert 100-nanosecond intervals to milliseconds
+		long long milliseconds = time.QuadPart / 10000;
+
+		// Extract the components
+		int hours = st.wHour + 2;
+		int minutes = st.wMinute;
+		int seconds = st.wSecond;
+		int millis = milliseconds % 1000;
+
+		if (hours >= 24) {
+			hours -= 24;
+		}
+
+		// Format the time
+		char buffer[32];
+		sprintf_s(buffer, sizeof(buffer), "%02d:%02d:%02d.%03d", hours, minutes, seconds, millis);
+
+		return buffer;
+		return "";
+	}
+
 	uint64_t getCurrentTimestamp()
 	{
 		return duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -185,7 +223,7 @@ namespace Helpers
 			// Empty string
 			return true;
 		}
-		return str[i] != '\0'; // Ensure last char is a nullbyte
+		return i == size; // Ensure last char is a nullbyte
 	}
 
 	bool fileExists(const wchar_t* name) {
@@ -355,11 +393,18 @@ namespace Helpers
 	{
 		std::ifstream file(filename, std::ios::binary);
 		file.seekg(0, std::ios::end);
-		size_out = file.tellg();
+		auto length = file.tellg();
+		if (length < 0) throw MovesetFile_BadSize();
+		size_out = static_cast<uint64_t>(length);
 
-		if (size_out < sizeof(TKMovesetHeader)) {
+		if (size_out < sizeof(TKMovesetHeader) || size_out > MovesetLimits::MaximumStored) {
 			throw MovesetFile_BadSize();
 		}
+        TKMovesetHeader prefix;
+        file.seekg(0, std::ios::beg);
+        if (!file.read(reinterpret_cast<char*>(&prefix), sizeof(prefix)) || !prefix.ValidateHeader(size_out))
+            throw MovesetFile_InvalidHeader();
+        if (!MovesetLimits::Fits(prefix, size_out)) throw MovesetFile_BadSize();
 
 		Byte* moveset = (Byte*)malloc(size_out);
 		if (moveset == nullptr) {
@@ -369,7 +414,7 @@ namespace Helpers
 			file.read((char*)moveset, size_out);
 
 
-			if (!((TKMovesetHeader*)moveset)->ValidateHeader()) {
+			if (!file || !((TKMovesetHeader*)moveset)->ValidateHeader(size_out) || !MovesetLimits::Fits(*(TKMovesetHeader*)moveset, size_out)) {
 				free(moveset);
 				throw MovesetFile_InvalidHeader();
 			}

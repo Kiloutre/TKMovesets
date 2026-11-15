@@ -45,13 +45,18 @@ gameAddr GameData::ReadPtrPath(const char* c_addressId) const
 		size_t pathLen = ptrPath.size() - 1;
 		if (pathLen > 0)
 		{
-			addr = ReadPtr(baseAddr + addr);
+			// ReadPtr() already applies baseAddr: pass it game addresses only
+			addr = ReadPtr(addr);
 			for (size_t i = 1; i < pathLen; ++i)
 			{
 				if (addr == (gameAddr)0) {
 					return GAME_ADDR_NULL;
 				}
-				addr = ReadPtr(baseAddr + addr + ptrPath[i]);
+				addr = ReadPtr(addr + ptrPath[i]);
+			}
+			// A null last pointer must not turn into the final offset
+			if (addr == (gameAddr)0) {
+				return GAME_ADDR_NULL;
 			}
 			addr += ptrPath[pathLen];
 		}
@@ -78,13 +83,18 @@ gameAddr GameData::ReadPtrPath32(const char* c_addressId) const
 		size_t pathLen = ptrPath.size() - 1;
 		if (pathLen > 0)
 		{
-			addr = (gameAddr32)ReadPtr(baseAddr + addr);
+			// ReadPtr() already applies baseAddr: pass it game addresses only
+			addr = (gameAddr32)ReadPtr(addr);
 			for (size_t i = 1; i < pathLen; ++i)
 			{
 				if (addr == (gameAddr32)0) {
 					return GAME_ADDR_NULL;
 				}
-				addr = (gameAddr32)ReadPtr(baseAddr + addr + ptrPath[i]);
+				addr = (gameAddr32)ReadPtr(addr + ptrPath[i]);
+			}
+			// A null last pointer must not turn into the final offset
+			if (addr == (gameAddr32)0) {
+				return GAME_ADDR_NULL;
 			}
 			addr += (gameAddr32)ptrPath[pathLen];
 		}
@@ -93,9 +103,9 @@ gameAddr GameData::ReadPtrPath32(const char* c_addressId) const
 	return addr;
 }
 
-void GameData::ReadBytes(gameAddr address, void* buf, size_t readSize) const
+bool GameData::ReadBytes(gameAddr address, void* buf, size_t readSize) const
 {
-	m_process->readBytes(baseAddr + address, buf, readSize);
+	return m_process->readBytes(baseAddr + address, buf, readSize);
 }
 
 void GameData::SetCurrentGame(const GameInfo* game)

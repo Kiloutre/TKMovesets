@@ -1,10 +1,14 @@
-﻿#include <windows.h>
+#include <memory>
+#include <windows.h>
 #include <filesystem>
 #include <fstream>
 
 #include "Helpers.hpp"
 #include "GameProcess.hpp"
 #include "AnimExtractors.hpp"
+#include "MovesetFolders.hpp"
+#include "OpenRequests.hpp"
+#include "Settings.hpp"
 
 #include "constants.h"
 
@@ -31,11 +35,6 @@ static void MoveMovesetFile(const std::wstring& argFile)
 		// Moveset file : Move to "extracted_chars" folder
 		std::filesystem::path moveset_dir = std::filesystem::current_path() / std::filesystem::path(MOVESET_DIRECTORY);
 		std::filesystem::path target = moveset_dir / file.filename();
-
-		if (moveset_dir == file.parent_path()) {
-			DEBUG_LOG("Not copying moveset: already in our folders\n");
-			return;
-		}
 
 		// Append (N) to filename if necessary
 		if (std::filesystem::exists(target))
@@ -64,105 +63,25 @@ static void MoveMovesetFile(const std::wstring& argFile)
 	}
 }
 
-static void MoveAnimationFile(const std::wstring& argFile)
+static void MoveAnimationFile(const std::wstring& argument)
 {
-	std::filesystem::path file(argFile);
-	DEBUG_LOG("Argument: '%S'\n", argFile.c_str());
-
-	if (!std::filesystem::exists(file)) {
-		DEBUG_ERR("File does not exist: '%S'", argFile.c_str());
-		return;
-	}
-
-	std::filesystem::path filename = file.filename();
-	std::wstring extension = file.filename().extension().wstring();
-	std::wstring name = file.filename().replace_extension("").wstring();
-
-	DEBUG_LOG("Filename is '%S', name is '%S', ext is '%S'\n", filename.wstring().c_str(), name.c_str(), extension.c_str());
-
-	if (extension == L"" ANIMATION_EXTENSION L"64" ||
-		extension == L"" ANIMATION_EXTENSION L"C8")
-	{
-		// Animation file: move to animation library
-		std::filesystem::path lib_dir = std::filesystem::current_path() / std::filesystem::path(EDITOR_LIB_DIRECTORY);
-		std::filesystem::path output_folder = lib_dir / std::filesystem::path("EXTERNAL");
-
-		CreateDirectoryW(L"" EDITOR_LIB_DIRECTORY, nullptr);
-		CreateDirectoryW(output_folder.wstring().c_str(), nullptr);
-
-		std::filesystem::path outputFile = output_folder / filename;
-		std::filesystem::path animCache = output_folder / std::filesystem::path("anims.txt");
-
-		if (output_folder == file.parent_path()) {
-			DEBUG_LOG("Not copying anim file: already in our folders\n");
-			return;
-		}
-
-		// Append (N) to filename if necessary
-		if (std::filesystem::exists(outputFile))
-		{
-			unsigned int number = 1;
-			while (std::filesystem::exists(outputFile))
-			{
-				++number;
-				outputFile = output_folder / std::filesystem::path(name + L" (" + std::to_wstring(number) + L")" + extension);
-			}
-		}
-
-		if (std::filesystem::exists(animCache))
-		{
-			Byte* anim;
-			uint64_t s_anim;
-
-			try {
-				std::ifstream animationData(argFile, std::ios::binary);
-
-				if (animationData.fail()) {
-					DEBUG_ERR("Failed to analyze animation data");
-					return;
-				}
-
-				animationData.seekg(0, std::ios::end);
-				s_anim = animationData.tellg();
-				anim = new Byte[s_anim];
-				animationData.seekg(0, std::ios::beg);
-				animationData.read((char*)anim, s_anim);
-			}
-			catch (const std::bad_alloc&)
-			{
-				DEBUG_ERR("Failed to allocate %llu bytes to analyze animation data", s_anim);
-				return;
-			}
-
-			std::ofstream animCacheFile(animCache, std::ios::app);
-			if (animCacheFile.fail()) {
-				try {
-					std::filesystem::remove(animCache);
-				}
-				catch (std::filesystem::filesystem_error const&) {
-					DEBUG_LOG("Deletion of cache '%S' failed.\n", animCache.wstring().c_str());
-				}
-			}
-			else {
-				DEBUG_LOG("Copying to target '%S'..\n", outputFile.c_str());
-				TAnimExtractorUtils::ExtractAnimation(Helpers::to_utf8(name).c_str(), anim, output_folder, animCacheFile, L"" ANIMATION_EXTENSION);
-			}
-
-			delete[] anim;
-		}
-		else
-		{
-			DEBUG_LOG("Copying to target '%S'\n", outputFile.wstring().c_str());
-			std::filesystem::copy_file(argFile, outputFile);
-		}
-
-		try {
-			std::filesystem::remove(argFile);
-		}
-		catch (std::filesystem::filesystem_error const&) {
-			DEBUG_LOG("Deletion of animation '%S' after copy failed.\n", argFile.c_str());
-		}
-	}
+    namespace fs = std::filesystem;
+    const fs::path source(argument);
+    const auto extension = source.extension().wstring();
+    if (extension != L"" ANIMATION_EXTENSION L"64" && extension != L"" ANIMATION_EXTENSION L"C8") return;
+    if (!fs::is_regular_file(source)) return;
+    const fs::path directory = fs::path(EDITOR_LIB_DIRECTORY) / "EXTERNAL";
+    fs::create_directories(directory);
+    auto destination = directory / source.filename();
+    std::error_code error;
+    if (fs::equivalent(source, destination, error)) return;
+    for (unsigned number = 2; fs::exists(destination); ++number)
+        destination = directory / (source.stem().wstring() + L" (" + std::to_wstring(number) + L")" + extension);
+    // Preserve the original until a complete copy has succeeded.
+    if (!fs::copy_file(source, destination)) return;
+    // The library regenerates its metadata cache when it is absent.
+    fs::remove(directory / "anims.txt", error);
+    fs::remove(source, error);
 }
 
 bool handle_arguments()
@@ -170,18 +89,32 @@ bool handle_arguments()
 	auto cmdLine = GetCommandLineW();
 	int argc;
 	auto argv = CommandLineToArgvW(cmdLine, &argc);
+	if (!argv) return true;
+	std::unique_ptr<void, decltype(&LocalFree)> owner(argv, LocalFree);
 
 	if (argc != 1)
 	{
 		std::wstring first_arg = argv[1];
+		// Moveset already in a folder the moveset list reads: open it where it is instead of moving it
+		std::wstring openRequest;
 		if (first_arg == L"--move-moveset") {
-			if (argc >= 2) {
-				MoveMovesetFile(argv[2]);
+			if (argc >= 3) {
+				try {
+					const std::filesystem::path file(argv[2]);
+					Settings::LoadFile();
+					MovesetFolders::Load();
+					std::error_code error;
+					if (file.extension() == L"" MOVESET_FILENAME_EXTENSION && std::filesystem::is_regular_file(file, error)
+						&& MovesetFolders::IsInSearchDirectory(file)) {
+						openRequest = std::filesystem::weakly_canonical(file).wstring();
+					}
+					else MoveMovesetFile(argv[2]);
+				} catch (const std::exception& error) { DEBUG_ERR("%s", error.what()); }
 			}
 		}
 		else if (first_arg == L"--move-animation") {
-			if (argc >= 2) {
-				MoveAnimationFile(argv[2]);
+			if (argc >= 3) {
+				try { MoveAnimationFile(argv[2]); } catch (const std::exception& error) { DEBUG_ERR("%s", error.what()); }
 			}
 		}
 
@@ -190,9 +123,13 @@ bool handle_arguments()
 		{
 			if (process.name == PROGRAM_FILENAME && process.pid != currPid) {
 				DEBUG_LOG("Not starting another instance of this software if using args.\n");
+				if (!openRequest.empty() && !OpenRequests::SendToInstance(process.pid, openRequest)) {
+					DEBUG_ERR("Could not ask the running instance to open '%S'", openRequest.c_str());
+				}
 				return true;
 			}
 		}
+		if (!openRequest.empty()) OpenRequests::Queue(openRequest);
 	}
 	return false;
 }

@@ -1,125 +1,111 @@
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT7;
 #define gAddr StructsT7_gameAddr
 
 void EditorT7::ModifyRequirementListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
-	int listSizeDiff = ModifyGenericMovelistListSize<Requirement>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.requirementCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<Requirement>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.requirementCount));
+
 	for (auto& cancel : m_iterators.cancels)
 	{
-		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			cancel.requirements_addr += listSizeDiff;
-		}
+		RemapRecordIndex(cancel.requirements_addr, edit);
 	}
 
 	// Grouped cancels
 	for (auto& cancel : m_iterators.grouped_cancels)
 	{
-		if (MUST_SHIFT_ID(cancel.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			cancel.requirements_addr += listSizeDiff;
-		}
+		RemapRecordIndex(cancel.requirements_addr, edit);
 	}
 
 	// Hit conditions
 	for (auto& hitCondition : m_iterators.hit_conditions)
 	{
-		if (MUST_SHIFT_ID(hitCondition.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			hitCondition.requirements_addr += listSizeDiff;
-		}
+		RemapRecordIndex(hitCondition.requirements_addr, edit);
 	}
 
 	// Move begin prop
 	for (auto& otherProp : m_iterators.move_start_properties)
 	{
-		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			otherProp.requirements_addr += listSizeDiff;
-		}
+		RemapRecordIndex(otherProp.requirements_addr, edit);
 	}
 
 	// Move end prop
 	for (auto& otherProp : m_iterators.move_end_properties)
 	{
-		if (MUST_SHIFT_ID(otherProp.requirements_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			otherProp.requirements_addr += listSizeDiff;
-		}
+		RemapRecordIndex(otherProp.requirements_addr, edit);
 	}
 }
 
 void EditorT7::ModifyHitConditionListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
-	int listSizeDiff = ModifyGenericMovelistListSize<HitCondition>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.hitConditionCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<HitCondition>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.hitConditionCount));
+
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.hit_condition_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.hit_condition_addr, listSizeDiff, listStart, listStart + oldSize)) {
-				move.hit_condition_addr += listSizeDiff;
-			}
+			RemapRecordIndex(move.hit_condition_addr, edit);
 		}
 	}
 	// Projectiles
 	for (auto& projectile : m_iterators.projectiles)
 	{
-		if (MUST_SHIFT_ID(projectile.hit_condition_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			projectile.hit_condition_addr += listSizeDiff;
-		}
+		RemapRecordIndex(projectile.hit_condition_addr, edit);
 	}
 }
 
 void EditorT7::ModifyInputListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
-	int listSizeDiff = ModifyGenericMovelistListSize<Input>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.inputCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
-	// Input sequences
-	for (auto& sequence : m_iterators.input_sequences)
-	{
-		if (MUST_SHIFT_ID(sequence.input_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			sequence.input_addr += listSizeDiff;
-		}
-		else if (sequence.input_addr >= listStart && sequence.input_addr <= ((uint64_t)listStart + oldSize)) {
-			sequence.input_amount += listSizeDiff;
-		}
-	}
+	ModifyGenericMovelistListSize<Input>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.inputCount));
+
+
+    for (auto& sequence : m_iterators.input_sequences) {
+        auto [first, amount] = edit.RemapRange(sequence.input_addr, sequence.input_amount);
+        if (amount > (std::numeric_limits<decltype(sequence.input_amount)>::max)())
+            throw std::out_of_range("Referenced sequence is too long");
+        sequence.input_addr = amount ? first : UINT64_MAX;
+        sequence.input_amount = static_cast<decltype(sequence.input_amount)>(amount);
+    }
 }
 
 void EditorT7::ModifyPushbackExtraListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
-	int listSizeDiff = ModifyGenericMovelistListSize<PushbackExtradata>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.pushbackExtradataCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
-	// Input sequences
-	for (auto& pushback : m_iterators.pushbacks)
-	{
-		if (MUST_SHIFT_ID(pushback.extradata_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			pushback.extradata_addr += listSizeDiff;
-		}
-		else if (pushback.extradata_addr >= listStart && pushback.extradata_addr <= ((uint64_t)listStart + oldSize)) {
-			pushback.num_of_loops += listSizeDiff;
-		}
-	}
+	ModifyGenericMovelistListSize<PushbackExtradata>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.pushbackExtradataCount));
+
+
+    for (auto& pushback : m_iterators.pushbacks) {
+        auto [first, amount] = edit.RemapRange(pushback.extradata_addr, pushback.num_of_loops);
+        if (amount > (std::numeric_limits<decltype(pushback.num_of_loops)>::max)())
+            throw std::out_of_range("Referenced sequence is too long");
+        pushback.extradata_addr = amount ? first : UINT64_MAX;
+        pushback.num_of_loops = static_cast<decltype(pushback.num_of_loops)>(amount);
+    }
 }
 
 void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
-	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.groupCancelCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.groupCancelCount));
+
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (cancel.command == constants[EditorConstants_GroupedCancelCommand]) {
-			if (MUST_SHIFT_ID(cancel.move_id, listSizeDiff, listStart, listStart + oldSize)) {
-				cancel.move_id += listSizeDiff;
-			}
+			RemapRecordIndex(cancel.move_id, edit);
 		}
 	}
 }
@@ -127,55 +113,51 @@ void EditorT7::ModifyGroupedCancelListSize(unsigned int listStart, const std::ve
 void EditorT7::ModifyCancelListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
-	int listSizeDiff = ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.cancelCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<Cancel>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.cancelCount));
+
 	for (auto& move : m_iterators.moves)
 	{
-		if (move.cancel_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.cancel_addr, listSizeDiff, listStart, listStart + oldSize)) {
-				move.cancel_addr += listSizeDiff;
-			}
-		}
+		        RemapRecordIndex(move.cancel_addr, edit);
+        RemapRecordIndex(move._0x28_cancel_addr, edit);
+        RemapRecordIndex(move._0x38_cancel_addr, edit);
+        RemapRecordIndex(move._0x48_cancel_addr, edit);
 	}
 
 	// Projectiles
 	for (auto& projectile : m_iterators.projectiles)
 	{
-		if (MUST_SHIFT_ID(projectile.cancel_addr, listSizeDiff, listStart, listStart + oldSize)) {
-			projectile.cancel_addr += listSizeDiff;
-		}
+		RemapRecordIndex(projectile.cancel_addr, edit);
 	}
 }
 
 void EditorT7::ModifyExtraPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
-	int listSizeDiff = ModifyGenericMovelistListSize<ExtraMoveProperty>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.extraMovePropertyCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<ExtraMoveProperty>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.extraMovePropertyCount));
+
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.extra_move_property_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.extra_move_property_addr, listSizeDiff, listStart, listStart + oldSize)) {
-				move.extra_move_property_addr += listSizeDiff;
-			}
+			RemapRecordIndex(move.extra_move_property_addr, edit);
 		}
 	}
 }
 
 void EditorT7::ModifyStartPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
-	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningPropCount;
-	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
+	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.moveBeginningPropCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.moveBeginningPropCount));
+
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_start_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.move_start_extraprop_addr, listSizeDiff, listStart, listStart + oldSize)) {
-				move.move_start_extraprop_addr += listSizeDiff;
-			}
+			RemapRecordIndex(move.move_start_extraprop_addr, edit);
 		}
 	}
 }
@@ -183,15 +165,14 @@ void EditorT7::ModifyStartPropertyListSize(unsigned int listStart, const std::ve
 void EditorT7::ModifyEndPropertyListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
-	int listSizeDiff = ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.moveEndingPropCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<OtherMoveProperty>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.moveEndingPropCount));
+
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.move_end_extraprop_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.move_end_extraprop_addr, listSizeDiff, listStart, listStart + oldSize)) {
-				move.move_end_extraprop_addr += listSizeDiff;
-			}
+			RemapRecordIndex(move.move_end_extraprop_addr, edit);
 		}
 	}
 }
@@ -199,21 +180,23 @@ void EditorT7::ModifyEndPropertyListSize(unsigned int listStart, const std::vect
 void EditorT7::ModifyVoiceclipListSize(unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
-	int listSizeDiff = ModifyGenericMovelistListSize<Voiceclip>(listStart, ids, deletedIds, listHead);
+	RecordEdit edit(listStart, ids, deletedIds, m_infos->table.voiceclipCount);
 
-	int oldSize = (int)ids.size() - listSizeDiff;
+	ModifyGenericMovelistListSize<Voiceclip>(listStart, ids, deletedIds, listHead, DescribeRecordCount(m_infos->table.voiceclipCount));
+
 	for (auto& move : m_iterators.moves)
 	{
 		if (move.voicelip_addr != MOVESET_ADDR_MISSING) {
-			if (MUST_SHIFT_ID(move.voicelip_addr, listSizeDiff, listStart, listStart + oldSize)) {
-				move.voicelip_addr += listSizeDiff;
-			}
+			RemapRecordIndex(move.voicelip_addr, edit);
 		}
 	}
 }
 
 void EditorT7::ModifyListSize(EditorWindowType type, unsigned int listStart, const std::vector<int>& ids, const std::set<int>& deletedIds)
 {
+	return Mutate([&]() {
+    RecordEdit checked(listStart, ids, deletedIds, GetStructureCount(type));
+
 	switch (type)
 	{
 	case TEditorWindowType_Requirement:
@@ -262,4 +245,6 @@ void EditorT7::ModifyListSize(EditorWindowType type, unsigned int listStart, con
 		ModifyMovelistInputSize(listStart, ids, deletedIds);
 		break;
 	}
+
+	});
 }

@@ -1,5 +1,7 @@
 #include "Editor_t7.hpp"
 
+using namespace StructsT7;
+
 bool EditorT7::IsCommandGroupedCancelReference(uint64_t command) const
 {
 	return command == constants.at(EditorConstants_GroupedCancelCommand);
@@ -89,6 +91,13 @@ unsigned int EditorT7::GetStructureCount(EditorWindowType type) const
 {
 	switch (type)
 	{
+    case TEditorWindowType_MovelistDisplayable:
+        return hasDisplayableMovelist ? m_mvlHead->displayables_count : 0;
+    case TEditorWindowType_MovelistPlayable:
+        return hasDisplayableMovelist ? m_mvlHead->playables_count : 0;
+    case TEditorWindowType_MovelistInput:
+        return hasDisplayableMovelist ? static_cast<unsigned>(m_iterators.mvl_inputs.size()) : 0;
+
 	case TEditorWindowType_Move:
 		return (unsigned int)m_infos->table.moveCount;
 		break;
@@ -152,6 +161,6 @@ unsigned int EditorT7::GetStructureCount(EditorWindowType type) const
 		return (unsigned int)m_infos->table.throwCamerasCount;
 		break;
 	}
-	throw;
+	throw std::invalid_argument("Unsupported record type");
 	return 0;
 }

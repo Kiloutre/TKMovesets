@@ -94,7 +94,8 @@ static void InitializeCustomMoveset(SharedMemT7_Player& player)
 {
 	MovesetInfo* moveset = (MovesetInfo*)player.custom_moveset_addr;
 
-	// Mark missing motas with bitflag
+	// Mark missing motas with bitflag. The mask may still hold the bits of the moveset previously in this slot.
+	player.missingMotas = 0;
 	for (unsigned int i = 0; i < _countof(moveset->motas.motas); ++i)
 	{
 		if ((uint64_t)moveset->motas.motas[i] == MOVESET_ADDR_MISSING) {
@@ -165,9 +166,8 @@ namespace T7Hooks
 		if (g_loader->sharedMemPtr->OnlinePlayMovesetsNotUseable()) {
 			DEBUG_LOG("ApplyNewMoveset: Online mode is on, but status is not ready. (%u)\n", g_loader->sharedMemPtr->moveset_sync_status);
 			g_loader->DiscardIncomingPackets();
-			auto incomingMoveset = g_loader->incoming_moveset.data;
-			g_loader->incoming_moveset.data = 0;
-			delete[] incomingMoveset;
+			// Locked against the loader thread's download; resets cursor/size/remaining bytes too
+			g_loader->DiscardIncomingMoveset();
 			return retVal;
 		}
 		g_loader->DiscardIncomingPackets();
@@ -208,22 +208,19 @@ namespace T7Hooks
 			// Fix moves relying on character IDs
 
 			// Find out which character ID we will be replacing and with which
-			int new_char_id = *(int*)((char*)player + 0xD8);
-			int char_id_to_replace = playerData.previous_character_id;
+			// Read like the importer does: 16 bits at chara_id_offset (game_addresses.ini).
+			const uint16_t new_char_id = *(uint16_t*)((char*)player + g_loader->addresses.GetValue("chara_id_offset"));
+			const uint16_t char_id_to_replace = playerData.previous_character_id;
 
 			DEBUG_LOG("Char ID that we will be replacing: %d. Replacement: %d\n", char_id_to_replace, new_char_id);
 
-			// Get the 'Is character ID' condition
+			// Same rewrite as ImporterT7::ApplyCharacterIDFixes: requirements and move start/end properties.
 			// todo: there are more than one condition that use character IDs. Might be relevant to also work on those?
-			int c_characterIdCondition = (int)g_loader->addresses.GetValue("character_id_condition");
-
-			// Loop through every requirement, replace character IDs in relevant requirements' values
-			for (auto& requirement : StructIterator<Requirement>(customMoveset->table.requirement, customMoveset->table.requirementCount))
-			{
-				if (requirement.condition == c_characterIdCondition) {
-					requirement.param_unsigned = (requirement.param_unsigned == char_id_to_replace) ? new_char_id : (new_char_id + 1);
-				}
-			}
+			const auto& table = customMoveset->table;
+			RetargetCharacterIdChecks((uint32_t)g_loader->addresses.GetValue("character_id_condition"), char_id_to_replace, new_char_id,
+				table.requirement, table.requirementCount,
+				table.moveBeginningProp, table.moveBeginningPropCount,
+				table.moveEndingProp, table.moveEndingPropCount);
 
 			// Mark which character ID we will have to replace on the next ApplyNewMoveset() call
 			playerData.previous_character_id = new_char_id;
@@ -453,7 +450,9 @@ void MovesetLoaderT7::OnInitEnd()
 	//HookFunction("TK__ExecuteExtraprop");
 
 	// Other
+#ifdef BUILD_TYPE_DEBUG
 	//HookFunction("TK__Log");
+#endif
 }
 
 // -- Main -- //

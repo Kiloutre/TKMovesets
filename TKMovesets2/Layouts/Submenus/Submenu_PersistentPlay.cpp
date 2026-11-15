@@ -68,6 +68,7 @@ void Submenu_PersistentPlay::RenderMovesetList(bool canSelectMoveset)
 			}
 
 			ImGui::TextUnformatted(moveset->name.c_str());
+			if (!moveset->notes.empty()) { ImGui::SameLine(); ImGuiExtra::HelpMarker(moveset->notes.c_str(), true); }
 
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted(moveset->origin.c_str());

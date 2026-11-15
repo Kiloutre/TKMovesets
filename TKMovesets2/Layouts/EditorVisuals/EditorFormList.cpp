@@ -6,10 +6,12 @@
 #include "EditorFormList.hpp"
 #include "Localization.hpp"
 #include "EditorVisuals.hpp"
+#include "EditorClipboard.hpp"
+#include <memory>
 
 // -- Public methods -- //
 
-EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName)
+EditorFormList::EditorFormList(const std::string& parentWindowName, EditorWindowType t_windowType, uint32_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName)
 {
 	m_windowTypeName = typeName;
 	windowType = t_windowType;
@@ -30,48 +32,33 @@ void EditorFormList::OnInitEnd()
 
 void EditorFormList::Apply()
 {
-	if (!IsFormValid()) {
-		return;
-	}
+    EditList([&] {
+        FlushPendingFields();
+        if (!IsFormValid()) return;
+        const int sizeChange = m_listSizeChange;
+        const int oldSize = static_cast<int>(GetOriginalStructureListSize());
+        bool reordered = false;
+        std::vector<int> ids;
+        for (size_t i = 0; i < m_items.size(); ++i) {
+            ids.push_back(m_items[i]->id);
+            reordered |= m_items[i]->id != structureId + i;
+        }
+        if (sizeChange || reordered)
+            m_editor->ModifyListSize(windowType, structureId, ids, m_deletedItemIds);
+        for (uint32_t i = 0; i < m_listSize; ++i)
+            m_editor->SaveItemWide(windowType, structureId + i, m_items[i]->identifierMap);
 
-	if (m_listSizeChange != 0)
-	{
-		// If items were added/removed, reallocate entire moveset
-		int newSize = (int)m_listSize;
-		int oldSize = (int)GetOriginalStructureListSize();
-		std::vector<int> itemIndexes;
-		for (auto& item : m_items) {
-			itemIndexes.push_back(item->id);
-		}
-		m_editor->ModifyListSize(windowType, structureId, itemIndexes, m_deletedItemIds);
-		OnApplyResize(m_listSizeChange, oldSize);
-		m_listSizeChange = 0;
-	}
-	else {
-		// Could optimize thing if needed here by calling a struct reordering function
-		// At it stands this isn't really needed and worth the effort at the current time
-	}
-
-	unsavedChanges = false;
-	justAppliedChanges = true;
-	m_requestedClosure = false;
-
-	if (m_listSize == 0) {
-		// List is now empty, no nede to kepe this open
-		popen = false;
-		return;
-	}
-
-	// Write into every individual item
-	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex) {
-		m_editor->SaveItem(windowType, structureId + listIndex, m_items[listIndex]->identifierMap);
-		// Re-set the IDs of the list items in case reordering/deletion/creation happened
-		m_items[listIndex]->id = structureId + listIndex;
-	}
-
-	m_deletedItemIds.clear();
-
-	OnApply();
+        // Observer and finalization callbacks must finish before committing editor bytes.
+        if (sizeChange) OnApplyResize(sizeChange, oldSize);
+        m_listSizeChange = 0;
+        for (size_t i = 0; i < m_items.size(); ++i) m_items[i]->id = structureId + i;
+        m_deletedItemIds.clear();
+        unsavedChanges = false;
+        justAppliedChanges = true;
+        m_requestedClosure = false;
+        if (!m_listSize) popen = false;
+        OnApply();
+    });
 }
 
 void EditorFormList::CopyFormToClipboard() const
@@ -83,64 +70,82 @@ void EditorFormList::CopyFormToClipboard() const
 		for (auto& [fieldName, field] : item->identifierMap)
 		{
 			//DEBUG_LOG("C: [%s] = [%s]\n", fieldName.c_str(), field->buffer);
-			clipboardText += field->buffer;
+			clipboardText += field->nextValue ? *field->nextValue : field->buffer;
 			clipboardText += "\n";
 		}
 	}
 	ImGui::SetClipboardText(clipboardText.c_str());
 }
 
-void EditorFormList::PasteFormFromClipboard()
+namespace {
+using RowOwner = std::unique_ptr<FieldItem>;
+RowOwner CloneRow(const FieldItem& source, size_t& budget) {
+    RowOwner row(new FieldItem);
+    row->itemLabel = source.itemLabel; row->openStatus = source.openStatus;
+    row->color = source.color; row->id = source.id;
+    row->identifierMap = EditorFormUtils::CloneFields(source.identifierMap, budget);
+    row->categoryMap = EditorFormUtils::CloneCategories(source.identifierMap, row->identifierMap, source.categoryMap);
+    return row;
+}
+}
+
+std::vector<size_t> EditorFormList::ClipboardWidths() const
 {
-	moveFocusAway = true;
-	const char* clipboardText = ImGui::GetClipboardText();
-	while (*clipboardText != '\n') ++clipboardText;
-	++clipboardText;
+    std::vector<size_t> widths;
+    if (!m_items.empty()) for (const auto& [name, field] : m_items.front()->identifierMap)
+        widths.push_back(field && field->buffer ? field->bufsize : 0);
+    return widths;
+}
 
+void EditorFormList::PasteText(std::string_view text)
+{
+    const auto widths = ClipboardWidths();
+    auto rows = EditorClipboard::Decode(text, m_windowTypeName, widths, ClipboardRowLimit());
+    if (m_items.empty() || m_listSize != m_items.size() || m_items.size() > ClipboardRowLimit()) throw std::invalid_argument("Invalid destination list size.");
+    EditList([&] {
+        size_t budget = 64 * 1024 * 1024;
+        for (const auto& row : m_items)
+            for (const auto& [name, field] : row->identifierMap) {
+                if (field->bufsize > budget || sizeof(EditorInput) > budget - field->bufsize)
+                    throw std::length_error("Clipboard form exceeds its 64 MiB field-storage budget.");
+                budget -= field->bufsize + sizeof(EditorInput);
+            }
+        const auto oldSize = m_listSize;
+        while (m_items.size() < rows.size()) {
+            auto row = CloneRow(*m_items.front(), budget); row->id = -1;
+            m_items.insert(m_items.end() - 1, std::move(row));
+        }
+        for (size_t r = 0; r < rows.size(); ++r) {
+            auto& fields = m_items[r]->identifierMap;
+            if (fields.size() != widths.size()) throw std::invalid_argument("Clipboard destination schemas differ.");
+            auto expected = m_items.front()->identifierMap.begin();
+            size_t c = 0;
+            for (const auto& [name, field] : fields) {
+                if (name.str() != expected->first.str() || field->bufsize != widths[c])
+                    throw std::invalid_argument("Clipboard destination schemas differ.");
+                field->nextValue = std::move(rows[r][c]);
+                ++c; ++expected;
+            }
+            m_items[r]->openStatus = EditorFormTreeview_ForceOpen;
+        }
+        m_listSize = m_items.size();
+        m_listSizeChange += static_cast<int>(m_listSize - oldSize);
+        if (m_listSize != oldSize) OnResize();
+        for (size_t r = 0; r < rows.size(); ++r) BuildItemDetails(static_cast<int>(r));
+        moveFocusAway = true; unsavedChanges = true;
+    });
+}
 
-	{
-		// Count the amount of fields, if there are too many fields to fit in the current list, make its size grow
-		unsigned int expectedFieldAmount = 0;
-		const char* cursor = clipboardText;
-		while (*cursor != '\0')
-		{
-			if (*cursor == '\n') {
-				++expectedFieldAmount;
-			}
-			++cursor;
-		}
-
-		unsigned int fieldAmountPerItem = (unsigned int)m_items[0]->identifierMap.size();
-		unsigned int fieldAmount = fieldAmountPerItem * (unsigned int)m_items.size();
-
-		while (fieldAmount < expectedFieldAmount) {
-			auto newId = CreateNewItem(-1);
-			m_items[newId]->openStatus = EditorFormTreeview_ForceOpen;
-			fieldAmount += fieldAmountPerItem;
-		}
-	}
-
-	for (auto& item : m_items)
-	{
-		for (auto& [fieldName, field] : item->identifierMap)
-		{
-			const char* newlinePos = strstr(clipboardText, "\n");
-
-			if (newlinePos == nullptr) {
-				newlinePos = (clipboardText + strlen(clipboardText));
-				return;
-			}
-
-			item->openStatus = EditorFormTreeview_ForceOpen;
-			field->nextValue = std::string(clipboardText, newlinePos - clipboardText);
-			//DEBUG_LOG("P: [%s] -> [%s]\n", fieldName.c_str(), field->nextValue.c_str());
-			clipboardText = newlinePos + 1;
-
-			if (*newlinePos == '\0') {
-				return;
-			}
-		}
-	}
+void EditorFormList::FlushPendingFields()
+{
+    for (size_t row = 0; row < m_items.size(); ++row)
+        for (auto& [name, field] : m_items[row]->identifierMap) {
+            if (field->ConsumeNextValue()) {
+                unsavedChanges = true;
+                field->errored = !m_editor->ValidateField(windowType, field);
+                if (!field->errored) OnUpdate(static_cast<int>(row), field);
+            }
+        }
 }
 
 bool EditorFormList::IsFormValid() const
@@ -193,7 +198,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 	if (listIndex + 1 != m_listSize || m_listSize == 1) {
 		ImGui::SetCursorPosX(pos_x);
 		if (ImGui::Button("+", buttonSize)) {
-			CreateNewItem(listIndex);
+            TryListEdit([&] { CreateNewItem(listIndex); });
 		}
 		ImGui::SameLine();
 	}
@@ -203,26 +208,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		ImGui::SetCursorPosX(pos_x + buttonWidth);
 		if (ImGui::Button("^", buttonSize))
 		{
-			// Move item UP
-			std::iter_swap(m_items.begin() + listIndex, m_items.begin() + listIndex - 1);
-
-			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
-			if (m_items[listIndex]->openStatus == EditorFormTreeview_Opened) {
-				m_items[listIndex]->openStatus = EditorFormTreeview_ForceOpen;
-			}
-			else if (m_items[listIndex]->openStatus == EditorFormTreeview_Closed) {
-				m_items[listIndex]->openStatus = EditorFormTreeview_ForceClose;
-			}
-
-			if (m_items[listIndex - 1]->openStatus == EditorFormTreeview_Opened) {
-				m_items[listIndex - 1]->openStatus = EditorFormTreeview_ForceOpen;
-			}
-			else if (m_items[listIndex - 1]->openStatus == EditorFormTreeview_Closed) {
-				m_items[listIndex - 1]->openStatus = EditorFormTreeview_ForceClose;
-			}
-
-			unsavedChanges = true;
-			OnReorder();
+            TryListEdit([&] { MoveItem(listIndex, listIndex - 1); });
 		}
 		ImGui::SameLine();
 	}
@@ -232,26 +218,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		ImGui::SetCursorPosX(pos_x + buttonWidth * 2);
 		if (ImGui::Button("V", buttonSize))
 		{
-			// Move item DOWN
-			std::iter_swap(m_items.begin() + listIndex, m_items.begin() + listIndex + 1);
-
-			// Ensure that whatever is open/closed will stay that way after being moved. TreeNode are annoying like that.
-			if (m_items[listIndex]->openStatus == EditorFormTreeview_Opened) {
-				m_items[listIndex]->openStatus = EditorFormTreeview_ForceOpen;
-			}
-			else if (m_items[listIndex]->openStatus == EditorFormTreeview_Closed) {
-				m_items[listIndex]->openStatus = EditorFormTreeview_ForceClose;
-			}
-
-			if (m_items[listIndex + 1]->openStatus == EditorFormTreeview_Opened) {
-				m_items[listIndex + 1]->openStatus = EditorFormTreeview_ForceOpen;
-			}
-			else if (m_items[listIndex + 1]->openStatus == EditorFormTreeview_Closed) {
-				m_items[listIndex + 1]->openStatus = EditorFormTreeview_ForceClose;
-			}
-
-			unsavedChanges = true;
-			OnReorder();
+            TryListEdit([&] { MoveItem(listIndex, listIndex + 1); });
 		}
 		ImGui::SameLine();
 	}
@@ -263,24 +230,7 @@ void EditorFormList::RenderListControlButtons(int listIndex)
 		ImGui::PushStyleColor(ImGuiCol_Button, FORM_DELETE_BTN);
 		if (ImGui::Button("X", buttonSize))
 		{
-			// Delete this item
-			--m_listSizeChange;
-			--m_listSize;
-
-			
-			if (m_items[listIndex]->id != -1) {
-				m_deletedItemIds.insert(m_items[listIndex]->id);
-			}
-
-			for (auto& [key, fieldPtr] : m_items[listIndex]->identifierMap) {
-				delete[] fieldPtr->buffer;
-				delete fieldPtr;
-			}
-			delete m_items[listIndex];
-			m_items.erase(m_items.begin() + listIndex);
-			unsavedChanges = true;
-
-			OnResize();
+            TryListEdit([&] { RemoveItem(listIndex); });
 		}
 		ImGui::PopStyleColor();
 		ImGui::SameLine();
@@ -300,72 +250,110 @@ unsigned int EditorFormList::CreateNewItem(int insertionPosition)
 		copyFormId = 0;
 	}
 
-	VectorSet<std::string> drawOrder;
+    if (m_items.empty() || insertionPosition < 0 || static_cast<size_t>(insertionPosition) >= m_items.size() || m_items.size() >= ClipboardRowLimit())
+        throw std::out_of_range("Cannot insert a row at this position.");
+    if (copyFormId < 0 || static_cast<size_t>(copyFormId) >= m_items.size())
+        throw std::out_of_range("Cannot copy a row from this position.");
+    EditList([&] {
+        // Prefill from the form row being copied (its current values), not from the editor at structureId + form index:
+        // after unapplied inserts a form index can lie past the stored list, and the editor would read beyond its table.
+        size_t budget = 64 * 1024 * 1024;
+        RowOwner prepared = CloneRow(*m_items[copyFormId], budget);
+        auto* item = prepared.get();
+        item->id = -1;
+        item->color = 0;
+        item->openStatus = EditorFormTreeview_ForceOpen;
+        for (const auto& [name, field] : item->identifierMap) field->savedText.reset(); // A new row has no applied value
 
-	m_items.insert(m_items.begin() + insertionPosition, new FieldItem);
-	auto& item = m_items[insertionPosition];
-
-	item->identifierMap = m_editor->GetListSingleForm(windowType, structureId + copyFormId, drawOrder);
-	item->openStatus = EditorFormTreeview_ForceOpen;
-
-	for (uint8_t category : m_categories)
-	{
-		std::vector<EditorInput*> inputs;
-		for (const std::string& fieldName : drawOrder) {
-			EditorInput* field = item->identifierMap[fieldName];
-			EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
-			if (field->category == category) {
-				inputs.push_back(field);
-			}
-		}
-		item->categoryMap[category] = inputs;
-	}
-	BuildItemDetails(insertionPosition);
-
-	for (const std::string& fieldName : drawOrder) {
-		EditorInput* field = item->identifierMap[fieldName];
-		std::string descriptionKey = field->fullName + ".description";
-		field->hoverDescription = Localization::HasText(descriptionKey) ? _(descriptionKey.c_str()) : _(field->fullName.c_str());
-		m_categories.insert(field->category);
-	}
-
-	++m_listSizeChange;
-	++m_listSize;
-
-	unsavedChanges = true;
-	OnResize();
+        m_items.insert(m_items.begin() + insertionPosition, std::move(prepared));
+        ++m_listSizeChange; ++m_listSize;
+        BuildItemDetails(insertionPosition);
+        OnResize();
+        unsavedChanges = true;
+    });
 	return (unsigned int)insertionPosition;
+}
+
+bool EditorFormList::CanDuplicateItemToEnd(size_t source) const
+{
+	// The last row ends the list; the starting lists' first row has no list controls either (RenderListControlButtons).
+	return m_items.size() > 1 && source + 1 < m_items.size() && !(structureId <= 1 && source == 0 && !uniqueType) &&
+		m_items.size() < ClipboardRowLimit();
+}
+
+unsigned int EditorFormList::DuplicateItemToEnd(size_t source)
+{
+	if (!CanDuplicateItemToEnd(source))
+		throw std::out_of_range("This row cannot be duplicated to the end of the list.");
+	const int position = static_cast<int>(m_items.size()) - 1;
+	EditList([&] {
+		size_t budget = 64 * 1024 * 1024;
+		RowOwner prepared = CloneRow(*m_items[source], budget);
+		auto* item = prepared.get();
+		item->id = -1;
+		item->color = 0;
+		item->openStatus = EditorFormTreeview_ForceOpen;
+		for (const auto& [name, field] : item->identifierMap) field->savedText.reset(); // A new row has no applied value
+
+		m_items.insert(m_items.begin() + position, std::move(prepared));
+		++m_listSizeChange; ++m_listSize;
+		BuildItemDetails(position);
+		BuildItemDetails(position + 1); // the end row moved down one index
+		OnResize();
+		unsavedChanges = true;
+	});
+	return static_cast<unsigned int>(position);
+}
+
+void EditorFormList::RenderItemContextMenuItems()
+{
+	if (m_contextItem < 0 || static_cast<size_t>(m_contextItem) >= m_items.size()) return;
+	const auto row = static_cast<size_t>(m_contextItem);
+	const auto label = std::format("{} ({})", _("edition.form_popup.duplicate_item"), m_items[row]->itemLabel);
+	ImGuiExtra::DisableBlockIf __(!CanDuplicateItemToEnd(row));
+	if (ImGui::Selectable(label.c_str(), false, 0, ImVec2(0, ImGui::GetFrameHeightWithSpacing())))
+	{
+		TryListEdit([&] { DuplicateItemToEnd(row); });
+		ImGui::CloseCurrentPopup();
+	}
 }
 
 void EditorFormList::DeleteStructure()
 {
-	auto origSize = GetOriginalStructureListSize();
-	m_editor->DeleteStructures(windowType, structureId, origSize);
-	popen = false;
-	unsavedChanges = false;
-	OnApplyResize(-origSize, origSize);
+    EditList([&] {
+        auto origSize = GetOriginalStructureListSize();
+        m_editor->DeleteStructures(windowType, structureId, origSize);
+        popen = false; unsavedChanges = false;
+        OnApplyResize(-origSize, origSize);
+    });
 }
 
 void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, EditorLogic* editor)
 {
 	structureId = t_id;
 	m_editor = editor;
+    if (!editor) throw std::invalid_argument("Cannot construct a form without an editor.");
+    if (m_listSize > ClipboardRowLimit()) throw std::out_of_range("Editor list exceeds its record range.");
 
 	VectorSet<std::string> drawOrder;
 
 	std::vector<InputMap> fieldIdentifierMaps;
 
 	if (m_listSize == 0) {
-		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder);
+		fieldIdentifierMaps = editor->GetFormFieldsListWide(windowType, t_id, drawOrder,0);
 		m_listSize = fieldIdentifierMaps.size();
 		DEBUG_LOG("GetFormFieldsList() without list size, returned size is %llu\n", m_listSize);
 	} else {
 		// Some struct lists may have fixed list sizes: in this case, we'll call a different function
 		// For now these two GetFormFields aren't swappable, if a list is not supposed to have a known size ahead of time, don't provide a size
-		fieldIdentifierMaps = editor->GetFormFieldsList(windowType, t_id, drawOrder, (int)m_listSize);
+		fieldIdentifierMaps = editor->GetFormFieldsListWide(windowType, t_id, drawOrder, (int)m_listSize);
 		DEBUG_LOG("GetFormFieldsList() with list size %llu, returned size is %llu\n", m_listSize, fieldIdentifierMaps.size());
 	}
 
+    if (fieldIdentifierMaps.empty() || fieldIdentifierMaps.size() != m_listSize ||
+        m_listSize > ClipboardRowLimit())
+        throw std::invalid_argument("Editor field factory returned an invalid row count.");
+    for (const auto& fields : fieldIdentifierMaps) EditorFormUtils::ValidateFields(fields, drawOrder);
 	DEBUG_LOG("GetFormFieldsList: drawOrder size is %llu\n", drawOrder.size());
 
 	// Tries to find a name to show in the window title
@@ -373,7 +361,7 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 
 
 	for (const std::string& fieldName : drawOrder) {
-		EditorInput* field = fieldIdentifierMaps[0][fieldName];
+		EditorInput* field = fieldIdentifierMaps.at(0).at(fieldName);
 		m_categories.insert(field->category);
 	}
 
@@ -388,17 +376,17 @@ void EditorFormList::InitForm(std::string windowTitleBase, uint32_t t_id, Editor
 	// Builds the <category : fields> maps & the item labels
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
-		m_items.push_back(new FieldItem);
+		m_items.push_back(std::make_unique<FieldItem>());
 		auto& item = m_items[listIndex];
 
 		item->id = structureId + listIndex;
-		item->identifierMap = fieldIdentifierMaps[listIndex];
+		item->identifierMap = std::move(fieldIdentifierMaps[listIndex]);
 
 		for (uint8_t category : m_categories)
 		{
 			std::vector<EditorInput*> inputs;
 			for (const std::string& fieldName : drawOrder) {
-				EditorInput* field = fieldIdentifierMaps[listIndex][fieldName];
+				EditorInput* field = item->identifierMap.at(fieldName);
 				std::string descriptionKey = field->fullName + ".description";
 				field->hoverDescription = Localization::HasText(descriptionKey) ? _(descriptionKey.c_str()) : _(field->fullName.c_str());
 				EditorFormUtils::SetFieldDisplayText(field, _(field->fullName.c_str()));
@@ -433,8 +421,17 @@ void EditorFormList::RenderInternal()
 	const float drawWidth = ImGui::GetContentRegionAvail().x;
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
+	// Right click: remember the row under the cursor (its header and fields) for the context menu.
+	const bool rightClicked = ImGui::GetIO().MouseClicked[1] && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
+	const float mouseY = ImGui::GetMousePos().y;
+	if (rightClicked) m_contextItem = -1;
+	float rowTop = 0;
+	auto hitRow = [&](uint32_t row, float bottom) { if (rightClicked && mouseY >= rowTop && mouseY < bottom) m_contextItem = static_cast<int>(row); };
+
 	for (uint32_t listIndex = 0; listIndex < m_listSize; ++listIndex)
 	{
+		if (listIndex > 0) hitRow(listIndex - 1, ImGui::GetCursorScreenPos().y);
+		rowTop = ImGui::GetCursorScreenPos().y - 2;
 		{
 			ImVec2 drawStart = m_winInfo.pos + ImGui::GetCursorPos();
 			drawStart.y -= ImGui::GetScrollY() + 2;
@@ -463,7 +460,7 @@ void EditorFormList::RenderInternal()
 		}
 
 		ImGui::PushID(listIndex);
-		if (!ImGui::TreeNodeEx(this + listIndex, nodeFlags, item->itemLabel.c_str())) {
+		if (!ImGui::TreeNodeEx(this + listIndex, nodeFlags, "%s", item->itemLabel.c_str())) {
 			// Tree node hidden so no need to render anything
 			ImGui::PopID();
 			item->openStatus = EditorFormTreeview_Closed;
@@ -499,6 +496,7 @@ void EditorFormList::RenderInternal()
 
 		ImGui::TreePop();
 	}
+	if (m_listSize > 0) hitRow(static_cast<uint32_t>(m_listSize - 1), ImGui::GetCursorScreenPos().y);
 }
 
 void EditorFormList::OnResize()
@@ -543,16 +541,98 @@ void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
 	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
 }
 
-EditorFormList::~EditorFormList()
-{
-	for (auto& item : m_items) {
-		for (auto& [key, fieldPtr] : item->identifierMap) {
-			delete[] fieldPtr->buffer;
-			delete fieldPtr;
-		}
-		delete item;
-	}
+EditorFormList::~EditorFormList() = default;
 
-	m_items.clear();
-	m_items.shrink_to_fit();
+struct EditorFormList::SavedListState final : TransactionState {
+    std::unique_ptr<TransactionState> base;
+    EditorFormList& form;
+    std::vector<RowOwner> original;
+    std::map<FieldItem*, size_t> identities;
+    size_t size;
+    int change;
+    std::set<int> deleted;
+    std::string resizeKey;
+    bool committed = false;
+    SavedListState(EditorFormList& target, size_t& budget)
+        : base(target.EditorForm::BeginTransaction(budget)), form(target), size(target.m_listSize),
+          change(target.m_listSizeChange), deleted(target.m_deletedItemIds), resizeKey(target.m_resizeEventKey) {
+        std::vector<RowOwner> copy;
+        copy.reserve(form.m_items.size());
+        for (const auto& row : form.m_items) {
+            copy.push_back(CloneRow(*row, budget));
+            identities.emplace(copy.back().get(), copy.size() - 1);
+        }
+        original.swap(form.m_items); form.m_items.swap(copy);
+    }
+    ~SavedListState() override {
+        if (committed) return;
+        original.swap(form.m_items);
+        form.m_listSize = size; form.m_listSizeChange = change;
+        deleted.swap(form.m_deletedItemIds); resizeKey.swap(form.m_resizeEventKey);
+    }
+    void Commit() noexcept override {
+
+        // Keep surviving row identities on successful insertion/removal/reordering too.
+        for (auto& row : form.m_items) {
+            auto found = identities.find(row.get());
+            if (found == identities.end()) continue;
+            auto& previous = original[found->second];
+            previous->identifierMap.swap(row->identifierMap);
+            previous->categoryMap.swap(row->categoryMap);
+            previous->itemLabel.swap(row->itemLabel);
+            std::swap(previous->openStatus, row->openStatus);
+            std::swap(previous->color, row->color);
+            std::swap(previous->id, row->id);
+            previous.swap(row);
+        }
+        base->Commit(); committed = true;
+    }
+};
+std::unique_ptr<EditorForm::TransactionState> EditorFormList::BeginTransaction(size_t& budget) {
+    return std::make_unique<SavedListState>(*this, budget);
+}
+void EditorFormList::EditList(const std::function<void()>& action) {
+    EditForm([&] { action(); return true; });
+}
+void EditorFormList::TryListEdit(const std::function<void()>& action) {
+    try { action(); m_operationError.clear(); }
+    catch (const std::exception& error) { m_operationError = error.what(); }
+    catch (...) { m_operationError = "The list edit failed."; }
+}
+void EditorFormList::RemoveItem(size_t index) {
+    if (index >= m_items.size() || (index + 1 == m_items.size() && m_items.size() != 1) ||
+        (uniqueType && m_items.size() == 1) || (structureId <= 1 && index == 0 && !uniqueType))
+        throw std::out_of_range("Cannot remove the retained last row or protected starting row.");
+    EditList([&] {
+        if (m_items[index]->id != -1) m_deletedItemIds.insert(m_items[index]->id);
+        m_items.erase(m_items.begin() + index);
+        --m_listSize; --m_listSizeChange;
+        unsavedChanges = true;
+        OnResize();
+    });
+}
+void EditorFormList::MoveItem(size_t from, size_t to) {
+    if (from >= m_items.size() || to >= m_items.size() || from + 1 == m_items.size() || to + 1 == m_items.size() ||
+        (from > to ? from - to : to - from) != 1)
+        throw std::out_of_range("Only adjacent rows before the retained last row can be reordered.");
+    EditList([&] {
+        std::swap(m_items[from], m_items[to]);
+        for (auto index : {from, to}) {
+            auto& status = m_items[index]->openStatus;
+            if (status == EditorFormTreeview_Opened) status = EditorFormTreeview_ForceOpen;
+            else if (status == EditorFormTreeview_Closed) status = EditorFormTreeview_ForceClose;
+        }
+        unsavedChanges = true;
+        OnReorder();
+    });
+}
+
+std::unique_ptr<EditorForm::TransactionState> EditorFormList::BeginListTransaction() {
+    if (m_baseWindow) return m_baseWindow->BeginFormTransaction(*this);
+    size_t budget = 64 * 1024 * 1024;
+    return BeginTransaction(budget);
+}
+
+std::unique_ptr<EditorForm::TransactionState> EditorFormList::BeginEditTransaction() {
+    return BeginListTransaction();
 }

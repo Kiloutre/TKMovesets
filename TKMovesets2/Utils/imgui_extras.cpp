@@ -1,23 +1,11 @@
 #include "imgui.h"
 #include <imgui_markdown.h>       // https://github.com/juliettef/imgui_markdown
 #include <string>
+#include <algorithm>
 
 #include "imgui_extras.hpp"
 
 #include "constants.h"
-
-ImVec2 operator+(const ImVec2& c_self, const ImVec2& c_other)
-{
-	return ImVec2(c_self.x + c_other.x, c_self.y + c_other.y);
-}
-ImVec2 operator-(const ImVec2& c_self, const ImVec2& c_other)
-{
-	return ImVec2(c_self.x - c_other.x, c_self.y - c_other.y);
-}
-ImVec2 operator*(const ImVec2& c_self, float value)
-{
-	return ImVec2(c_self.x * value, c_self.y * value);
-}
 
 static struct {
 	ImGui::MarkdownConfig config;
@@ -96,46 +84,45 @@ namespace ImGuiExtra
 	}
 
 	// Todo: min / max size, allow centering of text
-	void RenderTextbox(const char* c_text, ImU32 borderColor, ImU32 fillColor, float padding)
-	{
-		float HORIZ_PADDING = (padding < 0.0f ) ? TEXTBOX_HORIZ_PADDING : padding;
-		float VERTICAL_PADDING = (padding < 0.0f) ? TEXTBOX_VERT_PADDING : padding;
+    void RenderTextbox(const char* text, ImU32 borderColor, ImU32 fillColor, float padding)
+    {
+        const float horizontal = padding < 0 ? TEXTBOX_HORIZ_PADDING : padding;
+        const float vertical = padding < 0 ? TEXTBOX_VERT_PADDING : padding;
+        const float available = ImGui::GetContentRegionAvail().x - 2 * horizontal;
+        const float wrapWidth = available > 1 ? available : 1;
+        const ImVec2 origin = ImGui::GetCursorScreenPos();
+        const ImVec2 textSize = ImGui::CalcTextSize(text, nullptr, false, wrapWidth);
+        const ImVec2 size = textSize + ImVec2(2 * horizontal, 2 * vertical);
+        auto draw = ImGui::GetWindowDrawList();
+        if (fillColor)
+            draw->AddRectFilled(origin, origin + size, (fillColor & 0x00FFFFFF) | (70 << 24));
+        draw->AddRect(origin, origin + size, borderColor);
+        ImGui::SetCursorScreenPos(origin + ImVec2(horizontal, vertical));
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapWidth);
+        ImGui::TextUnformatted(text);
+        ImGui::PopTextWrapPos();
+        // Cursor movement alone does not reserve layout space, including bottom padding.
+        ImGui::SetCursorScreenPos(origin);
+        ImGui::Dummy(size);
+    }
 
-
-		// Get starting drawing pos (useful for border)
-		ImVec2 c_drawStart = ImGui::GetCursorPos();
-		// Todo: correct start pos when scrolling. This actually does not work for some reason. Must test more.
-		c_drawStart.y -= ImGui::GetScrollY();
-
-		// Draw border & fill
-		ImVec2 rectEnd;
-		{
-			{
-				ImVec2 textSize = ImGui::CalcTextSize(c_text, nullptr, false, ImGui::GetContentRegionAvail().x - (HORIZ_PADDING * 2.0f));
-				rectEnd = c_drawStart + textSize + (ImVec2(HORIZ_PADDING, VERTICAL_PADDING) * 2.0f);
-			}
-
-			ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-			const ImVec2 c_winPos = ImGui::GetWindowPos();
-			if (fillColor != 0) {
-				drawlist->AddRectFilled(c_drawStart + c_winPos, rectEnd + c_winPos, (fillColor & 0x00FFFFFF) | (70 << 24));
-			}
-			drawlist->AddRect(c_drawStart + c_winPos, rectEnd + c_winPos, borderColor);
-		}
-
-		// Shift cursor position according to padding to not draw text at the top left of the box
-		ImGui::SetCursorPos(c_drawStart + ImVec2(HORIZ_PADDING, VERTICAL_PADDING));
-
-		// Draw text
-		// I can't manage to reproduce the TextWrapped calculations so this works out for now
-		ImGui::PushTextWrapPos(rectEnd.x - HORIZ_PADDING);
-		ImGui::Text(c_text);
-		ImGui::PopTextWrapPos();
-
-		// Fix cursor position that is incorrect after drawing the text
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + VERTICAL_PADDING);
-	}
+    bool BeginFittedModal(const char* id, const char* title, bool* open, float widthEm)
+    {
+        // "title###id": the visible title can be localized while OpenPopup keeps using "###id".
+        const std::string label = std::string(title) + "###" + id;
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        // Opens a quarter wider than asked and at least 46 em, capped to the screen (callers' widths were tuned for a
+        // fixed modal and left long lines cramped).
+        const float width = (std::min)(ImGui::GetFontSize() * (std::max)(widthEm * 1.25f, 46.0f), viewport->WorkSize.x * 0.9f);
+        ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        // Opens at `width` with its height fitted to the content once (a zero height auto-fits that axis on the first
+        // frame), then stays resizable: wrapped text follows the new width, and content that does not wrap (long
+        // labels, tables, paths) scrolls instead of running past the border.
+        ImGui::SetNextWindowSize(ImVec2(width, 0.0f), ImGuiCond_Appearing);
+        // The height fits the content when it opens, but not below about 14 lines (half the screen at most).
+        ImGui::SetNextWindowSizeConstraints(ImVec2((std::min)(ImGui::GetFontSize() * 16.0f, width),
+            (std::min)(ImGui::GetFontSize() * 14.0f, viewport->WorkSize.y * 0.5f)),
+            ImVec2(viewport->WorkSize.x * 0.95f, viewport->WorkSize.y * 0.95f));
+        return ImGui::BeginPopupModal(label.c_str(), open, ImGuiWindowFlags_HorizontalScrollbar);
+    }
 }
-
-

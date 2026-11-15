@@ -209,7 +209,7 @@ void TEditorExtraproperties::PreItemRender(int listIdx)
 	ImGui::PushID(listIdx);
 	if (ImGui::Button(">", ImVec2(20, 18)))
 	{
-		auto identifierMap = m_items[listIdx]->identifierMap;
+		auto& identifierMap = m_items[listIdx]->identifierMap;
 
 		// Only execute if none of the related fields are errored
 		bool errored = false;

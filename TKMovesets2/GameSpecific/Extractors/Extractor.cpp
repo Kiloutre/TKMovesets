@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <format>
 #include <fstream>
 #include <cstdlib>
@@ -6,6 +7,7 @@
 
 #include "Helpers.hpp"
 #include "Extractor.hpp"
+#include "MovesetFolders.hpp"
 #include "Animations.hpp"
 
 #include "MovesetStructs.h"
@@ -36,6 +38,7 @@ namespace ExtractorUtils
 
 	TKMovesetCompressionType_ GetCompressionAlgorithm(ExtractSettings settings)
 	{
+		if (settings & ExtractSettings_CompressCompactZstd) return TKMovesetCompressionType_CompactZstd;
 		if (settings & ExtractSettings_CompressLZMA) return TKMovesetCompressionType_LZMA;
 		if (settings & ExtractSettings_CompressLZ4) return TKMovesetCompressionType_LZ4;
 		return TKMovesetCompressionType_None;
@@ -46,6 +49,7 @@ namespace ExtractorUtils
 
 Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, uint64_t& size_out)
 {
+	size_out = 0;
 	if (blockEnd < blockStart) {
 		DEBUG_LOG("Extraction error: block end (%llx) smaller than block start (%llx)\n", blockEnd, blockStart);
 		return nullptr;
@@ -69,22 +73,25 @@ Byte* Extractor::allocateAndReadBlock(gameAddr blockStart, gameAddr blockEnd, ui
 		return nullptr;
 	}
 
-	m_game.ReadBytes(blockStart, block, blockSize);
+	if (!m_game.ReadBytes(blockStart, block, blockSize)) {
+		free(block);
+		return nullptr;
+	}
 	size_out = blockSize;
 
 	return block;
 }
 
-std::wstring Extractor::GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId)
+std::wstring Extractor::GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, const std::filesystem::path& directory, unsigned int suffixId)
 {
 	if (suffixId <= 1) {
-		std::wstring outputFilename = Helpers::string_to_wstring(cm_extractionDir) + L"/" +
+		std::wstring outputFilename = directory.wstring() + L"/" +
 			Helpers::string_to_wstring(gameIdentifierString) + Helpers::string_to_wstring(characterName)
 			+ Helpers::string_to_wstring(extension);
 		return outputFilename;
 	}
 	else {
-		std::wstring outputFilename = Helpers::string_to_wstring(cm_extractionDir) + L"/" +
+		std::wstring outputFilename = directory.wstring() + L"/" +
 			Helpers::string_to_wstring(gameIdentifierString) + Helpers::string_to_wstring(characterName)
 			+ L" (" + std::to_wstring(suffixId) + L")" + Helpers::string_to_wstring(extension);
 		return outputFilename;
@@ -93,62 +100,42 @@ std::wstring Extractor::GenerateFilename(const char* characterName, const char* 
 
 void Extractor::GetFilepath(const char* characterName, std::wstring& out, std::wstring& out_tmp, bool overwriteSameFilename)
 {
-	CreateDirectoryA(cm_extractionDir, NULL);
+    const auto directory=std::string_view(cm_extractionDir)==MOVESET_DIRECTORY ? MovesetFolders::ExtractionDirectory() : std::filesystem::u8path(cm_extractionDir);
+    std::filesystem::create_directories(directory);
 	// Make sure the directory for extraction exists 
 
 	const char* gameIdentifierstring = m_gameInfo.movesetNamePrefix;
 
-	std::wstring filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, 0);
+	std::wstring filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, directory, 0);
 
 	if (!overwriteSameFilename && Helpers::fileExists(filePath.c_str())) {
 		// File exists: try to add numbered suffix, loop until we find a free one
 		unsigned int counter = 2;
-		filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, counter);
+		filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, directory, counter);
 
 		while (Helpers::fileExists(filePath.c_str())) {
-			filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, counter);
+			filePath = GenerateFilename(characterName, gameIdentifierstring, MOVESET_FILENAME_EXTENSION, directory, counter);
 			counter++;
 		}
 
 		out = filePath;
-		out_tmp = GenerateFilename(characterName, gameIdentifierstring, MOVESET_TMPFILENAME_EXTENSION, counter);
+		out_tmp = GenerateFilename(characterName, gameIdentifierstring, MOVESET_TMPFILENAME_EXTENSION, directory, counter);
 	}
 	else {
 		// File doesnt exist or we are allowed to overwrite, no need to suffix
 		out = filePath;
-		out_tmp = GenerateFilename(characterName, gameIdentifierstring, MOVESET_TMPFILENAME_EXTENSION);
+		out_tmp = GenerateFilename(characterName, gameIdentifierstring, MOVESET_TMPFILENAME_EXTENSION, directory);
 	}
 }
 
 uint64_t Extractor::GetAnimationSize(gameAddr anim)
 {
-	union {
-		struct {
-			Byte first_byte;
-			Byte second_byte;
-		};
-		uint16_t bytes;
-	} animType;
-	animType.bytes = m_process.readInt16(anim);
-
-	// Byteswap
-	if (animType.second_byte == 0x64 || animType.second_byte == 0xC8) {
-		animType.bytes = animType.second_byte;
-	}
-	else {
-		animType.bytes = animType.first_byte;
-	}
-
-	if (animType.first_byte == 0xC8) {
-		return TAnimUtils::FromProcess::getC8AnimSize(m_process, anim);
-	}
-	else if (animType.first_byte == 0x64) {
-		return TAnimUtils::FromProcess::get64AnimSize(m_process, anim);
-	}
-	// Invalid animation type
-
-	DEBUG_LOG("Animation address %llx does not have a valid animation type. First four bytes: %x\n", anim, m_process.readInt32(anim));
-
-	throw;
-	return 0;
+    uint16_t tag = 0;
+    if (!m_process.readBytes(anim, &tag, sizeof(tag)))
+        throw std::runtime_error("Cannot read animation header");
+    uint64_t size = 0;
+    if (tag == 0xc8 || tag == 0xc800) size = TAnimUtils::FromProcess::getC8AnimSize(m_process, anim);
+    if (tag == 0x64 || tag == 0x6400) size = TAnimUtils::FromProcess::get64AnimSize(m_process, anim);
+    if (!size) throw std::runtime_error("Invalid or unreadable animation");
+    return size;
 }

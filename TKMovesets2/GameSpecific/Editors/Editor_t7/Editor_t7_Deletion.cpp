@@ -1,30 +1,29 @@
+#include "Animations.hpp"
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT7;
 #define gAddr StructsT7_gameAddr
 
 void EditorT7::DeleteMove(int id)
 {
 	/*
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
-	ModifyGenericMovelistListSize<Move>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.moveCount);
+
+	ModifyGenericMovelistListSize<Move>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.moveCount));
 	// delete move name
 	// delete move anim
 
 	for (auto& cancel : m_iterators.cancels)
 	{
-		if (MUST_SHIFT_ID(cancel.move_id, -1, id, id + 1))
-		{
-			cancel.move_id -= 1;
-		}
+		RemapRecordIndex(cancel.move_id, edit);
 	}
 
 	for (auto& reactions : m_iterators.reactions)
 	{
 		for (unsigned int i = 0; i < _countof(reactions.moveids); ++i) {
-			if (MUST_SHIFT_ID(reactions.moveids[i], -1, id, id + 1)) {
-				reactions.moveids[i] -= 1;
-			}
+			RemapRecordIndex(reactions.moveids[i], edit);
 		}
 	}
 
@@ -39,35 +38,35 @@ void EditorT7::DeleteMove(int id)
 void EditorT7::DeleteCancelExtradata(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
-	ModifyGenericMovelistListSize<CancelExtradata>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.cancelExtradataCount);
+
+	ModifyGenericMovelistListSize<CancelExtradata>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.cancelExtradataCount));
 
 	for (auto& cancel : m_iterators.cancels)
 	{
-		if (MUST_SHIFT_ID(cancel.extradata_addr, -1, id, id + 1))
-		{
-			cancel.extradata_addr -= 1;
-		}
+		RemapRecordIndex(cancel.extradata_addr, edit);
 	}
 }
 
 void EditorT7::DeleteReactions(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.reactions;
-	ModifyGenericMovelistListSize<Reactions>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.reactionsCount);
+
+	ModifyGenericMovelistListSize<Reactions>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.reactionsCount));
 
 	for (auto& hitCondition : m_iterators.hit_conditions)
 	{
-		if (MUST_SHIFT_ID(hitCondition.reactions_addr, -1, id, id + 1))
-		{
-			hitCondition.reactions_addr -= 1;
-		}
+		RemapRecordIndex(hitCondition.reactions_addr, edit);
 	}
 }
 
 void EditorT7::DeletePushback(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushback;
-	ModifyGenericMovelistListSize<Pushback>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.pushbackCount);
+
+	ModifyGenericMovelistListSize<Pushback>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.pushbackCount));
 
 	for (auto& reactions : m_iterators.reactions)
 	{
@@ -88,15 +87,19 @@ void EditorT7::DeletePushback(int id)
 void EditorT7::DeleteInputSequence(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.inputSequence;
-	ModifyGenericMovelistListSize<InputSequence>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.inputSequenceCount);
+
+	ModifyGenericMovelistListSize<InputSequence>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.inputSequenceCount));
 
 	for (auto& cancel : m_iterators.cancels)
 	{
 		if (IsCommandInputSequence(cancel.command)) {
-			uint64_t correctedCommand = cancel.command - constants[EditorConstants_InputSequenceCommandStart];
-			if (MUST_SHIFT_ID(correctedCommand, -1, id, id + 1)) {
-				cancel.command -= 1;
-			}
+            const uint64_t base = constants.at(EditorConstants_InputSequenceCommandStart);
+            auto index = static_cast<uint32_t>(cancel.command) - base;
+            auto mapped = edit.Remap(index);
+            if (mapped == UINT64_MAX || mapped >= 0x10000 - base)
+                throw std::invalid_argument("Cannot remove the last input sequence while a cancel references it");
+            cancel.command = (cancel.command & 0xffffffff00000000ULL) | (base + mapped);
 		}
 	}
 }
@@ -104,14 +107,14 @@ void EditorT7::DeleteInputSequence(int id)
 void EditorT7::DeleteProjectile(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.projectile;
-	ModifyGenericMovelistListSize<Projectile>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.projectileCount);
+
+	ModifyGenericMovelistListSize<Projectile>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.projectileCount));
 
 	for (auto& extraProp : m_iterators.extra_move_properties)
 	{
 		if (IsPropertyProjectileRef(extraProp.id)) {
-			if (MUST_SHIFT_ID(extraProp.value_unsigned, -1, id, id + 1)) {
-				extraProp.value_unsigned -= 1;
-			}
+			RemapRecordIndex(extraProp.value_unsigned, edit);
 		}
 	}
 }
@@ -119,14 +122,14 @@ void EditorT7::DeleteProjectile(int id)
 void EditorT7::DeleteThrowCamera(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.throwCameras;
-	ModifyGenericMovelistListSize<ThrowCamera>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.throwCamerasCount);
+
+	ModifyGenericMovelistListSize<ThrowCamera>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.throwCamerasCount));
 
 	for (auto& extraProp : m_iterators.extra_move_properties)
 	{
 		if (IsPropertyThrowCameraRef(extraProp.id)) {
-			if (MUST_SHIFT_ID(extraProp.value_unsigned, -1, id, id + 1)) {
-				extraProp.value_unsigned -= 1;
-			}
+			RemapRecordIndex(extraProp.value_unsigned, edit);
 		}
 	}
 }
@@ -134,32 +137,38 @@ void EditorT7::DeleteThrowCamera(int id)
 void EditorT7::DeleteCameraData(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cameraData;
-	ModifyGenericMovelistListSize<CameraData>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_infos->table.cameraDataCount);
+
+	ModifyGenericMovelistListSize<CameraData>(id, {}, { id }, listHead, DescribeRecordCount(m_infos->table.cameraDataCount));
 
 	for (auto& throwData : m_iterators.throw_datas)
 	{
-		if (MUST_SHIFT_ID(throwData.cameradata_addr, -1, id, id + 1)) {
-			throwData.cameradata_addr -= 1;
-		}
+		RemapRecordIndex(throwData.cameradata_addr, edit);
 	}
 }
 
 void EditorT7::DeleteMovelistPlayable(int id)
 {
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + (uint64_t)m_mvlHead->playables_offset;
-	ModifyGenericMovelistListSize<MvlPlayable>(id, {}, { id }, listHead);
+	RecordEdit edit(id, {}, {id}, m_mvlHead->playables_count);
+
+	ModifyGenericMovelistListSize<MvlPlayable>(id, {}, { id }, listHead, DescribeRecordCount(m_mvlHead->playables_count));
 
 	for (auto& displayable : m_iterators.mvl_displayables)
 	{
-		if (MUST_SHIFT_ID(displayable.playable_id, -1, id, id + 1))
-		{
-			displayable.playable_id -= 1;
-		}
+		RemapRecordIndex(displayable.playable_id, edit);
 	}
 }
 
 void EditorT7::DeleteStructures(EditorWindowType type, uint32_t id, size_t listSize)
 {
+	return Mutate([&]() {
+    const auto total = GetStructureCount(type);
+    const auto amount = listSize ? listSize : 1;
+    if (id >= total || amount > total - id) throw std::out_of_range("Deletion exceeds the record list");
+
+	if (id > INT_MAX || listSize > INT_MAX || listSize > static_cast<size_t>(INT_MAX) - id) throw std::out_of_range("Deletion range is too large");
+
 	if (listSize == 0) {
 		listSize = 1;
 	}
@@ -247,191 +256,51 @@ void EditorT7::DeleteStructures(EditorWindowType type, uint32_t id, size_t listS
 		break;
 
 	}
+
+	});
 }
 
-void EditorT7::DeleteAnimation(uint64_t anim_offset)
+void EditorT7::DeleteAnimation(uint64_t offset)
 {
-	DEBUG_LOG("DeleteAnimation\n");
-	// MOTA block comes right after the animation block
-	// If the animation is the last in its block, end addr shoudl be mota block
-	uint64_t anim_end_addr = m_offsets->motaBlock;
-
-	// Get animation end position
-	for (const auto& move : m_iterators.moves) {
-		if (anim_offset < move.anim_addr && move.anim_addr < anim_end_addr) {
-			anim_end_addr = move.anim_addr;
-		}
-	}
-
-	uint64_t anim_size = anim_end_addr - anim_offset;
-
-	uint64_t newMovesetSize;
-	Byte* newMoveset;
-
-	const uint64_t listOffset = m_header->moveset_data_start + m_offsets->animationBlock + anim_offset;
-
-	uint64_t postListOffset = listOffset;
-	uint64_t orig_postListOffset = listOffset + anim_size;
-
-	// Compute following m_offsets-> block position. We do this because we want to make sure it always stays 8 bytes aligned
-	uint64_t new_followingBlockStart = m_movesetSize - anim_size; // Set initial value in case there is no following block
-	uint64_t old_followingBlockStart = m_movesetSize; // Set initial value in case there is no following block
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		uint64_t absoluteBlockAddr = (m_header->moveset_data_start + m_offsets->blocks[i]);
-		if (absoluteBlockAddr >= orig_postListOffset) {
-			old_followingBlockStart = absoluteBlockAddr;
-			new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart - anim_size);
-			break;
-		}
-	}
-
-	newMovesetSize = m_movesetSize + (new_followingBlockStart - old_followingBlockStart);
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		throw;
-	}
-
-	// Remove anim off map
-	{
-		auto tmp = m_animOffsetToNameOffset.find(anim_offset);
-		if (tmp != m_animOffsetToNameOffset.end()) {
-			m_animOffsetToNameOffset.erase(tmp);
-		}
-		else {
-			// This should not happen
-			DEBUG_ERR("Failed to find anim name in anim map. Most likely incorrect anim name.");
-		}
-	}
-
-	// Shift blocks
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		if ((m_header->moveset_data_start + m_offsets->blocks[i]) > listOffset) {
-			m_offsets->blocks[i] = Helpers::align8Bytes(m_offsets->blocks[i] - anim_size);
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx (before alignment)\n", i, anim_size);
-		}
-	}
-
-	// Shift move anim addresses
-	for (auto& m : m_iterators.moves)
-	{
-		if (m.anim_addr > anim_offset) {
-			m.anim_addr -= anim_size;
-		}
-	}
-
-	// Copy all the data up to the animation
-	memcpy(newMoveset, m_moveset, listOffset);
-
-	// Copy all the data after the animation, up to the start of the next block
-	memcpy(newMoveset + postListOffset, m_moveset + orig_postListOffset, old_followingBlockStart - orig_postListOffset);
-
-	// If there is a block afterward and not just the moveset end, copy everything from that block to the moveset end
-	if (old_followingBlockStart != m_movesetSize) {
-		memcpy(newMoveset + new_followingBlockStart, m_moveset + old_followingBlockStart, m_movesetSize - old_followingBlockStart);
-	}
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
+    Mutate([&] {
+        const auto blockSize = m_offsets->motaBlock - m_offsets->animationBlock;
+        if (offset >= blockSize) throw std::out_of_range("Animation deletion outside its section");
+        auto end = blockSize;
+        for (const auto& move : m_iterators.moves) {
+            if (move.anim_addr == offset) throw std::invalid_argument("Animation is still referenced");
+            if (move.anim_addr > offset) end = (std::min)(end, move.anim_addr);
+        }
+        for (const auto& [start, name] : m_animOffsetToNameOffset) {
+            if (start >= blockSize) throw std::out_of_range("Animation offset outside its section");
+            if (start > offset) end = (std::min)(end, start);
+            if (start < offset) {
+                auto data = m_movesetData + m_offsets->animationBlock + start;
+                const auto size = TAnimUtils::FromMemory::Safe::GetAnimSize(data, blockSize - start);
+                if (size > offset - start) throw std::invalid_argument("Deletion cuts through an animation");
+            }
+        }
+        const auto removed = end - offset;
+        ReplaceBlockRange(TKMovesetHeaderBlocks_Animation, offset, removed, {});
+        for (auto& move : m_iterators.moves) if (move.anim_addr > offset) move.anim_addr -= removed;
+        RebuildAnimationMaps();
+    });
 }
 
-void EditorT7::DeleteNameBlockString(uint64_t string_offset)
+void EditorT7::DeleteNameBlockString(uint64_t offset)
 {
-	DEBUG_LOG("DeleteNameBlockString\n");
-
-	const char* name = (char*)(m_movesetData + m_offsets->nameBlock) + string_offset;
-	uint64_t data_size = strlen(name) + 1;
-
-	uint64_t newMovesetSize;
-	Byte* newMoveset;
-
-	const uint64_t data_absolute_offset = m_header->moveset_data_start + m_offsets->nameBlock + string_offset;
-
-	uint64_t postDataOffset = data_absolute_offset;
-	uint64_t orig_postDataOffset = data_absolute_offset + data_size;
-
-	// Compute following m_offsets-> block position. We do this because we want to make sure it always stays 8 bytes aligned
-	uint64_t new_followingBlockStart = m_movesetSize - data_size; // Set initial value in case there is no following block
-	uint64_t old_followingBlockStart = m_movesetSize; // Set initial value in case there is no following block
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		uint64_t absoluteBlockAddr = (m_header->moveset_data_start + m_offsets->blocks[i]);
-		if (absoluteBlockAddr >= orig_postDataOffset) {
-			old_followingBlockStart = absoluteBlockAddr;
-			new_followingBlockStart = Helpers::align8Bytes(old_followingBlockStart - data_size);
-			break;
-		}
-	}
-
-	newMovesetSize = m_movesetSize + (new_followingBlockStart - old_followingBlockStart);
-	newMoveset = (Byte*)calloc(1, newMovesetSize);
-	if (newMoveset == nullptr) {
-		throw;
-	}
-
-	// Remove name from map
-	// Remove anim off map
-	{
-		auto tmp = m_animNameToOffsetMap.find(name);
-		if (tmp != m_animNameToOffsetMap.end()) {
-			m_animNameToOffsetMap.erase(tmp);
-		}
-		else {
-			// This should not happen
-			DEBUG_ERR("Failed to find anim name in anim map. Most likely incorrect anim name.");
-		}
-	}
-	// Re-set map with new value if the same name exists multiple times in the name block (that can happen)
-	for (auto& m : m_iterators.moves)
-	{
-		const char* m_name = (char*)(m_movesetData + m_offsets->nameBlock) + m.anim_name_addr;
-		if (strcmp(m_name, name) == 0) {
-			m_animNameToOffsetMap[m_name] = m.anim_addr;
-			break;
-		}
-	}
-
-	// Shift blocks
-	for (unsigned int i = 0; i < m_header->block_list_size; ++i)
-	{
-		if ((m_header->moveset_data_start + m_offsets->blocks[i]) > data_absolute_offset) {
-			m_offsets->blocks[i] = Helpers::align8Bytes(m_offsets->blocks[i] - data_size);
-			DEBUG_LOG("Shifted moveset block %d by 0x%llx (before alignment)\n", i, data_size);
-		}
-	}
-
-	// Shift move name & anim names
-	for (auto& m : m_iterators.moves)
-	{
-		if (m.name_addr > string_offset) {
-			m.name_addr -= data_size;
-		}
-		if (m.anim_name_addr > string_offset) {
-			m.anim_name_addr -= data_size;
-		}
-	}
-
-	// Re-adjust mappings
-	for (auto& pair : m_animOffsetToNameOffset) {
-		if (pair.second > string_offset) {
-			pair.second -= data_size;
-		}
-	}
-
-	// Copy all the data up to the animation
-	memcpy(newMoveset, m_moveset, data_absolute_offset);
-
-	// Copy all the data after the animation, up to the start of the next block
-	memcpy(newMoveset + postDataOffset, m_moveset + orig_postDataOffset, old_followingBlockStart - orig_postDataOffset);
-
-	// If there is a block afterward and not just the moveset end, copy everything from that block to the moveset end
-	if (old_followingBlockStart != m_movesetSize) {
-		memcpy(newMoveset + new_followingBlockStart, m_moveset + old_followingBlockStart, m_movesetSize - old_followingBlockStart);
-	}
-
-	// Assign new moveset
-	free(m_moveset);
-	LoadMovesetPtr(newMoveset, newMovesetSize);
+    Mutate([&] {
+        const auto removed = BlockString(TKMovesetHeaderBlocks_Name, offset).size() + 1;
+        if (NameRangeReferenced(offset, removed)) throw std::invalid_argument("Name is still referenced");
+        const auto oldEnd = m_offsets->movesetBlock;
+        ReplaceBlockRange(TKMovesetHeaderBlocks_Name, offset, removed, {});
+        for (auto& move : m_iterators.moves) {
+            if (move.name_addr > offset) move.name_addr -= removed;
+            if (move.anim_name_addr > offset) move.anim_name_addr -= removed;
+        }
+        for (auto field : {&m_infos->character_name_addr, &m_infos->character_creator_addr, &m_infos->date_addr, &m_infos->fulldate_addr})
+            if (auto value = reinterpret_cast<uint64_t>(*field);
+                value > m_offsets->nameBlock + offset && value < oldEnd)
+                *field = reinterpret_cast<char*>(value - removed);
+        RebuildAnimationMaps();
+    });
 }

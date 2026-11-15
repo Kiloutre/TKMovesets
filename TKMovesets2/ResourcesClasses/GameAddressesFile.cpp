@@ -1,4 +1,6 @@
 #include <sstream>
+#include <iterator>
+#include <cstring>
 
 #include "GameAddressesFile.hpp"
 #include "Compression.hpp"
@@ -22,7 +24,7 @@ static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 	size_t pos = 0;
 	while ((pos = path.find(",", pos)) != std::string::npos) {
 		try {
-			ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos, pos), NULL, 0));
+			ptrPath.push_back((gameAddr)std::stoll(path.substr(prevPos, pos - prevPos), NULL, 0));
 		}
 		catch (const std::exception&) {
 			// Todo: warn of bad formatting
@@ -47,12 +49,18 @@ static std::vector<gameAddr> parsePtrPathString(const std::string& path)
 
 // Calculate the strict minimum size to create a string containing every entry in the game addresses file
 // This takes only what is stricly necessary in order for parsing to still work afterward
+// Exe byte patterns (str:<game>_sig_*) are only read by the address updater, never by the injected DLLs.
+// Exe byte patterns stay out of the shared copy the injected loader reads, except the Tag mode's (sig_tag_*): the
+// loader checks every function it hooks or calls against them before touching it.
+static bool IsExeSignature(const std::string& key) { return key.rfind("sig_", 0) == 0 && key.rfind("sig_tag_", 0) != 0; }
+
 static int GetAddressMapStringSize(const std::map <std::string, GameAddresses_GameEntries>& entries)
 {
 	uint64_t compacted_addr_size = 0;
 	for (auto& [entryKey, entryValue] : entries)
 	{
 		for (auto& [stringKey, stringValue] : entryValue.strings) {
+			if (IsExeSignature(stringKey)) continue;
 			compacted_addr_size += 4 + entryKey.size() + 1 + stringKey.size() + 1 + stringValue.size() + 1;
 		}
 		for (auto& [valKey, valValue] : entryValue.values) {
@@ -91,6 +99,7 @@ static char* WriteAddressMapToString(const std::map <std::string, GameAddresses_
 	{
 		std::string sPrefix = "s:" + entryKey + "_";
 		for (auto& [stringKey, stringValue] : entryValue.strings) {
+			if (IsExeSignature(stringKey)) continue;
 			strcat_s(inBuf, bufSize, sPrefix.c_str());
 			strcat_s(inBuf, bufSize, stringKey.c_str());
 			strcat_s(inBuf, bufSize, "=");
@@ -423,8 +432,14 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 	std::vector<std::string> keys;
 	std::string line;
 
+	bool conversionRules = false;
 	while (std::getline(stream, line))
 	{
+		// The T7 <-> T8 conversion rules section is read by ConversionRules, not as addresses.
+		if (line.starts_with("# BEGIN T7 T8 CONVERSION RULES")) { conversionRules = true; continue; }
+		if (line.starts_with("# END T7 T8 CONVERSION RULES")) { conversionRules = false; continue; }
+		if (conversionRules) continue;
+
 		size_t commentStart = line.find_first_of('#');
 
 		size_t idStart = line.find_first_not_of(' ', 0);
@@ -442,11 +457,16 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 		}
 
 		std::string gameKey;
-		std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
+		// idStart <= separator: the '=' is the first non-space character at the latest
+		std::string key = line.substr(idStart, line.find_first_of(" =", idStart) - idStart);
 		std::string shortKey;
 		std::string value;
 		{
-			size_t value_start = line.find_first_not_of(" =", separator);
+			// Nothing after '=' (e.g. 'key = # todo' once the comment is stripped): no value, the entry is skipped
+			size_t value_start = line.find_first_not_of(" =\t\r", separator);
+			if (value_start == std::string::npos) {
+				continue;
+			}
 			value = line.substr(value_start, line.find_last_not_of(" ") + 1 - value_start);
 		}
 		if (key.length() == 0) {
@@ -465,7 +485,12 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 				++start;
 			}
 
-			end = key.find_first_of('_', start) - start;
+			end = key.find_first_of('_', start);
+			if (end == std::string::npos) {
+				// No '<game>_' prefix: not an address key
+				continue;
+			}
+			end -= start;
 			gameKey = key.substr(start, end);
 			if (!entries.contains(gameKey)) {
 				entries[gameKey] = {};
@@ -514,4 +539,58 @@ void GameAddressesFile::LoadFromStream(std::istream& stream)
 	// So can't clear them at the start and build them little by little.
 	m_entries = entries;
 	m_keys = keys;
+}
+
+std::map<std::string, std::string> GameAddressesFile::GetStringsWithPrefix(const std::string& gameKey, const std::string& prefix) const
+{
+	std::map<std::string, std::string> out;
+	const auto game = m_entries.find(gameKey);
+	if (game == m_entries.end()) return out;
+	for (const auto& [key, value] : game->second.strings) if (key.rfind(prefix, 0) == 0) out[key] = value;
+	return out;
+}
+
+bool GameAddressesFile::UpdateInPlace(const std::string& gameKey, const std::string& key, int64_t value)
+{
+	const auto game = m_entries.find(gameKey);
+	if (game == m_entries.end()) return false;
+	if (auto entry = game->second.values.find(key); entry != game->second.values.end()) {
+		entry->second = value;
+		return true;
+	}
+	if (auto entry = game->second.relative_pointer_paths.find(key); entry != game->second.relative_pointer_paths.end() && !entry->second.empty()) {
+		entry->second[0] = static_cast<gameAddr>(value);
+		return true;
+	}
+	return false;
+}
+
+void GameAddressesFile::RefreshSharedMemory()
+{
+	if (!m_sharedMemory) return;
+	uint64_t compressed_size;
+	const int compacted_addr_size = GetAddressMapStringSize(m_entries);
+	char* compressed_data = WriteAddressMapToString(m_entries, compressed_size);
+	if (compacted_addr_size > 0 && compressed_data != nullptr && compressed_size <= MAX_COMPRESSED_GAME_ADDRESSES_SIZE) {
+		memcpy(m_sharedMemory->compressedData, compressed_data, compressed_size);
+		m_sharedMemory->compressedSize = compressed_size;
+		m_sharedMemory->originalSize = compacted_addr_size;
+	}
+	delete[] compressed_data;
+}
+
+void GameAddressesFile::ReloadFrom(const std::filesystem::path& path)
+{
+	std::stringstream data(LoadSourceText(path));
+	LoadFromStream(data);
+}
+
+std::string GameAddressesFile::LoadSourceText(const std::filesystem::path& path)
+{
+	std::error_code error;
+	if (std::filesystem::is_regular_file(path, error)) {
+		std::ifstream infile(path, std::ios::binary);
+		return std::string(std::istreambuf_iterator<char>(infile), std::istreambuf_iterator<char>());
+	}
+	return std::string(game_addresses_ini, strnlen(game_addresses_ini, game_addresses_ini_size));
 }

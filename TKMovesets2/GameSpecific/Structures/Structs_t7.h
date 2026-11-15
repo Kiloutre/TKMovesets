@@ -389,8 +389,8 @@ namespace StructsT7
 		uint32_t anim_count;
 		char unk0x10;
 		bool is_little_endian; // When the game checks for Mota endian, it checks this byte specifically and not the one above
+		char unk0x12;
 		char unk0x13;
-		char unk0x14;
 		unsigned int anim_offset_list[1];
 
 
@@ -647,6 +647,31 @@ namespace StructsT7
 		uint32_t _unk0x78;
 		uint32_t _unk0x7c;
 	};
+
+	// Retargets "character id is X" checks (requirements and move start/end properties using the character id
+	// condition, game_addresses.ini character_id_condition) from one character to another. A check on fromId becomes
+	// a check on toId (true for the new character); any other id becomes toId + 10 (never true). Shared by the
+	// importer and the in-game moveset loader so both rewrite movesets the same way.
+	inline uint32_t RetargetCharacterId(uint32_t value, uint32_t fromId, uint32_t toId)
+	{
+		return value == fromId ? toId : toId + 10;
+	}
+
+	inline void RetargetCharacterIdChecks(uint32_t condition, uint32_t fromId, uint32_t toId,
+		Requirement* requirements, uint64_t requirementCount,
+		OtherMoveProperty* beginningProps, uint64_t beginningPropCount,
+		OtherMoveProperty* endingProps, uint64_t endingPropCount)
+	{
+		for (uint64_t i = 0; i < requirementCount; ++i)
+			if (requirements[i].condition == condition)
+				requirements[i].param_unsigned = RetargetCharacterId(requirements[i].param_unsigned, fromId, toId);
+		for (uint64_t i = 0; i < beginningPropCount; ++i)
+			if (beginningProps[i].extraprop == condition)
+				beginningProps[i].value = RetargetCharacterId(beginningProps[i].value, fromId, toId);
+		for (uint64_t i = 0; i < endingPropCount; ++i)
+			if (endingProps[i].extraprop == condition)
+				endingProps[i].value = RetargetCharacterId(endingProps[i].value, fromId, toId);
+	}
 }
 
 // Contains most of the same structs as above, but with no ptr (gameAddr instead)

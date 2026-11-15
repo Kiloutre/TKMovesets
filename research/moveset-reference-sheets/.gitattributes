@@ -1,0 +1,4 @@
+# Snapshot hashes cover exact bytes on every checkout platform.
+*.xlsx binary
+*.json -text
+*.csv -text

@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <windows.h>
 #include <tlhelp32.h>
 
@@ -18,7 +19,7 @@ namespace GameProcessUtils
 
 		std::vector<processEntry> processList;
 
-		if (GetLastError() != ERROR_ACCESS_DENIED)
+		if (hProcessSnap != INVALID_HANDLE_VALUE)
 		{
 			pe32.dwSize = sizeof(PROCESSENTRY32W);
 			if (Process32FirstW(hProcessSnap, &pe32)) {
@@ -128,6 +129,7 @@ GameProcessErrcode_ GameProcess::AttachToNamedProcess(const char* processName, D
 				return GameProcessErrcode_PROC_ATTACHED;
 			}
 			CloseHandle(m_processHandle);
+			m_processHandle = nullptr;
 		}
 		return GameProcessErrcode_PROC_ATTACH_ERR;
 	}
@@ -142,7 +144,7 @@ DWORD GameProcess::GetGamePID(const char* processName)
 
 	std::wstring w_processName = Helpers::string_to_wstring(processName);
 
-	if (GetLastError() != ERROR_ACCESS_DENIED)
+	if (hProcessSnap != INVALID_HANDLE_VALUE)
 	{
 		pe32.dwSize = sizeof(PROCESSENTRY32W);
 		if (Process32FirstW(hProcessSnap, &pe32)) {
@@ -166,6 +168,23 @@ DWORD GameProcess::GetGamePID(const char* processName)
 	return (DWORD)-1;
 }
 
+gameAddr GameProcess::ResolveRemoteFunction(FARPROC function) const
+{
+	if (!function) return 0;
+	MEMORY_BASIC_INFORMATION region{};
+	if (!VirtualQuery(reinterpret_cast<const void*>(function), &region, sizeof(region))) return 0;
+	wchar_t path[MAX_PATH];
+	auto length = GetModuleFileNameW(static_cast<HMODULE>(region.AllocationBase), path, MAX_PATH);
+	if (!length || length == MAX_PATH) return 0;
+	auto moduleName = std::filesystem::path(path).filename().wstring();
+	const auto offset = reinterpret_cast<gameAddr>(function) - reinterpret_cast<gameAddr>(region.AllocationBase);
+	for (const auto& module : GetModuleList()) {
+		if (_wcsicmp(std::filesystem::path(module.path).filename().c_str(), moduleName.c_str()) == 0 && offset < module.size)
+			return module.address + offset;
+	}
+	return 0;
+}
+
 std::vector<moduleEntry> GameProcess::GetModuleList() const
 {
 	HANDLE moduleSnap;
@@ -175,7 +194,7 @@ std::vector<moduleEntry> GameProcess::GetModuleList() const
 
 	moduleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, m_pid);
 
-	if (GetLastError() != ERROR_ACCESS_DENIED)
+	if (moduleSnap == INVALID_HANDLE_VALUE) return modules;
 	{
 		me32.dwSize = sizeof(me32);
 		if (Module32FirstW(moduleSnap, &me32)) {
@@ -210,29 +229,59 @@ bool GameProcess::LoadGameMainModule(const char* processName)
 		if (m.name == processName)
 		{
 			mainModule = m;
-			break;
+			return true;
 		}
 	}
 
-	return mainModule.address != -1;
+	return false;
 }
 
 // -- Public methods -- //
 
 bool GameProcess::Attach(const char* processName, DWORD processExtraFlags)
 {
+	std::lock_guard lock(m_resourceMutex);
 	if (status == GameProcessErrcode_PROC_ATTACHED) {
 		return false;
 	}
 
-	allocatedMemory.clear();
-	m_toFree.clear();
+    Detach();
 	status = AttachToNamedProcess(processName, processExtraFlags);
 	return status == GameProcessErrcode_PROC_ATTACHED;
 }
 
+bool GameProcess::AttachById(DWORD pid, DWORD flags)
+{
+    std::lock_guard lock(m_resourceMutex);
+    if (IsAttached()) return false;
+    Detach();
+    m_pid = pid;
+    m_processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | flags, FALSE, pid);
+    if (!m_processHandle) { status = GameProcessErrcode_PROC_ATTACH_ERR; return false; }
+    const auto modules = GetModuleList();
+    if (modules.empty()) { Detach(); status = GameProcessErrcode_PROC_ATTACH_ERR; return false; }
+    mainModule = modules.front(); processId = pid;
+    status = GameProcessErrcode_PROC_ATTACHED;
+    return true;
+}
+
 void GameProcess::Detach()
 {
+    std::lock_guard lock(m_resourceMutex);
+    if (m_suspensionHandle) {
+        // Never leave a live game suspended; a handle must never survive into another attachment either
+        if (!ResumeProcessRaw()) ResumeProcessRaw();
+        if (m_suspensionHandle) {
+            DEBUG_LOG("Detach(): could not resume the game process\n");
+            CloseHandle(m_suspensionHandle);
+            m_suspensionHandle = nullptr;
+        }
+    }
+    ++m_generation;
+    processId = static_cast<DWORD>(-1); m_pid = 0;
+    for (auto& thread : m_pendingThreads) CloseHandle(thread.handle);
+    m_pendingThreads.clear();
+    allocatedMemory.clear(); m_toFree.clear(); m_pinnedAllocations.clear();
 	if (m_processHandle != nullptr) {
 		CloseHandle(m_processHandle);
 		m_processHandle = nullptr;
@@ -248,6 +297,7 @@ bool GameProcess::IsAttached() const
 
 bool GameProcess::CheckRunning()
 {
+	std::lock_guard lock(m_resourceMutex);
 	if (m_processHandle != nullptr)
 	{
 		int32_t value = 0;
@@ -265,6 +315,8 @@ bool GameProcess::CheckRunning()
 
 void GameProcess::FreeOldGameMemory(bool instant)
 {
+    std::lock_guard lock(m_resourceMutex);
+    ReapRemoteThreads();
 	uint64_t currentDate = Helpers::getCurrentTimestamp();
 	for (int i = 0; i < m_toFree.size();)
 	{
@@ -274,7 +326,7 @@ void GameProcess::FreeOldGameMemory(bool instant)
 #pragma warning(push)
 #pragma warning(disable:6001)
 			DEBUG_LOG("Freeing game memory %llx after delay\n", targetAddr);
-			VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
+			ReleaseMemoryRaw(targetAddr);
 			m_toFree.erase(m_toFree.begin() + i, m_toFree.begin() + i + 1);
 #pragma warning(pop)
 		}
@@ -287,141 +339,176 @@ void GameProcess::FreeOldGameMemory(bool instant)
 int8_t GameProcess::readInt8(gameAddr addr) const
 {
 	int8_t value{ -1 };
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 int16_t GameProcess::readInt16(gameAddr addr) const
 {
 	int16_t value{ -1 };
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 int32_t GameProcess::readInt32(gameAddr addr) const
 {
 	int32_t value{ -1 };
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 int64_t GameProcess::readInt64(gameAddr addr) const
 {
 	int64_t value{ -1 };
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 uint8_t GameProcess::readUInt8(gameAddr addr) const
 {
 	uint8_t value{ (uint8_t)-1};
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 1, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 uint16_t GameProcess::readUInt16(gameAddr addr) const
 {
 	uint16_t value{ (uint16_t)-1};
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 2, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 uint32_t GameProcess::readUInt32(gameAddr addr) const
 {
 	uint32_t value{ (uint32_t)-1};
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 uint64_t GameProcess::readUInt64(gameAddr addr) const
 {
 	uint64_t value{ (uint64_t)- 1};
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 8, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
 float GameProcess::readFloat(gameAddr addr) const
 {
 	float value{ -1 };
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)&value, 4, nullptr);
+	readBytes(addr, &value, sizeof(value));
 	return value;
 }
 
-void GameProcess::readBytes(gameAddr addr, void* buf, size_t readSize) const
+bool GameProcess::readBytes(gameAddr address, void* data, size_t size) const
 {
-	ReadProcessMemory(m_processHandle, (LPCVOID)addr, (LPVOID)buf, readSize, nullptr);
+    const bool ok = probeBytes(address, data, size);
+    if (!ok) { if (auto batch = ActiveBatch()) batch->m_failed = true; return false; }
+    return true;
+}
+bool GameProcess::probeBytes(gameAddr address, void* data, size_t size) const
+{
+    std::lock_guard lock(m_resourceMutex);
+    auto batch = ActiveBatch();
+    if (batch && batch->m_generation != m_generation) { SetLastError(ERROR_INVALID_HANDLE); return false; }
+    if (!ReadMemoryRaw(address, data, size)) return false;
+    return !batch || batch->Overlay(address, data, size);
+}
+GameProcess::WriteBatch* GameProcess::ActiveBatch() const
+{
+    std::lock_guard lock(m_resourceMutex);
+    if (m_activeWriteBatch != nullptr && m_activeWriteBatch->m_owner == std::this_thread::get_id()) {
+        return m_activeWriteBatch;
+    }
+    return nullptr;
 }
 
 
-void GameProcess::writeInt8(gameAddr addr, int8_t value)
+bool GameProcess::writeInt8(gameAddr addr, int8_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 1, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeInt16(gameAddr addr, int16_t value)
+bool GameProcess::writeInt16(gameAddr addr, int16_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 2, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeInt32(gameAddr addr, int32_t value)
+bool GameProcess::writeInt32(gameAddr addr, int32_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeInt64(gameAddr addr, int64_t value)
+bool GameProcess::writeInt64(gameAddr addr, int64_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 8, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void GameProcess::writeUInt8(gameAddr addr, uint8_t value)
+bool GameProcess::writeUInt8(gameAddr addr, uint8_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 1, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeUInt16(gameAddr addr, uint16_t value)
+bool GameProcess::writeUInt16(gameAddr addr, uint16_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 2, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeUInt32(gameAddr addr, uint32_t value)
+bool GameProcess::writeUInt32(gameAddr addr, uint32_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeUInt64(gameAddr addr, uint64_t value)
+bool GameProcess::writeUInt64(gameAddr addr, uint64_t value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 8, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeFloat(gameAddr addr, float value)
+bool GameProcess::writeFloat(gameAddr addr, float value)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)&value, 4, nullptr);
+	return writeBytes(addr, &value, sizeof(value));
 }
 
-void  GameProcess::writeBytes(gameAddr addr, void* buf, size_t bufSize)
+bool GameProcess::writeBytes(gameAddr address, const void* data, size_t size)
 {
-	WriteProcessMemory(m_processHandle, (LPVOID)addr, (LPCVOID)buf, bufSize, nullptr);
+    std::lock_guard lock(m_resourceMutex);
+    if (auto batch = ActiveBatch()) return batch->Stage(address, data, size);
+    return WriteMemoryRaw(address, data, size);
 }
 
 
-gameAddr GameProcess::allocateMem(size_t amount, bool executable)
+gameAddr GameProcess::allocateMem(size_t size, bool executable)
 {
-	auto allocFlag = executable ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE;
-	gameAddr allocatedBlock = (gameAddr)VirtualAllocEx(m_processHandle, nullptr, amount, MEM_COMMIT | MEM_RESERVE, allocFlag);
-	if (allocatedBlock != 0) {
-		allocatedMemory.push_back(std::pair<gameAddr, uint64_t>(allocatedBlock, amount));
-		DEBUG_LOG("Allocated to game memory from : %llx to %llx\n", allocatedBlock, allocatedBlock + amount);
-	}
-	else {
-		DEBUG_LOG("Allocation failure: attempt to allocate %lld (%llx) bytes\n", amount, amount);
-	}
-
-	return allocatedBlock;
+    std::lock_guard lock(m_resourceMutex);
+    auto batch = ActiveBatch();
+    if (batch && batch->m_generation != m_generation) {
+        batch->m_failed = true; SetLastError(ERROR_INVALID_HANDLE); return 0;
+    }
+    allocatedMemory.reserve(allocatedMemory.size() + 1);
+    if (batch) batch->m_newAllocations.reserve(batch->m_newAllocations.size() + 1);
+    auto address = AllocateMemoryRaw(size, executable);
+    if (address) {
+        allocatedMemory.emplace_back(address, size);
+        if (batch) batch->m_newAllocations.emplace_back(address, size);
+    } else if (batch) batch->m_failed = true;
+    return address;
 }
 
 void GameProcess::freeMem(gameAddr targetAddr)
 {
-	for (std::pair<gameAddr, uint64_t>& block : allocatedMemory) {
+    std::lock_guard lock(m_resourceMutex);
+    if (std::find(m_pinnedAllocations.begin(), m_pinnedAllocations.end(), targetAddr) != m_pinnedAllocations.end()) return;
+    if (auto batch = ActiveBatch(); batch && batch->IsPrivate(targetAddr, 1)) {
+        ReleaseNow(targetAddr);
+        return;
+    }
+    for (auto& thread : m_pendingThreads) {
+        auto block = std::find_if(allocatedMemory.begin(), allocatedMemory.end(), [&](const auto& entry) {
+            return entry.first == targetAddr && thread.argument >= entry.first && thread.argument - entry.first < entry.second;
+        });
+        if (thread.argument == targetAddr || block != allocatedMemory.end()) { thread.releaseAddress = targetAddr; return; }
+    }
+
+	for (const auto block : allocatedMemory) {
 		if (block.first == (gameAddr)targetAddr)
 		{
 			allocatedMemory.erase(std::find(allocatedMemory.begin(), allocatedMemory.end(), block));
@@ -433,35 +520,211 @@ void GameProcess::freeMem(gameAddr targetAddr)
 	}
 
 	DEBUG_LOG("Freeing of allocated block %llx (not size found)\n", targetAddr);
-	VirtualFreeEx(m_processHandle, (LPVOID)targetAddr, 0, MEM_RELEASE);
+	ReleaseMemoryRaw(targetAddr);
 }
 
-GameProcessThreadCreation_ GameProcess::createRemoteThread(gameAddr startAddress, uint64_t argument, bool waitEnd, int32_t* exitCodeThread)
+GameProcessThreadCreation_ GameProcess::createRemoteThread(gameAddr start, uint64_t argument, bool waitEnd, int32_t* exitCode, DWORD timeoutMs)
 {
-	auto hThread = CreateRemoteThread(m_processHandle, nullptr, 0, (LPTHREAD_START_ROUTINE)startAddress, (PVOID)argument, 0, nullptr);
+    HANDLE thread;
+    uint64_t generation;
+    {
+        std::lock_guard lock(m_resourceMutex);
+        if (auto batch = ActiveBatch()) {
+            batch->m_failed = true;
+            return GameProcessThreadCreation_Error;
+        }
+        ReapRemoteThreads();
+        m_pendingThreads.reserve(m_pendingThreads.size() + 1);
+        generation = m_generation;
+        thread = CreateRemoteThread(m_processHandle, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(start),
+            reinterpret_cast<void*>(argument), 0, nullptr);
+    }
+    if (!thread) return GameProcessThreadCreation_Error;
+    // Wait without holding the resource lock: the worker keeps reaping and freeing meanwhile
+    auto result = GameProcessThreadCreation_Started;
+    bool finished = false;
+    if (waitEnd) {
+        switch (WaitForSingleObject(thread, timeoutMs)) {
+        case WAIT_OBJECT_0:
+            finished = true;
+            result = !exitCode || GetExitCodeThread(thread, reinterpret_cast<DWORD*>(exitCode))
+                ? GameProcessThreadCreation_FinishedCleanly : GameProcessThreadCreation_Error;
+            break;
+        case WAIT_TIMEOUT: result = GameProcessThreadCreation_WaitTimeout; break;
+        default: result = GameProcessThreadCreation_Error;
+        }
+    }
+    std::lock_guard lock(m_resourceMutex);
+    // A detach while waiting dropped the pending list of that attachment: do not carry this thread into the next one
+    if (finished || generation != m_generation) CloseHandle(thread);
+    else m_pendingThreads.push_back({thread, argument});
+    return result;
+}
 
-	bool result = hThread != nullptr;
-	DEBUG_LOG("CreateRemoteThread at %llx, arg is %llx ; success = %d\n", startAddress, argument, result);
-	if (hThread != nullptr && waitEnd) {
-		switch (WaitForSingleObject(hThread, 10000))
+bool GameProcess::ReflectInjectDll2(const Byte* orig_dllBytes, uint64_t dllSize)
+{
+	// -- THIS DOESN'T WORK AS OF YET -- //
+
+	CONTEXT* t;
+
+	DEBUG_LOG("::ReflectInjectDll(, %llu)\n", dllSize);
+
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)orig_dllBytes;
+	PIMAGE_NT_HEADERS32 ntHeaders = (PIMAGE_NT_HEADERS32)(orig_dllBytes + dosHeader->e_lfanew);
+	uint64_t sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
+
+	DEBUG_LOG("Alloc size %llu\n", sizeOfImage);
+	Byte* dllCopy;
+	try {
+		dllCopy = new Byte[sizeOfImage];
+	}
+	catch (std::bad_alloc) {
+		return false;
+	}
+
+	gameAddr dllGame = allocateMem(sizeOfImage, true);
+
+	if (dllGame == 0) {
+		DEBUG_LOG("Failed to allocate DLL within the target process.\n");
+		return false;
+	}
+
+	DEBUG_LOG("Allocated at game %llx\n", dllGame);
+
+	// Copy headers
+	memcpy(dllCopy, orig_dllBytes, ntHeaders->OptionalHeader.SizeOfHeaders);
+
+	// Copy each section
+	PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER)((uint64_t)ntHeaders + sizeof(IMAGE_NT_HEADERS));
+	for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; ++i)
+	{
+		auto& section = sections[i];
+		DEBUG_LOG("Copying section %d - %s at +0x%x\n", i, (char*)section.Name, section.VirtualAddress);
+		void* target_section_addr = (void*)(dllCopy + section.VirtualAddress);
+		void* source_section_addr = (void*)(orig_dllBytes + section.PointerToRawData);
+		memcpy(target_section_addr, source_section_addr, section.SizeOfRawData);
+	}
+
+	// Rebuild import table
+	auto& importDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+	if (importDirectory.Size != 0)
+	{
+		PIMAGE_IMPORT_DESCRIPTOR importDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)(dllCopy + importDirectory.VirtualAddress);
+
+		while (importDescriptor->Name != NULL)
 		{
-		case WAIT_TIMEOUT:
-			DEBUG_LOG("Thread: not waiting for more than 10secs for it to end.\n");
-			return GameProcessThreadCreation_WaitTimeout;
-		default:
-			DEBUG_LOG("Thread finished.\n");
-			if (exitCodeThread != nullptr) {
-				GetExitCodeThread(hThread, (DWORD*)exitCodeThread);
+			LPCSTR libName = (LPCSTR)(dllCopy + importDescriptor->Name);
+			HMODULE libModule = LoadLibraryA(libName);
+			DEBUG_LOG("%s = %p\n", libName, libModule);
+
+			if (libModule == 0) {
+				continue;
 			}
-			return GameProcessThreadCreation_FinishedCleanly;
+
+			PIMAGE_THUNK_DATA nameRef = (PIMAGE_THUNK_DATA)(dllCopy + importDescriptor->Characteristics);
+			PIMAGE_THUNK_DATA lpThunk = (PIMAGE_THUNK_DATA)(dllCopy + importDescriptor->FirstThunk);
+
+			for (; nameRef->u1.AddressOfData != 0; nameRef++, lpThunk++)
+			{
+				if (nameRef->u1.AddressOfData & IMAGE_ORDINAL_FLAG) {
+					*(FARPROC*)lpThunk = GetProcAddress(libModule, MAKEINTRESOURCEA(nameRef->u1.AddressOfData));
+					DEBUG_LOG("Import: addr [%llx] = %p\n", nameRef->u1.AddressOfData, *(FARPROC*)lpThunk);
+				}
+				else {
+					PIMAGE_IMPORT_BY_NAME thunkData = (PIMAGE_IMPORT_BY_NAME)(dllCopy + nameRef->u1.AddressOfData);
+					*(FARPROC*)lpThunk = GetProcAddress(libModule, (LPCSTR)&thunkData->Name);
+					DEBUG_LOG("Import: str [%s] = %p\n", thunkData->Name, *(FARPROC*)lpThunk);
+				}
+			}
+
+			FreeLibrary(libModule);
+			++importDescriptor;
 		}
 	}
-	return GameProcessThreadCreation_Error;
+
+	// Relocate
+	uint64_t deltaImageBase = dllGame - ntHeaders->OptionalHeader.ImageBase;
+	auto& relocDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+	DEBUG_LOG("Delta is %lld (%llx)\n", deltaImageBase, deltaImageBase);
+
+	typedef struct BASE_RELOCATION_BLOCK {
+		DWORD PageAddress;
+		DWORD BlockSize;
+	} BASE_RELOCATION_BLOCK, * PBASE_RELOCATION_BLOCK;
+
+	typedef struct BASE_RELOCATION_ENTRY {
+		USHORT Offset : 12;
+		USHORT Type : 4;
+	} BASE_RELOCATION_ENTRY, * PBASE_RELOCATION_ENTRY;
+
+	IMAGE_DATA_DIRECTORY relocations = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+	DWORD_PTR relocationTable = relocations.VirtualAddress + (DWORD_PTR)dllCopy;
+	DWORD relocationsProcessed = 0;
+
+	while (relocationsProcessed < relocations.Size)
+	{
+		PBASE_RELOCATION_BLOCK relocationBlock = (PBASE_RELOCATION_BLOCK)(relocationTable + relocationsProcessed);
+		relocationsProcessed += sizeof(BASE_RELOCATION_BLOCK);
+		DWORD relocationsCount = (relocationBlock->BlockSize - sizeof(BASE_RELOCATION_BLOCK)) / sizeof(BASE_RELOCATION_ENTRY);
+		PBASE_RELOCATION_ENTRY relocationEntries = (PBASE_RELOCATION_ENTRY)(relocationTable + relocationsProcessed);
+
+		for (DWORD i = 0; i < relocationsCount; i++)
+		{
+			relocationsProcessed += sizeof(BASE_RELOCATION_ENTRY);
+
+			if (relocationEntries[i].Type == 0)
+			{
+				continue;
+			}
+
+			DWORD_PTR relocationRVA = relocationBlock->PageAddress + relocationEntries[i].Offset;
+			DWORD_PTR addressToPatch = 0;
+			ReadProcessMemory(GetCurrentProcess(), (LPCVOID)((DWORD_PTR)dllCopy + relocationRVA), &addressToPatch, sizeof(DWORD_PTR), NULL);
+			addressToPatch += deltaImageBase;
+			std::memcpy((PVOID)((DWORD_PTR)dllCopy + relocationRVA), &addressToPatch, sizeof(DWORD_PTR));
+		}
+	}
+
+	std::map<std::string, uint64_t> exportedFunctions;
+	// DEBUG: Export table
+	{
+		auto& exportDir = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+		PIMAGE_EXPORT_DIRECTORY exp = (PIMAGE_EXPORT_DIRECTORY)(dllCopy + exportDir.VirtualAddress);
+
+		DEBUG_LOG("Export name - %s -\n", dllCopy + exp->Name);
+		DEBUG_LOG("Name count: %u. Address count: %u.\n", exp->NumberOfNames, exp->NumberOfFunctions);
+
+		DWORD* nameList = (DWORD*)(dllCopy + exp->AddressOfNames);
+		DWORD* addrList = (DWORD*)(dllCopy + exp->AddressOfFunctions);
+		for (unsigned int i = 0; i < exp->NumberOfNames; ++i)
+		{
+			char* nameAddr = (char*)(dllCopy + nameList[i]);
+			if (strncmp(nameAddr, "MovesetLoader", sizeof("MovesetLoader") - 1) == 0)
+			{
+				exportedFunctions[nameAddr] = dllGame + addrList[i];
+				DEBUG_LOG("EXPORTED FUNC [%s], OFFSET [%x], ABSOLUTE ADDR [%llx]\n", nameAddr, addrList[i], dllGame + addrList[i]);
+			}
+		}
+	}
+
+	DEBUG_LOG("Finished!\n");
+	writeBytes(dllGame, dllCopy, sizeOfImage);
+
+	LPTHREAD_START_ROUTINE entryPoint = (LPTHREAD_START_ROUTINE)(dllGame + ntHeaders->OptionalHeader.AddressOfEntryPoint);
+	entryPoint = (LPTHREAD_START_ROUTINE)exportedFunctions["MovesetLoaderTest"];
+	DEBUG_LOG("CreateRemoteThread at %p ...\n", entryPoint);
+	//createRemoteThread((gameAddr)entryPoint, 0, true);
+
+	delete[] dllCopy;
+	// -- THIS DOESN'T WORK AS OF YET -- //
+	return true;
 }
 
 bool GameProcess::ReflectInjectDll(const Byte* orig_dllBytes, uint64_t dllSize)
 {
 	// -- THIS DOESN'T WORK AS OF YET -- //
+
+	CONTEXT* t;
 
 	DEBUG_LOG("::ReflectInjectDll(, %llu)\n", dllSize);
 
@@ -641,34 +904,44 @@ bool GameProcess::InjectDll(const wchar_t* fullpath)
 	DEBUG_LOG("-- Injecting DLL %S --\n", fullpath);
 	// Allocate space for dll path in process memory
 	int fullpathSize = ((int)wcslen(fullpath) + 1) * (int)sizeof(WCHAR);
-	gameAddr bufferAddr = allocateMem(fullpathSize);
+	gameAddr bufferAddr;
+	{
+		// Not recorded in allocatedMemory: this may run on the injection thread while the worker iterates that list.
+		// freeMem() releases untracked blocks directly, or once the pending remote thread using it has completed.
+		std::lock_guard lock(m_resourceMutex);
+		bufferAddr = AllocateMemoryRaw(fullpathSize, false);
+	}
 
 	if (bufferAddr == 0) {
 		DEBUG_LOG("DLL injection failure: tried to allocated %d, got nullptr from alloc.\n", fullpathSize);
 		return false;
 	}
 	// Write path in process memory
-	writeBytes(bufferAddr, (void*)fullpath, fullpathSize);
+	if (!writeBytes(bufferAddr, fullpath, fullpathSize)) {
+		freeMem(bufferAddr);
+		return false;
+	}
 
 	// Get address of LoadLibraryW
 	auto moduleHandle = GetModuleHandleA("Kernel32");
 	if (moduleHandle == 0) {
 		DEBUG_LOG("Failed getting the module handle of Kernel32.\n");
+		freeMem(bufferAddr);
 		return false;
 	}
-	PTHREAD_START_ROUTINE threatStartRoutineAddress = (PTHREAD_START_ROUTINE)GetProcAddress(moduleHandle, "LoadLibraryW");
-
-	// Start thread in remote process
-	auto errcode = createRemoteThread((gameAddr)threatStartRoutineAddress, bufferAddr, true);
-	if (errcode != GameProcessThreadCreation_WaitTimeout) {
-		// Only free if the thread is actually finished
-		// Yes, this means a potential memory leak if the thread takes more than 10sec
-		// Todo: if WaitTimeout, remember the thread handle and regularly check if it is still ongoing
-		// Not really important here though
+	auto loadLibrary = ResolveRemoteFunction(GetProcAddress(moduleHandle, "LoadLibraryW"));
+	if (!loadLibrary) {
 		freeMem(bufferAddr);
+		return false;
 	}
 
-	return errcode != GameProcessThreadCreation_Error;
+	// Start thread in remote process
+	int32_t loadedModule = 0;
+	auto errcode = createRemoteThread(loadLibrary, bufferAddr, true, &loadedModule);
+    // freeMem retains the argument until a pending thread actually completes.
+    freeMem(bufferAddr);
+
+	return errcode == GameProcessThreadCreation_FinishedCleanly && loadedModule != 0;
 }
 
 

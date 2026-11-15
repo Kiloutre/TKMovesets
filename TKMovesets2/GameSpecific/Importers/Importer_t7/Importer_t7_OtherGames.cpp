@@ -4,6 +4,9 @@
 #include "Importer_t7.hpp"
 #include "MovesetConverters.hpp"
 #include "GameIDs.hpp"
+#include "T8ToT7.hpp"
+#include <exception>
+#include <vector>
 
 #include "Structs_t7.h"
 
@@ -16,6 +19,33 @@ using namespace T7ImportUtils;
 
 // -- Private methods -- //
 
+ImportationErrcode_ ImporterT7::_Import_FromT8(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
+{
+	DEBUG_LOG("_Import_FromT8()\n");
+	if (header->minorVersion != GameVersions::T8::RETAIL) {
+		m_lastError = "Only retail Tekken 8 movesets convert to Tekken 7";
+		return ImportationErrcode_UnsupportedGameVersion;
+	}
+	// Self-contained conversion (the same T7 file for every target), then the normal T7 import of that file.
+	std::vector<Byte> file;
+	try {
+		file = T8ToT7::Convert(*header, { moveset, static_cast<size_t>(s_moveset) }, nullptr, true, ImportProfile::Read(*header));
+	}
+	catch (const std::bad_alloc&) {
+		m_lastError = "Not enough memory to convert the Tekken 8 moveset";
+		return ImportationErrcode_AllocationErr;
+	}
+	catch (const std::exception& error) {
+		m_lastError = std::string("Tekken 8 to Tekken 7 conversion failed: ") + error.what();
+		DEBUG_ERR("%s", m_lastError.c_str());
+		return ImportationErrcode_MovesetDataError;
+	}
+	progress = 10;
+	auto* converted = reinterpret_cast<const TKMovesetHeader*>(file.data());
+	return _Import_FromT7(converted, file.data() + converted->moveset_data_start, file.size() - converted->moveset_data_start,
+		playerAddress, settings, progress);
+}
+
 ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress)
 {
 	DEBUG_LOG("_Import_FromTTT2()\n");
@@ -26,12 +56,16 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 
 	TKMovesetHeaderBlocks t7_offsets;
 	if (!MovesetConverter::TTT2ToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
-		delete[] moveset;
+
 		return ImportationErrcode_AllocationErr;
 	}
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks * offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -44,6 +78,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
 	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
+		delete[] moveset;
 		return ImportationErrcode_GameAllocationErr;
 	}
 	progress = 40;
@@ -56,7 +91,11 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 	progress = 70;
 
 	if (!BASIC_LOAD) {
@@ -71,11 +110,11 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD, settings);
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + offsets->movelistBlock);
-	bool hasDisplayableMovelist = ((header->moveset_data_start + offsets->movelistBlock + 4) < s_moveset) &&
+	bool hasDisplayableMovelist = (s_moveset - offsets->movelistBlock >= 4) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
@@ -85,7 +124,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 
 	// -- Allocation & Conversion finished -- //
 
-	if (hasDisplayableMovelist)
+	if (hasDisplayableMovelist && !BASIC_LOAD)
 	{
 		gameAddr game_mvlHead = (gameAddr)gameMoveset + offsets->movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
@@ -99,7 +138,11 @@ ImportationErrcode_ ImporterT7::_Import_FromTTT2(const TKMovesetHeader* header, 
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process.writeBytes(gameMoveset, moveset, s_moveset);
+	if (!m_process.writeBytes(gameMoveset, moveset, s_moveset)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_GameAllocationErr;
+	}
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
@@ -145,12 +188,16 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 
 	TKMovesetHeaderBlocks t7_offsets;
 	if (!MovesetConverter::TREVToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
-		delete[] moveset;
+
 		return ImportationErrcode_AllocationErr;
 	}
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -163,6 +210,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
 	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
+		delete[] moveset;
 		return ImportationErrcode_GameAllocationErr;
 	}
 	progress = 40;
@@ -175,7 +223,11 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 	progress = 70;
 
 	if (!BASIC_LOAD) {
@@ -190,11 +242,11 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD, settings);
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + offsets->movelistBlock);
-	bool hasDisplayableMovelist = ((header->moveset_data_start + offsets->movelistBlock + 4) < s_moveset) &&
+	bool hasDisplayableMovelist = (s_moveset - offsets->movelistBlock >= 4) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
@@ -204,7 +256,7 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 
 	// -- Allocation & Conversion finished -- //
 
-	if (hasDisplayableMovelist)
+	if (hasDisplayableMovelist && !BASIC_LOAD)
 	{
 		gameAddr game_mvlHead = (gameAddr)gameMoveset + offsets->movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
@@ -218,7 +270,11 @@ ImportationErrcode_ ImporterT7::_Import_FromTREV(const TKMovesetHeader* header, 
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process.writeBytes(gameMoveset, moveset, s_moveset);
+	if (!m_process.writeBytes(gameMoveset, moveset, s_moveset)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_GameAllocationErr;
+	}
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
@@ -265,12 +321,16 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 
 	TKMovesetHeaderBlocks t7_offsets;
 	if (!MovesetConverter::T6ToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
-		delete[] moveset;
+
 		return ImportationErrcode_AllocationErr;
 	}
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -283,6 +343,7 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
 	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
+		delete[] moveset;
 		return ImportationErrcode_GameAllocationErr;
 	}
 	progress = 40;
@@ -295,7 +356,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 	progress = 70;
 
 	if (!BASIC_LOAD) {
@@ -310,11 +375,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD, settings);
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + offsets->movelistBlock);
-	bool hasDisplayableMovelist = ((header->moveset_data_start + offsets->movelistBlock + 4) < s_moveset) &&
+	bool hasDisplayableMovelist = (s_moveset - offsets->movelistBlock >= 4) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
@@ -324,7 +389,7 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 
 	// -- Allocation & Conversion finished -- //
 
-	if (hasDisplayableMovelist)
+	if (hasDisplayableMovelist && !BASIC_LOAD)
 	{
 		gameAddr game_mvlHead = (gameAddr)gameMoveset + offsets->movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
@@ -338,7 +403,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT6(const TKMovesetHeader* header, By
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process.writeBytes(gameMoveset, moveset, s_moveset);
+	if (!m_process.writeBytes(gameMoveset, moveset, s_moveset)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_GameAllocationErr;
+	}
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 
@@ -386,19 +455,23 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	TKMovesetHeaderBlocks t7_offsets;
 	if (header->minorVersion == GameVersions::T5::DR_ONLINE) {
 		if (!MovesetConverter::T5DRToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
-			delete[] moveset;
+
 			return ImportationErrcode_AllocationErr;
 		}
 	}
 	else {
 		if (!MovesetConverter::T5ToT7().Convert(header, moveset, s_moveset, t7_offsets)) {
-			delete[] moveset;
+
 			return ImportationErrcode_AllocationErr;
 		}
 	}
 
 	// List of data blocks within the moveset
 	const TKMovesetHeaderBlocks* offsets = &t7_offsets;
+	if (!ValidateT7Semantics(*offsets, moveset, s_moveset)) {
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 
 	// Table that contains offsets and amount of cancels, move, requirements, etc...
 	gAddr::MovesetTable* table;
@@ -411,6 +484,7 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	// The idea is to write on our moveset in our own memory (should be faster), then write it all at once on gameMoveset with a single m_process.writeBytes()
 	const gameAddr gameMoveset = m_process.allocateMem(s_moveset);
 	if (gameMoveset == 0) {
+		delete[] moveset;
 		return ImportationErrcode_GameAllocationErr;
 	}
 	progress = 40;
@@ -423,7 +497,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	CorrectMovesetInfoValues((MovesetInfo*)moveset, gameMoveset);
 
 	//Convert move offets into ptrs
-	ConvertMovesetIndexes(moveset, gameMoveset, table, offsets);
+	if (!ConvertMovesetIndexes(moveset, gameMoveset, table, offsets)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_MovesetDataError;
+	}
 	progress = 70;
 
 	if (!BASIC_LOAD) {
@@ -438,11 +516,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	progress = 80;
 
 	// Turn our mota offsets into mota ptrs, or copy the currently loaded character's mota for each we didn't provide
-	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD);
+	ConvertMotaListOffsets(offsets, moveset, gameMoveset, playerAddress, !BASIC_LOAD, settings);
 	progress = 90;
 
 	MvlHead* mvlHead = (MvlHead*)(moveset + offsets->movelistBlock);
-	bool hasDisplayableMovelist = ((header->moveset_data_start + offsets->movelistBlock + 4) < s_moveset) &&
+	bool hasDisplayableMovelist = (s_moveset - offsets->movelistBlock >= 4) &&
 		(strncmp(mvlHead->mvlString, "MVLT", 4) == 0);
 
 	if (hasDisplayableMovelist) {
@@ -452,7 +530,7 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 
 	// -- Allocation & Conversion finished -- //
 
-	if (hasDisplayableMovelist)
+	if (hasDisplayableMovelist && !BASIC_LOAD)
 	{
 		gameAddr game_mvlHead = (gameAddr)gameMoveset + offsets->movelistBlock;
 		ImportMovelist(mvlHead, game_mvlHead, playerAddress);
@@ -466,7 +544,11 @@ ImportationErrcode_ ImporterT7::_Import_FromT5(const TKMovesetHeader* header, By
 	}
 
 	// Finally write our moveset to the game's memory
-	m_process.writeBytes(gameMoveset, moveset, s_moveset);
+	if (!m_process.writeBytes(gameMoveset, moveset, s_moveset)) {
+		m_process.freeMem(gameMoveset);
+		delete[] moveset;
+		return ImportationErrcode_GameAllocationErr;
+	}
 	progress = 99;
 	DEBUG_LOG("-- Imported moveset at %llx --\n", gameMoveset);
 

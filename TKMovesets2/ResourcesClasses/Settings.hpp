@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <map>
 #include <set>
 #include <string>
@@ -7,6 +8,11 @@
 
 namespace Settings
 {
+	// Settings file: %APPDATA%\TKMovesets2\TKMSettings.ini, or TKMSettings.ini next to the exe when AppData cannot be resolved.
+	std::filesystem::path FilePath();
+	// Uses `path` instead of the default file (tests); an empty path restores the default.
+	void SetFilePath(const std::filesystem::path& path);
+
 	// Load a translation file for use with Localization::GetText(). Returns false if locale not found.
 	bool LoadFile();
 

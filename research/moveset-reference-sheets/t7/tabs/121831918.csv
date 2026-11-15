@@ -1,0 +1,278 @@
+Rquirement ID,Param,Condition,Note
+881,0,End,
+0,0,Always true,
+1,0,Practice Mode Demo,"Inside Practice mode movelist demo.
+E.g, Used in Claudio to go to Starburst Manually"
+2,"0, 1536",Attack To Throw,"Used for Hit-to-Throw transitions. 
+Works for all opponent directions (Front, Back, Left, Right).
+and Status (Standing, Crouching, Airborne etc)
+Parameter is distance
+E.g, DVJ, KAZ Heaven's Door"
+3,1536,Throw Hit Forward (Standing),
+4,1536,Throw Hit Backward (Standing),
+5,1536,Throw Hit Left Side (Standing),
+6,1536,Throw Hit Right Side (Standing),
+7,1536,Throw Hit Forward (Crouching),
+8,1536,Throw Hit Backward (Crouching),
+9,1536,Throw Hit Left Side (Crouching),
+10,1536,Throw Hit Right Side (Crouching),
+11,1900,Throw Hit Forward (Face Up),
+12,1900,Throw Hit Backward (Face Up),
+13,1900,Throw Hit Left Side (Face Up),
+14,1900,Throw Hit Right Side (Face Up),
+15,1900,Throw Hit Forward (Face Down),
+16,1900,Throw Hit Backward (Face Down),
+17,1900,Throw Hit Left Side (Face Down),
+18,1900,Throw Hit Right Side (Face Down),
+23,1536,Attack To Throw (Forward),
+24,1536,Attack To Throw (Backward),
+25,1536,Attack To Throw (Left Side),
+26,1536,Attack To Throw (Right Side),
+27,Any,Airborne Throw Hit Forward (Face Up),
+28,Any,Airborne Throw Hit Backward (Face Up),
+29,Any,Airborne Throw Hit Left Side (Face Up),
+30,Any,Airborne Throw Hit Right Side (Face Up),
+31,Any,Airborne Throw Hit Forward (Face Down),
+32,Any,Airborne Throw Hit Backward (Face Down),
+33,Any,Airborne Throw Hit Left Side (Face Down),
+34,Any,Airborne Throw Hit Right Side (Face Down),
+35,Any,Opponent distance smaller or equal than,1000 = 1.0 distance in framedata
+36,Any,Opponent distance greater  or equal than,1000 = 1.0 distance in framedata
+43,0,On Hit or Block (?),Must be used at active frames (?)
+44,0,On Hit,Must be used at active frames (?)
+47,0,On Block,Must be used at active frames
+48,0,On Whiff,Must be used at active frames
+49,0,On Hit / On Block,"Used when cancel happens after active frames. i.e, 2D cancels"
+50,0,Hit/Block related (?),
+51,0,On Hit,"Used when cancel happens after active frames. i.e, Story mode mid-battle cutscenes."
+61,VULN,Check Opponent VULN,
+62,Any,Opponent Current Attack has Damage,Opp. current attack doesn't have damage of 0
+63,Any,Opponent Current Attack has Damage + Opp. Standing,
+64,Any,Opponent Current Attack has Damage + Opp. Crouching,
+65,Any,Opponent Current Attack has NO Damage,Opp. current attack have a damage of 0
+66,0,Opponent Standing,
+67,0,Opponent Crouching,
+68,0,Incoming high attack,
+69,0,Incoming mid attack,
+70,0,Incoming low attack,
+71,0,Incoming high/mid attack,
+72,0,Character Backturned,player direction >= 0x4000 is considered backturned
+73,0,Character Not Backturned,"Includes facing Front, Left and Right
+player direction < 0x4000 is considered not backturned"
+76,0,Character Facing Direction >= param,
+77,0,Character Facing Direction < param,
+87,0,Collide with opponent(?),
+92,0,Opponent facing Forward,
+93,0,Opponent facing Left,
+94,0,Opponent facing Right,
+95,0,Opponent facing Backwards,
+96,0,Opponent facing Forward,
+97,0,Opponent facing Left,
+98,0,Opponent facing Right,
+99,0,Opponent facing Backwards,
+100,0,"Opponent is close, last active frame not reached, high attack",Enemy within 1792 units & his last active frame is not reached & his attack is high
+101,Any,Enemy first active frame - curr frame < X,
+102,Any,Enemy first active frame - curr frame >= X,
+103,Any,Enemy first active frame - curr frame = X,
+104,Any,Enemy last active frame - curr frame < X,
+105,Any,Enemy last active frame - curr frame >= X,
+106,Any,Enemy last active frame - curr frame = X,
+107,Any,Enemy current frame - last active frame <= X,Returns True if attack doesn't have first active frame
+108,Any,Player current frame - max anim length >= X,
+109,Any,Player move max anim length - Current frame > X,
+110,Any,Enemy move frame >= X,
+111,Any,Enemy move frame < X,
+112,Any,Enemy move frame == X,
+124,0,"Opponent is not airborne, up close (?)",Used for running tackle and to cancel running animation when up close
+126,0,Opponent is downed,
+127,0,Opponent is on their feet,
+128,0,"Opponent is downed, not airborne, up close (?)",Used for running stomp
+130,0,On Counter Hit,
+131,0,Pressed ONLY Left Punch,Throw Breaking
+132,0,Pressed ONLY Right Punch,Throw Breaking
+133,0,Pressed ONLY Left + Right Punch,Throw Breaking
+135,0,On Death,
+136,0,On Opponent's Death,
+137,0,Opponent Health < 50%,
+138,0 - 175,Player HP >= Param,Max param value is 32767
+139,0 - 175,Player HP < Param,Max param value is 32767
+140,0 - 175,Opponent HP >= Param,Max param value is 32767
+141,0 - 175,Opponent HP < Param,Max param value is 32767. Doesn't work in practice mode
+142,0 - 100,Player HP Percentage >= Param,
+143,0 - 100,Player HP Percentage < Param,
+144,0 - 175,Opponent HP <= Param,Max param value is 32767
+145,0 - 175,Player HP <= Param,Max param value is 32767
+146,0,Standing on the Left Side,
+147,0,Standing on the Right Side,
+148,0,Player on the Ground (Right Side),
+149,0,Player on the Ground (Left Side),
+155,0,If Player is Ki Charged,"Player must be Ki Charged (e.g Leo's d/b+1,1+2)"
+156,0,If Player is NOT Ki Charged,
+157,0 - 1,Player is in rage,0 = Player NOT in Rage. 1 = Player in Rage.
+171,9,Something input related (?),Used in Akuma to trigger his Rage Art after the moves that cancels into it.
+176,0,Geese is in max mode,Checks to see if Geese is in Max Mode
+182,"1, 2, 4, 8",Near Wall,"Used in throws for Wall Splats.
+Each value indicates a facing direction"
+190,0,Wallbreak Available,Used for stages like Howard Estate and G-Corp Helipad
+216,0,Something Wallsplat Related (?),Always present in wallsplat cancels
+217,?,Player character ID,
+218,?,Player NOT character ID,
+219,?,Oppponent character ID,
+220,?,Opponent NOT character ID,
+221,?,Player character ID,"In TTT2, This req was ""Partner Char ID"""
+222,?,Player NOT character ID,"In TTT2, This req was ""Partner NOT Char ID"""
+223,?,Oppponent character ID,Used in character intros
+224,?,Oppponent NOT character ID,Used in character intros
+225,"0-1,3",Player Character Controller,Player = 0 CPU = 1 Intro/Outro = 3
+226,"0-1,3",Opponent Character Controller,Player = 0 CPU = 1 Intro/Outro = 3
+253,?,Buff Counter Value >= param,"if Buff Counter Value >= param then true
+Param value 1 used to grant access to Bryan's taunt moves"
+255,?,Prop 0x807c Value >= param,if Extra Property 0x807c >= param then true
+256,1,Prop 0x807f >= param,Used in Bryan to buff him
+270,0-65535,Devil Flag >= param,
+273,?,Prop 0x80c8 >= param,
+274,?,Prop 0x80cb >= param,
+284,0x[Flag#][Value],Player Flag >= param,if prop 0x8106 value >= param then true
+285,0xAABB,Prop 0x810c >= param,AA: 0-15. BB: 0-65535 (In Decimal)
+286,?,"Prop 0x80ed >= param
+(AI Combo route)",
+307,?,Devil Flag <= param,
+308,?,Chloe Points <= param,Checks if you have Less or a equal number of points. Used in Chloe's RA
+310,?,Prop 0x80c8 <= param,
+311,?,Prop 0x80cb <= param,
+321,0x[Flag#][Value],Player Flag <= param,if prop 0x8106 value <= param then true
+322,0xAABB,Prop 0x810c <= param,AA: 0-15. BB: 0-65535 (In Decimal)
+323,?,"Prop 0x80ed <= param
+(AI Combo route)",
+329,?,Prop 0x807c == param,Checks if Extra Property 0x807c is storing the given parameter value or not
+344,0-65535,"Devil Flag == param
+(Kazuya is in Devil Form)",0 = Not in Devil Form 1 = Is in Devil Form
+345,?,Chloe Points == param,
+346,?,Prop 0x80c5 == param (2D cancel),Checks if Extra Property 0x80c5 is storing the given parameter value or not
+347,?,Prop 0x80c8 == param,
+348,?,Prop 0x80cb == param,
+351,0-1,Claudio Starburst,"0 = No Starburst required, 1 = Starburst required"
+352,0-?,"Prop 0x80a6 == param
+(Check Input/Wallsplat Flag)","Checks if Extra Property 0x80a6 is storing the given parameter value or not.
+Resets itself when returning to idle stance"
+353,0-?,Prop 0x80a9 == param,"Checks if Extra Property 0x80a9 is storing the given parameter value or not.
+Resets itself when returning to idle stance"
+359,0x[Flag#][Value],"Prop 0x8106 == param
+(Check Player Flag)","Checks flag activated by extra prop 0x8106
+Flag# - 0-99 AND Value - 0-65535
+Used in boss Kazuya, Heihachi and Akuma."
+360,0x[Flag#][Value],Prop 0x810c == param,"Checks flag activated by extra prop 0x810c
+Flag# - 0-15 AND Value - 0-65535"
+361,0-?,"Prop 0x80ed == param
+(AI Combo route)","Used for the AI. Checks the value stored in extraprop 0x80ed.
+Parameter indicates which combo route is picked."
+532,Any,Player Speed >= param,"4096 = 100%
+Spotted in boss Heihachi WGF"
+533,Any,Player Speed <= param,"4096 = 100%
+Spotted in boss Heihachi WGF"
+534,Any,Player Speed == param,"4096 = 100%
+Spotted in boss Heihachi WGF"
+552,?,Random Number Generator (Uniform),"Parameter represents a possible option value, must contain multiple 
+cancels of this requirement with different paramater values for this to have an effect"
+553,0-1000,Random Number Generator (Weighted),"Parameter determines the percentage the given requirement would succeed
+0 means 0%, 1000 means 100.0%
+Leroy's dog, Sugar, has a 40.0% chance of missing
+(CPU) Boss Kazuya's lasers also use it"
+556,0,Arcade Battle,"If current game mode is Arcade, then this is considered true"
+558,0,Story Battle,"Checks if the value of the Game Mode address is 4 or not
+If Yes then requirement is fulfilled"
+559,0-27,Story Battle Number,"Checks the value of a variable with given parameter.
+Doesn't work if Game Mode != Story Mode.
+E.g, 0 = Prologue, 27 = Special Chapter"
+560,0-?,Customization Mode Sequence,"Used to play intros/outros in customization mode.
+Parameter is the sequence number from the ""Sequence Selection"" table
+"
+563,0-10,Game Mode,Checks what Game Mode is running.
+564,?,Round Type?,"Value indicates if it's an intro and outro and within which game mode
+Requires research"
+569,?,Round Number?,Checks current round number
+573,Stage ID,Stage ID,"Checks the current loaded stage.
+Used in special stage intros (Geese, Kunimitsu)"
+574,Stage ID,Stage NOT ID,
+579,0 - 1,Player Check,"Checks if you are Player 1 or Player 2.
+Used to play correct Arcade mode animations
+E.g, Arcade Stage 4 & 5 intro."
+583,0,Character is Male,Used in Heihachi's Arcade cutscenes to play correct anim
+584,0,Character is Female,
+607,0,Opponent is Airborne,
+608,0,Opponent is Not Airborne,"Opponent is on their feet (Standing, Crouching)"
+609,Item ID,Has Item,Parameter is the Item ID.
+611,0,Yoshimitsu Sword Sheathed,Used to cancel to NSS moves
+614,0,Opponent is in juggle,
+615,0,Screw available,
+629,"0-1000 (Akuma, Eliza)
+0-1500 (Geese)","Meter >= param
+(Meter Check)",Checks if the Meter is equal or higher than X (param)
+634,0,Treasure Battle Special Match,
+636,0,Assist Button Pressed,"If Assist is On and Assist button is being held, this req is considered true
+Note: Only works in Story Mode"
+637,0,Check Match Point,Checks if player requires only 1 round to win the match
+639,0,Parry Zoom (?),"This causes the ""Weak"" effect from Leroy's b2 parry"
+641,0,Once Per Match,Checks if the move has already been used before. (e.g Leroy Pimp Cane)
+643,0,Kunimistu Mask Check,Checks if Kunimitsu is equipped with a mask. Used in her intro.
+765,0,Arcade Mode Cutscene,"Used to play special arcade intros
+0 = Arcade Stage 4 Heihachi
+7 = Arcade Stage 5 Akuma intro
+8 = Akuma outro"
+785,0,Projectile on-hit,
+786,0,Projectile on-block,
+807,Any,Prop 0x8414 >= param,
+808,Any,Prop 0x8414 <= param,
+809,Any,"Prop 0x8414 == param
+(Check Assist Combo Value)",Checks value for prop 0x8414 that is used in assist combos
+811,0,Basic Combo Enabled,"Checks if basic combo is enabled and being used
+Note: Works everywhere except story mode"
+813,"0-???
+For limb values see the 
+link in the attached note",Parry High,"Parameter determines filter to catch limb type, 0 = no filter
+Not includes stuff like Elbows, Knees, 
+Projectiles and Rage Arts even without any filter"
+814,0-???,Parry Mid,"Parameter determines filter to catch limb type, 0 = no filter
+Not includes stuff like Elbows, Knees, 
+Projectiles and Rage Arts even without any filter"
+815,0-???,Parry Low,"Parameter determines filter to catch limb type, 0 = no filter
+Not includes stuff like Elbows, Knees,
+Projectiles and Rage Arts even without any filter"
+816,0-???,Parry High and Mid,"Parameter determines filter to catch limb type, 0 = no filter
+Not includes stuff like Elbows, Knees, 
+Projectiles and Rage Arts even without any filter
+E.g, Param 9 = Right Punch as seen in King's and Josie's movelist
+Param 13 = Left Punch"
+817,?????,Parry Group,Parameter determines the type of attacks to parry
+830,0,Attack Absorption During Power Crush,
+842,0-???,Parry High,"Parameter determines filter to catch limb type, 0 = no filter"
+843,0-???,Parry Mid,"Parameter determines filter to catch limb type, 0 = no filter"
+844,0-???,Parry Low,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Leroy Hermit Stance"
+845,0-???,Parry High and Mid,"Parameter determines filter to catch limb type, 0 = no filter"
+846,?????,Parry Group,"Parameter determines the type of attacks to parry
+Seen in Leroy Hermit Stance"
+859,0-???,Parry High (Special),"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+860,0-???,Parry Mid (Special),"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+861,0-???,Parry Low (Special),"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Geese, Lei, Negan, and Leroy"
+862,0-???,Parry High and Mid (Special),"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+863,0-???,Parry High,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+864,0-???,Parry Mid,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+865,0-???,Parry Low,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Geese, Lei, Negan, and Leroy"
+866,0-???,Parry High and Mid,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+871,0-???,Parry High,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+872,0-???,Parry Mid,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"
+873,0-???,Parry Low,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Geese, Lei, Negan, and Leroy"
+874,0-???,Parry High and Mid,"Parameter determines filter to catch limb type, 0 = no filter
+Seen in Jin, Geese, and Leroy"

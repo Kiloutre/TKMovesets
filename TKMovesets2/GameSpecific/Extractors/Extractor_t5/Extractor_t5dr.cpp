@@ -457,7 +457,7 @@ Byte* ExtractorT5DR::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 			if (!exportedMotas.contains(motaAddr[i]))
 			{
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
-				m_game.ReadBytes(motaAddr[i], (char*)motaPtr, motaSize);
+				if (!m_game.ReadBytes(motaAddr[i], (char*)motaPtr, motaSize)) { free(customBlock); size_out = 0; return nullptr; }
 
 				if (motaPtr->IsValid(motaSize))
 				{
@@ -466,7 +466,11 @@ Byte* ExtractorT5DR::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 					if (motaPtr->IsBigEndian()) {
 						// Like the game does when they are big endianed, force every MOTA to be little endianed
 						// This helps provide a more deterministic extraction
-						TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr);
+						if (!TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr, motaSize)) {
+                            free(customBlock);
+                            size_out = 0;
+                            return nullptr;
+                        }
 					}
 				}
 				else
@@ -571,6 +575,10 @@ Byte* ExtractorT5DR::CopyAnimations(const Move* movelist, size_t moveCount, uint
 			return nullptr;
 		}
 
+        if (!animSize || animSize + prefix_size > (256ULL << 20) || totalSize > (256ULL << 20) - (animSize + prefix_size)) {
+            size_out = 0;
+            return nullptr;
+        }
 		offsets[animAddr] = totalSize;
 		animSizes[animAddr] = animSize;
 		totalSize += animSize + prefix_size;
@@ -593,10 +601,12 @@ Byte* ExtractorT5DR::CopyAnimations(const Move* movelist, size_t moveCount, uint
 
 		// Write anim data
 		int64_t animSize = animSizes[animAddr];
-		m_game.ReadBytes(animAddr, animationBlockCursor, animSize);
+		if (!m_game.ReadBytes(animAddr, animationBlockCursor, animSize)) { free(animationBlock); size_out = 0; return nullptr; }
 
 		if (!TAnimUtils::FromMemory::IsLittleEndian(anim_start)) {
-			TAnimUtils::FromMemory::ByteswapAnimation(anim_start);
+			if (!TAnimUtils::FromMemory::ByteswapAnimation(anim_start, animSize + prefix_size)) {
+                free(animationBlock); size_out = 0; return nullptr;
+            }
 		}
 
 		animationBlockCursor += animSize;
@@ -792,6 +802,7 @@ ExtractionErrcode_ ExtractorT5DR::Extract(gameAddr playerAddress, ExtractSetting
 
 	// Reads block containing basic moveset infos and aliases
 	CopyMovesetInfoBlock(movesetAddr, &movesetHeader);
+	movesetHeader.motas = motasList;
 	progress = 70;
 
 	// Now that we extracted everything, we can properly convert pts to indexes
@@ -878,7 +889,9 @@ ExtractionErrcode_ ExtractorT5DR::Extract(gameAddr playerAddress, ExtractSetting
 
 			file.close();
 
-			if (settings & ExtractSettings_Compress) {
+			if (!file) {
+				errcode = ExtractionErrcode_FileCreationErr;
+			} else if (settings & ExtractSettings_Compress) {
 				DEBUG_LOG("Saved temp moveset, compressing...\n");
 				if (!CompressionUtils::FILE::Moveset::Compress(filepath, tmp_filepath, ExtractorUtils::GetCompressionAlgorithm(settings))) {
 					errcode = ExtractionErrcode_CompressionFailure;

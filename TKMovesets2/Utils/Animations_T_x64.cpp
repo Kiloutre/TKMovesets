@@ -1,3 +1,8 @@
+#include "Animations.hpp"
+#include "AnimationReader.hpp"
+#include <array>
+#include <cmath>
+#include <vector>
 #include <stdint.h>
 #include <cstring>
 
@@ -7,11 +12,18 @@ typedef unsigned char Byte;
 
 // ============================= //
 
-# define READ(type, addr) (*(type*)(addr))
+template<class T> static T ReadUnaligned(const Byte* address)
+{
+    T value;
+    memcpy(&value, address, sizeof(value));
+    return value;
+}
+#define READ(type, addr) ReadUnaligned<type>(addr)
 
 struct s_weirdStack {
 	const Byte* anim_ptr;
-	int remainder;
+	const Byte* anim_end;
+	uint32_t remainder;
 	int starts_at_two;
 };
 
@@ -41,6 +53,7 @@ static int16_t sub_1407316F0(s_weirdStack* weirdStack, int a2)
 
 		for (unsigned int i = 0; i < iter_count; ++i)
 		{
+			if (weirdStack->anim_ptr == weirdStack->anim_end) throw std::out_of_range("Animation channel is truncated");
 			auto value = *weirdStack->anim_ptr;
 			remainder = value | (remainder << 8);
 
@@ -50,7 +63,7 @@ static int16_t sub_1407316F0(s_weirdStack* weirdStack, int a2)
 
 	int v7 = starts_at_two - a2;
 	weirdStack->starts_at_two = v7;
-	weirdStack->remainder = remainder & ~(0xFFFFFFFF << v7);
+	weirdStack->remainder = remainder & ((1u << v7) - 1);
 
 	return remainder >> v7;
 }
@@ -199,7 +212,7 @@ static int TK__Anim_64_sub_140733340(s_weirdStack* weirdStack, uint16_t* a2a_sho
 
 		default:
 			// This really should never happen and is a sign of a bad animation or a bad algorithm
-			throw;
+			throw std::invalid_argument("Invalid animation channel opcode");
 			break;
 		}
 	}
@@ -251,159 +264,83 @@ static unsigned int StoreBaseBoneValue(uint16_t bone_descriptor, const Byte* __a
 }
 
 
-namespace TAnimUtils
+
+namespace TAnimUtils::FromMemory
 {
-	namespace FromMemory
-	{
-		uint16_t ParseAnimation0x64(const Byte* anim, unsigned int frame, float* pos_out)
-		{
-			uint64_t boneCount = READ(uint16_t, anim + 2);
-
-			float pos_buffer[1552]{ 0 };
-
-			float float_bones_offsets[256];
-			int16_t v81_buf[768];
-
-			if (frame == 0) {
-				// Frame should be 1 for 1st frame
-				throw;
-				return 0;
-			}
-
-			if (boneCount >= 0x100) {
-				throw;
-				return 0;
-			}
-
-			// -- Get important informations about the animation (bone amount, length, amount of float bones, useful pointers) -- //
-
-			const uint16_t* bone_descriptors = (uint16_t*)(anim + 4);
-
-			uint64_t postBoneDescriptor_offset = (4 + boneCount * sizeof(uint16_t));
-			const Byte* anim_postBoneDescriptorAddr = (Byte*)(anim + postBoneDescriptor_offset);
-
-			uint64_t animLength = READ(uint16_t, anim_postBoneDescriptorAddr);
-			uint64_t float_final_value_shift = READ(Byte, anim_postBoneDescriptorAddr + 3);
-			uint64_t vv17 = READ(Byte, anim_postBoneDescriptorAddr + 2);
-
-			uint64_t float_bones_amount = READ(uint16_t, anim_postBoneDescriptorAddr + 4); // Amount of bones that are in float format
-
-			for (unsigned int i = 0; i < float_bones_amount; ++i) {
-				// Offsets to apply to each float bone (one value = applied to all three axes)
-				float_bones_offsets[i] = READ(float, anim_postBoneDescriptorAddr + 6 + i * sizeof(float));
-			}
-
-			int short_value_shift = vv17 & 0x7F; // Short values are shifted by this amount both in base pos & actual animation data
-
-			if (frame > animLength) {
-				frame = (unsigned int)animLength;
-			}
-
-			uint64_t base_pos_offset = 2 * ((4 * float_bones_amount + 6) / 2); // Offset of the base position, relative to the animation post-bone descriptor
-			uint64_t base_pose_size = (boneCount * sizeof(uint16_t) * 3) + (float_bones_amount * sizeof(uint16_t) * 3);
-
-			// -- Parse the base pos which is a bunch of short/floats, filling some other buffers in the process with the base pos data -- //
-			{
-				const Byte* __anim_ptr = &anim_postBoneDescriptorAddr[base_pos_offset];
-
-				// Fill output buffer with base pos
-				float* base_pos = pos_buffer;
-				for (unsigned int i = 0; i < boneCount; ++i) {
-					__anim_ptr += StoreBaseBoneValue(bone_descriptors[i], __anim_ptr, &base_pos[i * 3], &v81_buf[i * 3], short_value_shift);
-					memcpy(&pos_out[i * 3], &base_pos[i * 3], sizeof(float) * 3);
-				}
-			}
-
-			// -- Parse the frame we are looking for and add it to the base pos -- //
-
-			// This is the post base-pose ptr
-			const Byte* animPtr = &anim_postBoneDescriptorAddr[base_pos_offset + base_pose_size];
-
-			// Calculate the keyframe to read from and its offset (-1 because input frame starts at 1 and not 0)
-			unsigned int baseFrame = frame - 1;
-
-			if (baseFrame == 0) {
-				// Base pos is sufficient, no extra animation data to apply
-				return (uint16_t)boneCount;
-			}
-
-			unsigned int targetSubKeyframe = baseFrame & 0xF; // Remove any bits at 16 and over : isolate the sub-keyframe number (0 - 16 - 32 - 48 - 64...)
-			int keyframe = baseFrame / 16;
-			unsigned int keyframe_offset = *(unsigned int*)(animPtr + 4 * keyframe);
-			const Byte* current_value_ptr = animPtr + keyframe_offset;
-
-
-			const uint16_t* bone_descriptors_ptr = bone_descriptors;
-			const float* float_bones_offsets_ptr = float_bones_offsets;
-			float* base_pos = pos_buffer;
-
-			s_weirdStack weirdStack;
-			uint16_t a2a_short;
-			int __x1 = 0;
-			int __x2 = 0;
-
-			int16_t* v81_buf_ptr = v81_buf;
-
-			// Loop on each bone
-			for (unsigned int j = 0; j < boneCount; ++j)
-			{
-				// Loop on eaxh axis. XYZ, probably not in that order though iirc 
-				for (int i = 0; i < 3; ++i)
-				{
-					Byte currentAnimValue = *current_value_ptr;
-
-					int next_value_offset = currentAnimValue >> 2; // Offset to add to get to the next byte to read
-					int offset_remainder = currentAnimValue & 3;
-
-					weirdStack.anim_ptr = current_value_ptr + 1;
-					weirdStack.remainder = offset_remainder;
-					weirdStack.starts_at_two = 2;
-
-					a2a_short = 0;
-					*v81_buf_ptr += TK__Anim_64_sub_140733340(&weirdStack, &a2a_short, &__x1, &__x2);
-
-					if (targetSubKeyframe)
-					{
-						// If we're in the middle of two keyframes, fetch the required data on what are seemingly the next frames to properly created the desired in-between
-						int sum = 0;
-						for (unsigned int subkeyframe = 0; subkeyframe < targetSubKeyframe; ++subkeyframe)
-						{
-							int result = TK__Anim_64_sub_140733340(&weirdStack, &a2a_short, &__x1, &__x2);
-							if (result == 0xF0000000) { // End value
-								break;
-							}
-							sum += result;
-							*v81_buf_ptr += sum;
-						}
-					}
-
-					int value = *v81_buf_ptr;
-
-					if (isBoneShort(*bone_descriptors_ptr)) {
-						// value was shifted right by [short_value_shift] in StoreBaseBoneValue, is shifted back here
-						*pos_out = (float)(value << short_value_shift) * mult_const;
-					}
-					else {
-						// Floats are apparently the only ones to build directly upon the base pos? I'm not sure how that works.
-						*pos_out = (float)((float)(value << float_final_value_shift) * *float_bones_offsets_ptr) + *base_pos;
-					}
-
-					++pos_out;
-					++base_pos;
-					++v81_buf_ptr;
-					current_value_ptr += next_value_offset;
-				}
-
-				if (!isBoneShort(*bone_descriptors_ptr)) {
-					// Increment the float offset (every float bone has an offset that it applies to all three axes)
-					float_bones_offsets_ptr++;
-				}
-
-				++bone_descriptors_ptr;
-			}
-
-			return (uint16_t)boneCount;
-		}
-
-	}
-};
+uint16_t ParseAnimation0x64(std::span<const Byte> bytes, unsigned int frame, std::span<float> output)
+{
+    try {
+        auto layout = ReadAnimationLayout(bytes);
+        if (layout.type != 0x64 || !frame || output.size() < layout.bones * 3)
+            return 0;
+        std::vector<Byte> normalized;
+        if (layout.swapped) {
+            normalized.assign(bytes.begin(), bytes.begin() + layout.size);
+            if (!ByteswapAnimation(normalized.data(), normalized.size())) return 0;
+            bytes = normalized;
+            layout = ReadAnimationLayout(bytes);
+        }
+        AnimationReader input(bytes);
+        const Byte* anim = bytes.data();
+        const auto shortShift = input.Read<Byte>(layout.postDescriptors + 2) & 0x7f;
+        const auto floatShift = input.Read<Byte>(layout.postDescriptors + 3);
+        if (shortShift > 15 || floatShift > 31) return 0;
+        std::array<float, 255 * 3> positions{};
+        std::array<float, 255> floatOffsets{};
+        std::array<int16_t, 255 * 3> values{};
+        for (size_t i = 0; i < layout.floatBones; ++i)
+            floatOffsets[i] = input.Read<float>(layout.postDescriptors + 6 + i * 4);
+        size_t pose = layout.basePose;
+        for (size_t i = 0; i < layout.bones; ++i) {
+            auto descriptor = input.Read<uint16_t>(4 + i * 2);
+            pose += StoreBaseBoneValue(descriptor, anim + pose, positions.data() + i * 3,
+                values.data() + i * 3, shortShift);
+        }
+        frame = (std::min)(frame, layout.frames);
+        if (frame > 1) {
+            const unsigned baseFrame = frame - 2;
+            const unsigned subframe = baseFrame & 15;
+            const size_t keyframe = baseFrame / 16;
+            const size_t chunks = (layout.frames + 14) / 16;
+            if (keyframe >= chunks) return 0;
+            size_t cursor = layout.keyframes + input.Read<uint32_t>(layout.keyframes + keyframe * 4);
+            size_t floatBone = 0;
+            int width = 0, bias = 0;
+            for (size_t bone = 0; bone < layout.bones; ++bone) {
+                auto descriptor = input.Read<uint16_t>(4 + bone * 2);
+                for (size_t axis = 0; axis < 3; ++axis) {
+                    const auto prefix = input.Read<Byte>(cursor);
+                    const size_t length = prefix >> 2;
+                    input.Require(cursor, length);
+                    if (!length) return 0;
+                    s_weirdStack state{anim + cursor + 1, anim + cursor + length,
+                        static_cast<uint32_t>(prefix & 3), 2};
+                    uint16_t repeat = 0;
+                    const size_t index = bone * 3 + axis;
+                    values[index] = static_cast<int16_t>(static_cast<uint16_t>(values[index]) +
+                        TK__Anim_64_sub_140733340(&state, &repeat, &width, &bias));
+                    int sum = 0;
+                    for (unsigned step = 0; step < subframe; ++step) {
+                        int delta = TK__Anim_64_sub_140733340(&state, &repeat, &width, &bias);
+                        if (static_cast<uint32_t>(delta) == 0xf0000000) break;
+                        sum += delta;
+                        values[index] = static_cast<int16_t>(static_cast<uint16_t>(values[index]) + sum);
+                    }
+                    if (isBoneShort(descriptor))
+                        positions[index] = std::ldexp(static_cast<float>(values[index]), shortShift) * mult_const;
+                    else
+                        positions[index] += std::ldexp(static_cast<float>(values[index]), floatShift) * floatOffsets[floatBone];
+                    cursor += length;
+                }
+                if (!isBoneShort(descriptor)) ++floatBone;
+            }
+        }
+        for (size_t i = 0; i < layout.bones * 3; ++i)
+            if (!std::isfinite(positions[i])) return 0;
+        std::copy_n(positions.begin(), layout.bones * 3, output.begin());
+        return layout.bones;
+    } catch (const std::exception&) {
+        return 0;
+    }
+}
+}

@@ -156,7 +156,7 @@ void TEditorGroupedCancels::RenderExtraContextMenuItems()
 	ImVec2 selectableSize(0, ImGui::GetFrameHeightWithSpacing());
 
 	ImGuiExtra::DisableBlockIf __(true);
-	if (ImGui::Selectable(_("edition.form_popup.edition.form_popup.what_moves_use_this_cancel_list "), false, 0, selectableSize))
+	if (ImGui::Selectable(_("edition.form_popup.what_references_this_cancel"), false, 0, selectableSize))
 	{
 		//todo
 	}

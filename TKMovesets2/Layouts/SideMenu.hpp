@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <atomic>
 #include <string>
 
 #include "GameAddressesFile.hpp"
@@ -12,7 +13,7 @@ struct s_updateStatus {
 	bool addrFile = false;
 	bool programUpdateAvailable = false;
 	bool up_to_date = false; // up_to_date is only used to show 'Up to date' (true) text or nothing
-	bool verifying = false;
+	std::atomic_bool verifying = false;
 	bool verifiedOnce = false; // Used to properly join the thread.
 	std::string tagName;
 	std::string tagNameSeparatorText;
@@ -23,6 +24,10 @@ struct s_updateStatus {
 class SideMenu
 {
 private:
+    char m_extractionFolder[32768]{};
+    char m_additionalFolder[32768]{};
+    std::string m_folderError;
+    void RenderFolderSettings();
 	// List of translations to display
 	const TranslationData* m_translations;
 	// Settings
@@ -33,8 +38,6 @@ private:
 		uint8_t m_vsync_setting;
 		// True if the settings menu is open
 		bool m_settingsMenuOpen = false;
-		// Extraction: Whether to overwrite moveset extracted with similar character names or use number suffixes
-		bool m_overwriteSameFilename;
 		// Whether to check for program updates at startup or not
 		bool m_auto_update_check;
 		// Whether to download address updates at startup or not
@@ -72,6 +75,8 @@ private:
 public:
 	// Ptr to MainProgram.requestedUpdate, set to true when updating in order to close the program
 	bool* requestedUpdatePtr = nullptr;
+	// Character list storage, refreshed when the character folders change
+	class LocalStorage* storage = nullptr;
 
 	SideMenu();
 	~SideMenu();

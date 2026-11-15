@@ -58,6 +58,8 @@ public:
 	~TEditorMove_Animations();
 	// Read the library for every animation
 	void LoadAnimationList();
+	// Path picked with "Import from file" (animationToImport points into it)
+	std::wstring m_browsedPath;
 	// Render the popup/window. Returns false if closed.
 	bool Render();
 };

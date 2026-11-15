@@ -2,33 +2,41 @@
 
 void GameSharedMem::OnProcessAttach()
 {
+	auto state = LockState();
 	InstantiateFactory();
 	m_plannedImportations.clear();
 }
 
 void GameSharedMem::OnProcessDetach()
 {
+	auto state = LockState();
 	isMemoryLoaded = false;
 	isInjecting = false;
 	m_requestedInjection = false;
 	lockedIn = false;
+	versionMismatch = false;
 	displayedMovesets.clear();
+	if (m_sharedMemHandler) m_sharedMemHandler->FreeSharedMemory();
 }
 
 void GameSharedMem::InstantiateFactory()
 {
+	auto state = LockState();
 	// Delete old instances if needed
-	m_toFree_importer = m_importer;
-	m_toFree_sharedMemHandler = m_sharedMemHandler;
+	m_importer.reset();
+	delete m_sharedMemHandler;
+	m_sharedMemHandler = nullptr;
 
 	game.SetCurrentGame(currentGame);
-	// Every game has its own subtleties so we use polymorphism to manage that
-	m_importer = currentGame->importer == nullptr ? nullptr : Games::FactoryGetImporter(currentGame, process, game);
+	// Game might not have an importer, but it does not matter.
+	m_importer.reset(currentGame->importer == nullptr ? nullptr : Games::FactoryGetImporter(currentGame, process, game));
 	m_sharedMemHandler = Games::FactoryGetOnline(currentGame, process, game);
 }
 
 void GameSharedMem::RunningUpdate()
 {
+	auto state = LockState();
+	if (!m_sharedMemHandler) return;
 	// Atempt to load the shared memory if needed
 	if (!m_sharedMemHandler->IsMemoryLoaded()) {
 		// Update cached variable to avoid external code having to access .sharedMemHandler 
@@ -36,7 +44,7 @@ void GameSharedMem::RunningUpdate()
 		if (isMemoryLoaded) {
 			isInjecting = false;
 			m_requestedInjection = false;
-			versionMismatch = m_sharedMemHandler->versionMismatch;
+			versionMismatch = m_sharedMemHandler->VerifyDllVersionMismatch();
 		}
 		else if (isInjecting) {
 			// Memory loaded, check if we were requested to inject the DLL in the past
@@ -58,15 +66,14 @@ void GameSharedMem::RunningUpdate()
 		if (synchronizeLockin) {
 			m_sharedMemHandler->SetLockIn(lockedIn, movesetLoaderMode);
 		}
-		if (m_sharedMemHandler->versionMismatch) {
-			m_sharedMemHandler->VerifyDllVersionMismatch();
-		}
+		// Checked on every tick: the loader may still have been writing its version when the memory got loaded
+		versionMismatch = m_sharedMemHandler->VerifyDllVersionMismatch();
 	}
 
 
 	while (IsBusy())
 	{
-		auto& [moveset, settings, playerId] = m_plannedImportations[0];
+		auto [moveset, settings, playerId] = m_plannedImportations[0];
 
 		// The only case where .size can be 0 is if a Submenu purposefully set it that way, to indicate that we want to clear the selection
 		if (moveset.size == 0) {
@@ -76,7 +83,12 @@ void GameSharedMem::RunningUpdate()
 		else
 		{
 			ImportationErrcode_ errcode;
-			errcode = m_importer->Import(moveset.filename.c_str(), 0, settings, progress);
+            uint8_t operationProgress = 0;
+            progress = 0;
+            errcode = RunOutsideState(state, [&] {
+                return m_importer ? m_importer->Import(moveset.filename.c_str(), 0, settings, operationProgress) : ImportationErrcode_MovesetDataError;
+            });
+            progress = operationProgress;
 
 			// Send the successfully loaded moveset to the shared memory manager
 			if (errcode == ImportationErrcode_Successful) {
@@ -84,7 +96,7 @@ void GameSharedMem::RunningUpdate()
 				m_sharedMemHandler->OnMovesetImport(&moveset, playerId, lastLoaded);
 				m_plannedImportations.erase(m_plannedImportations.begin());
 			} else {
-				m_errors.push_back(errcode);
+				m_errors.emplace_back(errcode,m_importer ? m_importer->LastError() : std::string{});
 				m_plannedImportations.clear();
 			}
 		}
@@ -106,6 +118,8 @@ void GameSharedMem::RunningUpdate()
 
 void GameSharedMem::QueueCharacterImportation(movesetInfo* moveset, unsigned int playerId, ImportSettings settings)
 {
+	auto state = LockState();
+	if (!moveset || playerId >= GetCharacterCount()) return;
 	m_plannedImportations.push_back({
 		.moveset = *moveset,
 		.settings = settings,
@@ -115,63 +129,39 @@ void GameSharedMem::QueueCharacterImportation(movesetInfo* moveset, unsigned int
 
 bool GameSharedMem::IsBusy() const
 {
-	return m_plannedImportations.size() > 0;
+	auto state = LockState();
+	return m_executingOperation || m_plannedImportations.size() > 0;
 }
 
 void GameSharedMem::InjectDll()
 {
+	auto state = LockState();
 	isInjecting = true;
 }
 
 void GameSharedMem::StopThreadAndCleanup()
 {
 	// Order thread to stop
-	m_threadStarted = false;
-	m_t.join();
+	ThreadedClass::StopThreadAndCleanup();
+	auto state = LockState();
 
 	if (m_sharedMemHandler != nullptr) {
 		if (process.IsAttached() && m_importer != nullptr) {
 			m_importer->CleanupUnusedMovesets();
 		}
 		delete m_sharedMemHandler;
-		delete m_importer;
+		m_importer.reset();
+		m_sharedMemHandler = nullptr;
 	}
+	m_plannedImportations.clear();
 }
 
 void GameSharedMem::FreeExpiredFactoryClasses()
 {
-	if (m_toFree_importer) {
-		delete m_toFree_importer;
-		delete m_toFree_sharedMemHandler;
-
-		if (m_toFree_importer == m_importer) {
-			m_importer = nullptr;
-		}
-		if (m_toFree_sharedMemHandler == m_sharedMemHandler) {
-			m_sharedMemHandler = nullptr;
-		}
-
-		m_toFree_importer = nullptr;
-		m_toFree_sharedMemHandler = nullptr;
-	}
+    // Factory lifetime is synchronized with the worker and rendering frame.
 }
 
 void GameSharedMem::ResetTargetProcess()
 {
-	if (process.IsAttached())
-	{
-		PreProcessDetach();
-		process.Detach();
-		OnProcessDetach();
-	}
-
-	currentGame = nullptr;
-
-	if (m_importer != nullptr) {
-		m_toFree_importer = m_importer;
-	}
-
-	if (m_sharedMemHandler != nullptr) {
-		m_toFree_sharedMemHandler = m_sharedMemHandler;
-	}
+    GameInteraction::ResetTargetProcess();
 }

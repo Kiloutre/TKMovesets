@@ -5,10 +5,14 @@
 
 #include "constants.h"
 
+#include <atomic>
+
 // Store info globally that way repeated calls to MovesetLoaderStart() won't start multiple loaders
 HINSTANCE hModule = nullptr;
 MovesetLoader* g_loader = nullptr;
 bool g_loading = false;
+// True once a thread entered the main loop: a second MovesetLoaderRun() call must never start another one
+std::atomic_bool g_running = false;
 
 // -- Debug console -- //
 // Only if in debug mode
@@ -74,7 +78,10 @@ bool MovesetLoader::Init()
     if (m_loadSteam)
     {
         DEBUG_LOG("Initializing steam API...\n");
-        SteamHelper::Init(GetModuleHandleA("steam_api64.dll"));
+        if (!SteamHelper::Init(GetModuleHandleA("steam_api64.dll"))) {
+            DEBUG_ERR("Required Steam interfaces are unavailable");
+            return false;
+        }
     }
 
     // Initialize the list of hooks and error out if a required one is not found
@@ -115,7 +122,8 @@ bool MovesetLoader::Init()
         return false;
     }
     memset(orig_sharedMemPtr, 0, SHARED_MEMORY_BUFSIZE);
-    strcpy_s(orig_sharedMemPtr->moveset_loader_version, sizeof(orig_sharedMemPtr->moveset_loader_version), "test");
+    // Read by the tool to refuse calling into a loader built from another version
+    strcpy_s(orig_sharedMemPtr->moveset_loader_version, sizeof(orig_sharedMemPtr->moveset_loader_version), PROGRAM_VERSION);
 
     OnInitEnd();
     return true;
@@ -133,7 +141,7 @@ void MovesetLoader::InitHook(const char* hookName, uint64_t originalAddr, uint64
 
     // Initialize the original function's hook
     hook.originalAddress = originalAddr;
-    hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline, m_disassembler);
+    hook.detour = new PLH::x64Detour(originalAddr, newAddr, &hook.trampoline);
 }
 
 void MovesetLoader::SetMainModule(const char* name)
@@ -202,10 +210,9 @@ uint64_t MovesetLoader::GetFunctionAddr(const char* functionName) const
 void MovesetLoader::HookFunction(const char* functionName)
 {
     auto hook = m_hooks.find(functionName);
-    if (hook != m_hooks.end() && !hook->second.isHooked) {
-        DEBUG_LOG("Hook %s\n", functionName);
-        hook->second.detour->hook();
-        hook->second.isHooked = true;
+    if (hook != m_hooks.end() && hook->second.detour != nullptr && !hook->second.isHooked) {
+        DEBUG_LOG("Hook %s (orig addr %llx)\n", functionName, hook->second.originalAddress);
+        hook->second.isHooked = hook->second.detour->hook();
     }
     else {
         DEBUG_ERR("MovesetLoader::HookFunction() : Could not find %s", functionName);
@@ -215,9 +222,9 @@ void MovesetLoader::HookFunction(const char* functionName)
 void MovesetLoader::UnhookFunction(const char* functionName)
 {
     auto hook = m_hooks.find(functionName);
-    if (hook != m_hooks.end() && hook->second.isHooked) {
+    if (hook != m_hooks.end() && hook->second.detour != nullptr && hook->second.isHooked) {
         DEBUG_LOG("Unhook %s\n", functionName);
-        hook->second.detour->hook();
+        hook->second.detour->unHook();
         hook->second.isHooked = false;
     }
     else {
@@ -227,16 +234,21 @@ void MovesetLoader::UnhookFunction(const char* functionName)
 
 // -- Static helper -- //
 
-static bool Init()
+static MovesetLoaderInitStatus_ Init()
 {
     // Safety in case this function is called multiple times
     if (g_loader != nullptr && g_loader->isInitialized()) {
-        DEBUG_LOG("Loader already started: not starting again\n");
-        return false;
+        if (g_running) {
+            DEBUG_LOG("Loader already started: not starting again\n");
+            return MovesetLoaderInitStatus_AlreadyRunning;
+        }
+        // Initialized but the main loop was never entered: let the caller run it (Run() refuses a second loop)
+        DEBUG_LOG("Loader already initialized, main loop not started yet\n");
+        return MovesetLoaderInitStatus_Started;
     }
     if (g_loading) {
         DEBUG_LOG("Loader already starting...\n");
-        return false;
+        return MovesetLoaderInitStatus_Failed;
     }
 
     g_loading = true;
@@ -256,14 +268,13 @@ static bool Init()
             g_loader = new MovesetLoaderT7;
         }
         else if (processName == "Polaris-Win64-Shipping.exe") {
-                g_loader = new MovesetLoaderT8;
-            }
+            g_loader = new MovesetLoaderT8;
+        }
         else {
             DEBUG_LOG("Unknown process name: '%s'\n", processName.c_str());
             g_loading = false;
-            return false;
+            return MovesetLoaderInitStatus_Failed;
         }
-        g_loading = false;
         g_loader->SetMainModule(processName.c_str());
     }
 
@@ -273,20 +284,28 @@ static bool Init()
         DEBUG_LOG("Error during MovesetLoader::Init()\n");
         delete g_loader;
         g_loader = nullptr;
-        return false;
+        g_loading = false;
+        return MovesetLoaderInitStatus_Failed;
     }
-    return true;
+    g_loading = false;
+    return MovesetLoaderInitStatus_Started;
 }
 
 static void Run()
 {
     if (g_loader != nullptr)
     {
+        if (g_running.exchange(true)) {
+            DEBUG_LOG("Mainloop already running: not starting another one.\n");
+            return;
+        }
         DEBUG_LOG("Starting mainloop.\n");
         g_loader->Mainloop();
         DEBUG_LOG("Mainloop stopped. Unloading the DLL.\n");
         // If mainloop is stopped then we have no reason to let the DLL stay as loaded
         delete g_loader;
+        g_loader = nullptr;
+        g_running = false;
         FreeLibraryAndExitThread(hModule, 0);
     }
 }
@@ -296,12 +315,13 @@ static void Run()
 
 extern "C"
 {
-    bool __declspec(dllexport) MovesetLoaderInit()
+    // Returns a MovesetLoaderInitStatus_ as a full 32-bit value (the caller reads it as the remote thread's exit code)
+    DWORD __declspec(dllexport) MovesetLoaderInit()
     {
         DEBUG_LOG("MovesetLoaderInit\n");
-        bool res = Init();
-        DEBUG_LOG("MovesetLoaderInit() -> return(%d)\n", res);
-        return res;
+        MovesetLoaderInitStatus_ res = Init();
+        DEBUG_LOG("MovesetLoaderInit() -> return(%d)\n", (int)res);
+        return (DWORD)res;
     }
 
     void __declspec(dllexport) MovesetLoaderRun()

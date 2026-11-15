@@ -1,4 +1,13 @@
 #pragma once
+#include <type_traits>
+#include <stdexcept>
+#include <memory>
+#include <span>
+#include <string_view>
+#include <optional>
+#include <cstring>
+#include <stdexcept>
+#include "RecordEdit.hpp"
 
 #include <ImGui.h>
 #include <string>
@@ -134,8 +143,23 @@ struct EditorInput
 	bool visible = true;
 	// Contains true if the buffer contains invalid data
 	bool errored = false;
+	// Text of the last applied value, for changed-field marking (set by editors that use it, unset otherwise)
+	std::optional<std::string> savedText;
 	// Used to implement pasting from clipboard. Can't write into a focused field.
-	std::string nextValue;
+	std::optional<std::string> nextValue;
+    void QueueValue(std::string value) {
+        if (!buffer || !bufsize || value.size() >= bufsize || value.find('\0') != value.npos)
+            throw std::length_error("Pasted text does not fit this field.");
+        nextValue = std::move(value);
+    }
+    bool ConsumeNextValue() {
+        if (!nextValue) return false;
+        if (!buffer || !bufsize || nextValue->size() >= bufsize || nextValue->find('\0') != nextValue->npos)
+            throw std::length_error("Pending text does not fit this field.");
+        memcpy(buffer, nextValue->c_str(), nextValue->size() + 1);
+        nextValue.reset();
+        return true;
+    }
 };
 
 // Pre-calculate these flags in order to color-code, sort and filter the movelist
@@ -170,7 +194,45 @@ struct DisplayableMove
 	EditorMoveFlags flags;
 };
 
-typedef std::map<FasterStringComp, EditorInput*> InputMap;
+struct DeleteEditorInput {
+    void operator()(EditorInput* field) const noexcept {
+        if (field) { delete[] field->buffer; delete field; }
+    }
+};
+using OwnedEditorInput = std::unique_ptr<EditorInput, DeleteEditorInput>;
+
+// Own fields and buffers; category/draw-order maps only borrow their pointers.
+// Copying would duplicate ownership, so factory returns and row transfers must move.
+class InputMap : private std::map<FasterStringComp, EditorInput*> {
+    using Base = std::map<FasterStringComp, EditorInput*>;
+public:
+    using Base::size; using Base::empty; using Base::contains;
+    auto begin() const noexcept { return Base::begin(); }
+    auto end() const noexcept { return Base::end(); }
+    auto find(const FasterStringComp& name) const { return Base::find(name); }
+    EditorInput* const& at(const FasterStringComp& name) const { return Base::at(name); }
+    EditorInput* const& operator[](const FasterStringComp& name) const { return Base::at(name); }
+    InputMap() = default;
+    InputMap(const InputMap&) = delete;
+    InputMap& operator=(const InputMap&) = delete;
+    InputMap(InputMap&& other) noexcept { Base::swap(other); }
+    InputMap& operator=(InputMap&& other) noexcept {
+        if (this != &other) { clear(); Base::swap(other); }
+        return *this;
+    }
+    ~InputMap() { clear(); }
+    void clear() noexcept {
+        for (auto& [name, field] : *this) DeleteEditorInput{}(field);
+        Base::clear();
+    }
+    void swap(InputMap& other) noexcept { Base::swap(other); }
+    EditorInput* Own(const std::string& name, OwnedEditorInput field) {
+        if (!field) throw std::invalid_argument("Cannot own a null editor field.");
+        if (!Base::emplace(name, field.get()).second)
+            throw std::invalid_argument("Duplicate editor field: " + name);
+        return field.release();
+    }
+};
 
 namespace EditorUtils
 {
@@ -181,7 +243,32 @@ namespace EditorUtils
 	// Used for color coding input fields
 	void SetInputfieldColor(EditorInput* field);
 	// Returns a format depending on the input type
-	constexpr const char* GetFieldFormat(EditorInputFlag flags);
+	// Defined here: constexpr functions are inline, and the templates below use it from other files.
+	constexpr const char* GetFieldFormat(EditorInputFlag flags)
+	{
+		if (flags & (EditorInput_H64)) {
+			return "0x%llX";
+		}
+		if (flags & (EditorInput_H32 | EditorInput_H16 | EditorInput_H8)) {
+			return "0x%X";
+		}
+		if (flags & EditorInput_S64) {
+			return "%lld";
+		}
+		if (flags & EditorInput_U64) {
+			return "%llu";
+		}
+		if (flags & (EditorInput_U32 | EditorInput_U16 | EditorInput_U8)) {
+			return "%u";
+		}
+		if (flags & (EditorInput_Float)) {
+			return "%.7g";
+		}
+		if (flags & (EditorInput_String)) {
+			return "%s";
+		}
+		return "%d";
+	}
 	// Returns an imgui Input() charset depending on the input type
 	ImGuiInputTextFlags GetFieldCharset(EditorInputFlag flags);
 	// Returns an field value, parsing it as a hex or regular int depending on the type
@@ -196,7 +283,7 @@ namespace EditorUtils
 	template <typename T>
 	EditorInput* CreateField(const std::string& fieldName, VectorSet<std::string>& drawOrder, InputMap& inputMap, uint8_t category, uint32_t flags, T value, uint32_t bufsize = 0)
 	{
-		drawOrder.push_back(fieldName);
+		if (inputMap.contains(fieldName)) throw std::invalid_argument("Duplicate editor field: " + fieldName);
 
 		if (bufsize == 0)
 		{
@@ -209,26 +296,32 @@ namespace EditorUtils
 			}
 		}
 
-		EditorInput* newField = new EditorInput{
+		auto buffer = std::make_unique<char[]>(bufsize);
+		OwnedEditorInput newField(new EditorInput{
 			.name = fieldName,
 			.category = category,
 			.imguiInputFlags = EditorUtils::GetFieldCharset(flags),
 			.flags = flags,
-			.buffer = new char[bufsize],
+			.buffer = buffer.get(),
 			.bufsize = bufsize,
-		};
-
-		inputMap[fieldName] = newField;
-		EditorUtils::SetInputfieldColor(newField);
-		sprintf_s(newField->buffer, newField->bufsize, EditorUtils::GetFieldFormat(flags), value);
-
-		return newField;
+        });
+        buffer.release();
+        EditorUtils::SetInputfieldColor(newField.get());
+        if (_snprintf_s(newField->buffer, newField->bufsize, _TRUNCATE, EditorUtils::GetFieldFormat(flags), value) < 0)
+            throw std::length_error("Initial editor value exceeds field capacity.");
+        const auto oldOrderSize = drawOrder.size();
+        drawOrder.push_back(fieldName);
+        try { return inputMap.Own(fieldName, std::move(newField)); }
+        catch (...) { drawOrder.resize(oldOrderSize); throw; }
 	}
 }
 
 class EditorLogic : public BaseGameSpecificClass
 {
+public:
+    class Mutation;
 protected:
+    Mutation* m_activeBatch = nullptr;
 	// Contains our header data
 	TKMovesetHeader* m_header = nullptr;
 
@@ -241,9 +334,86 @@ protected:
 	// Contains the moveset size, without our header
 	uint64_t m_movesetDataSize = 0;
 
+	template<class Count> RecordListCount DescribeRecordCount(const Count& count) const {
+        return {static_cast<uint64_t>(count),
+            static_cast<uint64_t>(reinterpret_cast<const Byte*>(&count) - m_moveset), sizeof(count)};
+    }
+    struct MutationState {
+        virtual ~MutationState() = default;
+        virtual void Restore() noexcept = 0;
+        virtual void Commit() noexcept {}
+    };
+    virtual std::unique_ptr<MutationState> CaptureMutationState() { return {}; }
+    // Replaces bytes inside one payload section; publishes only a complete, bounded allocation.
+    void ReplaceBlockRange(size_t block, size_t offset, size_t removed, std::span<const Byte> inserted);
+    std::string_view BlockString(size_t block, uint64_t offset) const;
+    static std::string_view InputString(const EditorInput* input);
+    virtual void RestoreMovesetPtr(Byte* data, uint64_t size) { LoadMovesetPtr(data,size); }
+    virtual Byte* AllocateMutationBuffer(size_t size) { return static_cast<Byte*>(malloc(size)); }
+
 	// Returns false if the field's input buffer is invalid for the field type
 	bool ValidateFieldType(EditorInput* field);
 public:
+    // A transaction owns the previous allocation until the complete operation succeeds.
+    class Mutation
+    {
+        EditorLogic& m_editor;
+        Byte* m_original;
+        uint64_t m_size;
+        gameAddr m_liveAddress;
+        std::unique_ptr<MutationState> m_state;
+        Mutation* m_parentBatch;
+        bool m_registered = false;
+        bool m_failed = false;
+        friend class EditorLogic;
+    public:
+        explicit Mutation(EditorLogic& editor, bool batch = false);
+        ~Mutation();
+        void Commit();
+        Mutation(const Mutation&) = delete;
+        Mutation& operator=(const Mutation&) = delete;
+    };
+
+    template<class Operation>
+    auto Mutate(Operation&& operation)
+    {
+        if (m_activeBatch) {
+            if (m_activeBatch->m_failed) throw std::runtime_error("Edit batch has already failed");
+            try {
+                return operation();
+            } catch (...) {
+                m_activeBatch->m_failed = true;
+                throw;
+            }
+        }
+        Mutation transaction(*this);
+        if constexpr (std::is_void_v<std::invoke_result_t<Operation>>) {
+            operation();
+            transaction.Commit();
+        } else {
+            auto result = operation();
+            transaction.Commit();
+            return result;
+        }
+    }
+
+    // Explicit batches are all-or-nothing. A caught child failure still prevents Commit.
+    // Construct Mutation directly for an independent nested savepoint.
+    template<class Operation>
+    auto MutateBatch(Operation&& operation)
+    {
+        if (m_activeBatch) return Mutate(std::forward<Operation>(operation));
+        Mutation batch(*this, true);
+        if constexpr (std::is_void_v<std::invoke_result_t<Operation>>) {
+            operation();
+            batch.Commit();
+        } else {
+            auto result = operation();
+            batch.Commit();
+            return result;
+        }
+    }
+
 	// Constants useful constant variables, to be set on a per-game basis
 	std::map<EditorConstants_, unsigned int > constants;
 	// Stores the address of the loaded moveset in-game. Will become 0 if it does not match the current moveset.
@@ -262,6 +432,8 @@ public:
 	const Byte* GetMoveset(uint64_t& movesetSize_out);
 
 
+    std::vector<Byte> BuildSaveSnapshot();
+
 	// Forms
 	// Returns the fields to display to build a single form of a certain type (move, voiceclip, cancel extradata, etc...)
 	virtual InputMap GetFormFields(EditorWindowType type, uint16_t id, VectorSet<std::string>& drawOrder) = 0;
@@ -276,6 +448,16 @@ public:
 
 	// -- Iteractions -- //
 	// Imports an animation into the moveset and applies it to a move. Returns the name of the imported anim.
+    // Wide row IDs are required by retail tables; legacy editors keep their u16 bounds.
+    virtual InputMap GetListSingleFormWide(EditorWindowType type,uint32_t id,VectorSet<std::string>& order) {
+        if(id>UINT16_MAX)throw std::out_of_range("Legacy record ID exceeds 16 bits");return GetListSingleForm(type,uint16_t(id),order);
+    }
+    virtual std::vector<InputMap> GetFormFieldsListWide(EditorWindowType type,uint32_t id,VectorSet<std::string>& order,int count) {
+        if(id>UINT16_MAX)throw std::out_of_range("Legacy list ID exceeds 16 bits");return count?GetFormFieldsList(type,uint16_t(id),order,count):GetFormFieldsList(type,uint16_t(id),order);
+    }
+    virtual void SaveItemWide(EditorWindowType type,uint32_t id,InputMap& fields) {
+        if(id>UINT16_MAX)throw std::out_of_range("Legacy record ID exceeds 16 bits");SaveItem(type,uint16_t(id),fields);
+    }
 	virtual std::string ImportAnimation(const wchar_t* filepath, int moveid) = 0;
 
 	// -- Creation -- //

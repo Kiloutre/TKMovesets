@@ -467,7 +467,7 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 			if (!exportedMotas.contains(motaAddr[i]))
 			{
 				MotaHeader* motaPtr = (MotaHeader*)(customBlock + motaOffset);
-				m_game.ReadBytes(motaAddr[i], (char*)motaPtr, motaSize);
+				if (!m_game.ReadBytes(motaAddr[i], (char*)motaPtr, motaSize)) { free(customBlock); size_out = 0; return nullptr; }
 
 				if (motaPtr->IsValid(motaSize))
 				{
@@ -476,7 +476,11 @@ Byte* ExtractorTTT2::AllocateMotaCustomBlock(MotaList* motas, uint64_t& size_out
 					if (motaPtr->IsBigEndian()) {
 						// Like the game does when they are big endianed, force every MOTA to be little endianed
 						// This helps provide a more deterministic extraction
-						TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr);
+						if (!TAnimUtils::FromMemory::ByteswapMota((Byte*)motaPtr, motaSize)) {
+                            free(customBlock);
+                            size_out = 0;
+                            return nullptr;
+                        }
 					}
 				}
 				else
@@ -569,6 +573,10 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 			return nullptr;
 		}
 
+        if (!animSize || animSize > (256ULL << 20) || totalSize > (256ULL << 20) - animSize) {
+            size_out = 0;
+            return nullptr;
+        }
 		offsets[animAddr] = totalSize;
 		animSizes[animAddr] = animSize;
 		totalSize += animSize;
@@ -585,10 +593,12 @@ Byte* ExtractorTTT2::CopyAnimations(const Move* movelist, size_t moveCount, uint
 	for (gameAddr animAddr : addrList)
 	{
 		int64_t animSize = animSizes[animAddr];
-		m_game.ReadBytes(animAddr, animationBlockCursor, animSize);
+		if (!m_game.ReadBytes(animAddr, animationBlockCursor, animSize)) { free(animationBlock); size_out = 0; return nullptr; }
 
 		if (!TAnimUtils::FromMemory::IsLittleEndian(animationBlockCursor)) {
-			TAnimUtils::FromMemory::ByteswapAnimation(animationBlockCursor);
+			if (!TAnimUtils::FromMemory::ByteswapAnimation(animationBlockCursor, animSize)) {
+                free(animationBlock); size_out = 0; return nullptr;
+            }
 		}
 
 		animationBlockCursor += animSize;
@@ -910,7 +920,9 @@ ExtractionErrcode_ ExtractorTTT2::Extract(gameAddr playerAddress, ExtractSetting
 
 			file.close();
 
-			if (settings & ExtractSettings_Compress) {
+			if (!file) {
+				errcode = ExtractionErrcode_FileCreationErr;
+			} else if (settings & ExtractSettings_Compress) {
 				DEBUG_LOG("Saved temp moveset, compressing...\n");
 				if (!CompressionUtils::FILE::Moveset::Compress(filepath, tmp_filepath, ExtractorUtils::GetCompressionAlgorithm(settings))) {
 					errcode = ExtractionErrcode_CompressionFailure;

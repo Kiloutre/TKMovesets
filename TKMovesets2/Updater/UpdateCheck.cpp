@@ -1,275 +1,59 @@
-#include <curlpp/cURLpp.hpp>
-#include <curlpp/Easy.hpp>
-#include <curlpp/Options.hpp>
-#include <curlpp/Infos.hpp>
-#include <sstream>
-#include <regex>
-#include <filesystem>
-#include <fstream>
-
+#include "Http.hpp"
 #include "SideMenu.hpp"
 #include "helpers.hpp"
 #include "Settings.hpp"
-
 #include "constants.h"
+#include <nlohmann/json.hpp>
+#include <regex>
+#include <sstream>
 
-// -- Private methods -- //
-
-
-bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only)
+bool DownloadProgramUpdate(s_updateStatus* status, GameAddressesFile*, bool verifyOnly)
 {
-	std::string repoUrl = UPDATE_REPO_URL;
-	std::string releasesUrl = repoUrl;
-	releasesUrl.replace(releasesUrl.find("github.com"), sizeof("github.com") - 1, "api.github.com/repos");
-	releasesUrl += "/releases/latest";
-
-	DEBUG_LOG("Querying '%s'...\n", releasesUrl.c_str());
-
-	// Have to set up user agent or github will deny the request
-	std::string releasesContent;
-	{
-		std::list<std::string> headers;
-		headers.push_back("Host: api.github.com");
-		headers.push_back("Accept: */*");
-		headers.push_back("User-Agent: curl/7.83.1");
-
-		curlpp::Cleanup myCleanup;
-		curlpp::Easy myRequest;
-		myRequest.setOpt(new curlpp::options::Url(releasesUrl));
-		myRequest.setOpt(new curlpp::options::HttpHeader(headers));
-		myRequest.setOpt(new curlpp::options::Timeout(HTTP_REQUEST_TIMEOUT));
-
-		std::stringstream os;
-		try {
-			curlpp::options::WriteStream ws(&os);
-			myRequest.setOpt(ws);
-			myRequest.perform();
-			releasesContent = os.str();
-		}
-		catch (curlpp::LibcurlRuntimeError&) {
-			updateStatus->error = true;
-			DEBUG_ERR("CURL ERROR");
-			return false;
-		}
-		catch (curlpp::LogicError&) {
-			updateStatus->error = true;
-			DEBUG_ERR("CURL ERROR");
-			return false;
-		}
-	}
-
-
-	std::smatch m;
-	std::regex urlExpr("browser_download_url\" *: *\"([^\"]+)\"");
-	std::regex tagExpr("tag_name\" *: *\"([^\"]+)\"");
-	std::regex bodyExpr("(body\" *: *\")");
-	std::string downloadUrl;
-	std::string tagName;
-	std::string changelog;
-
-	if (std::regex_search(releasesContent, m, urlExpr)) {
-		downloadUrl = m[1].str();
-	}
-	if (std::regex_search(releasesContent, m, tagExpr)) {
-		tagName = m[1].str();
-	}
-	if (std::regex_search(releasesContent, m, bodyExpr))
-	{
-		std::string body_start_str = m[1].str();
-		size_t body_start = releasesContent.find(body_start_str.c_str()) + body_start_str.size();
-		size_t body_end = std::string::npos;
-
-		// Have to factor in double quote escaping as opposed to URL & tag name
-		bool escape = false;
-		for (size_t idx = body_start + 1; idx < releasesContent.size(); ++idx)
-		{
-			if (escape) {
-				escape = false;
-			}
-			else {
-				switch (releasesContent[idx])
-				{
-				case '\\':
-					escape = true;
-					break;
-				case '"':
-					body_end = idx;
-					break;
-				}
-				
-			}
-		}
-
-		if (body_end != std::string::npos) {
-			changelog = releasesContent.substr(body_start, body_end - body_start);
-
-			// Fix newlines
-			changelog = std::regex_replace(changelog, std::regex("(\\\\r)?\\\\n"), "\n");
-			// Remove quote escaping
-			changelog = std::regex_replace(changelog, std::regex("\\\\\""), "\"");
-		}
-	}
-
-	DEBUG_LOG("Remote URL: [%s]\n", downloadUrl.c_str());
-	DEBUG_LOG("Remote tagname: [%s]\n", tagName.c_str());
-
-	if (downloadUrl.empty() || tagName.empty()) {
-		return false;
-	}
-
-	updateStatus->tagName = tagName;
-	updateStatus->tagNameSeparatorText = std::format("{} - {}", _("sidemenu.changelog"), tagName);
-	updateStatus->changelog = changelog;
-
-	DEBUG_LOG("'%s'\n", updateStatus->changelog.c_str());
-
-	if (!Helpers::VersionGreater(tagName.c_str(), PROGRAM_VERSION)) {
-		return false;
-	}
-
-	if (!Helpers::endsWith<std::string>(downloadUrl, ".exe")) {
-		// todo: Maybe handle .7z & .zip releases
-		DEBUG_LOG("Bad release extension (not .exe), can't install.\n");
-		return false;
-	}
-
-	// In case other extensions are ever handled, fetch the extension dynamically to write the proper file name
-	std::string extension = downloadUrl.substr(downloadUrl.find_last_of("."));
-
-	if (verify_only) {
-		DEBUG_LOG("New release available.\n");
-	} else {
-		DEBUG_LOG("New release download...\n");
-
-		// Finally download the file
-		{
-			bool validFile = true;
-			std::list<std::string> headers;
-			headers.push_back("Host: github.com");
-			headers.push_back("Accept: */*");
-			headers.push_back("User-Agent: curl/7.83.1");
-
-			curlpp::Cleanup myCleanup;
-			curlpp::Easy myRequest;
-			myRequest.setOpt(new curlpp::options::FollowLocation(true));
-			myRequest.setOpt(new curlpp::options::Url(downloadUrl));
-			myRequest.setOpt(new curlpp::options::HttpHeader(headers));
-			myRequest.setOpt(new curlpp::options::Timeout(HTTP_REQUEST_TIMEOUT));
-
-			std::wstring filename = L"" UPDATE_TMP_FILENAME;
-			filename += Helpers::string_to_wstring(extension);
-			try {
-				std::ofstream ofs(filename, std::ios::out | std::ios::trunc | std::ios::binary);
-				curlpp::options::WriteStream ws(&ofs);
-				myRequest.setOpt(ws);
-				myRequest.perform();
-
-				// First validation step is filesize
-				size_t fileSize = ofs.tellp();
-				if (fileSize < UPDATE_MIN_FILESIZE) {
-					DEBUG_ERR("File size too small (%llu)", fileSize);
-					validFile = false;
-				}
-			}
-			catch (curlpp::LibcurlRuntimeError&) {
-				updateStatus->error = true;
-				DEBUG_ERR("CURL ERROR");
-				return false;
-			}
-			catch (curlpp::LogicError&) {
-				updateStatus->error = true;
-				DEBUG_ERR("CURL ERROR");
-				return false;
-			}
-
-			// Second validation step, after we obtained the .exe, is magic bytes
-			std::wstring exe_filename = std::wstring(L"" UPDATE_TMP_FILENAME) + L".exe";
-
-			if (!Helpers::fileExists(exe_filename.c_str())) {
-				validFile = false;
-				DEBUG_LOG("Update: .exe file does not exist.\n");
-			}
-
-			if (validFile) {
-				std::ifstream executableFile(exe_filename, std::ios::binary);
-
-				unsigned char buf[2]{ 0 };
-				executableFile.read((char*)buf, 2);
-
-				if (buf[0] != 0x4D || buf[1] != 0x5A) {
-					DEBUG_LOG("Bad magic bytes (%x %x).\n", buf[0], buf[1]);
-					validFile = false;
-				}
-			}
-
-			if (!validFile) {
-				DEBUG_LOG("Invalid file, removing.\n");
-				updateStatus->error = true;
-				if (Helpers::fileExists(exe_filename.c_str())) {
-					std::filesystem::remove(exe_filename);
-				}
-				return false;
-			}
-
-		}
-	}
-
-	return true;
-}
-
-
-static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
-{
-	std::string addrUrl = UPDATE_REPO_URL;
-	addrUrl.replace(addrUrl.find("github.com"), sizeof("github.com") - 1, "raw.githubusercontent.com");
-	addrUrl += "/master/TKMovesets2/Resources/game_addresses.ini";
-
-	DEBUG_LOG("Querying '%s'...\n", addrUrl.c_str());
-
-	std::ostringstream os;
-	std::string addrContent;
 	try {
-		os << curlpp::options::Url(addrUrl);
-		addrContent = os.str();
-	}
-	catch (curlpp::LibcurlRuntimeError&) {
-		*error = true;
-		DEBUG_ERR("CURL ERROR");
-		return false;
-	}
-	catch (curlpp::LogicError&) {
-		*error = true;
-		DEBUG_ERR("CURL ERROR");
-		return false;
-	}
-
-	std::smatch m;
-	std::regex expr("^ *val:global_addr_version *= *(\\d+) *$");
-	int addrVersion = -1;
-	int currVersion = (int)addresses->GetValue("global", "addr_version");
-
-	if (std::regex_search(addrContent, m, expr)) {
-		addrVersion = std::stoi(m[1].str());
-	}
-
-	if (addrVersion != -1 && (addrVersion > currVersion)) {
-
-		std::ofstream addrFile(GAME_ADDRESSES_FILE);
-		if (addrFile.fail()) {
-			DEBUG_LOG("Updater: Failed to write addresses file.\n");
+		auto release = nlohmann::json::parse(Http::Get(Http::RepositoryApi() + "/releases/latest", 4 << 20));
+		auto tag = release.at("tag_name").get<std::string>();
+		if (!Helpers::VersionGreater(tag.c_str(), PROGRAM_VERSION)) return false;
+		for (const auto& asset : release.at("assets")) {
+			if (asset.at("name") != PROGRAM_FILENAME) continue;
+			status->tagName = tag;
+			status->tagNameSeparatorText = std::format("{} - {}", _("sidemenu.changelog"), tag);
+			status->changelog = release["body"].is_string() ? release["body"].get<std::string>() : "";
+			if (verifyOnly) return true;
+			auto digest = asset.at("digest").get<std::string>();
+			auto bytes = Http::Get(asset.at("browser_download_url").get<std::string>(), 256 << 20);
+			if (bytes.size() != asset.at("size").get<size_t>() || !bytes.starts_with("MZ") ||
+				digest != "sha256:" + Http::Sha256(bytes)) throw std::runtime_error("Invalid release asset");
+			Http::InstallDownload(UPDATE_TMP_FILENAME ".exe", bytes);
+			return true;
 		}
-		else {
-			addrFile << addrContent;
-			addrFile.close();
-			DEBUG_LOG("Updater: Updated game addresses.\n");
-		}
-
-		return true;
+	} catch (const std::exception&) {
+		status->error = true;
 	}
-
 	return false;
 }
 
+static bool UpdateAddresses(bool* error, GameAddressesFile* addresses)
+{
+	try {
+		std::string repo = UPDATE_REPO_URL;
+		repo.replace(repo.find("github.com"), sizeof("github.com") - 1, "raw.githubusercontent.com");
+		auto content = Http::Get(repo + "/master/TKMovesets2/Resources/game_addresses.ini", 4 << 20);
+		std::istringstream lines(content);
+		std::string line;
+		std::regex version(R"(^\s*val:global_addr_version\s*=\s*(\d+)\s*$)");
+		std::smatch match;
+		while (std::getline(lines, line)) {
+			if (!std::regex_match(line, match, version)) continue;
+			if (std::stoll(match[1].str()) <= addresses->GetValue("global", "addr_version")) return false;
+			Http::InstallDownload(GAME_ADDRESSES_FILE, content);
+			return true;
+		}
+		*error = true;
+	} catch (const std::exception&) {
+		*error = true;
+	}
+	return false;
+}
 
 void SideMenu::CheckForUpdates(bool firstTime)
 {
@@ -295,8 +79,8 @@ void SideMenu::CheckForUpdates(bool firstTime)
 	}
 
 
+	m_updateStatus.up_to_date = !updatedAnything && !m_updateStatus.error;
 	m_updateStatus.verifying = false;
-	m_updateStatus.up_to_date = !updatedAnything;
 
 	DEBUG_LOG("::CheckForUpdates() - END\n");
 }
@@ -311,8 +95,7 @@ void SideMenu::RequestCheckForUpdates()
 		m_updateStatus.thread.join();
 	}
 
-	// Reload addresses before updating, in case the loaded game addresses is not up to date but the local file one is
-	m_addresses->Reload();
+	// The loaded address snapshot is shared with workers. Updated disk data is loaded on restart.
 
 	m_updateStatus.error = false;
 	m_updateStatus.addrFile = false;

@@ -7,6 +7,74 @@
 #include "Localization.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
+#include "MovesetFolders.hpp"
+#include "LocalStorage.hpp"
+#include <shobjidl.h>
+
+namespace {
+void BrowseFolder(char* buffer,size_t capacity) {
+    const auto initialized=CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
+    if(FAILED(initialized) && initialized!=RPC_E_CHANGED_MODE)return;
+    IFileOpenDialog* dialog=nullptr;
+    if(SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog,nullptr,CLSCTX_INPROC_SERVER,IID_PPV_ARGS(&dialog)))) {
+        dialog->SetOptions(FOS_PICKFOLDERS|FOS_FORCEFILESYSTEM|FOS_PATHMUSTEXIST|FOS_NOCHANGEDIR);
+        if(SUCCEEDED(dialog->Show(GetActiveWindow()))) {
+            IShellItem* item=nullptr;
+            if(SUCCEEDED(dialog->GetResult(&item))) {
+                PWSTR path=nullptr;
+                if(SUCCEEDED(item->GetDisplayName(SIGDN_FILESYSPATH,&path))) {
+                    auto text=Helpers::to_utf8(path);snprintf(buffer,capacity,"%s",text.c_str());CoTaskMemFree(path);
+                }
+                item->Release();
+            }
+        }
+        dialog->Release();
+    }
+    if(SUCCEEDED(initialized))CoUninitialize();
+}
+}
+
+void SideMenu::RenderFolderSettings() {
+    ImGui::SeparatorText(_("settings.folders.title"));
+    ImGui::TextUnformatted(_("settings.folders.extraction"));
+    ImGui::SetNextItemWidth(-200);
+    ImGui::InputTextWithHint("##extractionFolder",_("settings.folders.extraction_hint"),m_extractionFolder,sizeof(m_extractionFolder));
+    ImGui::SameLine();if(ImGui::Button((std::string(_("settings.folders.browse"))+"##output").c_str()))BrowseFolder(m_extractionFolder,sizeof(m_extractionFolder));
+    ImGui::SameLine();if(ImGui::Button((std::string(_("settings.folders.save"))+"##output").c_str())) {
+        try {auto c=MovesetFolders::Get();c.extraction=m_extractionFolder;MovesetFolders::Save(std::move(c));m_folderError.clear();}
+        catch(const std::exception& e){m_folderError=e.what();}
+    }
+    ImGui::SameLine();if(ImGui::Button((std::string(_("settings.folders.clear"))+"##output").c_str())) {
+        auto c=MovesetFolders::Get();c.extraction.clear();MovesetFolders::Save(std::move(c));m_extractionFolder[0]=0;m_folderError.clear();
+    }
+    ImGui::TextWrapped("%s",_("settings.folders.extraction_help"));
+    ImGui::Spacing();ImGui::TextUnformatted(_("settings.folders.additional"));
+    ImGui::TextWrapped("%s",_("settings.folders.additional_help"));
+    auto c=MovesetFolders::Get();
+    // Any change rebuilds the character list right away (a removed folder's files must leave the list too).
+    auto refresh=[&]{if(storage)storage->RefreshMovesets();};
+    for(size_t i=0;i<c.additional.size();++i) {
+        ImGui::PushID(static_cast<int>(i));
+        if(ImGui::Button(_("settings.folders.remove"))) {c.additional.erase(c.additional.begin()+i);MovesetFolders::Save(c);refresh();ImGui::PopID();break;}
+        ImGui::SameLine();ImGui::TextWrapped("%s",c.additional[i].c_str());ImGui::PopID();
+    }
+    if(ImGui::Button((std::string(_("settings.folders.add"))+"##search").c_str())) {
+        // Pick a folder in the explorer: it is registered immediately.
+        m_additionalFolder[0]=0;
+        BrowseFolder(m_additionalFolder,sizeof(m_additionalFolder));
+        if(m_additionalFolder[0]) try {
+            auto path=std::filesystem::u8path(m_additionalFolder);
+            if(!path.is_absolute() || !std::filesystem::is_directory(path))throw std::invalid_argument(_("settings.folders.missing"));
+            bool duplicate=false;
+            for(const auto& existing:c.additional) {std::error_code ec;if(std::filesystem::equivalent(path,std::filesystem::u8path(existing),ec))duplicate=true;}
+            if(!duplicate){c.additional.push_back(m_additionalFolder);MovesetFolders::Save(c);refresh();}
+            m_folderError=duplicate?_("settings.folders.duplicate"):"";
+        }catch(const std::exception& e){m_folderError=e.what();}
+        m_additionalFolder[0]=0;
+    }
+    ImGui::SameLine();ImGui::TextDisabled("%s",_("settings.folders.add_help"));
+    if(!m_folderError.empty())ImGui::TextWrapped("%s",m_folderError.c_str());
+}
 
 bool DownloadProgramUpdate(s_updateStatus* updateStatus, GameAddressesFile* addresses, bool verify_only);
 
@@ -140,7 +208,19 @@ static void SetWindowsFileAssociation()
 	std::wstring animation_command = L"\"" + std::wstring(program_path) + L"\" --move-animation \"%1\"";
 
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_FILENAME_EXTENSION, "tkmvst_file");
-	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_TMPFILENAME_EXTENSION, "tkmvst_file");
+
+	// Older versions also associated the temporary file an interrupted extraction leaves behind.
+	// That file is not a valid moveset, so remove the stale association if it is still ours.
+	{
+		const char* tmpKey = "Software\\Classes\\" MOVESET_TMPFILENAME_EXTENSION;
+		char current[64] = { 0 };
+		DWORD size = sizeof(current);
+		if (RegGetValueA(HKEY_CURRENT_USER, tmpKey, NULL, RRF_RT_REG_SZ, NULL, current, &size) == ERROR_SUCCESS
+			&& strcmp(current, "tkmvst_file") == 0) {
+			RegDeleteTreeA(HKEY_CURRENT_USER, tmpKey);
+		}
+	}
+
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanim64", "tkanim_file");
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\.tkanimC8", "tkanim_file");
 
@@ -158,6 +238,8 @@ static void SetWindowsFileAssociation()
 
 SideMenu::SideMenu()
 {
+    MovesetFolders::Load();
+    snprintf(m_extractionFolder,sizeof(m_extractionFolder),"%s",MovesetFolders::Get().extraction.c_str());
 	m_keybinds = &Keybinds::GetKeybinds();
 
 #ifdef BUILD_TYPE_DEBUG
@@ -169,7 +251,6 @@ SideMenu::SideMenu()
 #endif
 
 	m_vsync_setting = Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER);
-	m_overwriteSameFilename = Settings::Get(SETTING_EXPORT_OVERWRITE_KEY, SETTING_EXPORT_OVERWRITE);
 	m_freeUnusedMoveset = Settings::Get(SETTING_FREE_UNUSED_KEY, SETTING_FREE_UNUSED);
 	m_applyInstantly = Settings::Get(SETTING_IMPORT_INSTANT_KEY, SETTING_IMPORT_INSTANT);
 	m_languageId = Localization::GetCurrLangId();
@@ -269,6 +350,7 @@ void SideMenu::RenderSettingsMenu()
 		ImGui::EndTable();
 	}
 
+    RenderFolderSettings();
 	// Importation settings
 	ImGui::SeparatorText(_("settings.importation"));
 	if (ImGui::BeginTable("ImportSettingsTable", 2, ImGuiTableFlags_RowBg))
@@ -294,26 +376,17 @@ void SideMenu::RenderSettingsMenu()
 		ImGui::EndTable();
 	}
 
-	// Exportation settings
-	ImGui::SeparatorText(_("settings.exportation"));
-	if (ImGui::BeginTable("ExportSettingsTable", 2, ImGuiTableFlags_RowBg))
-	{
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-
-		// Ovewrite movesets with same name
-		if (ImGui::Checkbox(_("settings.overwrite_duplicate"), &m_overwriteSameFilename)) {
-			Settings::Set(SETTING_EXPORT_OVERWRITE_KEY, m_overwriteSameFilename);
-		}
-		ImGui::SameLine();
-		ImGuiExtra::HelpMarker(_("settings.overwrite_explanation"));
-
-		ImGui::EndTable();
-	}
-
 
 	ImGui::SeparatorText(_("settings.keybinds"));
-	if (ImGui::BeginTable("KeybindsSettingsTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoHostExtendY, ImVec2(0, 300)))
+	// Fit the table to its rows; only scroll once there are more than a handful of keybinds.
+	const size_t keybindRows = (m_keybinds->size() + 1) / 2;
+	const size_t visibleKeybindRows = 6;
+	const float keybindRowHeight = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetFrameHeightWithSpacing();
+	const bool scrollKeybinds = keybindRows > visibleKeybindRows;
+	ImGuiTableFlags keybindTableFlags = ImGuiTableFlags_RowBg;
+	if (scrollKeybinds) keybindTableFlags |= ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoHostExtendY;
+	if (ImGui::BeginTable("KeybindsSettingsTable", 2, keybindTableFlags,
+		ImVec2(0, scrollKeybinds ? keybindRowHeight * visibleKeybindRows : 0)))
 	{
 
 		bool row_end = true;
@@ -449,15 +522,15 @@ void SideMenu::Render(float width)
 		ImGui::TextUnformatted(_("sidemenu.update_check"));
 	}
 
-	if (m_updateStatus.error) {
+	if (!m_updateStatus.verifying && m_updateStatus.error) {
 		ImGui::TextColored(ImVec4(1.0f, 0, 0, 1), _("sidemenu.update_error"));
 	}
 	else {
-		if (m_updateStatus.up_to_date) {
+		if (!m_updateStatus.verifying && m_updateStatus.up_to_date) {
 			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("sidemenu.up_to_date"));
 		}
 		else {
-			if (m_updateStatus.addrFile) {
+			if (!m_updateStatus.verifying && m_updateStatus.addrFile) {
 				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("sidemenu.updated_addr"));
 			}
 		}
@@ -465,11 +538,10 @@ void SideMenu::Render(float width)
 	}
 
 	// Update popup
-	if (m_updateStatus.programUpdateAvailable) {
-		ImGui::OpenPopup("ProgramUpdatePopup");
-		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(720, 720));
+	if (!m_updateStatus.verifying && m_updateStatus.programUpdateAvailable) {
+		ImGui::OpenPopup("###ProgramUpdatePopup");
 	}
-	if (ImGui::BeginPopupModal("ProgramUpdatePopup", &m_updateStatus.programUpdateAvailable))
+	if (!m_updateStatus.verifying && ImGuiExtra::BeginFittedModal("ProgramUpdatePopup", _("sidemenu.update"), &m_updateStatus.programUpdateAvailable, 40.0f))
 	{
 		RenderChangelog();
 		ImGui::EndPopup();
@@ -477,10 +549,9 @@ void SideMenu::Render(float width)
 
 	// Update popup
 	if (m_settingsMenuOpen) {
-		ImGui::OpenPopup("SettingsMenu");
-		ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(-1, -1));
+		ImGui::OpenPopup("###SettingsMenu");
 	}
-	if (ImGui::BeginPopupModal("SettingsMenu", &m_settingsMenuOpen))
+	if (ImGuiExtra::BeginFittedModal("SettingsMenu", _("sidemenu.settings"), &m_settingsMenuOpen, 46.0f))
 	{
 		RenderSettingsMenu();
 		ImGui::EndPopup();

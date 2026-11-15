@@ -1,0 +1,38 @@
+Hit Level,Number,Hex,Description,Hit Effect,Stand,Crouch,Jump,Power Crush,Parry Level,Notes
+N/A,0,0x0,Indicates the given move doesn't have an attack,N/A,N/A,N/A,N/A,N/A,N/A,
+,2097152,0x200000,,,,,,,,
+Low,271,0x10F,"Main hit level component, self explanatory",Low,Hit,Block,Miss,RA Only,Low,
+,65807,0x01010F,,,,,,,,
+,327951,0x05010F,,,,,,,,
+,1900815,0x1D010F,,,,,,,,
+,2162959,0x21010F,,,,,,,,
+,2359567,0x24010F,,,,,,,,
+,8388879,0x80010F,,,,,,,,Seen in 10 Hit Combo strings
+Mid,535,0x217,"Main hit level component, self explanatory",Mid,Block,Hit,Hit,Yes,Mid,
+,1638935,0x190217,,,,,,,,
+,2097687,0x200217,,,,,,,,
+,2359831,0x240217,,,,,,,,
+,2884119,0x2C0217,,,,,,,,
+Mid Throw,4194839,0x400217,,Mid,Miss,Grab,Miss,N/A,N/A,Seen in Crouch/Grounded Throws
+,8389143,0x800217,,,,,,,,Seen in 10 Hit Combo strings
+High,1298,0x512,"Main hit level component, self explanatory",High,Block,Miss,Hit,Yes,High,
+,1836306,0x1C0512,,,,,,,,
+,2098450,0x200512,,,,,,,,
+,2360594,0x240512,,,,,,,,
+,3933458,0x3C0512,,,,,,,,
+High Throw,4195602,0x400512,,High,Grab,Miss,Miss,RA Only,N/A,Seen in Standing Throws
+,8389906,0x800512,,,,,,,,Seen in 10 Hit Combo strings
+,10487058,0xA00512,,,,,,,,
+Special Mid,799,0x31F,"Can be blocked standing and crouching, is treated like a mid for parries/reversals and low crushing",Special Mid,Block,Block,Hit,Yes,Mid,
+Special Low,1055,0x41F,"Can be blocked standing and crouching, is treated like a low for parries/reversals and low crushing",Special Low,Block,Block,Miss,Yes,Low,
+,10486815,0xA0041F,,,,,,,,
+,2098207,0x20041F,,,,,,,,
+UB Mid,1799,0x707,"Hits standing, crouching, and jumping",Unblockable(!),Hit,Hit,Hit,RA Only,Mid,
+,2098951,0x200707,,,,,,,,
+,3737351,0x390707,,,,,,,,
+UB High,2054,0x806,"Whiffs on crouching, hits standing and jumping",Unblockable(!),HIt,Miss,Hit,RA Only,High,
+UB Low,2311,0x907,"Whiffs on jumping, hits standing and crouching",Unblockable(!),Hit,Hit,Miss,RA Only,Low,
+Throw Animation,2560,0xA00,"Seen in animations that have a corresponding reaction animation
+i.e, Throws, Parries, Throw Breaks",N/A,N/A,N/A,N/A,N/A,N/A,
+,2099712,0x200A00,,,,,,,,
+Anti-Air,2823,0xB07,Can only hit airborne opponents,High,Miss,Miss,Hit,N/A,N/A,

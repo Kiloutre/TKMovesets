@@ -1,0 +1,15 @@
+Value,Hex,Category?,Status,Airborne,Block
+2114,0x842,1,Standing,Airborne(Juggle),None
+4178,0x1052,2,Standing,Airborne(Juggle),Block
+135250,0x21052,2,,,
+10273,0x2821,5,Crouching,Crouching,None
+12329,0x3029,6,Crouching,Airborne(Juggle),Block
+143401,0x23029,6,,,
+24708,0x6084,12,Downed (Face Up),Downed (Face Up),None
+27268,0x6A84,13,Downed (Face Down),Downed (Face Down),None
+36996,0x9084,18,Downed (Face Up),Downed (Face Up),None
+39556,0x9A84,19,Downed (Face Down),Downed (Face Down),None
+40960,0xA000,20,Invincible,Invincible,N/A
+51266,0xC842,25,Standing,Airborne(Jumping),None
+55378,0xD852,27,Standing,Airborne(Jumping),None
+120914,0x1D852,27,Standing,Airborne(Jumping),Block

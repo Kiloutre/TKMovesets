@@ -1,9 +1,11 @@
+#include <memory>
 #include <string>
 
 #include "helpers.hpp"
 #include "Aliases.hpp"
 #include "Importer_t7/Importer_t7.hpp"
 #include "MovesetConverters.hpp"
+#include "LegacyLayout.hpp"
 
 #include "Structs_t7.h"
 #include "Structs_t5dr.h"
@@ -77,7 +79,7 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	blocks_out.movelistBlock = movesetSize;
 
 	try {
-		Byte* new_moveset = new Byte[movesetSize];
+		Byte* new_moveset = new Byte[movesetSize]{};
 		size_out = movesetSize;
 		return new_moveset;
 	}
@@ -92,8 +94,19 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 
 bool MovesetConverter::T5DRToT7::Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, TKMovesetHeaderBlocks& blocks_out)
 {
+	const size_t strides[] = {
+		sizeof(T5::Reactions), sizeof(T5::Requirement), sizeof(T5::HitCondition), sizeof(T5::Pushback),
+		sizeof(T5::PushbackExtradata), sizeof(T5::Cancel), sizeof(T5::Cancel), sizeof(T5::CancelExtradata),
+		sizeof(T5::ExtraMoveProperty), sizeof(T5::OtherMoveProperty), sizeof(T5::OtherMoveProperty), sizeof(T5::Move),
+		sizeof(T5::Voiceclip), sizeof(T5::InputSequence), sizeof(T5::Input), 0,
+		0, 0, 0, 0,
+		0, 0, 0
+	};
+	if (!ValidateLegacyLayout<T5::TKMovesetHeaderBlocks, T5DR::MovesetInfo>(*header, moveset, s_moveset, strides)) return false;
+
 	uint64_t new_moveset_size;
-	Byte* new_moveset = AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out);
+	std::unique_ptr<Byte[]> convertedOwner(AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out));
+	Byte* new_moveset = convertedOwner.get();
 
 	if (new_moveset == nullptr) {
 		return false;
@@ -312,8 +325,9 @@ bool MovesetConverter::T5DRToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->ground_fall = source->ground_fall;
 		target->voicelip_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->voicelip_addr);
 		target->extra_move_property_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->extra_move_property_addr);
-		target->move_start_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_start_extraprop_addr);
-		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
+		// Start/end property rows are voided below (no 881 terminator): the moves reference no such list.
+		target->move_start_extraprop_addr = MOVESET_ADDR_MISSING;
+		target->move_end_extraprop_addr = MOVESET_ADDR_MISSING;
 		target->_0x98_int = T5_T7_Aliases::ConvertMove0x98(source->_0x98_int);
 		target->hitbox_location = source->hitbox_location;
 		target->first_active_frame = source->first_active_frame;
@@ -443,7 +457,9 @@ bool MovesetConverter::T5DRToT7::Convert(const TKMovesetHeader* header, Byte*& m
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
 		gameAddr32 motaAddr32 = old_movesetInfo->motas.motas[i];
-		if (motaAddr32 == MOVESET_ADDR32_MISSING) {
+		// Older extracts used zero for absent entries when the MOTA block was empty.
+		if (motaAddr32 == MOVESET_ADDR32_MISSING ||
+			(motaAddr32 == 0 && blocks_out.motaBlock == blocks_out.movelistBlock)) {
 			new_movesetInfo->motas.motas[i] = (MotaHeader*)MOVESET_ADDR_MISSING;
 		}
 		else {
@@ -452,7 +468,7 @@ bool MovesetConverter::T5DRToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		}
 	}
 
-	moveset = new_moveset;
+	moveset = convertedOwner.release();
 	s_moveset = new_moveset_size;
 
 	return true;

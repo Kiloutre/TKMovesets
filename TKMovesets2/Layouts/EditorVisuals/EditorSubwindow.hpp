@@ -3,6 +3,7 @@
 class EditorSubwindow
 {
 public:
+    virtual ~EditorSubwindow() = default;
 	// Unique identifier, used to avoid duplicated subwindows when it doesn't make sense
 	std::string identifier;
 

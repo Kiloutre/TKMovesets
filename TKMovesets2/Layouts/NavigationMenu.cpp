@@ -19,6 +19,8 @@ const NavMenuBtn cg_play_btns[] = {
 
 const NavMenuBtn cg_tools_btns[] = {
 	{NAV__MENU_EDITION, "navmenu.moveset_edit"},
+	{NAV__MENU_ADDRESSES, "navmenu.addresses"},
+	{NAV__MENU_EXTRA, "navmenu.extra"},
 	//{NAV__MENU_CAMERA, "navmenu.camera"},
 };
 

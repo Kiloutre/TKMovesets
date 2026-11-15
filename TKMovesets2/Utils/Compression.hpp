@@ -38,8 +38,8 @@ namespace CompressionUtils
 	namespace RAW {
 		// Tools to decompress moveset specifically, will adapt to the moveset's compression algorithm indicated in the header
 		namespace Moveset {
-			// Decompress moveset (keeps header in the final allocated memory area)
-			Byte* DecompressWithHeader(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out);
+			// Expand a malloc-owned file buffer. Ownership is unchanged on failure.
+			bool ExpandFileBuffer(Byte*& moveset, uint64_t& fileSize);
 			// Decompress moveset (without keeping header)
 			Byte* Decompress(const Byte* moveset, uint64_t compressed_data_size, uint64_t& size_out);
 			// Decompress a moveset (without keeping header) to a previously allocated buffer

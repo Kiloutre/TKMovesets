@@ -3,6 +3,8 @@
 #include "Editor_t7.hpp"
 #include "helpers.hpp"
 
+using namespace StructsT7;
+
 // Live edition callbacks that will only be called if live edition is enabled, the moveset is loaded in memory AND if the modified field is valid
 
 void EditorT7::Live_OnMovelistDisplayableEdit(int id, EditorInput* field)

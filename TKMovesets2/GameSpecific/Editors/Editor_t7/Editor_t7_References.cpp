@@ -2,6 +2,8 @@
 
 #include "Editor_t7.hpp"
 
+using namespace StructsT7;
+
 // -- Cancels -- //
 
 std::vector<TEditor::CancelMoveReference> EditorT7::ListCancelsMoveReferences(unsigned int cancel_start_id) const

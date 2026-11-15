@@ -1,0 +1,652 @@
+Prop ID,Value Range,Function,Description,Related Requirements
+0x0,0,End of Extra Properties,,
+0x8001,0,Camera Shake: Lightest,Used in some attacks and mini wall splats.,
+0x8002,0,Camera Shake: Light,Stronger than 0x8001 but still minimal,
+0x8003,0,Camera Shake: Medium,Shakes the game camera.,
+0x8004,0,Camera Shake: Heavy,Same as 0x8009,
+0x8005,0 - 10,Camera Shake: Custom,Shakes camera based on given parameter,
+0x8006,0,Camera Shake: Lightest,Same as 0x8001,
+0x8007,0,Camera Shake: Light,Used when opponent lands on walls. Same as 0x8002,
+0x8008,0,Camera Shake: Medium,Used when the attack hits. Same as 0x8003,
+0x8009,0,Camera Shake: Heavy,Gives a heavy camera shake. Same as 0x8004,
+0x800a,0 - 10,Camera Shake: Custom,Shakes camera based on given parameter,
+0x800b,0,Ground Ripple,"Adds a ground ripple effect when triggered.
+e.g Used when the player hits the ground.",
+0x800e,0 - 2,Break Tile,"Used in some throws. Can use 0, 1 or 2.",
+0x800f,0,Medium Ground Ripple,Adds a medium ground ripple effect when triggered.,
+0x8010,0,Heavy Ground Ripple,Adds a heavy ground ripple effect when triggered.,
+0x8011,0,Fire Burn Effect on self,,
+0x8012,0,Fire Burn Effect on opponent,,
+0x8017,?,Play VFX,"Used for effects such as hitsparks, Kazuya's forcefield VFX
+Note: parameter is a decimal value converted from (VFX value + Limb value) in hex).
+Ex: 11665421 (an example for a left hand heat engager) is B2000D in hex.
+(B2 is the VFX hex, 000D is the limb the VFX will play on)
+Some effects may not play on the limb or might have a set spot to play. 
+VFX hex values in notes.",
+0x8019,0,Electric Effect on self,,
+0x801a,0,Electric Effect on opponent,,
+0x801b,1,Heat Smash VFX on self,Plays the little aura/spark VFX when Heat Smash is initiated,
+0x8024,?,Stop VFX,"Looks like it's used to stop the VFXs played by prop 0x8049.
+Value 125 and 126 spotted",
+0x8025,?,Play VFX,Plays an effect.  Follow the notes in 0x8017 and convert the values into decimal ,
+0x8031,Limb Value,Char Hit Spark on Self,"Adds a Character specific hit spark. 
+The value dictates the bone where the value will play from.
+e.g Used alot in Throws or Ki Charging",
+0x8039,?,Play Character Trail VFX,"Used for trail effects left behind by some characters' moves such as Jun's heal, etc.
+Parameter is VFX ID. Jun's heal uses 793",
+0x803e,Limb Value,Hit spark on self,Plays a standard hit spark. The value dictates the bone where the value will play from,
+0x803f,Limb Value,Hit spark on opponent,Plays a standard hit spark. The value dictates the bone where the value will play from,
+0x8040,Limb Value,Heavy sparks on self,Plays a heavy hit spark. The value dictates the bone where the value will play from,
+0x8041,Limb Value,Heavy sparks on opponent,Plays a heavy hit spark. The value dictates the bone where the value will play from,
+0x8042,Limb Value,Heavy sparks with char hit spark on self,Plays heavy hit sparks to an attack with the character unique hit effect. The value dictates the bone where the value will play from,
+0x8043,Limb Value,Heavy sparks with char hit spark on opponent,Plays heavy hit sparks to an attack with the character unique hit effect. The value dictates the bone where the value will play from,
+0x8046,?,Play Stage VFX,Used for stage effects such as the ground and water impacts.,
+0x8049,?,Play Common VFX,"Used for enabling Homing VFX
+Note: parameter is a decimal value converted from (Limb value + VFX value) in hex).
+Ex: The parameter for Heihachis yellow spark is 2496 in decimal
+(2496 = 9C0 in hex, 9 = right hand, C0 = Yellow sparks value)
+Some effects may not play on the limb or might have a set spot to play. 
+VFX hex values in notes",
+0x804a,?,Play Common VFX,"Plays common VFX on a different ""attach target."" Seen only in Clive",
+0x804b,?,Tile Break VFX on self,Also makes the player dirty,
+0x8052,?,Environment VFX,Foot Water VFX,
+0x8079,Limb Value,Throw Effect on self,,
+0x807a,Limb Value,Smoke Effect on self,,
+0x807c,Limb Value,Block Effect on self,,
+0x807d,Limb Value,Sparks on self (?),,
+0x807f,Limb Value,Small Sparks on self,,
+0x8087,0-?,Inflict Self Damage,Value subtracts permanent health.,
+0x8088,0-?,Heal Health,Value adds to permanent health.,
+0x808e,0-?,Inflict Self Damage,Value subtracts permanent health.,
+0x8092,Any,Store Value,,"254: >= param
+292: <= param
+330: == param"
+0x8093,Any,Store Value,,"255: >= param
+293: <= param
+331: == param"
+0x8094,Any,Store Value,,"256: >= param
+294: <= param
+332: == param"
+0x8095,Any,Store Value 0x8092 (Opponent),,
+0x8096,Any,Store Value 0x8093 (Opponent),,
+0x8097,Any,Store Value 0x8094 (Opponent),,
+0x8098,4-byte Integer,Store Value,Used in Kunimitsu to spawn her weapons,"258: >= param
+296: <= param
+334: == param"
+0x8099,4-byte Integer,Add value to prop 0x8098,,
+0x809a,4-byte Integer,Subtract value from prop 0x8098,,
+0x809b,4-byte Integer,Store Value,"Seen in Devil Jin's Gates of Hades (b, f+1+2) move to manage cancels	","259: >= param
+297: <= param
+335: == param"
+0x809c,4-byte Integer,Add value to prop 0x809c,,
+0x809d,4-byte Integer,Subtract value from prop 0x809c,,
+0x80a6,4-byte Integer,Store Value,Store Value,"260: >= param
+298: <= param
+336: == param"
+0x80a7,4-byte Integer,Add value to prop 0x80a6,,
+0x80a8,4-byte Integer,Subtract value from prop 0x80a6,,
+0x80c5,4-byte Integer,Store Value,Used in cancels where input happens prior to cancel frames,"281: >= param
+319: <= param
+358: == param"
+0x80c6,4-byte Integer,Add value to prop 0x80c5,,
+0x80c7,4-byte Integer,Subtract value from prop 0x80c5,,
+0x80c8,4-byte Integer,Store Value,Used in cancels where input happens prior to cancel frames,"282: >= param
+320: <= param
+359: == param"
+0x80c9,4-byte Integer,Add value to prop 0x80c8,,
+0x80ca,4-byte Integer,Subtract value from prop 0x80c8,,
+0x80cb,4-byte Integer,Store Value,"Normally used in cancels where input happens prior to cancel frames, though this is multi-purpose.
+Seen in Kazuya's d/b+1, 2 cancel
+Also seen in Story Devil Jin to play different dialogues during his Rage Arts","283: >= param
+321: <= param
+360: == param"
+0x80cc,4-byte Integer,Add value to prop 0x80cb,,
+0x80cd,4-byte Integer,Subtract value from prop 0x80cb,,
+0x80ce,4-byte Integer,Store Value,Used in Bob's Heat Smash to execute the Just Frame version,"284: >= param
+322: <= param
+361: == param"
+0x80cf,4-byte Integer,Add value to prop 0x80ce,,
+0x80d0,4-byte Integer,Subtract value from prop 0x80ce,,
+0x80d1,4-byte Integer,Store Value,,"285: >= param
+323: <= param
+362: == param"
+0x80d2,4-byte Integer,Add value to prop 0x80d1,,
+0x80d3,4-byte Integer,Subtract value from prop 0x80d1,,
+0x80dc,0 - 65535,Kazuya Devil State,"Used whenever the game makes Kazuya transform into his devil state.
+0 = Human form 1 = Devil form","274: >= param
+312: <= param
+350: == param"
+0x80dd,0 - 65535,Add to Devil Flag,,Same as above
+0x80de,0 - 65535,Subtract from Devil Flag,,Same as above
+0x80df,0 - 65535,Bitwise OR from Devil Flag,DevilFlag |= Param,Same as above
+0x80e0,0 - 65535,Bitwise AND from Devil Flag,DevilFlag &= Param,Same as above
+0x80e4,0 - 65535,Store Value,Used in cancels where input happens prior to cancel frames,"276: >= param
+314: <= param
+352: == param"
+0x80e5,0 - 65535,Add value to prop 0x80e4,,
+0x80e6,0 - 65535,Subtract value from prop 0x80e4,,
+0x80e7,4-byte Integer,Store Value,,"277: >= param
+315: <= param
+353: == param"
+0x80e8,4-byte Integer,Add value to prop 0x80e7,,
+0x80e9,4-byte Integer,Subtract value from prop 0x80e7,,
+0x80ea,4-byte Integer,Store Value,,"278: >= param
+316: <= param
+354: == param"
+0x80eb,4-byte Integer,Add value to prop 0x80ea,,
+0x80ec,4-byte Integer,Subtract value from prop 0x80ea,,
+0x80ed,4-byte Integer,Store Value,,"279: >= param
+317: <= param
+355: == param"
+0x80ee,4-byte Integer,Add value to prop 0x80ed,,
+0x80ef,4-byte Integer,Subtract value from prop 0x80ed,,
+0x80f0,0 - 65535,Store Value,Seen in Kazuya to perform some of his story attacks,"280: >= param
+318: <= param
+356: == param"
+0x80f1,0 - 65535,Add value to prop 0x80f0,,
+0x80f2,0 - 65535,Subtract value from prop 0x80f0,,
+0x80f3,4-byte Integer,Store Value,,"286: >= param
+324: <= param
+363: == param"
+0x80f4,4-byte Integer,Add value to prop 0x80f3,,
+0x80f5,4-byte Integer,Subtract value from prop 0x80f3,,
+0x80f8,4-byte Integer,Store Value + Current Frame,Stores Value + Current Move Frame into the field,
+0x80f9,4-byte Integer,Store Value - Current Frame,Stores Value - Current Move Frame into the field,
+0x80fa,"p1 = 0 - 4, p2 = Any",Set Wall-hit Counter,Used in Wallsplats to count hits,"287: >= param
+325: <= param
+364: == param"
+0x80fb,"p1 = 0 - 4, p2 = Any",Add to Wall-hit Counter,,
+0x80fc,"p1 = 0 - 4, p2 = Any",Subtract Wall-hit Counter,,
+0x8123,0 - 65535,"Kazuya Devil State
+(Opponent)","Used whenever the game makes Kazuya transform into his devil state.
+0 = Human form 1 = Devil form",
+0x8124,0 - 65535,"Add to Devil Flag
+(Opponent)",,
+0x8125,0 - 65535,"Subtract from Devil Flag
+(Opponent)",,Same as above
+0x8126,0 - 65535,"Bitwise OR from Devil Flag
+(Opponent)",DevilFlag |= Param,Same as above
+0x8127,0 - 65535,"Bitwise AND from Devil Flag
+(Opponent)",DevilFlag &= Param,Same as above
+0x8128,4-byte Unsigned int,Activate Short Flag,"Activates flags in player's structure. Each flag is 2 bytes.
+Value format is 0xAAAABBBB
+AAAA is Flag # - 0 - 99
+BBBB is the value of the flag - 0 - 65535
+Req 365 checks value of the flag.
+0x60001 means activate flag 0x0006 and put value 0x0001 in it.","288: >= param
+326: <= param
+365: == param"
+0x8129,4-byte Unsigned int,Add to Short Flag,Value format same as above,
+0x812a,4-byte Unsigned int,Subtract from Short Flag,Value format same as above,
+0x812b,4-byte Unsigned int,"Activate Short Flag
+(Opponent)",Value format same as above,"391: >= param
+415: <= param"
+0x812c,4-byte Unsigned int,"Add to Short Flag
+(Opponent)",Value format same as above,
+0x812d,4-byte Unsigned int,"Subtract from Short Flag
+(Opponent)",Value format same as above,
+0x812e,4-byte Unsigned int,Activate Int Flag,"Activates flags in player's structure. Each flag is 2 bytes.
+Value format is 0xAAAABBBB
+AAAA is Flag # - 0 - 49
+BBBB is the value of the flag - 0 - 65535
+Req 366 checks value of the flag.
+0x60001 means activate flag 0x0006 and put value 0x0001 in it.","289: >= param
+327: <= param
+366: == param"
+0x812f,4-byte Unsigned int,Add To Int Flag,Same as above,
+0x8130,4-byte Unsigned int,Subtract From Int Flag,Same as above,
+0x8131,4-byte Unsigned int,"Activate Int Flag
+(Opponent)",Same as above,"392: >= param
+416: <= param
+439: == param"
+0x8132,4-byte Unsigned int,"Add To Int Flag
+(Opponent)",Same as above,
+0x8133,4-byte Unsigned int,"Subtract From Int Flag
+(Opponent)",Same as above,
+0x8139,"p1 = Index: 1 - 4
+p2 = Value",Store Heat State,"Related to showing/hiding Heat Meter.
+Value 1 was causing the meter to disappear.  ","440: >= param
+441: <= param
+442: == param"
+0x813a,Same as above,Add to Heat State,"Generally used for marking a Heat state as ""Consumed""
+e.g, Heat Dash consumed.",Same as above
+0x813b,Same as above,Sub from Heat State,,Same as above
+0x813f,Same as above,"Store Heat State
+(Opponent)","Related to showing/hiding Heat Meter.
+Value 1 was causing the meter to disappear.  ","446: >= param
+447: <= param
+448: == param"
+0x8140,Same as above,"Add to Heat State
+(Opponent)","Seen inside opponent reaction moves, to give his/her opponent heat on heat engager",Same as above
+0x8141,Same as above,"Sub from Heat State
+(Opponent)",,Same as above
+0x8146,4-byte Signed int,Inflict Recoverable Damage (self),Inflicts recoverable damage to the player at specified frame,Same as above
+0x814a,4-byte signed int,Raven Clone Horizontal Offset,Offsets raven clone spawn position by value,
+0x814b,0-?,Add Recoverable Health,Parameter is how much recoverable health the player gains.,
+0x814d,"0, 300, 600, 900",Set Heat Dash Charge,"Sets Heat Dash charge
+Allows heat dash on-hit reactions on the opponent (Needs more experimenting)
+If you set it to 300, you can do Heat Dash once, if you set it to 600, you can Heat Dash twice.","462: >= param
+464: == param"
+0x814e,Any,Spend Heat Dash Charge,Seen in Heat Dashes with value -300 and Heat Smashes with value -600,
+0x814f,Any,Some Freeze Timer,"Always seen in Rage Arts and Heat Bursts.
+In Rage Arts, has param 114, Heat Bursts have param 46.
+These parameters, when subtracting from actual active frame, align with fake startup frames",
+0x8151,0 - 1,Activate Devil State Permanently,"Activates Kazuya's devil form permanently
+Used in Story & Arcade modes to give you Devil Kazuya",473: == param
+0x8152,"p1 = 1 - 20, p2 = Any",Store Value in P20 Flags,"There are 20 flags inside the player struct, param1 decides which flag, param2 decides the value.
+First index is 1, not 0. So Player->p20_flags[p1 - 1] = p2
+Writes to 4 already existing flags/members","474: >= param
+475: <= param
+476: == param"
+0x8153,"p1 = 1 - 20, p2 = Any",Add to P20 Flags,Same as above,Same as above
+0x8154,"p1 = 1 - 20, p2 = Any",Substract From P20 Flags,Same as above,Same as above
+0x8155,Any,"Set Story Scripted Flag
+(SS Flags)","Store Value
+Seen in all Characters to play scripted Heat Engagers and some other sequences","484: >= param
+485: <= param
+486: == param"
+0x8156,Any,Add to SS Flag,Same as above,
+0x8157,Any,Sub from SS Flag,Same as above,
+0x8158,0xAAAABBBB,Store Value,0xAAAA is the index and 0xBBBB is the value to be stored,
+0x815a,"p1 = 0 - 9
+p2 = Any
+p3 = Any",Store Value,"There are 10 ""entries"" and each entry consists of a [value1, value2] pair.
+p1 = entry index (0-9); ignored if >= 10.
+p2 = value1
+p3 = value2 (the value req 507 compares)
+No-op if p1 is out of range.",507: == param2
+0x815b,4-byte signed int,Floor Blast Flag,"Floor Blast Flag.
+Always seen in reaction animations that lead to the Floor Blast","514: Player
+515: Opponent"
+0x815c,4-byte signed int,Add to Floor Blast Flag,,
+0x815d,4-byte signed int,Substract From Floor Blast Flag,,
+0x81ec,0 - 1,Allow Blocking," Allows blocking during a reaction animation.
+0 = Can't block. 1 = Allowed to block",
+0x81ed,4-byte Unsigned int,Give CH property,"Used in Ki-charge moves. 
+The parameter is how many frames until the CH effect will be active.
+e.g, For Jin's charge, value is 330 (frames)",
+0x81f1,0,Detach position,"While a throw, disconnects position of the characters. 
+Removes mutual collision near walls",
+0x81f5,1,Detach height (smoothly),"While a throw, disconnects height average of the characters (during a few frames)",
+0x81f6,1,Detach height (instantly),"While a throw, disconnects height average of the characters (during one frame)",
+0x81f8,0 - 1,Give Parry immunity,0 = Parryable. 1 = Can't be parried,
+0x81fa,"0 - 54, 153",Add Tracking/Alignment (Player),"Adds tracking properties to a move.
+0 = No Tracking 1 = Homing Level Tracking 7 = Standard Tracking 12 = Infinite Tracking
+e.g Used in a handful of homing moves.",
+0x81fb,"0 - 54, 153",Add Tracking/Alignment (Opponent),,
+0x81fc,VULN,Change Player Status/Vulnerability,Can tweak the Player's Status. You can cross reference your state with the Frame Display,
+0x81fd,1,Detach characters,"While a throw, brings back characters' collision.
+Requires constant performance up to the end of the move (start frame must be 0x4XXX)",
+0x81fe,?,Change Hurtboxes Size,"4096 = 100.0% size, Collision enabled
+0 = 0% size, Collision disabled
+Parameter is percentage written in hex form. E.g, 4096 is 0x1000 which is 100.0%",
+0x8203,0-1,"Footstep SFX & VFX
+","0 = Don't play
+1 = Play footstep VFX (snow/smoke) + SFX.
+Non-zero value triggers the property
+",
+0x8213,1,Start back turn,,
+0x8214,1,End back turn,,
+0x822d,4-byte Unsigned int,Power Crush Properties,"Gives a move Power Crush properties. This allows for a move to absorb hits.
+Using it again with a value of 0 disables the power crush affect.
+Value format is 0xAABBCCDD
+AA - Powercrush flag (0 = Off, 1 = On), If this is Off, nothing gets absorbed
+BB - Scaling applied to absorbed hits (100 = 100%)
+CC - Lows & Throws flag (1 = absorb them, 0 = not absorb them)
+DD - Player doesnt freeze when hit during power crush (0 = Off, 1 = On)",
+0x822e,0 - 1,Rage Art Activate VFX,Used in Rage Arts to trigger the Tint that's displayed when a RA is activated,
+0x8232,0 - 1000,Fill Kazama Essence,"Fills the value for Kazama-essence
+0 = 0.0, 1000 = 100.0","738: >= param
+744 : < param"
+0x8238,0-32767,Skip Frames of Move (=N),Value is the number of frames to skip,Must be used in a cancel and requires extradata that allow frame skipping
+0x8239,,Skip Frames of Move (+N),Same as above but adds to the current frame counter,
+0x823a,,Skip Frames of move (-N),Same as above but removes from the current frame counter,
+0x823b,,Skip frames of move (= N + 0x1000),"Value is number of frame to skip, will be additioned with 0x1000",
+0x823c,,Skip frames of move (= N + 0x2000),"Value is number of frame to skip, will be additioned with 0x2000",
+0x823f,,Skip frames of move (= N + 0x4000),"Value is number of frame to skip, will be additioned with 0x4000",
+0x8240,,Skip frames of move (= N + 0x8000),"Value is number of frame to skip, will be additioned with 0x8000",
+0x8244,"p1 = Move ID
+p2 = Queueing Flag",Force Move on Opponent (With Reset),"Forces the opponent to play a move from the character's list of moves.
+This one clears Animation Managers first and then forces the move.
+Param2 0 = Instant, 1 = Queue",
+0x8245,"p1 = Move ID
+p2 = Queueing Flag",Force Move on Opponent (Raw),"Doesn't clear any manager states, goes straight for forcing the move.
+Param2 0 = Instant, 1 = Queue",
+0x8246,0 - ?,Set Player Speed,"Slows down the player's attack. (4096 = 100%)
+e.g Balancing moves to make them come out slower, etc.","168: ???
+640: >= param
+641: <= param
+642: == param"
+0x8247,?,Add to Player Speed (modifier),"Takes both positive and negative values. It's a modifier of some sort.
+It doesn't add the value directly, multiplies it first with a float that we yet know nothing about.",Same as above
+0x8248,0 - ?,Set Opponent Speed,Same as 0x8246 except it's for opponent,
+0x8249,?,Add to Opponent Speed (modifier),Same as 0x8247,
+0x824a,?,Set Maximum Player Speed,,
+0x824b,?,Set Minimum Player Speed,"Used in charged moves. Value indicates the speed the player will be set at when the move is charging.
+This is needed for charge moves!",
+0x824c,Move ID,Change Animation,Changes current animation with animation referenced by move id,
+0x8251,0-?,"Horizontal Animation Distance Multiplier
+(Eased Horizontal Movement)","Modifies how far the character moves forwards or backwards as a result of the animation. 
+Value of 0 gives no horizontal movement. 
+100 is default, using 200 would double the distance.
+Value 110 means 10% increase in distance",
+0x8252,0-?,"Vertical Animation Distance Multiplier
+(Eased Vertical Movement)","Modifies how far the character moves upwards or downwards as a result of the animation. 
+Value of 0 gives no vertical movement. 
+100 is default
+Origin of animation is within the floor",
+0x8254,1,Break Floor Function,"THE FLOOR GOES BOOM
+Breaks the floor at a specified frame.
+Depending on your current vulnerability will depend on what falling state will play when the floor breaks.",
+0x8258,Pushback idx,Inflict Pushback on self,Pushes player on world axis using specified pushback,
+0x825a,?,Align pushback with self,Sets pushback direction of prop 0x8258 to be the character's forward direction,
+0x825b,?,Align pushback with self (backwards),Sets pushback direction of prop 0x8258 to be the character's backward direction,
+0x825c,0 - 1,Enable/Disable Gravity,Used in Wallsplats,
+0x825d,Pushback idx,Inflict Pushback on opponent,Pushes opponent on world axis using specified pushback,
+0x825f,?,Align opponent pushback with self,Sets pushback direction of prop 0x825d to be the character's forward direction,
+0x8260,?,Align opponent pushback with character,Sets pushback direction of prop 0x825d to be the opponent's forward direction,
+0x826f,4-byte signed int,Set Slide Speed,"Used in tandem with 0x8270 to adjust the speed of the slide
+e.g Yoshimitsu's d3+4 slide uses 4294959096 (0xFFFF DFF8)",
+0x8270,4-byte signed int,Slide Player,Slides the player in direction set by value,
+0x8271,4-byte signed int,Slide Player on world axis,Slides the player in direction set by value on world axis,
+0x8272,4-byte signed int,Rotate Player,"Negative value: Rotate right
+Positive value: Rotate left
+See formula above for values",
+0x8273,4-byte signed int,Rotate Opponent,"Negative value: Rotate right
+Positive value: Rotate left
+See formula above for values",
+0x8275,4-byte signed int,Push Player in Z-axis,"From character's current positon, pushes your character into foreground or background.
+0x1000 = 1.0 distance in frame data display
+Imagine your character standing in a T-pose, then param value:
+Positive: into character's left. Negative: into character's right.",
+0x8276,4-byte signed int,Push Player in X-axis,"From character's current positon, pushes your character forward or backward.
+0x1000 = 1.0 distance in frame data display
+Imagine your character standing in a T-pose, then param value:
+Positive: into character's left. Negative: into character's right.",
+0x8278,4-byte signed int,Push Player in Y-axis (height),"From character's current positon, pushes your character up or down.
+0x1000 = 1.0 distance in frame data display
+Imagine your character standing in a T-pose, then param value:
+Positive: into character's left. Negative: into character's right.",
+0x827b,Projectile ID,Spawn Projectile,Spawns a projectile from the player. The Value is the ID of the Projectile,
+0x827c,?,Projectile Initial Height Related (?),,
+0x827d,Signed integer (4 bytes),"Projectile Initial Horizontal Velocity
+(Distance from Spawn Point)","Initial X-axis direction of the projectile. After unspecified number of frames, the projectile goes to the direction described within it.
+E.g, Anna uses 880 for her PT1 projectile",
+0x827e,Signed integer (4 bytes),"Projectile Initial Vertical Velocity
+(Distance from Spawn Point)","Initial Y-axis direction of the projectile. After unspecified number of frames, the projectile goes to the direction described within it. Anna's PT1 has value of 990 by default. Setting it to 3000 makes the Bazooka go upwards for a few frames and then in it's designated direction",
+0x827f,Signed integer (4 bytes),"Projectile Initial Lateral Velocity
+(Distance from Spawn Point)","Initial Z-axis direction of the projectile. After unspecified number of frames, the projectile goes to the direction described within it. Anna's PT1 has value of 205 by default. Setting it to 1000 makes the Bazooka go to the opponent's right for a few frames and then in it's designated direction.
+Positive value: Foreground. Negative value: Background",
+0x828b,0-1000,Enable Scaled Damage,"REQUIRED FOR TEKKEN 8 STYLE THROWS.
+Value indicates the maximum damage a scaled throw can do.
+Starting frame should always be 0x8001",
+0x828c,0-100,Hit with Scaled Damage (Opponent),"Damages the opponent when it reaches the specified frame. 
+If other scale values are present the value indicates how strong it is in comparison to the other scale values.
+Setting the value to 0 will deal the left over scaled damage. (Used at the end of throws)
+100 Deals the maximum damage the throw can do.
+DOESN'T WORK IF 0x828b IS NOT PRESENT BEFOREHAND",
+0x828d,0-100,Hit with Scaled Damage (Self),"Damages the player when it reaches the specified frame. 
+Same properties as 0x828c
+DOESN'T WORK IF 0x828b IS NOT PRESENT BEFOREHAND",
+0x828e,0-100,Scaled Heal (Self),Seen in NPC Jack. Needs 0x828b present,
+0x8290,0-100,Hit with Scaled Damage (Self),Damage the player when it reaches the specified frame. Used inside reaction's moves.DOESN'T WORK IF 0x828b IS NOT PRESENT BEFOREHAND,
+0x8296,Unsigned Integer (4 bytes),2D Jump Height,"Value affects the character's jump height
+Value Format: 0xXXYYZZZZ
+XX - Upwards Vector
+YY - Gravity
+ZZZZ - Vertical Offset",
+0x82a5,?,Set Chip Damage,"Value is the percentage of the move's actual damage (assigned in the Hit Condition) inflicted on the opponent. Value 335 is required to cause 100% damage if the opponent has Rage because it activates Chip Damage Reduction buff.
+Prop to be used on the attack, rather than on the reaction",
+0x82a9,0 - 100,Add scaling (downed),Used specifically for downed reactions,
+0x82bc,Frame,Reset Combo Meter,"Parameter tells at what frame the combo meter will be reset.
+Found in reaction animations e.g, reaction to King's hopkick",
+0x82be,0-1,Add to Combo Counter,Can be used only on Reaction animations (?),
+0x82c1,0-?,Player Visibility,"0 = visible, 1 = invisible.
+If value is 4, you will be invisible on frame 4,8, 12, 16 etc.",
+0x82c2,0-?,Opponent Visibility,Same as above,
+0x82c5,0 - 1,Spend Tornado,"0 = Spend Tornado, 1 = Reset Tornado",724: Tornado available
+0x82c6,0,Trigger Animation-Change State,Marks the character as entering an animation-change state. The parameter is unused (leave at 0). Does not change which move plays — use 0x824C for that,510
+0x82d2,0 - 1,Trigger Wing Flap,,
+0x82d4,0 - 1,Yoshimitsu's main sword,"Yoshimitsu's katana in the left hand.
+1 = Appears, 0 = Disappears",
+0x82d5,0 - 1,Yoshimitsu's second sword,"Yoshimitsu's wakizashi in the right hand.
+1 = Appears, 0 = Disappears",
+0x82d8,0 - 1,Yoshimitsu's main sword effect,"Visual effect on Yoshimitsu's katana in the left hand.
+1 = Appears, 0 = Disappears",
+0x82d9,0 - 1,Yoshimitsu's second sword effect,"Visual effect on Yoshimitsu's wakizashi in the right hand.
+1 = Appears, 0 = Disappears",
+0x82e0,1,Activates Rage,Activates Rage if Rage is available.,159: Is Player in Rage?
+0x82e2,0-1,Spend Rage,Removes rage (1). Allows rage to be obtained again (0),
+0x82e7,2-byte integer,Trigger Opponent Rage,"Param uses low 16 bits: 0 = off, any non-zero = on.
+Used in several moves, like Tornados, to grant Rage to the player in Story Mode",
+0x82f0, 0 - 1,Toggle Neck Tracking,"Normally, animations force your character's neck/face to be in opponent's direction. This prop disables forcing. 
+0 (OR ANY EVEN VALUE) = Disable
+1 (OR ANY ODD VALUE) = Enable",
+0x82fc,?,Slow Down Effect,"Anything effected by this doesnt move. Including characters and the enivornment.
+Value format is 0xYYYYZZZZ
+YYYY - Game speed %
+ZZZZ - How many frames will the slow down effect last for
+Rage Art uses value 65566",
+0x8302,?,Player Stop Motion Effect,"Plays the 2D stop motion effect on player.
+Value format is 0xWWXXYY??
+?? is unknown.
+WW is delay. When this property activates, how many frames to wait until character vibrates with YY intensity
+XX is how many frames the character will stay stopped.
+YY is the intensity of character vibration",
+0x8303,?,Opponent Stop Motion Effect,"Plays the 2D stop motion effect on opponent.
+Value format is same as above",
+0x830a,0 - 1,Some Wallsplat Related Value,"Seen in Getup moves and reactions that lead to wallsplats.
+Toggles a byte-flag member in the Player struct.
+Value 0 = Set member to 1. Value 1 (non-zero) = Set member to 0.","728: == param (opponent)
+729: == param (player)"
+0x830d,0xAAAABBBB,Health Bar Control,"Different values control the HD Display.
+The value format is 0xAAAABBBB",
+0x8313,1 - 9,"Set Drama Type
+(Trigger Drama Camera)","Required alongside 0x8314 to trigger intro/outro camera
+Value indicates the type of cinematic. 1 = Intro, 2 = Outro",
+0x8314,Index,"Set Drama No.
+(Trigger Drama Camera)","Required alongside 0x8313 to trigger intro/outro camera
+Value is the intro index (0 - 2)",
+0x8338,-1000 - 1000,"Use ""Fake"" Frame Advantage","Used to add fake frame advantage to a move. The move to which this property is attached, imagine the last cancel says it goes back to neutral on frame 72. Then if this prop has a value of 72 as well, it will show you +1 on block.
+Last Cancel's Frame + 1 - Prop value = Frame advantage.
+Do note that the opponent's reaction animation length also plays into the calculation, exactly how is unknown",
+0x8339,-1000 to 1000,Set Fake Startup frames,"Used in Heat Bursts, which have 62 startup frames to show them as i16.
+Param was 4294967250 which translates to -46.
+62 - 46 = 16",
+0x835b,0 - 1,Spend Leroy's Cane,"Used to allow Leroy using his once-per-match cane move
+0 = Reset, 1 = Spend Leroy's cane install",
+0x8370,Prop ID,Spawn Kuni Item,Parameter is which prop to spawn,
+0x8371,Prop ID,Despawn Kuni Item,,
+0x8379,0,Break floor,Into reaction's move,
+0x837a,0,Break floor at frame,"When triggered at desired frame, the floor effectively brake. Into reaction's move",
+0x8381,1,Ignore powercrush,Hitboxes will ignore any opponent powercrush,
+0x8382,0 - 1,Set Heat Engager Success Flag,"0 = Failed. 1 = Succeeded to land.
+Used in tandem with reqs 442 (Heat Available) and 466 (Not a Trade)",
+0x8383 ,"Param 1: -900 to +900
+Param 2: Flag",Refill / Drain Heat Gauge,"Adds or drains Heat Gauge. Max is 900 points.
+For draining Heat, use 4294967295 - (amount to drain)
+Negative value drains Heat. Plays Heat activation VFX + SFX if it's not already active
+Value 0 plays the Heat Deactivation SFX. Also sometimes uses Parameter 2 with Value 1, which means ""This fill is Heat Activation""",
+0x8384,Same as Above,"Refill / Drain Heat Gauge
+(Opponent)",Same as above,
+0x8385,0 - 1,Player Facing Related?,"Seen in some reaction pre-move props list, decompiled code suggests it rotates the player around. 
+Needs testing",
+0x8386,Any,Remove Recoverable Health on self,Removes recoverable health on self.,
+0x8387,Any,Remove Recoverable Health on opponent,"Removes recoverable health of the opponent.
+Value of 200 spotted",
+0x838e,Index,Trigger Cinematic Camera,"Seen in Rage Arts
+Handled through UE rather than movesets",
+0x838f,Check Note,Trigger Rage Art Stage VFX,"Changes stage background to those seen in Rage Arts
+E.g, 2 = Jun's RA background. 6 = Dragunov",
+0x8394,0,Activate Heat Aura,Enables the Heat Aura VFX,
+0x83a0,0-100,Hit with Scaled Chip Damage (Opponent),Only deal chip damage,
+0x83aa,0-16,Create Raven Clone,Value decides clone animation,
+0x83ab,0,Remove Raven Clone,,
+0x83ad,?,Play Subtitles Text,"Plays subtitles at a given frame.
+Value format is 0xYYYYZZZZ
+YYYY is subtitle number. E.g, 0x25 = ""I will believe in my heart!""
+ZZZZ is duration for which the subtitle will be displayed (in frames)
+Subtitles values are universally stored (So Lars subtiles will load on Jin for example)",
+0x83b1,?,Set Character Installs,"0 = Install consumed, 1 = Install activated
+Seen in Bryan, Asuka, Leo etc.",454: == param
+0x83bc,2-byte signed integer,Rotate Player,Value is in degrees,
+0x83bd,2-byte signed integer,Rotate Opponent,,
+0x83be,?,Pause/Resume Heat Timer,"Used in Heat Bursts to Pause/Resume Heat Timer
+Value format 0xAAAABBBB
+Any non-zero value at 0xAAAA pauses the timer. Duration uncontrolled
+Any non-zero value at 0xBBBB doesn't let the timer be paused",
+0x83c0,Uses 3 param values,Play the black screen VFX,"Used to play VFX on moves where the recoverable health is removed from the opponent.
+Uses param values 0, 35 and 4 (for Heihachi)
+Value 1: needs to be 0
+Value 2: duration of the VFX in frames
+Valud 3: Unknown, probably VFX ID because changing value crashed the game",
+0x83c3,0-1,Hit do chip damage,"1 activate chip damage, 0 deactivate chip damage. Works with a move doing damage like standard heat engager",
+0x83ca,0xAABBCCDD,Make Character Glow,"Can give a blue-ish glow to a character, one similar to Rage Drives in T7. Value format is 0xAABBCCDD
+AA - Enable Flag
+BB - VFX ID
+CC - Duration
+DD - Unknown, spotted to be zero
+Spotted in Kazuya, Heihachi, Azazel and True Devil Kazuya",
+0x83cb,0xAAAABBBB,Glow Slot Enable/Disable,"AAAA = glow slot index 0-5.
+BBBB = on/off (non-zero = enable, zero = disable)",
+0x83cc,0xAAAABBBB,Glow Slot Intensity,AAAA = slot index 0-5. BBBB = intensity,
+0x83cd,0 - 100,Add scaling (airborne),Used specifically for airborne reactions,
+0x83ce,"P1 = 0 - 100
+P2 = ?",Add scaling,Used in hit reactions to add scaling to followup attacks. Value is % scaling.,
+0x83d3,0-1,,1 often with player in heat at the start of the move. 0 near end of the move,
+0x83d6,?,Set Game Speed,"Affects everything: The characters, the stage props and animationsetc..",
+0x83d7,?,Slow Down Effect,"Anything effected by this doesnt move. Including characters and the enivornment.
+Value format is 0xYYYYZZZZ
+YYYY - Game speed %
+ZZZZ - How many frames will the slow down effect last for
+Used in Moves like Eddy d/b+4,4 (value: 327700)",
+0x83e6,0-1,Gives Armor Break Property,Suspected to also make the move unparryable,
+0x83ee,-1 to 2,"Add Stock Levels
+(Clamped)","Used for adding or subtracting to character stocks. Has character-specific ceilings, floor is always 0.
+Negative param subtracts from the stock levels
+It's essentially new = max(0, currentStockLevel + param)
+Seen in Eddy, Lidia, Heihachi and Clive",490: >= param
+0x83f9,0 - 1,Trigger Warrior Instinct,"Used in Heihachi to trigger his Warrior Instinct.
+0 = Remove Warrior Instinct (removed the logo from HUD)
+1 = Activate Warrior Instinct",498: == param
+0x8405,0-1,Apply Weakened state,Extend the hurtbox ,
+0x848b,?,Attach Item,Attaches an Item onto the Player. Shotgun uses Value 30?,
+0x848c,?,Detach Item,Detaches an Item from the Player. Shotgun uses Value 30?,
+0x850b,"P1 = ?, P2 = ?",Set Opponent Floor Level,"Always spotted in move ""FallBalconyFKAM2""
+P1 = 400, P2 = 5000.",
+0x850c,Move ID,Force Move on Opponent,"Used in Balcony break moves (FallBalconyFKAM2).
+Legacy code from T7 and very likely unused.",
+0x850d - 0x852d,Move ID,Change Aliased / Generic Move,"Change value of aliases 0x8000 - 0x8020
+See Generic Move ID sheet",
+0x852e - 0x854e,Move ID,Restore Aliased / Generic Move,"Restore value of aliases 0x8000 - 0x8020
+See Generic Move ID sheet",
+0x8555,?,(Gray) Health Regeneration,"Seen in Boss Heihachi to restore his recoverable health.
+Value format appears to be 0xAAAABBBB
+Values seen: 0x000C0001 and 0x00190001",
+0x856a,?,,"Sets integer value at vtable FE084 offset 0x218. Story Mode related.
+Mostly seen in ""Direct"" cancels and Story Cutscene animations.","769: >= param
+770: <= param
+771: == param"
+0x856b,?,,Adds to integer value at vtable FE084 offset 0x218. Story Mode related.,
+0x856c,?,,"Subs from integer value at vtable FE084 offset 0x218. Story Mode related.
+Clamps at >= 0",
+0x8578,?,,Sets integer value at vtable FE084 offset 0x200. Story Mode related.,
+0x8582,?,,Sets a flag at vtable FE084 offset 0x208. Story Mode related.,789: == param
+0x860a,Hand Pose Index,Both Hands Pose,"Plays the hand pose at the specified frame.
+Value format is 0xAABB
+AA - Index for Hand Pose
+BB - Duration of blending into that pose",
+0x860b,Hand Pose Index,Left Hand Pose,Plays the hand pose for the left hand at the specified frame.,
+0x860c,Hand Pose Index,Right Hand Pose,Plays the hand pose for the right hand at the specified frame.,
+0x860e,?,Both Hands Pose related,It appears to be playing seq # 1 on left hand & seq # 2 on right hand with param num of frames,
+0x860f,Anim Index,Play Both Hands Animation,,
+0x8610,Anim Index,Play Left Hand Animation,,
+0x8611,Anim Index,Play Right Hand Animation,,
+0x8612,0xYYZZZZ,Left Hand Anim related,"0xYY is the animation index, 0xZZZZ is unknown
+It's suppose to play an animation but nothing was observed",
+0x8613,0xYYZZZZ,Right Hand Anim related,It's suppose to play an animation but nothing was observed,
+0x8683,Anim Index,Play Wing Animation,,
+0x8684,Anim Index,Wing Anim related,It's suppose to play an animation but nothing was observed,
+0x8685,Anim Index,Play Wing Animation,,
+0x8688,Anim Index,Play Camera Animation,"Param is the anim index in ""anmbin"" file.
+Some unknown ""Mode"" value is set to 2",
+0x8689,Anim Index,"Play Camera Animation
+(Mirror position)","Same as above. Unknown ""mode"" value set to 3",
+0x868a,Anim Index,"Play Camera Animation
+(Mirror position)","Same as above. Unknown ""mode"" value set to 3",
+0x868b,Anim Index,"Play Camera Animation
+(Mirror position)","Same as above. Unknown ""mode"" value set to 1",
+0x868c,Anim Index,"Play Camera Animation
+(Left Side)","Via TK__playCameraAnimWithOpponent, mode 2, keyed from self. Requires TK__isPlayerSide==0, +0x164==1, +0x18B4==0.",
+0x868d,Anim Index,"Play Camera Animation
+(Right Side)","Same as 0x868C, but requires TK__isPlayerSide==1.",
+0x868f,Index,Throw Camera,Parameter is the index of the Throw Camera to be played,
+0x8694,?,,"Always found in those ""Continue?"" moves",
+0x8695,0-2,Camera Zoom Focal Point / Camera transition,"Value determines where the camera zooms at
+0 = Zoom on P1, 1 = Zoom on P2, 2 = Zoom on both
+Needs Extra Prop 0x8696 for it to work
+It also has a unique param of 0xWWXXYYZZ in tandem with 0x8697 where
+WW = The length of how long the camera will transition into place in frames
+XX = The length of how long the camera will transition back to normal
+YY = Will need more research (00 is spotted in tornado reacctions) (?)
+ZZ = Focus point (00 = p1, 01 = p2, 02 = both p1 & p2) (?)",
+0x8696,?,Camera Zoom Effect,"Camera zooms in momentarily
+Use 0xAAWWXXYZ where
+AA is how many frames it takes to reach zoomed-in position
+WW is how long the camera stays zoomed in, X for how long it takes to zoom out, 
+Y for the direction to zoom, Z for duration of zooming itself
+e.g. 68420899 is mainly used for heavy hitting moves, 67765542 is commonly used for CH effects",
+0x8697,?,Camera orbit effect,"Camera orbits momentarily
+Use 0xWWXXYYZZ where
+WW = Position of camera on the first axis
+XX = Position of camera on the second axis
+YY = How long the effect will last in frames
+ZZ = How much zoom the effect will have
+(Seen in tornado reactions)",
+0x8698,Anim Index,"Play Cinematic Camera
+(Male Fighters Only)","Play only if Fighter is male, some unknown ""mode"" value set to 2",
+0x8699,Anim Index,"Play Cinematic Camera
+(Female Fighters Only)","Play only if Fighter is female, some unknown ""mode"" value set to 2",
+0x869a,Anim Index,"Play Cinematic Camera
+(Big Fighters Only)","Play only if Fighter is (Jack, Fahkumram, Seiryu)
+Some unknown ""mode"" value set to 2",
+0x869b,Anim Index,Play Camera Animation,"TK__playCameraAnim, mode 2. Requires +0x368C==0. Anim index from anmbin.",
+0x869c,Anim Index,Play Camera Animation,"Same as 0x869B, but requires +0x368C==1.",
+0x86a9,Anim Index,"Play Cinematic Camera
+(Bears Only)","Play only if Fighter is a Bear
+Some unknown ""mode"" value set to 2",
+0x86aa,Anim Index,"Play Cinematic Camera
+(Opponent's – Left Side)","Via TK__playCameraAnimWithOpponent, mode 2, keyed from opponent (r15). Requires TK__isPlayerSide==0. Sibling of 0x86AB.",
+0x86ab,Anim Index,"Play Cinematic Camera
+(Opponent's – Right Side)","Same as 0x86AA, but requires TK__isPlayerSide==1.",
+0x86b0,?,Heat Camera,Used in Heat Bursts and Heat Engagers. Value controls the camera angle,
+0x8779,0xAABB,Play Facial Expression,"Parameter is the index of the facial expression to play.
+0xAA is the expression ID meanwhile 0xBB is the interpolation duration.",
+0x877a,Index,Play Facial Animation,Parameter is the index of the facial animation to play.,
+0x877b,Index,Play Drama Facial Animation,"Refer to prop 0x87f8
+Drama = Intro / Outro / Fate",
+0x877c,"0xAAAABBBB
+(2 values)",Expand Left Arm Muscles,"Used to expand muscles and make the body reddish. This uses atleast 2 values where each value is further divided into 2 sub-values. First value is about Fade-in and the 2nd one is about Fade-out.
+0xAAAABBBB.
+AAAA = For value-1, it is set 1 to Trigger it. For value-2, it's very likely the duration after which Fade-out will trigger.
+BBBB = Duration of the Fade-in & Fade-out.",
+0x877d,"0xAAAABBBB
+(2 values)",Expand Right Arm Muscles,"Same as above
+Seen in Kazuya's EWGF",
+0x8780,"p1 = Anim Index
+p2 = ?",Play Wing Animations,Spotted in True Devil Kazuya,
+0x87ef,?,Play Sound from Player,"Requires 3 param values
+1st Param - The folder of sounds
+2nd Param - Chance of the voiceline playing. 100 means 100% chance   
+3rd Param - Actual voiceclip ID to be played",
+0x87f0,?,Play Sound from Player,Same as above,
+0x87f1,?,Play Sound from Player,Same as above,
+0x87f2,?,Play Sound from Opponent,Same as above,
+0x87f3,?,Play Sound from Opponent,Same as above,
+0x87f7,0,Store Current Move Voiceclip Key?,"Under certain conditions, stores a voiceclip key inside the player struct using the current move's name key",
+0x87f8,0xAAAABBBB,Play Drama Voiceclip,"Used for playing dialogue in intros/winposes, both generic and character specific. Searches for appropriate voiceclip & facial anim inside the ""dialogues"" array within the moveset
+Value format is 0xAAAABBBB
+AAAA - Type of move. 0 = Intro, 1 = Outro, 2 = FATE Intro
+BBBB - ID
+E.g, All of Kazuya's ""Enough of this farce"" intro variations have the AAAA value as 0 and BBBB value as 2, which means ""Intro # 2"" (counting from 0)",
+0x87f9,?,Preset Camera Zoom,,

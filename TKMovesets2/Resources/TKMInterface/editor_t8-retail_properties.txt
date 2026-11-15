@@ -1,0 +1,980 @@
+0, End of Extra Properties
+32769, Camera Shake: Lightest
+32770, Camera Shake: Light
+32771, Camera Shake: Medium
+32772, Camera Shake: Heavy
+32773, Camera Shake: Custom
+32774, Camera Shake: Lightest
+32775, Camera Shake: Light
+32776, Camera Shake: Medium
+32777, Camera Shake: Heavy
+32778, Camera Shake: Custom
+32779, Ground Ripple
+32782, Break Tile
+32783, Medium Ground Ripple
+32784, Heavy Ground Ripple
+32785, Fire Burn Effect on self
+32786, Fire Burn Effect on opponent
+32791, Play VFX
+32792, Play Common Vfx At Bone Self
+32793, Electric Effect on self
+32794, Electric Effect on opponent
+32795, Heat Smash VFX on self
+32798, Mouth Fog Vfx
+32799, Spawn Bone Linked Effect67to69
+32801, Play Common Vfx At Bone Self B
+32802, Start Attached Vfx
+32803, Play Common Vfx At Bone Opponent
+32804, Stop VFX
+32805, Play VFX
+32806, Camera Shake Custom Param
+32807, Break Stage Tile
+32808, Spawn Effect At Bone
+32809, Stop Bone Effect
+32810, Spawn Effect72At Player
+32811, Spawn Facing Effects70 71
+32812, Spawn Effect On Opponent
+32813, Spawn Effect At Fx Pos Self
+32814, Spawn Effect At Fx Pos Opponent
+32817, Char Hit Spark on Self
+32818, Char Hit Spark Self
+32819, Compute Self Bone Pos Only [no effect in retail]
+32820, Set Effect Direction From Param Bytes
+32823, Play Common Vfx At Bone Self Staged
+32824, Play Common Vfx At Bone Opponent Staged
+32825, Play Character Trail VFX
+32827, Spawn Linked Effect On Opponent Bone
+32829, Spawn Linked Effect From Own Bone
+32830, Hit spark on self
+32831, Hit spark on opponent
+32832, Heavy sparks on self
+32833, Heavy sparks on opponent
+32834, Heavy sparks with char hit spark on self
+32835, Heavy sparks with char hit spark on opponent
+32836, Spawn Effect6EAt Self Bone
+32837, Spawn Effect6F
+32838, Play Stage VFX
+32839, Spawn Effect6B
+32841, Play Common VFX
+32842, Play Common VFX
+32843, Tile Break VFX on self
+32844, Item State Event
+32845, Spawn Effect At Bone Packed
+32847, Spawn Effect77
+32848, Tile Break Vfx Self
+32850, Environment VFX
+32851, Set Effect Attach Bone
+32852, Spawn Vfx At Offset
+32853, Spawn Vfx At Offset
+32854, Spawn Vfx At Offset2
+32855, Set Flag155D
+32856, Set Effect Offset
+32859, Send Bone Effect Event20
+32861, Spawn Effect On Self
+32862, Spawn Linked Effect On Opponent Bone
+32863, Set Float1570
+32864, Spawn Effect At Bone Ext
+32883, Set Target Point Flag
+32884, Set Effect Aim From Facing374
+32885, Set Effect Aim From Local Offset
+32886, Set Effect Aim From Facing376
+32887, Set Effect Aim From Angles
+32888, Spawn Effect100At Effect Pos
+32889, Throw Effect on self
+32890, Smoke Effect on self
+32891, Set Effect Offset From Param Bytes
+32892, Block Effect on self
+32893, Sparks on self (?)
+32894, Play Common Vfx At Opponent Bone Pos
+32895, Small Sparks on self
+32896, Spawn Item Effect At Stored Bone
+32897, Set Item Effect Bone
+32898, No Op In Interpreter 8082 [no effect in retail]
+32899, No Op In Interpreter 8082 [no effect in retail]
+32900, No Op In Interpreter 8082 [no effect in retail]
+32902, Hp Command Mode1
+32903, Inflict Self Damage
+32904, Heal Health
+32905, Set Modifier103C Mode4
+32906, Hp Command Mode5
+32907, Hp Command Mode6
+32908, Hp Command Mode7
+32909, Hp Command Mode8
+32910, Inflict Self Damage
+32913, Hp Command Mode2Percent Of Opponent
+32914, Store Value
+32915, Store Value
+32916, Store Value
+32917, Store Value 0x8092 (Opponent)
+32918, Store Value 0x8093 (Opponent)
+32919, Store Value 0x8094 (Opponent)
+32920, Store Value
+32921, Add value to prop 0x8098
+32922, Subtract value from prop 0x8098
+32923, Store Value
+32924, Add value to prop 0x809c
+32925, Subtract value from prop 0x809c
+32926, Store Value15DC
+32927, Add Value15DC
+32928, Sub Value15DC
+32929, Set Value15E0
+32930, Add Value15E0
+32931, Sub Value15E0
+32932, Set U16181C
+32933, Add U16181C
+32934, Subtract value from u16 P+0x181C
+32935, Set u16 P+0x181E to value
+32936, Add value to u16 P+0x181E
+32937, Sub U16181E
+32938, Set U161820
+32939, Add U161820
+32940, Sub U161820
+32941, Set U16Array1822
+32942, Add U16Array1822
+32943, Sub U16Array1822
+32944, Set Total Damage Taken
+32945, Add Total Damage Taken
+32946, Sub Total Damage Taken
+32953, Set Item Counter0 [no effect in retail]
+32954, Add Item Counter0 [no effect in retail]
+32955, Sub Item Counter0 [no effect in retail]
+32956, Set Item Counter1 [no effect in retail]
+32957, Add Item Counter1 [no effect in retail]
+32958, Sub Item Counter1 [no effect in retail]
+32959, Set Item Counter2 [no effect in retail]
+32960, Add Item Counter2 [no effect in retail]
+32961, Sub Item Counter2 [no effect in retail]
+32962, Set Value1610
+32963, Add Value1610
+32964, Sub Value1610
+32965, Store Value
+32966, Add value to prop 0x80c5
+32967, Subtract value from prop 0x80c5
+32968, Store Value
+32969, Add value to prop 0x80c8
+32970, Subtract value from prop 0x80c8
+32971, Store Value
+32972, Add value to prop 0x80cb
+32973, Subtract value from prop 0x80cb
+32974, Store Value
+32975, Add value to prop 0x80ce
+32976, Subtract value from prop 0x80ce
+32977, Store Value
+32978, Add value to prop 0x80d1
+32979, Subtract value from prop 0x80d1
+32983, Set15E4
+32984, Add Value15E4
+32985, Sub Value15E4
+32986, Or Value15E4
+32987, And Value15E4
+32988, Kazuya Devil State
+32989, Add to Devil Flag
+32990, Subtract from Devil Flag
+32991, Bitwise OR from Devil Flag
+32992, Bitwise AND from Devil Flag
+32996, Store Value
+32997, Add value to prop 0x80e4
+32998, Subtract value from prop 0x80e4
+32999, Store Value
+33000, Add value to prop 0x80e7
+33001, Subtract value from prop 0x80e7
+33002, Store Value
+33003, Add value to prop 0x80ea
+33004, Subtract value from prop 0x80ea
+33005, Store Value
+33006, Add value to prop 0x80ed
+33007, Subtract value from prop 0x80ed
+33008, Store Value
+33009, Add value to prop 0x80f0
+33010, Subtract value from prop 0x80f0
+33011, Store Value
+33012, Add value to prop 0x80f3
+33013, Subtract value from prop 0x80f3
+33014, Store Value1650Plus Frame3A4
+33015, Store Value1650Minus Frame3A4
+33016, Store Value + Current Frame
+33017, Store Value - Current Frame
+33018, Set Wall-hit Counter
+33019, Add to Wall-hit Counter
+33020, Subtract Wall-hit Counter
+33021, Set Value15D4Opponent
+33022, Add Value15D4Opponent
+33023, Sub Value15D4Opponent
+33024, Set U16181COpponent
+33025, Add U16181COpponent
+33026, Sub U16181COpponent
+33027, Set U16181EOpponent
+33028, Add U16181EOpponent
+33029, Sub U16181EOpponent
+33030, Set U161820Opponent
+33031, Add U161820Opponent
+33032, Sub U161820Opponent
+33033, Set U16Array1822Opponent
+33034, Add Opponent U16Array1822
+33035, Sub Opponent U16Array1822
+33036, Set Opponent Total Damage Taken
+33037, Add Opponent Total Damage Taken
+33038, Sub Opponent Total Damage Taken
+33039, Set Value1688
+33045, Set Opponent Subobj Int0 [no effect in retail]
+33046, Add Opponent Subobj Int0 [no effect in retail]
+33047, Sub Opponent Subobj Int0 [no effect in retail]
+33048, Set Opponent Subobj Int1 [no effect in retail]
+33049, Add Opponent Subobj Int1 [no effect in retail]
+33050, Sub Opponent Subobj Int1 [no effect in retail]
+33051, Set Opponent Subobj Int2 [no effect in retail]
+33052, Add Opponent Subobj Int2 [no effect in retail]
+33053, Sub Opponent Subobj Int2 [no effect in retail]
+33054, Store Value on Opponent (purpose unknown)
+33055, Add Opponent15E4
+33056, Sub Opponent15E4
+33057, Or Opponent15E4
+33058, And Opponent15E4
+33059, Kazuya Devil State\n(Opponent)
+33060, Add to Devil Flag\n(Opponent)
+33061, Subtract from Devil Flag\n(Opponent)
+33062, Bitwise OR from Devil Flag\n(Opponent)
+33063, Bitwise AND from Devil Flag\n(Opponent)
+33064, Activate Short Flag
+33065, Add to Short Flag
+33066, Subtract from Short Flag
+33067, Activate Short Flag\n(Opponent)
+33068, Add to Short Flag\n(Opponent)
+33069, Subtract from Short Flag\n(Opponent)
+33070, Activate Int Flag
+33071, Add To Int Flag
+33072, Subtract From Int Flag
+33073, Activate Int Flag\n(Opponent)
+33074, Add To Int Flag\n(Opponent)
+33075, Subtract From Int Flag\n(Opponent)
+33076, Add Value1688
+33077, Sub Value1688
+33078, Set Value5DC
+33079, Add Value5DC
+33080, Sub Value5DC
+33081, Store Heat State
+33082, Add to Heat State
+33083, Sub from Heat State
+33087, Store Heat State\n(Opponent)
+33088, Add to Heat State\n(Opponent)
+33089, Sub from Heat State\n(Opponent)
+33093, Queue Hp Cmd Mode11
+33094, Inflict Recoverable Damage (self)
+33096, Reset Timers1AF4All Players
+33097, Set Clone Flag27C4
+33098, Raven Clone Horizontal Offset
+33099, Add Recoverable Health
+33100, Set Flag951
+33101, Set Heat Dash Charge
+33102, Spend Heat Dash Charge
+33103, Some Freeze Timer
+33104, Set Modifier103C Mode14
+33105, Activate Devil State Permanently
+33106, Store Value in P20 Flags
+33107, Add to P20 Flags
+33108, Substract From P20 Flags
+33109, Set Story Scripted Flag\n(SS Flags)
+33110, Add to SS Flag
+33111, Sub from SS Flag
+33112, Store Value
+33113, Set Flag714Bit26
+33114, Store Value
+33115, Floor Blast Flag
+33116, Add to Floor Blast Flag
+33117, Substract From Floor Blast Flag
+33260, Allow Blocking
+33261, Give CH property
+33262, Start Timed159C
+33263, Reset1598 1C1C
+33264, Set Field4F0
+33265, Detach position
+33266, Set Flag704 2
+33267, Detach Position
+33269, Detach height (smoothly)
+33270, Detach height (instantly)
+33271, Set Flag704 10
+33272, Give Parry immunity
+33273, Set Flag704Bit7
+33274, Add Tracking/Alignment (Player)
+33275, Add Tracking/Alignment (Opponent)
+33276, Change Player Status/Vulnerability
+33277, Detach characters
+33278, Change Hurtboxes Size
+33279, Set Hurtbox Scale B
+33280, Set Slot Vector Mask
+33281, Set Pair62C630
+33282, Set Flag6FF
+33283, Footstep SFX & VFX\n
+33284, Set Flag704 100
+33285, Set Flag704Bit9
+33286, Set Flags704 400 800
+33287, Set Flag704 2000
+33288, Set Stored Yaw Relative
+33289, Set Value568Level
+33290, Set Byte6A2
+33291, Set Flag710Bit0
+33292, Set Flag710Bit2
+33293, Set Flag710Bit1
+33294, Set6E0
+33299, Start back turn
+33300, End back turn
+33301, Store Value5EC
+33302, Set Opponent Field5EC
+33303, Enable four adjacent player state flags (purpose unknown)
+33304, Set All Glow Slots
+33305, Set primary player flag bit 3 from parameter bit 0 (purpose unknown)
+33306, Set Flag710 10
+33307, Set Flag710 20
+33309, Set primary player flag bit 30 from parameter bit 0 (purpose unknown)
+33310, Save540To1AD8
+33311, Set540And Hit Flag
+33312, Restore540From1AD8
+33313, Set Flag486
+33315, Set Flag1C84Bit11
+33316, Set1C84Bit2
+33317, Roll Random Chance BD5
+33320, Set Flag1C38
+33321, Set Opponent Flag1C38
+33322, Set Opponent Input Mode
+33325, Power Crush Properties
+33326, Rage Art Activate VFX
+33327, Set Install Aura Alt
+33328, Set Power Crush Variant
+33329, Add Gauge1D0CClamped
+33330, Fill Kazama Essence
+33331, Set State Code6D0
+33332, Set Facing Mode
+33333, Set Input Mode
+33334, Set Gauge Lock1
+33335, Set Gauge Lock2
+33336, Skip Frames of Move (=N)
+33337, Skip Frames of Move (+N)
+33338, Skip Frames of move (-N)
+33339, Skip frames of move (= N + 0x1000)
+33340, Skip frames of move (= N + 0x2000)
+33341, Skip Frames Forward From Move Frame
+33342, Skip Frames Backward From Move Frame
+33343, Skip frames of move (= N + 0x4000)
+33344, Skip frames of move (= N + 0x8000)
+33345, Skip To Random Frame
+33346, Skip Frames Forward Random
+33347, Skip Frames Forward Random From Move Frame
+33348, Force Move on Opponent (With Reset)
+33349, Force Move on Opponent (Raw)
+33350, Set Player Speed
+33351, Add to Player Speed (modifier)
+33352, Set Opponent Speed
+33353, Add to Opponent Speed (modifier)
+33354, Set Maximum Player Speed
+33355, Set Minimum Player Speed
+33356, Change Animation
+33357, Blend With Move (parameter byte)
+33358, Select blending move
+33359, Set Byte6C1
+33360, Blending Duration
+33361, Horizontal Animation Distance Multiplier\n(Eased Horizontal Movement)
+33362, Vertical Animation Distance Multiplier\n(Eased Vertical Movement)
+33363, Clear Flag704 4000
+33364, Break Floor Function
+33365, Set Angle EC4
+33366, Set Opponent Field EC4
+33367, Set Flag1ACD
+33368, Inflict Pushback on self
+33369, Set Value158CFrom Base
+33370, Align pushback with self
+33371, Align pushback with self (backwards)
+33372, Enable/Disable Gravity
+33373, Inflict Pushback on opponent
+33374, Set Opponent Pushback Angle From Base
+33375, Align opponent pushback with self
+33376, Align opponent pushback with character
+33377, Copy Pushback State To Opponent
+33378, Set Attached Prop Type
+33379, Start Attached Prop Anim
+33380, Stop Attached Prop Anim
+33381, Apply Secondary Pushback
+33382, Set Secondary Pushback Param
+33385, Set474Float
+33390, Stop Vertical Motion No Gravity
+33391, Set Slide Speed
+33392, Slide Player
+33393, Slide Player on world axis
+33394, Rotate Player
+33395, Rotate Opponent
+33397, Push Player in Z-axis
+33398, Push Player in X-axis
+33399, Set Flag710 10000000
+33400, Push Player in Y-axis (height)
+33401, Shift Vertical Position
+33403, Spawn Projectile
+33404, Set projectile spawn bone
+33405, Projectile Initial Horizontal Velocity\n(Distance from Spawn Point)
+33406, Projectile Initial Vertical Velocity\n(Distance from Spawn Point)
+33407, Projectile Initial Lateral Velocity\n(Distance from Spawn Point)
+33408, Set Flag71F
+33409, Push List Value720
+33410, Remove List Value720
+33411, Set Bone Sphere
+33412, Set Bone Sphere Alt
+33414, Array4F30Call65C0
+33415, Array4F30Call65A0
+33419, Enable Scaled Damage
+33420, Hit with Scaled Damage (Opponent)
+33421, Hit with Scaled Damage (Self)
+33422, Scaled Heal (Self)
+33423, Queue Scaled Hp Cmd Mode4
+33424, Hit with Scaled Damage (Self)
+33425, Queue Scaled Hp Cmd Mode6
+33427, Inflict Self Damage
+33428, Setup Scaled Damage
+33430, 2D Jump Height
+33432, Set Flag C2C
+33435, Set Flag489
+33436, Add2DJump Params
+33437, Scale2DJump Params
+33438, Set Value C28
+33442, Toggle Attached Effect8A
+33443, Set Packed Params1C60
+33444, Start Timed Presentation1C60
+33445, Set Chip Damage
+33446, Set Flag71E
+33448, Set Flag C5C
+33449, Add scaling (downed)
+33450, Set Flag1D98
+33451, Set Flag C2D
+33452, Set Scale BD0
+33453, Controller Rumble Both Pads
+33454, Set Active
+33455, Set Opponent Active
+33457, Set Byte6D9
+33458, Set Flag1C80
+33461, Clear Slot Table3FE0
+33462, Opponent Change Animation
+33464, Reset Round Tracking And Opponent Hit History
+33465, Count Opponent Stat Once Per Combo
+33466, Store Value6DC
+33467, Set Flag704Bit16
+33468, Reset Combo Meter
+33469, Set player flag at +0x704, bit 17 from parameter bit 0 (purpose unknown)
+33470, Add to Combo Counter
+33471, Set Value708
+33472, Set Value70C
+33473, Player Visibility
+33474, Opponent Visibility
+33475, Set Flag710Bit19
+33476, Set Flag710Bit20
+33477, Spend Tornado
+33478, Trigger Animation-Change State
+33479, Set primary player flag bit 24 from parameter bit 0 (purpose unknown)
+33480, Set Flag710Bit26
+33481, Set Field672
+33482, Set Flag714Bit8
+33485, Set Flag714Bit7
+33489, Set Misc Flag714Bit1
+33490, Trigger Wing Flap
+33492, Yoshimitsu's main sword
+33493, Yoshimitsu's second sword
+33496, Yoshimitsu's main sword effect
+33497, Yoshimitsu's second sword effect
+33498, Toggle Attached Effect7D
+33499, Toggle Attached Effect7D 654
+33500, Toggle Attached Effect7D 658
+33501, Toggle Attached Effect7D 65C
+33504, Activates Rage
+33505, Set Value1014
+33506, Spend Rage
+33507, Set Flag710Bit25And Count Stat
+33508, Set Value640To709
+33511, Trigger Opponent Rage
+33512, UEEvent 0B Plus Param
+33513, Set Flag71D
+33514, Set Opponent Contact Flag29
+33515, Set Value1C90
+33516, Set Opponent Value1C90
+33518, Set character-state flag bit 9 from parameter bit 0 (purpose unknown)
+33519, Recalc Move Timer5E8
+33520, Toggle Neck Tracking
+33521, Set Field644
+33522, Set Field7A8
+33524, Set Flag714Bit15
+33525, Set Flag714Bit16
+33526, Reset Opponent Combo Stats
+33531, Set Game Speed
+33532, Slow Down Effect
+33533, Set Flag1D1E
+33534, Set Flag C1C
+33535, Set Value C30
+33536, Set Round4Flag3F0
+33537, Set Flag714 2000Inverted
+33538, Player Stop Motion Effect
+33539, Opponent Stop Motion Effect
+33541, Set Factor46C
+33542, Set Value638
+33543, UEPlayer VCall A0 6
+33544, Set Flag710 200000
+33545, UEPlayer VCall40Bool
+33546, Some Wallsplat Related Value
+33548, Set Flag648
+33549, Health Bar Control
+33550, Timed Channel Transition
+33554, No Op 8312 [no effect in retail]
+33555, Set Drama Type\n(Trigger Drama Camera)
+33556, Set Drama No.\n(Trigger Drama Camera)
+33562, Flag If Chara Id ==
+33563, Set Anchor Radius
+33576, Set Flag7AC
+33578, Set Chara Bit1C20
+33579, Clear Chara Bit1C20
+33580, Hud Notify120If Flag1544Off
+33582, Turn To Angle Over Frames
+33583, Hud Notify120If Flag1544On
+33584, Set Flag7AD
+33585, Set Value BE8With Flag
+33591, Set Flag1547
+33592, Use "Fake" Frame Advantage
+33593, Set Fake Startup frames
+33594, Add Enc848To828
+33595, Set Flags918Group
+33596, Char Flag1C1EIf Fighter25
+33597, Clear Flag1C1EIf Char25
+33598, Set Flag91C
+33599, Spawn Effect At Socket8FD5108A
+33600, Set Opponent Flag486
+33601, Enc Sub828By848
+33602, Set Encrypted Value7C8Clamped
+33604, Set Field920
+33605, Set Value928
+33606, Set Value92C
+33607, Set Value930
+33610, Set Flag935
+33611, Stats Event
+33612, Set Encrypted Flag7E8
+33613, Set Encrypted Flag808
+33614, Set Enc Value818
+33615, Set Enc Value878To1
+33616, Set Encrypted Value7D8
+33618, Set Enc Counter888Self And Opponent
+33621, Set Char Bit1C24
+33622, Clear Char Bit1C24
+33623, Set Flag934
+33624, Set Post Hit Display Values
+33627, Spend Leroy's Cane
+33628, Toggle Attached Effect7D 668
+33629, Toggle Attached Effect7D 66C
+33630, Set Flag936
+33631, Set Encrypted7F8True
+33632, Set Encrypted Flag8B8
+33633, Set Encrypted838
+33634, Add Encrypted838
+33635, Add Enc Value828
+33636, Clear Flag486
+33637, Clear Opponent Flag486
+33638, Set Flag938
+33639, Set Flag939
+33640, Set Value924
+33641, Set Flag93A
+33642, Set Chara Specific State1DBC
+33644, Set Misc Flag714Bit18
+33645, Set Value940
+33646, Post Event E
+33647, UEPlayer VCall B0Bool
+33648, Spawn Kuni Item
+33649, Despawn Kuni Item
+33650, Socket Effect By Hash
+33651, Fahkumram: store character state float (purpose unknown)
+33652, Set Flag CDE
+33653, Set Extra Collision Sphere
+33654, Disable Extra Collision Sphere
+33657, Break floor
+33658, Break floor at frame
+33659, Start Timed Effect CE4
+33660, Enforce Min Height
+33661, Set Power Crush
+33662, Launch Ballistic To Height
+33663, Set Value D24
+33664, Set Value D28
+33665, Ignore powercrush
+33666, Set Heat Engager Success Flag
+33667, Refill / Drain Heat Gauge
+33668, Refill / Drain Heat Gauge\n(Opponent)
+33669, Player Facing Related?
+33670, Remove Recoverable Health on self
+33671, Remove Recoverable Health on opponent
+33673, Set Flag D2D
+33674, Set Round Flag364Bit1
+33675, Set Fixed80
+33676, Set Flag EC2
+33677, Snap Position XZ
+33678, Trigger Cinematic Camera
+33679, Trigger Rage Art Stage VFX
+33680, Set Field D30
+33681, Ballistic Launch
+33682, UEOpponent VCall1D8
+33683, Start Fade38C0
+33684, Activate Heat Aura
+33685, Opponent KOEffect Burst
+33686, Set Value D38
+33687, Place On Ground And Position Opponent
+33689, Set Vector38D4
+33690, Set Cinematic Camera Flip
+33691, Push Event9
+33692, Set State Flag C34
+33695, Set Hp Request Flag1048
+33696, Hit with Scaled Chip Damage (Opponent)
+33697, Add Gauge Percent And Queue Event
+33698, Set Flag D48
+33699, Set Heat State
+33700, Set Opponent Heat State
+33701, Set Flag C3E
+33702, Set Mask Bits1C2C
+33703, Clear Mask Bits1C2C
+33705, Send Character Exclusion Bitsets
+33706, Create Raven Clone
+33707, Remove Raven Clone
+33708, Set Value Percent Of1038
+33709, Play Subtitles Text
+33710, Set Flag91E
+33711, Count Opponent Stat And Notify
+33712, Set Install
+33713, Set Character Installs
+33714, Visual Mask Bit1DB8Toggle
+33715, Set Percent10C
+33716, Set Flag6A3
+33717, Set Value15AC
+33718, Set Flag D3C
+33719, Start Stop Bone Anchored Effect
+33721, Notify Heat State Presentation
+33722, Toggle Aura8E State2550
+33724, Rotate Player
+33725, Rotate Opponent
+33726, Pause/Resume Heat Timer
+33727, Set Flag E43
+33728, Play the black screen VFX
+33729, Ballistic Launch
+33730, Set Value D40
+33731, Hit do chip damage
+33732, Set Flag714Bit14Inverted
+33733, No Op [no effect in retail]
+33734, Set Bone Anchor Slot
+33735, Lock Facing Snapshot
+33736, Battle Sys VCall90Then Flag697
+33738, Make Character Glow
+33739, Glow Slot Enable/Disable
+33740, Glow Slot Intensity
+33741, Add scaling (airborne)
+33742, Add scaling
+33743, Claim Global Owner Slot
+33744, Set Misc Flag714Bit2
+33745, Break Stage Tile Alt
+33746, Set Flag952
+33747, Set Flag C36And Count Stat
+33748, Set Byte6C3
+33750, Set Game Speed
+33751, Slow Down Effect
+33752, Set C37State And Count Stat
+33753, Set Clear Flags E48
+33754, Set Flag954
+33756, Snap To Queried Point And Place Opponent
+33757, Set Value C58
+33759, Set Flag258C
+33760, Tutorial Mode Event40
+33761, Chara Specific Toggle1E
+33762, Set Pair110 118
+33763, Set Misc Flag714Bit25
+33765, Set State C38With Counter
+33766, Gives Armor Break Property
+33767, Set Flag E4C
+33768, Set Flag E4D
+33769, Set Flag C57
+33770, Set Table1A50Field8
+33771, Set Table1A50Field C
+33772, Set Flag1A90
+33773, Set Flag714Bit27
+33774, Add Stock Levels\n(Clamped)
+33777, Set Flag C3F
+33778, Set Flag24F4
+33779, Start Timer Slot
+33780, Set Flag163CFor Char35
+33781, Set conditional global flag (purpose unknown)
+33782, Set All Bool Slots6F3
+33783, Set Bool Slot6F3
+33784, Set Scale D10
+33785, Trigger Warrior Instinct
+33786, Set Field D4C
+33787, Set Flags714Bit29
+33788, Set Global Tint Color
+33789, Set Slot Flag1E36
+33790, Set Per Slot Flag1E37
+33791, Set Value C04
+33792, Set Multiplier964
+33793, Set Value E54Or E5C
+33794, Set9B4Bit0Or Reset
+33795, Set9BC
+33796, Set Slot Table Value
+33797, Apply Weakened state
+33798, Set Flag710 800000
+33799, Set Flag9EDReset Scale
+33800, Set Flag953
+33801, Save Position Restore Position
+33802, Set9C0Bounded
+33803, Set9B4Bit1Or Reset
+33805, Set Flag700
+33806, Set Opponent Flag700
+33807, Dec Or Reset1AC8
+33808, Add Timed Effect Slot
+33809, Set Flag704 1000
+33810, Set Slot Rate9F4
+33811, Opponent Break Stage Tile Alt
+33812, Set Slot Scale A80
+33813, Set Slot Vector A70
+33814, Set Flag Array9A8
+33816, Set Value530With Angle
+33817, Set Values9CC
+33818, Set Flag9DC
+33819, Set Opponent Flag9DC
+33820, Force Move On Linked Entity
+33821, Set Flag714Bit31
+33822, Set Flag718Bit0
+33823, Set Value C64
+33824, Set Vec3Table Entry
+33825, Set Flag487
+33826, Set Gauge2558
+33827, Add Gauge2558
+33903, Spawn Sub Entity Slot
+33904, Clear Item Slots By Id
+33905, Set Sub Entity Timer By Id
+33906, Set Item Id
+33907, Sub Obj Set5A4
+33908, Sub Obj Set5A8
+33909, Set Current Attack Code
+33910, Sub Obj Set5B4
+33911, Sub Obj Set5B8
+33912, Sub Obj Set Entry Ptr5C0
+33913, Sub Obj Set Entry Ptr5C8
+33914, Set Item Effect
+33915, Set Item Effect
+33916, Sub Obj Set Flag5D0
+33917, Sub Obj Set Flag5D1
+33919, Sub Obj Set Float5D4
+33920, Sub Obj Set Float5D8
+33921, Sub Obj Set Float5DC
+33922, Sub Obj Set Float5E0
+33923, Sub Obj Set Float5E4
+33924, Sub Obj Set Float5F0
+33925, Sub Obj Set Float5F4
+33926, Sub Obj Set Float5F8
+33927, Sub Obj Set Flag5E8
+33928, Sub Obj Set Flag5E9
+33929, Sub Obj Set Flag5EA
+33930, Set Item Value600
+33931, Attach Item
+33932, Detach Item
+33936, No Op [no effect in retail]
+33937, Item Iface Call130
+33939, Item Iface Call130
+33951, UEPlayer VCall138
+33952, Set Item State5A0Notify
+33953, Reset Item State5A0Notify
+33954, UEPlayer VCall148
+33955, Set Item Or Char Param
+33960, Set secondary player flag bit 5 (purpose unknown)
+33991, Set Effect9E4
+33992, Set Value9E8
+33993, Set Flag9EC [no effect in retail]
+34000, Visual Slot1DA0On
+34001, Visual Slot1DA0Off
+34002, Visual Slot1DACOn
+34003, Visual Slot1DACOff
+34004, Visual Mask Bit1DB4Clear
+34005, Set Mask1DB4Bit
+34006, Set Actor Visual Param A
+34007, Set Actor Visual Param C
+34008, Set Actor Visual Param B
+34009, Set Actor Visual Params BC
+34010, Set Actor Visual Params All
+34011, Visual Command
+34012, Set Flag710 8000000
+34027, Camera control toggle (T7 Lazy Camera-man)
+34048, Set Value3F98
+34049, Set Value3F9C
+34050, Set Target Point Ahead
+34051, Set Target Point Value3FB0
+34052, Enable Target Point
+34053, Disable Target Point
+34059, Set Opponent Floor Level
+34060, Force Move on Opponent
+34061, Override Moveset Alias
+34062, Override Moveset Alias
+34063, Override Moveset Alias
+34064, Override Moveset Alias
+34065, Override Moveset Alias
+34066, Override Moveset Alias
+34067, Override Moveset Alias
+34068, Override Moveset Alias
+34069, Override Moveset Alias
+34070, Override Moveset Alias
+34071, Override Moveset Alias
+34072, Override Moveset Alias
+34073, Override Moveset Alias
+34074, Override Moveset Alias
+34075, Override Moveset Alias
+34076, Override Moveset Alias
+34077, Override Moveset Alias
+34078, Override Moveset Alias
+34079, Override Moveset Alias
+34080, Override Moveset Alias
+34081, Override Moveset Alias
+34082, Override Moveset Alias
+34083, Override Moveset Alias
+34084, Override Moveset Alias
+34085, Override Moveset Alias
+34086, Override Moveset Alias
+34087, Override Moveset Alias
+34088, Override Moveset Alias
+34089, Override Moveset Alias
+34090, Override Moveset Alias
+34091, Override Moveset Alias
+34092, Override Moveset Alias
+34093, Override Moveset Alias
+34094, Restore Moveset Alias
+34095, Restore Moveset Alias
+34096, Restore Moveset Alias
+34097, Restore Moveset Alias
+34098, Restore Moveset Alias
+34099, Restore Moveset Alias
+34100, Restore Moveset Alias
+34101, Restore Moveset Alias
+34102, Restore Moveset Alias
+34103, Restore Moveset Alias
+34104, Restore Moveset Alias
+34105, Restore Moveset Alias
+34106, Restore Moveset Alias
+34107, Restore Moveset Alias
+34108, Restore Moveset Alias
+34109, Restore Moveset Alias
+34110, Restore Moveset Alias
+34111, Restore Moveset Alias
+34112, Restore Moveset Alias
+34113, Restore Moveset Alias
+34114, Restore Moveset Alias
+34115, Restore Moveset Alias
+34116, Restore Moveset Alias
+34117, Restore Moveset Alias
+34118, Restore Moveset Alias
+34119, Restore Moveset Alias
+34120, Restore Moveset Alias
+34121, Restore Moveset Alias
+34122, Restore Moveset Alias
+34123, Restore Moveset Alias
+34124, Restore Moveset Alias
+34125, Restore Moveset Alias
+34126, Restore Moveset Alias
+34127, Reset Position And Set Yaw
+34128, Place Opponent In Front
+34130, Misc Battle Flag Switch
+34131, Set Flag1D2BIn Mode4
+34133, (Gray) Health Regeneration
+34134, Set Player Service Pair38
+34135, Set Pair7A0
+34136, Set Current Sequence Entry Value [no effect in retail]
+34137, Configure C40Block
+34138, No Op 855A [no effect in retail]
+34139, No Op 855B [no effect in retail]
+34140, Set Value1604
+34141, Add Value1604
+34142, Sub Value1604
+34144, Story Mode Battle Mgr Vfn138
+34145, Story Mode Battle Mgr Vfn140
+34146, Set Flag D50
+34147, Set Float D54
+34148, Set Value D58
+34149, Story Cond Set Flag D5A
+34150, Set Vector D60
+34151, Start Sequence With Args
+34152, Queue Sequence Value
+34153, Set Flag1D3ASelf Or Opponent
+34154, Set Battle Script Value
+34155, Battle Mgr Add Counter
+34156, Battle Mgr Sub Counter
+34157, Set Vector4E4
+34158, Set Install
+34159, Set Settings Inhibit Bit1
+34160, Increment Round Counter40C
+34161, Reset Current Sequence Entry Value
+34162, Battle Mgr Set Bool228
+34163, Store Value1D3C
+34164, Set Player Service Value
+34165, Add Player Service Value
+34166, Sub Player Service Value
+34167, Apply From822DProp
+34168, Set Player Control Flag In Mode14
+34302, Partner Play Move
+34303, Partner Reset
+34304, Partner Play Move
+34305, Partner Reset
+34306, Partner Play Move Flagged
+34307, Partner Reset
+34308, Swap With Partner
+34309, Swap With Partner Alt
+34310, Store Value1A3C
+34311, Set Table1A50Field0
+34312, Set Table1A50Field1
+34314, Both Hands Pose
+34315, Left Hand Pose
+34316, Right Hand Pose
+34318, Both Hands Pose related
+34319, Play Both Hands Animation
+34320, Play Left Hand Animation
+34321, Play Right Hand Animation
+34322, Left Hand Anim related
+34323, Right Hand Anim related
+34435, Play Wing Animation
+34436, Wing Anim related
+34437, Play Wing Animation
+34440, Play Camera Animation
+34441, Play Camera Animation\n(Mirror position)
+34442, Play Camera Animation\n(Mirror position)
+34443, Play Camera Animation\n(Mirror position)
+34444, Play Camera Animation\n(Left Side)
+34445, Play Camera Animation\n(Right Side)
+34447, Throw Camera
+34452, Set Camera Param148
+34453, Camera Zoom Focal Point / Camera transition
+34454, Camera Zoom Effect
+34455, Camera orbit effect
+34456, Play Cinematic Camera\n(Male Fighters Only)
+34457, Play Cinematic Camera\n(Female Fighters Only)
+34458, Play Cinematic Camera\n(Big Fighters Only)
+34459, Play Camera Animation
+34460, Play Camera Animation
+34461, Set Flag580
+34462, Stop Camera Animation
+34463, Set Value1C94
+34464, Set Value1C98
+34473, Play Cinematic Camera\n(Bears Only)
+34474, Play Cinematic Camera\n(Opponent's – Left Side)
+34475, Play Cinematic Camera\n(Opponent's – Right Side)
+34476, Set Flag581
+34479, Set Camera Mode
+34480, Heat Camera
+34681, Play Facial Expression
+34682, Play Facial Animation
+34683, Play Drama Facial Animation
+34684, Expand Left Arm Muscles
+34685, Expand Right Arm Muscles
+34686, Muscle Morph
+34687, Muscle Morph
+34688, Play Wing Animations
+34690, Char23Components Set5
+34799, Play Sound from Player
+34800, Play Sound from Player
+34801, Play Sound from Player
+34802, Play Sound from Opponent
+34803, Play Sound from Opponent
+34805, Set D7CPair
+34806, Play System Cue
+34807, Store Current Move Voiceclip Key?
+34808, Play Drama Voiceclip
+34809, Preset Camera Zoom
+34814, Push Param Queue
+34815, Increment Player Stat

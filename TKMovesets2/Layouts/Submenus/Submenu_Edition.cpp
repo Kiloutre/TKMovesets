@@ -1,15 +1,54 @@
+#include "FileIO.hpp"
+#include <fstream>
 #include <ImGui.h>
 #include <filesystem>
 #include <system_error>
+#include <cstring>
 
 #include "Submenu_Edition.hpp"
 #include "Localization.hpp"
+#include "MovesetFolders.hpp"
+#include "MovesetListSort.hpp"
 #include "imgui_extras.hpp"
 #include "helpers.hpp"
 #include "MovesetConverters/MovesetFileConverter.hpp"
 #include "AnimExtractors/AnimExtractors.hpp"
+#include "AnimExtractors/AnimExtractor_t8.hpp"
+#include "Extractor_t8/RetailDiskMoveset.hpp"
+#include "Extractor_t8/RetailGameData.hpp"
+#include "GameStaticData.hpp"
+#include <algorithm>
 
 // -- Static helpers -- //
+
+static bool IsConversionTarget(const GameInfo& game, uint16_t sourceGameId)
+{
+	return CanConvertMoveset(sourceGameId, game.gameId, game.minorVersion);
+}
+
+// Copies a UTF-8 string into a fixed buffer, cutting it at a code point boundary when too long (strcpy_s would abort the process)
+static void CopyUtf8Truncated(char* destination, size_t destinationSize, const std::string& source)
+{
+	if (destinationSize == 0) return;
+	size_t length = (std::min)(source.size(), destinationSize - 1);
+	if (length < source.size()) {
+		// Don't keep the lead bytes of a character whose continuation bytes were cut off
+		while (length > 0 && (static_cast<unsigned char>(source[length]) & 0xC0) == 0x80) --length;
+	}
+	memcpy(destination, source.data(), length);
+	destination[length] = '\0';
+}
+
+static bool HasConversionTarget(uint16_t sourceGameId)
+{
+	const auto gameCount = Games::GetGamesCount();
+	for (unsigned int i = 0; i < gameCount; ++i) {
+		if (IsConversionTarget(*Games::GetGameInfoFromIndex(i), sourceGameId)) {
+			return true;
+		}
+	}
+	return false;
+}
 
 void DuplicateMoveset(std::wstring filename)
 {
@@ -42,7 +81,12 @@ static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newN
 		return RenameErrcode_EmptyName;
 	}
 
-	std::wstring w_newName = Helpers::to_unicode(newName);
+	std::wstring w_newName;
+	try {
+		w_newName = Helpers::to_unicode(newName);
+	} catch (const std::exception&) {
+		return RenameErrcode_InvalidName; // Not valid UTF-8
+	}
 	std::wstring new_full_filename = full_filename.substr(0, full_filename.find_last_of(L"/\\") + 1)
 									+ w_newName + (L"" MOVESET_FILENAME_EXTENSION);
 
@@ -54,12 +98,11 @@ static RenameErrcode_ RenameMoveset(std::wstring full_filename, const char* newN
 		return RenameErrcode_AlreadyExists;
 	}
 
-	try {
-		std::filesystem::rename(full_filename.c_str(), new_full_filename.c_str());
-	} catch (std::exception& _) {
-        DEBUG_ERR("Failed to rename moveset");
-		(void)_;
-		// Todo: maybe an error popup of some kind
+	std::error_code error;
+	std::filesystem::rename(full_filename, new_full_filename, error);
+	if (error) {
+		DEBUG_ERR("Failed to rename moveset");
+		return RenameErrcode_RenameErr; // permissions, a locked file, ...: keep the dialog open with the error
 	}
 
 
@@ -80,7 +123,8 @@ void Submenu_Edition::RenderRenamePopup()
 	ImGui::SameLine();
 	if (ImGui::Button(_("edition.save")))
 	{
-		currentErr = RenameMoveset(m_actionTarget.filename, m_newName);
+		// An open editor keeps the old path and would recreate the old file on its next save
+		currentErr = IsOpenInEditor(m_actionTarget.filename) ? RenameErrcode_OpenInEditor : RenameMoveset(m_actionTarget.filename, m_newName);
 		if (currentErr == RenameErrcode_NoErr) {
 			ImGui::CloseCurrentPopup();
 			m_renamePopup = false;
@@ -91,16 +135,21 @@ void Submenu_Edition::RenderRenamePopup()
 	switch (currentErr)
 	{
 	case RenameErrcode_EmptyName:
-		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.empty_name"));
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), "%s", _("edition.rename.empty_name"));
 		break;
 	case RenameErrcode_AlreadyExists:
-		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.already_exists"));
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), "%s", _("edition.rename.already_exists"));
 		break;
 	case RenameErrcode_RenameErr:
-		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.rename_err"));
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), "%s", _("edition.rename.rename_err"));
 		break;
 	case RenameErrcode_InvalidName:
-		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), _("edition.rename.invalid_name"));
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), "%s", _("edition.rename.invalid_name"));
+		break;
+	case RenameErrcode_OpenInEditor:
+		ImGui::TextColored(ImVec4(1, 0, 0.2f, 1), "%s", _("edition.moveset_open_in_editor"));
+		break;
+	default:
 		break;
 	}
 }
@@ -113,7 +162,17 @@ void Submenu_Edition::RenderConversionPopup()
 		return;
 	}
 
+    if (!m_conversionMessage.empty()) ImGui::TextUnformatted(m_conversionMessage.c_str());
+    if (m_conversionJob.Busy()) {
+        ImGui::TextUnformatted(FileJobStageText(m_conversionJob.Stage()));
+        if (ImGui::Button(_("edition.convert.cancel"))) m_conversionJob.Cancel();
+        return;
+    }
 	ImGui::SeparatorText(_("edition.convert.format_target"));
+    if (m_actionTarget.gameId == GameId_T7)
+        ImGui::TextWrapped("%s",_("edition.convert.t7_to_t8_explanation"));
+    else if (m_actionTarget.gameId == GameId_T8)
+        ImGui::TextWrapped("%s",_("edition.convert.t8_to_t7_explanation"));
 
 	auto gameListCount = Games::GetGamesCount();
 	const GameInfo* games = Games::GetGameInfoFromIndex(0);
@@ -121,11 +180,16 @@ void Submenu_Edition::RenderConversionPopup()
 	ImGui::PushID(games);
 	for (unsigned int i = 0; i < gameListCount; ++i)
 	{
-		if (games->supportedImports.contains(m_actionTarget.gameId)){
+		if (IsConversionTarget(*games, m_actionTarget.gameId)){
 			if (ImGui::Button(games->name)) {
-				ConvertMoveset(m_actionTarget, (GameId_)games->gameId);
-				ImGui::CloseCurrentPopup();
-				m_conversionPopup = false;
+                try {
+                    FileJobRequest request;
+                    request.kind = games->gameId == GameId_T8 ? FileJobKind::ConvertToT8 : FileJobKind::ConvertToT7;
+                    request.source = m_actionTarget.filename;
+                    request.output = ConvertedMovesetPath(m_actionTarget, games->gameId);
+                    m_conversionJob.Start(std::move(request));
+                    m_conversionMessage.clear();
+                } catch (const std::exception& error) { m_conversionMessage = error.what(); }
 				ImGui::PopID();
 				return;
 			}
@@ -134,6 +198,111 @@ void Submenu_Edition::RenderConversionPopup()
 	}
 	ImGui::PopID();
 
+}
+
+void Submenu_Edition::RenderImportProfilePopup()
+{
+	using P = ImportProfile::Profile;
+	ImGui::TextUnformatted(m_actionTarget.name.c_str());
+	ImGui::TextWrapped("%s", _("edition.import_settings.explanation"));
+	ImGui::Separator();
+
+	int identity = static_cast<int>(m_profile.identity);
+	ImGui::TextUnformatted(_("edition.import_settings.identity"));
+	ImGui::RadioButton(_("edition.import_settings.identity_target"), &identity, 0); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.identity_fixed"), &identity, 1);
+	m_profile.identity = static_cast<P::Identity>(identity);
+	if (m_profile.identity == P::Identity::Fixed) {
+		ImGui::SetNextItemWidth(120.0f);
+		if (ImGui::InputInt(_("edition.import_settings.character"), &m_profile.character)) m_profile.character = std::clamp(m_profile.character, 0, 255);
+	}
+
+	int gender = static_cast<int>(m_profile.gender);
+	ImGui::TextUnformatted(_("edition.import_settings.gender"));
+	ImGui::RadioButton(_("edition.import_settings.gender_target"), &gender, 0); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.male"), &gender, 1); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.female"), &gender, 2);
+	m_profile.gender = static_cast<P::Gender>(gender);
+
+	bool storyGame = m_profile.storyFlag == ImportProfile::StoryFlagGameDecides;
+	ImGui::TextUnformatted(_("edition.import_settings.story_flag"));
+	if (ImGui::Checkbox(_("edition.import_settings.story_game"), &storyGame))
+		m_profile.storyFlag = storyGame ? ImportProfile::StoryFlagGameDecides : m_profileStoryFlag;
+	if (!storyGame) {
+		ImGui::SetNextItemWidth(120.0f);
+		if (ImGui::InputInt(_("edition.import_settings.story_value"), &m_profileStoryFlag)) m_profileStoryFlag = std::clamp(m_profileStoryFlag, 0, 0xffff);
+		m_profile.storyFlag = m_profileStoryFlag;
+	}
+
+	ImGui::Checkbox(_("edition.import_settings.in_heat"), &m_profile.inHeat);
+	ImGui::Checkbox(_("edition.import_settings.flags_clear"), &m_profile.flagsClear);
+
+	// Context options: every default leaves the checks to the game (or the conversion rules).
+	ImGui::SeparatorText(_("edition.import_settings.context"));
+	auto toggle = [](const char* label, P::Toggle& value) {
+		bool on = value == P::Toggle::Versus;
+		if (ImGui::Checkbox(label, &on)) value = on ? P::Toggle::Versus : P::Toggle::Default;
+	};
+	toggle(_("edition.import_settings.story_mode"), m_profile.storyMode);
+	toggle(_("edition.import_settings.dlc_story"), m_profile.dlcStory);
+	toggle(_("edition.import_settings.special_modes"), m_profile.specialModes);
+	toggle(_("edition.import_settings.stage"), m_profile.stage);
+	auto value = [](const char* label, const char* fixedLabel, int& v) {
+		bool fixed = v != ImportProfile::ValueGameDecides;
+		if (ImGui::Checkbox(label, &fixed)) v = fixed ? 0 : ImportProfile::ValueGameDecides;
+		if (fixed) {
+			ImGui::SameLine(); ImGui::SetNextItemWidth(100.0f);
+			ImGui::PushID(label);
+			if (ImGui::InputInt(fixedLabel, &v)) v = (std::max)(v, 0);
+			ImGui::PopID();
+		}
+	};
+	value(_("edition.import_settings.wave_index"), _("edition.import_settings.value"), m_profile.waveIndex);
+	value(_("edition.import_settings.battle_script"), _("edition.import_settings.value"), m_profile.battleScript);
+	int item = static_cast<int>(m_profile.item);
+	ImGui::TextUnformatted(_("edition.import_settings.item"));
+	ImGui::RadioButton(_("edition.import_settings.game_decides"), &item, 0); ImGui::SameLine();
+	ImGui::PushID("item");
+	ImGui::RadioButton(_("edition.import_settings.item_none"), &item, 1); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.item_all"), &item, 2);
+	ImGui::PopID();
+	m_profile.item = static_cast<P::Item>(item);
+	int body = static_cast<int>(m_profile.bodyType);
+	ImGui::TextUnformatted(_("edition.import_settings.body"));
+	ImGui::PushID("body");
+	ImGui::RadioButton(_("edition.import_settings.game_decides"), &body, 0); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.body_normal"), &body, 1); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.body_big"), &body, 2); ImGui::SameLine();
+	ImGui::RadioButton(_("edition.import_settings.body_bear"), &body, 3);
+	ImGui::PopID();
+	m_profile.bodyType = static_cast<P::Body>(body);
+	auto strip = [](const char* label, P::Strip& value) {
+		bool on = value == P::Strip::Strip;
+		if (ImGui::Checkbox(label, &on)) value = on ? P::Strip::Strip : P::Strip::Keep;
+	};
+	strip(_("edition.import_settings.story_effects"), m_profile.storyEffects);
+	strip(_("edition.import_settings.global_writes"), m_profile.globalWrites);
+
+	ImGui::Separator();
+	if (!m_profileMessage.empty()) ImGui::TextWrapped("%s", m_profileMessage.c_str());
+	if (ImGui::Button(_("edition.import_settings.defaults"))) { m_profile = {}; m_profileStoryFlag = 0; }
+	ImGui::SameLine();
+	if (ImGui::Button(_("edition.import_settings.save"))) {
+		// Only the header region changes (ImportProfile::WithProfile); the moveset data is copied byte for byte.
+		// An open editor holds its own copy of the header and would revert the profile on its next save.
+		if (IsOpenInEditor(m_actionTarget.filename)) m_profileMessage = _("edition.moveset_open_in_editor");
+		else try {
+			const std::filesystem::path path(m_actionTarget.filename);
+			std::ifstream file(path, std::ios::binary);
+			const std::vector<Byte> bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			file.close();
+			const auto updated = ImportProfile::WithProfile(bytes, m_profile);
+			if (!FileIO::WriteAtomically(path, updated)) throw std::runtime_error("Cannot write the moveset file");
+			m_profileMessage = _("edition.import_settings.saved");
+		} catch (const std::exception& error) {
+			m_profileMessage = error.what();
+		}
+	}
 }
 
 void Submenu_Edition::ExtractAllAnimations()
@@ -147,12 +316,28 @@ void Submenu_Edition::ExtractAllAnimations()
 		});
 
 	DEBUG_LOG("Extracting all animations...\n");
-	AnimExtractor::ExtractAnimations(m_animExtraction.movesets, m_animExtraction.extractionControl);
+	// This runs on a worker thread: an exception escaping it would terminate the program, report it on the current moveset
+	auto& control = m_animExtraction.extractionControl;
+	try {
+		AnimExtractor::ExtractAnimations(m_animExtraction.movesets, control);
+	} catch (...) {
+		if (control.current_index < control.statuses.size()) {
+			control.statuses[control.current_index].status = AnimExtractionStatus_Error;
+		}
+	}
 	m_animExtraction.extracting = false;
 }
 
 movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 {
+    if (auto result = m_conversionJob.Poll()) {
+        m_conversionMessage = result->ok ? std::string(_("edition.convert.saved")) + " " + Helpers::to_utf8(result->output.wstring()) :
+            result->cancelled ? std::string(_("edition.convert.cancelled")) : result->error;
+        if (result->ok) storage.RefreshMovesets();
+    }
+    if (m_conversionJob.Busy()) ImGui::TextUnformatted(FileJobStageText(m_conversionJob.Stage()));
+    else if (!m_conversionMessage.empty()) ImGui::TextUnformatted(m_conversionMessage.c_str());
+
 	ImGuiExtra::RenderTextbox(_("edition.explanation"));
 
 	ImGui::SeparatorText(_("edition.tools"));
@@ -169,19 +354,12 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				m_animExtraction.movesets.push_back(*item);
 			}
 
-			if (m_animExtraction.started) {
-				m_animExtraction.thread.join();
-			}
-
-			m_animExtraction.started = true;
-			m_animExtraction.extracting = true;
-
-			m_animExtraction.thread = std::thread(&Submenu_Edition::ExtractAllAnimations, this);
-
-
-			ImGui::OpenPopup("AnimExtractionPopup");
+			// Extraction starts from the modal's Start button, not when it opens.
+			m_animExtraction.ran = false;
+			ImGui::OpenPopup("###AnimExtractionPopup");
 			m_animExtraction.popup = true;
 		}
+
 
 		ImGui::SameLine();
 		if (ImGui::Button(_("edition.open_editor_library")))
@@ -205,10 +383,8 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 		if (ImGui::Button(_("edition.open_characters_directory")))
 		{
-			std::wstring path = std::filesystem::current_path();
-			path += L"\\" MOVESET_DIRECTORY;
-			DEBUG_LOG("%S\n", path.c_str());
-			CreateDirectoryW(path.c_str(), nullptr);
+            const auto path=std::filesystem::absolute(MovesetFolders::ExtractionDirectory());
+            std::filesystem::create_directories(path);
 			ShellExecuteW(NULL, L"open", path.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 		}
 
@@ -219,17 +395,13 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		}
 	}
 
-	if (m_animExtraction.popup) {
-		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 300), ImVec2(1920, 1080));
-	}
-
-	if (ImGui::BeginPopupModal("AnimExtractionPopup", &m_animExtraction.popup))
+	if (ImGuiExtra::BeginFittedModal("AnimExtractionPopup", "Extract animations", &m_animExtraction.popup, 40.0f))
 	{
 		uint32_t total_extracted_count = 0;
 		uint32_t total_animations = 0;
 
-		ImVec2 tableSize = ImGui::GetContentRegionAvail();
-		tableSize.y -= ImGui::GetFrameHeightWithSpacing() * 5;
+		// Fixed height: the modal auto-fits its content, so sizing the table from the remaining space oscillated.
+		const ImVec2 tableSize(0, ImGui::GetFrameHeightWithSpacing() * 14);
 			
 		ImGui::SeparatorText(_("edition.animation_extraction.extraction_status"));
 		if (ImGui::BeginTable("AnimExtractionMovesetList", 2, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
@@ -281,8 +453,17 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		ImGui::TextUnformatted(std::format("{}/{}", total_extracted_count, total_animations).c_str());
 
 		if (!m_animExtraction.extracting) {
-			ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), _("edition.extract_animations_finished"));
-
+			if (m_animExtraction.ran && !m_animExtraction.extractionControl.must_interrupt)
+				ImGui::TextColored(ImVec4(0, 1.0f, 0, 1), "%s", _("edition.extract_animations_finished"));
+			if (ImGuiExtra::RenderButtonEnabled(_("edition.t8_disk.start"), !m_animExtraction.movesets.empty())) {
+				if (m_animExtraction.started) m_animExtraction.thread.join();
+				m_animExtraction.extractionControl.statuses = std::vector<s_extractionStatus>(m_animExtraction.movesets.size());
+				m_animExtraction.started = true;
+				m_animExtraction.extracting = true;
+				m_animExtraction.ran = true;
+				m_animExtraction.thread = std::thread(&Submenu_Edition::ExtractAllAnimations, this);
+			}
+			ImGui::SameLine();
 			if (ImGui::Button(_("close")))
 			{
 				ImGui::CloseCurrentPopup();
@@ -309,53 +490,48 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	ImVec2 tableSize = ImVec2(0, availableSpace.y);
 
 #ifdef BUILD_TYPE_DEBUG
-	const unsigned int rowCount = 10;
+	const unsigned int rowCount = 11;
 	// +1 row for original extraction date
 #else
-	const unsigned int rowCount = 9;
+	const unsigned int rowCount = 10;
 #endif
 	if (ImGui::BeginTable("MovesetEditionList", rowCount, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
-		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, tableSize))
+		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable, tableSize))
 	{
-		ImGui::TableSetupColumn("##", 0, 5.0f);
-		ImGui::TableSetupColumn(_("moveset.origin"));
-		ImGui::TableSetupColumn(_("moveset.target_character"));
-		ImGui::TableSetupColumn(_("moveset.date"));
+		ImGui::TableSetupColumn(_("moveset.name"), ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_WidthStretch, 0.0f, MovesetListSort::Name);
+		ImGui::TableSetupColumn(_("moveset.game"), 0, 0.0f, MovesetListSort::Game);
+		ImGui::TableSetupColumn(_("moveset.target_character"), ImGuiTableColumnFlags_NoSort);
+		ImGui::TableSetupColumn(_("moveset.date"), ImGuiTableColumnFlags_NoSort);
 #ifdef BUILD_TYPE_DEBUG
-		ImGui::TableSetupColumn(_("moveset.extraction_date"));
+		ImGui::TableSetupColumn(_("moveset.extraction_date"), ImGuiTableColumnFlags_NoSort);
 #endif
-		ImGui::TableSetupColumn(_("moveset.size"));
-		ImGui::TableSetupColumn(_("moveset.convert"));
-		ImGui::TableSetupColumn(_("moveset.duplicate"));
-		ImGui::TableSetupColumn(_("moveset.rename"));
-		ImGui::TableSetupColumn(_("moveset.edit"));
+		ImGui::TableSetupColumn(_("moveset.size"), ImGuiTableColumnFlags_NoSort);
+		ImGui::TableSetupColumn(_("moveset.convert"), ImGuiTableColumnFlags_NoSort);
+		ImGui::TableSetupColumn(_("moveset.import_settings"), ImGuiTableColumnFlags_NoSort);
+		ImGui::TableSetupColumn(_("moveset.duplicate"), ImGuiTableColumnFlags_NoSort);
+		ImGui::TableSetupColumn(_("moveset.rename"), ImGuiTableColumnFlags_NoSort);
+		ImGui::TableSetupColumn(_("moveset.edit"), ImGuiTableColumnFlags_NoSort);
 		ImGui::TableHeadersRow();
 
 		ImGui::PushID(&storage);
 
-		// drawList & windowPos are used to display a different row bg
-		ImDrawList* drawlist = ImGui::GetWindowDrawList();
-		auto windowPos = ImGui::GetWindowPos();
-
-		// Yes, we don't use an iterator here because the vector might actually change size mid-iteration
-		for (size_t i = 0; i < storage.extractedMovesets.size(); ++i)
+		// Movesets are guaranteed not to be freed until after this loop
+		for (const auto& group : MovesetListSort::GroupedTableView(storage.extractedMovesets))
 		{
-			// moveset is guaranteed not to be freed until after this loop
-			movesetInfo* moveset = storage.extractedMovesets[i];
-
+		if (!MovesetListSort::GroupHeader(group, group.game == "INVALID" ? _("moveset.invalid") : group.game.c_str())) continue;
+		for (movesetInfo* moveset : group.movesets)
+		{
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
+			MovesetListSort::RowHover hover;
+			hover.Begin();
 
-			if (moveset->color != 0)
-			{
-				// Draw BG
-				ImVec2 drawStart = windowPos + ImGui::GetCursorPos();
-				drawStart.y -= ImGui::GetScrollY();
-				ImVec2 drawArea = ImVec2(availableSpace.x, ImGui::GetFrameHeight());
-				drawlist->AddRectFilled(drawStart, drawStart + drawArea, moveset->color);
+			if (moveset->color != 0) {
+				ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, moveset->color);
 			}
 
 			ImGui::TextUnformatted(moveset->name.c_str());
+			if (!moveset->notes.empty()) { ImGui::SameLine(); ImGuiExtra::HelpMarker(moveset->notes.c_str(), true); }
 
 			ImGui::TableNextColumn();
 			if (moveset->origin == "INVALID") {
@@ -382,9 +558,22 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::PushID(moveset->filename.c_str());
 
 				ImGui::TableNextColumn();
-				if (ImGui::Button(_("moveset.convert"))) {
+				if (ImGuiExtra::RenderButtonEnabled(_("moveset.convert"), HasConversionTarget(moveset->gameId))) {
 					m_actionTarget = *moveset;
 					m_conversionPopup = true;
+				}
+
+				ImGui::TableNextColumn();
+				if (ImGui::Button(_("moveset.import_settings"))) {
+					m_actionTarget = *moveset;
+					m_profileMessage.clear();
+					try {
+						std::ifstream file(std::filesystem::path(moveset->filename), std::ios::binary);
+						const std::vector<Byte> bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+						m_profile = ImportProfile::Read(bytes);
+					} catch (const std::exception& error) { m_profile = {}; m_profileMessage = error.what(); }
+					m_profileStoryFlag = m_profile.storyFlag == ImportProfile::StoryFlagGameDecides ? 0 : m_profile.storyFlag;
+					m_profilePopup = true;
 				}
 
 				ImGui::TableNextColumn();
@@ -395,7 +584,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::TableNextColumn();
 				if (ImGui::Button(_("moveset.rename"))) {
 					m_actionTarget = *moveset;
-					strcpy_s(m_newName, sizeof(m_newName), moveset->name.c_str());
+					CopyUtf8Truncated(m_newName, sizeof(m_newName), moveset->name);
 					m_renamePopup = true;
 					currentErr = RenameErrcode_NoErr;
 				}
@@ -408,6 +597,8 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 				ImGui::PopStyleColor();
 				ImGui::PopID();
 			}
+			hover.End();
+		}
 		}
 		ImGui::PopID();
 
@@ -415,22 +606,28 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 	}
 
 	if (m_renamePopup) {
-		ImGui::OpenPopup("EditionRenamePopup");
-		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
+		ImGui::OpenPopup("###EditionRenamePopup");
 	}
 	else if (m_conversionPopup) {
-		ImGui::OpenPopup("EditionConvertPopup");
-		ImGui::SetNextWindowSizeConstraints(ImVec2(500, 200), ImVec2(1920, 1080));
+		ImGui::OpenPopup("###EditionConvertPopup");
+	}
+	else if (m_profilePopup) {
+		ImGui::OpenPopup("###EditionImportProfilePopup");
 	}
 
-	if (ImGui::BeginPopupModal("EditionRenamePopup", &m_renamePopup))
+	if (ImGuiExtra::BeginFittedModal("EditionRenamePopup", "Rename", &m_renamePopup))
 	{
 		RenderRenamePopup();
 		ImGui::EndPopup();
 	}
-	else if (ImGui::BeginPopupModal("EditionConvertPopup", &m_conversionPopup))
+	else if (ImGuiExtra::BeginFittedModal("EditionConvertPopup", "Convert", &m_conversionPopup))
 	{
 		RenderConversionPopup();
+		ImGui::EndPopup();
+	}
+	else if (ImGuiExtra::BeginFittedModal("EditionImportProfilePopup", _("edition.import_settings.title"), &m_profilePopup))
+	{
+		RenderImportProfilePopup();
 		ImGui::EndPopup();
 	}
 

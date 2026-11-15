@@ -2,7 +2,7 @@
 
 #include "MovesetLoader.hpp"
 
-#include "Structs_t8.h"
+#include "Structs_t8cnt.h"
 #include "SharedMemory_t8.h"
 #include "steam_api.h"
 
@@ -18,8 +18,8 @@ private:
 
 	void SetAddressesGameKey() override
 	{
-		addresses.gameKey = "t8";
-		addresses.minorGameKey = "t8";
+		addresses.gameKey = "t8cbt";
+		addresses.minorGameKey = "t8cbt";
 	}
 
 public:
@@ -30,6 +30,14 @@ public:
 
 	// Sale ptr to the shared memory as base class but casted
 	SharedMemT8* sharedMemPtr = nullptr;
+	// Retail build (no closed beta signatures): only the Tag mode runs
+	bool isRetail = false;
+	// Why TagT8::Init() failed, shown in Tools > Extra
+	std::string tagInitError;
+	int32_t lastTriggerId = 0;
+
+	// Takes the Tag commands written by Tools > Extra and reports the Tag state back
+	void HandleTagCommands();
 
 	void InitHooks() override;
 	void OnInitEnd() override;

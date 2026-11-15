@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <filesystem>
 #include <vector>
 #include <fstream>
 #include <format>
@@ -71,6 +72,8 @@ public:
 	void LoadToSharedMemory();
 	// Reload the game addresses file.
 	void Reload();
+	// Load from the file at `path` (embedded data if it does not exist), instead of the one in the working directory.
+	void ReloadFrom(const std::filesystem::path& path);
 
 	// Returns true if such a key exists (looks at values, strings and ptr paths)
 	bool HasKey(const std::string& gameKey, const char* key) const;
@@ -87,4 +90,14 @@ public:
 	// Returns a pointer path, that may rely on the base address or not.
 	const std::vector<gameAddr>& GetPtrPath(const std::string& gameKey, const char* c_addressId, bool& isRelative) const;
 	bool GetPtrPathEx(const std::string& gameKey, const char* c_addressId, bool& isRelative, const std::vector<gameAddr>*& out) const;
+
+	// Strings whose short key starts with `prefix` (e.g. "sig_" for the exe byte patterns), keyed by short key.
+	std::map<std::string, std::string> GetStringsWithPrefix(const std::string& gameKey, const std::string& prefix) const;
+	// Change an existing entry without reallocating anything workers may be reading: a `val:` value, or the module offset
+	// (first element) of a relative pointer path. Returns false, changing nothing, if no such entry exists.
+	bool UpdateInPlace(const std::string& gameKey, const std::string& key, int64_t value);
+	// Text of game_addresses.ini as Reload() would read it: the file at `path` (default: next to the program), else the embedded copy.
+	static std::string LoadSourceText(const std::filesystem::path& path = GAME_ADDRESSES_FILE);
+	// Rewrite the shared-memory copy (if this instance owns one) after UpdateInPlace.
+	void RefreshSharedMemory();
 };

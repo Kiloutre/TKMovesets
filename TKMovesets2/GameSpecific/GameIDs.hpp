@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 // Items here may only be renamed, not moved / deleted / replaced
 enum GameId_
@@ -15,9 +16,12 @@ namespace GameVersions
 {
 	namespace T8
 	{
+		inline constexpr uint16_t FROM_T7 = 1; // conversion_origin, not minorVersion
 		enum
 		{
 			CLOSED_NETWORK_TEST,
+			CLOSED_BETA_TEST,
+			RETAIL, // Append only: CNT/CBT values are serialized in existing files.
 		};
 	}
 
@@ -32,6 +36,7 @@ namespace GameVersions
 			FROM_T6,
 			FROM_T5,
 			FROM_T5DR,
+			FROM_T8, // retail Tekken 8 (T8ToT7)
 		};
 	}
 

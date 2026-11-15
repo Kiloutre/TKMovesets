@@ -1,0 +1,61 @@
+Alias ID,Alias ID (Hex),Purpose,Description
+32768,8000,Default / Initiator,This is what cancels into your intros and outros
+32769,8001,Standing,
+32770,8002,Crouching,
+32771,8003,Death,"The ""ow! my back"" anim played after a KO'ed character falls on the ground"
+32772,8004,Face Up Feet Towards,
+32773,8005,,
+32774,8006,,
+32775,8007,,
+32776,8008,,
+32777,8009,,
+32778,800A,,
+32779,800B,,
+32780,800C,,
+32781,800D,Sidestep left,"The game calls it ""Guard Step"""
+32782,800E,Sidestep right,
+32783,800F,CL1.5 - No movement,The quick crouch that happens when a high-attack is incoming
+32784,8010,CL1.5 - Forward movement,
+32785,8011,CL1.5 - Backward movement,
+32786,8012,,
+32787,8013,Roll forward,
+32788,8014,Forward jump,
+32789,8015,Tackle punch break,
+32790,8016,Legacy KO,
+32791,8017,KO High 1,fall to knees and roll over
+32792,8018,KO Mid 1,hold stomach and fall back
+32793,8019,KO Low 1,trip over leg
+32794,801A,KO High 2,fall forward
+32795,801B,KO Mid 2,hold stomach and fall forward
+32796,801C,KO Low 2,trip over leg and fall back
+32797,801D,,
+32798,801E,,
+32799,801F,,
+32800,8020,,
+32801,8021,Airborne (face-up),Generic float caused by a jab
+32802,8022,Airborne (face-down),
+32803,8023,Airborne (rotating left),go face-down to face-up by rotating left
+32804,8024,Airborne (rotating right),go face-down to face-up by rotating right
+32805,8025,Airborne (rotating left),go face-up to face-down by rotating left
+32806,8026,Airborne (rotating right),go face-up to face-down by rotating right
+32807,8027,,
+32808,8028,,
+32809,8029,,
+32810,802A,,
+32811,802B,,
+32812,802C,,
+32813,802D,,
+32814,802E,,
+32815,802F,,
+32816,8030,,
+32817,8031,Throw break,
+32818,8032,,
+32819,8033,,
+32820,8034,,
+32821,8035,,
+32822,8036,,
+32823,8037,,
+32824,8038,,
+32825,8039,Rage Art,Only seen in Heihachi so far
+32826,803A,Revenge,"A cut feature where you could sacrifice your Rage to re-activate Heat. Some characters have unique animations but others use Paul's (qcb 1+2). Only 8-10 characters have this leftover in their moveset, namely, Jin, Law, King, Paul, Victor, Zafina, Claudio & Jack"
+32827,803B,Empty move,

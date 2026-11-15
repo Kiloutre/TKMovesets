@@ -2,6 +2,7 @@
 
 #include <map>
 #include <set>
+#include <functional>
 
 #include "EditorLogic.hpp"
 
@@ -9,6 +10,10 @@ class EditorVisuals;
 
 namespace EditorFormUtils
 {
+	InputMap CloneFields(const InputMap& fields, size_t& budget);
+    std::map<int, std::vector<EditorInput*>> CloneCategories(const InputMap& source, const InputMap& copy,
+        const std::map<int, std::vector<EditorInput*>>& categories);
+    void ValidateFields(const InputMap& fields, const VectorSet<std::string>& order);
 	// Sets the field display text and calculate the text size for alignment
 	void SetFieldDisplayText(EditorInput* field, const std::string& newName);
 
@@ -19,7 +24,24 @@ namespace EditorFormUtils
 // Windowed class managing a single struct
 class EditorForm
 {
+public:
+    struct TransactionState {
+        virtual ~TransactionState() = default;
+        virtual void Commit() noexcept = 0;
+    };
 protected:
+    struct SavedState;
+    void EditForm(const std::function<bool()>& action);
+    uint32_t DuplicateStructure();
+    bool TryDuplicateStructure();
+    bool TryDeleteStructure();
+    virtual void OpenDuplicatedForm(uint32_t id, int listSize);
+    virtual void PrepareDuplication(unsigned int newId, unsigned int listSize) {};
+    virtual void OnDeletion();
+    bool m_formEditActive = false;
+    virtual std::unique_ptr<TransactionState> BeginEditTransaction();
+	std::string m_operationError;
+	void TryApply();
 	// Contains the window title to display
 	std::string m_windowTitle;
 	// The form's fields, contains the field buffer along with its validity as a boolean and more useful data 
@@ -56,6 +78,7 @@ protected:
 	bool m_deletionPopupOpen = false;
 	// Marks if deletion is possible on this structure
 	bool m_isDeletable = true;
+    bool m_canDuplicate = true;
 	// Will be set to true when opening the context menu if the clipboard can be pasted
 	bool m_canPaste = false;
 
@@ -64,6 +87,10 @@ protected:
 	// Pastes the content of the clipboard to the current form.
 	// Content of the form must be returned by "CopyFormToClipboard" and match the current window type.
 	virtual void PasteFormFromClipboard();
+	virtual void PasteText(std::string_view text);
+	virtual std::vector<size_t> ClipboardWidths() const;
+	virtual size_t ClipboardRowLimit() const { return 1; }
+	virtual void FlushPendingFields();
 	// Returns true if the current clipboard content can be pasted into this form
 	bool CanPasteFormFromClipboard() const;
 	// Returns the casted base window for when wanting to call non-generic methods
@@ -96,8 +123,8 @@ protected:
 	void RenderDiscardButtons();
 	// Render inputs from the <category : input> map
 	void RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount);
-	// Render a single input field in the form
-	void RenderInput(int listIdx, EditorInput* field);
+	// Render a single input field in the form. Game-specific forms may draw a decoded widget (combo) first.
+	virtual void RenderInput(int listIdx, EditorInput* field);
 	// Render a single input label in the form
 	void RenderLabel(int listIdx, EditorInput* field);
 	// Called when clicking the apply button, will check for field errors, set variables and then save the data
@@ -110,7 +137,11 @@ protected:
 	bool IsWindowRightClicked() const;
 	// Overrideable to render extra items in the form's context menu
 	virtual void RenderExtraContextMenuItems() {};
+	// Items about the row under the cursor (list forms), drawn before the structure duplication item
+	virtual void RenderItemContextMenuItems() {};
 public:
+    // Uncommitted checkpoints restore without allocation, including original pointer identity.
+    virtual std::unique_ptr<TransactionState> BeginTransaction(size_t& budget);
 	// Stores the state of the window. If close, this class will be destroyed soon
 	bool popen = true;
 	// If set to true, will display an unsaved icon on the window title bar
@@ -140,6 +171,10 @@ public:
 
 	// Called after the constructor
 	virtual void OnInitEnd() {};
+	// Last operation error shown in the form (tests).
+	const std::string& OperationError() const { return m_operationError; }
+	// Display text of a field (tests). listIdx is ignored by single forms.
+	virtual std::string FieldDisplayName(int listIdx, const char* name) const { (void)listIdx; auto* field = m_fieldIdentifierMap.at(name); return field ? field->displayName : std::string(); }
 	// Updates a field (if not errored) containing an ID or an integer value by adding the given value
 	virtual void RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd) {};
 	void Render(bool parent_window_focused);

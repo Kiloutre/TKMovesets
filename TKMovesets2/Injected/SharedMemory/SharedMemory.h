@@ -7,6 +7,18 @@ enum MovesetLoaderMode_
 	MovesetLoaderMode_PersistentPlay,
 };
 
+// 32-bit value returned by the exported MovesetLoaderInit(), read by the tool as the remote thread's exit code.
+// Values 0 and 1 match what older loaders returned as a bool (in the low byte only).
+enum MovesetLoaderInitStatus_
+{
+	// Initialization failed: the loader is not usable
+	MovesetLoaderInitStatus_Failed = 0,
+	// Initialization succeeded: the caller must now call MovesetLoaderRun()
+	MovesetLoaderInitStatus_Started = 1,
+	// The loader was already initialized and its main loop is running: usable, the caller must NOT call MovesetLoaderRun()
+	MovesetLoaderInitStatus_AlreadyRunning = 2,
+};
+
 enum MovesetSyncStatus_
 {
 	// Packets will not be received (and be buffered) as long as the NotStarted state is on

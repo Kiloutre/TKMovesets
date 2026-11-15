@@ -1,0 +1,101 @@
+Useful Sounds,Values in Hex,Description
+"Note: Values 0x010000??, 0x060000?? and 0x070000?? play the same SFX.
+Difference b/w them not discovered yet.",,
+16777217,01000001,"Announcer ""Chicken"""
+16777218,01000002,"Announcer ""Great"""
+16777219,01000003,"Announcer ""Zero"""
+16777220,01000004,"Announcer ""One"""
+16777221,01000005,"Announcer ""Two"""
+16777222,01000006,"Announcer ""Three"""
+16777223,01000007,"Announcer ""Four"""
+16777224,01000008,"Announcer ""Five"""
+16777225,01000009,"Announcer ""Six"""
+16777226,0100000A,"Announcer ""Seven"""
+16777227,0100000B,"Announcer ""Eight"""
+16777228,0100000C,"Announcer ""Nine"""
+16777229,0100000D,"Announcer ""Ten"""
+16777230,0100000E,Attack Hit SFX  - 1
+16777241,01000019,Attack Hit SFX  - 12
+16777246,0100001E,Jump
+16777250,01000022,Limb Swinging 1
+16777251,01000023,Limb Swinging 2
+16777252,01000024,Jack Mechanical SFX (?)
+16777253,01000025,Bone crack SFX 1
+16777254,01000026,Bone crack SFX 2
+16777255,01000027,Bone crack SFX 3
+16777256,01000028,Bone crack SFX 4
+16777257,01000029,"Announcer ""Oops"""
+16777258,0100002A,Thud SFX (?)
+16777259,0100002B,Electric SFX
+16777260,0100002C,Devil Laser SFX
+16777261,0100002D,Ki-Charge SFX
+16777262,0100002E,On hit SFX
+16777263,0100002F,"On hit SFX (e.g, used in Bryan hatchet kick)"
+16777270,01000036,Counter Hit SFX
+16777273,01000039,"Fly away SFX, Used in DVJ and KAZ Heaven's Door"
+33554432,02000000,Character Attack Grunt - 1
+33554442,0200000A,"Character Attack Grunt - 10, see notes attached to cell"
+33554464,02000020,Character Attack Grunt - 33 (Last)
+50331648,03000000,Character Hurt Grunt - 1
+50331658,0300000A,Character Hurt Grunt - 11 (Last)
+67108864,04000000,KO Scream 1
+67108865,04000001,KO Scream 2
+100663330,06000022,Limb Swinging 1
+100663331,06000023,Limb Swinging 2
+134217785,08000039,Kazumi's Tiger (Tora's) Appearance sound
+134217786,0800003A,"Tora Paw Hit (Devil Kazumi f,f+2)"
+134217787,0800003B,Tora Rolling (Kazumi 1+4)
+134217788,0800003C,Tora swoosh forward
+134217789,0800003D,Tora disappearance SFX
+134217790,0800003E,Tora Roar 1
+134217791,0800003F,Tora Roar 2
+134217792,08000040,Tora Roar 3
+150994944,09000000,Hit the ground 1
+167772160,0A000000,Stage Footsteps VFX
+251658240 - 251658248,0F00000000 - 0F00000008 ,"Announcer, ""Round 1"" to ""Round 9"" "
+251658249,0F000009,"Announcer, ""Final Round"""
+251658251,0F00000B,"Announcer, ""Fight"""
+251658252,0F00000C,"Announcer, ""K.O"""
+251658253,0F00000D,"Announcer, ""Double K.O"""
+251658254,0F00000E,"Announcer, ""Time Up"""
+251658255,0F00000F,"Announcer, ""Perfect"""
+251658256,0F000010,"Announcer, ""Great"""
+251658257,0F000011,"Announcer, ""You Win"""
+251658258,0F000012,"Announcer, ""Win"""
+251658259,0F000013,"Announcer, ""Wins"""
+251658260,0F000014,"Announcer, ""You Lose"""
+251658261,0F000015,"Announcer, ""Lose"""
+251658262,0F000016,"Announcer, ""Loses"""
+251658263,0F000017,"Announcer, ""Draw"""
+251658285,0F00002D,Siren
+251658286,0F00002E,Match Loading Screen Coming In
+251658287,0F00002F,Match Loading Screen Settle
+251658288,0F000030,Match Loading Screen Going Away
+251658289,0F000031,Rage Art Activation
+251658292,0F000034,"Announcer, ""Revenge Match"""
+251658293,0F000035,Arcade Special Match
+251658294,0F000036,Arcade Special Match
+251658295,0F000037,Arcade Special Match
+251658297,0F000039,Akuma Blue Fireball
+251658298,0F00003A,Akuma Red Fireball
+251658299,0F00003B,Akuma EX Sound
+251658301,0F00003D,Akuma Rage Art connect
+251658311,0F000047,Meter Consume (Akuma/Eliza)
+251658312,0F000048,Full Meter Consumption move SFX
+251658313,0F000049,Rage Drive Sound Effect
+251658314,0F00004A,Akuma Focus Attack Start/Charge
+251658315,0F00004B,Akuma Focus Attack Release
+251658318,0F00004E,Akuma Charging
+251658375,0F000087,Story Mode lifebar refill SFX
+251658397,0F00009D,"Heihachi ""Is that it?"""
+251658414,0F0000AE,"Devil Kazumi, ""Die, Heihachi!"""
+251658420,0F0000B4,"Heihachi ""You deluded fool!"""
+251658424,0F0000B8,"Boss Heihachi ""Die Kazuya"""
+251658425,0F0000B9,"Boss Heihachi ""Your delusion of grandeur end here"""
+251658427,0F0000BB,"Boss Kazuya, ""Feel the power of Devil himself"""
+251658429,0F0000BD,"Boss Kazuya ""This will be your burial ground"""
+251658430,0F0000BE,"Boss Kazuya ""It's over, Die!"""
+251658564,0F000144,Boss Kazuya Laser sound effect
+251658565,0F000145,Story Mode Chapter 14 thud SFX
+251658566,0F000146,"Kazuya, ""Feel power of Devil"" discharge SFX"
+251658567,0F000147,Some sort of air whoosh sound (used in Kazuya's boss RA)

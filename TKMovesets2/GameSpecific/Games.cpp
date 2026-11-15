@@ -3,14 +3,20 @@
 
 
 #include "Extractor_t7/Extractor_t7.hpp"
+#include "Extractor_t8/Extractor_t8cnt.hpp"
+#include "Extractor_t8/Extractor_t8.hpp"
 #include "Extractor_ttt2/Extractor_ttt2.hpp"
 #include "Extractor_t6/Extractor_t6.hpp"
 #include "Extractor_t5/Extractor_t5.hpp"
 #include "Extractor_t5/Extractor_t5dr.hpp"
 
 #include "Importer_t7/Importer_t7.hpp"
+#include "Importer_t8/Importer_t8.hpp"
 
 #include "Editor_t7/Editor_t7.hpp"
+#include "Editor_t8/Editor_t8cnt.hpp"
+#include "Editor_t8Retail/Editor_t8Retail.hpp"
+#include "EditorVisuals_t8Retail/EditorVisuals_t8Retail.hpp"
 
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
 
@@ -20,29 +26,76 @@
 // -- -- //
 
 const GameInfo cg_gamesInfo[] = {
+    {
+        .name = "Tekken 8",
+        .processName = "Polaris-Win64-Shipping.exe",
+        .movesetNamePrefix = "T8_",
+        .gameId = GameId_T8,
+        .minorVersion = GameVersions::T8::RETAIL,
+        .characterCount = 2,
+        .ptrSize = 8,
+        .flags = GameFlag_MovesetLiveEditable,
+        .dataString = "t8-retail",
+        .minorDataString = "t8-retail",
+        .supportedImports = { GameId_T7 },
+        .supportedOnlineImports = {},
+        // Retail records/PANM snapshots have a distinct reader/container; no CNT layouts.
+        .extractor = new GameFactory<ExtractorT8>,
+        .importer = new GameFactory<ImporterT8>,
+        .editorLogic = new GameFactory<EditorT8Retail>,
+        .editorVisuals = new EditorFactory<EditorVisualsT8Retail>,
+        .onlineHandler = nullptr,
+        .GetBaseAddressFunc = GetBaseAddrFromFile,
+        .bigEndian = false,
+        .matchingProcessSubstrings = {}
+    },
+
 	{
-		// -- T8 -- //
-		.name = "Tekken 8 CNT",
+		// -- T8 CBT -- //
+		.name = "Tekken 8 CBT",
 		.processName = "Polaris-Win64-Shipping.exe",
-		.movesetNamePrefix = "T8_",
+		.movesetNamePrefix = "T8CBT_",
 		.gameId = GameId_T8,
-		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
+		.minorVersion = GameVersions::T8::CLOSED_BETA_TEST,
 		.characterCount = 2,
 		.ptrSize = 8,
 		.flags = 0,
-		.dataString = "t8",
-		.minorDataString = "t8",
+		.dataString = "t8cbt",
+		.minorDataString = "t8cbt",
 		.supportedImports = { },
 		.supportedOnlineImports = { },
 		.extractor = nullptr,
 		.importer = nullptr,
 		.editorLogic = nullptr,
 		.editorVisuals = nullptr,
-#ifdef BUILD_TYPE_DEBUG
-		.onlineHandler = new GameFactory<OnlineT8>,
-#else
+		// Not offered in Online / Persistent play (owner, 2026-11-15)
 		.onlineHandler = nullptr,
-#endif
+		.GetBaseAddressFunc = GetBaseAddrFromFile,
+		.bigEndian = false,
+		.matchingProcessSubstrings = {}
+	},
+
+	{
+		// -- T8 CNT -- //
+		.name = "Tekken 8 CNT",
+		.processName = "Polaris-Win64-Shipping.exe",
+		.movesetNamePrefix = "T8CNT_",
+		.gameId = GameId_T8,
+		.minorVersion = GameVersions::T8::CLOSED_NETWORK_TEST,
+		.characterCount = 2,
+		.ptrSize = 8,
+		.flags = 0,
+		.dataString = "t8cnt",
+		.minorDataString = "t8cnt",
+		.supportedImports = { },
+		.supportedOnlineImports = { },
+		.extractor = new GameFactory<ExtractorT8CNT>,
+		.importer = nullptr,
+		.editorLogic = new GameFactory<EditorT8CNT>,
+		// The T7 visual editor casts its logic to EditorT7 and cannot edit CNT records.
+		.editorVisuals = nullptr,
+		// Not injectable: no online/persistent play, no loader DLL injection.
+		.onlineHandler = nullptr,
 		.GetBaseAddressFunc = GetBaseAddrFromFile,
 		.bigEndian = false,
 		.matchingProcessSubstrings = {}
@@ -60,7 +113,8 @@ const GameInfo cg_gamesInfo[] = {
 		.flags = GameFlag_MovesetLiveEditable,
 		.dataString = "t7",
 		.minorDataString = "t7",
-		.supportedImports = { GameId_TTT2, GameId_TREV, GameId_T6, GameId_T5 },
+		// T8: retail files only, converted by T8ToT7 at import (CNT/CBT files are refused there)
+		.supportedImports = { GameId_TTT2, GameId_TREV, GameId_T6, GameId_T5, GameId_T8 },
 		.supportedOnlineImports = { GameId_TTT2, GameId_TREV, GameId_T6 },
 		.extractor = new GameFactory<ExtractorT7>,
 		.importer = new GameFactory<ImporterT7>,
@@ -305,7 +359,7 @@ namespace Games
 	bool IsGameEditable(uint16_t gameId, uint16_t minorVersion)
 	{
 		auto game = GetGameInfoFromIdentifier(gameId, minorVersion);
-		return game->IsEditable();
+		return game && game->IsEditable();
 	}
 
 	bool IsGameLiveEditable(uint16_t gameId, uint16_t minorVersion)
@@ -322,12 +376,6 @@ namespace Games
 		return ex;
 	}
 
-	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess& process, GameData& game)
-	{
-		Importer* im = (Importer*)gameInfo->importer->allocate(process, game, gameInfo);
-		return im;
-	}
-
 	EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
 		EditorLogic* ed = (EditorLogic*)gameInfo->editorLogic->allocate(process, game, gameInfo);
@@ -342,6 +390,9 @@ namespace Games
 
 	Online* FactoryGetOnline(const GameInfo* gameInfo, GameProcess& process, GameData& game)
 	{
+		if (gameInfo->onlineHandler == nullptr) {
+			return nullptr;
+		}
 		Online* on = (Online*)gameInfo->onlineHandler->allocate(process, game, gameInfo);
 		return on;
 	}

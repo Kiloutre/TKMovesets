@@ -69,7 +69,9 @@ enum TEditorWindowType_
 class TEditor : public EditorLogic
 {
 protected:
-	// Stores a <name, offset> animation map
+	class SavedMutationState;
+    std::unique_ptr<MutationState> CaptureMutationState() override;
+    // Stores a <name, offset> animation map
 	std::map<std::string, gameAddr> m_animNameToOffsetMap;
 	// Stores a <offset, offset> animation map
 	std::map<gameAddr, gameAddr> m_animOffsetToNameOffset;

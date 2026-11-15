@@ -1,0 +1,151 @@
+Value,Values in Hex,Function
+"These values are bit flags. Different Combination of activated bits activate certain properties.
+E.g, ""Skip Starting Frames"" property is activated if bit # 11 is set.
+meanwhile, the ""Play Reaction Move"" property works if both bit # 11 & 12 are set.
+bit # 12 set >> Reverse replay animation",,
+0,00000000,No Extra Properties
+128,00000080,Retain Jump Height Info
+150,00000096,Heavy Tracking Both Sides
+151,00000097,
+152,00000098,
+153,00000099,Extremely Weak Tracking (?)
+169,000000A9,
+171,000000AB,
+172,000000AC,
+173,000000AD,
+256,00000100,Extreme Tracking
+276,00000114,
+277,00000115,
+333,0000014D,
+339,00000153,
+386,00000182,Moderate Tracking Both Sides
+387,00000183,
+388,00000184,
+389,00000185,
+390,00000186,
+527,0000020F,Homing Move Strength Tracking
+528,00000210,
+532,00000214,
+537,00000219,Moderate Tracking Left Side
+1024,00000400,Retain Current Frame + ???
+1025,00000401,Retain Current Frame + No Homing
+1026,00000402,Retain Current Frame
+1029,00000405,
+1044,00000414,Retain Current Frame + ???
+1063,00000427,Retain Current Frame + ???
+1152,00000480,Retain Current Frame + ???
+1153,00000481,Retain Current Frame + ???
+1174,00000496,Retain Current Frame + ???
+1175,00000497,Retain Current Frame + ???
+1177,00000499,Retain Current Frame + ???
+1195,000004AB,Retain Current Frame + ???
+1197,000004AD,Retain Current Frame + ???
+1280,00000500,Retain Current Frame + ???
+1300,00000514,Retain Current Frame + ???
+1363,00000553,Retain Current Frame + Reposition Player Few steps Back
+1551,0000060F,Retain Current Frame + ???
+1556,00000614,Retain Current Frame + ???
+1557,00000615,Retain Current Frame + ???
+1561,00000619,Retain Current Frame + ???
+2049,00000801,Skip starting frames + ???
+2176,00000880,Used with 0x81c8 to Skip Specified Startup Frames + Retain Jump Height Info
+2199,00000897,Skip starting frames + ???
+2219,000008AB,Skip starting frames + ???
+2221,000008AD,Skip starting frames + ???
+2304,00000900,Used with 0x81c8 to Skip Specified Startup Frames + Retain Jump Height Info + Extreme Tracking
+2324,00000914,Skip starting frames + ???
+2434,00000982,Skip starting frames + Retain Current Frame + ???
+2437,00000985,Skip starting frames + Homing Move Strength Tracking
+2580,00000A14,Skip starting frames + ???
+2585,00000A19,Skip starting frames + ???
+4224,00001080,Reverse animation replay + Retain Jump Height Info
+6876,00001ADC,(Used in Throws) Play reaction move + Put Player and Opponent Together
+9119,0000239F,
+10240,00002800,"Non-Transitioning Cancel, used to activate commands (Extraprops)"
+11264,00002C00,"Non-Transitioning Cancel, used to activate commands (Extraprops)"
+12282,00002FFA,
+13312,00003400,
+14464,00003880,
+16383,00003FFF,Disable cancel if condition True
+16512,00004080,
+16514,00004082,
+16534,00004096,
+16535,00004097,
+16640,00004100,
+16661,00004115,
+16770,00004182,
+16773,00004185,
+16832,000041C0,
+16916,00004214,
+16921,00004219,
+17409,00004401,
+17410,00004402,
+17536,00004480,
+17558,00004496,
+17945,00004619,
+18560,00004880,
+18708,00004914,
+18818,00004982,
+18969,00004A19,
+23260,00005ADC,Play reaction move + ???
+32896,00008080,Turn Player Around + Blend Pose?
+32918,00008096,Turn Player Around + ???
+32921,00008099,Turn Player Around
+33044,00008114,
+33107,00008153,Turn Player Around + ???
+33154,00008182,Turn Player Around + ???
+33157,00008185,Turn Player Around + ???
+33300,00008214,Turn Player Around + ???
+33305,00008219,Turn Player Around + ???
+33793,00008401,Turn Player Around + ???
+33794,00008402,Turn Player Around + ???
+33921,00008481,Turn Player Around + Retain Current Frame
+33943,00008497,Turn Player Around + Retain Current Frame + ???
+34319,0000860F,Turn Player Around + Retain Current Frame + ???
+34329,00008619,Turn Player Around + Retain Current Frame + ???
+39644,00009ADC,Turn Player Around + Play reaction move + Put Player and Opponent Together
+49280,0000C080,Turn Player Around + ???
+49302,0000C096,Turn Player Around + ???
+49538,0000C182,Turn Player Around + ???
+49541,0000C185,Turn Player Around + ???
+49689,0000C219,Turn Player Around + ???
+50177,0000C401,Turn Player Around + Retain Current Frame + ???
+56028,0000DADC,Play reaction move + Put Player and Opponent Together + ???
+67584,00010800,Reposition Player Little Back + ???
+67840,00010900,Reposition Player Little Back + ???
+131604,00020214,
+132097,00020401,
+262272,00040080,
+262533,00040185,
+262676,00040214,
+262681,00040219,
+524416,00080080,
+524674,00080182,
+524675,00080183,
+524677,00080185,
+524820,00080214,
+524825,00080219,
+525313,00080401,
+525314,00080402,
+525315,00080403,
+525844,00080614,
+540800,00084080,
+540825,00084099,
+541058,00084182,
+541209,00084219,
+541697,00084401,Retain current frame + ???
+542233,00084619,
+542848,00084880,
+543106,00084982,2D Cancel + Skip Starting Frames + ???
+543257,00084A19,
+547548,00085ADC,Play reaction move + ???
+558617,00088619,
+573568,0008C080,Turn Player Around (doesn't blend)
+573593,0008C099,
+4194432,00400080,
+4194454,00400096,
+4194690,00400182,
+4194841,00400219,
+4195329,00400401,
+4196503,00400897,
+4196523,004008AB,

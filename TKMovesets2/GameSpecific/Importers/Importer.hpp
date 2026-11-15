@@ -26,9 +26,25 @@ enum ImportSettings_
 	ImportSettings_BasicLoadOnly = (1 << 3),
 	// The original moveset data will also be loaded, used by for online moveset syncing
 	ImportSettings_ImportOriginalData = (1 << 4),
+	// Bits 16..27 select file MOTAs; absent flag preserves legacy all-available behavior.
+	ImportSettings_UseMotaMask = (1 << 5),
+    // Retail T8: do the full import (animation entries, moveset allocation and writes) but never point the player
+    // at the result: no root swap, no instant apply. Used for staging and benchmarks.
+    ImportSettings_StageOnly = (1 << 7),
 
 	ImportSettings_DEFAULT = ImportSettings_ApplyInstantly | ImportSettings_FreeUnusedMovesets,
 };
+
+namespace ImportSettingsUtils {
+    inline constexpr ImportSettings AllMotas = 0xfff;
+    inline constexpr unsigned MotaShift = 16;
+    constexpr uint16_t MotaMask(ImportSettings settings) {
+        return static_cast<uint16_t>((settings & ImportSettings_UseMotaMask) ? (settings >> MotaShift) & AllMotas : AllMotas);
+    }
+    constexpr ImportSettings WithMotaMask(ImportSettings settings, uint16_t mask) {
+        return (settings & ~(AllMotas << MotaShift)) | ImportSettings_UseMotaMask | ((ImportSettings(mask) & AllMotas) << MotaShift);
+    }
+}
 
 enum ImportationErrcode_
 {
@@ -39,6 +55,8 @@ enum ImportationErrcode_
 	ImportationErrcode_DecompressionError,
 	ImportationErrcode_UnsupportedGameVersion,
 	ImportationErrcode_MovesetDataError,
+    ImportationErrcode_GameWriteError,
+    ImportationErrcode_GameRollbackError,
 };
 
 // Base class for extracting from a game
@@ -48,8 +66,11 @@ protected:
 	// Internal import method that will decompress the moveset (if needed) and get a ptr to the moveset data before calling ImportMOvesetData
 	ImportationErrcode_ _Import(Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 
+    ImportationErrcode_ ImportChecked(Byte* moveset, uint64_t size, gameAddr player, ImportSettings settings, uint8_t& progress);
+
 	virtual ImportationErrcode_ ImportMovesetData(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress) = 0;
 public:
+	virtual const std::string& LastError() const { static const std::string empty; return empty; }
 	// Store informations about the last loaded moveset such as its address, crc32, character ID. Used by online shared memory.
 	s_lastLoaded lastLoaded;
 

@@ -1,0 +1,669 @@
+0, Always true
+1, Practice Mode Demo
+2, Attack To Throw
+3, Throw Hit Forward (Standing)
+4, Throw Hit Backward (Standing)
+5, Throw Hit Left Side (Standing)
+6, Throw Hit Right Side (Standing)
+7, Throw Hit Forward (Crouching)
+8, Throw Hit Backward (Crouching)
+9, Throw Hit Left Side (Crouching)
+10, Throw Hit Right Side (Crouching)
+11, Throw Hit Forward (Face Up)
+12, Throw Hit Backward (Face Up)
+13, Throw Hit Left Side (Face Up)
+14, Throw Hit Right Side (Face Up)
+15, Throw Hit Forward (Face Down)
+16, Throw Hit Backward (Face Down)
+17, Throw Hit Left Side (Face Down)
+18, Throw Hit Right Side (Face Down)
+19, Throw Contact Type Eq And Dist <=
+20, Throw Contact Type Eq And Dist <=
+21, Throw Contact Type Eq And Dist <=
+22, Throw Contact Type Eq And Dist <=
+23, Attack To Throw (Forward)
+24, Attack To Throw (Backward)
+25, Attack To Throw (Left Side)
+26, Attack To Throw (Right Side)
+27, Airborne Throw Hit Forward (Face Up)
+28, Airborne Throw Hit Backward (Face Up)
+29, Airborne Throw Hit Left Side (Face Up)
+30, Airborne Throw Hit Right Side (Face Up)
+31, Airborne Throw Hit Forward (Face Down)
+32, Airborne Throw Hit Backward (Face Down)
+33, Airborne Throw Hit Left Side (Face Down)
+34, Airborne Throw Hit Right Side (Face Down)
+35, Opponent distance smaller or equal than
+36, Opponent distance greater  or equal than
+43, On Hit / On Block
+44, On Hit
+45, Opponent Flag FE4Positive And No Bit4
+46, On Hit
+47, On Block
+48, On Whiff
+49, On Hit / On Block
+50, Hit/Block related (?)
+51, On Hit
+52, Field68DSet
+53, Opp Contact Flag Bit31
+54, Opponent Contact Flag Bit9
+55, Contact Flag Bit14
+56, Opponent Hit State Check
+57, Contact Flag Bit13
+58, Contact Flag Check
+59, Opp Reaction ==
+60, Opponent Field2904Not1800
+61, Check Opponent VULN
+62, Opponent Attacking
+63, Opponent Attacking while Standing
+64, Opponent Attacking while Crouching
+65, Opponent moving but not attacking
+66, Opponent Standing
+67, Opponent Crouching
+68, Incoming high attack
+69, Incoming mid attack
+70, Incoming low attack
+71, Incoming high/mid attack
+72, Character Backturned
+73, Character Not Backturned
+74, Field37ANegative
+75, Field37ANon Negative
+76, Character Facing Direction >= param
+77, Character Facing Direction < param
+78, Opponent Lookat >=
+79, Opponent Lookat <
+80, Angle37AIn Range4000
+81, Angle37AIn Range8000
+82, Angle Field37a In110To180
+83, Angle Field37a In Minus180To Minus110
+84, Player facing Forward
+85, Player facing Left
+86, Player facing Right
+87, Player facing Backwards
+88, Player facing Forward
+89, Player facing Left
+90, Player facing Right
+91, Player facing Backwards
+92, Opponent facing Forward
+93, Opponent facing Left
+94, Opponent facing Right
+95, Opponent facing Backwards
+96, Opponent facing Forward
+97, Opponent facing Left
+98, Opponent facing Right
+99, Opponent facing Backwards
+100, Opponent is close, last active frame not reached, high attack
+101, Enemy first active frame - curr frame < X
+102, Enemy first active frame - curr frame >= X
+103, Enemy first active frame - curr frame = X
+104, Enemy last active frame - curr frame < X
+105, Enemy last active frame - curr frame >= X
+106, Enemy last active frame - curr frame = X
+107, Enemy current frame - last active frame <= X
+108, Player current frame - max anim length >= X
+109, Player move max anim length - Current frame > X
+110, Enemy move frame ≥ X
+111, Enemy move frame < X
+112, Enemy move frame == X
+113, Player state frame counter (field_3A4) ≥ X
+114,         Player state frame counter < X
+115, Player state frame counter == X
+116, Field3ac >=
+117, Move Timer <
+118, Field3ac ==
+119, Field3b4 >=
+120, Field3b4 <
+121, Field3b4 ==
+122, Always True
+123, Flag Bd5Set
+124, Check nonzero player vector (purpose unknown)
+125, Vec3710Non Zero And Opp Not Flag4
+126, Opponent is downed
+127, Opponent is grounded
+128, Opponent is downed, not airborne, distance <= X
+129, Opponent Vuln Bit2And Lookat GT3FFF
+130, On Counter Hit
+131, Pressed ONLY Left Punch
+132, Pressed ONLY Right Punch
+133, Pressed ONLY Left + Right Punch
+134, Throw break related
+135, Throw break related
+136, Call Fun141914250And Set Flag700
+137, On Death
+138, On Opponent Death
+139, Opponent Health < 50%
+140, Player HP >= Param
+141, Player HP < Param
+142, Opponent HP >= Param
+143, Opponent HP < Param
+144, Player HP Percentage >= Param
+145, Player HP Percentage < Param
+146, Opponent HP <= Param
+147, Player HP <= Param
+148, Standing on the Left Side
+149, Standing on the Right Side
+150, Player on left side and backturned
+151, Player on right side and backturned
+152, Standing on Left Side + Facing front
+153, Standing on Right Side + Facing front
+157, If Player is Ki Charged
+158, If Player is NOT Ki Charged
+159, Player is in rage
+160, Round Flag88Set
+161, Field28d8 <
+163, Player Slot Move Start20
+164, Any Player Move Flag20At First Frame
+165, Check Opponent Current Move
+166, Global Flag Set 9A228
+167, Global Flag Clear 9A228
+168, Something related to Speed & frame values of some unknown cancel
+170, Field1ad8Zero
+171, Flag488 ==
+172, Opp Not Flag2934And Byte71e
+174, Round Timer >=
+175, Round Timer <=
+177, Opp Byte1d1e Clear
+179, Is Ai Or Dummy Controlled Latch
+180, Opp Is Ai Or Dummy Or Flag1578
+181, Hp At Or Below Damage Threshold
+182, Opponent Lethal Range [no effect in retail]
+183, Opponent Standing or Crouching
+184, Near Wall
+185, Near Wall (Sensor 1)
+186, Near Wall (Sensor 2)
+187, Near Wall (Sensor 3)
+188, Near Wall (Sensor 4)
+189, Near Wall (Sensor 5)
+190, Near Wall (Sensor 6)
+191, Near Wall (Opponent)
+192, Wallbreak Available
+194, Facing Trace Hit
+195, Facing Trace No Hit
+196, Wall Probe Facing180
+197, No Obstacle Behind Within
+198, Wall Probe Facing Plus90
+199, No Obstacle Side Within
+200, Wall Probe Facing Minus90
+201, No Obstacle Other Side Within
+202, Opponent Field548Set
+203, Flag710Bit14Is
+204, Round Value350 >=
+205, Flag710Bit15
+206, Flag710Bit16
+219, Always True
+220, Player character ID
+221, Player NOT character ID
+222, Oppponent character ID
+223, Opponent NOT character ID
+224, Player character ID
+225, Player NOT character ID
+226, Oppponent character ID
+227, Oppponent NOT character ID
+228, Player Character Controller
+229, Opponent Character Controller
+231, Player Entry80 >=
+232, Player Entry80 <=
+233, Player Entry80 ==
+236, Player is Eddy
+238, Player is Eddy
+239, Always True
+242, Practice Dummy Input Mode345
+247, Always True
+254, Prop 0x8092 >= Value
+255, Prop 0x8093 >= Value
+256, Prop 0x8094 >= Value
+258, Prop 0x8098 >= Value
+259, Prop 0x809b >= Value
+260, Prop 0x80a6 >= Value
+261, Field15e0 >=
+262, Field181c >=
+263, Field181e >=
+264, Field1820 >=
+265, Floor Blast Related >= Value
+266, Total Damage Taken >=
+269, Component Slot0 >=
+270, Sub3870Counter1 >=
+271, Sub3870Counter2 >=
+272, Field1610 >=
+273, Field15e4 >=
+274, Kazuya Devil Flag >= Value
+276, Prop 0x80e4 >= Value
+277, Prop 0x80e7 >= Value
+278, Prop 0x80ea >= Value
+279, Prop 0x80ed >= Value
+280, Prop 0x80f0 >= Value
+281, Prop 0x80c5 >= Value
+282, Prop 0x80c8 >= Value
+283, Prop 0x80cb >= Value
+284, Prop 0x80ce >= Value
+285, Prop 0x80d1 >= Value
+286, Prop 0x80f3 >= Value
+287, Wall Hit Counter >= Value
+288, Short Flag (Prop 0x8128) >= Value
+289, Int Flag (Prop 0x812e) >= Value
+290, Field1688 >=
+291, Field5dc >=
+292, Prop 0x8092 <= Value
+293, Prop 0x8093 <= Value
+294, Prop 0x8094 <= Value
+296, Prop 0x8098 <= Value
+297, Prop 0x809b <= Value
+298, Prop 0x80a6 <= Value
+299, Field15e0 <=
+300, Field181c <=
+301, Field181e <=
+302, Field1820 <=
+303, Floor Blast Related <= Value
+304, Total Damage Taken <=
+307, Sub3870Counter0 <=
+308, Sub3870Counter1 <=
+309, Sub3870Counter2 <=
+310, Field1610 <=
+311, Field15E4 <=
+312, Kazuya Devil Flag <= Value
+314, Prop 0x80e4 <= Value
+315, Prop 0x80e7 <= Value
+316, Prop 0x80ea <= Value
+317, Prop 0x80ed <= Value
+318, Prop 0x80f0 <= Value
+319, Prop 0x80c5 <= Value
+320, Prop 0x80c8 <= Value
+321, Prop 0x80cb <= Value
+322, Prop 0x80ce <= Value
+323, Prop 0x80d1 <= Value
+324, Prop 0x80f3 <= Value
+325, Wall Hit Counter <= Value
+326, Short Flag (Prop 0x8128) <= Value
+327, Int Flag (Prop 0x812e) <= Value
+328, Field1688 <=
+329, Field5DC <=
+330, Prop 0x8092 == Value
+331, Prop 0x8093 == Value
+332, Prop 0x8094 == Value
+334, Prop 0x8098 == Value
+335, Prop 0x809b == Value
+336, Prop 0x80a6 == Value
+337, Field15E0 ==
+338, Field181C ==
+339, Field181E ==
+340, Field1820 ==
+341, Floor Blast Related == Value
+342, Field1608 ==
+345, Component Slot0 ==
+346, Component Slot1 ==
+347, Component Slot2 ==
+348, Field1610 ==
+349, Field15E4 ==
+350, Kazuya Devil Flag == Value
+352, Prop 0x80e4 == Value
+353, Prop 0x80e7 == Value
+354, Prop 0x80ea == Value
+355, Prop 0x80ed == Value
+356, Prop 0x80f0 == Value
+357, Claudio Starburst
+358, Prop 0x80c5 == Value
+359, Prop 0x80c8 == Value
+360, Prop 0x80cb == Value
+361, Prop 0x80ce == Value
+362, Prop 0x80d1 == Value
+363, Prop 0x80f3 == Value
+364, Wall Hit Counter == Value
+365, Short Flag (Prop 0x8128) == Value
+366, Check Flag (Prop 0x812e) == Value
+367, Field1688 ==
+368, Field5DC ==
+369, Opponent Battle Frame >=
+370, Opponent Prop8093 >=
+371, Opponent Prop8094 >=
+373, Opponent Prop8098 >=
+374, Opponent Field181C >=
+375, Opponent Field181E >=
+376, Opponent Field1820 >=
+377, Opponent Field1822Array >=
+378, Opponent Field1608 >=
+381, Opponent Component Slot0 >=
+382, Opponent Component Slot1 >=
+383, Opponent Component Slot2 >=
+384, Opponent Field15E4 >=
+385, Opponent Kazuya Devil Flag >=
+386, Opponent Prop 0x80c5 >= Value
+387, Opponent Prop 0x80c8 >= Value
+388, Opponent Prop 0x80cb >= Value
+389, Opponent Prop 0x80ce >= Value
+390, Opponent Prop 0x80d1 >= Value
+391, Opponent Short Flag >= Value
+392, Opponent Int Flag >= Value
+393, Opponent Battle Frame <=
+394, Opponent Prop8093 <=
+395, Opponent Prop8094 <=
+397, Opponent Prop8098 <=
+398, Opponent Field181C <=
+399, Opponent Field181E <=
+400, Opponent Field1820 <=
+401, Opponent Field1822Array <=
+402, Opponent Field1608 <=
+405, Opponent Component Slot0 <=
+406, Opponent Component Slot1 <=
+407, Opponent Component Slot2 <=
+408, Opponent Field15E4 <=
+409, Opponent Kazuya Devil Flag <=
+410, Opponent Prop 0x80c5 <= Value
+411, Opponent Prop 0x80c8 <= Value
+412, Opponent Prop 0x80cb <= Value
+413, Opponent Prop 0x80ce <= Value
+414, Opponent Prop 0x80d1 <= Value
+415, Opponent Short Flag <= Value
+416, Opponent Int Flag <= Value
+417, Opponent Battle Frame ==
+418, Opponent Prop8093 ==
+419, Opponent Prop8094 ==
+421, Opponent Prop8098 ==
+422, Opponent Field181C ==
+423, Opponent Field181E ==
+424, Opponent Field1820 ==
+425, Opponent Field1822Array ==
+426, Opponent Field1608 ==
+428, Opponent Component Slot0 ==
+429, Opponent Component Slot1 ==
+430, Opponent Component Slot2 ==
+431, Opponent Field15E4 ==
+432, Opponent Field15E8 ==
+433, Opponent Prop 0x80c5 == Value
+434, Opponent Prop 0x80c8 == Value
+435, Opponent Prop 0x80cb == Value
+436, Opponent Prop 0x80ce == Value
+437, Opponent Prop 0x80d1 == Value
+438, Opponent Short Flag == Value
+439, Opponent Int Flag == Value
+440, Heat State X >= Y
+441, Heat State X <= Y
+442, Heat State X == Y
+446, Heat State X >= Y (Opponent)
+447, Heat State X <= Y (Opponent)
+448, Heat State X == Y (Opponent)
+453, Check Button Input
+454, Character Install Active
+455, Flag710Bit17
+456, Field15ACNon Zero
+457, Field15ACZero
+458, Player Hp Not Full
+459, Opponent Hp Not Full
+460, Is Counter-hit Throw
+461, Is Normal Throw
+462, Heat Dash Charge >= X
+463, Flag710Bit18
+464, Heat Dash Charge == X
+465, Is Punish Throw
+466, Check Trade
+467, Heat Meter >= X
+468, Heat Meter <= X
+469, Heat Meter == X
+470, (Opponent) Heat Meter >= X
+471, (Opponent) Heat Meter <= X
+472, (Opponent) Heat Meter == X
+473, Kazuya Permanent Devil Flag == Value
+474, P20 Flags >= X
+475, P20 Flags <= X
+476, P20 Flags == X
+477, Opponent P20 Flags >= X
+478, Opponent P20 Flags <= X
+479, Opponent P20 Flags == X
+480, Short Array >=
+481, State Flag714Bit25 ==
+482, Player Alive Not At One Hp
+483, Opponent Alive
+484, Story Scripted Flag >= X (SS Flag)
+485, Story Scripted Flag <= X (SS Flag)
+486, Story Scripted Flag == X (SS Flag)
+487, Field1A30 ==
+488, Check Opponent Current Move Flag
+489, Field CE0 ==
+490, Stock Level >= X
+491, Throw Hit Forward (Standing)
+492, Throw Hit Forward (Standing or Crouching)
+493, Throw Hit Forward (Crouching)
+494, Last Drama Voiceclip Key?
+495, Field27E4 ==
+496, Flag27E8Clear
+497, Flag27EBClear
+498, Heihachi Warrior Instinct Active
+499, Player Character ID\n(List Check)
+500, Player Not Character ID\n(List Check)
+501, Opponent Character ID\n(List Check)
+502, Opponent Not Character ID\n(List Check)
+503, Player Character ID\n(List Check)
+504, Player Not Character ID\n(List Check)
+505, Opponent Character ID\n(List Check)
+506, Opponent Not Character ID\n(List Check)
+507, Check Prop 0x815a Value
+508, "Related Player" Current Move != param
+509, Opponent Facing matches param
+510, Opponent Anim Move ID > param
+511, Check Some VULN related value
+512, Check Some VULN related value (Opponent)
+513, Check Opponent state frame window (not blocking)
+514, Check Floor Blast Flag Value\n(Player)
+515, Check Floor Blast Flag Value\n(Opponent)
+516, "Related Player" Current Move Name Key == param
+517, Field2558Cmp
+640, Player Speed >= param
+641, Player Speed <= param
+642, Player Speed == param
+643, Related Player Contact Bit3
+644, Related Player Move Start20
+645, Related Player Vuln Bit2
+646, Related Player Vuln Bit9
+647, Related Player Vuln Lacks204
+648, Opponent Current Move == param
+649, Opponent Next Move == param
+650, Related Player Field4F4Negative
+651, Random One In N
+652, Random Number Generator (2-way)
+653, Random Number Generator (3-way)
+654, Random Number Generator (4-way)
+655, Random Number Generator (5-way)
+656, Random Number Generator (6-way)
+657, Random Number Generator (7-way)
+658, Random Number Generator (8-way)
+659, Random Number Generator (9-way)
+660, Random Number Generator (10-way)
+661, Random Number Generator (Weighted)
+662, RNG-Related
+664, Arcade Mode(?)
+666, Tekken Ball Mode
+667, Story Mode
+668, Story Battle Number
+669, Value1D90 ==
+670, Field1BECIs1000
+671, Field1BECAbove1000
+672, Game Mode
+673, Game State ==
+675, Round Lead State ==
+678, Round4Field340 ==
+679, Match Decided
+680, Battle Phase Is0x11
+681, Round Field78 ==
+682, Stage ID == X
+683, Stage ID != X
+684, Is Player Visible
+685, Input Mode ==
+687, Player is a Bear
+688, Player Check
+689, Player is a male character
+690, Player is a female character
+691, Player is a big character
+692, Opponent is a male character
+693, Opponent is a female character
+694, Opponent is a big character 
+695, Opponent is a Bear
+696, Pre-round animation
+698, Mode Flag64Check
+699, Always True
+700, Bone Below Floor
+701, Bone Height Above Floor <=
+702, Bone Height Above Floor <=
+703, Bone Height Above Floor <=
+704, Bone Height Above Floor <=
+705, Bone Height Above Floor <=
+706, Bone Height Above Floor <=
+707, Wall Contact A Any
+710, Wall splat related
+713, Height Above Floor <
+714, Height Above Floor >=
+715, Root Y <=
+716, Opponent is Airborne
+717, Opponent is NOT Airborne
+718, Has Item
+719, Flag1C1E
+720, Yoshimitsu Sword Sheathed
+721, Flag1C1FSet
+722, Flag1C1FClear
+723, Opponent is in juggle
+724, Tornado Available
+728, Something heat/wallsplat related (Opponent)
+729, Something heat/wallsplat related (Player)
+730, Something heat/wallsplat related (Opponent)
+737, Field1D0C >=
+738, Kazama Essence >= Param
+739, Field494Positive
+740, Field494Negative
+741, Pos YAbove
+742, Pos YBelow
+744, Kazama Essence < Param
+745, Flag1544Outside Modes
+746, One Round From Victory
+748, Opponent's Current Move Cancel has Prop 0x843A
+749, Is Training Dummy Side
+750, Leroy Install Available
+751, Leroy Install Unavailable
+753, Param Is Zero
+754, Fate-related?
+755, Player 1 Character ID
+756, Fate-related?
+758, Opponent distance smaller or equal than
+759, Stick Direction In Digits
+760, Is Leading In Rounds
+764, Episode Battle Entry Side ==
+765, Episode Battle Entry20 ==
+766, Chara Episode pre-fight?
+767, Chara Episode post-fight?
+768, Controller Type1And Field1D64 ==
+769, Battle Mgr Value128 >=
+770, Battle Mgr Value128 <=
+771, Battle Mgr Value128 ==
+772, Mode Flag And Player Side Matches
+773, Value1D94 ==
+774, Vuln Flag200And Down Or Airborne
+775, Stage ID number
+776, Mask1C2CTest ==
+777, Story Flag == X
+778, Not Story Mode
+779, Incoming High Attack
+780, Incoming Mid Attack
+781, Incoming Low Attack
+782, Incoming High or Mid Attack
+783, Something-RNG-Related >= X
+784, Wave/enemy index <= X
+785, Wave/enemy index == X (0-based)
+786, Mode4Interface Flag260 ==
+787, Check Opponent Attacking Limb
+788, Check Opponent Ordinal ID / Parry Group Check
+789, Mode4Interface Flag230 ==
+790, Enemy first active frame < X
+791, Enemy first active frame >= X
+792, Enemy first active frame == X
+793, Enemy last active frame < X
+794, Enemy last active frame >= X
+795, Enemy last active frame == X
+796, Not in story battle X
+797, Opponent Airborne And Flag1AD1
+798, Value2690Set Or Flag2698
+799, Special Style related
+800, Special Style related
+801, (DLC) Story Battle
+802, (DLC) Story Battle Number
+803, (DLC) Story Not Battle Number
+804, Check Player Side
+806, Heihachi Story DLC Flags
+807, Store Some Player Value
+808, Store Some Opponent Value
+810, Lidia Story DLC Flags
+811, Round4Flag3B1
+814, Bitfield15B4Test
+815, Opp Bitfield15B4Test
+816, Opp Field1AC8Non Neg
+953, Always True
+989, Active Slot Count <
+990, Active Slot Opp Contact28
+991, Hitbox Active Opp Flag Bit5
+992, Hitbox Active Opp Flag Bit3
+997, Projectile on-hit
+998, Projectile on-block
+1014, Story Flags
+1016, Wave Enemy Index\n(Story Mode)
+1018, Always False Bs Slot48 [no effect in retail]
+1019, Stored player value >= parameter (unsigned; purpose unknown)
+1020, Field1604 <=
+1021, Field1604 ==
+1023, Always False Bs Slot78 [no effect in retail]
+1024, Opp Field24F8Is1
+1025, Opp Field24FCAbove Round Value
+1026, Field FE4Bit7
+1027, Contact Flag C56
+1028, Player is in Heat
+1029, Opponent is in Heat
+1031, Check Parry Facing (Player Front, Opp Front)
+1032, Parry High (Player Front, Opp Front)
+1033, Parry Mid (Player Front, Opp Front)
+1034, Parry Low (Player Front, Opp Front)
+1035, Parry High and Mid (Player Front, Opp Front)
+1036, Parry Group (Player Front, Opp Front)
+1037, Check Parry Facing (Player Front, Opp Side)
+1038, Parry High (Player Front, Opp Side)
+1039, Parry Mid (Player Front, Opp Side)
+1040, Parry Low (Player Front, Opp Side)
+1041, Parry High and Mid (Player Front, Opp Side)
+1042, Parry Group (Player Front, Opp Side)
+1043, Check Parry Facing (Opp Front)
+1044, Parry High (Opp Front)
+1045, Parry Mid (Opp Front)
+1046, Parry Low (Opp Front)
+1047, Parry High and Mid (Opp Front)
+1048, Parry Group (Opp Front)
+1049, Power Crush Attack Absorption
+1060, Check Parry Facing (Player Front, Opp Front)
+1061, Parry High (Player Front, Opp Front)
+1062, Parry Mid (Player Front, Opp Front)
+1063, Parry Low (Player Front, Opp Front)
+1064, Parry High and Mid (Player Front, Opp Front)
+1065, Parry Group (Player Front, Opp Front)
+1066, Check Parry Facing (Player Front, Opp Side)
+1067, Parry High (Player Front, Opp Side)
+1068, Parry Mid (Player Front, Opp Side)
+1069, Parry Low (Player Front, Opp Side)
+1070, Parry High and Mid (Player Front, Opp Side)
+1071, Parry Group (Player Front, Opp Side)
+1072, Check Parry Facing (Opp Front)
+1073, Parry High (Opp Front)
+1074, Parry Mid (Opp Front)
+1075, Parry Low (Opp Front)
+1076, Parry High and Mid (Opp Front)
+1077, Parry Group (Opp Front)
+1078, Parry High (Airborne, Player Front, Opp Front)
+1079, Parry Mid (Airborne, Player Front, Opp Front)
+1080, Parry Low (Airborne, Player Front, Opp Front)
+1081, Parry High and Mid (Airborne, Player Front, Opp Front)
+1082, Parry High (Airborne, Player Front, Opp Side)
+1083, Parry Mid (Airborne, Player Front, Opp Side)
+1084, Parry Low (Airborne, Player Front, Opp Side)
+1085, Parry High and Mid (Airborne, Player Front, Opp Side)
+1086, Parry High (Airborne, Opp Front)
+1087, Parry Mid (Airborne, Opp Front)
+1088, Parry Low (Airborne, Opp Front)
+1089, Parry High and Mid (Airborne, Opp Front)
+1090, Parry High (Player Front)
+1091, Parry Mid (Player Front)
+1092, Parry Low (Player Front)
+1093, Parry High and Mid (Player Front)
+1100, End
+32903, Property action: set player state mode 2 and parameters (purpose unknown)

@@ -33,6 +33,25 @@ enum ExtractSettings_
 	ExtractSettings_CompressLZ4 = (1 << 15),
 
 	ExtractSettings_UnknownMotas = (1 << 16),
+    // Independent retail PANM categories. Selection is explicit so older callers
+    // that supply only compression flags retain complete snapshot behaviour.
+    ExtractSettings_T8_PANM_SELECTION = (1ULL << 17),
+    ExtractSettings_T8_BODY = (1ULL << 18),
+    ExtractSettings_T8_HANDS = (1ULL << 19),
+    ExtractSettings_T8_FACE = (1ULL << 20),
+    ExtractSettings_T8_SWING = (1ULL << 21),
+    ExtractSettings_T8_CAMERA = (1ULL << 22),
+    ExtractSettings_T8_EXTRA = (1ULL << 23),
+    ExtractSettings_T8_ALL = 63ULL << 18,
+    ExtractSettings_T8_DEFAULT = ExtractSettings_T8_BODY | ExtractSettings_T8_HANDS | ExtractSettings_T8_CAMERA,
+    // Clear (default): a selected animation the game has not loaded is read from its tkdata.bin, so the file carries
+    // every animation. Set: it is recorded as missing; importing the file then reads it from tkdata.bin, or fails.
+    ExtractSettings_T8_NO_ARCHIVE = (1ULL << 24),
+    ExtractSettings_CompressCompactZstd = (1ULL << 25),
 
-	ExtractSettings_Compress = ExtractSettings_CompressLZMA | ExtractSettings_CompressLZ4,
+	ExtractSettings_Compress = ExtractSettings_CompressLZMA | ExtractSettings_CompressLZ4 | ExtractSettings_CompressCompactZstd,
 };
+
+inline uint8_t RetailAnimationSelection(ExtractSettings settings) {
+    return settings & ExtractSettings_T8_PANM_SELECTION ? static_cast<uint8_t>((settings >> 18) & 63) : 63;
+}

@@ -15,7 +15,7 @@ class ImporterT7 : public Importer
 {
 private:
 	// In our locally allocated moveset, correct the mota lists offsets or copy the motas from the currently loaded character if we can't provide them
-	void ConvertMotaListOffsets(const StructsT7::TKMovesetHeaderBlocks* offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress, bool replaceEmpty);
+	void ConvertMotaListOffsets(const StructsT7::TKMovesetHeaderBlocks* offsets, Byte* moveset, gameAddr gameMoveset, gameAddr playerAddress, bool replaceEmpty, ImportSettings settings);
 
 	// Write the player's camera motas to his structure. This is required for proper camera mota importation, and does not break anything of those camera mota have not been imported by us
 	void WriteCameraMotasToPlayer(gameAddr movesetAddr, gameAddr playerAddress);
@@ -31,7 +31,11 @@ private:
 	ImportationErrcode_ _Import_FromTREV(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	ImportationErrcode_ _Import_FromT6(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
 	ImportationErrcode_ _Import_FromT5(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
+	// Retail Tekken 8: converted to a T7 moveset first (T8ToT7), then imported like a T7 file
+	ImportationErrcode_ _Import_FromT8(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, gameAddr playerAddress, ImportSettings settings, uint8_t& progress);
+	std::string m_lastError;
 public:
+	const std::string& LastError() const override { return m_lastError; }
 	using Importer::Importer; // Inherit constructor too
 	bool CanImport() override;
 	void CleanupUnusedMovesets() override;

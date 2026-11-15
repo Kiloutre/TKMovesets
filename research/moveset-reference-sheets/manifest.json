@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "retrieved_at_utc": "2026-11-12T19:32:13+00:00",
+  "sources": [
+    {
+      "game": "t7",
+      "title": "Tekken 7 MovesetEditor Data",
+      "spreadsheet_id": "1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI",
+      "initial_gid": 121831918,
+      "source_url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit?gid=121831918",
+      "export_url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/export?format=xlsx",
+      "retrieved_at_utc": "2026-11-12T19:32:13+00:00",
+      "xlsx_sha256": "cabdcb97ee94105d59d8b534c71bd99b4602d600878a630a7676d82eefa8583a",
+      "page_revision_observed": 7316,
+      "acquisition": "public_https_export",
+      "tabs": [
+        {
+          "name": "Requirement",
+          "gid": 121831918,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918",
+          "state": "visible",
+          "row_count": 208,
+          "column_count": 4,
+          "populated_cells": 731,
+          "formula_count": 0,
+          "note_count": 8,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t7/tabs/121831918.csv",
+          "csv_sha256": "acf40f8d9033d36ae0aeb47d5d28179ff4fd189b162529da383e1bb8338b35ba"
+        },
+        {
+          "name": "Extra Properties",
+          "gid": 0,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0",
+          "state": "visible",
+          "row_count": 319,
+          "column_count": 5,
+          "populated_cells": 1265,
+          "formula_count": 0,
+          "note_count": 26,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t7/tabs/0.csv",
+          "csv_sha256": "df8dc537f41fc5d02c60f7cbab842f3529a6ff578147681e4007ab9e3f21483a"
+        },
+        {
+          "name": "Sound Effects - (SFX)",
+          "gid": 1071911039,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=1071911039",
+          "state": "visible",
+          "row_count": 100,
+          "column_count": 3,
+          "populated_cells": 298,
+          "formula_count": 97,
+          "note_count": 9,
+          "error_count": 0,
+          "merged_ranges": [
+            "A2:C2"
+          ],
+          "csv": "t7/tabs/1071911039.csv",
+          "csv_sha256": "b4a6aff8995b2b78c75fc650c541f32a36c46e347238892006a7d0738c31a420"
+        },
+        {
+          "name": "Cancel Extra Data",
+          "gid": 1876612704,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=1876612704",
+          "state": "visible",
+          "row_count": 147,
+          "column_count": 3,
+          "populated_cells": 364,
+          "formula_count": 145,
+          "note_count": 4,
+          "error_count": 0,
+          "merged_ranges": [
+            "A2:C2"
+          ],
+          "csv": "t7/tabs/1876612704.csv",
+          "csv_sha256": "cacce54a6e68de74ae70dbe459ae03c679a86d6272605b5b26e2a7709bd1271f"
+        },
+        {
+          "name": "Cancel Option",
+          "gid": 719076746,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=719076746",
+          "state": "visible",
+          "row_count": 24,
+          "column_count": 4,
+          "populated_cells": 80,
+          "formula_count": 0,
+          "note_count": 4,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t7/tabs/719076746.csv",
+          "csv_sha256": "cc263466f7c41aeccaa926790b7d326360e32cffb6a2693ca231d7a372227337"
+        },
+        {
+          "name": "Hit Levels - (HIT)",
+          "gid": 1267385287,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=1267385287",
+          "state": "visible",
+          "row_count": 37,
+          "column_count": 11,
+          "populated_cells": 191,
+          "formula_count": 0,
+          "note_count": 3,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t7/tabs/1267385287.csv",
+          "csv_sha256": "5b1c89fa17595e52192b1a74aa45e2aae6151e8b5b17c579fd4114bbdbd51c54"
+        },
+        {
+          "name": "Vulnerability - (VUL)",
+          "gid": 414625078,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=414625078",
+          "state": "visible",
+          "row_count": 13,
+          "column_count": 5,
+          "populated_cells": 55,
+          "formula_count": 0,
+          "note_count": 7,
+          "error_count": 0,
+          "merged_ranges": [
+            "A2:E2"
+          ],
+          "csv": "t7/tabs/414625078.csv",
+          "csv_sha256": "84fafc0f41ed50815779949b6193abdb5cf4640c6e8c81e77443eb43ab5b86d0"
+        },
+        {
+          "name": "Command",
+          "gid": 1079598677,
+          "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=1079598677",
+          "state": "visible",
+          "row_count": 78,
+          "column_count": 2,
+          "populated_cells": 143,
+          "formula_count": 0,
+          "note_count": 7,
+          "error_count": 0,
+          "merged_ranges": [
+            "A31:B31",
+            "A49:B49",
+            "A66:B66",
+            "A72:B72",
+            "A77:B77",
+            "A78:B78",
+            "A79:B79",
+            "A2:B2",
+            "A11:B11",
+            "A12:B12",
+            "A13:B13",
+            "A14:B14",
+            "A25:B25",
+            "A26:B26"
+          ],
+          "csv": "t7/tabs/1079598677.csv",
+          "csv_sha256": "835c6ffe34d0b8275e90924b37562bf8bdfdf15236d471bf0affe7942d4a658c"
+        }
+      ]
+    },
+    {
+      "game": "t8-retail",
+      "title": "Tekken 8 Moveset Editing Data",
+      "spreadsheet_id": "1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY",
+      "initial_gid": 0,
+      "source_url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit?gid=0",
+      "export_url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/export?format=xlsx",
+      "retrieved_at_utc": "2026-11-12T19:32:13+00:00",
+      "xlsx_sha256": "d09e314a96c958015e3147ebe1715b6fb0593b69e53fa92a6b62448ddbed3ad3",
+      "page_revision_observed": 5835,
+      "acquisition": "public_https_export",
+      "tabs": [
+        {
+          "name": "Requirements",
+          "gid": 0,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0",
+          "state": "visible",
+          "row_count": 434,
+          "column_count": 4,
+          "populated_cells": 1512,
+          "formula_count": 0,
+          "note_count": 21,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t8-retail/tabs/0.csv",
+          "csv_sha256": "d7a9e20b7659474ee1aae3a6e05c092de5ff01a741ffca03921cfa3f4ddeec0e"
+        },
+        {
+          "name": "Extra Move Properties",
+          "gid": 1974294367,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367",
+          "state": "visible",
+          "row_count": 327,
+          "column_count": 5,
+          "populated_cells": 1281,
+          "formula_count": 0,
+          "note_count": 26,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t8-retail/tabs/1974294367.csv",
+          "csv_sha256": "1c1b95b790f8fc2ee3b96d12896719cecf37e00c52b00c97ebc00003491d3345"
+        },
+        {
+          "name": "Sound Effects - (SFX)",
+          "gid": 2099031418,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=2099031418",
+          "state": "visible",
+          "row_count": 10,
+          "column_count": 3,
+          "populated_cells": 28,
+          "formula_count": 0,
+          "note_count": 1,
+          "error_count": 0,
+          "merged_ranges": [
+            "A2:C2"
+          ],
+          "csv": "t8-retail/tabs/2099031418.csv",
+          "csv_sha256": "e2c3de573a16e15f0c148f984e965d61923f28026e67097928659ea0ba942e4f"
+        },
+        {
+          "name": "Cancel Extra Data",
+          "gid": 638509589,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=638509589",
+          "state": "visible",
+          "row_count": 148,
+          "column_count": 3,
+          "populated_cells": 368,
+          "formula_count": 146,
+          "note_count": 5,
+          "error_count": 0,
+          "merged_ranges": [
+            "A2:C2"
+          ],
+          "csv": "t8-retail/tabs/638509589.csv",
+          "csv_sha256": "5e5afadb115356502756e2b4985a475252960d3aacb9b6dd12d0d5b46513daf6"
+        },
+        {
+          "name": "Cancel Options",
+          "gid": 1123472459,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1123472459",
+          "state": "visible",
+          "row_count": 30,
+          "column_count": 4,
+          "populated_cells": 100,
+          "formula_count": 0,
+          "note_count": 2,
+          "error_count": 0,
+          "merged_ranges": [
+            "A25:D25",
+            "A26:D26",
+            "A27:D27",
+            "A28:D28",
+            "A29:D29",
+            "A30:D30"
+          ],
+          "csv": "t8-retail/tabs/1123472459.csv",
+          "csv_sha256": "31faa4dbce43d2b21f34c2ed33cec2c544af6179a869b009aae46f25e2e3912b"
+        },
+        {
+          "name": "Hit Levels - (HIT)",
+          "gid": 1292684689,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1292684689",
+          "state": "visible",
+          "row_count": 37,
+          "column_count": 11,
+          "populated_cells": 190,
+          "formula_count": 0,
+          "note_count": 3,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t8-retail/tabs/1292684689.csv",
+          "csv_sha256": "e892d23b9e8ee1b8a11943cb06c0b056e306b3ea71610eb0ca8504b2e0362cba"
+        },
+        {
+          "name": "Vulnerability - (VULN)",
+          "gid": 422187284,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=422187284",
+          "state": "visible",
+          "row_count": 15,
+          "column_count": 6,
+          "populated_cells": 84,
+          "formula_count": 0,
+          "note_count": 8,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t8-retail/tabs/422187284.csv",
+          "csv_sha256": "8121672829b6b18f45002c018fc5a2611f4e9e6bc9c6c0a807bb68879218ca72"
+        },
+        {
+          "name": "Generic Move IDs",
+          "gid": 1275930420,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1275930420",
+          "state": "visible",
+          "row_count": 61,
+          "column_count": 4,
+          "populated_cells": 171,
+          "formula_count": 119,
+          "note_count": 0,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t8-retail/tabs/1275930420.csv",
+          "csv_sha256": "f5dfc42b1fdd578bc3e601093e53b5c1061259efc360897240c62fbadf49331c"
+        },
+        {
+          "name": "Command",
+          "gid": 334355488,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=334355488",
+          "state": "visible",
+          "row_count": 84,
+          "column_count": 2,
+          "populated_cells": 157,
+          "formula_count": 0,
+          "note_count": 7,
+          "error_count": 0,
+          "merged_ranges": [
+            "A37:B37",
+            "A57:B57",
+            "A74:B74",
+            "A80:B80",
+            "A2:B2",
+            "A17:B17",
+            "A18:B18",
+            "A19:B19",
+            "A20:B20",
+            "A31:B31",
+            "A32:B32"
+          ],
+          "csv": "t8-retail/tabs/334355488.csv",
+          "csv_sha256": "0b1cd7a4b14f1fe04498e12bfa4e036f0365c9b6d5d57400a12d26d472ad53b5"
+        },
+        {
+          "name": "Limb IDs",
+          "gid": 2078729588,
+          "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=2078729588",
+          "state": "visible",
+          "row_count": 5,
+          "column_count": 3,
+          "populated_cells": 15,
+          "formula_count": 4,
+          "note_count": 0,
+          "error_count": 0,
+          "merged_ranges": [],
+          "csv": "t8-retail/tabs/2078729588.csv",
+          "csv_sha256": "47cdbedf8861eba303e2ef1138e148c6c97365cf0c285927b94f2372c935bb92"
+        }
+      ]
+    }
+  ],
+  "label_catalog_entries": 1280,
+  "files": {
+    "label-catalog.json": {
+      "sha256": "05ad96889f3a882e6cfdacd2b0298086f02d89e0446eebe546cc24fd6476b064",
+      "bytes": 880195
+    },
+    "t7/source.xlsx": {
+      "sha256": "cabdcb97ee94105d59d8b534c71bd99b4602d600878a630a7676d82eefa8583a",
+      "bytes": 360124
+    },
+    "t7/tabs/0.csv": {
+      "sha256": "df8dc537f41fc5d02c60f7cbab842f3529a6ff578147681e4007ab9e3f21483a",
+      "bytes": 41716
+    },
+    "t7/tabs/1071911039.csv": {
+      "sha256": "b4a6aff8995b2b78c75fc650c541f32a36c46e347238892006a7d0738c31a420",
+      "bytes": 4440
+    },
+    "t7/tabs/1079598677.csv": {
+      "sha256": "835c6ffe34d0b8275e90924b37562bf8bdfdf15236d471bf0affe7942d4a658c",
+      "bytes": 2532
+    },
+    "t7/tabs/121831918.csv": {
+      "sha256": "acf40f8d9033d36ae0aeb47d5d28179ff4fd189b162529da383e1bb8338b35ba",
+      "bytes": 14437
+    },
+    "t7/tabs/1267385287.csv": {
+      "sha256": "5b1c89fa17595e52192b1a74aa45e2aae6151e8b5b17c579fd4114bbdbd51c54",
+      "bytes": 2140
+    },
+    "t7/tabs/1876612704.csv": {
+      "sha256": "cacce54a6e68de74ae70dbe459ae03c679a86d6272605b5b26e2a7709bd1271f",
+      "bytes": 4883
+    },
+    "t7/tabs/414625078.csv": {
+      "sha256": "84fafc0f41ed50815779949b6193abdb5cf4640c6e8c81e77443eb43ab5b86d0",
+      "bytes": 666
+    },
+    "t7/tabs/719076746.csv": {
+      "sha256": "cc263466f7c41aeccaa926790b7d326360e32cffb6a2693ca231d7a372227337",
+      "bytes": 1968
+    },
+    "t7/workbook.json": {
+      "sha256": "238fcd1ce80483031d20f46bbaa02074db1691c11a455fbb22b97573bd3c45a6",
+      "bytes": 997800
+    },
+    "t8-retail/source.xlsx": {
+      "sha256": "d09e314a96c958015e3147ebe1715b6fb0593b69e53fa92a6b62448ddbed3ad3",
+      "bytes": 97707
+    },
+    "t8-retail/tabs/0.csv": {
+      "sha256": "d7a9e20b7659474ee1aae3a6e05c092de5ff01a741ffca03921cfa3f4ddeec0e",
+      "bytes": 29000
+    },
+    "t8-retail/tabs/1123472459.csv": {
+      "sha256": "31faa4dbce43d2b21f34c2ed33cec2c544af6179a869b009aae46f25e2e3912b",
+      "bytes": 4511
+    },
+    "t8-retail/tabs/1275930420.csv": {
+      "sha256": "f5dfc42b1fdd578bc3e601093e53b5c1061259efc360897240c62fbadf49331c",
+      "bytes": 2088
+    },
+    "t8-retail/tabs/1292684689.csv": {
+      "sha256": "e892d23b9e8ee1b8a11943cb06c0b056e306b3ea71610eb0ca8504b2e0362cba",
+      "bytes": 2168
+    },
+    "t8-retail/tabs/1974294367.csv": {
+      "sha256": "1c1b95b790f8fc2ee3b96d12896719cecf37e00c52b00c97ebc00003491d3345",
+      "bytes": 40517
+    },
+    "t8-retail/tabs/2078729588.csv": {
+      "sha256": "47cdbedf8861eba303e2ef1138e148c6c97365cf0c285927b94f2372c935bb92",
+      "bytes": 116
+    },
+    "t8-retail/tabs/2099031418.csv": {
+      "sha256": "e2c3de573a16e15f0c148f984e965d61923f28026e67097928659ea0ba942e4f",
+      "bytes": 365
+    },
+    "t8-retail/tabs/334355488.csv": {
+      "sha256": "0b1cd7a4b14f1fe04498e12bfa4e036f0365c9b6d5d57400a12d26d472ad53b5",
+      "bytes": 2531
+    },
+    "t8-retail/tabs/422187284.csv": {
+      "sha256": "8121672829b6b18f45002c018fc5a2611f4e9e6bc9c6c0a807bb68879218ca72",
+      "bytes": 677
+    },
+    "t8-retail/tabs/638509589.csv": {
+      "sha256": "5e5afadb115356502756e2b4985a475252960d3aacb9b6dd12d0d5b46513daf6",
+      "bytes": 5015
+    },
+    "t8-retail/workbook.json": {
+      "sha256": "f084e39cdf372f1cbbc6c687f3905cdcb21dd5eb0e1f788fcace8632f5565933",
+      "bytes": 1217336
+    }
+  }
+}

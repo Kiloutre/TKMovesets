@@ -1,3 +1,5 @@
+#include <Windows.h>
+#include <shobjidl.h>
 #include <ImGui.h>
 #include <filesystem>
 #include <fstream>
@@ -214,6 +216,32 @@ void TEditorMove_Animations::LoadAnimationList()
 	m_justFinishedLoading = true;
 }
 
+namespace {
+std::wstring BrowseAnimationFile()
+{
+	std::wstring result;
+	const auto initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+	if (FAILED(initialized) && initialized != RPC_E_CHANGED_MODE) return result;
+	IFileOpenDialog* dialog = nullptr;
+	if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dialog)))) {
+		COMDLG_FILTERSPEC filters[]{ {L"Animations (Tekken 7 0x64 / 0xC8, Tekken 8 .panm)", L"*.bin;*.anm;*.panm"}, {L"All files", L"*.*"} };
+		dialog->SetFileTypes(2, filters);
+		dialog->SetOptions(FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST | FOS_NOCHANGEDIR);
+		if (SUCCEEDED(dialog->Show(GetActiveWindow()))) {
+			IShellItem* item = nullptr;
+			if (SUCCEEDED(dialog->GetResult(&item))) {
+				PWSTR path = nullptr;
+				if (SUCCEEDED(item->GetDisplayName(SIGDN_FILESYSPATH, &path))) { result = path; CoTaskMemFree(path); }
+				item->Release();
+			}
+		}
+		dialog->Release();
+	}
+	if (SUCCEEDED(initialized)) CoUninitialize();
+	return result;
+}
+}
+
 bool TEditorMove_Animations::Render()
 {
 	ImGui::SetNextWindowSizeConstraints(ImVec2(720, 640), ImVec2(9999, 9999));
@@ -231,6 +259,13 @@ bool TEditorMove_Animations::Render()
 			m_prevRenderAnimCount = m_animCount;
 			ApplySearchFilter();
 			// Animation was added, re-compute animation list
+		}
+
+		ImGui::SameLine();
+		// Any 0x64 / 0xC8 or raw-track .panm file (converted to 0xC8), not only the library's.
+		if (ImGui::Button(_("edition.animation_list.import_file"))) {
+			const auto path = BrowseAnimationFile();
+			if (!path.empty()) { m_browsedPath = path; animationToImport = m_browsedPath.c_str(); }
 		}
 
 		ImGui::SameLine();

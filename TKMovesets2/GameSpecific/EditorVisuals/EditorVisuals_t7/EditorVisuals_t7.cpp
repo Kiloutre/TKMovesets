@@ -121,7 +121,7 @@ int32_t EditorVisuals_T7::ValidateMoveId(const char* buf)
 void EditorVisuals_T7::OnMoveCreate(unsigned int moveId)
 {
 	m_editor->ReloadDisplayableMoveList();
-	ReloadMovelistFilter();
+    m_editor->mustReloadMovelist = true;
 	m_moveToScrollTo = moveId;
 	m_highlightedMoveId = moveId;
 }
@@ -207,34 +207,15 @@ void EditorVisuals_T7::ImportToPlayer(int playerid)
 EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddressesFile* addrFile, LocalStorage* storage)
 	: EditorVisuals(movesetInfo, addrFile, storage)
 {
-	m_editor = (EditorT7*)m_abstractEditor;
+	m_editor = static_cast<EditorT7*>(m_abstractEditor.get());
 
 	Byte* moveset;
 	uint64_t movesetSize;
-	{
-		// Read moveset
-		std::ifstream file(movesetInfo->filename.c_str(), std::ios::binary);
-
-		if (file.fail()) {
-			delete m_importerHelper;
-			delete m_sharedMemHelper;
-			throw EditorWindow_MovesetLoadFail();
-		}
-
-		file.seekg(0, std::ios::end);
-		movesetSize = file.tellg();
-
-		moveset = (Byte*)malloc(movesetSize);
-		if (moveset == nullptr) {
-			delete m_importerHelper;
-			delete m_sharedMemHelper;
-			throw EditorWindow_MovesetLoadFail();
-		}
-
-		file.seekg(0, std::ios::beg);
-		file.read((char*)moveset, movesetSize);
-
-		file.close();
+	try {
+		moveset = Helpers::ReadMovesetFile(movesetInfo->filename, movesetSize);
+	} catch (const std::exception&) {
+		popen = false;
+		return;
 	}
 
 	TKMovesetCompressionType_ compressionType = TKMovesetCompressionType_None;
@@ -245,6 +226,7 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 
 	if (!m_editor->LoadMoveset(moveset, movesetSize)) {
 		this->popen = false;
+		return;
 	}
 
 	PopulateWindowCreatorMap();
@@ -263,4 +245,26 @@ EditorVisuals_T7::EditorVisuals_T7(const movesetInfo* movesetInfo, GameAddresses
 void EditorVisuals_T7::ReloadMovelistFilter()
 {
 	FilterMovelist(m_movelistFilter);
+}
+
+struct EditorVisuals_T7::ViewState final : EditorForm::TransactionState {
+    std::unique_ptr<EditorForm::TransactionState> base;
+    EditorVisuals_T7& owner;
+    std::vector<DisplayableMove*> filtered;
+    EditorVisualsT7::EditorMovelistFilter_ filter;
+    int32_t scroll;
+    int16_t highlighted;
+    bool committed = false;
+    explicit ViewState(EditorVisuals_T7& target)
+        : base(target.EditorVisuals::BeginWindowTransaction()), owner(target), filtered(target.m_filteredMovelist),
+          filter(target.m_movelistFilter), scroll(target.m_moveToScrollTo), highlighted(target.m_highlightedMoveId) {}
+    ~ViewState() override {
+        if (committed) return;
+        filtered.swap(owner.m_filteredMovelist); std::swap(filter, owner.m_movelistFilter);
+        std::swap(scroll, owner.m_moveToScrollTo); std::swap(highlighted, owner.m_highlightedMoveId);
+    }
+    void Commit() noexcept override { base->Commit(); committed = true; }
+};
+std::unique_ptr<EditorForm::TransactionState> EditorVisuals_T7::BeginWindowTransaction() {
+    return std::make_unique<ViewState>(*this);
 }

@@ -43,6 +43,8 @@ process.dll_version_mismatch = The DLL currently injected does not match the pro
 
 # Moveset #
 moveset.origin = Origin
+moveset.name = Name
+moveset.game = Game
 moveset.target_character = Character
 moveset.original_character = Original character
 moveset.date = Date
@@ -72,6 +74,8 @@ navmenu.persistent_play = Persistent play
 
 navmenu.category_tools = Tools
 navmenu.moveset_edit = Moveset Edition
+navmenu.addresses = Addresses
+navmenu.extra = Extra
 navmenu.camera = Camera
 
 navmenu.category_other = Other
@@ -153,7 +157,7 @@ importation.progress_done = Importing... Done!
 importation.error_file_reading = There was an error while reading the moveset file
 importation.error_allocation = There was a memory allocation error while reading the moveset data
 importation.error_game_allocation = There was a game memory allocation error while writing the moveset data
-importation.error_decompression = Therewas an error while decompressing the moveset data
+importation.error_decompression = There was an error while decompressing the moveset data
 
 # Persistent play #
 persistent.explanation = The persistent mode allows you to select the movesets to apply on players, with those movesets staying across loading screens and even if you switch the side you're playing on.\nThis can be used online if the opponent also has this tool running, with each of you having downloaded/extracted both movesets already:\nYou must then each set your own moveset (or None) as "Player 1", and the opponent's moveset (or None) as "Player 2", and lock-in.
@@ -170,7 +174,6 @@ persistent.clear_moveset = Clear moveset
 
 # Online #
 online.explanation = Online play requires both players to have this tool running.\nYou must each select your moveset (or none if you want) before the match's loading screen, the tool will in the background synchronize moveset files without you having to send it to one another.\nCustom movesets will not be loaded if you or the opponent do not have the tool running or if any of the two players has not locked in his character selection in this tool.
-online.select_moveset = Select moveset
 online.no_selected_moveset = No moveset selected
 online.dll_not_loaded = DLL is not loaded, inject it
 online.inject_dll = Inject
@@ -224,6 +227,23 @@ edition.animation_extraction.skipped = Skipped
 edition.animation_extraction.skipped_exists = Exists
 edition.animation_extraction.error = Error
 edition.animation_extraction.interrupt = Interrupt
+edition.t7_disk.button = Extract from files
+edition.t7_disk.executable = Tekken 7 executable (TekkenGame-Win64-Shipping.exe)
+edition.t7_disk.title = Extract all T7 movesets from game files
+edition.t8_disk.button = Extract from files
+edition.t8_disk.executable = Tekken 8 executable (Polaris-Win64-Shipping.exe)
+edition.t8_disk.executable_hint = Paste the exe path or browse; filled in when the game is running
+edition.t8_disk.title = Extract all T8 movesets from game files
+edition.t8_disk.explanation = Extracts characters from the game files. Characters can be large in size.
+edition.t8_disk.start = Start
+edition.t8_disk.characters = Characters
+edition.t8_disk.column_name = Name
+edition.t8_disk.column_code = Code
+edition.t8_disk.column_status = Status
+edition.t8_disk.select_none = None
+edition.t8_disk.building = Building...
+edition.t8_disk.built = {} moves, {} animations
+edition.t8_disk.finished = All movesets done!
 edition.open_characters_directory = Open characters directory
 edition.open_editor_library = Open editor library
 edition.open_editor_backups = Open editor backups
@@ -233,6 +253,7 @@ edition.form_popup.copy_structure_clipboard = Copy structure
 edition.form_popup.copy_single_item_clipboard = Copy single item
 edition.form_popup.paste_structure_clipboard = Paste structure
 edition.form_popup.duplicate_structure = Duplicate structure
+edition.form_popup.duplicate_item = Duplicate this row to the end of the list
 edition.form_popup.delete_structure = Delete structure
 edition.form_popup.what_references_this_move = What structure uses into this move?
 edition.form_popup.what_references_this_cancel = What move use this cancel list?
@@ -240,6 +261,8 @@ edition.form_popup.deletion_are_you_sure = Are you sure you wish to delete this 
 edition.form_popup.yes_delete = Yes, delete.
 
 edition.create_new = Create new
+edition.goto = Go to
+edition.goto_open = Open
 edition.requirement = Requirement list
 edition.move = Move
 edition.voiceclips = Voiceclips
@@ -349,7 +372,7 @@ edition.cancel.extradata_addr.description = ID to cancel extra: Bit flags that g
 edition.cancel.detection_start = Detection start
 edition.cancel.detection_start.description = First frame where this cancel can start (if its command & requirement match)
 edition.cancel.detection_end = Detection end
-edition.cancel.detection_start.description = Last frame where this cancel can start
+edition.cancel.detection_end.description = Last frame where this cancel can start
 edition.cancel.starting_frame = Starting frame
 edition.cancel.starting_frame.description = First frame where this cancel will start if command & requirements detection have been successful
 edition.cancel.move_id = Move ID
@@ -368,7 +391,7 @@ edition.grouped_cancel.extradata_addr.description = ID to cancel extra: Bit flag
 edition.grouped_cancel.detection_start = Detection start
 edition.grouped_cancel.detection_start.description = First frame where this cancel can start (if its command & requirement match)
 edition.grouped_cancel.detection_end = Detection end
-edition.grouped_cancel.detection_start.description = Last frame where this cancel can start
+edition.grouped_cancel.detection_end.description = Last frame where this cancel can start
 edition.grouped_cancel.starting_frame = Starting frame
 edition.grouped_cancel.starting_frame.description = First frame where this cancel will start if command & requirements detection have been successful
 edition.grouped_cancel.move_id = Move ID
@@ -409,6 +432,12 @@ edition.reactions.right_side_direction = Right side
 edition.reactions.front_counterhit_direction = Front CH
 edition.reactions.downed_direction = Downed
 edition.reactions.0x44_long = _0x44_long
+edition.reactions.front_rotation = Front
+edition.reactions.back_rotation = Back
+edition.reactions.left_side_rotation = Left side
+edition.reactions.right_side_rotation = Right side
+edition.reactions.front_counterhit_rotation = Front CH
+edition.reactions.downed_rotation = Downed
 edition.reactions.vertical_pushback = Vertical pushback
 edition.reactions.standing_moveid = Standing
 edition.reactions.default_moveid = Default
@@ -457,9 +486,15 @@ edition.projectile.voiceclip_on_hit = Voiceclip (hit)
 
 edition.pushback.window_name = Pushback
 edition.pushback.duration = Duration
-edition.pushback.num_of_loops = Num of loops
-edition.pushback.displacement = Displacmeent
+edition.pushback.duration.description = Duration of linear displacement
+edition.pushback.num_of_loops = Num of pushback extras
+edition.pushback.num_of_loops.description = Pushback values applied on first %d frames of a move
+edition.pushback.offsets_count = Num of pushback extras
+edition.pushback.offsets_count.description = Pushback values applied on first %d frames of a move
+edition.pushback.displacement = Displacement
+edition.pushback.displacement.description = Linear Displacement applied after first %d frames
 edition.pushback.extradata_addr = Extradata ID
+edition.pushback.extradata_addr.description = List of Pushback values applied on each frame
 
 edition.pushback_extradata.window_name = Pushback Extradata
 edition.pushback_extradata.horizontal_offset = Horizontal offset
@@ -476,6 +511,7 @@ edition.animation_list.import = Import in move
 edition.animation_list.search_animation = Search animation name to import in current move...
 edition.animation_list.no_anim = No animation was found in the animation library. Go to the editor submenu 'Extract animations' button to extract character animations to the library.
 edition.animation_list.loading = Loading animation list...
+edition.animation_list.import_file = Import from file...
 edition.animation_list.clear_filter = Clear filter
 
 edition.throw_camera.window_name = Throw Camera
@@ -483,11 +519,18 @@ edition.throw_camera.side = Side
 edition.throw_camera.cameradata_addr = Camera data ID
 
 edition.camera_data.window_name = Camera data
-edition.camera_data._0x0_int = _0x0_int
-edition.camera_data._0x4_short = _0x4_short
+edition.camera_data._0x0_int = Pick Probability
+edition.camera_data._0x0_int.description = Chance of this camera value to be picked\n1: Normal\n2: Double
+edition.camera_data.pick_probability = Pick Probability
+edition.camera_data.pick_probability.description = Chance of this camera value to be picked\n1: Normal\n2: Double
+edition.camera_data._0x4_short = Camera Type
+edition.camera_data._0x4_short.description = Type of Camera\n15: Animation\n16: Custom
+edition.camera_data.camera_type = Camera Type
+edition.camera_data.camera_type.description = Type of Camera\n15: Animation\n16: Custom
 edition.camera_data.left_side_camera_data = Left side camera data
 edition.camera_data.right_side_camera_data = Right side camera data
-edition.camera_data._0xA_short = _0xA_short
+edition.camera_data._0xA_short = Additional Rotation
+edition.camera_data.additional_rotation = Additional Rotation
 
 edition.mvl_displayable.window_name = Movelist: Displayable
 edition.mvl_displayable.type = Type
@@ -560,3 +603,346 @@ about.fletch_explanation = Brought moveset edition to great lengths by creating 
 about.koenji_explanation = Got on moveset edition early and helped understand its workflow a ton, also contributed to deciphering many moveset properties
 about.sadamitsu_explanation = Helped understand a lot more about animations of various kind, how they were structured and where they were stored
 about.dennis_stanistan_explanation = Unknowingly helped through a random discord post that then allowed the first moveset extractor to get started
+
+extraction.retail_tables_only = Retail T8 exports record tables and all six loaded PANM animation categories. Unavailable animation IDs are recorded explicitly. Legacy MOTA/training-list options do not apply. Retail importing and the separate training movelist are not supported.
+
+importation.mota_explanation = Select which MOTA archives to use from the file. Unchecked slots keep the current character's archives. Missing archives also keep the current ones. Applies to T7 imports, including converted movesets.
+
+extraction.settings.reset_motas = Reset MOTA selection
+
+extraction.panm.title = Animations
+extraction.panm.reset = Reset animation selection
+extraction.panm.all = All
+extraction.panm.none = None (tables only)
+extraction.panm.explanation = Select animations to include, just like MOTA selection. Unchecked categories reuse the game's source resources on import. No animations selected exports tables only. Defaults include body, hands and cameras. Extraction reads memory only.
+extraction.panm.body = Body animations
+extraction.panm.hands = Hand animations
+extraction.panm.face = Face animations
+extraction.panm.swing = Swing animations
+extraction.panm.camera = Camera animations
+extraction.panm.from_archive = Read animations the game has not loaded from its files (tkdata.bin)
+extraction.panm.from_archive_explanation = The game keeps only some animations in memory (intros, outros and rarely used moves are loaded when needed). On: the export reads those from the game's tkdata.bin, the same bytes the game loads, so the file carries every animation. Off: they are left out; importing the file then reads them from tkdata.bin, or the import fails. No move ever falls back to another animation.
+extraction.panm.extra = Extra animations
+
+# -- Tekken 8 (retail) editor -- #
+edition.t8.game_attached = Attached to Tekken 8
+edition.t8.game_running = Tekken 8 running, not attached
+edition.t8.game_not_running = Tekken 8 not running
+edition.t8.references.details = Details
+edition.t8.animation_library.this_moveset = This moveset
+edition.t8.animation_library.library = Library (editor_library)
+edition.t8.animation_library.refresh = Refresh
+edition.t8.animation_library.open_folder = Open folder
+edition.t8.animation_library.loading = Loading animation library...
+edition.t8.animation_library.empty = No .panm file in editor_library. Use 'Extract animations' on a moveset to fill it; every folder below is one extraction.
+edition.t8.animation_library.frames = Frames
+edition.t8.animation_library.import = Import in move
+edition.t8.table = Table
+edition.t8.status_counters = {} pending | {} unsaved
+edition.t8.saving_failed = Saving failed. Your edits remain open; retry Save.
+edition.t8.unsaved_title = Unsaved edits
+edition.t8.unsaved_unapplied = Some records have unapplied edits. Apply them before saving.
+edition.t8.unsaved_question = Save your changes before closing?
+edition.t8.save_and_close = Save and close
+edition.t8.discard_and_close = Discard and close
+edition.t8.keep_editing = Keep editing
+edition.t8.apply_other_forms = Apply the other open forms before changing record IDs.
+edition.t8.names_unavailable = Names unavailable:
+edition.t8.animation_missing = Animation name is not present in this moveset
+edition.t8.animation_identity = Animation identity is unavailable
+edition.t8.panm_rewritten = Non-native layout: it will be rewritten over a native template on Apply.
+edition.t8.cannot_write_panm = Cannot write PANM
+edition.t8.find_references = Find references
+edition.t8.import_panm = Import PANM
+edition.t8.export_panm = Export PANM
+edition.t8.cancel_custom_panm = Cancel custom PANM
+edition.t8.animation_search_hint = Search animation name or move ID
+edition.t8.pending_panm = Pending custom PANM (applied with Apply). It becomes a new animation of this move, named after its file; no other move changes. Click an animation below to use that one instead.
+edition.t8.new_move_created = Move {} created from the idle stance ({}): its own AUTO-to-idle cancel list, no extra cancel lists, no voiceclips, no properties; hit conditions are the idle's.
+edition.t8.unknown_move = Unknown move
+edition.t8.custom_filter_tooltip = Moves edited in this session or with custom names
+edition.t8.column_id = ID
+edition.t8.column_record = Record
+edition.t8.column_table = Table
+edition.t8.column_field = Field
+edition.t8.open = Open
+edition.t8.copy_move_id = Copy move ID
+edition.t8.no_matching_move = No matching move ID, alias or name
+edition.t8.play_tooltip = Import this document on this player before playing moves. Re-import after applying edits.
+edition.t8.record_search_hint = Record ID / label
+edition.t8.importing = Importing document...
+edition.t8.queuing = Queuing move...
+edition.t8.cannot_attach = Cannot attach to the supported retail game
+edition.t8.live_stopped = Live editing stopped because the imported player changed
+edition.t8.live_edit_written = Live edit: {} record(s) written on P{}
+edition.t8.reimported = Reimported on P{} ({})
+edition.t8.imported = Imported on P{}
+edition.t8.move_queued = Move queued on P{}
+edition.t8.no_saved_changes = No saved changes
+edition.t8.live_editing_explanation = Valid fields are applied when you finish editing and written in place into the moveset imported on the selected player. Structural edits (added or removed records, renames) import the document again.
+edition.t8.cancel_save = Cancel save
+edition.t8.references_title = References:
+edition.t8.references_count = {} references to {}
+edition.t8.extracted = Extracted {} PANMs to {}
+edition.t8.extract.title = Extract animations
+edition.t8.extract.explanation = Writes the checked animations of this moveset (unsaved edits included) to a new folder in editor_library. Animations that moves play are named after the animation; the others by category and ID.
+edition.t8.extract.search_hint = Search by name, category or ID
+edition.t8.extract.select_all = Select all
+edition.t8.extract.select_none = Select none
+edition.t8.extract.select_explanation = Both buttons apply to the rows the search shows.
+edition.t8.extract.column_name = Animation
+edition.t8.extract.column_category = Category
+edition.t8.extract.column_id = ID
+edition.t8.extract.column_size = Size
+edition.t8.extract.selected = {} of {} selected
+edition.t8.extract.start = Extract
+edition.t8.extract.stopped = Animation extraction interrupted; nothing was written.
+edition.t8.extract.none = This moveset carries no animation. Export it again with animation categories selected.
+edition.t8.codec.hit_level = Attack type in the low 12 bits; the flag bits above are kept. High, mid, low and special mid come from the retail requirement handlers; entries marked ? are named from the moves that use them. The raw value stays editable on the right.
+edition.t8.codec.hitbox_location = One limb (0x00aa: line from its previous to its current position) or a line between two limbs (0xaabb). Hands and feet were matched on 1,400+ punch and kick moves each; entries marked ? are hypotheses. The raw value stays editable on the right.
+
+# Field descriptions (hover). Unverified meanings say so.
+edition.t8.moves.vulnerability.description = Hurtbox state (encrypted field, shown decoded). Determines what hit level is allowed to hit this move.
+edition.t8.moves.hit_level.description = Attack type (encrypted field, shown decoded). 0x512 = high and 0x217 = mid are confirmed by the retail requirement handlers; 0x10F = low and 0x41F = special mid are unverified. 0 = no attack.
+edition.t8.moves.cancels.description = Cancel list of this move (cancels table index, -1 = none). The list ends on the AUTO cancel, which decides the move played when nothing else matches.
+edition.t8.moves.cancels_2.description = Extra cancel list (cancels table index). Only used when its gate is greater than 0.
+edition.t8.moves.cancels_3.description = Extra cancel list (cancels table index). Only used when its gate is greater than 0.
+edition.t8.moves.cancels_4.description = Extra cancel list (cancels table index). Only used when its gate is greater than 0.
+edition.t8.moves.cancel_gate_2.description = Gate of the matching extra cancel list: 0 or below disables it (the importer then clears the list pointer).
+edition.t8.moves.cancel_gate_3.description = Gate of the matching extra cancel list: 0 or below disables it (the importer then clears the list pointer).
+edition.t8.moves.cancel_gate_4.description = Gate of the matching extra cancel list: 0 or below disables it (the importer then clears the list pointer).
+edition.t8.moves.transition.description = Move played automatically when this move's animation ends (move ID, or generic alias 0x8001 = idle).
+edition.t8.moves.end_rotation.description = Rotation applied at the end of the move (unverified).
+edition.t8.moves.character_id.description = Encrypted field, shown decoded: the character id pair (low 16 bits = -id, high 16 bits = id), e.g. 0x0005FFFB = Jin (5). Same on every move. Keep it.
+edition.t8.moves.move_key.description = Encrypted field, shown decoded: Kamui hash of CODE_name (e.g. JIN_ + move name), unique per move. Keep it.
+edition.t8.moves.damage_override.description = Signed damage override for the move; -1 keeps the hit conditions' damage (-1 on 99.9 % of retail moves).
+edition.t8.moves.active_start.description = Start of the move's active window. No hitbox is live before it; 0 = the move has no hitbox.
+edition.t8.moves.active_end.description = End of the move's active window. No hitbox is live after it.
+edition.t8.moves.hitbox_start.description = First active frame of this hitbox (the move's active window applies too).
+edition.t8.moves.hitbox_last.description = Last active frame of this hitbox.
+edition.t8.moves.hitbox_location.description = Byte 0 = limb A, byte 1 = limb B: the hit line runs from A to B. When B is 0 the line sweeps limb A from its previous-frame position. 0 = slot unused.
+edition.t8.moves.hitbox_radius.description = Hit line radius. 0 = the character's default.
+edition.t8.moves.hitbox_vertical_height.description = When greater than 0, the hit line is a vertical segment of this height centred on limb A.
+edition.t8.moves.hitbox_offset_a.description = Offset applied to limb A (bone space; which component is which axis is unverified).
+edition.t8.moves.hitbox_offset_b.description = Offset applied to limb B (bone space; which component is which axis is unverified).
+edition.t8.moves.hitbox_starts_off.description = 1 = this hitbox starts switched off. Property 0x8158 switches it on or off during the move.
+edition.t8.moves.unknown_0x150.description = Unknown, retained as-is.
+edition.t8.moves.unknown_0x154.description = Unknown, retained as-is.
+edition.t8.moves.hit_conditions.description = Hit condition list: damage and the opponent's reaction on hit/block (hit_conditions table index, -1 = none).
+edition.t8.moves.animation_length_adjuster.description = Signed adjustment to the animation length (default 1; unverified).
+edition.t8.moves.animation_length.description = Animation length in frames. Filled from the PANM when a custom animation is imported.
+edition.t8.moves.airborne_start.description = First frame where the character counts as airborne (0 = never).
+edition.t8.moves.airborne_end.description = Last airborne frame.
+edition.t8.moves.ground_fall.description = Frame where the character is grounded again.
+edition.t8.moves.voiceclips.description = Voiceclips played during this move (voiceclips table index, -1 = none).
+edition.t8.moves.properties.description = Extra properties played during this move (extra_properties table index, -1 = none).
+edition.t8.moves.start_properties.description = Properties applied when the move starts (start_properties table index, -1 = none).
+edition.t8.moves.end_properties.description = Properties applied when the move ends (end_properties table index, -1 = none).
+edition.t8.moves.collision.description = Collision state id (unverified).
+edition.t8.moves.distance.description = Distance travelled while airborne (unverified).
+edition.t8.cancels.command.description = Input: direction bits in the low dword, buttons in the high dword, decoded in the row title. Specials: 0x8000 = list end (AUTO), 0x8012 = group cancel, 0x8013 = group-list end, 0x8014 + n = input sequence n.
+edition.t8.cancels.requirements.description = Conditions this cancel must match for it to occur (requirements table index).
+edition.t8.cancels.extra.description = Cancel extradata (cancel_extra table index): bit flags such as frame skipping, keep current frame, homing.
+edition.t8.cancels.window_start.description = First frame where this cancel can start (if its command and requirements match).
+edition.t8.cancels.window_end.description = Last frame where this cancel can start.
+edition.t8.cancels.starting_frame.description = Frame the target move starts on once the command and requirements matched.
+edition.t8.cancels.move_id.description = Target move ID or generic alias (0x8001 = idle). For a group cancel (command 0x8012): the group_cancels row.
+edition.t8.cancels.option.description = Cancel option flags. 0 on disk for every cancel; the game fills it at load (80, 65, 336, 257 seen). Meaning unverified.
+edition.t8.group_cancels.command.description = Same encoding as a cancel command. 0x8013 ends the group list.
+edition.t8.group_cancels.requirements.description = Conditions this cancel must match for it to occur (requirements table index).
+edition.t8.group_cancels.extra.description = Cancel extradata (cancel_extra table index): bit flags such as frame skipping, keep current frame, homing.
+edition.t8.group_cancels.window_start.description = First frame where this cancel can start (if its command and requirements match).
+edition.t8.group_cancels.window_end.description = Last frame where this cancel can start.
+edition.t8.group_cancels.starting_frame.description = Frame the target move starts on once the command and requirements matched.
+edition.t8.group_cancels.move_id.description = Target move ID or generic alias (0x8001 = idle).
+edition.t8.group_cancels.option.description = Cancel option flags. 0 on disk; filled by the game at load. Meaning unverified.
+edition.t8.cancel_extra.value.description = Cancel extradata bit flags (frame skipping, keep current frame, homing...). Unverified for T8.
+edition.t8.requirements.condition.description = Condition id (label in the row title). 1100 ends the list.
+edition.t8.requirements.parameter_1.description = First parameter; its meaning depends on the condition (see the row title). Most conditions use this one only.
+edition.t8.requirements.parameter_2.description = Second parameter. Used by slot checks, character lists and generic compares (operator).
+edition.t8.requirements.parameter_3.description = Third parameter. Used by slot checks, character lists and generic compares.
+edition.t8.requirements.parameter_4.description = Fourth parameter. Used by slot checks, character lists and generic compares.
+edition.t8.hit_conditions.requirements.description = Conditions that must be true for this hit condition to apply (requirements table index). The list ends at the entry whose requirements start with 1100.
+edition.t8.hit_conditions.damage.description = Damage dealt when this hit condition applies.
+edition.t8.hit_conditions.unknown_0xC.description = Unknown, retained as-is.
+edition.t8.hit_conditions.reactions.description = Reaction list deciding the opponent's behaviour on hit/block (reactions table index).
+edition.t8.reactions.vertical_pushback.description = Vertical pushback (signed, small values).
+edition.t8.reactions.front_rotation.description = Rotation, 0 in every retail file.
+edition.t8.reactions.back_rotation.description = Rotation, 0 in every retail file.
+edition.t8.reactions.left_side_rotation.description = Rotation, 0 in every retail file.
+edition.t8.reactions.right_side_rotation.description = Rotation, 0 in every retail file.
+edition.t8.reactions.downed_rotation.description = Rotation, 0 in every retail file. Not read by the reaction picker.
+edition.t8.reactions.unknown_0x6C.description = Unknown, 0 in every retail file.
+edition.t8.extra_properties.frame.description = Frame the property triggers on: 32769 = instant (+n), 0x4000 + n = every n frames, 9999 = every frame.
+edition.t8.extra_properties.requirements.description = Conditions for this property to apply (requirements table index, -1 = none).
+edition.t8.extra_properties.property.description = Property id (label in the row title). 0 ends the list.
+edition.t8.extra_properties.parameter_1.description = Property parameter; its meaning depends on the property.
+edition.t8.extra_properties.parameter_2.description = Property parameter; its meaning depends on the property.
+edition.t8.extra_properties.parameter_3.description = Property parameter; its meaning depends on the property.
+edition.t8.extra_properties.parameter_4.description = Property parameter; its meaning depends on the property.
+edition.t8.extra_properties.parameter_5.description = Property parameter; its meaning depends on the property.
+edition.t8.start_properties.requirements.description = Conditions for this property to apply (requirements table index, -1 = none).
+edition.t8.start_properties.property.description = Property or requirement id applied when the move starts. 1100 ends the list.
+edition.t8.start_properties.parameter_1.description = Property parameter; its meaning depends on the property.
+edition.t8.end_properties.requirements.description = Conditions for this property to apply (requirements table index, -1 = none).
+edition.t8.end_properties.property.description = Property or requirement id applied when the move ends. 1100 ends the list.
+edition.t8.end_properties.parameter_1.description = Property parameter; its meaning depends on the property.
+edition.t8.pushbacks.duration.description = Duration of the linear displacement.
+edition.t8.pushbacks.displacement.description = Linear displacement applied after the per-frame values.
+edition.t8.pushbacks.extra_count.description = Number of per-frame pushback values (pushback_extra entries) applied at the start.
+edition.t8.pushbacks.extra.description = Per-frame pushback values (pushback_extra table index).
+edition.t8.pushback_extra.value.description = Horizontal offset applied on one frame.
+edition.t8.voiceclips.parameter_1.description = Voice/sound key. 0xFFFFFFFF ends the list.
+edition.t8.voiceclips.parameter_2.description = Unverified.
+edition.t8.voiceclips.parameter_3.description = Unverified.
+edition.t8.input_sequences.window.description = Frames allowed between two inputs of the sequence (unverified).
+edition.t8.input_sequences.input_count.description = Number of inputs read in the sequence.
+edition.t8.input_sequences.inputs.description = First input of the sequence (inputs table index).
+edition.t8.inputs.direction.description = Direction bits, same layout as a cancel command's low dword.
+edition.t8.inputs.buttons.description = Button bits, same layout as a cancel command's high dword.
+edition.t8.parry.key.description = Parryable move key (unverified).
+edition.t8.cameras.probability.description = Chance of this camera to be picked (T7: 1 normal, 2 double; unverified for T8).
+edition.t8.cameras.type.description = Camera type (T7: 15 animation, 16 custom; unverified for T8).
+edition.t8.throws.camera.description = Throw camera (cameras table index).
+edition.t8.throws.side.description = Throw side (unverified).
+edition.t8.dialogues.requirements.description = Conditions for this dialogue (requirements table index).
+edition.t8.dialogues.voice_key.description = Voice line key.
+edition.t8.dialogues.facial_animation.description = Facial animation id (-1 = none).
+edition.t8.projectiles.hit_conditions.description = Hit condition list of the projectile (hit_conditions table index).
+edition.t8.projectiles.cancels.description = Cancel list of the projectile (cancels table index).
+edition.t8.parameter_1 = Parameter 1
+edition.t8.param_unused = unused
+edition.t8.param_hover = {} [{}]
+{}
+Parameter 1: {}
+Common values: {}
+edition.t8.param_hover_other = {}: {}
+This parameter is not described for this id.
+edition.t8.codec.cancel_option = Derived by the game when the moveset loads (0 on disk for every cancel): 0x1 = no command, 0x10 = has a command, 0x100 = the target is a generic alias (exact on 34,463 live cancels); 0x80 follows command flag 0x20000000 (95%); the other bits are not decoded. Editing it has no effect after a reload.
+edition.t8.codec.requirement_param = Meaning of the first parameter for this requirement. Game modes, controller types and the story battle code come from LukzB's TekkenMovesetExtractor and are unverified; fighter ids, flags and buttons follow the retail handler review.
+edition.t8.codec.vulnerability = Posture word of the move (copied to the player at move start): bits 0-2 = standing 2 / crouching 1 / downed 4, 0x400 = airborne, from the retail requirement handlers. The list holds the values the retail movesets use most; the combo keeps the other bits. The raw value stays editable on the right.
+edition.t8.id_picker_hint = Filter by id, hex, label or handler name...
+edition.t8.codec.id_picker = Every known condition / property id with its label; reviewed ids without a community label show their handler name. Hover an entry for its meaning. The raw id stays editable on the right.
+
+# Folders, close dialog, conversion and error messages
+settings.folders.title = Character folders
+settings.folders.extraction = Extraction folder
+settings.folders.extraction_hint = Empty: .\extracted_chars
+settings.folders.browse = Browse
+settings.folders.save = Save
+settings.folders.clear = Clear
+settings.folders.extraction_help = Leave empty to extract into .\extracted_chars. A custom folder must be an absolute path.
+settings.folders.additional = Additional character folders
+settings.folders.additional_help = Character lists always search .\extracted_chars, the extraction folder, and the folders below.
+settings.folders.remove = Remove
+settings.folders.add = Add folder
+settings.folders.missing = The chosen folder does not exist.
+settings.folders.duplicate = That folder is already in the list.
+settings.folders.add_help = Choose a folder in the explorer; its characters appear in the lists.
+close.title = Close application?
+close.busy = A save is still running. Wait for it to finish.
+close.unsaved = Some editors have unsaved or unapplied edits. Keep editing to apply and save them.
+close.discard = Discard edits and exit
+close.keep_editing = Keep editing
+edition.convert.cancel = Cancel conversion
+edition.convert.t7_to_t8_explanation = Creates a separate Tekken 8 file from this T7 moveset, without needing the game: moves, hitboxes, cameras, throws, projectiles and every body animation come from the T7 file. Conditions and properties with no Tekken 8 equivalent have no effect, and training movelists are not converted.
+edition.convert.t8_to_t7_explanation = Creates a separate Tekken 7 file from this retail Tekken 8 moveset, without needing the game: moves, hitboxes, cameras, throws, projectiles and every embedded body animation come from the T8 file. Conditions and properties with no Tekken 7 equivalent have no effect, hand, face and camera animations stay the target's own, and training movelists are not converted.
+moveset.import_settings = Import settings
+edition.import_settings.title = Import settings
+edition.import_settings.explanation = How this moveset is built when it is imported. Only the file header changes: the moveset data stays as it is. The defaults import it exactly as before.
+edition.import_settings.identity = Character identity
+edition.import_settings.identity_target = Adopt the target character
+edition.import_settings.identity_fixed = Act as character ID
+edition.import_settings.character = Character ID
+edition.import_settings.gender = Gender checks
+edition.import_settings.gender_target = From the target
+edition.import_settings.male = Male
+edition.import_settings.female = Female
+edition.import_settings.story_flag = Tekken 8 story flag
+edition.import_settings.story_game = Game decides (conversions to Tekken 7 use 0, versus)
+edition.import_settings.story_value = Story flag value (1 to 4: story chapters)
+edition.import_settings.in_heat = Counts as in Heat (Tekken 8 movesets in Tekken 7)
+edition.import_settings.flags_clear = Tekken 8 flag checks see clear flags (normal play)
+edition.import_settings.defaults = Defaults
+edition.import_settings.save = Save
+edition.import_settings.saved = Saved. Import the moveset again to apply.
+edition.moveset_open_in_editor = This moveset is open in an editor: close its editor window first, otherwise its next save would undo this change.
+edition.import_settings.context = Context checks (unchecked: the game decides)
+edition.import_settings.story_mode = Story mode checks as outside story
+edition.import_settings.dlc_story = DLC story checks as outside DLC story (Tekken 8)
+edition.import_settings.special_modes = Arcade, episode and special mode checks off
+edition.import_settings.stage = Any stage (stage-specific checks off)
+edition.import_settings.wave_index = Fixed story wave index (Tekken 8)
+edition.import_settings.battle_script = Fixed battle script value (Tekken 8)
+edition.import_settings.value = Value
+edition.import_settings.item = Customization item checks
+edition.import_settings.game_decides = Game decides
+edition.import_settings.item_none = No item
+edition.import_settings.item_all = Every item
+edition.import_settings.body = Body type checks (Tekken 8)
+edition.import_settings.body_normal = Normal
+edition.import_settings.body_big = Big
+edition.import_settings.body_bear = Bear
+edition.import_settings.story_effects = Strip story presentation properties (subtitles, HUD, cutscene effects)
+edition.import_settings.global_writes = Strip properties that write global game state (Tekken 8)
+edition.convert.saved = Saved:
+edition.convert.cancelled = Conversion cancelled.
+importation.error_game_write = The game-memory write failed. Previous values were restored.
+importation.error_game_rollback = The game-memory write failed and rollback was incomplete. The allocation was retained to avoid dangling pointers.
+importation.error_unsupported_version = This file is not supported by the selected game version.
+importation.error_moveset_data = The moveset could not be validated or bound. Retail T8 requires a matching loaded source moveset and animation resources.
+importation.warning_title = Imported with warnings
+importation.warning_idle_fallback = {} move(s) play the idle animation: {} animation(s) were found neither in the file nor in the game's tkdata.bin.
+importation.warning_target_fallback = {} move(s) play the idle animation: no loaded moveset matched this file, so the target character's own animations were used.
+importation.warning_first_error = First error: {}
+extraction.error_title = Extraction failed
+extraction.error_moveset_data = The moveset could not be read consistently. Check that the character is loaded and retry extraction.
+about.dantarion_explanation = His early Tekken moveset research and tools paved the way for this project
+
+# Tools > Addresses
+addresses.title = Game addresses
+addresses.explanation = When the game updates, the addresses TKMovesets uses to export and import can move. This tool searches the game's executable file on disk (it never reads or writes the running game) for the byte patterns stored in game_addresses.ini, then writes the addresses it finds to game_addresses.ini and to the addresses this program uses right away. Values that cannot be found are left as they are.
+addresses.game = Game:
+addresses.executable = Game executable:
+addresses.executable_hint = Path to Polaris-Win64-Shipping.exe
+addresses.browse = Browse
+addresses.detect = Detect
+addresses.not_detected = The game executable was not found. Browse to Polaris-Win64-Shipping.exe.
+addresses.invalid_path = The executable path is not valid text. Browse to the file again.
+addresses.update = Update addresses from the executable
+addresses.scanning = Searching the executable...
+addresses.busy = Waiting for the current extraction or import to finish.
+addresses.no_patterns = game_addresses.ini holds no byte patterns for this game.
+addresses.write_failed = Could not write game_addresses.ini: nothing was changed.
+addresses.up_to_date = Every address already matches the executable.
+addresses.nothing_changed = Nothing was changed.
+addresses.updated = {} address(es) updated in game_addresses.ini and in this program.
+addresses.some_failed = {} could not be found and kept their current value.
+addresses.results = Results
+addresses.exe_build = Executable build timestamp: 0x%X
+addresses.col_key = Address
+addresses.col_before = Before
+addresses.col_found = In the executable
+addresses.col_patterns = Patterns found
+addresses.col_result = Result
+addresses.pattern_not_found = not found
+addresses.pattern_ambiguous = found more than once (ignored)
+addresses.result_updated = Updated
+addresses.result_unchanged = Unchanged
+addresses.result_not_found = Not found, kept
+addresses.result_conflict = Patterns disagree, kept
+addresses.result_not_in_ini = Missing from the ini, kept
+
+# Tools > Extra
+extra.tag.title = Tag (Tekken 8 Practice)
+extra.tag.explanation = Two teams of two in Practice: P3 is P1's partner, P4 is P2's partner. Start a Practice match, then press the button: P3 and P4 join the running match within a few seconds. Ki Charge (the game's 1+2+3+4 button, or X+Y+A+B) tags your partner in. A Quick Select or character reselect switches Tag off: press the button again in the new match. Tag in Practice only. This feature is experimental and for debug purposes only.
+extra.tag.names_missing = TKMInterface/t8-retail_names.json was not found next to TKMovesets2.exe: using the built-in roster.
+extra.tag.p3 = P3 (P1's partner)
+extra.tag.p4 = P4 (P2's partner)
+extra.tag.none = None (P2 fights alone)
+extra.tag.load = Load P3/P4 and enable Tag
+extra.tag.disable = Disable
+extra.tag.injecting = Injecting the moveset loader into the game...
+extra.tag.no_game = Tekken 8 is not running.
+extra.tag.inject_failed = The moveset loader could not be started in the game.
+extra.tag.version_mismatch = The game holds a moveset loader from another TKMovesets2 version: restart the game.

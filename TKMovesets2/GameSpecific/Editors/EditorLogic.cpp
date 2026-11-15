@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "EditorLogic.hpp"
 
 #include <format>
@@ -55,7 +56,7 @@ namespace EditorUtils
 		if (valueChange < 0)
 		{
 			// Item is situated between the new list end and the old one, we want to keep it in the current list, shift ID down
-			if (valueChange >= new_listEnd) return true;
+			if (structureId >= new_listEnd) return true;
 		}
 		// An item was added to the list
 		else if (valueChange > 0)
@@ -104,32 +105,6 @@ namespace EditorUtils
 			return ImGuiInputTextFlags_CharsDecimal;
 		}
 		return ImGuiInputTextFlags_CharsDecimal;
-	}
-
-	constexpr const char* GetFieldFormat(EditorInputFlag flags)
-	{
-		if (flags & (EditorInput_H64)) {
-			return "0x%llX";
-		}
-		if (flags & (EditorInput_H32 | EditorInput_H16 | EditorInput_H8)) {
-			return "0x%X";
-		}
-		if (flags & EditorInput_S64) {
-			return "%lld";
-		}
-		if (flags & EditorInput_U64) {
-			return "%llu";
-		}
-		if (flags & (EditorInput_U32 | EditorInput_U16 | EditorInput_U8)) {
-			return "%u";
-		}
-		if (flags & (EditorInput_Float)) {
-			return "%.7g";
-		}
-		if (flags & (EditorInput_String)) {
-			return "%s";
-		}
-		return "%d";
 	}
 
 	uint64_t GetFieldValue(EditorInput* field)
@@ -189,7 +164,18 @@ namespace EditorUtils
 	void ChangeFieldDataType(EditorInput* field)
 	{
 		auto& flags = field->flags;
-		uint64_t value = GetFieldValue(field);
+		// Floats are not cycled: their bits shown as an integer would be read back as a float value
+		// (EditorInput_32b includes EditorInput_Float, so the 32-bit cycle below would also mix the flags).
+		if (flags & EditorInput_Float) return;
+
+		// Raw bits of the current text within the field's width, so cycling the display never changes the stored
+		// value: no saturation of 64-bit values >= 2^63, no sign extension of negative 8/16/32-bit values.
+		const unsigned int width = (flags & EditorInput_64b) ? 64 : (flags & EditorInput_32b) ? 32 : (flags & EditorInput_16b) ? 16 : 8;
+		uint64_t value;
+		if (flags & EditorInput_Hex) value = strtoull(field->buffer, nullptr, 16);
+		else if (flags & EditorInput_Signed) value = (uint64_t)strtoll(field->buffer, nullptr, 10);
+		else value = strtoull(field->buffer, nullptr, 10);
+		if (width < 64) value &= (uint64_t(1) << width) - 1;
 
 		if (flags & EditorInput_64b)
 		{
@@ -258,11 +244,17 @@ namespace EditorUtils
 		const unsigned int bufSize = 32;
 		char buf[bufSize];
 
-		sprintf_s(buf, bufSize, GetFieldFormat(field->flags), value);
+		if (field->flags & EditorInput_Hex) sprintf_s(buf, bufSize, "0x%llX", (unsigned long long)value);
+		else if (field->flags & EditorInput_Signed) {
+			// Sign-extend from the field width
+			const long long signedValue = width < 64 ? (long long)(value << (64 - width)) >> (64 - width) : (long long)value;
+			sprintf_s(buf, bufSize, "%lld", signedValue);
+		}
+		else sprintf_s(buf, bufSize, "%llu", (unsigned long long)value);
 
-		DEBUG_LOG("Format is '%s', value is %llu, result is '%s'\n", GetFieldFormat(field->flags), value, buf);
+		DEBUG_LOG("Value is %llu, result is '%s'\n", value, buf);
 
-		field->nextValue = std::string(buf);
+		field->QueueValue(std::string(buf));
 
 		SetInputfieldColor(field);
 	}
@@ -366,4 +358,135 @@ EditorLogic::EditorLogic(GameProcess& process, GameData& game, const GameInfo* g
 
 EditorLogic::~EditorLogic()
 {
+	free(m_moveset);
+}
+EditorLogic::Mutation::Mutation(EditorLogic& editor, bool batch)
+    : m_editor(editor), m_original(editor.m_moveset), m_size(editor.m_movesetSize),
+      m_liveAddress(editor.live_loadedMoveset), m_parentBatch(editor.m_activeBatch)
+{
+    if (!m_original || !m_size) throw std::invalid_argument("No moveset is loaded");
+    std::unique_ptr<Byte, decltype(&free)> copy(editor.AllocateMutationBuffer(m_size), &free);
+    if (!copy) throw std::bad_alloc();
+    memcpy(copy.get(), m_original, m_size);
+    m_state = editor.CaptureMutationState();
+    try {
+        editor.LoadMovesetPtr(copy.get(), m_size);
+    } catch (...) {
+        if (m_state) m_state->Restore();
+        editor.RestoreMovesetPtr(m_original, m_size);
+        editor.live_loadedMoveset = m_liveAddress;
+        throw;
+    }
+    copy.release();
+    if (batch || m_parentBatch) {
+        editor.m_activeBatch = this;
+        m_registered = true;
+    }
+}
+
+EditorLogic::Mutation::~Mutation()
+{
+    if (m_registered) m_editor.m_activeBatch = m_parentBatch;
+    if (m_original) {
+        if (m_state) m_state->Restore();
+        free(m_editor.m_moveset);
+        m_editor.RestoreMovesetPtr(m_original, m_size);
+        m_editor.live_loadedMoveset = m_liveAddress;
+    }
+}
+
+void EditorLogic::Mutation::Commit()
+{
+    if (m_registered && m_editor.m_activeBatch != this) throw std::logic_error("Edit transactions must commit in nesting order");
+    if (m_failed) throw std::runtime_error("Cannot commit a failed edit batch");
+    if (m_registered) {
+        m_editor.m_activeBatch = m_parentBatch;
+        m_registered = false;
+    }
+    if (m_editor.m_movesetSize == m_size && memcmp(m_editor.m_moveset, m_original, m_size) == 0) return;
+    if (m_state) m_state->Commit();
+    free(m_original);
+    m_original = nullptr;
+}
+
+std::string_view EditorLogic::InputString(const EditorInput* input)
+{
+    if (!input || !input->buffer || !input->bufsize) throw std::invalid_argument("Missing input field");
+    auto end = static_cast<const char*>(memchr(input->buffer, 0, input->bufsize));
+    if (!end) throw std::invalid_argument("Unterminated input field");
+    return {input->buffer, static_cast<size_t>(end - input->buffer)};
+}
+
+std::string_view EditorLogic::BlockString(size_t block, uint64_t offset) const
+{
+    if (!m_header || m_header->moveset_data_start > m_movesetSize ||
+        m_header->block_list > m_header->moveset_data_start ||
+        m_header->block_list_size > (m_header->moveset_data_start - m_header->block_list) / sizeof(uint64_t) ||
+        block >= m_header->block_list_size) throw std::out_of_range("Invalid string section");
+    auto blocks = reinterpret_cast<const uint64_t*>(m_moveset + m_header->block_list);
+    auto start = blocks[block];
+    auto end = block + 1 < m_header->block_list_size ? blocks[block + 1] : m_movesetDataSize;
+    if (start > end || end > m_movesetDataSize || offset >= end - start)
+        throw std::out_of_range("String outside its section");
+    auto text = reinterpret_cast<const char*>(m_movesetData + start + offset);
+    auto terminator = static_cast<const char*>(memchr(text, 0, end - start - offset));
+    if (!terminator) throw std::invalid_argument("Unterminated section string");
+    return {text, static_cast<size_t>(terminator - text)};
+}
+
+void EditorLogic::ReplaceBlockRange(size_t block, size_t offset, size_t removed, std::span<const Byte> inserted)
+{
+    constexpr size_t budget = 256ULL << 20;
+    if (!m_header || m_movesetSize > budget || m_header->moveset_data_start > m_movesetSize ||
+        m_header->block_list > m_header->moveset_data_start ||
+        m_header->block_list_size > (m_header->moveset_data_start - m_header->block_list) / sizeof(uint64_t) ||
+        block >= m_header->block_list_size)
+        throw std::invalid_argument("Invalid section table");
+    auto blocks = reinterpret_cast<const uint64_t*>(m_moveset + m_header->block_list);
+    const size_t start = blocks[block];
+    const size_t end = block + 1 < m_header->block_list_size ? blocks[block + 1] : m_movesetDataSize;
+    if (start > end || end > m_movesetDataSize || offset > end - start || removed > end - start - offset ||
+        inserted.size() > budget) throw std::out_of_range("Section edit outside its bounds");
+    size_t newEnd = end - removed + inserted.size();
+    if (block + 1 < m_header->block_list_size) newEnd = (newEnd + 7) & ~size_t(7);
+    const int64_t delta = static_cast<int64_t>(newEnd) - static_cast<int64_t>(end);
+    const int64_t newSize = static_cast<int64_t>(m_movesetSize) + delta;
+    if (newSize < 0 || newSize > budget) throw std::length_error("Edited moveset exceeds the 256 MiB budget");
+    std::unique_ptr<Byte, decltype(&free)> replacement(AllocateMutationBuffer(static_cast<size_t>(newSize)), &free);
+    if (!replacement) throw std::bad_alloc();
+    memset(replacement.get(), 0, static_cast<size_t>(newSize));
+    const size_t absolute = m_header->moveset_data_start + start + offset;
+    const size_t oldEnd = m_header->moveset_data_start + end;
+    memcpy(replacement.get(), m_moveset, absolute);
+    if (!inserted.empty()) memcpy(replacement.get() + absolute, inserted.data(), inserted.size());
+    memcpy(replacement.get() + absolute + inserted.size(), m_moveset + absolute + removed,
+        oldEnd - absolute - removed);
+    memcpy(replacement.get() + m_header->moveset_data_start + newEnd, m_moveset + oldEnd, m_movesetSize - oldEnd);
+    auto nextBlocks = reinterpret_cast<uint64_t*>(replacement.get() + m_header->block_list);
+    for (size_t i = block + 1; i < m_header->block_list_size; ++i) {
+        if (blocks[i] < end || blocks[i] > m_movesetDataSize) throw std::invalid_argument("Unordered section table");
+        nextBlocks[i] = static_cast<uint64_t>(static_cast<int64_t>(blocks[i]) + delta);
+    }
+    auto previous = m_moveset;
+    const auto previousSize = m_movesetSize;
+    const auto previousLive = live_loadedMoveset;
+    try {
+        LoadMovesetPtr(replacement.get(), static_cast<uint64_t>(newSize));
+    } catch (...) {
+        LoadMovesetPtr(previous, previousSize);
+        live_loadedMoveset = previousLive;
+        throw;
+    }
+    replacement.release();
+    free(previous);
+}
+
+std::vector<Byte> EditorLogic::BuildSaveSnapshot()
+{
+    if (!m_moveset || m_movesetSize < sizeof(TKMovesetHeader)) throw std::runtime_error("No moveset to save");
+    std::vector<Byte> snapshot(m_moveset, m_moveset + m_movesetSize);
+    auto header = reinterpret_cast<TKMovesetHeader*>(snapshot.data());
+    header->crc32 = CalculateCRC32();
+    header->date = Helpers::getCurrentTimestamp();
+    return snapshot;
 }

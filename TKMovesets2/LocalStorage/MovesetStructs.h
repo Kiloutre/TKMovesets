@@ -11,6 +11,7 @@ enum TKMovesetCompressionType_
 
 	TKMovesetCompressionType_LZ4,
 	TKMovesetCompressionType_LZMA,
+	TKMovesetCompressionType_CompactZstd,
 };
 
 enum TKMovesetProperty_
@@ -87,14 +88,22 @@ struct TKMovesetHeader
 	// -- Functions -- //
 
 	// Function to validate some of the header content, first step to ensuring the file isn't badly formated
-	bool ValidateHeader() const
+	bool ValidateHeader(uint64_t fileSize) const
 	{
 		if (strncmp(_signature, "TKM2", 4) != 0) return false;
+		if (!memchr(version_string, 0, sizeof(version_string)) || !memchr(origin, 0, sizeof(origin)) ||
+			!memchr(target_character, 0, sizeof(target_character))) return false;
+		if (header_size >= offsetof(TKMovesetHeader, game_specific_flags) &&
+			!memchr(orig_character_name, 0, sizeof(orig_character_name))) return false;
 
+		if (header_size < offsetof(TKMovesetHeader, orig_character_name)) return false;
 		if (block_list_size == 0) return false;
 		if (block_list < header_size) return false;
 		if (moveset_data_start <= block_list) return false;
-		if (moveset_data_size < 0) return false;
+		if (moveset_data_start >= fileSize) return false;
+		if (block_list_size > (moveset_data_start - block_list) / sizeof(uint64_t)) return false;
+		if (compressionType > TKMovesetCompressionType_CompactZstd) return false;
+		if (isCompressed() && (moveset_data_size == 0 || moveset_data_size > INT32_MAX)) return false;
 
 		return true;
 	}
@@ -103,10 +112,18 @@ struct TKMovesetHeader
 
 	// -- Version specific -- //
 
+	// A version-gated field is only read when the file's header actually contains it:
+	// past header_size the bytes belong to the property list or block list.
+	bool HeaderContains(size_t fieldOffset, size_t fieldSize) const
+	{
+		return header_size >= fieldOffset + fieldSize;
+	}
+
 	uint64_t GetConversionOrigin() const
 	{
 		// conversion_origin was introduced in 0.6
-		if (Helpers::VersionGreater(version_string, "0.6")) return conversion_origin;
+		if (Helpers::VersionGreater(version_string, "0.6") &&
+			HeaderContains(offsetof(TKMovesetHeader, conversion_origin), sizeof(conversion_origin))) return conversion_origin;
 		return 0;
 	}
 
@@ -114,14 +131,16 @@ struct TKMovesetHeader
 	uint64_t GetGameSpecificFlags() const
 	{
 		// game_specific_flags was introduced in 0.6
-		if (Helpers::VersionGreater(version_string, "0.5")) return game_specific_flags;
+		if (Helpers::VersionGreater(version_string, "0.5") &&
+			HeaderContains(offsetof(TKMovesetHeader, game_specific_flags), sizeof(game_specific_flags))) return game_specific_flags;
 		return 0;
 	}
 
 	const char* GetOrigCharacterName() const
 	{
-		// Orig_character_name was introduced in 0.6
-		if (Helpers::VersionGreater(version_string, "0.5")) return orig_character_name;
+		// Orig_character_name was introduced in 0.6. Same condition as ValidateHeader's NUL check.
+		if (Helpers::VersionGreater(version_string, "0.5") &&
+			HeaderContains(offsetof(TKMovesetHeader, orig_character_name), sizeof(orig_character_name))) return orig_character_name;
 		return target_character;
 	}
 };

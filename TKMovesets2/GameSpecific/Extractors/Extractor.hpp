@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <filesystem>
 
 #include "GameData.hpp"
 #include "GameProcess.hpp"
@@ -20,6 +21,7 @@ enum ExtractionErrcode_
 	ExtractionErrcode_AllocationErr,
 	ExtractionErrcode_FileCreationErr,
 	ExtractionErrcode_CompressionFailure,
+    ExtractionErrcode_MovesetDataError,
 };
 
 namespace ExtractorUtils
@@ -35,7 +37,7 @@ class Extractor : public BaseGameSpecificClass
 {
 private:
 	// Generates the filename to write, with a suffix (or not if [suffixId] is 0)
-	std::wstring GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, unsigned int suffixId=0);
+	std::wstring GenerateFilename(const char* characterName, const char* gameIdentifierString, const char* extension, const std::filesystem::path& directory, unsigned int suffixId=0);
 protected:
 	// Stores the extraction directory
 	const char* cm_extractionDir = MOVESET_DIRECTORY;
@@ -50,6 +52,9 @@ protected:
 public:
 	// Inherit copy constructor
 	using BaseGameSpecificClass::BaseGameSpecificClass;
+
+	// Writes extracted files to [directory] (UTF-8) instead of the configured extraction directory. The string must outlive extraction.
+	void SetExtractionDirectory(const char* directory) { cm_extractionDir = directory; }
 
 	// Pure virtual base method meant to do the heavy lifting
 	virtual ExtractionErrcode_ Extract(gameAddr playerAddress, ExtractSettings settings, uint8_t& progress) = 0;

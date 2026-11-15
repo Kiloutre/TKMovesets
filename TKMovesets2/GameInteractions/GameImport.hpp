@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+#include <memory>
 #include "Importer.hpp"
 #include "GameInteraction.hpp"
 
@@ -7,13 +9,16 @@
 
 struct importEntry
 {
-	const Byte* moveset; // Can be nullptr. If so, import from filename.
-	uint64_t movesetSize; // Can be 0
+	std::shared_ptr<const std::vector<Byte>> moveset; // Null for a file import.
 	std::wstring filename;
 	gameAddr playerAddress;
 	ImportSettings settings;
 	gameAddr* out_moveset = nullptr;
 };
+
+// Warning about a successful importation, as data: the UI builds the (translated) text.
+// targetFallback: no loaded moveset matched the file; the target's own animations were used (ImporterT8::TargetFallback).
+struct ImportWarning { uint64_t fallbackMoves = 0; size_t unavailableAnimations = 0; std::string firstError; bool targetFallback = false; };
 
 class GameImport : public GameInteraction
 {
@@ -23,11 +28,11 @@ private:
 
 protected:
 	// List of errors, one extraction fail = 1 error
-	std::vector<ImportationErrcode_> m_errors;
-	// Importer class, never stores an Importer*, used for polymorphism
-	Importer* m_importer = nullptr;
-	// Importer class that is going to be freed next FreeExpiredFactoryClasses() call
-	Importer* m_toFree_importer = nullptr;
+	std::vector<std::pair<ImportationErrcode_,std::string>> m_errors;
+	// Warning about the last successful importation (e.g. retail T8 moves falling back to the idle animation).
+	ImportWarning m_warning;
+	// Owns the active game-specific importer.
+	std::unique_ptr<Importer> m_importer;
 
 	// Callback called whenever the process is re-attached
 	virtual void OnProcessAttach() override;
@@ -41,6 +46,7 @@ protected:
 	void PreProcessDetach() override;
 
 public:
+	~GameImport() override { StopThreadAndCleanup(); }
 	// PlayerID to apply the moveset to
 	uint8_t currentPlayerId = 0;
 
@@ -59,7 +65,9 @@ public:
 	virtual void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0, gameAddr* out_moveset = nullptr);
 	virtual void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings=0, gameAddr* out_moveset1 = nullptr, gameAddr* out_moveset2 = nullptr);
 	// Returns an error code to consume instantly through a popup, sound player or such
-	ImportationErrcode_ GetLastError();
+	ImportationErrcode_ GetLastError(std::string* detail = nullptr);
+	// Consumes the warning of the last successful importation; false if there is none. Text is built by the UI.
+	bool GetLastWarning(ImportWarning& warning);
 	// Returns the moveset address of the currently selected player
 	gameAddr GetCurrentPlayerMovesetAddr() const;
 	// Frees the factory-obtained class we allocated earlier

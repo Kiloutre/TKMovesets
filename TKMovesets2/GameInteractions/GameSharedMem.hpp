@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include "Online.hpp"
 #include "GameImport.hpp"
 
@@ -19,8 +20,6 @@ private:
 	bool m_requestedInjection = false;
 	// Online class, manages shared memory
 	Online* m_sharedMemHandler = nullptr;
-	// Online class that is going to be freed next FreeExpiredFactoryClasses() call
-	Online* m_toFree_sharedMemHandler = nullptr;
 
 	// Callback called whenever the process is re-attached
 	void OnProcessAttach() override;
@@ -32,6 +31,7 @@ private:
 	void RunningUpdate() override;
 
 public:
+	~GameSharedMem() override { StopThreadAndCleanup(); }
 	// Copy of sharedMemHandler.displayedMovesets in case it gets deallocated
 	std::vector<movesetInfo> displayedMovesets;
 	// True if we are currently injecting the MovesetLoader
@@ -66,6 +66,7 @@ public:
 	// Orders the shared memory to be cleared when the Online instance gets destroyed
 	void SetSharedMemDestroyBehaviour(bool resetMemOnDestroy)
 	{
+		auto state = LockState();
 		if (m_sharedMemHandler) {
 			m_sharedMemHandler->resetMemOnDestroy = resetMemOnDestroy;
 		}
@@ -77,13 +78,14 @@ public:
 	void QueueCharacterImportation(movesetInfo* moveset, unsigned int playerId, ImportSettings settings = 0);
 
 	// Forbid access to these
-	void QueueCharacterImportation(std::wstring filename, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw; };
-	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw; };
-	void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw; };
-	void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset1 = nullptr, gameAddr* out_moveset2 = nullptr) override { throw; };
+	void QueueCharacterImportation(std::wstring filename, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw std::logic_error("Use the online moveset queue"); };
+	void QueueCharacterImportation(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw std::logic_error("Use the online moveset queue"); };
+	void QueueCharacterImportation(int playerid, const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset = nullptr) override { throw std::logic_error("Use the online moveset queue"); };
+	void QueueCharacterImportationOnBothPlayers(const Byte* moveset, uint64_t movesetSize, ImportSettings settings = 0, gameAddr* out_moveset1 = nullptr, gameAddr* out_moveset2 = nullptr) override { throw std::logic_error("Use the online moveset queue"); };
 
 	void CallDebugFunction()
 	{
+		auto state = LockState();
 		if (m_sharedMemHandler) {
 			m_sharedMemHandler->CallDebugFunction();
 		}

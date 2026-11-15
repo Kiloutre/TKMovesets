@@ -1,3 +1,5 @@
+#include "Extractor_t8/RetailSnapshot.hpp"
+#include "GameIDs.hpp"
 #include <filesystem>
 #include <fstream>
 #include <sys/stat.h>
@@ -6,11 +8,22 @@
 #include "Localization.hpp"
 #include "Helpers.hpp"
 #include "Games.hpp"
+#include "GameStaticData.hpp"
+#include "MovesetFolders.hpp"
 
 #include "MovesetStructs.h"
 #include "constants.h"
 
 // -- Static helpers --
+
+static std::string displayCharacterName(const TKMovesetHeader& header, const char* stored)
+{
+    if (header.gameId != GameId_T8 || header.minorVersion != GameVersions::T8::RETAIL) return stored;
+    const auto generic = "Character " + std::to_string(header.characterId);
+    if (*stored && stored != generic) return stored;
+    static const auto names = GameStaticData::LoadOptional("t8-retail");
+    return names.CharacterName(header.characterId);
+}
 
 static int getMovesetColor(MovesetFlags flags)
 {
@@ -36,7 +49,7 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 		size_t totalSize = file.tellg();
 		file.close();
 
-		if (readBytes != sizeof(TKMovesetHeader) || !movesetInfos.ValidateHeader() ||
+		if (readBytes != sizeof(TKMovesetHeader) || !movesetInfos.ValidateHeader(totalSize) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.version_string, sizeof(movesetInfos.version_string)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.origin, sizeof(movesetInfos.origin)) ||
 			Helpers::isHeaderStringMalformated(movesetInfos.target_character, sizeof(movesetInfos.target_character))) {
@@ -44,9 +57,9 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 			return nullptr;
 		}
 		else {
-			struct _stat buffer;
-			// _wstat() the file to read modification time
-			_wstat(filename.c_str(), &buffer);
+			struct _stat64 buffer{};
+			// _wstat64() the file to read modification time
+			_wstat64(filename.c_str(), &buffer);
 
 			// Build crc32 str string
 			std::string crc32Str;
@@ -56,20 +69,31 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				crc32Str = buffer;
 			}
 
+			// Retail T8 files may carry a notes section in their extended header.
+			std::string notes;
+			if (movesetInfos.gameId == GameId_T8 && movesetInfos.minorVersion == GameVersions::T8::RETAIL &&
+				movesetInfos.header_size > sizeof(TKMovesetHeader) && movesetInfos.header_size <= (65u << 20) && movesetInfos.header_size <= totalSize) {
+				try {
+					std::vector<Byte> prefix(movesetInfos.header_size);
+					std::ifstream again(filename, std::ios::binary);
+					if (again.read(reinterpret_cast<char*>(prefix.data()), prefix.size())) notes = RetailT8Snapshot::Notes(prefix);
+				} catch (const std::exception&) { notes.clear(); }
+			}
+
 			return new movesetInfo{
 				.color = getMovesetColor(movesetInfos.flags),
 				.filename = filename,
 				.name = Helpers::getMovesetNameFromFilename(filename),
 				.wname = Helpers::getMovesetWNameFromFilename(filename),
 				.origin = movesetInfos.origin,
-				.target_character = movesetInfos.target_character,
-				.original_character = movesetInfos.GetOrigCharacterName(),
+				.target_character = displayCharacterName(movesetInfos, movesetInfos.target_character),
+				.original_character = displayCharacterName(movesetInfos, movesetInfos.GetOrigCharacterName()),
 				.version_string = std::string(movesetInfos.version_string),
 				.date = movesetInfos.date,
 				.date_str = Helpers::formatDateTime(movesetInfos.date),
 				.extraction_date_str = Helpers::formatDateTime(movesetInfos.extraction_date),
 				.size = totalSize,
-				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, _("moveset.size_mb")),
+				.sizeStr = std::format("{:.2f} {}", (float)totalSize / 1000 / 1000, "MB"),
 				.hash = crc32Str,
 				.extractionDate = movesetInfos.extraction_date,
 				.modificationDate = buffer.st_mtime,
@@ -78,7 +102,8 @@ static movesetInfo* fetchMovesetInformations(const std::wstring& filename)
 				.modified = (movesetInfos.flags & MovesetFlags_MovesetModified) != 0,
 				.editable = Games::IsGameEditable(movesetInfos.gameId, movesetInfos.minorVersion),
 				.onlineImportable = totalSize < ONLINE_MOVESET_MAX_SIZE_BYTES,
-				.is_valid = true
+				.is_valid = true,
+				.notes = std::move(notes)
 			};
 		}
 
@@ -95,7 +120,11 @@ void LocalStorage::Update()
 	while (m_threadStarted)
 	{
 		// Update the list of moveset files. This is better than doing it in the display thread
-		ReloadMovesetList();
+		try {
+			ReloadMovesetList();
+		} catch (const std::filesystem::filesystem_error&) {
+			// Files can disappear during directory iteration. Retry on the next scan.
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(GAME_INTERACTION_THREAD_SLEEP_MS));
 	}
@@ -105,72 +134,72 @@ void LocalStorage::Update()
 
 void LocalStorage::StopThreadAndCleanup()
 {
-	// Order thread to stop
-	if (m_threadStarted)
-	{
-		m_threadStarted = false;
-		m_t.join();
-	}
-
-	// Free allocated ressources
-	CleanupUnusedMovesetInfos();
-	for (movesetInfo* movesetInfo : extractedMovesets) {
-		delete movesetInfo;
-	}
+	ThreadedClass::StopThreadAndCleanup();
+    std::lock_guard lock(m_listMutex);
+    extractedMovesets.clear();
+    m_publishedMovesets.clear();
+    localMovesets.clear();
+    m_extractedMovesetFilenames.clear();
 }
 
 void LocalStorage::ReloadMovesetList()
 {
-	if (m_refreshMovesets)
+	std::lock_guard lock(m_listMutex);
+	if (m_refreshMovesets.exchange(false))
 	{
-		for (unsigned int i = 0; i < extractedMovesets.size();)
-		{
-			auto m = extractedMovesets[i];
-			m_garbage.push_back(m);
-			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(m->filename));
-			extractedMovesets.erase(extractedMovesets.begin());
-		}
-		m_refreshMovesets = false;
+        localMovesets.clear();
+        m_extractedMovesetFilenames.clear();
 	}
 
 	// Delete moveset entries that don't exist anymore (deleted files)
-	for (size_t i = 0; i < extractedMovesets.size();) {
-		movesetInfo* moveset = extractedMovesets[i];
-		struct _stat buffer;
+	for (size_t i = 0; i < localMovesets.size();) {
+		auto moveset = localMovesets[i];
+		struct _stat64 buffer{};
 
-		bool statFailed = _wstat(moveset->filename.c_str(), &buffer) != 0;
+		bool statFailed = _wstat64(moveset->filename.c_str(), &buffer) != 0;
 
 		if (statFailed ||
-			(moveset->modificationDate != 0 && (buffer.st_mtime != moveset->modificationDate || buffer.st_size != moveset->size))) {
+			(buffer.st_mtime != moveset->modificationDate || buffer.st_size != moveset->size)) {
 			// File does not exist anymore or was recently modified, de-allocate the info we stored about it
 			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
-			extractedMovesets.erase(extractedMovesets.begin() + i);
-			m_garbage.push_back(moveset);
+			localMovesets.erase(localMovesets.begin() + i);
 		}
 		else {
 			++i;
 		}
 	}
 
-	if (Helpers::fileExists(L"" MOVESET_DIRECTORY))
+    std::set<std::wstring> seen;
+    const auto directories=m_useConfiguredFolders ? MovesetFolders::SearchDirectories() : std::vector<std::filesystem::path>{m_directory};
+    for (const auto& directory:directories)
 	{
-		for (const auto& entry : std::filesystem::directory_iterator(L"" MOVESET_DIRECTORY))
+        std::error_code directoryError;
+        auto iterator=std::filesystem::directory_iterator(directory,std::filesystem::directory_options::skip_permission_denied,directoryError);
+		for (; !directoryError && iterator!=std::filesystem::directory_iterator(); iterator.increment(directoryError))
 		{
+			const auto& entry=*iterator;
 			std::filesystem::path file = entry.path();
 			std::wstring filename = file.wstring();
 		
 
-			if (entry.file_size() == 0 || file.extension().wstring() != L"" MOVESET_FILENAME_EXTENSION) {
+			std::error_code ec;
+			if (file.extension() != L"" MOVESET_FILENAME_EXTENSION || !entry.is_regular_file(ec) || entry.file_size(ec) == 0 || ec) {
 				// Skip files that we do not recognize or that are not yet fully written
 				continue;
 			}
+            auto canonical=std::filesystem::weakly_canonical(file,ec);
+            if(ec)continue;
+            filename=canonical.wstring();
+            if(!seen.insert(filename).second)continue;
 
 			// If new file is detected, fetch its infos
 			if (!m_extractedMovesetFilenames.contains(filename))
 			{
 				m_extractedMovesetFilenames.insert(filename);
 				movesetInfo* moveset = fetchMovesetInformations(filename);
+				struct _stat64 fileStat{};
+				_wstat64(filename.c_str(), &fileStat);
 
 				if (moveset == nullptr) {
 					moveset = new movesetInfo{
@@ -181,28 +210,31 @@ void LocalStorage::ReloadMovesetList()
 						.target_character = "",
 						.original_character = "",
 						.date = 0,
-						.size = 0,
-						.modificationDate = 0,
+						.size = static_cast<uint64_t>(fileStat.st_size),
+						.modificationDate = fileStat.st_mtime,
 						.modified = false,
 						.editable = false,
 						.is_valid = false
 					};
 				}
 
-				extractedMovesets.push_back(moveset);
+				localMovesets.emplace_back(moveset);
 			}
 		}
 	}
+    std::erase_if(localMovesets,[&](const auto& moveset) {
+        if(seen.contains(moveset->filename))return false;
+        m_extractedMovesetFilenames.erase(moveset->filename);return true;
+    });
 }
 
 void LocalStorage::CleanupUnusedMovesetInfos()
 {
-	while (m_garbage.size() > 0)
-	{
-		movesetInfo* moveset = m_garbage[0];
-		m_garbage.erase(m_garbage.begin());
-		delete moveset;
-	}
+	std::unique_lock lock(m_listMutex, std::try_to_lock);
+	if (!lock) return;
+    m_publishedMovesets = localMovesets;
+    extractedMovesets.clear();
+    for (const auto& moveset : m_publishedMovesets) extractedMovesets.push_back(moveset.get());
 }
 
 bool LocalStorage::DeleteMoveset(const wchar_t* filename)
@@ -219,21 +251,10 @@ bool LocalStorage::DeleteMoveset(const wchar_t* filename)
 
 LocalStorage::~LocalStorage()
 {
-	CleanupUnusedMovesetInfos();
+	StopThreadAndCleanup();
 }
 
 void LocalStorage::RefreshMovesets()
 {
-	if (m_refreshMovesets) return;
-	DEBUG_LOG("RefreshMovesets start\n");
-
-	// Set m_refreshMovesets to true so that ReloadMovesetList() will completely clear the moveset list on its next call
 	m_refreshMovesets = true;
-	while (!m_refreshMovesets)
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		continue;
-	}
-
-	DEBUG_LOG("RefreshMovesets end\n");
 }

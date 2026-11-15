@@ -55,6 +55,9 @@ uint64_t GameAddressesWrapper::ReadPtrPathInCurrProcess(const char* c_addressId,
 		size_t pathLen = ptrPath.size() - 1;
 		if (pathLen > 0)
 		{
+			if (addr == 0) {
+				return 0;
+			}
 			addr = *(uint64_t*)addr;
 			for (size_t i = 1; i < pathLen; ++i)
 			{
@@ -62,6 +65,10 @@ uint64_t GameAddressesWrapper::ReadPtrPathInCurrProcess(const char* c_addressId,
 					return 0;
 				}
 				addr = *(uint64_t*)(addr + ptrPath[i]);
+			}
+			// A null last pointer must not turn into the final offset
+			if (addr == 0) {
+				return 0;
 			}
 			addr += ptrPath[pathLen];
 		}

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <set>
+#include <memory>
+#include <filesystem>
+#include "constants.h"
+#include <mutex>
 #include <vector>
 
 #include "ThreadedClass.hpp"
@@ -37,19 +41,23 @@ struct movesetInfo
 	bool onlineImportable; // Moveset over a certain size can't be used online
 
 	bool is_valid;
+	// Retail T8 notes section (RetailT8Snapshot::NotesTag), empty when the file has nothing to say.
+	std::string notes;
 };
 
 class LocalStorage : public ThreadedClass
 {
 private:
+	std::filesystem::path m_directory;
+    bool m_useConfiguredFolders=false;
 	// Contains the list of movesets found in the extraction directory
-	std::vector<movesetInfo*> localMovesets;
+	std::vector<std::shared_ptr<movesetInfo>> localMovesets;
+	std::vector<std::shared_ptr<movesetInfo>> m_publishedMovesets;
 	// A set containing the list of moveset files in the configured extraction dir. Used to determine when to fetch new movesets info
 	std::set<std::wstring> m_extractedMovesetFilenames;
-	// .extractedMovesets garbage, because it can be accessed in another thread while we remove items for it.
-	std::vector<movesetInfo*> m_garbage;
 	// If true, will clear the moveset list and refresh it in the next run
-	bool m_refreshMovesets = false;
+	std::atomic_bool m_refreshMovesets = false;
+	std::mutex m_listMutex;
 
 	// Function ran in the parallel thread, used to list files regularly
 	void Update() override;
@@ -57,6 +65,8 @@ public:
 	// Contains the list of movesets found in the extraction directory
 	std::vector<movesetInfo*> extractedMovesets;
 
+    LocalStorage() : m_directory(MOVESET_DIRECTORY), m_useConfiguredFolders(true) {}
+	explicit LocalStorage(std::filesystem::path directory) : m_directory(std::move(directory)) {}
 	~LocalStorage();
 
 	// Stops the thread started above

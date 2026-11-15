@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "MovesetLoader.hpp"
 
 #include "Structs_t7.h"
@@ -95,6 +97,8 @@ public:
 	CSteamID opponentId;
 
 	// Informations about the coming movesets are stored here
+	// .data, .cursor, .size and .remaining_bytes (the download) are shared between the loader thread and game-thread hooks:
+	// only access them while holding incoming_moveset_mutex
 	struct {
 		Byte* prev_moveset = nullptr;
 		Byte* data = nullptr;
@@ -102,6 +106,8 @@ public:
 		uint64_t size = 0;
 		uint64_t remaining_bytes = 0;
 	} incoming_moveset;
+	// Guards the download state of incoming_moveset. Never hold it during long work (decompression, import, networking).
+	std::mutex incoming_moveset_mutex;
 
 	// Informations about the syncing status is stored here
 	struct {
@@ -146,14 +152,19 @@ public:
 	void SendMoveset();
 	// Discard any incoming packet until there is no more to discard
 	void DiscardIncomingPackets();
+	// Takes the download buffer out of incoming_moveset and resets every download field (cursor, size, remaining bytes).
+	// Caller must hold incoming_moveset_mutex, and owns the returned buffer (delete[] it after releasing the lock).
+	Byte* DetachIncomingMoveset();
+	// Discards any download in progress, from any thread. Cheap enough for game-thread hooks.
+	void DiscardIncomingMoveset();
 
 	// Moveset importing function
-	Byte* ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
+	static Byte* ImportForOnline(SharedMemT7_Player& player, Byte* moveset, uint64_t s_moveset);
 	// Game-specific Moveset importing functions, returns moveset or nullptr on failure
-	Byte* ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
-	Byte* ImportForOnline_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
-	Byte* ImportForOnline_FromTREV(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
-	Byte* ImportForOnline_FromT6(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	static Byte* ImportForOnline_FromT7(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	static Byte* ImportForOnline_FromTTT2(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	static Byte* ImportForOnline_FromTREV(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
+	static Byte* ImportForOnline_FromT6(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset);
 
 	// Utils
 	CSteamID GetLobbyOpponentSteamId() const;

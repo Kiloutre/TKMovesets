@@ -1,9 +1,11 @@
+#include <memory>
 #include <string>
 
 #include "helpers.hpp"
 #include "Aliases.hpp"
 #include "Importer_t7/Importer_t7.hpp"
 #include "MovesetConverters.hpp"
+#include "LegacyLayout.hpp"
 
 #include "Structs_t7.h"
 #include "Structs_ttt2.h"
@@ -78,7 +80,7 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 	blocks_out.movelistBlock = movesetSize;
 
 	try {
-		Byte* new_moveset = new Byte[movesetSize];
+		Byte* new_moveset = new Byte[movesetSize]{};
 		size_out = movesetSize;
 		return new_moveset;
 	}
@@ -93,8 +95,27 @@ static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, u
 
 bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, TKMovesetHeaderBlocks& blocks_out)
 {
+	const size_t strides[] = {
+		sizeof(TTT2::Reactions), sizeof(TTT2::Requirement), sizeof(TTT2::HitCondition), sizeof(TTT2::Projectile),
+		sizeof(TTT2::Pushback), sizeof(TTT2::PushbackExtradata), sizeof(TTT2::Cancel), sizeof(TTT2::Cancel),
+		sizeof(TTT2::CancelExtradata), sizeof(TTT2::ExtraMoveProperty), sizeof(TTT2::OtherMoveProperty), sizeof(TTT2::OtherMoveProperty),
+		sizeof(TTT2::Move), sizeof(TTT2::Voiceclip), sizeof(TTT2::InputSequence), sizeof(TTT2::Input),
+		sizeof(TTT2::UnknownParryRelated), sizeof(TTT2::CameraData), sizeof(TTT2::ThrowCamera)
+	};
+	if (!ValidateLegacyLayout<TTT2::TKMovesetHeaderBlocks, TTT2::MovesetInfo>(*header, moveset, s_moveset, strides)) return false;
+	const auto& sourceBlocks = *reinterpret_cast<const TTT2::TKMovesetHeaderBlocks*>(reinterpret_cast<const Byte*>(header) + header->block_list);
+	const auto& sourceTable = reinterpret_cast<const TTT2::MovesetInfo*>(moveset)->table;
+	const auto* names = moveset + sourceBlocks.nameBlock;
+	const auto namesSize = sourceBlocks.movesetBlock - sourceBlocks.nameBlock;
+	const auto* sourceMoves = reinterpret_cast<const TTT2::Move*>(moveset + sourceBlocks.movesetBlock + sourceTable.move);
+	for (size_t i = 0; i < sourceTable.moveCount; ++i) {
+		auto offset = sourceMoves[i].name_addr;
+		if (offset >= namesSize || !memchr(names + offset, 0, namesSize - offset)) return false;
+	}
+
 	uint64_t new_moveset_size;
-	Byte* new_moveset = AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out);
+	std::unique_ptr<Byte[]> convertedOwner(AllocateMovesetArea(header, moveset, s_moveset, new_moveset_size, blocks_out));
+	Byte* new_moveset = convertedOwner.get();
 
 	if (new_moveset == nullptr) {
 		return false;
@@ -483,7 +504,7 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		}
 	}
 
-	moveset = new_moveset;
+	moveset = convertedOwner.release();
 	s_moveset = new_moveset_size;
 
 	return true;

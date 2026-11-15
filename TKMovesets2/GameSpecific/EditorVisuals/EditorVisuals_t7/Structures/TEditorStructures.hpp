@@ -73,6 +73,7 @@ public:
 class TEditorMove : public EditorForm
 {
 private:
+    struct RenameState;
 	// Stores whether to display the animation list 
 	bool m_animationListOpen = false;
 	// If the move name was changed. Used to re-apply window name.
@@ -87,11 +88,12 @@ private:
 	void OnInitEnd() override;
 	void PostRender() override;
 	void RenderExtraContextMenuItems() override;
-	void OnDuplication(unsigned int moveId, unsigned int listSize) override;
+	void PrepareDuplication(unsigned int moveId, unsigned int listSize) override;
 
 	// Loads the list of animation available in our library and allows to import one of them
 	void OpenAnimationList();
 public:
+    std::unique_ptr<TransactionState> BeginTransaction(size_t& budget) override;
 	using EditorForm::EditorForm;
 	void RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd) override;
 };

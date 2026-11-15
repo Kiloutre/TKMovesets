@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <functional>
 
 #include "EditorForm.hpp"
 
@@ -33,7 +34,15 @@ struct FieldItem
 class EditorFormList : public EditorForm
 {
 protected:
-	std::vector<FieldItem*> m_items;
+    EditorFormList() = default;
+    struct SavedListState;
+    std::unique_ptr<TransactionState> BeginEditTransaction() override;
+    virtual std::unique_ptr<TransactionState> BeginListTransaction();
+    void EditList(const std::function<void()>& action);
+    void TryListEdit(const std::function<void()>& action);
+    void RemoveItem(size_t index);
+    void MoveItem(size_t from, size_t to);
+	std::vector<std::unique_ptr<FieldItem>> m_items;
 	// Contains the size of the current list. Value can change.
 	size_t m_listSize = 0;
 	// If positive or negative, applying will result in either the list growing (with reallocation) or shrinking
@@ -46,11 +55,22 @@ protected:
 	// Create a new item to the list, set position to -1 for appending to the end.
 	// Will copy the data at the inserted index. Returns the final insertion position.
 	unsigned int CreateNewItem(int insertionPosition=-1);
+	// Copies row `source` (its current, possibly unapplied values) to the end of the list, just before the last row
+	// (the list's end marker). Rows in between keep their positions. Returns the copy's position.
+	unsigned int DuplicateItemToEnd(size_t source);
+	// False for the end-marker row itself, for row 0 of the shared starting lists and for full lists.
+	bool CanDuplicateItemToEnd(size_t source) const;
+	// Row under the cursor at the last right click in this window (-1: none), for the context menu.
+	int m_contextItem = -1;
+	void RenderItemContextMenuItems() override;
 	// Copy the entire form, evrey field of every tiem, to the clipboard
 	void CopyFormToClipboard() const override;
 	// Pastes the content of the clipboard to the current form.
 	// Content of the form must be returned by "CopyFormToClipboard" and match the current window type.
-	void PasteFormFromClipboard() override;
+	void PasteText(std::string_view text) override;
+	std::vector<size_t> ClipboardWidths() const override;
+	size_t ClipboardRowLimit() const override { return (windowType & 0x80000000U) ? INT_MAX-structureId : structureId < 65536 ? 65536 - structureId : 0; }
+	void FlushPendingFields() override;
 	// Delete this entire structure from the moveset and close the window
 	void DeleteStructure() override;
 	// Get the size of the structure before we made unsaved changes to it
@@ -78,10 +98,12 @@ protected:
 	// Called whenever a field changes (and is valid).
 	virtual void OnUpdate(int listIdx, EditorInput* field) override;
 public:
-	EditorFormList(const std::string& parentWindowName, EditorWindowType t_windowType, uint16_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName);
+    std::unique_ptr<TransactionState> BeginTransaction(size_t& budget) override;
+	EditorFormList(const std::string& parentWindowName, EditorWindowType t_windowType, uint32_t t_structureId, EditorLogic* editor, EditorVisuals* baseWindow, int listSize, const char* typeName);
 	virtual ~EditorFormList() override;
 
 	// Called after the constructor
 	virtual void OnInitEnd() override;
+	std::string FieldDisplayName(int listIdx, const char* name) const override { if (listIdx < 0 || size_t(listIdx) >= m_items.size()) return std::string(); auto* field = m_items[listIdx]->identifierMap.at(name); return field ? field->displayName : std::string(); }
 	void RenderInternal() override;
 };

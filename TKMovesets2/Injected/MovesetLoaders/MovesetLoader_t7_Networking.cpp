@@ -125,7 +125,7 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 				PacketT7_AnswerMovesetSync newPacket;
 				newPacket.requesting_download = true;
 				
-				if (_packet->local_moveset.crc32 == sharedMemPtr->players[1].crc32) {
+				if (sharedMemPtr->players[1].custom_moveset_addr && _packet->local_moveset.crc32 == sharedMemPtr->players[1].crc32) {
 					newPacket.requesting_download = false;
 				}
 				else if (false) {
@@ -139,10 +139,25 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 				}
 
 				if (newPacket.requesting_download) {
-					incoming_moveset.size = _packet->local_moveset.size;
-					incoming_moveset.remaining_bytes = incoming_moveset.size;
-					incoming_moveset.data = new Byte[incoming_moveset.size];
-					incoming_moveset.cursor = incoming_moveset.data;
+					const uint64_t downloadSize = _packet->local_moveset.size;
+					Byte* downloadBuffer = new (std::nothrow) Byte[downloadSize];
+					Byte* previousBuffer;
+					{
+						std::lock_guard downloadLock(incoming_moveset_mutex);
+						// Replace any previous download, resetting all of its state
+						previousBuffer = DetachIncomingMoveset();
+						if (downloadBuffer != nullptr) {
+							incoming_moveset.data = downloadBuffer;
+							incoming_moveset.cursor = downloadBuffer;
+							incoming_moveset.size = downloadSize;
+							incoming_moveset.remaining_bytes = downloadSize;
+						}
+					}
+					delete[] previousBuffer;
+					if (!downloadBuffer) {
+						sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
+						return;
+					}
 					sharedMemPtr->players[1].custom_moveset_addr = 0;
 				}
 
@@ -164,8 +179,7 @@ void MovesetLoaderT7::OnCommunicationPacketReceive(const PacketT7* packet)
 						if (!SendPacket(&newPacket, sizeof(PacketT7_Ready))) {
 							DEBUG_LOG("COMMUNICATION: Failed to Ready in AnswerSync\n");
 							sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-							delete[] incoming_moveset.data;
-							incoming_moveset.data = 0;
+							DiscardIncomingMoveset();
 							return;
 						} else {
 							DEBUG_LOG("COMMUNICATION: Sending READY.\n");
@@ -203,34 +217,57 @@ void MovesetLoaderT7::OnMovesetBytesReceive(const Byte* buf, uint32_t bufSize)
 {
 	DEBUG_LOG("OnMovesetBytesReceive() %u bytes\n", bufSize);
 
-	if (incoming_moveset.remaining_bytes < bufSize) {
-		// Received too much data
-		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_AcceptPackets;
-		DEBUG_LOG("PACKET: Received too much data.\n");
-		return;
+	// The game thread may discard the download at any time: copy under the lock, and take ownership of a completed buffer
+	Byte* completedMoveset = nullptr;
+	uint64_t completedSize = 0;
+	{
+		Byte* discardedBuffer = nullptr;
+		{
+			std::lock_guard downloadLock(incoming_moveset_mutex);
+			if (incoming_moveset.data == nullptr || incoming_moveset.remaining_bytes < bufSize) {
+				// Received too much data, or the download was discarded
+				sharedMemPtr->moveset_sync_status = MovesetSyncStatus_AcceptPackets;
+				discardedBuffer = DetachIncomingMoveset();
+			}
+			else {
+				memcpy(incoming_moveset.cursor, buf, bufSize);
+				incoming_moveset.cursor += bufSize;
+				incoming_moveset.remaining_bytes -= bufSize;
+
+				if (incoming_moveset.remaining_bytes == 0) {
+					completedSize = incoming_moveset.size;
+					completedMoveset = DetachIncomingMoveset();
+				}
+				else {
+					DEBUG_LOG("Remaining bytes: %llu\n", incoming_moveset.remaining_bytes);
+					return;
+				}
+			}
+		}
+		if (completedMoveset == nullptr) {
+			DEBUG_LOG("PACKET: Received too much data, or no download in progress.\n");
+			delete[] discardedBuffer;
+			return;
+		}
 	}
 
-	memcpy(incoming_moveset.cursor, buf, bufSize);
-	incoming_moveset.cursor += bufSize;
-	incoming_moveset.remaining_bytes -= bufSize;
-
-	if (incoming_moveset.remaining_bytes == 0)
 	{
 		DEBUG_LOG("PACKET: Successfully received entire moveset!\n");
 
 		auto& player = sharedMemPtr->players[1];
 
-		incoming_moveset.data = ImportForOnline(sharedMemPtr->players[1], incoming_moveset.data, incoming_moveset.size);
+		// ImportForOnline() takes ownership of the buffer
+		auto installed = ImportForOnline(player, completedMoveset, completedSize);
 
-		if (incoming_moveset.data != nullptr)
+		if (installed != nullptr)
 		{
 			if (incoming_moveset.prev_moveset != 0) {
 				DEBUG_LOG("Freeing old moveset.\n");
 				delete[] incoming_moveset.prev_moveset;
 			}
-			incoming_moveset.prev_moveset = incoming_moveset.data;
+			incoming_moveset.prev_moveset = installed;
 
-			player.custom_moveset_addr = (uint64_t)incoming_moveset.data;
+			player.custom_moveset_addr = (uint64_t)installed;
 			player.is_initialized = false;
 
 			// Tell the opponent we are ready to start
@@ -239,7 +276,8 @@ void MovesetLoaderT7::OnMovesetBytesReceive(const Byte* buf, uint32_t bufSize)
 				DEBUG_LOG("COMMUNICATION: Failed to Ready in MovesetReception\n");
 				player.custom_moveset_addr = 0;
 				sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
-				delete[] incoming_moveset.data;
+				delete[] installed;
+				incoming_moveset.prev_moveset = nullptr;
 				return;
 			}
 			else {
@@ -258,8 +296,6 @@ void MovesetLoaderT7::OnMovesetBytesReceive(const Byte* buf, uint32_t bufSize)
 			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_AcceptPackets;
 			player.custom_moveset_addr = 0;
 		}
-	} else {
-		DEBUG_LOG("Remaining bytes: %llu\n", incoming_moveset.remaining_bytes);
 	}
 }
 
@@ -290,48 +326,6 @@ void MovesetLoaderT7::OnPacketReceive(CSteamID senderId, const Byte* packetBuf, 
 }
 
 // Compress moveset to LZMA before sending
-// Sending packets can be so slow at this, this becomes worth it
-// to use when a moveset is loaded for online use
-static bool CompressMovesetLzma(Byte*& moveset_out, uint64_t& size_out)
-{
-	const TKMovesetHeader* current_header = (TKMovesetHeader*)moveset_out;
-	if (current_header->compressionType == TKMovesetCompressionType_LZMA) {
-		DEBUG_LOG("Local moveset is already LZMA, sending as is.\n");
-		return false;
-	}
-	DEBUG_LOG("Local moveset is not LZMA (%llu bytes), compressing.\n", size_out);
-
-	Byte* moveset = moveset_out;
-	uint64_t moveset_size = size_out;
-
-	if (current_header->isCompressed())
-	{
-		// Create temp uncompressed copy
-		uint64_t compressed_data_size = size_out - current_header->moveset_data_start;
-		moveset_size = current_header->moveset_data_start + current_header->moveset_data_size;
-		moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(moveset, compressed_data_size, moveset_size);
-
-		DEBUG_LOG("Local moveset was compressed, its decompressed size is %llu bytes.\n", moveset_size);
-	}
-
-	// Compress to LZMA
-	Byte* new_moveset = CompressionUtils::RAW::Moveset::Compress(moveset, moveset_size, TKMovesetCompressionType_LZMA, moveset_size);
-	DEBUG_LOG("Local moveset now compressed to LZMA is %llu bytes.\n", moveset_size);
-
-	if (current_header->isCompressed()) {
-		// Delete the temp uncompressed copy we made
-		delete[] moveset;
-	}
-
-	if (new_moveset == nullptr) {
-		return false;
-	}
-
-	moveset_out = new_moveset;
-	size_out = moveset_size;
-	return true;
-}
-
 void MovesetLoaderT7::SendMoveset()
 {
 	auto& player = sharedMemPtr->players[0];
@@ -364,7 +358,7 @@ void MovesetLoaderT7::InitMovesetSyncing()
 	sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 
 	syncStatus.Reset();
-	incoming_moveset.data = nullptr;
+	DiscardIncomingMoveset();
 
 	if (sharedMemPtr->locked_in == false) {
 		DEBUG_LOG("MOVESET_SYNC: Not locked in.\n");
@@ -399,6 +393,32 @@ void MovesetLoaderT7::InitMovesetSyncing()
 		sharedMemPtr->moveset_sync_status = MovesetSyncStatus_NotStarted;
 		return;
 	}
+}
+
+// -- Download state -- //
+
+Byte* MovesetLoaderT7::DetachIncomingMoveset()
+{
+	Byte* data = incoming_moveset.data;
+	incoming_moveset.data = nullptr;
+	incoming_moveset.cursor = nullptr;
+	incoming_moveset.size = 0;
+	incoming_moveset.remaining_bytes = 0;
+	return data;
+}
+
+void MovesetLoaderT7::DiscardIncomingMoveset()
+{
+	Byte* discarded;
+	{
+		std::lock_guard downloadLock(incoming_moveset_mutex);
+		discarded = DetachIncomingMoveset();
+		// A download in progress cannot complete anymore: stop treating incoming bytes as moveset data
+		if (sharedMemPtr != nullptr && sharedMemPtr->moveset_sync_status == MovesetSyncStatus_DownloadingMoveset) {
+			sharedMemPtr->moveset_sync_status = MovesetSyncStatus_AcceptPackets;
+		}
+	}
+	delete[] discarded;
 }
 
 // -- Packet consumption -- //

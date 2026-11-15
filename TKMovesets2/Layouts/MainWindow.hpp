@@ -1,5 +1,9 @@
 #pragma once
 
+#include <chrono>
+#include <string>
+#include <vector>
+
 // Toplevel menus
 #include "NavigationMenu.hpp"
 #include "SideMenu.hpp"
@@ -9,6 +13,8 @@
 #include "Submenu_Edition.hpp"
 #include "Submenu_OnlinePlay.hpp"
 #include "Submenu_PersistentPlay.hpp"
+#include "Submenu_Addresses.hpp"
+#include "Submenu_Extra.hpp"
 // Editor window
 #include "EditorVisuals.hpp"
 
@@ -23,10 +29,19 @@ class MainWindow {
 private:
 	// Attempt to load a moveset, open a new editor window on success
 	void LoadMovesetEditor(const movesetInfo* movesetInfos);
+	// Opens movesets requested from outside (Explorer) once the moveset list contains them
+	void HandleOpenRequests();
+	// True if the moveset file is open in one of the editor windows (same file, whatever the path spelling)
+	bool IsMovesetOpenInEditor(const std::wstring& filename) const;
+	struct PendingOpen { std::wstring path; std::chrono::steady_clock::time_point deadline; };
+	std::vector<PendingOpen> m_pendingOpens;
 
 
 	// Navigation menu, also handles language selection and update button
 	NavigationMenu m_navMenu;
+
+	// Shared address data outlives every worker and editor that borrows it.
+	std::unique_ptr<GameAddressesFile> m_addrFile;
 
 	// Extractor instance, can attach to its own process separately from everyone else
 	GameExtract m_extractor;
@@ -47,25 +62,29 @@ private:
 	Submenu_OnlinePlay m_onlineMenu;
 	// Persistent play submenu
 	Submenu_PersistentPlay m_persistentPlayMenu;
+	// Tools > Addresses submenu
+	Submenu_Addresses m_addressesMenu;
+	// Tools > Extra: Tag in retail T8 Practice
+	Submenu_Extra m_extraMenu;
 
 	// Edition windows
-	std::vector<EditorVisuals*> m_editorWindows;
+	std::vector<std::unique_ptr<EditorVisuals>> m_editorWindows;
 
-	// Addrfile to pass to child classes (mainly editorWindows)
-	GameAddressesFile* m_addrFile = nullptr;
 public:
 	// If true, program will exit
+    bool ConfirmExit(bool requested);
+    bool m_exitPending=false, m_exitUpdate=false;
 	bool requestedUpdate = false;
 	// Side menu containing language selector, vsync, updater & other settings
 	SideMenu sideMenu;
 
-	MainWindow();
+	explicit MainWindow(bool offline = false);
 	~MainWindow();
+
+	void SetActiveMenu(NAV__MENU menu) { m_navMenu.menuId = menu; }
 
 	// Creates the required base ImGui and GLSL frames, everything we do is rendered in there
 	void NewFrame();
 	// Main layout rendering function
 	void Update();
-	// Cleanup function
-	void Shutdown();
 };

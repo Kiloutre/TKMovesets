@@ -23,4 +23,8 @@ public:
 	void ClearMovesetSelection(unsigned int playerid) override;
 	void SetLockIn(bool locked, MovesetLoaderMode_ movesetLoaderMode) override;
 	void ExecuteExtraprop(uint32_t playerid, uint32_t id, uint32_t value);
+	// The loader's shared memory (Tag commands, Tools > Extra), null until LoadSharedMemory() succeeded
+	SharedMemT8* SharedMemory() const { return m_orig_sharedMemPtr ? m_sharedMemPtr : nullptr; }
+	// Asks the injected loader to stop and unload itself
+	bool StopLoader() { return CallMovesetLoaderFunction(MOVESET_LOADER_STOP_FUNC, true); }
 };

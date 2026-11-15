@@ -2,6 +2,7 @@
 
 #include <format>
 
+using namespace StructsT7;
 using namespace EditorUtils;
 
 #define CREATE_STRING_FIELD(k, c, f, v, s) CreateField<decltype(v)>(k, drawOrder, inputMap, c, EditorInput_String | f, v, s)
@@ -11,11 +12,12 @@ using namespace EditorUtils;
 
 std::string EditorT7::GetMovelistDisplayableText(uint32_t offset)
 {
-	const char* entryString = (char*)m_mvlHead + offset;
+	const auto bounded = offset ? BlockString(StructsT7::TKMovesetHeaderBlocks_Movelist, offset) : std::string_view();
+    const char* entryString = bounded.data();
 
 	std::string convertedString;
 
-	int maxLen = (int)strlen(entryString);
+	int maxLen = static_cast<int>(bounded.size());
 	for (int i = 0; i < maxLen;)
 	{
 		if ((unsigned char)entryString[i] == 0xE3 && (i + 2 < maxLen) && (unsigned char)entryString[i + 1] == 0x80)
@@ -147,7 +149,7 @@ std::vector<InputMap> EditorT7::GetMovelistInputListInputs(uint16_t id, int list
 		CREATE_FIELD("trigger_highlight", 0, EditorInput_U8, input->trigger_highlight);
 
 		WriteFieldFullname(inputMap, "mvl_input");
-		inputListMap.push_back(inputMap);
+		inputListMap.push_back(std::move(inputMap));
 		input++;
 	} while (--listSize > 0);
 
@@ -224,7 +226,7 @@ std::vector<InputMap> EditorT7::GetMovelistDisplayablesInputs(uint16_t id, Vecto
 		}
 
 		WriteFieldFullname(inputMap, "mvl_displayable");
-		inputListMap.push_back(inputMap);
+		inputListMap.push_back(std::move(inputMap));
 
 		if (singleItem) {
 			break;
@@ -238,16 +240,16 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, InputMap& inputs)
 {
 	auto displayable = m_iterators.mvl_displayables[id];
 
-	SetMemberValue(&displayable->type, inputs["type"]);
-	SetMemberValue(&displayable->playable_id, inputs["playable_id"]);
-	SetMemberValue(&displayable->icons, inputs["icons"]);
-	SetMemberValue(&displayable->icons_2, inputs["icons_2"]);
-	SetMemberValue(&displayable->combo_difficulty, inputs["combo_difficulty"]);
-	SetMemberValue(&displayable->combo_damage, inputs["combo_damage"]);
+	SetMemberValue(&displayable->type, inputs.at("type"));
+	SetMemberValue(&displayable->playable_id, inputs.at("playable_id"));
+	SetMemberValue(&displayable->icons, inputs.at("icons"));
+	SetMemberValue(&displayable->icons_2, inputs.at("icons_2"));
+	SetMemberValue(&displayable->combo_difficulty, inputs.at("combo_difficulty"));
+	SetMemberValue(&displayable->combo_damage, inputs.at("combo_damage"));
 
-	SetMemberValue(&displayable->_unk0x40, inputs["_unk0x40"]);
-	SetMemberValue(&displayable->_unk0x46, inputs["_unk0x46"]);
-	SetMemberValue(&displayable->_unk0x153, inputs["_unk0x153"]);
+	SetMemberValue(&displayable->_unk0x40, inputs.at("_unk0x40"));
+	SetMemberValue(&displayable->_unk0x46, inputs.at("_unk0x46"));
+	SetMemberValue(&displayable->_unk0x153, inputs.at("_unk0x153"));
 
 	for (int ofst = 0x4C; ofst <= 0x170; ofst += 4)
 	{
@@ -259,74 +261,33 @@ void EditorT7::SaveMovelistDisplayable(uint16_t id, InputMap& inputs)
 		default:
 			int* valuePtr = (int*)((char*)displayable + ofst);
 			std::string key = std::format("unk_{:x}", ofst);
-			SetMemberValue(valuePtr, inputs[key]);
+			SetMemberValue(valuePtr, inputs.at(key));
 			break;
 		}
 	}
 
-	for (int i = 0; i < _countof(displayable->title_translation_offsets); ++i) {
 
-		std::string key = "title_translation_" + std::to_string(i);
-		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
-
-		int currentLen = 0;
-		int newLen = (int)convertedBuffer.size();
-		uint32_t copySize = (newLen + 1);
-
-		uint32_t offset = displayable->title_translation_offsets[i];
-		char* currentString = (char*)m_mvlHead + offset;
-
-		if (offset == 0) {
-			// This was a new field whose string has not yet been created
-			currentLen = -1;
-			displayable->title_translation_offsets[i] = m_mvlHead->displayables_offset;
-		}
-		else {
-			currentLen = (int)strlen(currentString);
-		}
-
-		if (newLen != currentLen) {
-			// Reallocation
-			ModifyMovelistDisplayableTextSize(displayable->title_translation_offsets[i], currentLen + 1, newLen + 1);
-
-			displayable = m_iterators.mvl_displayables[id];
-			currentString = (char*)m_mvlHead + displayable->title_translation_offsets[i];
-		}
-
-		strcpy_s(currentString, copySize, convertedBuffer.c_str());
-	}
-
-	for (int i = 0; i < _countof(displayable->translation_offsets); ++i) {
-
-		std::string key = "translation_" + std::to_string(i);
-		std::string convertedBuffer = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs[key]->buffer);
-
-		int currentLen = 0;
-		int newLen = (int)convertedBuffer.size();
-		uint32_t copySize = (newLen + 1);
-
-		uint32_t offset = displayable->translation_offsets[i];
-		char* currentString = (char*)m_mvlHead + offset;
-
-		if (offset == 0) {
-			// This was a new field whose string has not yet been created
-			currentLen = -1;
-			displayable->translation_offsets[i] = m_mvlHead->displayables_offset;
-		}
-		else {
-			currentLen = (int)strlen(currentString);
-		}
-
-		if (newLen != currentLen) {
-			// Reallocation
-			ModifyMovelistDisplayableTextSize(displayable->translation_offsets[i], currentLen + 1, newLen + 1);
-
-			displayable = m_iterators.mvl_displayables[id];
-			currentString = (char*)m_mvlHead + displayable->translation_offsets[i];
-		}
-
-		strcpy_s(currentString, copySize, convertedBuffer.c_str());
-	}
+    // Append changed fields independently; shared strings and suffix references remain intact.
+    std::map<std::string, int32_t> appended;
+    for (int i = 0; i < 16; ++i) {
+        const auto key = i < 4 ? "title_translation_" + std::to_string(i) : "translation_" + std::to_string(i - 4);
+        const auto converted = EditorT7Utils::ConvertMovelistDisplayableTextToGameText(inputs.at(key)->buffer);
+        displayable = m_iterators.mvl_displayables[id];
+        const auto old = displayable->all_translation_offsets[i];
+        if (old && BlockString(StructsT7::TKMovesetHeaderBlocks_Movelist, old) == converted) continue;
+        auto found = appended.find(converted);
+        int32_t offset;
+        if (found != appended.end()) offset = found->second;
+        else {
+            const auto end = m_movesetDataSize - m_offsets->movelistBlock;
+            if (end > INT32_MAX) throw std::length_error("Movelist string offset overflow");
+            offset = static_cast<int32_t>(end);
+            ReplaceBlockRange(StructsT7::TKMovesetHeaderBlocks_Movelist, end, 0,
+                {reinterpret_cast<const Byte*>(converted.c_str()), converted.size() + 1});
+            appended.emplace(converted, offset);
+        }
+        m_iterators.mvl_displayables[id]->all_translation_offsets[i] = offset;
+    }
 }
 
 bool EditorT7::ValidateMovelistDisplayableField(EditorInput* field)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <atomic>
 
 #include "GameInfo.hpp"
 #include "GameAddressesFile.hpp"
@@ -8,6 +9,7 @@
 class EditorLabel
 {
 private:
+	std::atomic_bool reloadPending = false;
 	// Map containing the labels
 	std::map<int, std::string> m_labels;
 	// Thread that will access internet to fetch labels informations
@@ -25,11 +27,11 @@ private:
 	void DownloadFromWebsite();
 public:
 	// Becomes true if a CURL error is encountered
-	bool errored = false;
+	std::atomic_bool errored = false;
 	// Is true if the CURL request is still ongoing
-	bool ongoingQuery = false;
+	std::atomic_bool ongoingQuery = false;
 	// Becomes true if the last query successfully updated the file (a change was found)
-	bool updated = false;
+	std::atomic_bool updated = false;
 	// True if the update thread has been started at least once
 	bool startedThread = false;
 
@@ -39,7 +41,9 @@ public:
 	// Reload the dictionary for the files, without clearing the old values already inserted in previous loads
 	void Reload();
 	// Returns a string for the given requirement/property ID
-	const char* GetText(int id) const;
+	const char* GetText(int id);
+	// Every loaded label (requirement ids below 0x8000, property ids above), for id pickers
+	const std::map<int, std::string>& Labels() const { return m_labels; }
 	// Request for the downloading of editor labels
 	void UpdateFromWebsite();
 };

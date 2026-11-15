@@ -10,7 +10,7 @@
 
 # define PROGRAM_FILENAME        "TKMovesets2.exe"
 # define PROGRAM_TITLE           "TKMovesets - kilo"
-# define PROGRAM_VERSION         "0.9.9.9.3"
+# define PROGRAM_VERSION         "1.0"
 # define PROGRAM_WIN_WIDTH       1280
 # define PROGRAM_WIN_HEIGHT      720
 # define PROGRAM_DEFAULT_LOCALE  "en-US"
@@ -115,6 +115,7 @@
 # define FORM_INPUT_SIGNED       IM_COL32(16, 55, 112, 255)
 # define FORM_LABEL_CLICKABLE    FORM_INPUT_REF
 # define FORM_ITEM_HIGHLIGHT     IM_COL32(56, 82, 124, 100)
+# define FORM_INPUT_CHANGED      IM_COL32(176, 124, 30, 150)
 
 # define MVL_CATEGORY            IM_COL32(77, 131, 219, 50)
 # define MVL_COMBO               IM_COL32(140, 177, 237, 50)
@@ -127,4 +128,4 @@
 # define MOVELIST_TAB_INACTIVE       (0)
 
 # define SHARED_MEMORY_BUFSIZE      (4096) // Shared memory containing basic values for moveset loader (addr of moveset, character ID)
-# define SHARED_ADDR_MEMORY_BUFSIZE (8192) // Shared memory containing compacted & compressed game_addresses.txt file
+# define SHARED_ADDR_MEMORY_BUFSIZE (65536) // Shared memory containing compacted & compressed game_addresses.txt file (the Tag patterns made 8 KB too small)

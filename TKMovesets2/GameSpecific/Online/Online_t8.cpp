@@ -2,7 +2,8 @@
 
 OnlineT8::~OnlineT8()
 {
-    if (resetMemOnDestroy && m_sharedMemPtr && m_process.CheckRunning()) {
+    // FreeSharedMemory() unmaps the view and nulls m_orig_sharedMemPtr, not our derived copy: check the base pointer
+    if (resetMemOnDestroy && m_orig_sharedMemPtr && m_sharedMemPtr && m_process.CheckRunning()) {
         m_sharedMemPtr->locked_in = false;
     }
 }

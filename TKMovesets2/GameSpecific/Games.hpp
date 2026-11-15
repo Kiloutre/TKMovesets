@@ -35,7 +35,10 @@ namespace Games
 	Extractor* FactoryGetExtractor(const GameInfo* gameInfo, GameProcess& process, GameData& game);
 
 	// Instantiate a new game-specific importer
-	Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess& process, GameData& game);
+	inline Importer* FactoryGetImporter(const GameInfo* gameInfo, GameProcess& process, GameData& game)
+	{
+		return gameInfo->importer ? static_cast<Importer*>(gameInfo->importer->allocate(process, game, gameInfo)) : nullptr;
+	}
 
 	// Instantiate a new game-specific editor
 	EditorLogic* FactoryGetEditorLogic(const GameInfo* gameInfo, GameProcess& process, GameData& game);

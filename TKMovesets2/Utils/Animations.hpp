@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 
 #include "GameProcess.hpp"
 
@@ -21,30 +22,17 @@ namespace TAnimUtils
 	namespace FromMemory
 	{
 		// Byteswaps a MOTA block and its animations (little endian <-> big endian). Animations will be made to match the MOTA's endian.
-		void ByteswapMota(Byte* motaAddr);
+		bool ByteswapMota(Byte* motaAddr, uint64_t size);
 		// Byteswaps an animation (little endian <-> big endian)
-		void ByteswapAnimation(Byte* animAddr);
+		bool ByteswapAnimation(Byte* animAddr, uint64_t size);
 		// Returns true if an animation is in little endian
-		inline bool IsLittleEndian(const Byte* animAddr);
+		inline bool IsLittleEndian(const Byte* animAddr) { return animAddr[0] == 0x64 || animAddr[0] == 0xC8; }
 		
-		// Returns an animation's duration in frames (60 per sec)
-		uint32_t GetAnimDuration(const Byte* anim);
-		// Returns a 0xC8 animation's duration in frames (60 per sec)
-		uint32_t GetC8AnimDuration(const Byte* anim);
-		// Returns a 0x64 animation's duration in frames (60 per sec)
-		uint32_t Get64AnimDuration(const Byte* anim);
-
-		// Returns the size in bytes of an animation
-		uint64_t GetAnimSize(const Byte* anim);
-		// Returns the size in bytes of a 0xC8 animation
-		uint64_t getC8AnimSize(const Byte* anim);
-		// Returns the size in bytes of a 0x64 animation
-		uint64_t get64AnimSize(const Byte* anim);
-
 		// Safe animation-size fetching functions that require providing the size of the file / memory area
 		// If the animation data makes the size go above max_size (incomplete animation data), returns 0.
 		namespace Safe
 		{
+			uint32_t GetAnimDuration(const Byte* anim, uint64_t size);
 			// Returns the size in bytes of an animation.
 			uint64_t GetAnimSize(const Byte* anim, uint64_t max_size);
 			// Returns the size in bytes of a 0xC8 animation.
@@ -55,7 +43,7 @@ namespace TAnimUtils
 
 		// Parse a specific frame of animation data, filling the float buffer with the appropriate values
 		// Returns the amount of bones the animation contains which you may use to read the pos_out buffer (bone_count * 3 * float)
-		uint16_t ParseAnimation0x64(const Byte* anim, unsigned int frame, float* pos_out);
+		uint16_t ParseAnimation0x64(std::span<const Byte> anim, unsigned int frame, std::span<float> output);
 	};
 
 	namespace FromProcess

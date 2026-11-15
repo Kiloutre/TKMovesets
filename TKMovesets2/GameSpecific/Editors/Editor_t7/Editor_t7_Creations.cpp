@@ -1,6 +1,7 @@
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
 
+using namespace StructsT7;
 #define gAddr StructsT7_gameAddr
 
 uint32_t EditorT7::CreateNewProjectile()
@@ -8,7 +9,7 @@ uint32_t EditorT7::CreateNewProjectile()
 	uint32_t newStructId = (uint32_t)m_infos->table.projectileCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.projectile;
 
-	ModifyGenericMovelistListSize<Projectile>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Projectile>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.projectileCount));
 
 	return newStructId;
 }
@@ -18,7 +19,7 @@ uint32_t EditorT7::CreateInputSequence()
 	uint32_t newStructId = (uint32_t)m_infos->table.inputSequenceCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.inputSequence;
 
-	ModifyGenericMovelistListSize<InputSequence>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<InputSequence>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.inputSequenceCount));
 
 	return newStructId;
 }
@@ -28,7 +29,7 @@ uint32_t EditorT7::CreateInputList()
 	uint32_t newStructId = (uint32_t)m_infos->table.inputCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.input;
 
-	ModifyGenericMovelistListSize<Input>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Input>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.inputCount));
 
 	return newStructId;
 }
@@ -38,7 +39,7 @@ uint32_t EditorT7::CreateNewPushbackExtra()
 	uint32_t newStructId = (uint32_t)m_infos->table.pushbackExtradataCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushbackExtradata;
 
-	ModifyGenericMovelistListSize<PushbackExtradata>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<PushbackExtradata>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.pushbackExtradataCount));
 
 	return newStructId;
 }
@@ -48,7 +49,7 @@ uint32_t EditorT7::CreateNewPushback()
 	uint32_t newStructId = (uint32_t)m_infos->table.pushbackCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.pushback;
 
-	ModifyGenericMovelistListSize<Pushback>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Pushback>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.pushbackCount));
 
 	return newStructId;
 }
@@ -58,7 +59,7 @@ uint32_t EditorT7::CreateNewReactions()
 	uint32_t newStructId = (uint32_t)m_infos->table.reactionsCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.reactions;
 
-	ModifyGenericMovelistListSize<Reactions>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Reactions>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.reactionsCount));
 
 	return newStructId;
 }
@@ -68,7 +69,7 @@ uint32_t EditorT7::CreateNewHitConditions()
 	uint32_t newStructId = (uint32_t)m_infos->table.hitConditionCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.hitCondition;
 
-	ModifyGenericMovelistListSize<HitCondition>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<HitCondition>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.hitConditionCount));
 	auto* newStruct = m_iterators.hit_conditions[newStructId];
 	// This may potentially cause problems if the moveset's requirement 1 does not immediately end with a 881 requirement
 	newStruct->requirements_addr = 1;
@@ -81,10 +82,13 @@ uint32_t EditorT7::CreateNewExtraProperties()
 	uint32_t newStructId = (uint32_t)m_infos->table.extraMovePropertyCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.extraMoveProperty;
 
-	ModifyGenericMovelistListSize<ExtraMoveProperty>(newStructId, { -1, -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<ExtraMoveProperty>(newStructId, { -1, -1 }, {}, listHead, DescribeRecordCount(m_infos->table.extraMovePropertyCount));
 	auto* newStruct = m_iterators.extra_move_properties[newStructId];
 	newStruct[0].starting_frame = constants[EditorConstants_ExtraProperty_Instant];
+	// Terminator: property id 0 ends the list (frame 0 kept for the usual {0, 0, 0} end row).
 	newStruct[1].starting_frame = constants[EditorConstants_ExtraPropertyEnd];
+	newStruct[1].id = constants[EditorConstants_ExtraPropertyEnd];
+	newStruct[1].value_unsigned = 0;
 
 	return newStructId;
 }
@@ -94,7 +98,7 @@ uint32_t EditorT7::CreateNewMoveBeginProperties()
 	uint32_t newStructId = (uint32_t)m_infos->table.moveBeginningPropCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveBeginningProp;
 
-	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.moveBeginningPropCount));
 	auto* newStruct = m_iterators.move_start_properties[newStructId];
 	newStruct->extraprop = constants[EditorConstants_RequirementEnd];
 
@@ -106,7 +110,7 @@ uint32_t EditorT7::CreateNewMoveEndProperties()
 	uint32_t newStructId = (uint32_t)m_infos->table.moveEndingPropCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.moveEndingProp;
 
-	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<OtherMoveProperty>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.moveEndingPropCount));
 	auto* newStruct = m_iterators.move_end_properties[newStructId];
 	newStruct->extraprop = constants[EditorConstants_RequirementEnd];
 
@@ -118,7 +122,7 @@ uint32_t EditorT7::CreateNewRequirements()
 	uint32_t newStructId = (uint32_t)m_infos->table.requirementCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.requirement;
 
-	ModifyGenericMovelistListSize<Requirement>(newStructId, { -1, -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Requirement>(newStructId, { -1, -1 }, {}, listHead, DescribeRecordCount(m_infos->table.requirementCount));
 	auto* newStruct = m_iterators.requirements[newStructId];
 	newStruct[1].condition = constants[EditorConstants_RequirementEnd];
 
@@ -130,7 +134,7 @@ uint32_t EditorT7::CreateNewVoiceclipList()
 	uint32_t newStructId = (uint32_t)m_infos->table.voiceclipCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.voiceclip;
 
-	ModifyGenericMovelistListSize<Voiceclip>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Voiceclip>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.voiceclipCount));
 	auto* newStruct = m_iterators.voiceclips[newStructId];
 	newStruct->id = (uint32_t)-1;
 
@@ -142,7 +146,7 @@ uint32_t EditorT7::CreateNewCancelExtra()
 	uint32_t newStructId = (uint32_t)m_infos->table.cancelExtradataCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancelExtradata;
 
-	ModifyGenericMovelistListSize<CancelExtradata>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<CancelExtradata>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.cancelExtradataCount));
 
 	return newStructId;
 }
@@ -152,7 +156,7 @@ uint32_t EditorT7::CreateNewCancelList()
 	uint32_t newStructId = (uint32_t)m_infos->table.cancelCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cancel;
 
-	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead, DescribeRecordCount(m_infos->table.cancelCount));
 	auto* newStruct = m_iterators.cancels[newStructId];
 	newStruct[1].command = constants[EditorConstants_CancelCommandEnd];
 
@@ -164,7 +168,7 @@ uint32_t EditorT7::CreateNewGroupedCancelList()
 	uint32_t newStructId = (uint32_t)m_infos->table.groupCancelCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.groupCancel;
 
-	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Cancel>(newStructId, { -1, -1 }, {}, listHead, DescribeRecordCount(m_infos->table.groupCancelCount));
 	auto* newStruct = m_iterators.grouped_cancels[newStructId];
 	newStruct[1].command = constants[EditorConstants_GroupedCancelCommandEnd];
 
@@ -176,7 +180,7 @@ uint32_t EditorT7::CreateNewThrowCamera()
 	uint32_t newStructId = (uint32_t)m_infos->table.throwCamerasCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.throwCameras;
 
-	ModifyGenericMovelistListSize<ThrowCamera>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<ThrowCamera>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.throwCamerasCount));
 
 	return newStructId;
 }
@@ -186,7 +190,7 @@ uint32_t EditorT7::CreateNewCameraData()
 	uint32_t newStructId = (uint32_t)m_infos->table.cameraDataCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.cameraData;
 
-	ModifyGenericMovelistListSize<CameraData>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<CameraData>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.cameraDataCount));
 
 	return newStructId;
 }
@@ -198,7 +202,7 @@ uint32_t EditorT7::CreateNewMove()
 	uint32_t newStructId = (uint32_t)m_infos->table.moveCount;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movesetBlock + (uint64_t)m_infos->table.move;
 
-	ModifyGenericMovelistListSize<Move>(newStructId, { -1 }, {}, listHead);
+	ModifyGenericMovelistListSize<Move>(newStructId, { -1 }, {}, listHead, DescribeRecordCount(m_infos->table.moveCount));
 	auto* baseStruct = m_iterators.moves[0];
 	auto* newStruct = m_iterators.moves[newStructId];
 	memcpy(newStruct, baseStruct, sizeof(Move));
@@ -209,6 +213,10 @@ uint32_t EditorT7::CreateNewMove()
 
 uint32_t EditorT7::CreateNew(EditorWindowType type)
 {
+    return Mutate([&]() -> uint32_t {
+        if (type == TEditorWindowType_Move && !GetStructureCount(type))
+            throw std::out_of_range("Creating a move requires an existing base move");
+
 	switch (type)
 	{
 	case TEditorWindowType_Requirement:
@@ -280,4 +288,6 @@ uint32_t EditorT7::CreateNew(EditorWindowType type)
 		break;
 	}
 	return -1;
+
+    });
 }

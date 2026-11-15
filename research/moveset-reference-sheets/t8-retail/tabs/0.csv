@@ -1,0 +1,523 @@
+Requirement ID,Param,Condition,Note
+1100,0,End,o
+0,0,Always true,
+1,0,Practice Mode Demo,"Inside Practice mode movelist demo.
+E.g, Used in Claudio to go to Starburst Manually"
+2,Any,Attack To Throw,"Used for Hit-to-Throw transitions. 
+Works for all opponent directions (Front, Back, Left, Right).
+and Status (Standing, Crouching, Airborne etc)
+Parameter is distance
+E.g, DVJ, KAZ Heaven's Door
+Common values are 1536 and 1900"
+3,Any,Throw Hit Forward (Standing),
+4,Any,Throw Hit Backward (Standing),
+5,Any,Throw Hit Left Side (Standing),
+6,Any,Throw Hit Right Side (Standing),
+7,Any,Throw Hit Forward (Crouching),
+8,Any,Throw Hit Backward (Crouching),
+9,Any,Throw Hit Left Side (Crouching),
+10,Any,Throw Hit Right Side (Crouching),
+11,Any,Throw Hit Forward (Face Up),
+12,Any,Throw Hit Backward (Face Up),
+13,Any,Throw Hit Left Side (Face Up),
+14,Any,Throw Hit Right Side (Face Up),
+15,Any,Throw Hit Forward (Face Down),
+16,Any,Throw Hit Backward (Face Down),
+17,Any,Throw Hit Left Side (Face Down),
+18,Any,Throw Hit Right Side (Face Down),
+23,Any,Attack To Throw (Forward),
+24,Any,Attack To Throw (Backward),
+25,Any,Attack To Throw (Left Side),
+26,Any,Attack To Throw (Right Side),
+27,Any,Airborne Throw Hit Forward (Face Up),
+28,Any,Airborne Throw Hit Backward (Face Up),
+29,Any,Airborne Throw Hit Left Side (Face Up),
+30,Any,Airborne Throw Hit Right Side (Face Up),
+31,Any,Airborne Throw Hit Forward (Face Down),
+32,Any,Airborne Throw Hit Backward (Face Down),
+33,Any,Airborne Throw Hit Left Side (Face Down),
+34,Any,Airborne Throw Hit Right Side (Face Down),
+35,Any,Opponent distance smaller or equal than,1000 = 1.0 distance in framedata
+36,Any,Opponent distance greater  or equal than,1000 = 1.0 distance in framedata
+43,0,On Hit / On Block,Must be used at active frames
+44,0,On Hit,Must be used at active frames
+46,1,On Hit,During active frames + opponent contact. Pass when param!=0 and !(opp visible) — same hit test as 44. Param 0 always fails.
+47,0,On Block,"Can be used anytime, before & after active frames"
+48,0,On Whiff,Must be used at active frames
+49,0,On Hit / On Block,"Used when cancel happens after active frames. i.e, 2D cancels"
+50,0,Hit/Block related (?),
+51,0,On Hit,"Used when cancel happens after active frames. i.e, Story mode mid-battle cutscenes."
+61,VULN,Check Opponent VULN,
+62,Any,Opponent Attacking,Checks if the opponent current move has non-zero damage value
+63,Any,Opponent Attacking while Standing,"Checks if the opponent current move has non-zero damage value while they are considered ""standing"""
+64,Any,Opponent Attacking while Crouching,"Checks if the opponent current move has non-zero damage value while they are considered ""crouching"""
+65,Any,Opponent moving but not attacking,Opp. current move has a damage of 0
+66,0,Opponent Standing,
+67,0,Opponent Crouching,
+68,0,Incoming high attack,
+69,0,Incoming mid attack,
+70,0,Incoming low attack,
+71,0,Incoming high/mid attack,
+72,0,Character Backturned,player direction >= 0x4000 is considered backturned
+73,0,Character Not Backturned,"Includes facing Front, Left and Right
+player direction < 0x4000 is considered not backturned"
+76,Any,Character Facing Direction >= param,
+77,Any,Character Facing Direction < param,
+84,0,Player facing Forward,
+85,0,Player facing Left,
+86,0,Player facing Right,
+87,0,Player facing Backwards,
+88,0,Player facing Forward,
+89,0,Player facing Left,
+90,0,Player facing Right,
+91,0,Player facing Backwards,
+92,0,Opponent facing Forward,
+93,0,Opponent facing Left,
+94,0,Opponent facing Right,
+95,0,Opponent facing Backwards,
+96,0,Opponent facing Forward,
+97,0,Opponent facing Left,
+98,0,Opponent facing Right,
+99,0,Opponent facing Backwards,
+100,0,"Opponent is close, last active frame not reached, high attack",Enemy within 1792 units & his last active frame is not reached & his attack is high
+101,Any,Enemy first active frame - curr frame < X,
+102,Any,Enemy first active frame - curr frame >= X,
+103,Any,Enemy first active frame - curr frame = X,
+104,Any,Enemy last active frame - curr frame < X,
+105,Any,Enemy last active frame - curr frame >= X,
+106,Any,Enemy last active frame - curr frame = X,
+107,Any,Enemy current frame - last active frame <= X,Returns True if attack doesn't have first active frame
+108,Any,Player current frame - max anim length >= X,
+109,Any,Player move max anim length - Current frame > X,
+110,Any,Enemy move frame ≥ X,
+111,Any,Enemy move frame < X,
+112,Any,Enemy move frame == X,
+113,Any,Player state frame counter (field_3A4) ≥ X,
+114,Any,        Player state frame counter < X,
+115,Any ,Player state frame counter == X,
+122,0,Always True,
+126,0,Opponent is downed,
+127,0 - 1,Opponent is grounded,"Opponent is standing or crouching, parameter unknown.
+Param value 1 allows it to be true for non-grounded opponents under some conditions"
+128,0,"Opponent is downed, not airborne, distance <= X",
+130,0,On Counter Hit,
+131,0,Pressed ONLY Left Punch,Throw Breaking
+132,0,Pressed ONLY Right Punch,Throw Breaking
+133,0,Pressed ONLY Left + Right Punch,Throw Breaking
+134,0,Throw break related,
+135,0,Throw break related,
+137,0,On Death,
+138,0,On Opponent Death,
+139,0,Opponent Health < 50%,
+140,0 - Max Health,Player HP >= Param,Max param value is 32767
+141,0 - Max Health,Player HP < Param,Max param value is 32767
+142,0 - Max Health,Opponent HP >= Param,Max param value is 32767
+143,0 - Max Health,Opponent HP < Param,Max param value is 32767. Doesn't work in practice mode
+144,0 - 100,Player HP Percentage >= Param,
+145,0 - 100,Player HP Percentage < Param,
+146,0 - Max Health,Opponent HP <= Param,Max param value is 32767
+147,0 - Max Health,Player HP <= Param,Max param value is 32767
+148,0,Standing on the Left Side,
+149,0,Standing on the Right Side,
+150,0,Player on the Ground (Right Side),
+151,0,Player on the Ground (Left Side),
+152,0,Standing on Left Side + Facing front,Standing on the required side but facing backwards makes this false
+153,0,Standing on Right Side + Facing front,Same as above
+157,0,If Player is Ki Charged,"Player must be Ki Charged (e.g Leo's d/b+1,1+2)"
+158,0,If Player is NOT Ki Charged,
+159,0 - 1,Player is in rage,0 = Player NOT in Rage. 1 = Player in Rage.
+165,Index,Check Opponent Current Move,"Checks the parryable moves array to see if opponent's current move is within there.
+Essentially it's just a big ""Is Opponent doing one of the following moves?"" check.
+Parameter is the starting point in the global array and ends at a 0 (EOL)"
+168,?,Something related to Speed & frame values of some unknown cancel,
+183,0,Opponent Standing or Crouching,"“opponent is upright” (standing or crouching, including state 0) — not downed. Broader than 66/67, stricter than 127 (127 only checks bit 4 clear). Common on hit cancels next to 44/56/717."
+184,"1, 2, 4, 8, 16",Near Wall,"Used in throws for Wall Splats.
+Each value indicates a facing direction
+Bits: 1=Forward, 2=Back, 4=Left, 8=Right (character-relative to facing). 16=any direction (pass if any sensor byte non-zero).
+Each Player has 6 ""wall_proximity"" objects, this checks all of them"
+185,Same as above,Near Wall (Sensor 1),wall_proximity[0]
+186,Same as above,Near Wall (Sensor 2),wall_proximity[1]
+187,Same as above,Near Wall (Sensor 3),wall_proximity[2]
+188,Same as above,Near Wall (Sensor 4),wall_proximity[3]
+189,Same as above,Near Wall (Sensor 5),wall_proximity[4]
+190,Same as above,Near Wall (Sensor 6),wall_proximity[5]
+191,Same as above,Near Wall (Opponent),Same as 184
+192,0,Wallbreak Available,
+219,0,Always True,Always present in wallsplat cancels
+220,Character ID,Player character ID,
+221,Character ID,Player NOT character ID,
+222,Character ID,Oppponent character ID,
+223,Character ID,Opponent NOT character ID,
+224,Character ID,Player character ID,
+225,Character ID,Player NOT character ID,
+226,Character ID,Oppponent character ID,Used in character intros
+227,Character ID,Oppponent NOT character ID,Used in character intros
+228,"0-1,3",Player Character Controller,Player = 0 CPU = 1 Intro/Outro = 3
+229,"0-1,3",Opponent Character Controller,Player = 0 CPU = 1 Intro/Outro = 3
+236,0,Player is Eddy,
+238,0,Player is Eddy,This one checks opponent's existence first. Probably a mistake from the devs where they were supposed to apply opponent check for Eddy
+239,0,Always True,
+247,0,Always True,
+254,Any,Prop 0x8092 >= Value,
+255,Any,Prop 0x8093 >= Value,
+256,Any,Prop 0x8094 >= Value,
+258,Any,Prop 0x8098 >= Value,
+259,Any,Prop 0x809b >= Value,
+260,Any,Prop 0x80a6 >= Value,
+265,"p1=1, p2=0-1",Floor Blast Related >= Value,
+274,0 - 1,Kazuya Devil Flag >= Value,
+276,Any,Prop 0x80e4 >= Value,
+277,Any,Prop 0x80e7 >= Value,
+278,Any,Prop 0x80ea >= Value,
+279,Any,Prop 0x80ed >= Value,
+280,Any,Prop 0x80f0 >= Value,
+281,Any,Prop 0x80c5 >= Value,
+282,Any,Prop 0x80c8 >= Value,
+283,Any,Prop 0x80cb >= Value,
+284,Any,Prop 0x80ce >= Value,
+285,Any,Prop 0x80d1 >= Value,
+286,Any,Prop 0x80f3 >= Value,
+287,"P1= ?, P2 = Val to Check",Wall Hit Counter >= Value,"Flag when get hit by at least param hits or more. Uses 2 params, P1 spotted to be 1 or 2
+Player->SomeField[Param1] >= Param2
+Seen in wallsplat moves like wDm_AirF_00"
+288,0xAAAABBBB,Short Flag (Prop 0x8128) >= Value,"AAAA is Flag number (0 to 99)
+BBBB is the value of the flag"
+289,0xAAAABBBB,Int Flag (Prop 0x812e) >= Value,"AAAA is Flag number (0 to 49)
+BBBB is the value of the flag"
+292,Any,Prop 0x8092 <= Value,
+293,Any,Prop 0x8093 <= Value,
+294,Any,Prop 0x8094 <= Value,
+296,Any,Prop 0x8098 <= Value,
+297,Any,Prop 0x809b <= Value,
+298,Any,Prop 0x80a6 <= Value,
+303,"p1=1, p2=0-1",Floor Blast Related <= Value,
+312,0 - 1,Kazuya Devil Flag <= Value,
+314,Any,Prop 0x80e4 <= Value,
+315,Any,Prop 0x80e7 <= Value,
+316,Any,Prop 0x80ea <= Value,
+317,Any,Prop 0x80ed <= Value,
+318,Any,Prop 0x80f0 <= Value,
+319,Any,Prop 0x80c5 <= Value,
+320,Any,Prop 0x80c8 <= Value,
+321,Any,Prop 0x80cb <= Value,
+322,Any,Prop 0x80ce <= Value,
+323,Any,Prop 0x80d1 <= Value,
+324,Any,Prop 0x80f3 <= Value,
+325,"P1 = ?, P2 = Val to Check",Wall Hit Counter <= Value,"Uses 2 params, Param1 always spotted to be 1.
+Player->SomeField[Param1] <= Param2
+Seen in wallsplat moves like wDm_AirF_00"
+326,0xAAAABBBB,Short Flag (Prop 0x8128) <= Value,"AAAA is Flag number (0 to 99)
+BBBB is the value of the flag"
+327,0xAAAABBBB,Int Flag (Prop 0x812e) <= Value,"AAAA is Flag number (0 to 49)
+BBBB is the value of the flag"
+330,Any,Prop 0x8092 == Value,
+331,Any,Prop 0x8093 == Value,
+332,Any,Prop 0x8094 == Value,
+334,Any,Prop 0x8098 == Value,
+335,Any,Prop 0x809b == Value,
+336,Any,Prop 0x80a6 == Value,
+341,"p1=1, p2=0-1",Floor Blast Related == Value,p2=0 means only trigger on the last floor and until floor blast is spent
+350,0 - 1,Kazuya Devil Flag == Value,"Technically it's a 4-byte integer but it's treated as a flag (0 - 1).
+0 = Human, 1 = Devil"
+352,Any,Prop 0x80e4 == Value,
+353,Any,Prop 0x80e7 == Value,
+354,Any,Prop 0x80ea == Value,
+355,Any,Prop 0x80ed == Value,
+356,Any,Prop 0x80f0 == Value,
+358,Any,Prop 0x80c5 == Value,
+359,Any,Prop 0x80c8 == Value,
+360,Any,Prop 0x80cb == Value,
+361,Any,Prop 0x80ce == Value,
+362,Any,Prop 0x80d1 == Value,
+363,Any,Prop 0x80f3 == Value,
+364,"P1 = ?, P2 = Val to Check",Wall Hit Counter == Value,"Uses 2 params, Param1 generally 1.
+Player->SomeField[Param1] == Param2
+No usage spotted"
+365,0xAAAABBBB,Short Flag (Prop 0x8128) == Value,"AAAA is Flag number (0 to 99)
+BBBB is the value of the flag"
+366,0xAAAABBBB,Check Flag (Prop 0x812e) == Value,"AAAA is the Flag Number (0 to 49)
+BBBB is the value of the flag"
+386,Any,Opponent Prop 0x80c5 >= Value,
+387,Any,Opponent Prop 0x80c8 >= Value,
+388,Any,Opponent Prop 0x80cb >= Value,
+389,Any,Opponent Prop 0x80ce >= Value,
+390,,Opponent Prop 0x80d1 >= Value,
+391,0xAAAABBBB,Opponent Short Flag >= Value,Same as above
+392,0xAAAABBBB,Opponent Int Flag >= Value,Same as above
+410,Any,Opponent Prop 0x80c5 <= Value,
+411,Any,Opponent Prop 0x80c8 <= Value,
+412,Any,Opponent Prop 0x80cb <= Value,
+413,Any,Opponent Prop 0x80ce <= Value,
+414,Any,Opponent Prop 0x80d1 <= Value,
+415,0xAAAABBBB,Opponent Short Flag <= Value,Same as above
+416,0xAAAABBBB,Opponent Int Flag <= Value,Same as above
+433,Any,Opponent Prop 0x80c5 == Value,
+434,Any,Opponent Prop 0x80c8 == Value,
+435,Any,Opponent Prop 0x80cb == Value,
+436,Any,Opponent Prop 0x80ce == Value,
+437,Any,Opponent Prop 0x80d1 == Value,
+438,0xAAAABBBB,Opponent Short Flag == Value,Has some Game-Mode checks in there too
+439,0xAAAABBBB,Opponent Int Flag == Value,Same as above
+440,Same as 442,Heat State X >= Y,Same as 442
+441,Same as 442,Heat State X <= Y,Same as 442
+442,"p1 = Index (1 - 4), p2 = 0 - 1",Heat State X == Y,"Each Player has 4 Heat State slots, seems like Slot 1 is about being in Heat or Not.
+p1 = X, p2 = Y. Uses Prop 0x8139
+Player->heatState[p1 - 1] == p2"
+446,Same as 442,Heat State X >= Y (Opponent),
+447,Same as 442,Heat State X <= Y (Opponent),
+448,Same as 442,Heat State X == Y (Opponent),
+453,Command,Check Button Input,Used in frame-1 cancels to check the input
+454,0 - 1,Character Install Active,"0 = No, 1 = Yes"
+460,0,Is Counter-hit Throw,Used in Throws to allow shorter break window
+461,0,Is Normal Throw,Used in Throws to allow regular break window
+462,Any,Heat Dash Charge >= X,Uses Prop 0x814d to set value
+464,Any,Heat Dash Charge == X,
+465,0,Is Punish Throw,Used to make throws unbreakable after Rage Art or Power Crush
+466,0 - 1,Check Trade,"0 = True if not Trade. 1 (or any non-zero) = True If Trade.
+Always used in Heat Engaging moves to make sure Heat doesn't activate on Trades"
+467,?,Heat Meter >= X,
+468,?,Heat Meter <= X,
+469,?,Heat Meter == X,
+470,?,(Opponent) Heat Meter >= X,
+471,?,(Opponent) Heat Meter <= X,
+472,?,(Opponent) Heat Meter == X,
+473,0 - 1,Kazuya Permanent Devil Flag == Value,"0 = No, 1 = Yes.
+Refer to prop 0x8151"
+474,"P1 = 1 - 20, P2 = ?",P20 Flags >= X,"There are 20 flags, P1 tells you what flag, P2 checks the value.
+Player->p20_flags[p1 - 1] >= p2"
+475,Same as above,P20 Flags <= X,Player->p20_flags[p1 - 1] <= p2
+476,Same as above,P20 Flags == X,Player->p20_flags[p1 - 1] == p2
+477,Same as above,Opponent P20 Flags >= X,Opponent->p20_flags[p1 - 1] >= p2
+478,Same as above,Opponent P20 Flags <= X,Opponent->p20_flags[p1 - 1] <= p2
+479,Same as above,Opponent P20 Flags == X,Opponent->p20_flags[p1 - 1] == p2
+484,Any,Story Scripted Flag >= X (SS Flag),"Only eligible in Main or DLC story, otherwise always False"
+485,Any,Story Scripted Flag <= X (SS Flag),Same as above
+486,Any,Story Scripted Flag == X (SS Flag),Same as above
+487,P1 = 1,,Always seen in cancels that lead upto Floor Blasts
+488,Any,Check Opponent Current Move Flag,"If Opponent's Current Move's offset 0x154 has any flags set, then returns true.
+Said 0x154 field sometimes has value 0x8000 for moves like Heat Burst.
+Only seen in Paul's move Co_jprk00F"
+490,Any,Stock Level >= X,"Universal but is used in Heihachi, Lidia, Eddy and Clive"
+491,"p1=distance, p2=degrees",Throw Hit Forward (Standing),"Param2 is very likely related to ""opponent facing direction""
+Only seen in Eddy's HSP 1+3 / 2+4 throw"
+492,"p1=distance, p2=degrees",Throw Hit Forward (Standing or Crouching),Same as above
+493,"p1=distance, p2=degrees",Throw Hit Forward (Crouching),"Used in crouch throws that lead to Heat.
+Param2 is very likely related to ""opponent facing direction"""
+494,?,Last Drama Voiceclip Key?,Drama prop 0x87f8 writes to a player field that this reads.
+498,0 - 1,Heihachi Warrior Instinct Active,"0 = No, 1 = Yes"
+499,Character ID,"Player Character ID
+(List Check)","Uses multiple parameters, each Parameter is a Character ID. If opponent isn't param0 then it checks if the opponent is param1, then checks if it's param2.
+parameter value 255 denotes a NULL value or an empty parameter"
+500,Character ID,"Player Not Character ID
+(List Check)",
+501,Character ID,"Opponent Character ID
+(List Check)",
+502,Character ID,"Opponent Not Character ID
+(List Check)",
+503,Character ID,"Player Character ID
+(List Check)",
+504,Character ID,"Player Not Character ID
+(List Check)",
+505,Character ID,"Opponent Character ID
+(List Check)","Used in Devil Jin to play specific voicelines in his Heat Smash against Heihachi.
+Same as above
+Seen in Devil Jin and Heihachi"
+506,Character ID,"Opponent Not Character ID
+(List Check)",
+507,"p1 = 0 - 9
+p2 = Any",Check Prop 0x815a Value,"Similar to short flags, P1 decides what flag and P2 is the actual value in there.
+operation is extra_815a[params[0]].value == params[1]
+See Prop 0x815a for detailed description"
+508,Move Technical ID,"""Related Player"" Current Move == param","Checks the ""ordinal id"" field of a move"
+509,1 / 2 / 4 / 8 bitflags,Opponent Facing matches param,"Bitmask of allowed facings (same field as reqs 92-95 / facing_side):
+1 = Forward. 2 = Left
+4 = Backwards. 8 = Right
+True if opponent facing matches any set bit.
+False if no opponent.
+Now used as a replacement for Req 92 & 96, with param 11. Seen in Kazuya d/f+2 CH"
+510,Any,Opponent Anim Move ID > param,"True if opponent.anim_move_id (+0x54C) > params[0].
+False if no opponent or value <= param.
+Field is a general animation-change tracker (sometimes set to 1 by prop 0x82C6, sometimes a real move ID by move-transition code).
+Distinct from current_move_id (+0x550)."
+511,"See VULN Sheet
+Category column",Check Some VULN related value,"Different from Req 61, which is a direct check.
+Player field 0x670 stores VULN like this: (VULN >> 1) & 0x1F which means it can only hold value 0 - 31 and this param checks that"
+512,Same as above,Check Some VULN related value (Opponent),Same as above
+513,"p1 = Frame
+p2 = Operation",Check Opponent state frame window (not blocking),"Param 0 = frame threshold. Param 1: 0 = pass if elapsed ≥ Param 0; non-zero = pass if elapsed ≤ Param 0. 
+Fails if no opponent or opponent is blocking. Elapsed = min(frames since recovery, frames since opponent’s reference counter field_3A4)."
+514,"p1 = Value
+p2 = Operation","Check Floor Blast Flag Value
+(Player)","Checks value stored by prop 0x815b.
+Param1 is the operand / value to check, meanwhile Param2 denotes operation."
+515,Same as above,"Check Floor Blast Flag Value
+(Opponent)",Same as above
+516,Move Name Key,"""Related Player"" Current Move Name Key == param","Checks the decrypted name_key of related_player[0]->current_move.
+False if player / related player / current move is null"
+640,Any,Player Speed >= param,4096 = 100%
+641,Any,Player Speed <= param,4096 = 100%
+642,Any,Player Speed == param,4096 = 100%
+648,Move Technical ID,Opponent Current Move == param,"Checks the ""ordinal id"" field of a move"
+649,Move Technical ID,Opponent Next Move == param,"Checks the ""ordinal id"" field of a move"
+652,0 - 2,Random Number Generator (2-way),"Parameter represents a possible option value, must contain multiple 
+cancels of this requirement with different paramater values for this to have an effect.
+This requirement is the odd one out because it uses values 0 - 2, which shouldn't be the case judging by the params for other RNG reqs"
+653,0 - 2,Random Number Generator (3-way),"Same as above, but requires 3 cancels"
+654,0 - 3,Random Number Generator (4-way),"Same as above, but requires 4 cancels"
+655,0 - 4,Random Number Generator (5-way),"Same as above, but requires 5 cancels
+Seen in Kazuya, True Devil Kazuya & Seiryu for Story AI"
+656,0 - 5,Random Number Generator (6-way),"Same as above, but requires 6 cancels
+Seen in Lars for Story AI and Lee"
+657,0 - 6,Random Number Generator (7-way),"Same as above, but requires 7 cancels"
+658,0 - 7,Random Number Generator (8-way),"Same as above, but requires 8 cancels"
+659,0 - 8,Random Number Generator (9-way),"Same as above, but requires 9 cancels
+Seen in Kazuya and True Devil Kazuya for Story AI"
+660,0 - 9,Random Number Generator (10-way),"Same as above, but requires 10 cancels
+Seen in Alisa"
+661,0-1000,Random Number Generator (Weighted),"Parameter determines the percentage the given requirement would succeed
+0 means 0%, 1000 means 100.0%
+Leroy's dog, Sugar, has a 40.0% chance of missing"
+662,?,RNG-Related,
+664,0,Arcade Mode(?),Seen in True Devil Kazuya to play a specific dialogue during Rage Art
+666,0,Tekken Ball Mode,Checks if ball mode (8) is playing
+667,0 - 1,Story Mode,"Checks if storymode (4) is playing
+Parameter is suspected to indicate whether you're player Tekken Force segment (1) or not (0)"
+668, 0 - 244,Story Battle Number,Doesn't work if storymode isn't playing
+672,Game Mode,Game Mode,Check what Game Mode is running
+682,Stage ID,Stage ID == X,Checks the current load stage
+683,Stage ID,Stage ID != X,True if the stage loaded is NOT Stage ID
+684,0 - 1,Is Player Visible,"0 = No, 1 = Yes"
+687,0,Player is a Bear,Checks if the player is currently using Kuma or Panda
+688,Index,Player Check,"0 = P1, 1 = P2"
+689,0,Player is a male character,Includes Leo
+690,0,Player is a female character,
+691,0,Player is a big character,"Jack-8, Fahkumram, Jack-7 and Seiryu"
+692,0,Opponent is a male character,Includes Leo
+693,0,Opponent is a female character,
+694,0,Opponent is a big character ,"Jack-8, Fahkumram, Jack-7 and Seiryu"
+695,0,Opponent is a Bear,
+696,0 - 2,Pre-round animation,Used to decide which pre-round animation to play. Each character has 3 animations hence param 0 - 2. The req is very likely tied to some RNG system
+699,0,Always True,
+710,0,Wall splat related,Apply when slammed to wall
+716,0,Opponent is Airborne,
+717,0,Opponent is NOT Airborne,
+718,Item ID,Has Item,Checks if the player has equipped the specified customized item
+723,0,Opponent is in juggle,Opponent is being juggled / in an airborne state
+724,0,Tornado Available,
+728,0,Something heat/wallsplat related (Opponent),Opponent check
+729,0,Something heat/wallsplat related (Player),"Player check, Spotted in some Heat Smash reactions that lead to Wallsplats.
+Uses Prop 0x830A"
+730,0,Something heat/wallsplat related (Opponent),"Checks some opponent values, Spotted in many Heat Engagers' cancel and hit condition lists"
+738,?,Kazama Essence >= Param,"Checks Kazama-essence install value. Used in Jun.
+1000 = 100.0"
+744,?,Kazama Essence < Param,
+748,Any,Opponent's Current Move Cancel has Prop 0x843A,"If Opponent's current move cancel has prop 0x843A with non-zero param OR if opponent field 0x815 is non-zero then it returns True, otherwise False."
+750,0,Leroy Install Available,Leroy has not consumed his once-per-match move
+751,0,Leroy Install Unavailable,Leroy has consumed his once-per-match move
+754,?,Fate-related?,"Always spotted in ""Direct"" cancels that lead to 1st and 2nd part of the Fate Intro"
+755,Character ID,Player 1 Character ID,"Checks character ID for the Left Player (P1). Always false in Practice Mode, Also false if you're P2
+Only ever found in Fate cancel requirement lists."
+756,?,Fate-related?,"Always spotted in ""Direct"" cancels that lead to the 3rd part of the Fate Intro"
+758,Any,Opponent distance smaller or equal than,
+766,?,Chara Episode pre-fight?,"Used to play specific intro dialogues in chara episodes. If it's not Character Episodes being played, it's considered false"
+767,?,Chara Episode post-fight?,"Used to play specific outro dialogues in chara episodes. If it's not Character Episodes being played, it's considered false"
+775,Stage ID,Stage ID number,Difference with 682 is still unknown
+777,Any,Story Flag == X,"Checks if some story mode flags are activated or not. Needs Gamemode to be story mode.
+Used in Jin to enable his Mishima, Kazama and other variants"
+778,0,Not Story Mode,Current game mode is not story mode
+779,0,Incoming High Attack,Used in Story Mode for setting up the CPU to do certain moves after getting up. The logic itself doesn't Story Mode to be active but it's only ever used in tandem with story related reqs
+780,0,Incoming Mid Attack,Same as above
+781,0,Incoming Low Attack,Includes Special Lows
+782,0,Incoming High or Mid Attack,
+783,Any,Something-RNG-Related >= X,"Seen only in Angel Jin
+Value seen: 1"
+784,Any,Something-RNG-Related <= X,"Seen only in Nina
+Value seen: 1"
+785,Any,Something-RNG-Related == X,"Seen in the entire cast
+Values seen: 0 - 2"
+787,Limb ID,Check Opponent Attacking Limb,"Check's the limb ID of the opponent's current move
+Seen in Xiayou"
+788,Ordinal ID,Check Opponent Ordinal ID / Parry Group Check,Seen in Xiayou
+790,Any,Enemy first active frame < X,
+791,Any,Enemy first active frame >= X,
+792,Any,Enemy first active frame == X,
+793,Any,Enemy last active frame < X,
+794,Any,Enemy last active frame >= X,
+795,Any,Enemy last active frame == X,
+796,Battle ID,Is Tekken Force Mode,"Parameter is the battle ID for that section
+Seen in all the characters that have a playable segment in Tekken Force mode"
+799,0,Special Style related,
+800,0,Special Style related,
+801,1,(DLC) Story Battle,
+802,Battle ID,(DLC) Story Battle Number,
+803,Battle ID,(DLC) Story Not Battle Number,
+804,1 - 2,Check Player Side,"1 = Player 1
+2 = Player 2
+Seen in the Dialogue structure, used in Intros"
+806,Any,Heihachi Story DLC Flags,"Used in Heihachi to grant him storymode attacks
+1 = Monk, 2 = Shadow, 3 = Final"
+807,Any,Store Some Player Value,
+808,Any,Store Some Opponent Value,"Seen in Lee's 2, 1, 4"
+810,Any,Lidia Story DLC Flags,Used to grant her special attacks. Param always 1
+953,0,Always True,
+997,0,Projectile on-hit,
+998,0,Projectile on-block,
+1014,Any,Story Flags,Applicable only in main or DLC story
+1016,1 - Any,"Wave Enemy Index
+(Story Mode)","Checks Which Enemy Number it is inside the wave. Index starts from 1
+Seen only in Jack-7, Soldier & Tekken Monks, Values spotted 1 - 5"
+1028,0-1,Player is in Heat,0 = Player NOT in Heat. 1 = Player in Heat.
+1029,0-1,Opponent is in Heat,0 = Opponent NOT in Heat. 1 = Opponent in Heat.
+1031,0,"Check Parry Facing (Player Front, Opp Front)",Both opponent and player must be facing front
+1032,Limb ID,"Parry High (Player Front, Opp Front)",Seen in Lidia & Feng
+1033,Limb ID,"Parry Mid (Player Front, Opp Front)",
+1034,Limb ID,"Parry Low (Player Front, Opp Front)",Seen in generic low parry
+1035,Limb ID,"Parry High and Mid (Player Front, Opp Front)",Seen in King
+1036,Index,"Parry Group (Player Front, Opp Front)",
+1037,0,"Check Parry Facing (Player Front, Opp Side)",
+1038,Limb ID,"Parry High (Player Front, Opp Side)",
+1039,Limb ID,"Parry Mid (Player Front, Opp Side)",
+1040,Limb ID,"Parry Low (Player Front, Opp Side)",
+1041,Limb ID,"Parry High and Mid (Player Front, Opp Side)",
+1042,Index,"Parry Group (Player Front, Opp Side)",
+1043,0,Check Parry Facing (Opp Front),No Player Facing Check
+1044,Limb ID,Parry High (Opp Front),No Player Facing Check
+1045,Limb ID,Parry Mid (Opp Front),No Player Facing Check
+1046,Limb ID,Parry Low (Opp Front),No Player Facing Check
+1047,Limb ID,Parry High and Mid (Opp Front),No Player Facing Check
+1048,Index,Parry Group (Opp Front),No Player Facing Check
+1049,0,Power Crush Attack Absorption,
+1060,0,"Check Parry Facing (Player Front, Opp Front)",Same as 1031
+1061,Limb ID,"Parry High (Player Front, Opp Front)",Same as 1032
+1062,Limb ID,"Parry Mid (Player Front, Opp Front)",Same as 1033
+1063,Limb ID,"Parry Low (Player Front, Opp Front)",Same as 1034
+1064,Limb ID,"Parry High and Mid (Player Front, Opp Front)",Same as 1035
+1065,Index,"Parry Group (Player Front, Opp Front)",Seen in Jin
+1066,0,"Check Parry Facing (Player Front, Opp Side)",Same as 1037
+1067,Limb ID,"Parry High (Player Front, Opp Side)",Same as 1038
+1068,Limb ID,"Parry Mid (Player Front, Opp Side)",Same as 1039
+1069,Limb ID,"Parry Low (Player Front, Opp Side)",Same as 1040
+1070,Limb ID,"Parry High and Mid (Player Front, Opp Side)",Same as 1041
+1071,Index,"Parry Group (Player Front, Opp Side)",Same as 1042
+1072,0,Check Parry Facing (Opp Front),Same as 1043
+1073,Limb ID,Parry High (Opp Front),Same as 1044
+1074,Limb ID,Parry Mid (Opp Front),Same as 1045
+1075,Limb ID,Parry Low (Opp Front),Same as 1046
+1076,Limb ID,Parry High and Mid (Opp Front),Same as 1047
+1077,Index,Parry Group (Opp Front),Same as 1048
+1078,Limb ID,"Parry High (Airborne, Player Front, Opp Front)",Could also be for Airborne opponents. Seen in Alisa
+1079,Limb ID,"Parry Mid (Airborne, Player Front, Opp Front)",
+1080,Limb ID,"Parry Low (Airborne, Player Front, Opp Front)",Could also be for Airborne opponents
+1081,Limb ID,"Parry High and Mid (Airborne, Player Front, Opp Front)",
+1082,Limb ID,"Parry High (Airborne, Player Front, Opp Side)",Seen in Alisa
+1083,Limb ID,"Parry Mid (Airborne, Player Front, Opp Side)",
+1084,Limb ID,"Parry Low (Airborne, Player Front, Opp Side)",
+1085,Limb ID,"Parry High and Mid (Airborne, Player Front, Opp Side)",
+1086,Limb ID,"Parry High (Airborne, Opp Front)",No Player Facing Check
+1087,Limb ID,"Parry Mid (Airborne, Opp Front)",No Player Facing Check
+1088,Limb ID,"Parry Low (Airborne, Opp Front)",No Player Facing Check
+1089,Limb ID,"Parry High and Mid (Airborne, Opp Front)",No Player Facing Check
+1090,Limb ID,Parry High (Player Front),"No Opponent Facing Check, can also handle Airborne"
+1091,Limb ID,Parry Mid (Player Front),"No Opponent Facing Check, can also handle Airborne"
+1092,Limb ID,Parry Low (Player Front),"No Opponent Facing Check, can also handle Airborne"
+1093,Limb ID,Parry High and Mid (Player Front),"No Opponent Facing Check, can also handle Airborne"

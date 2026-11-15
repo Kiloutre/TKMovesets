@@ -2,25 +2,81 @@
 #include <sstream>
 
 #include "Settings.hpp"
+#include "FileIO.hpp"
 #include "Keybinds.hpp"
 #include "Helpers.hpp"
 
 #include "constants.h"
 
+#include <Windows.h>
+#include <shlobj.h>
+
 std::map<std::string, std::string> g_settings;
+static std::filesystem::path g_settingsPathOverride;
+
+namespace
+{
+	// TKMSettings.ini next to the exe, where versions before the AppData location kept it.
+	std::filesystem::path ExeSettingsPath()
+	{
+		wchar_t exe[MAX_PATH * 2] = { 0 };
+		const DWORD length = GetModuleFileNameW(nullptr, exe, (DWORD)std::size(exe));
+		if (length == 0 || length >= std::size(exe)) return SETTINGS_FILE;
+		return std::filesystem::path(exe).parent_path() / SETTINGS_FILE;
+	}
+
+	std::filesystem::path AppDataSettingsPath()
+	{
+		PWSTR folder = nullptr;
+		std::filesystem::path path;
+		if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_DEFAULT, nullptr, &folder)))
+			path = std::filesystem::path(folder) / "TKMovesets2" / SETTINGS_FILE;
+		CoTaskMemFree(folder);
+		return path;
+	}
+
+	// First start with the AppData location: the settings file next to the exe is copied there once (and left in place).
+	void MigrateExeSettings(const std::filesystem::path& destination)
+	{
+		std::error_code error;
+		if (std::filesystem::exists(destination, error)) return;
+		const auto legacy = ExeSettingsPath();
+		if (!std::filesystem::is_regular_file(legacy, error)) return;
+		std::filesystem::create_directories(destination.parent_path(), error);
+		if (std::filesystem::copy_file(legacy, destination, error))
+			DEBUG_LOG("Settings copied from '%S' to '%S'\n", legacy.c_str(), destination.c_str());
+		else
+			DEBUG_ERR("Cannot copy settings from '%S' to '%S': %s", legacy.c_str(), destination.c_str(), error.message().c_str());
+	}
+}
 
 namespace Settings
 {
+	std::filesystem::path FilePath()
+	{
+		if (!g_settingsPathOverride.empty()) return g_settingsPathOverride;
+		const auto appData = AppDataSettingsPath();
+		return appData.empty() ? ExeSettingsPath() : appData;
+	}
+
+	void SetFilePath(const std::filesystem::path& path)
+	{
+		g_settingsPathOverride = path;
+	}
+
 	const std::map<std::string, std::string>& GetSettingsMap() {
 		return g_settings;
 	}
 
 	bool LoadFile()
 	{
+		g_settings.clear();
 		Keybinds::ApplyDefaultKeybinds();
 		auto& keybinds = Keybinds::GetKeybinds();
 
-		std::ifstream settingsFile(SETTINGS_FILE);
+		const auto path = FilePath();
+		if (g_settingsPathOverride.empty()) MigrateExeSettings(path);
+		std::ifstream settingsFile(path);
 		std::string line;
 
 		if (settingsFile.fail()) {
@@ -46,7 +102,9 @@ namespace Settings
 				line = line.substr(0, commentStart);
 			}
 
-			std::string key = line.substr(idStart, line.find_first_of(" =", idStart));
+			if (idStart == std::string::npos || idStart >= separator) continue;
+			auto keyEnd = line.find_last_not_of(" \t", separator - 1);
+			std::string key = line.substr(idStart, keyEnd - idStart + 1);
 			std::string value;
 			{
 				size_t value_start = line.find_first_not_of(" =", separator);
@@ -87,7 +145,7 @@ namespace Settings
 
 	void SaveSettingsFile()
 	{
-		std::ofstream settingsFile(SETTINGS_FILE);
+		std::ostringstream settingsFile;
 		
 		// Save settings
 		for (const auto& [key, value] : g_settings) {
@@ -102,7 +160,7 @@ namespace Settings
 			{
 				settingsFile << identifier << " = ";
 
-				for (auto cursor = keys.begin();;)
+				for (auto cursor = keys.begin(); cursor != keys.end();)
 				{
 					settingsFile << *cursor;
 					std::advance(cursor, 1);
@@ -112,6 +170,12 @@ namespace Settings
 				settingsFile << "\n";
 			}
 		}
+        const auto content = settingsFile.str();
+        const auto path = FilePath();
+        std::error_code error;
+        if (path.has_parent_path()) std::filesystem::create_directories(path.parent_path(), error);
+        if (!FileIO::WriteAtomically(path, content)) DEBUG_ERR("Cannot save settings to '%S'", path.c_str());
+
 	}
 
 	// -- Getters -- //

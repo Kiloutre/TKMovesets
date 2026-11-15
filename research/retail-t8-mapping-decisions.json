@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "target_game": "t8-retail",
+  "decisions": [
+    {
+      "category": "requirement",
+      "t7_id": 3,
+      "retail_id": 3,
+      "reason": "The classic one-distance throw entry matches the T7 single parameter; retail 491 additionally needs facing degrees.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 6,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A6:E6"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 6,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A6:E6"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 7,
+      "retail_id": 7,
+      "reason": "Classic single-distance crouch throw; retail 493 additionally needs facing degrees and is Heat-related.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 10,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A10:E10"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 10,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A10:E10"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 35,
+      "retail_id": 35,
+      "reason": "Both descriptions explicitly specify 1000 units per framedata distance; alternate 758 has no such description.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 34,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A34:E34"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 34,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A34:E34"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 44,
+      "retail_id": 44,
+      "reason": "Both describe active-frame contact, while retail 46 requires param 1 and 51 is after active frames.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 37,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A37:E37"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 37,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A37:E37"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 49,
+      "retail_id": 49,
+      "reason": "Exact matching after-active-frame / 2D cancel description distinguishes retail 43.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 40,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A40:E40"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 41,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A41:E41"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 51,
+      "retail_id": 51,
+      "reason": "Exact matching post-active-frame story cutscene description distinguishes retail 44/46.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 42,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A42:E42"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 43,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A43:E43"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "requirement",
+      "t7_id": 223,
+      "retail_id": 226,
+      "reason": "Exact matching character-intro description; other opponent-character-ID entry lacks that context.",
+      "t7_source": {
+        "sheet": "Requirement",
+        "gid": 121831918,
+        "row": 117,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=121831918&range=A117:E117"
+      },
+      "retail_source": {
+        "sheet": "Requirements",
+        "gid": 0,
+        "row": 140,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=0&range=A140:E140"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32769,
+      "retail_id": 32769,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 3,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A3:E3"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 3,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A3:E3"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32770,
+      "retail_id": 32770,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 4,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A4:E4"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 4,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A4:E4"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32771,
+      "retail_id": 32771,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 5,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A5:E5"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 5,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A5:E5"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32772,
+      "retail_id": 32772,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 6,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A6:E6"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 6,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A6:E6"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32774,
+      "retail_id": 32774,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 8,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A8:E8"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 8,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A8:E8"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32775,
+      "retail_id": 32775,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 9,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A9:E9"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 9,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A9:E9"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32776,
+      "retail_id": 32776,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 10,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A10:E10"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 10,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A10:E10"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 32777,
+      "retail_id": 32777,
+      "reason": "Exact description identifies this camera-shake variant, rather than the similarly named alternate.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 11,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A11:E11"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 11,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A11:E11"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 33282,
+      "retail_id": 33394,
+      "reason": "Matching signed 4-byte rotation units and description; retail 0x83bc uses degrees in a 2-byte value.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 168,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A168:E168"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 191,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A191:E191"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    },
+    {
+      "category": "extra_property",
+      "t7_id": 33283,
+      "retail_id": 33395,
+      "reason": "Matching signed 4-byte rotation units and description; retail 0x83bd uses a 2-byte value.",
+      "t7_source": {
+        "sheet": "Extra Properties",
+        "gid": 0,
+        "row": 169,
+        "url": "https://docs.google.com/spreadsheets/d/1xOvUozLiC-pwflK53JtZs_-Qnd3jQ5KyQspNooEtPAI/edit#gid=0&range=A169:E169"
+      },
+      "retail_source": {
+        "sheet": "Extra Move Properties",
+        "gid": 1974294367,
+        "row": 192,
+        "url": "https://docs.google.com/spreadsheets/d/1DBkC-HfqD0KWQNeOTKjJWmPxdbEuCcGZxkPxQpsLkOY/edit#gid=1974294367&range=A192:E192"
+      },
+      "confidence": "documented_alignment_not_game_verified"
+    }
+  ]
+}

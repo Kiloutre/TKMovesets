@@ -54,7 +54,7 @@ public:
 	// Reads a ptr, reads 4 or 8 bytes depending on the ptr size, taking into account base address and endian
 	gameAddr ReadPtr(gameAddr address) const;
 	// Reads [readSize] amounts of bytes from the game and write them to the provided buffer, applies base address before reading
-	void ReadBytes(gameAddr address, void* buf, size_t readSize) const;
+	bool ReadBytes(gameAddr address, void* buf, size_t readSize) const;
 
 	// Reads a ptr path
 	gameAddr ReadPtrPath(const char* c_addressId) const;

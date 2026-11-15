@@ -3,12 +3,17 @@
 #include <filesystem>
 #include <fstream>
 #include <format>
+#include <stdexcept>
+#include <cstring>
+#include <vector>
 #include <windows.h>
 
 #include "AnimExtractors.hpp"
 #include "GameIDs.hpp"
 #include "Animations.hpp"
 #include "Compression.hpp"
+#include "AnimExtractor_t8.hpp"
+#include "MovesetFile.hpp"
 
 #include "constants.h"
 #include "MovesetStructs.h"
@@ -34,6 +39,20 @@ namespace AnimExtractor
 			}
 
 			std::wstring game_prefix;
+			if(m.gameId==GameId_T8 && m.minorVersion==GameVersions::T8::RETAIL) {
+                extractionStatus.status=AnimExtractionStatus_Started;
+                try {
+                    MovesetFile file(m.filename);file.Validate();
+                    auto base=std::filesystem::absolute(EDITOR_LIB_DIRECTORY);
+                    auto stem=std::filesystem::path(m.filename).stem().wstring()+L"_"+std::to_wstring(Helpers::getCurrentTimestamp());
+                    auto directory=base/stem;
+                    for(unsigned suffix=2;std::filesystem::exists(directory);++suffix)directory=base/(stem+L"_"+std::to_wstring(suffix));
+                    RetailT8Animations::Extract(file.Payload(),directory,&extractionControl.must_interrupt,
+                        &extractionStatus.current_animation,&extractionStatus.total_animation_count);
+                    extractionStatus.status=extractionControl.must_interrupt?AnimExtractionStatus_NotStarted:AnimExtractionStatus_Finished;
+                }catch(const std::exception&){extractionStatus.status=AnimExtractionStatus_Error;}
+                continue;
+            }
 			// Don't allocate moveset if its extraction isn't supported
 			switch (m.gameId)
 			{
@@ -57,7 +76,8 @@ namespace AnimExtractor
 				continue;
 			}
 
-			const std::wstring outputFolder = L"" EDITOR_LIB_DIRECTORY "/" + game_prefix + Helpers::string_to_wstring(m.original_character) + L"/";
+			// The character name comes from the file header: one safe folder name under the editor library (no "..", separators...)
+			const std::wstring outputFolder = L"" EDITOR_LIB_DIRECTORY "/" + game_prefix + Helpers::string_to_wstring(AnimExtractorPaths::SafeComponent(m.original_character)) + L"/";
 			const std::wstring outputFilename = outputFolder + L"anims_tmp.txt";
 			const std::wstring outputFinalFilename = outputFolder + L"anims.txt";
 
@@ -70,44 +90,22 @@ namespace AnimExtractor
 				}
 			}
 
-			uint64_t s_moveset;
-			Byte* moveset;
-			TKMovesetHeader* movesetHeader;
-            
-            try {
-                moveset = Helpers::ReadMovesetFile(m.filename, s_moveset);
-				movesetHeader = (TKMovesetHeader*)moveset;
-            } catch(const std::exception&)
-            {
-				extractionStatus.status = AnimExtractionStatus_Error;
-				DEBUG_ERR("'%S': Moveset error", m.filename.c_str());
-				continue;
-            }
+			try {
+				// Reads and decompresses the file (header checks only)
+				MovesetFile file(m.filename);
 
-			if (movesetHeader->conversion_origin != 0)
-			{
-				// Skip converted movesets
-				extractionStatus.status = AnimExtractionStatus_Skipped;
-				DEBUG_LOG("'%S': Converted moveset: skipping\n", m.filename.c_str());
-			}
-			else
-			{
-
-				if (movesetHeader->isCompressed())
+				if (file.Header().conversion_origin != 0)
 				{
-					Byte* orig_moveset = moveset;
-
-					int32_t compressed_data_size = (int32_t)(s_moveset - movesetHeader->moveset_data_start);
-					moveset = CompressionUtils::RAW::Moveset::DecompressWithHeader(moveset, compressed_data_size, s_moveset);
-
-					delete[] orig_moveset;
-
-					if (moveset == nullptr) {
-						DEBUG_ERR("Failed decompress moveset '%S'", m.filename.c_str());
-						extractionStatus.status = AnimExtractionStatus_Error;
-						continue;
-					}
+					// Skip converted movesets
+					extractionStatus.status = AnimExtractionStatus_Skipped;
+					DEBUG_LOG("'%S': Converted moveset: skipping\n", m.filename.c_str());
+					continue;
 				}
+
+				// The file is untrusted: same record validation as conversion and import before any table is walked
+				file.Validate();
+				const Byte* moveset = file.Bytes().data();
+				const uint64_t s_moveset = file.Bytes().size();
 
 				CreateDirectoryW(outputFolder.c_str(), nullptr);
 				std::ofstream outputFile(outputFilename);
@@ -152,24 +150,79 @@ namespace AnimExtractor
 					}
 				}
 			}
-
-			free(moveset);
+			catch (const std::exception&)
+			{
+				// Invalid or unreadable moveset, or a table outside the file: this moveset is skipped with an error
+				extractionStatus.status = AnimExtractionStatus_Error;
+				DEBUG_ERR("'%S': Moveset error", m.filename.c_str());
+			}
 		}
 	}
 };
 
 namespace TAnimExtractorUtils
 {
-	void ExtractAnimation(const char* name, const Byte* anim, const std::wstring& outputFolder, std::ofstream& outputFile, const wchar_t* extension)
+	std::vector<uint64_t> BlockSizes(const Byte* moveset, uint64_t s_moveset, size_t blockCount)
 	{
-		auto anim_size = TAnimUtils::FromMemory::GetAnimSize(anim);
+		if (s_moveset < sizeof(TKMovesetHeader)) {
+			throw std::runtime_error("Moveset header is truncated");
+		}
+		const TKMovesetHeader& header = *(const TKMovesetHeader*)moveset;
+		const uint64_t dataStart = header.moveset_data_start;
+		if (header.block_list_size < blockCount || header.block_list > s_moveset ||
+			blockCount * sizeof(uint64_t) > s_moveset - header.block_list || dataStart > s_moveset) {
+			throw std::runtime_error("Moveset block table outside the file");
+		}
+		const uint64_t payloadSize = s_moveset - dataStart;
+		std::vector<uint64_t> offsets(blockCount);
+		memcpy(offsets.data(), moveset + header.block_list, blockCount * sizeof(uint64_t));
+		std::vector<uint64_t> sizes(blockCount);
+		for (size_t i = 0; i < blockCount; ++i) {
+			const uint64_t end = i + 1 < blockCount ? offsets[i + 1] : payloadSize;
+			if (offsets[i] > end || end > payloadSize) {
+				throw std::runtime_error("Moveset block outside the payload");
+			}
+			sizes[i] = end - offsets[i];
+		}
+		return sizes;
+	}
+
+	std::string BlockString(const Byte* block, uint64_t blockSize, uint64_t offset, const std::string& fallback)
+	{
+		if (offset >= blockSize) {
+			return fallback;
+		}
+		const char* start = (const char*)block + offset;
+		const void* end = memchr(start, 0, static_cast<size_t>(blockSize - offset));
+		return end ? std::string(start, (const char*)end) : fallback;
+	}
+
+	void RequireTable(uint64_t blockSize, uint64_t offset, uint64_t count, uint64_t recordSize, const char* what)
+	{
+		if (offset > blockSize || (recordSize != 0 && count > (blockSize - offset) / recordSize)) {
+			throw std::runtime_error(std::string(what) + " outside its block");
+		}
+	}
+
+	void ExtractAnimation(const std::string& rawName, const Byte* anim, uint64_t available, const std::wstring& outputFolder, std::ofstream& outputFile, const wchar_t* extension)
+	{
+		auto anim_size = TAnimUtils::FromMemory::Safe::GetAnimSize(anim, available);
 
 		if (anim_size == 0) {
-			DEBUG_ERR("Bad anim data for anim name '%s'\n", name);
+			DEBUG_ERR("Bad anim data for anim name '%s'\n", rawName.c_str());
 			return;
 		}
 
-		std::wstring filename = Helpers::to_unicode(name) + extension + (*anim == 0xC8 ? L"C8" : L"64");
+		// The name comes from the file: never a path ("..\", separators), a reserved name or invalid UTF-8 (to_unicode throws)
+		const std::string name = AnimExtractorPaths::SafeComponent(rawName);
+		std::wstring filename;
+		try {
+			filename = Helpers::to_unicode(name) + extension + (*anim == 0xC8 ? L"C8" : L"64");
+		}
+		catch (const std::exception&) {
+			DEBUG_ERR("Bad anim name '%s'\n", name.c_str());
+			return;
+		}
 		std::ofstream file(outputFolder + filename, std::ios::binary);
 		if (!file.fail())
 		{
@@ -179,7 +232,7 @@ namespace TAnimExtractorUtils
 			outputFile << name << Helpers::wstring_to_string(extension) << (*anim == 0xC8 ? "C8" : "64");
 			outputFile << ",";
 			// Animation duration
-			outputFile << TAnimUtils::FromMemory::GetAnimDuration(anim);
+			outputFile << TAnimUtils::FromMemory::Safe::GetAnimDuration(anim, available);
 			outputFile << ",";
 			// Animation size
 			outputFile << anim_size;
