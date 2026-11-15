@@ -25,6 +25,8 @@ namespace EditorFormUtils
 class EditorForm
 {
 public:
+    // Headless captures only (anim-preview-shot open=SECTION): category headers with these localized labels open.
+    static inline std::set<std::string> forceOpenCategories;
     struct TransactionState {
         virtual ~TransactionState() = default;
         virtual void Commit() noexcept = 0;

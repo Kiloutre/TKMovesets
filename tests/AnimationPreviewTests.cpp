@@ -14,6 +14,7 @@
 #include "AnimationPreview.hpp"
 #include "AnimationPreview/PreviewModel.hpp"
 #include "AppTheme.hpp"
+#include "EditorForm.hpp"
 #include "EditorVisuals.hpp"
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
 #include "EditorVisuals_t8Retail/EditorVisuals_t8Retail.hpp"
@@ -282,6 +283,7 @@ int ShootAnimationPreview(std::span<const std::wstring> arguments) {
             Settings::SetFilePath(std::filesystem::temp_directory_path() / "tkm-anim-preview-shot.ini");
             Settings::Set("editor.animation_preview_open", false);
         }
+        else if (a.starts_with("open=")) EditorForm::forceOpenCategories.insert(a.substr(5));  // a form section, e.g. open=Hitbox 1
         else if (a.starts_with("size=")) { Require(sscanf_s(a.c_str() + 5, "%dx%d", &width, &height) == 2, "size=WxH"); }
         else frames = a;
     }

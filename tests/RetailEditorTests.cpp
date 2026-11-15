@@ -896,7 +896,10 @@ int RunRetailEditorUiTests() {
     Check(RetailFieldCodecs::CancelOptionText(0x101)=="no command | alias target","cancel option 0x101");
     Check(RetailFieldCodecs::CancelOptionText(0)=="0 (not filled: set by the game at load)","cancel option 0");
     Check(RetailFieldCodecs::HitLevelText(0x200512)=="High (0x512) + flags 0x200","hit level text");
-    Check(RetailFieldCodecs::HitboxLocationText(0x809)=="Right forearm? -> Right hand","hitbox location text");
+    Check(RetailFieldCodecs::HitboxLocationText(0x809)=="Right forearm [R_LowerArm] -> Right hand [R_Hand]","hitbox location text");
+    Check(RetailFieldCodecs::HitboxLocationText(0x16)=="Head top [ATH_Head_Top]" && RetailFieldCodecs::HitboxLocationText(0x956)=="Right hand [R_Hand] -> item1","hitbox location limb table");
+    Check(RetailFieldCodecs::HitboxLocationText(0x40D,false)=="Neck>L_Hand","hitbox location compact");
+    Check(RetailFieldCodecs::LimbName(0x7D)=="limb 0x7D [0x7392ED95]" && RetailFieldCodecs::LimbName(0x86)=="limb 0x86 [none]","hitbox location unresolved limbs");
     {
         auto name=[](uint32_t id){return "C"+std::to_string(id);};
         using RetailFieldCodecs::RequirementParamText;

@@ -292,10 +292,18 @@ class RetailRecordForm final : public EditorForm {
         if(codec==m_codecs.end() || field->errored){EditorForm::RenderInput(listIdx,field);return;}
         namespace C=RetailFieldCodecs;
         const auto current=uint32_t(RetailInputValue(field));
-        const auto preview=codec->second==Codec::HitLevel?C::HitLevelText(current):codec->second==Codec::Vulnerability?C::VulnerabilityText(current):C::HitboxLocationText(current);
-        ImGui::PushID(field);ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x*0.6f);
+        const auto preview=codec->second==Codec::HitLevel?C::HitLevelText(current):codec->second==Codec::Vulnerability?C::VulnerabilityText(current):C::HitboxLocationText(current,false);
+        float comboWidth=ImGui::GetContentRegionAvail().x*0.6f;
+        ImGuiComboFlags comboFlags=0;
+        if(codec->second==Codec::HitboxLocation){
+            // Bone names: no arrow, and as wide as the text needs while leaving the raw value 4 hex digits.
+            comboFlags=ImGuiComboFlags_NoArrowButton;
+            const float fit=ImGui::CalcTextSize(preview.c_str()).x+ImGui::GetStyle().FramePadding.x*2;
+            comboWidth=(std::max)(comboWidth,(std::min)(fit,ImGui::GetContentRegionAvail().x-ImGui::CalcTextSize("0x000").x-ImGui::GetStyle().FramePadding.x*2-ImGui::GetStyle().ItemSpacing.x));
+        }
+        ImGui::PushID(field);ImGui::SetNextItemWidth(comboWidth);
         const ImGuiID comboId=ImGui::GetID("##codec");
-        if(ImGui::BeginCombo("##codec",preview.c_str())){
+        if(ImGui::BeginCombo("##codec",preview.c_str(),comboFlags)){
             if(codec->second==Codec::HitLevel){
                 for(const auto& choice:C::HitLevels){
                     const auto label=std::format("{} (0x{:X}){}",choice.label,choice.value,choice.confirmed?"":" ?");
@@ -307,14 +315,18 @@ class RetailRecordForm final : public EditorForm {
                     if(ImGui::Selectable(label.c_str(),(current&0xFFFF)==choice.value))WriteDecoded(listIdx,field,(current&0xFFFF0000u)|choice.value);
                 }
             }else{
-                for(const auto& choice:C::HitboxLocations){
-                    const auto label=std::format("{} (0x{:X}){}",choice.label,choice.value,choice.confirmed?"":" ?");
-                    if(ImGui::Selectable(label.c_str(),current==choice.value))WriteDecoded(listIdx,field,choice.value);
+                if(ImGui::Selectable("None (0x0)",current==0))WriteDecoded(listIdx,field,0);
+                for(const auto value:RetailLimbs::CommonLocations){
+                    const auto label=std::format("{} (0x{:X})",C::HitboxLocationText(value),value);
+                    if(ImGui::Selectable(label.c_str(),current==value))WriteDecoded(listIdx,field,value);
                 }
             }
             ImGui::EndCombo();
         }
-        if(ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))ImGui::SetTooltip("%s",_(codec->second==Codec::HitLevel?"edition.t8.codec.hit_level":codec->second==Codec::Vulnerability?"edition.t8.codec.vulnerability":"edition.t8.codec.hitbox_location"));
+        if(ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)){
+            if(codec->second==Codec::HitboxLocation)ImGui::SetTooltip("%s\n\n%s",C::HitboxLocationText(current).c_str(),_("edition.t8.codec.hitbox_location"));
+            else ImGui::SetTooltip("%s",_(codec->second==Codec::HitLevel?"edition.t8.codec.hit_level":"edition.t8.codec.vulnerability"));
+        }
         // Name the combo for Dear ImGui Test Engine after its ItemAdd (BeginCombo records no label): "codec:<field>".
         if(ImGui::GetCurrentContext()->TestEngineHookItems)ImGuiTestEngineHook_ItemInfo(ImGui::GetCurrentContext(),comboId,("codec:"+field->name.str()).c_str(),0);
         ImGui::PopID();

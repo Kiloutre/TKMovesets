@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <format>
 #include <string>
+#include <string_view>
+#include "RetailLimbs.hpp"
 
 // Decoders for retail Tekken 8 move fields shown as combos next to the raw value.
 // Evidence (2026-11-14, Tekken8 cnt project, all 52 retail motbins, work/tkdata_retail/readable/*/moves.csv):
@@ -13,10 +15,10 @@
 //   their moves only. Bits 16-23 are flags (0x20 on most character attacks, 0x40 on throw moves, 0x80 on
 //   special/story moves, 0x2C/0x3C on Heat and rage moves); they are kept untouched by the combo.
 // - hitbox location: 0x000000aa = one limb aa (line from its previous-frame to current position),
-//   0x0000aabb = a line between limbs aa and bb. Limb ids by move-name correlation:
-//   0x9 right hand (1,404 of the *rp* moves), 0xD left hand (1,744 *lp*), 0x10 right foot (1,844 *rk*),
-//   0x13 left foot (1,905 *lk*); the neighbours 0x8/0xC/0xF/0x12 and the lines 0x809/0xC0D/0xF10/0x1213
-//   follow the same punch/kick split and are read as forearm/shin (hypothesis).
+//   0x0000aabb = a line between limbs aa and bb. Limb ids are read from the game (2026-11-15): the hit-line point
+//   function 0x1418D2470 maps each id to a node through TK__BoneIndexToHash 0x14195B770 (RetailLimbs.hpp). It
+//   agrees with the earlier move-name correlation (0x9 R_Hand, 0xD L_Hand, 0x10 R_Foot, 0x13 L_Foot,
+//   0x8/0xC forearms, 0xF/0x12 shins).
 namespace RetailFieldCodecs {
 struct Choice { uint32_t value; const char* label; bool confirmed; };
 
@@ -44,32 +46,20 @@ inline std::string HitLevelText(uint32_t value) {
     return text;
 }
 
-inline constexpr Choice Limbs[] = {
-    {0x9, "Right hand", true},
-    {0xD, "Left hand", true},
-    {0x10, "Right foot", true},
-    {0x13, "Left foot", true},
-    {0x8, "Right forearm", false},
-    {0xC, "Left forearm", false},
-    {0xF, "Right shin", false},
-    {0x12, "Left shin", false},
-};
+// Limb names come from the game (RetailLimbs.hpp, generated): "Right hand [R_Hand]". The label is ours, the
+// bracketed node is the skeleton bone or hit node the game resolves. Ids without a resolved node show their key.
 inline std::string LimbName(uint32_t limb) {
-    for (const auto& choice : Limbs) if (choice.value == limb) return choice.confirmed ? choice.label : std::format("{}?", choice.label);
-    return std::format("limb 0x{:X}", limb);
+    const auto* l = RetailLimbs::Find(limb);
+    if (!l) return std::format("limb 0x{:X} [none]", limb);
+    if (!*l->node) return std::format("limb 0x{:X} [0x{:08X}]", limb, l->key);
+    if (std::string_view(l->label) == l->node) return l->node;
+    return std::format("{} [{}]", l->label, l->node);
 }
-// Combo entries for a hitbox location: single limbs and the four forearm/shin lines.
-inline constexpr Choice HitboxLocations[] = {
-    {0x0, "None", true},
-    {0x9, "Right hand", true},
-    {0xD, "Left hand", true},
-    {0x10, "Right foot", true},
-    {0x13, "Left foot", true},
-    {0x809, "Right forearm -> right hand", false},
-    {0xC0D, "Left forearm -> left hand", false},
-    {0xF10, "Right shin -> right foot", false},
-    {0x1213, "Left shin -> left foot", false},
-};
+// Compact form for the field itself: the node (bone) name alone.
+inline std::string LimbNode(uint32_t limb) {
+    const auto* l = RetailLimbs::Find(limb);
+    return l && *l->node ? std::string(l->node) : std::format("limb 0x{:X}", limb);
+}
 // Cancel option (+0x26): 0 on disk, filled by the game at load. Live values of 34,463 cancels (3 retail movesets,
 // Tekken8 cnt work/movevm/port/retail_live_movesets.json): 0x1 <=> command is 0 (10,931/10,931, never otherwise);
 // 0x10 <=> command is not 0 (23,514/23,532); 0x100 <=> the target is a generic alias >= 0x8000 (8,889/8,889);
@@ -133,11 +123,13 @@ inline std::string VulnerabilityText(uint32_t value) {
     if (value >> 16) text += std::format(" + flags 0x{:X}", value >> 16);
     return text;
 }
-inline std::string HitboxLocationText(uint32_t value) {
+// full: "Right forearm [R_LowerArm] -> Right hand [R_Hand]"; compact (the field): "R_LowerArm>R_Hand".
+inline std::string HitboxLocationText(uint32_t value, bool full = true) {
     if (!value) return "None";
+    auto name = full ? LimbName : LimbNode;
     std::string text;
-    if (value < 0x100) text = LimbName(value);
-    else text = LimbName((value >> 8) & 0xFF) + " -> " + LimbName(value & 0xFF);
+    if (value < 0x100) text = name(value);
+    else text = name((value >> 8) & 0xFF) + (full ? " -> " : ">") + name(value & 0xFF);
     if (value > 0xFFFF) text += std::format(" (+0x{:X})", value >> 16);
     return text;
 }

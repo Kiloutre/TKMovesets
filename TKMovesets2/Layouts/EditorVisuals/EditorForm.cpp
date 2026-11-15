@@ -403,6 +403,8 @@ void EditorForm::RenderInternal()
 	{
 		const int headerFlags = ImGuiTreeNodeFlags_Framed | (category & 1 ? 0 : ImGuiTreeNodeFlags_DefaultOpen);
 		// todo: compute this std::format() once and not every frame
+		if (category != 0 && !forceOpenCategories.empty() && forceOpenCategories.contains(_(m_categoryStringIdentifiers[category].c_str())))
+			ImGui::SetNextItemOpen(true, ImGuiCond_Always);
 		if (category != 0 && !ImGui::CollapsingHeader(_(m_categoryStringIdentifiers[category].c_str()), headerFlags)) {
 			// Only show titles for category > 0, and if tree is not open: no need to render anything
 			continue;
