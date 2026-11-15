@@ -1,4 +1,4 @@
-![Editor screenshot](https://dist.tekkenmods.com/dist-cache/1920/340/mods/2429/thumbnails/4abb6005b885731d-1282x721.jpg)
+<img width="1280" height="618" alt="image-1794761243988" src="https://github.com/user-attachments/assets/74ddd22c-f0b5-4474-bf92-41b3f34fe2d9" />
 
 Tekken mods page:
 https://tekkenmods.com/mod/2429/tkmovesets2
