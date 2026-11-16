@@ -54,6 +54,7 @@ int VerifyRetailEditorFile(const std::wstring& input, const std::wstring& output
 int RenderRetailEditorFile(const std::wstring& input, const std::wstring& output,bool references,bool lists);
 int RunRetailEditorUiTests();
 int VerifyRetailEditorStructure(const std::wstring& input,const std::wstring& output);
+int AuditRetailEditorValidation(std::span<const std::wstring> inputs);
 int WriteRetailPanmFixture(const std::wstring& output);
 int CheckAnimationPreview(const std::wstring& reference);
 int ShootAnimationPreview(std::span<const std::wstring> arguments);
@@ -364,6 +365,7 @@ int RunHeadless(std::span<const std::wstring> arguments)
                 "  retail-editor-smoke INPUT OUTPUT\n"
                 "  retail-editor-structure-smoke INPUT OUTPUT\n"
                 "  retail-editor-render INPUT OUTPUT.json [references|lists]\n"
+                "  retail-validation-audit FILE|FOLDER...          every untouched T8 field must pass form validation\n"
                 "  retail-editor-ui-test\n"
                 "  retail-panm-fixture OUTPUT_DIRECTORY\n"
                 "  anim-preview-check REFERENCE.json               animation preview pose against Blender\n"
@@ -1086,6 +1088,10 @@ int RunHeadless(std::span<const std::wstring> arguments)
         if(command==L"retail-editor-render") {
             if(arguments.size()!=3 && !(arguments.size()==4 && (arguments[3]==L"references" || arguments[3]==L"lists")))throw std::invalid_argument("retail-editor-render takes INPUT OUTPUT.json [references|lists]");
             return RenderRetailEditorFile(arguments[1],arguments[2],arguments.size()==4 && arguments[3]==L"references",arguments.size()==4 && arguments[3]==L"lists");
+        }
+        if(command==L"retail-validation-audit"){
+            if(arguments.size()<2)throw std::invalid_argument("retail-validation-audit takes FILE|FOLDER...");
+            return AuditRetailEditorValidation(arguments.subspan(1));
         }
         if(command==L"retail-editor-ui-test") {
             // Dear ImGui Test Engine drives the retail editor on a synthetic document (tests/RetailEditorTests.cpp).

@@ -110,7 +110,7 @@
 # define PROPID_PROJECTILE       IM_COL32(77, 131, 219, 50)
 
 # define FORM_INPUT_HEX          IM_COL32(78, 51, 111, 255)
-# define FORM_INPUT_FLOAT        IM_COL32(186, 54, 54, 75)
+# define FORM_INPUT_FLOAT        IM_COL32(28, 92, 86, 255)  // teal: red is reserved for errored fields
 # define FORM_INPUT_REF          IM_COL32(56, 82, 124, 255)
 # define FORM_INPUT_SIGNED       IM_COL32(16, 55, 112, 255)
 # define FORM_LABEL_CLICKABLE    FORM_INPUT_REF

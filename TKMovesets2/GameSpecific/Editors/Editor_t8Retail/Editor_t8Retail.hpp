@@ -30,6 +30,10 @@ public:
     std::span<const Byte> Record(size_t table, uint32_t row) const;
     std::optional<uint32_t> MoveNameHash(uint32_t row) const;
     uint32_t ResolveMove(uint32_t id) const;
+    // Cancel row (tables 6/7) cross-field check, as EditorVisuals_t7 TEditorCancels::OnUpdate: the target must match the
+    // command type (group row, move or alias, input sequence in range). Terminators are left alone.
+    struct CancelRowErrors { bool command = false, target = false; };
+    CancelRowErrors ValidateCancelRow(uint64_t command, uint64_t target) const;
     std::vector<uint32_t> MoveAliases(uint32_t row) const;
     // T7-style summary of an input sequence: decoded inputs ("D, D/F, F+1") or "N inputs" when long/empty.
     std::string InputSequenceText(uint32_t sequence) const;

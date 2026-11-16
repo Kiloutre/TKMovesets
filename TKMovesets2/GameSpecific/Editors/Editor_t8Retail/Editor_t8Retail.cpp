@@ -186,6 +186,16 @@ uint32_t EditorT8Retail::ResolveMove(uint32_t id) const {
     if(id>=Count(12))throw std::out_of_range("Move ID or alias is outside this moveset");
     return id;
 }
+EditorT8Retail::CancelRowErrors EditorT8Retail::ValidateCancelRow(uint64_t command,uint64_t target) const {
+    namespace C=RetailT8Commands; CancelRowErrors errors;
+    if(command==C::ListEnd || command==C::GroupEnd)return errors;
+    if(C::IsInputSequence(command))errors.command=C::InputSequenceId(command)>=Count(14);
+    if(command==C::GroupCancel){errors.target=target>=Count(7);return errors;}
+    bool valid=target<=0xFFFF;
+    if(valid)try{ResolveMove(uint32_t(target));}catch(const std::exception&){valid=false;}
+    errors.target=!valid;
+    return errors;
+}
 std::vector<uint32_t> EditorT8Retail::MoveAliases(uint32_t row) const {
     std::vector<uint32_t> result;
     for(uint32_t alias=0x8000;alias<0x8000+60;++alias)try{if(ResolveMove(alias)==row)result.push_back(alias);}catch(const std::out_of_range&){}

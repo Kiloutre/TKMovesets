@@ -728,19 +728,12 @@ class RetailListForm final:public EditorFormList {
             field->hoverDescription=info?Fmt("edition.t8.param_hover_other",info->name,info->meaning):RetailFieldDescription(R::Tables[m_table].name,key);
         }
     }
-    // EditorVisuals_t7 TEditorCancels::OnUpdate: the target must match the command type (group row, move or
-    // alias, input sequence in range). Terminators are left alone.
+    // EditorT8Retail::ValidateCancelRow: the target must match the command type. Terminators are left alone.
     void ValidateCancelRow(int index){
-        namespace C=RetailT8Commands;
         auto& fields=m_items[index]->identifierMap;auto* command=fields.at("command");auto* target=fields.at("move_id");
         if(command->errored)return;
-        const auto value=RetailInputValue(command);const auto id=RetailInputValue(target);
-        if(value==C::ListEnd || value==C::GroupEnd){target->errored=false;return;}
-        if(C::IsInputSequence(value))command->errored=C::InputSequenceId(value)>=Retail().Count(14);
-        if(value==C::GroupCancel){target->errored=id>=Retail().Count(7);return;}
-        bool valid=id<=0xFFFF;
-        if(valid)try{Retail().ResolveMove(uint32_t(id));}catch(const std::exception&){valid=false;}
-        target->errored=!valid;
+        const auto errors=Retail().ValidateCancelRow(RetailInputValue(command),RetailInputValue(target));
+        command->errored=errors.command;target->errored=errors.target;
     }
     void OnUpdate(int index,EditorInput* field) override {
         if((m_table==6 || m_table==7) && (field->name.str()=="command" || field->name.str()=="move_id"))ValidateCancelRow(index);

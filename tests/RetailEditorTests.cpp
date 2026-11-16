@@ -333,6 +333,18 @@ void RunRetailEditorTests() {
     Check(Bytes(editor)==original,"Retail load altered bytes");
     Check(editor.ResolveMove(0x8001)==0 && editor.ResolveMove(1)==1 && !editor.MoveAliases(0).empty(),"Retail jump-by-ID/generic alias mapping differs");
     Reject([&]{editor.ResolveMove(UINT32_MAX);});
+    {
+        // Negative control for retail-validation-audit: the checks it runs do reject bad values.
+        namespace C=RetailT8Commands;using E=EditorT8Retail::CancelRowErrors;
+        auto same=[](E a,E b){return a.command==b.command && a.target==b.target;};
+        Check(same(editor.ValidateCancelRow(C::ListEnd,999),{}) && same(editor.ValidateCancelRow(C::GroupEnd,999),{}),"Cancel terminator target was checked");
+        Check(same(editor.ValidateCancelRow(1,1),{}) && same(editor.ValidateCancelRow(1,0x8001),{}) && same(editor.ValidateCancelRow(1,2),{false,true}),"Cancel move target check differs");
+        Check(same(editor.ValidateCancelRow(C::GroupCancel,1),{}) && same(editor.ValidateCancelRow(C::GroupCancel,2),{false,true}),"Group cancel target check differs");
+        Check(!editor.ValidateCancelRow(C::InputSequenceBase+1,0).command && editor.ValidateCancelRow(C::InputSequenceBase+5,0).command,"Input sequence range check differs");
+        VectorSet<std::string> order;auto fields=editor.RecordFields(12,0,order);auto* radius=fields.at("hitbox_0_radius");
+        Check(editor.ValidateField(EditorT8Retail::Type(12),radius),"Untouched float field rejected");
+        strcpy_s(radius->buffer,radius->bufsize,"abc");Check(!editor.ValidateField(EditorT8Retail::Type(12),radius),"Invalid float accepted");
+    }
     auto names=std::vector<Byte>();for(uint32_t row=0;row<editor.Count(12);++row){auto record=editor.Record(12,row);names.insert(names.end(),record.begin(),record.end());}
     Check(editor.MatchesMoveNames(names),"Retail current-move matching rejected the document's move identities");
     names[0]^=1;Check(!editor.MatchesMoveNames(names),"Retail current-move matching accepted another move identity");
@@ -664,6 +676,68 @@ int VerifyRetailEditorFile(const std::wstring& input,const std::wstring& output)
     Check(Helpers::CalculateCrc32(payload.data(),payload.size())==saved.Header().crc32,"Reopened retail CRC mismatch");
     size_t decoded=0;for(uint32_t i=0;i<editor.Count(12);++i)if(editor.MoveNameHash(i))++decoded;
     std::cout<<nlohmann::json({{"ok",true},{"moves",editor.Count(12)},{"decoded_move_names",decoded},{"unchanged_other_payload",true},{"live_editing",false}}).dump()<<'\n';return 0;
+}
+
+// Validation audit over real movesets: every untouched value a form shows must pass the checks the form runs when it
+// is edited (EditorT8Retail::ValidateField, the cancel row check) and Apply (SaveRecord) without changing a byte.
+// A failure here means the validation is stricter than the game's own data.
+int AuditRetailEditorValidation(std::span<const std::wstring> inputs){
+    namespace fs=std::filesystem;
+    std::vector<fs::path> files;
+    for(const auto& input:inputs){
+        if(fs::is_directory(input)){for(const auto& entry:fs::directory_iterator(input))if(entry.is_regular_file() && entry.path().extension()==L".tkmvst")files.push_back(entry.path());}
+        else files.emplace_back(input);
+    }
+    std::sort(files.begin(),files.end());
+    // Same reading as the retail form (EditorVisuals_t8Retail RetailInputValue).
+    auto value=[](const EditorInput* field)->uint64_t{
+        if(field->flags&EditorInput_Float){float v=std::strtof(field->buffer,nullptr);uint32_t bits;memcpy(&bits,&v,4);return bits;}
+        return std::strtoull(field->buffer,nullptr,(field->flags&EditorInput_Hex)?16:10);
+    };
+    GameProcess process;GameData data;auto* game=Games::GetGameInfoFromIdentifier(GameId_T8,GameVersions::T8::RETAIL);
+    nlohmann::json report=nlohmann::json::array();size_t totalFailures=0,audited=0;
+    for(const auto& path:files){
+        nlohmann::json entry{{"file",Helpers::to_utf8(path.filename().wstring())}};
+        EditorT8Retail editor(process,data,game);
+        try{
+            MovesetFile source(path);source.Validate();
+            auto* copy=static_cast<Byte*>(malloc(source.Bytes().size()));if(!copy)throw std::bad_alloc();
+            memcpy(copy,source.Bytes().data(),source.Bytes().size());
+            if(!editor.LoadMoveset(copy,source.Bytes().size()))throw std::runtime_error("not a retail T8 moveset");
+        }catch(const std::exception& error){entry["skipped"]=error.what();report.push_back(std::move(entry));continue;}
+        ++audited;
+        struct Failure{size_t count=0;nlohmann::json examples=nlohmann::json::array();};
+        std::map<std::string,Failure> failures;size_t records=0,fields=0;
+        auto fail=[&](const std::string& key,uint32_t row,const std::string& text){auto& f=failures[key];if(f.examples.size()<5)f.examples.push_back({{"row",row},{"value",text}});++f.count;};
+        const auto crc=editor.CalculateCRC32();
+        {
+            EditorLogic::Mutation transaction(editor,true);
+            for(size_t table=0;table<20;++table)for(uint32_t row=0;row<editor.Count(table);++row){
+                ++records;const std::string tableName=R::Tables[table].name;
+                VectorSet<std::string> order;auto map=editor.RecordFields(table,row,order);
+                for(const auto& name:order){
+                    ++fields;auto* field=map.at(name);
+                    if(!editor.ValidateField(EditorT8Retail::Type(table),field))fail(tableName+"."+name,row,field->buffer);
+                }
+                if((table==6 || table==7) && map.contains("command") && map.contains("move_id")){
+                    auto* command=map.at("command");auto* target=map.at("move_id");
+                    const auto errors=editor.ValidateCancelRow(value(command),value(target));
+                    if(errors.command)fail(tableName+".command (cancel row)",row,command->buffer);
+                    if(errors.target)fail(tableName+".move_id (cancel row)",row,std::string(command->buffer)+" -> "+target->buffer);
+                }
+                try{editor.SaveRecord(table,row,map);}
+                catch(const std::exception& error){fail(tableName+" Apply: "+error.what(),row,"");}
+            }
+            if(editor.CalculateCRC32()!=crc)fail("untouched Apply changed the payload",0,"");
+            // Never keep the no-op saves: the editor is discarded either way.
+        }
+        nlohmann::json list=nlohmann::json::object();
+        for(auto& [key,f]:failures){list[key]={{"count",f.count},{"examples",f.examples}};totalFailures+=f.count;}
+        entry["records"]=records;entry["fields"]=fields;entry["failures"]=list;
+        report.push_back(std::move(entry));
+    }
+    std::cout<<nlohmann::json({{"ok",totalFailures==0},{"audited",audited},{"failures",totalFailures},{"files",report}}).dump(1)<<'\n';
+    return totalFailures==0?0:1;
 }
 
 int VerifyRetailEditorStructure(const std::wstring& input,const std::wstring& output){
