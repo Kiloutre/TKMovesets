@@ -177,6 +177,9 @@ public:
 	// Returns a list of module currently loaded in the target remote process
 	virtual std::vector<moduleEntry> GetModuleList() const;
 	gameAddr ResolveRemoteFunction(FARPROC function) const;
+	// Address of [functionName] exported by the module named [moduleName] as loaded in the remote process, read from that
+	// module's own export table (not from a local copy of the file). 0 if the module or the export is not there.
+	gameAddr RemoteExport(const char* moduleName, const char* functionName) const;
 
 	// Returns a list of window names for the windows attached to the process
 	std::vector<std::string> GetWindowsList() const;

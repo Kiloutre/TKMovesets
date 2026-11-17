@@ -4,6 +4,8 @@
 
 #include "Online.hpp"
 #include "Compression.hpp"
+#include "helpers.hpp"
+#include <string>
 
 // Embedded moveset loader .dll
 #ifndef BUILD_TYPE_DEBUG
@@ -165,14 +167,16 @@ bool Online::IsMemoryLoaded()
     return m_memoryHandle != nullptr;
 }
 
-// Compares a (possibly unterminated) shared memory version string with ours. Empty = loader still initializing, not a mismatch yet.
+// Checks a (possibly unterminated) shared memory version string against the loader versions this tool can drive:
+// MOVESET_LOADER_MIN_VERSION up to our own (a newer loader may have changed things this tool does not know about).
+// Empty = loader still initializing, not a mismatch yet.
 static bool IsLoaderVersionMismatching(const SharedMemBase* sharedMem)
 {
-    const char* version = sharedMem->moveset_loader_version;
-    if (version[0] == '\0') {
+    const std::string version(sharedMem->moveset_loader_version, strnlen(sharedMem->moveset_loader_version, sizeof(sharedMem->moveset_loader_version)));
+    if (version.empty()) {
         return false;
     }
-    return strncmp(version, PROGRAM_VERSION, sizeof(sharedMem->moveset_loader_version)) != 0;
+    return Helpers::VersionGreater(MOVESET_LOADER_MIN_VERSION, version.c_str()) || Helpers::VersionGreater(version.c_str(), PROGRAM_VERSION);
 }
 
 bool Online::VerifyDllVersionMismatch()
@@ -211,6 +215,15 @@ bool Online::CallMovesetLoaderFunction(const char* functionName, bool waitEnd, u
     }
 
     DEBUG_LOG("Caling remote process '%s'...\n", functionName);
+    // The loader the game holds may be another file than our local copy (an older extraction kept loaded by the game,
+    // another build of the same version): its own export table gives the right addresses, wherever it was loaded from.
+    if (const gameAddr loaded = m_process.RemoteExport(MOVESET_LOADER_NAME, functionName)) {
+        int32_t exitCode = 0;
+        const auto result = m_process.createRemoteThread(loaded, 0, waitEnd, &exitCode);
+        if (outExitCode != nullptr) *outExitCode = (uint32_t)exitCode;
+        return waitEnd ? result == GameProcessThreadCreation_FinishedCleanly
+            : result == GameProcessThreadCreation_Started || result == GameProcessThreadCreation_FinishedCleanly;
+    }
     auto moduleHandle = GetModuleHandleA(MOVESET_LOADER_NAME);
     if (moduleHandle == 0) {
         DEBUG_LOG("Failure getting the module handle for 'TKMovesetLoader.dll'\n");
@@ -253,7 +266,10 @@ bool Online::InjectDllAndWaitEnd()
     std::lock_guard injectionLock(m_injectionMutex);
     bool result = false;
 
-    if (ExtractMovesetLoaderIfNeeded())
+    // A loader the game already holds is used as it is: a fresh extraction is only needed to load one, and fails while the
+    // game keeps the old file open (a newer build started next to it), which used to need a game restart.
+    const bool alreadyLoaded = m_process.RemoteExport(MOVESET_LOADER_NAME, MOVESET_LOADER_INIT_FUNC) != 0;
+    if (alreadyLoaded || ExtractMovesetLoaderIfNeeded())
     {
         DEBUG_LOG("Online::InjectDll()\n");
         std::wstring currDirectory;
@@ -272,7 +288,7 @@ bool Online::InjectDllAndWaitEnd()
 
 
         // Call the functions to initiate and run the moveset loader
-        if (m_process.InjectDll(w_dllPath.c_str()))
+        if (alreadyLoaded || m_process.InjectDll(w_dllPath.c_str()))
         {
             // A loader that already initialized the shared memory tells its version: refuse to call into another build
             if (PeekDllVersionMismatch()) {

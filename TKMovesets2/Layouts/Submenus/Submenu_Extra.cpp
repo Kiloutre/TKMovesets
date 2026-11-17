@@ -76,6 +76,7 @@ bool Submenu_Extra::Attach(GameAddressesFile& addresses)
 {
 	if (m_process.IsAttached() && m_process.CheckRunning()) return true;
 	m_loader.reset();
+	m_injectionStarted = m_loaderStarted = false; m_startingSince = m_retryAt = 0;
 	m_process.Detach();
 	if (!m_process.Attach(T8_PROCESS, PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_CREATE_THREAD)) return false;
 	const GameInfo* info = Games::GetGameInfoFromIdentifier(GameId_T8, GameVersions::T8::RETAIL);
@@ -95,19 +96,42 @@ void Submenu_Extra::Send(int command)
 void Submenu_Extra::Update()
 {
 	if (!m_loader) return;
-	if (!m_process.CheckRunning()) { m_loader.reset(); m_process.Detach(); m_pendingCommand = 0; return; }
-	if (!m_loader->IsMemoryLoaded()) {
-		if (m_loader->LoadSharedMemory()) m_loader->VerifyDllVersionMismatch();
-		else if (m_pendingCommand && !m_loader->isInjecting) {
-			// two attempts: the first injection into a freshly started game has failed without a trace (2026-11-14)
-			if (m_injectionAttempts < 2) { m_loader->InjectDll(); m_injectionStarted = true; ++m_injectionAttempts; }
-			else { m_message = _("extra.tag.inject_failed"); m_pendingCommand = 0; m_injectionStarted = false; m_injectionAttempts = 0; }
-		}
-		if (!m_loader->IsMemoryLoaded()) return;
+	if (!m_process.CheckRunning()) {
+		m_loader.reset(); m_process.Detach(); m_pendingCommand = 0;
+		m_injectionStarted = m_loaderStarted = false; m_startingSince = m_retryAt = 0;
+		return;
 	}
-	m_injectionStarted = false;
-	m_injectionAttempts = 0;
-	if (m_loader->versionMismatch) { m_message = _("extra.tag.version_mismatch"); m_pendingCommand = 0; return; }
+	if (!m_loader->IsMemoryLoaded() && m_loader->LoadSharedMemory()) m_loader->VerifyDllVersionMismatch();
+	if (m_loader->versionMismatch) { m_message = _("extra.tag.version_mismatch"); m_pendingCommand = 0; m_injectionStarted = false; return; }
+	if (!m_pendingCommand) return;
+	if (!m_loaderStarted) {
+		// Always through the loader's Init/Run, as `--headless tag-t8` does, even when its shared memory already exists:
+		// Init answers AlreadyRunning when the main loop runs, else Run starts it. A start that was cut short (Init past the
+		// 10 s wait in a freshly started game) leaves the shared memory without a main loop, and an attempt made while that
+		// Init still runs is refused, so attempts are retried for 30 s instead of the game having to be restarted.
+		if (m_loader->isInjecting) return;
+		const ULONGLONG now = GetTickCount64();
+		if (m_injectionStarted) {
+			m_injectionStarted = false;
+			if (!m_loader->IsMemoryLoaded() && m_loader->LoadSharedMemory()) m_loader->VerifyDllVersionMismatch();
+			if (m_loader->versionMismatch) { m_message = _("extra.tag.version_mismatch"); m_pendingCommand = 0; return; }
+			if (m_loader->injectedDll && m_loader->IsMemoryLoaded()) m_loaderStarted = true;
+			else if (now - m_startingSince >= 30000) {
+				m_message = _("extra.tag.inject_failed"); m_pendingCommand = 0; m_startingSince = m_retryAt = 0;
+				return;
+			}
+			else { m_retryAt = now + 1000; return; }
+		}
+		if (!m_loaderStarted) {
+			if (now < m_retryAt) return;
+			if (!m_startingSince) m_startingSince = now;
+			m_loader->injectedDll = false;
+			m_loader->InjectDll();
+			m_injectionStarted = true;
+			return;
+		}
+		m_startingSince = m_retryAt = 0;
+	}
 	auto mem = m_loader->SharedMemory();
 	if (!mem || !m_pendingCommand) return;
 	if (mem->moveset_loader_version[0] == '\0') return;   // loader still initializing

@@ -185,6 +185,42 @@ gameAddr GameProcess::ResolveRemoteFunction(FARPROC function) const
 	return 0;
 }
 
+gameAddr GameProcess::RemoteExport(const char* moduleName, const char* functionName) const
+{
+	for (const auto& module : GetModuleList()) {
+		if (_stricmp(module.name.c_str(), moduleName) != 0) continue;
+		const gameAddr base = module.address;
+		auto inModule = [&](uint64_t rva, uint64_t size) { return rva < module.size && size <= module.size - rva; };
+		IMAGE_DOS_HEADER dos{};
+		if (!readBytes(base, &dos, sizeof(dos)) || dos.e_magic != IMAGE_DOS_SIGNATURE || !inModule((uint32_t)dos.e_lfanew, sizeof(IMAGE_NT_HEADERS64))) return 0;
+		IMAGE_NT_HEADERS64 nt{};
+		if (!readBytes(base + (uint32_t)dos.e_lfanew, &nt, sizeof(nt)) || nt.Signature != IMAGE_NT_SIGNATURE ||
+			nt.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC || nt.OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_EXPORT) return 0;
+		const auto& directory = nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+		IMAGE_EXPORT_DIRECTORY exports{};
+		if (!directory.VirtualAddress || !inModule(directory.VirtualAddress, sizeof(exports)) ||
+			!readBytes(base + directory.VirtualAddress, &exports, sizeof(exports))) return 0;
+		if (!inModule(exports.AddressOfNames, uint64_t(exports.NumberOfNames) * 4) || !inModule(exports.AddressOfNameOrdinals, uint64_t(exports.NumberOfNames) * 2) ||
+			!inModule(exports.AddressOfFunctions, uint64_t(exports.NumberOfFunctions) * 4)) return 0;
+		const size_t wanted = strlen(functionName);
+		std::vector<char> name(wanted + 1);
+		for (DWORD i = 0; i < exports.NumberOfNames; ++i) {
+			uint32_t nameRva = 0;
+			if (!readBytes(base + exports.AddressOfNames + uint64_t(i) * 4, &nameRva, 4) || !inModule(nameRva, name.size())) continue;
+			if (!readBytes(base + nameRva, name.data(), name.size()) || memcmp(name.data(), functionName, wanted + 1) != 0) continue;
+			uint16_t ordinal = 0;
+			uint32_t functionRva = 0;
+			if (!readBytes(base + exports.AddressOfNameOrdinals + uint64_t(i) * 2, &ordinal, 2) || ordinal >= exports.NumberOfFunctions ||
+				!readBytes(base + exports.AddressOfFunctions + uint64_t(ordinal) * 4, &functionRva, 4) || !inModule(functionRva, 1)) return 0;
+			// A forwarded export points inside the export directory: not code
+			if (functionRva >= directory.VirtualAddress && functionRva < uint64_t(directory.VirtualAddress) + directory.Size) return 0;
+			return base + functionRva;
+		}
+		return 0;
+	}
+	return 0;
+}
+
 std::vector<moduleEntry> GameProcess::GetModuleList() const
 {
 	HANDLE moduleSnap;

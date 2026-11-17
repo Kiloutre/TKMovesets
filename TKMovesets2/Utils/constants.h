@@ -41,6 +41,10 @@
 // Anything else indicate a malformed header : a bad file
 # define MOVESET_HEADER_STRING_CHARSET   "_-+!()[]{}.,;: /"
 
+// Oldest moveset loader this tool can drive: a loader already in the game whose version is from this one up to
+// PROGRAM_VERSION is used as it is. Raise it when the shared memory (Injected/SharedMemory/*.h) or the loader's exported
+// functions change: those have been unchanged since 1.0.
+# define MOVESET_LOADER_MIN_VERSION      "1.0"
 # define MOVESET_LOADER_NAME             "TKMovesetLoader.dll"
 # define MOVESET_LOADER_INIT_FUNC        "MovesetLoaderInit"
 # define MOVESET_LOADER_RUN_FUNC         "MovesetLoaderRun"

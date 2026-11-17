@@ -26,8 +26,9 @@ class Submenu_Extra
 	std::unique_ptr<OnlineT8> m_loader;
 	int m_pendingCommand = 0;          // TagCommand_ sent once the loader's shared memory is up
 	int m_requestId = 0;
-	bool m_injectionStarted = false;
-	int m_injectionAttempts = 0;
+	bool m_injectionStarted = false;      // an Init/Run attempt is running on the loader's injection thread
+	bool m_loaderStarted = false;         // this attachment's loader answered Init/Run: its main loop runs
+	unsigned long long m_startingSince = 0, m_retryAt = 0;
 	std::string m_message;
 
 	void LoadFighters();
