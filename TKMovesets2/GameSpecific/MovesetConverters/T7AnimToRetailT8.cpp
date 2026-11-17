@@ -1,4 +1,5 @@
 #include "T7AnimToRetailT8.hpp"
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <map>
@@ -75,7 +76,7 @@ Frame ReadFrame(const RetailPanm::T7Animation& source, uint32_t frame) {
 struct Pose { Quat rotation = Identity; std::array<double, 3> translation{}; bool hasTranslation = false; };
 using Bones = std::map<std::string, Pose>;
 // Per T8 bone, the converted local transform of one frame.
-Bones ConvertFrame(const Frame& f, bool native, Channel facing) {
+Bones ConvertFrame(const Frame& f, bool native) {
     Bones out;
     auto q = [&](int ch) { return FromEuler(f.c[ch]); };
     out["Top"] = {Identity, {f.c[GlobalPos][0]/10, f.c[GlobalPos][1]/10, f.c[GlobalPos][2]/10}, true};
@@ -84,7 +85,12 @@ Bones ConvertFrame(const Frame& f, bool native, Channel facing) {
     // older files converted from T8 pin LowerBody to BLower and carry it in FullBody (current ones use the native layout).
     const Quat orient = native ? Norm(Mul(q(LowerBody), Conj(BLower))) : Identity;
     out["Rot"].rotation = Norm(Mul(q(FullBody), orient));
-    out["MUKI"].rotation = Norm(q(facing)); // in-game facing
+    // Native T8 layout: MUKI is the facing (T7 DirY: identity, or a 180 degree yaw for back-turned moves) and
+    // HARA_ROT1 is the T7 FullBody rotation, the body state the game reads during juggles and downs (upright,
+    // turned, face up/down). Putting FullBody into MUKI instead flipped juggled opponents (issue #178).
+    // Files converted from T8 that carry the pelvis in FullBody (not native) have no such state: HARA_ROT1 stays upright.
+    out["MUKI"].rotation = Norm(q(DirY));
+    out["HARA_ROT1"].rotation = native ? Norm(q(FullBody)) : Identity;
     const Quat upper = Norm(Mul(Conj(HipRotation), Mul(Conj(orient), q(UpperBody))));
     const Quat spine1 = Slerp(Identity, upper, Spine1Ratio);
     out["Spine1"].rotation = spine1;
@@ -162,11 +168,11 @@ std::vector<Byte> Convert(const RetailPanm::T7Animation& source) { return Conver
 
 uint32_t MaxConvertibleFrames() {
     static const uint32_t frames = [] {
-        // The bones ConvertFrame animates (Hip and HARA_ROT1 are pinned to one sample by ConvertOnto).
-        const Bones converted = ConvertFrame(Frame{}, true, DirY);
+        // The bones ConvertFrame animates (Hip is pinned to one sample by ConvertOnto).
+        const Bones converted = ConvertFrame(Frame{}, true);
         size_t animated = 0;
         for (const auto& track : BuiltInSkeleton().tracks)
-            if (converted.contains(track.name) && track.name != "Hip" && track.name != "HARA_ROT1") ++animated;
+            if (converted.contains(track.name) && track.name != "Hip") ++animated;
         if (!animated) throw std::logic_error("Built-in skeleton has no converted bones");
         return static_cast<uint32_t>((32ULL << 20) / (animated * sizeof(RetailPanm::Sample)));
     }();
@@ -184,26 +190,32 @@ std::vector<Byte> ConvertOnto(const RetailPanm::T7Animation& source, RetailPanm:
     std::vector<Frame> frames(source.frames);
     for (uint32_t f = 0; f < source.frames; ++f) frames[f] = ReadFrame(source, f);
     // Native T7 convention unless every LowerBody frame sits at the constant rest (-pi/2, 0, -pi/2).
-    bool native = false, fullBodyTurns = false;
+    bool native = false;
     for (const auto& f : frames) {
         const auto& lower = f.c[LowerBody];
         native |= !(std::abs(lower[0] + Pi/2) < 0.001 && std::abs(lower[1]) < 0.001 && std::abs(lower[2] + Pi/2) < 0.001);
-        fullBodyTurns |= std::abs(FromEuler(f.c[FullBody])[3]) < 0.9962; // FullBody turns more than ~10 degrees
     }
-    const Channel facing = fullBodyTurns ? FullBody : DirY;
     std::vector<Bones> converted(source.frames);
-    for (uint32_t f = 0; f < source.frames; ++f) converted[f] = ConvertFrame(frames[f], native, facing);
+    for (uint32_t f = 0; f < source.frames; ++f) converted[f] = ConvertFrame(frames[f], native);
     for (auto& track : output.tracks) {
         const auto base = track.samples.front();
-        // Bones the formulas expect static at a fixed pose; other unconverted bones keep the template's frame 0.
-        if (track.name == "Hip" || track.name == "HARA_ROT1") {
+        // Hip is static at the pose the spine formula expects; other unconverted bones keep the template's frame 0.
+        if (track.name == "Hip") {
             auto sample = base;
-            const Quat r = track.name == "Hip" ? HipRotation : Identity;
-            for (int i = 0; i < 4; ++i) sample.rotation[i] = static_cast<float>(r[i]);
+            for (int i = 0; i < 4; ++i) sample.rotation[i] = static_cast<float>(HipRotation[i]);
             track.samples = {sample};
             continue;
         }
         if (!converted.front().contains(track.name)) { track.samples = {base}; continue; }
+        // A body state that never changes stays one static sample, like native HARA_ROT1 in most animations.
+        if (track.name == "HARA_ROT1" && std::all_of(converted.begin(), converted.end(), [&](const Bones& b) {
+                return b.at(track.name).rotation == converted.front().at(track.name).rotation; })) {
+            auto sample = base;
+            const Quat r = converted.front().at(track.name).rotation;
+            for (int i = 0; i < 4; ++i) sample.rotation[i] = static_cast<float>(r[i]);
+            track.samples = {sample};
+            continue;
+        }
         track.samples.assign(source.frames, base);
         Quat previous = Identity;
         for (uint32_t f = 0; f < source.frames; ++f) {

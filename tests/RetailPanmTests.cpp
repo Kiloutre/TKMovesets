@@ -8,6 +8,7 @@
 #include "AnimationReader.hpp"
 #include <chrono>
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <functional>
 #include <limits>
@@ -216,6 +217,43 @@ void RunPanmToT7Tests() {
     auto nan=SyntheticT7(3);nan.values[5]=std::numeric_limits<float>::quiet_NaN();Reject([&]{T::WriteC8(nan);});
     auto noRoot=P::DecodeRaw(T7AnimToRetailT8::Convert(SyntheticT7(3)));
     std::erase_if(noRoot.tracks,[](const P::Track& t){return t.name=="Top";});Reject([&]{T::ToChannels(noRoot);});
+    // Native T8 layout (issue #178): MUKI is T7 DirY, HARA_ROT1 is T7 FullBody (the juggle/down body state).
+    {
+        constexpr double HalfPi=1.5707963267948966;
+        auto body=[&](bool native,bool turning) {
+            auto a=SyntheticT7(6);
+            for(uint32_t f=0;f<6;++f) {
+                auto at=[&](int ch,int i)->float&{return a.values[(size_t(f)*23+ch)*3+i];};
+                for(int i=0;i<3;++i)at(2,i)=at(3,i)=0;
+                at(2,1)=static_cast<float>(2*HalfPi);                    // DirY: back-turned (180 degree yaw)
+                at(3,0)=static_cast<float>(turning && f>=3?HalfPi:0.0);  // FullBody: face up from frame 3
+                if(native)at(5,1)=0.2f;                                  // LowerBody off its rest: native T7 layout
+            }
+            return P::DecodeRaw(T7AnimToRetailT8::Convert(a));
+        };
+        auto track=[](const P::Animation& a,const char* name)->const P::Track&{
+            for(const auto& t:a.tracks)if(t.name==name)return t;
+            throw std::runtime_error(std::string("Converted animation has no ")+name);
+        };
+        auto sameRotation=[](const P::Sample& s,std::array<double,4> q){
+            double minus=0,plus=0;
+            for(int i=0;i<4;++i){minus+=(s.rotation[i]-q[i])*(s.rotation[i]-q[i]);plus+=(s.rotation[i]+q[i])*(s.rotation[i]+q[i]);}
+            return std::fmin(minus,plus)<1e-8;
+        };
+        const std::array<double,4> identity{0,0,0,1},backTurned{0,1,0,0},faceUp{std::sin(HalfPi/2),0,0,std::cos(HalfPi/2)};
+        const auto turning=body(true,true);
+        const auto& hara=track(turning,"HARA_ROT1");const auto& muki=track(turning,"MUKI");
+        Check(hara.samples.size()==6,"HARA_ROT1 is not animated when FullBody turns");
+        for(size_t f=0;f<6;++f) {
+            Check(sameRotation(hara.samples[f],f>=3?faceUp:identity),"HARA_ROT1 does not carry FullBody");
+            Check(sameRotation(muki.samples[muki.samples.size()==1?0:f],backTurned),"MUKI does not carry DirY alone");
+        }
+        const auto still=body(true,false);
+        Check(track(still,"HARA_ROT1").samples.size()==1 && sameRotation(track(still,"HARA_ROT1").samples[0],identity),"Still HARA_ROT1 is not one upright sample");
+        const auto fromT8=body(false,true);
+        Check(track(fromT8,"HARA_ROT1").samples.size()==1 && sameRotation(track(fromT8,"HARA_ROT1").samples[0],identity),
+            "HARA_ROT1 is not upright for the pelvis-in-FullBody layout");
+    }
 }
 }
 void RunRetailPanmTests() {
@@ -267,7 +305,7 @@ void RunRetailPanmTests() {
         // QA 1.0 (T7DecodeFrameBudget): a 0x64 animation longer than its conversion can hold is refused before
         // the per-frame decode (whose cost grows with frames squared), and the bound rejects nothing convertible.
         const auto limit=T7AnimToRetailT8::MaxConvertibleFrames();
-        Check(limit==(32u<<20)/(22*sizeof(P::Sample)),"Converted bone count changed: review MaxConvertibleFrames");
+        Check(limit==(32u<<20)/(23*sizeof(P::Sample)),"Converted bone count changed: review MaxConvertibleFrames"); // 23 with HARA_ROT1 (#178)
         const uint16_t frames=40000,bones=1;const size_t chunks=(frames+14)/16;
         std::vector<Byte> long64(4+2*bones+6+6*bones+chunks*4+3*bones);
         Put<uint16_t>(long64,0,0x64);Put<uint16_t>(long64,2,bones);Put<uint16_t>(long64,4,4);Put<uint16_t>(long64,6,frames);
