@@ -242,4 +242,7 @@ public:
 	virtual std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const = 0;
 	virtual std::vector<MoveGroupedCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const = 0;
 	virtual std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const = 0;
+	// Moves and projectiles reaching the grouped cancel list that starts at [group_start_id] through a cancel
+	virtual std::vector<TEditor::CancelMoveReference> ListGroupedCancelsMoveReferences(unsigned int group_start_id) const { return {}; }
+	virtual std::vector<TEditor::CancelProjectileReference> ListGroupedCancelsProjectilesReferences(unsigned int group_start_id) const { return {}; }
 };

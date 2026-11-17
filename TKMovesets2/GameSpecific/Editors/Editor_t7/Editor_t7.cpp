@@ -324,53 +324,31 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 		flags |= EditorMoveFlags_Custom;
 	}
 
+	// Same flags, colour and alias as ReloadDisplayableMoveList
 	uint16_t aliasId = 0;
+	unsigned int color = TEditorUtils::GetMoveColorFromFlag(flags);
 	auto displayedMove = displayableMovelist[moveId];
 
-	// Mark if default generic moves
+	// Mark if default generic moves, then if current generic move
+	const std::pair<uint16_t*, EditorMoveFlags> aliasLists[] = {
+		{ m_infos->orig_aliases, EditorMoveFlags_Generic },
+		{ m_infos->current_aliases, EditorMoveFlags_CurrentGeneric },
+	};
+	static_assert(_countof(m_infos->orig_aliases) == _countof(m_infos->current_aliases));
+	for (const auto& [aliases, aliasFlag] : aliasLists)
 	{
-		uint16_t* aliases = m_infos->orig_aliases;
-		uint8_t aliasesCount = (uint8_t)_countof(m_infos->orig_aliases);
-
-		for (uint8_t j = 0; j < aliasesCount; ++j)
+		for (uint8_t j = 0; j < (uint8_t)_countof(m_infos->orig_aliases); ++j)
 		{
-			uint16_t aliasMoveId = aliases[j];
-			uint16_t aliasId = 0x8000 + j;
-
-			if (moveId != aliasMoveId) {
+			if (moveId != aliases[j]) {
 				continue;
 			}
 
-			displayedMove->flags |= EditorMoveFlags_Generic;
+			flags |= aliasFlag;
 
-			if (displayedMove->aliasId == 0)
+			if (aliasId == 0)
 			{
-				displayedMove->color |= TEditorUtils::GetMoveColorFromFlag(displayedMove->flags);
-				aliasId = aliasId;
-			}
-		}
-	}
-
-	// Mark if current generic move
-	{
-		uint16_t* aliases = m_infos->current_aliases;
-		uint8_t aliasesCount = (uint8_t)_countof(m_infos->current_aliases);
-
-		for (uint8_t j = 0; j < aliasesCount; ++j)
-		{
-			uint16_t aliasMoveId = aliases[j];
-			uint16_t aliasId = 0x8000 + j;
-
-			if (moveId != aliasMoveId) {
-				continue;
-			}
-
-			displayedMove->flags |= EditorMoveFlags_Generic;
-
-			if (displayedMove->aliasId == 0)
-			{
-				displayedMove->color |= TEditorUtils::GetMoveColorFromFlag(displayedMove->flags);
-				aliasId = aliasId;
+				color |= TEditorUtils::GetMoveColorFromFlag(flags);
+				aliasId = 0x8000 + j;
 			}
 		}
 	}
@@ -378,7 +356,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 	displayedMove->moveId_str = std::to_string(moveId);
 	displayedMove->name = moveName;
 	displayedMove->alias_str = aliasId == 0 ? std::string() : std::to_string(aliasId);
-	displayedMove->color = TEditorUtils::GetMoveColorFromFlag(flags);
+	displayedMove->color = color;
 	displayedMove->aliasId = aliasId;
 	displayedMove->flags = flags;
 	displayedMove->screw = MoveUsesScrew(moveId);

@@ -57,6 +57,12 @@ std::vector<TEditor::CancelProjectileReference> EditorT7::ListCancelsProjectiles
 		++ref_id;
 	}
 
+	ListProjectilesMoveReferences(references);
+	return references;
+}
+
+void EditorT7::ListProjectilesMoveReferences(std::vector<TEditor::CancelProjectileReference>& references) const
+{
 	struct s_extra_prop_ref {
 		unsigned int list_start_id;
 		unsigned int id;
@@ -65,7 +71,7 @@ std::vector<TEditor::CancelProjectileReference> EditorT7::ListCancelsProjectiles
 
 	std::vector<s_extra_prop_ref> extra_properties_refs;
 	unsigned int list_start_id = 0;
-	ref_id = 0;
+	unsigned int ref_id = 0;
 	for (const auto& extra_property : m_iterators.extra_move_properties)
 	{
 		if (extra_property.id == constants.at(EditorConstants_ProjectileProperty))
@@ -103,7 +109,88 @@ std::vector<TEditor::CancelProjectileReference> EditorT7::ListCancelsProjectiles
 		}
 		++ref_id;
 	}
+}
 
+// -- Grouped cancels -- //
+
+std::vector<std::pair<unsigned int, unsigned int>> EditorT7::ListGroupedCancelUsers(unsigned int group_start_id) const
+{
+	std::vector<std::pair<unsigned int, unsigned int>> users;
+	const size_t groupCount = m_iterators.grouped_cancels.size();
+	if (group_start_id >= groupCount) return users;
+
+	unsigned int group_end_id = group_start_id;
+	while (group_end_id + 1 < groupCount &&
+		m_iterators.grouped_cancels[group_end_id]->command != constants.at(EditorConstants_GroupedCancelCommandEnd)) {
+		++group_end_id;
+	}
+
+	unsigned int ref_id = 0;
+	unsigned int list_start = 0;
+	for (const auto& cancel : m_iterators.cancels)
+	{
+		// A cancel entering the list anywhere before its end runs the rest of it
+		if (IsCommandGroupedCancelReference(cancel.command) &&
+			group_start_id <= cancel.move_id && cancel.move_id <= group_end_id) {
+			users.push_back({ list_start, ref_id });
+		}
+		++ref_id;
+		if (cancel.command == constants.at(EditorConstants_CancelCommandEnd)) {
+			list_start = ref_id;
+		}
+	}
+	return users;
+}
+
+std::vector<TEditor::CancelMoveReference> EditorT7::ListGroupedCancelsMoveReferences(unsigned int group_start_id) const
+{
+	std::vector<TEditor::CancelMoveReference> references;
+	const auto users = ListGroupedCancelUsers(group_start_id);
+	if (users.empty()) return references;
+
+	unsigned int ref_id = 0;
+	for (const auto& move : m_iterators.moves)
+	{
+		for (const auto& [list_start, cancel_id] : users)
+		{
+			if (
+				(list_start <= move.cancel_addr && move.cancel_addr <= cancel_id) ||
+				(list_start <= move._0x28_cancel_addr && move._0x28_cancel_addr <= cancel_id) ||
+				(list_start <= move._0x38_cancel_addr && move._0x38_cancel_addr <= cancel_id) ||
+				(list_start <= move._0x48_cancel_addr && move._0x48_cancel_addr <= cancel_id)
+				) {
+				references.push_back({
+					.move_id = ref_id,
+					.name = std::format("{} - {}", ref_id, (char*)(m_movesetData + m_offsets->nameBlock + move.name_addr))
+				});
+				break;
+			}
+		}
+		++ref_id;
+	}
+	return references;
+}
+
+std::vector<TEditor::CancelProjectileReference> EditorT7::ListGroupedCancelsProjectilesReferences(unsigned int group_start_id) const
+{
+	std::vector<TEditor::CancelProjectileReference> references;
+	const auto users = ListGroupedCancelUsers(group_start_id);
+	if (users.empty()) return references;
+
+	unsigned int ref_id = 0;
+	for (const auto& projectile : m_iterators.projectiles)
+	{
+		for (const auto& [list_start, cancel_id] : users)
+		{
+			if (list_start <= projectile.cancel_addr && projectile.cancel_addr <= cancel_id) {
+				references.push_back({ .id = ref_id, .id_str = std::to_string(ref_id) });
+				break;
+			}
+		}
+		++ref_id;
+	}
+
+	ListProjectilesMoveReferences(references);
 	return references;
 }
 

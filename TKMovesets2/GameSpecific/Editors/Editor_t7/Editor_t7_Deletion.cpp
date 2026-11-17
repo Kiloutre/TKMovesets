@@ -70,18 +70,12 @@ void EditorT7::DeletePushback(int id)
 
 	for (auto& reactions : m_iterators.reactions)
 	{
-		for (unsigned int i = 0; i < _countof(reactions.pushbacks); ++i) {
-			if (MUST_SHIFT_ID(reactions.pushbacks[i], -1, id, id + 1)) {
-				reactions.pushbacks[i]  -= 1;
-			}
+		// Same remap as the other deletions: a reaction pointing at the deleted pushback moves to the next one
+		for (auto& pushback : reactions.pushbacks) {
+			RemapRecordIndex(pushback, edit);
 		}
 	}
-
-
-	for (auto& extraProp : m_iterators.extra_move_properties)
-	{
-		//TODO
-	}
+	// No extra property references a pushback (docs/t7-structures.md, reference summary)
 }
 
 void EditorT7::DeleteInputSequence(int id)

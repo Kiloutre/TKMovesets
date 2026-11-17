@@ -164,7 +164,6 @@ void TEditorMove::OnApply()
 	editor->RecomputeDisplayableMoveFlags(structureId);
 	// Mutation commit requests the next-frame filter refresh; do not publish working-row pointers here.
 	if (m_renamed) {
-		// todo: re-compute displayable color of this move according ot its new properties
 		ApplyWindowName();
 		m_renamed = false;
 	}

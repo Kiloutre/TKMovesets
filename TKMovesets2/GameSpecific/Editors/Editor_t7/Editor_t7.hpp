@@ -381,6 +381,13 @@ public:
 	std::vector<MoveCancelReference> ListMoveCancelsReferences(unsigned int moveid) const override;
 	std::vector<MoveGroupedCancelReference> ListMoveGroupedCancelsReferences(unsigned int moveid) const override;
 	std::vector<MoveReactionsReference> ListMoveReactionsReferences(unsigned int moveid) const override;
+	std::vector<TEditor::CancelMoveReference> ListGroupedCancelsMoveReferences(unsigned int group_start_id) const override;
+	std::vector<TEditor::CancelProjectileReference> ListGroupedCancelsProjectilesReferences(unsigned int group_start_id) const override;
+private:
+	// Cancels jumping into the grouped cancel list at [group_start_id], as {cancel list start, cancel id}
+	std::vector<std::pair<unsigned int, unsigned int>> ListGroupedCancelUsers(unsigned int group_start_id) const;
+	// Fill each projectile's moves_references (moves that spawn it through an extra property)
+	void ListProjectilesMoveReferences(std::vector<TEditor::CancelProjectileReference>& projectiles) const;
 };
 
 template<typename T> int EditorT7::ModifyGenericMovelistListSize(unsigned int listStart,

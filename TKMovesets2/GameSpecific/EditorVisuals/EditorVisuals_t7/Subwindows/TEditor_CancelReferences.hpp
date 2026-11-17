@@ -13,6 +13,8 @@ private:
 
 	// Cancel ID to search (will be treated as the start of the list)
 	unsigned int m_cancelid;
+	// m_cancelid is a grouped cancel list: list what reaches it through cancels
+	bool m_grouped;
 	// Editor reference
 	const TEditor* m_editor;
 
@@ -46,8 +48,9 @@ private:
 	void RenderProjectilesReferences();
 	void RenderMovesReferences();
 public:
-	TEditor_CancelReferences(const TEditor* editor, EditorVisuals* baseWindow, unsigned int moveid);
+	TEditor_CancelReferences(const TEditor* editor, EditorVisuals* baseWindow, unsigned int cancelid, bool grouped = false);
 	static constexpr const char* identifier_prefix = "cancel_reference_";
+	static constexpr const char* grouped_identifier_prefix = "grouped_cancel_reference_";
 
 	// Refresh the subwindow
 	void Refresh(ImGuiID nextDockID) override;

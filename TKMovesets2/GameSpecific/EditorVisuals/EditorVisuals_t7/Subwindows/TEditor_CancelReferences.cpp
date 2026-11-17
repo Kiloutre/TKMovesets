@@ -10,8 +10,17 @@
 
 void TEditor_CancelReferences::LoadReferenceList(const TEditor* editor, unsigned int cancelid)
 {
-	m_references.moves = editor->ListCancelsMoveReferences(cancelid);
-	m_references.projectiles = editor->ListCancelsProjectilesReferences(cancelid);
+	// Pointers into the old lists would dangle after a reload
+	m_references.current_move = nullptr;
+	m_references.current_projectile = nullptr;
+	if (m_grouped) {
+		m_references.moves = editor->ListGroupedCancelsMoveReferences(cancelid);
+		m_references.projectiles = editor->ListGroupedCancelsProjectilesReferences(cancelid);
+	}
+	else {
+		m_references.moves = editor->ListCancelsMoveReferences(cancelid);
+		m_references.projectiles = editor->ListCancelsProjectilesReferences(cancelid);
+	}
 
 	for (auto& projectile_ref : m_references.projectiles) {
 		projectile_ref.references_count_str = std::format("{} {}", projectile_ref.moves_references.size(), _("references.moves"));
@@ -209,10 +218,11 @@ void TEditor_CancelReferences::RenderProjectilesReferences()
 
 // -- Public methods -- //
 
-TEditor_CancelReferences::TEditor_CancelReferences(const TEditor* editor, EditorVisuals* baseWindow, unsigned int cancelid) : m_editor(editor), m_baseWindow(baseWindow), m_cancelid(cancelid)
+TEditor_CancelReferences::TEditor_CancelReferences(const TEditor* editor, EditorVisuals* baseWindow, unsigned int cancelid, bool grouped) : m_baseWindow(baseWindow), m_cancelid(cancelid), m_grouped(grouped), m_editor(editor)
 {
-	m_identifier = std::format("{} {}###{}", _("references.cancel.title"), cancelid, (uint64_t)this);
-	identifier = TEditor_CancelReferences::identifier_prefix + std::to_string(cancelid);
+	const char* title = grouped ? _("edition.grouped_cancel.window_name") : _("references.cancel.title");
+	m_identifier = std::format("{} {}###{}", title, cancelid, (uint64_t)this);
+	identifier = (grouped ? grouped_identifier_prefix : identifier_prefix) + std::to_string(cancelid);
 	LoadReferenceList(m_editor, m_cancelid);
 }
 

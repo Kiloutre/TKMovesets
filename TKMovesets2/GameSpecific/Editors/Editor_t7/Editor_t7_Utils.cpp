@@ -72,8 +72,19 @@ bool EditorT7::IsVoicelipValueEnd(const char* buffer) const
 
 unsigned int EditorT7::GetMotaAnimCount(int motaId) const
 {
-	// todo
-	return 0;
+	if (motaId < 0 || motaId >= static_cast<int>(_countof(m_infos->motas.motas))) return 0;
+	const auto offset = reinterpret_cast<uint64_t>(m_infos->motas.motas[motaId]);
+	if (offset == MOVESET_ADDR_MISSING) return 0;
+
+	// Slots are offsets inside the MOTA block; archives are stored little-endian
+	const uint64_t blockSize = m_offsets->movelistBlock - m_offsets->motaBlock;
+	constexpr uint64_t headerSize = offsetof(MotaHeader, anim_offset_list);
+	if (offset > blockSize || blockSize - offset < headerSize) return 0;
+
+	const auto* header = reinterpret_cast<const MotaHeader*>(m_movesetData + m_offsets->motaBlock + offset);
+	if (strncmp(header->mota_string, "MOTA", 4) != 0) return 0;
+	if (header->anim_count > (blockSize - offset - headerSize) / sizeof(header->anim_offset_list[0])) return 0;
+	return header->anim_count;
 }
 
 unsigned int EditorT7::GetMovelistDisplayableInputCount() const
