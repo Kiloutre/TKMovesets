@@ -161,21 +161,35 @@ void EditorVisuals_T7::RenderToolBar()
 
 		if (structType != EditorWindowType_INVALID)
 		{
-			uint32_t structId = m_editor->CreateNew(structType);
+			// All or nothing: on failure the moveset, the movelist, the open windows and the move list view are restored
+			// (the window state is declared first so the moveset is restored before the new windows are deleted).
+			try {
+				auto windows = BeginWindowTransaction();
+				{
+					EditorLogic::Mutation edit(*m_editor, true);
+					uint32_t structId = m_editor->CreateNew(structType);
+					if (!OpenFormWindow(structType, structId, listSize))
+						throw std::runtime_error("The new structure's window could not be opened.");
 
-			MarkDirty();
-			OpenFormWindow(structType, structId, listSize);
-
-			// Custom pre-creation behaviour implementations
-			switch (structType)
-			{
-			case TEditorWindowType_Move:
-				m_editor->ReloadDisplayableMoveList();
-				ReloadMovelistFilter();
-				m_moveToScrollTo = structId;
-				m_highlightedMoveId = structId;
-				FilterMovelistIfMoveNotFound((uint16_t)structId);
-				break;
+					// Custom pre-creation behaviour implementations
+					switch (structType)
+					{
+					case TEditorWindowType_Move:
+						m_editor->ReloadDisplayableMoveList();
+						ReloadMovelistFilter();
+						m_moveToScrollTo = structId;
+						m_highlightedMoveId = structId;
+						FilterMovelistIfMoveNotFound((uint16_t)structId);
+						break;
+					}
+					edit.Commit();
+				}
+				windows->Commit();
+				MarkDirty();
+				m_localProcessError.clear();
+			}
+			catch (const std::exception& error) {
+				m_localProcessError = std::string("Create new failed, nothing was changed: ") + error.what();
 			}
 		}
 

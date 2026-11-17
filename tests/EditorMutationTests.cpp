@@ -150,6 +150,13 @@ void RunEditorMutationTests()
         bool tooLong = false;
         try { editor.GetFormFieldsList(TEditorWindowType_Input, uint16_t(input), drawOrder, 2); } catch (const std::out_of_range&) { tooLong = true; }
         Check(tooLong, "input list form read past its table");
+        // The toolbar runs Create new in one batch: a failure after the creation (here, opening the form) undoes it.
+        Rejected(editor, [&] {
+            EditorLogic::Mutation batch(editor, true);
+            const auto id = editor.CreateNew(TEditorWindowType_Input);
+            editor.GetFormFieldsList(TEditorWindowType_Input, uint16_t(id), drawOrder, 2);
+            batch.Commit();
+        });
     }
     {
         Editor editor(process, game, &info); Load(editor, true);
