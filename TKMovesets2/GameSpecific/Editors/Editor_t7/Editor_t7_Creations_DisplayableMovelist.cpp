@@ -1,5 +1,6 @@
 # include "Editor_t7.hpp"
 # include "Helpers.hpp"
+#include <stdexcept>
 
 using namespace StructsT7;
 #define gAddr StructsT7_gameAddr
@@ -38,6 +39,7 @@ void EditorT7::ModifyMovelistInputSize(unsigned int listStart, const std::vector
 
 uint32_t EditorT7::CreateNewMvlPlayable()
 {
+	if (!hasDisplayableMovelist) throw std::logic_error("This moveset has no displayable movelist.");
 	uint32_t newStructId = m_mvlHead->playables_count;
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + m_mvlHead->playables_offset;
 
@@ -50,6 +52,7 @@ uint32_t EditorT7::CreateNewMvlPlayable()
 
 uint32_t EditorT7::CreateNewMvlInputs()
 {
+	if (!hasDisplayableMovelist) throw std::logic_error("This moveset has no displayable movelist.");
 	uint32_t newStructId = (uint32_t)m_iterators.mvl_inputs.size();
 	uint64_t listHead = m_header->moveset_data_start + m_offsets->movelistBlock + m_mvlHead->inputs_offset;
 

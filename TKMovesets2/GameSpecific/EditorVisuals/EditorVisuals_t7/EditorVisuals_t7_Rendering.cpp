@@ -134,8 +134,8 @@ void EditorVisuals_T7::RenderToolBar()
 			structType = TEditorWindowType_InputSequence;
 		}
 		if (ImGui::MenuItem(_("edition.inputs"))) {
-			// Input list sizes must be known ahead of time when opening a window
-			listSize = 2;
+			// Input list sizes must be known ahead of time when opening a window: CreateNew adds one input
+			listSize = 1;
 			structType = TEditorWindowType_Input;
 		}
 
@@ -147,11 +147,12 @@ void EditorVisuals_T7::RenderToolBar()
 			structType = TEditorWindowType_CameraData;
 		}
 
+		// Movesets without a displayable movelist (converted from T8, for one) have no movelist to add to
 		ImGui::Separator();
-		if (ImGui::MenuItem(_("edition.mvl_playable"))) {
+		if (ImGui::MenuItem(_("edition.mvl_playable"), nullptr, false, m_editor->hasDisplayableMovelist)) {
 			structType = TEditorWindowType_MovelistPlayable;
 		}
-		if (ImGui::MenuItem(_("edition.mvl_inputs"))) {
+		if (ImGui::MenuItem(_("edition.mvl_inputs"), nullptr, false, m_editor->hasDisplayableMovelist)) {
 			// MVL Input list sizes must be known ahead of time when opening a window
 			listSize = 2;
 			structType = TEditorWindowType_MovelistInput;

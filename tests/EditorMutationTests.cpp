@@ -136,6 +136,26 @@ void RunEditorMutationTests()
     GameData game;
     GameInfo info{};
     info.dataString = info.minorDataString = "t7";
+    // Create new: a moveset without a displayable movelist (converted from T8) refuses movelist rows, unchanged,
+    // and a new input list is one input, the list size the toolbar opens it with.
+    {
+        Editor editor(process, game, &info); Load(editor);
+        Check(!editor.hasDisplayableMovelist, "fixture without a movelist has one");
+        Rejected(editor, [&] { editor.CreateNew(TEditorWindowType_MovelistPlayable); });
+        Rejected(editor, [&] { editor.CreateNew(TEditorWindowType_MovelistInput); });
+        const auto input = editor.CreateNew(TEditorWindowType_Input);
+        VectorSet<std::string> drawOrder;
+        Check(input == 3 && editor.GetFormFieldsList(TEditorWindowType_Input, uint16_t(input), drawOrder, 1).size() == 1,
+            "new input list does not open with one input");
+        bool tooLong = false;
+        try { editor.GetFormFieldsList(TEditorWindowType_Input, uint16_t(input), drawOrder, 2); } catch (const std::out_of_range&) { tooLong = true; }
+        Check(tooLong, "input list form read past its table");
+    }
+    {
+        Editor editor(process, game, &info); Load(editor, true);
+        Check(editor.CreateNew(TEditorWindowType_MovelistPlayable) == 2, "movelist playable not created");
+        Check(editor.CreateNew(TEditorWindowType_MovelistInput) == 3, "movelist inputs not created");
+    }
     {
         Editor editor(process, game, &info); Load(editor);
         editor.ModifyListSize(TEditorWindowType_Requirement, 1, {3, -1}, {1, 2});
