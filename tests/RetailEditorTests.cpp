@@ -22,6 +22,7 @@
 #include "Importer_t8/RetailLiveEdit.hpp"
 #include <algorithm>
 #include <functional>
+#include <set>
 #include <thread>
 #include "RetailCommands.hpp"
 #include "RetailNames.hpp"
@@ -320,6 +321,7 @@ void RunRetailCommandTests(const GameInfo* game) {
     Check(editor.Record(7,created+editor.ListSize(7,created)-1).size()==R::Tables[7].stride &&
         *reinterpret_cast<const uint64_t*>(editor.Record(7,created+editor.ListSize(7,created)-1).data())==C::GroupEnd,"New group cancel list is not terminated with 0x8013");
 }
+static size_t CheckRetailCancelGraph(const EditorVisualsT8Retail& view,uint32_t root,int depth,bool incoming,bool hideCommon);
 void RunRetailEditorTests() {
     RunMovesetFolderTests();
     auto* game=Games::GetGameInfoFromIdentifier(GameId_T8,GameVersions::T8::RETAIL);
@@ -507,6 +509,7 @@ void RunRetailEditorTests() {
             Check(view.RecordWindowId(12,0)!=other.RecordWindowId(12,0),"Two documents share a record window ID");
             Check(EditorVisualsT8Retail::NormalizeSearch("HeLLo 0xABC")=="hello 0xabc","Search normalization differs");
             Check(view.SearchMetadata(12,0).find("0x00000000")!=std::string::npos,"Search metadata omitted move hash");
+            CheckRetailCancelGraph(view,0,3,true,true);CheckRetailCancelGraph(view,0,3,false,false);
             view.OpenRecord(12,0);view.OpenRecord(5,65536);other.OpenRecord(12,0);view.Render(700);other.Render(701);
             ImGui::Render();
             ImGui::NewFrame();view.OpenRecord(0,0);view.OpenRecord(6,0);view.Render(700);ImGui::Render();
@@ -635,6 +638,26 @@ int WriteRetailPanmFixture(const std::wstring& output) {
         FileIO::WriteAtomically(directory/"partial.panm",NativeLikePanm(7,3,12)),"Cannot write PANM fixture");
     std::cout<<nlohmann::json({{"ok",true}}).dump()<<'\n';return 0;
 }
+// Cancel graph invariants (as CheckCancelGraph in SpecializedEditorTests.cpp): one node per move, valid and unique
+// edges, within the depth, generic and hidden Co_ moves not expanded, incoming moves only lead to the root. Returns the node count.
+static size_t CheckRetailCancelGraph(const EditorVisualsT8Retail& view,uint32_t root,int depth,bool incoming,bool hideCommon) {
+    const auto graph=view.BuildCancelGraph(root,depth,incoming,hideCommon);
+    Check(!graph.nodes.empty() && graph.nodes[0].moveId==root && graph.nodes[0].depth==0,"Retail cancel graph root is wrong");
+    Check(graph.nodes.size()<=2*CancelGraph::MaxNodes,"Retail cancel graph exceeds its node limit");
+    std::set<uint32_t> ids;
+    for(size_t i=0;i<graph.nodes.size();++i){const auto& node=graph.nodes[i];
+        Check(ids.insert(node.moveId).second,"Retail cancel graph shows a move twice");
+        Check(node.depth>=-1 && node.depth<=depth && (node.depth>=0 || incoming),"Retail cancel graph node outside its depth");
+        Check(!hideCommon || i==0 || !node.name.starts_with("Co_"),"Retail cancel graph shows a hidden Co_ move");}
+    std::set<std::pair<int,int>> pairs;
+    for(const auto& edge:graph.edges){
+        Check(edge.from>=0 && edge.to>=0 && size_t(edge.from)<graph.nodes.size() && size_t(edge.to)<graph.nodes.size() && !edge.cancels.empty() && pairs.insert({edge.from,edge.to}).second,"Retail cancel graph edge is wrong");
+        const auto& from=graph.nodes[edge.from];
+        if(from.depth<0)Check(edge.to==0,"Retail incoming move does not lead to the root");
+        else Check(edge.from==0 || !from.generic || (incoming && edge.to==0),"Retail cancel graph expanded a generic move");
+    }
+    return graph.nodes.size();
+}
 int RenderRetailEditorFile(const std::wstring& input,const std::wstring& output,bool references,bool lists) {
     Localization::LoadFile("en-US");
     movesetInfo info{};info.filename=input;info.name=std::filesystem::path(input).stem().string();
@@ -645,6 +668,11 @@ int RenderRetailEditorFile(const std::wstring& input,const std::wstring& output,
     nlohmann::json result{{"width",1440},{"height",920},{"atlas_width",width},{"atlas_height",height},{"lists",nlohmann::json::array()}};
     {EditorVisualsT8Retail view(&info,nullptr,nullptr);
         for(int frame=0;frame<5;++frame){ImGui::NewFrame();ImGui::SetNextWindowPos(ImVec2(0,0));ImGui::SetNextWindowSize(io.DisplaySize);view.Render(700);if(frame==0){view.OpenRecord(0,0);view.OpenRecord(6,0);view.OpenRecord(1,0);view.OpenRecord(12,11);}if(frame==1 && references)view.FindReferences(12,11);if(frame==1 && lists)view.OpenRecord(6,127);ImGui::Render();}
+        // Cancel graphs of the first moves and of every generic move (idle and the like fan out the most)
+        size_t graphs=0,graphNodes=0;const auto* retail=view.Editor();
+        for(uint32_t row=0;row<(std::min)(uint64_t(16),retail->Count(12));++row,++graphs)graphNodes+=CheckRetailCancelGraph(view,row,3,true,row%2==0);
+        for(uint32_t alias=0x8000;alias<0x8000+60;++alias){uint32_t row=0;try{row=retail->ResolveMove(alias);}catch(const std::exception&){continue;}graphNodes+=CheckRetailCancelGraph(view,row,CancelGraph::MaxNodes,alias==0x8000,false);++graphs;}
+        result["cancel_graphs"]=graphs;result["cancel_graph_nodes"]=graphNodes;
         const auto* draw=ImGui::GetDrawData();
         for(int i=0;i<draw->CmdListsCount;++i){const auto* list=draw->CmdLists[i];nlohmann::json item{{"vertices",nlohmann::json::array()},{"indices",nlohmann::json::array()},{"commands",nlohmann::json::array()}};
             for(const auto& v:list->VtxBuffer)item["vertices"].push_back({v.pos.x,v.pos.y,v.uv.x,v.uv.y,v.col});

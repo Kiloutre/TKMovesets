@@ -603,12 +603,75 @@ void AnimationPreview::RenderViewport(float width, float height, const Input& in
         draw->AddText(ImVec2(origin.x + 10, origin.y + 10), IM_COL32(200, 200, 200, 255), text);
         return;
     }
+    const ImVec2 scale = io.DisplayFramebufferScale;
+    RenderScene((std::max)(1, int(width * (scale.x > 0 ? scale.x : 1))), (std::max)(1, int(height * (scale.y > 0 ? scale.y : 1))), input);
+    if (m_gpu && m_gpu->texture && !m_gpu->failed)
+        draw->AddImage(ImTextureID(uintptr_t(m_gpu->texture)), origin, end, ImVec2(0, 1), ImVec2(1, 0));
+    // Overlay: frame number and active state, top left.
+    if (m_clip) {
+        const int frame = int(m_frame) + 1;
+        bool activeFrame = false;
+        for (const auto& [first, last] : input.active) activeFrame |= frame >= first && frame <= last;
+        const auto label = std::format("{} / {}", frame, m_clip->frames.size());
+        draw->AddText(ImVec2(origin.x + 8, origin.y + 6), IM_COL32(230, 230, 235, 255), label.c_str());
+        if (activeFrame) {
+            const auto x = origin.x + 16 + ImGui::CalcTextSize(label.c_str()).x;
+            draw->AddRectFilled(ImVec2(x - 4, origin.y + 5), ImVec2(x + ImGui::CalcTextSize(_("edition.preview.active")).x + 4, origin.y + 7 + ImGui::GetTextLineHeight()), IM_COL32(190, 40, 40, 230), 3);
+            draw->AddText(ImVec2(x, origin.y + 6), IM_COL32(255, 255, 255, 255), _("edition.preview.active"));
+        }
+        draw->AddText(ImVec2(origin.x + 8, end.y - ImGui::GetTextLineHeight() - 6), IM_COL32(150, 155, 165, 255), m_clip->format.c_str());
+    } else {
+        const char* text = !m_error.empty() ? m_error.c_str() : _("edition.preview.loading");
+        draw->AddText(ImVec2(origin.x + 10, origin.y + 10), m_error.empty() ? IM_COL32(200, 200, 200, 255) : IM_COL32(240, 120, 110, 255), text);
+    }
+    draw->AddRect(origin, end, IM_COL32(60, 66, 80, 255));
+}
+
+void AnimationPreview::Thumbnail(const Input& input, ImDrawList* draw, ImVec2 min, ImVec2 max, bool play) {
+    Poll(input);
+    // Thumbnails show the character alone, without hitboxes or displacement properties.
+    m_showOpponent = false; m_showHitboxes = false;
+    if (m_clip) {
+        const int frames = int(Frames().size());
+        if (play) {
+            if (!m_thumbPlaying) m_frame = 0;
+            m_frame += ImGui::GetIO().DeltaTime * 60;
+            if (m_frame >= frames) m_frame = std::fmod(m_frame, float(frames));
+        }
+        else {
+            // Still pose: the first active frame of an attack, the middle of the animation otherwise.
+            const int still = !input.active.empty() ? input.active.front().first - 1 : frames / 2;
+            m_frame = float(std::clamp(still, 0, frames - 1));
+        }
+    }
+    m_thumbPlaying = play;
+    const ImVec2 scale = ImGui::GetIO().DisplayFramebufferScale;
+    const int w = (std::max)(1, int((max.x - min.x) * (scale.x > 0 ? scale.x : 1))), h = (std::max)(1, int((max.y - min.y) * (scale.y > 0 ? scale.y : 1)));
+    if (!GlAvailable() || (m_gpu && m_gpu->failed)) {
+        draw->AddRectFilled(min, max, IM_COL32(22, 24, 30, 255));
+        return;
+    }
+    // A still thumbnail is drawn once: the texture keeps it until the frame or the size changes.
+    if (m_clip && (m_frame != m_thumbFrame || m_posedFrame != m_frame || w != m_thumbWidth || h != m_thumbHeight)) {
+        RenderScene(w, h, input);
+        m_thumbFrame = m_frame; m_thumbWidth = w; m_thumbHeight = h;
+    }
+    if (m_clip && m_gpu && m_gpu->texture && !m_gpu->failed)
+        draw->AddImage(ImTextureID(uintptr_t(m_gpu->texture)), min, max, ImVec2(0, 1), ImVec2(1, 0));
+    else {
+        draw->AddRectFilled(min, max, IM_COL32(22, 24, 30, 255));
+        const char* text = !m_error.empty() ? m_error.c_str() : _("edition.preview.loading");
+        draw->PushClipRect(min, max, true);
+        draw->AddText(ImVec2(min.x + 4, min.y + 4), m_error.empty() ? IM_COL32(200, 200, 200, 255) : IM_COL32(240, 120, 110, 255), text);
+        draw->PopClipRect();
+    }
+}
+
+void AnimationPreview::RenderScene(int w, int h, const Input& input) {
     try {
         if (!m_gpu) m_gpu = std::make_unique<Gpu>();
         GlState saved;
         if (!m_gpu->ready) m_gpu->Init();
-        const ImVec2 scale = io.DisplayFramebufferScale;
-        const int w = (std::max)(1, int(width * (scale.x > 0 ? scale.x : 1))), h = (std::max)(1, int(height * (scale.y > 0 ? scale.y : 1)));
         m_gpu->Resize(w, h);
         UpdatePose(m_frame);
         UpdateOpponent(input, m_frame);
@@ -685,26 +748,6 @@ void AnimationPreview::RenderViewport(float width, float height, const Input& in
         if (!m_gpu) m_gpu = std::make_unique<Gpu>();
         m_gpu->failed = true; m_gpu->error = e.what();
     }
-    if (m_gpu && m_gpu->texture && !m_gpu->failed)
-        draw->AddImage(ImTextureID(uintptr_t(m_gpu->texture)), origin, end, ImVec2(0, 1), ImVec2(1, 0));
-    // Overlay: frame number and active state, top left.
-    if (m_clip) {
-        const int frame = int(m_frame) + 1;
-        bool activeFrame = false;
-        for (const auto& [first, last] : input.active) activeFrame |= frame >= first && frame <= last;
-        const auto label = std::format("{} / {}", frame, m_clip->frames.size());
-        draw->AddText(ImVec2(origin.x + 8, origin.y + 6), IM_COL32(230, 230, 235, 255), label.c_str());
-        if (activeFrame) {
-            const auto x = origin.x + 16 + ImGui::CalcTextSize(label.c_str()).x;
-            draw->AddRectFilled(ImVec2(x - 4, origin.y + 5), ImVec2(x + ImGui::CalcTextSize(_("edition.preview.active")).x + 4, origin.y + 7 + ImGui::GetTextLineHeight()), IM_COL32(190, 40, 40, 230), 3);
-            draw->AddText(ImVec2(x, origin.y + 6), IM_COL32(255, 255, 255, 255), _("edition.preview.active"));
-        }
-        draw->AddText(ImVec2(origin.x + 8, end.y - ImGui::GetTextLineHeight() - 6), IM_COL32(150, 155, 165, 255), m_clip->format.c_str());
-    } else {
-        const char* text = !m_error.empty() ? m_error.c_str() : _("edition.preview.loading");
-        draw->AddText(ImVec2(origin.x + 10, origin.y + 10), m_error.empty() ? IM_COL32(200, 200, 200, 255) : IM_COL32(240, 120, 110, 255), text);
-    }
-    draw->AddRect(origin, end, IM_COL32(60, 66, 80, 255));
 }
 
 void AnimationPreview::RenderTimeline(const Input& input, int frames) {

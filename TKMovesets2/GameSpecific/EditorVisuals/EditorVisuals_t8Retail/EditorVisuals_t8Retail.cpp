@@ -15,6 +15,7 @@
 #include <imgui_internal.h>
 #include "FileIO.hpp"
 #include "AnimationPreview.hpp"
+#include "CancelGraphView.hpp"
 #include <optional>
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -234,6 +235,36 @@ class RetailRecordForm final : public EditorForm {
     std::string m_pendingNote;
     // 3D preview of the move's animation (moves table only): the pending PANM once one is picked, else the applied one.
     AnimationPreview m_preview;
+    // Cancel graph (moves table): drawn in place of the fields while open, from the icon next to the cancels field
+    CancelGraphView m_cancelGraph;
+    bool m_cancelGraphOpen=CancelGraphView::openByDefault;
+    bool ShowsApplyButton() const override {return !(m_table==12 && m_cancelGraphOpen);}
+    void RenderLabel(int listIdx,EditorInput* field) override {
+        if(m_table!=12 || field->name.str()!="cancels"){EditorForm::RenderLabel(listIdx,field);return;}
+        // The cancels label, with the cancel graph icon at its right (as the T7 move form)
+        const float icon=ImGui::GetFrameHeight(),spacing=ImGui::GetStyle().ItemSpacing.x/2;
+        ImGui::PushStyleColor(ImGuiCol_Header,FORM_LABEL_CLICKABLE);
+        if(ImGui::Selectable(_(field->displayName.c_str()),true,0,ImVec2((std::max)(1.0f,ImGui::GetContentRegionAvail().x-icon-spacing),0)))OnFieldLabelClick(listIdx,field);
+        ImGui::PopStyleColor();
+        ImGui::SameLine(0,spacing);
+        if(CancelGraphView::IconButton("##cancelGraph")){m_cancelGraph.Invalidate();m_cancelGraphOpen=true;}
+    }
+    void RenderCancelGraph() {
+        m_ignoreRightClick=true;
+        auto* retail=m_retail;auto* owner=&Owner();const uint32_t root=structureId;
+        const CancelGraphView::Callbacks callbacks{
+            .build=[owner,root](int depth,bool incoming,bool hideCommon){return owner->BuildCancelGraph(root,depth,incoming,hideCommon);},
+            .animation=[retail](const CancelGraph::Node& node){
+                // As PreviewInput: the animation key identifies the animation
+                AnimationPreview::Input input;const uint32_t row=node.moveId;
+                const auto record=retail->Record(12,row);uint64_t value=0,key=0;memcpy(&value,record.data()+0x20,8);memcpy(&key,record.data()+0x28,8);
+                input.token=(value*0x9E3779B97F4A7C15ULL^key)|1;input.load=[retail,row]{return retail->MoveAnimation(row);};
+                return input;},
+            .open=[owner](uint32_t row){owner->OpenRecord(12,row);},
+            .screwLabel="edition.cancel_graph.kind_tornado",
+        };
+        m_cancelGraphOpen=m_cancelGraph.Render(callbacks,m_baseWindow);
+    }
     AnimationPreview::Input PreviewInput() {
         auto number=[&](const std::string& name)->int64_t{
             auto found=m_fieldIdentifierMap.find(name);
@@ -334,7 +365,7 @@ class RetailRecordForm final : public EditorForm {
         EditorForm::RenderInput(listIdx,field);
     }
     void OnUpdate(int,EditorInput*) override {m_lastTyped=ImGui::GetTime();}
-    void OnApply() override {MarkFieldsSaved(m_fieldIdentifierMap);}
+    void OnApply() override {MarkFieldsSaved(m_fieldIdentifierMap);m_cancelGraph.Invalidate();}
     void PostRender() override {
         // A failing Apply leaves unsavedChanges set: do not retry it every frame (each attempt clones the forms and
         // copies the document), only once the form has been edited again.
@@ -396,6 +427,7 @@ class RetailRecordForm final : public EditorForm {
         }
     }
     void RenderInternal() override {
+        if(m_table==12 && m_cancelGraphOpen){RenderCancelGraph();return;}
         // Reserve the footer for Apply; long groups scroll independently. Wide move forms with the preview shown: the
         // fields on the left half and the preview on the right half, filling the height. Otherwise the preview is
         // stacked above the fields and scrolls with them. The icon next to the Animation button shows / hides it.

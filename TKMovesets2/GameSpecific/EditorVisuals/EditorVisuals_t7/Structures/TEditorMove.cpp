@@ -32,6 +32,24 @@ void TEditorMove::OnInitEnd()
 void TEditorMove::RenderInternal()
 {
 	auto editor = Editor<EditorT7>();
+	if (m_cancelGraphOpen) {
+		m_ignoreRightClick = true;
+		const uint16_t root = static_cast<uint16_t>(structureId);
+		auto* baseWindow = m_baseWindow;
+		const CancelGraphView::Callbacks callbacks{
+			.build = [editor, root](int depth, bool incoming, bool hideCommon) { return editor->BuildCancelGraph(root, depth, incoming, hideCommon); },
+			.animation = [editor](const CancelGraph::Node& node) {
+				AnimationPreview::Input input;
+				const uint16_t id = static_cast<uint16_t>(node.moveId);
+				input.token = editor->MoveAnimationToken(id);
+				input.load = [editor, id] { return editor->MoveAnimation(id); };
+				return input;
+			},
+			.open = [baseWindow](uint32_t moveId) { baseWindow->OpenFormWindow(TEditorWindowType_Move, static_cast<uint16_t>(moveId)); },
+		};
+		m_cancelGraphOpen = m_cancelGraph.Render(callbacks, m_baseWindow);
+		return;
+	}
 	// Values typed in the form show at once (before Apply); unparsable fields count as 0.
 	auto number = [&](const char* name) -> int {
 		auto found = m_fieldIdentifierMap.find(name);
@@ -85,6 +103,21 @@ void TEditorMove::RenderInternal()
 
 void TEditorMove::RenderLabel(int listIdx, EditorInput* field)
 {
+	if (field->name == "cancel_addr") {
+		// The Cancel button, with the cancel graph's icon at its right
+		const float icon = ImGui::GetFrameHeight(), spacing = ImGui::GetStyle().ItemSpacing.x / 2;
+		const char* label = _(field->displayName.c_str());
+		ImGui::PushStyleColor(ImGuiCol_Header, FORM_LABEL_CLICKABLE);
+		if (ImGui::Selectable(label, true, 0, ImVec2((std::max)(1.0f, ImGui::GetContentRegionAvail().x - icon - spacing), 0)))
+			OnFieldLabelClick(listIdx, field);
+		ImGui::PopStyleColor();
+		ImGui::SameLine(0, spacing);
+		if (CancelGraphView::IconButton("##cancelGraph")) {
+			m_cancelGraph.Invalidate();
+			m_cancelGraphOpen = true;
+		}
+		return;
+	}
 	if (!(field->name == "anim_name")) { EditorForm::RenderLabel(listIdx, field); return; }
 	// The Animation button, with the preview's show / hide icon at its right.
 	const float icon = AnimationPreview::ToggleButtonWidth(), spacing = ImGui::GetStyle().ItemSpacing.x / 2;
@@ -162,6 +195,7 @@ void TEditorMove::OnApply()
 	auto editor = Editor<EditorT7>();
 
 	editor->RecomputeDisplayableMoveFlags(structureId);
+	m_cancelGraph.Invalidate();
 	// Mutation commit requests the next-frame filter refresh; do not publish working-row pointers here.
 	if (m_renamed) {
 		ApplyWindowName();
@@ -171,6 +205,7 @@ void TEditorMove::OnApply()
 
 void TEditorMove::RequestFieldUpdate(EditorWindowType winType, int valueChange, int listStart, int listEnd)
 {
+	m_cancelGraph.Invalidate();
 	if ((winType & (TEditorWindowType_HitCondition | TEditorWindowType_Extraproperty | TEditorWindowType_Cancel
 		| TEditorWindowType_MoveBeginProperty | TEditorWindowType_MoveEndProperty | TEditorWindowType_Voiceclip)) == 0) {
 		return;

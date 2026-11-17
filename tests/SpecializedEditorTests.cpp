@@ -8,6 +8,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <set>
 #include <stdexcept>
 #include <vector>
 
@@ -226,8 +227,45 @@ public:
 };
 }
 
+// Cancel graph invariants: one node per move, valid edges, the depth limit and the stops (generic moves are not
+// expanded), incoming moves only lead to the root.
+void CheckCancelGraph(Editor& editor, uint16_t root, int depth, bool incoming) {
+    // LoadMovesetPtr leaves the constants to LoadMoveset: the T7 values (881 ends a requirement list)
+    if (editor.constants.empty()) editor.constants = {
+        {EditorConstants_RequirementEnd, 881}, {EditorConstants_CancelCommandEnd, 0x8000},
+        {EditorConstants_GroupedCancelCommand, 0x800B}, {EditorConstants_GroupedCancelCommandEnd, 0x800C},
+        {EditorConstants_InputSequenceCommandStart, 0x800D}, {EditorConstants_ProjectileProperty, 0x820B},
+        {EditorConstants_ExtraProperty_Instant, 32769}, {EditorConstants_ExtraPropertyEnd, 0}};
+    const auto graph = editor.BuildCancelGraph(root, depth, incoming);
+    Check(!graph.nodes.empty() && graph.nodes[0].moveId == root && graph.nodes[0].depth == 0, "cancel graph root is wrong");
+    Check(graph.nodes.size() <= 2 * CancelGraph::MaxNodes, "cancel graph exceeds its node limit");
+    std::set<uint16_t> ids;
+    for (const auto& node : graph.nodes) {
+        Check(ids.insert(node.moveId).second, "cancel graph shows a move twice");
+        Check(node.depth >= -1 && node.depth <= depth, "cancel graph node outside the depth limit");
+        Check(node.depth >= 0 || incoming, "cancel graph has incoming moves it was not asked for");
+    }
+    std::set<std::pair<int, int>> pairs;
+    for (const auto& edge : graph.edges) {
+        Check(edge.from >= 0 && edge.to >= 0 && edge.from < int(graph.nodes.size()) && edge.to < int(graph.nodes.size()), "cancel graph edge out of range");
+        Check(!edge.cancels.empty() && pairs.insert({edge.from, edge.to}).second, "cancel graph edge is empty or duplicated");
+        const auto& from = graph.nodes[edge.from];
+        if (from.depth < 0) Check(edge.to == 0, "incoming move does not lead to the root");
+        // A generic move's own edge into the root comes from the incoming search, not from expanding it
+        else Check(edge.from == 0 || !from.generic || (incoming && edge.to == 0), "cancel graph expanded a generic move");
+        Check(from.depth < 0 || graph.nodes[edge.to].depth <= from.depth + 1, "cancel graph edge skips a level");
+    }
+}
+
 void RunSpecializedEditorTests() {
     GameProcess process; GameData game; GameInfo info{}; info.dataString = info.minorDataString = "t7";
+    {
+        // Moves without a cancel list: the graph is the move alone
+        Editor editor(process, game, &info); Load(editor);
+        CheckCancelGraph(editor, 0, 5, true);
+        Check(editor.BuildCancelGraph(0, 5, true).nodes.size() == 1 && editor.BuildCancelGraph(0, 5, true).edges.empty(), "move without cancels has a graph");
+        Check(editor.BuildCancelGraph(999, 5, false).nodes.empty(), "cancel graph of a missing move");
+    }
     {
         Editor editor(process, game, &info); Load(editor);
         const auto shared = editor.Moves()[0].name_addr;
@@ -452,6 +490,11 @@ void RunHistoricalEditorTests(const std::vector<Byte>& file)
         memcmp(bytes + header->moveset_data_start + blocks->movelistBlock, "MVLT", 4) == 0;
     editor.LoadMovesetPtr(bytes, file.size()); editor.SeedMaps(); editor.ReloadDisplayableMoveList();
     if (!editor.Info()->table.moveCount) return;
+    // Cancel graphs of the first moves and of every generic move (idle and the like fan out the most)
+    try {
+        for (uint16_t move = 0; move < (std::min)(uint32_t(8), editor.MoveCount()); ++move) CheckCancelGraph(editor, move, 5, true);
+        for (auto alias : editor.aliases) if (alias < editor.MoveCount()) CheckCancelGraph(editor, alias, CancelGraph::MaxNodes, alias == editor.aliases[0]);
+    } catch (const std::exception& e) { throw std::runtime_error(std::string("cancel graph: ") + e.what()); }
     Form form(editor, TEditorWindowType_Move);
     form.Set("move_name", "audit regression rename");
     bool completed = false;

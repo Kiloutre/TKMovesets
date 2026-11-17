@@ -2,6 +2,7 @@
 #include "EditorVisuals.hpp"
 #include "Editor_t8Retail/Editor_t8Retail.hpp"
 #include "GameStaticData.hpp"
+#include "CancelGraph.hpp"
 #include "Importer_t8/RetailPreview.hpp"
 #include "AnimExtractors/AnimExtractor_t8.hpp"
 #include <atomic>
@@ -120,4 +121,6 @@ public:
     void StructureChanged(EditorForm* source,size_t table,const RecordEdit& edit);
     uint32_t ResolveAnimation(std::string_view name) const;
     void CreateRecord(size_t table);
+    // Cancel graph of a move form (EditorVisuals_t8Retail_CancelGraph.cpp; BuildCancelGraph over the main cancel list)
+    CancelGraph BuildCancelGraph(uint32_t row, int depth, bool incoming, bool hideCommon) const;
 };

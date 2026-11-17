@@ -2,6 +2,7 @@
 #include "AnimationPreview/PreviewDisplacement.hpp"
 #include "AnimationPreview/PreviewHitbox.hpp"
 #include "RecordEdit.hpp"
+#include "CancelGraph.hpp"
 #include <memory>
 
 #include <vector>
@@ -23,6 +24,8 @@ namespace EditorT7Utils
 class EditorT7 : public TEditor
 {
 private:
+	// The moveset as BuildCancelGraph reads it (Editor_t7_CancelGraph.cpp)
+	class CancelSource;
 	// Contains a ptr to the offset list
 	StructsT7::TKMovesetHeaderBlocks* m_offsets;
 	// Stores a ptr to the moveset table containing lists offsets & count, aliases too
@@ -320,6 +323,12 @@ public:
 	bool MoveUsesScrew(uint16_t moveId) const;
 	// Move id with aliases (0x8000 + n) resolved; -1 when out of range.
 	int32_t ResolveMoveId(uint32_t moveId) const;
+	// Moves reached from [moveId] through its cancel list (grouped cancels expanded), breadth first, up to [maxDepth]
+	// cancels away. Generic moves, moves already in the graph and loops are not expanded again. [incoming]: also the
+	// moves whose cancel list leads to [moveId] (one level).
+	CancelGraph BuildCancelGraph(uint16_t moveId, int maxDepth, bool incoming, bool hideCommon = false) const;
+	// Whether the move is a generic move (target of an alias)
+	bool IsGenericMove(uint16_t moveId) const;
 	uint32_t MoveHitboxLocation(uint16_t moveId) { return moveId < m_iterators.moves.size() ? m_iterators.moves[moveId]->hitbox_location : 0; }
 	uint32_t MoveCount() const { return static_cast<uint32_t>(m_iterators.moves.size()); }
 	void DeleteAnimation(uint64_t anim_offset);

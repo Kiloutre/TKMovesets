@@ -16,7 +16,7 @@ Program entry and headless mode.
 | --- | --- |
 | `main.cpp` | `WinMain`: `--headless` / `--help` go to `RunHeadless` before anything else; otherwise sets the working directory to the exe folder, applies pending updates, starts the GUI |
 | `run_gui.cpp` | `run_gui`: GLFW/OpenGL/ImGui setup, locale, icon, main loop |
-| `arguments_handling.cpp` | Moveset files passed on the command line (moved into the moveset folder, forwarded through `OpenRequests`) |
+| `arguments_handling.cpp` | Moveset files passed on the command line (opened in the editor where they are, forwarded through `OpenRequests`); animation files copied into the animation library |
 | `headless.cpp` / `.hpp` | `RunHeadless`: every `--headless` command, see [headless.md](headless.md). Also `UiSmoke` |
 
 ## `TKMovesets2/Layouts/`
@@ -37,6 +37,7 @@ User interface (Dear ImGui).
 | `EditorVisuals/EditorVisuals.cpp` | `EditorVisuals`: base editor window (form windows, subwindows, save, live edit) |
 | `EditorVisuals/EditorForm.cpp`, `EditorFormList.cpp`, `EditorSubwindow.hpp`, `EditorClipboard.hpp` | Base classes for record forms, list forms, subwindows; clipboard |
 | `EditorVisuals/AnimationPreview.cpp` | `AnimationPreview`: the move forms' 3D animation preview (OpenGL into a texture, orbit camera, timeline with the active frames in red); used by `TEditorMove` (T7) and the retail moves form |
+| `EditorVisuals/CancelGraphView.cpp` | `CancelGraphView`: the move forms' read-only cancel graph, T7 (`TEditorMove`) and retail T8 (`RetailRecordForm`, moves table), opened by the icon next to the cancels field and drawn in place of the fields (no Apply footer, `EditorForm::ShowsApplyButton`). One node per move with an `AnimationPreview::Thumbnail` (still pose, plays on hover), coloured by kind (attack, throw, screw / tornado) as are the links leading to it; links labelled with inputs and requirements; pan (drag), zoom (wheel), autoscroll (middle click), click opens the move; Co_ moves hidden unless ticked; incoming cancels behind the button left of the root. Data: `BuildCancelGraph` (`GameSpecific/Editors/CancelGraph.cpp`) over a `CancelGraphSource`, implemented by `EditorT7` (`Editor_t7_CancelGraph.cpp`) and `EditorVisualsT8Retail` (`EditorVisuals_t8Retail_CancelGraph.cpp`): breadth first over the main cancel list, grouped cancels expanded, stops at generic moves, moves already shown, the depth (default 3) and 400 nodes; incoming cancels (one level) on request |
 
 ## `TKMovesets2/GameInteractions/`
 

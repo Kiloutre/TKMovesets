@@ -119,6 +119,8 @@ protected:
 	virtual void PostRender() {};
 	// Actual rendering function
 	virtual void RenderInternal();
+	// False while the form shows content with nothing to apply (a move form's cancel graph): no Apply footer
+	virtual bool ShowsApplyButton() const { return true; }
 	// Sets the window name and reapplies its position and size because imgui ties window pos / size to their name
 	virtual void ApplyWindowName();
 	// Called whenever the changes are successfully applied

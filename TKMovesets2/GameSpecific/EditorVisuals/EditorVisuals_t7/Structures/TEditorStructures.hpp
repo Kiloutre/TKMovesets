@@ -2,6 +2,7 @@
 
 #include "EditorFormList.hpp"
 #include "EditorVisuals_t7/Structures/Subwindows/TEditorMove_Animations.hpp"
+#include "CancelGraphView.hpp"
 #include "AnimationPreview.hpp"
 
 class TEditorCancels : public EditorFormList
@@ -83,9 +84,13 @@ private:
 	TEditorMove_Animations* m_animationList = nullptr;
 	// 3D preview of the move's animation, drawn above the fields
 	AnimationPreview m_preview;
+	// Graph of the moves this move cancels into, shown in place of the fields while open
+	CancelGraphView m_cancelGraph;
+	bool m_cancelGraphOpen = CancelGraphView::openByDefault;
 
 	void RenderInternal() override;
-	// The Animation label also gets the preview's show / hide icon.
+	bool ShowsApplyButton() const override { return !m_cancelGraphOpen; }
+	// The Animation label also gets the preview's show / hide icon, the Cancel label the cancel graph's.
 	void RenderLabel(int listIdx, EditorInput* field) override;
 
 	void OnFieldLabelClick(int listIdx, EditorInput* field) override;

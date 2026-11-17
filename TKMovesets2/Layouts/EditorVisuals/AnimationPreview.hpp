@@ -2,6 +2,7 @@
 #include "AnimationPreview/PreviewClip.hpp"
 #include "AnimationPreview/PreviewDisplacement.hpp"
 #include "AnimationPreview/PreviewHitbox.hpp"
+#include <imgui.h>
 #include <functional>
 #include <limits>
 #include <map>
@@ -59,6 +60,10 @@ public:
     // fillHeight > 0: fills that height (view, controls and timeline), for forms that put the preview beside the
     // fields; 0: as Render.
     void Body(const Input& input, float fillHeight);
+    // Thumbnail of the animation in [min, max] of `draw`, without controls (used by the cancel graph's nodes): a still
+    // pose (first active frame, else the middle frame), or the animation looping when `play`. A still thumbnail is
+    // rendered once and kept in its texture.
+    void Thumbnail(const Input& input, ImDrawList* draw, ImVec2 min, ImVec2 max, bool play);
     // Square icon button (frame height) that shows / hides the preview; returns true when clicked.
     bool ToggleButton();
     static float ToggleButtonWidth();
@@ -145,6 +150,12 @@ private:
 
     void Poll(const Input& input);
     void RenderViewport(float width, float height, const Input& input);
+    // Poses the current frame and renders the scene into the texture (w x h pixels).
+    void RenderScene(int w, int h, const Input& input);
+    // Thumbnail state: playing (hovered) last frame, and the frame and size its texture holds.
+    bool m_thumbPlaying = false;
+    float m_thumbFrame = -1;
+    int m_thumbWidth = 0, m_thumbHeight = 0;
     void RenderTimeline(const Input& input, int frames);
     void LoopButton();
     // Poses the mannequin at a fractional frame, interpolating linearly between the keyframes around it.

@@ -129,6 +129,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Importers/Importer_t8/RetailPreview.cpp"
                     "GameSpecific/AnimExtractors/AnimExtractor_t8.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t8Retail/EditorVisuals_t8Retail_Browser.cpp"
+                    "GameSpecific/EditorVisuals/EditorVisuals_t8Retail/EditorVisuals_t8Retail_CancelGraph.cpp"
                     "GameSpecific/Editors/Editor_t8Retail/Editor_t8Retail.cpp"
                     "GameSpecific/Editors/Editor_t8Retail/RetailEditorData.cpp"
                     "GameSpecific/Editors/Editor_t8Retail/RetailEditorOperations.cpp"
@@ -136,6 +137,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/EditorVisuals/EditorVisuals_t8Retail/EditorVisuals_t8Retail.cpp"
                     "ResourcesClasses/GameStaticData.cpp"
                     "GameSpecific/Editors/RecordEdit.cpp"
+                    "GameSpecific/Editors/CancelGraph.cpp"
                     # Animation preview of the move forms (model, poses, OpenGL view)
                     "GameSpecific/AnimationPreview/PreviewModel.cpp"
                     "GameSpecific/AnimationPreview/PreviewClip.cpp"
@@ -217,6 +219,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Editors/Editor_t7/Editor_t7_LiveEdition_Displayable.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_Utils.cpp"
                     "GameSpecific/Editors/Editor_t7/Editor_t7_References.cpp"
+                    "GameSpecific/Editors/Editor_t7/Editor_t7_CancelGraph.cpp"
                     ### Editor layout
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/EditorVisuals_t7_Rendering.cpp"
@@ -242,6 +245,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/TEditorMovelistPlayable.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/DisplayableMovelist/TEditorMovelistInput.cpp"
                     "GameSpecific/EditorVisuals/EditorVisuals_t7/Structures/Subwindows/TEditorMove_Animations.cpp"
+                    "Layouts/EditorVisuals/CancelGraphView.cpp"
 
                     # TTT2
                     "GameSpecific/Extractors/Extractor_ttt2/Extractor_ttt2.cpp"

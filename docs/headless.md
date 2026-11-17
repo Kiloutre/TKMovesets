@@ -137,7 +137,7 @@ Test builds only (`TKM_EDITOR_FORM_TESTS`, set when `BUILD_TESTING` is on):
 | `retail-editor-ui-test` | none | Dear ImGui Test Engine run over the retail editor |
 | `retail-panm-fixture` | `OUTPUT_DIRECTORY` | Writes PANM test fixtures |
 | `anim-preview-check` | `REFERENCE.json` | Animation preview pose and skinning against Blender (`tests/data/anim_preview_blender_reference.json`, from `tools/build_preview_mannequin.py`) |
-| `anim-preview-shot` | `FILE MOVE OUT_DIR [FRAMES] [yaw=R] [pitch=R] [preview=off] [displacement=off] [size=WxH]` | Opens FILE in its editor in a hidden GLFW window with the GUI's OpenGL backend, opens the move form and writes `frame_NNNN.png` per frame (`all`, `A-B` or `1,5,9`). MOVE: row (retail aliases such as `0x8001` resolve) |
+| `anim-preview-shot` | `FILE MOVE OUT_DIR [FRAMES] [yaw=R] [pitch=R] [preview=off] [displacement=off] [graph=on] [depth=N] [incoming=on] [size=WxH]` | Opens FILE in its editor in a hidden GLFW window with the GUI's OpenGL backend, opens the move form and writes `frame_NNNN.png` per frame (`all`, `A-B` or `1,5,9`). MOVE: row (retail aliases such as `0x8001` resolve). `graph=on`: the T7 move form shows its cancel graph instead (one capture; `depth=N` levels, `incoming=on` with incoming cancels) |
 | `anim-preview-joints` | `ANIMATION OUT.json` | Mannequin joint positions per frame of a `.panm` or T7 animation |
 | `anim-preview-export` | `T7_FILE MOVE OUT [panm]` | A T7 move's animation bytes, or their conversion onto the built-in retail skeleton |
 | `anim-preview-scan` | `FILE` | Decodes and poses every move animation of a T7 or retail T8 moveset as the move forms do |

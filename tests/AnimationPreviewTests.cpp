@@ -17,6 +17,7 @@
 #include "EditorForm.hpp"
 #include "EditorVisuals.hpp"
 #include "EditorVisuals_t7/EditorVisuals_t7.hpp"
+#include "CancelGraphView.hpp"
 #include "EditorVisuals_t8Retail/EditorVisuals_t8Retail.hpp"
 #include "Editor_t8Retail/Editor_t8Retail.hpp"
 #include "FileIO.hpp"
@@ -284,6 +285,10 @@ int ShootAnimationPreview(std::span<const std::wstring> arguments) {
             Settings::Set("editor.animation_preview_open", false);
         }
         else if (a.starts_with("open=")) EditorForm::forceOpenCategories.insert(a.substr(5));  // a form section, e.g. open=Hitbox 1
+        // T7 cancel graph in place of the move form's fields: graph=on, depth=N, incoming=on
+        else if (a == "graph=on") CancelGraphView::openByDefault = true;
+        else if (a.starts_with("depth=")) CancelGraphView::defaultDepth = std::stoi(a.substr(6));
+        else if (a == "incoming=on") CancelGraphView::defaultIncoming = true;
         else if (a.starts_with("size=")) { Require(sscanf_s(a.c_str() + 5, "%dx%d", &width, &height) == 2, "size=WxH"); }
         else frames = a;
     }
@@ -379,7 +384,8 @@ int ShootAnimationPreview(std::span<const std::wstring> arguments) {
         clipFrames = AnimationPreview::lastFrames;
         clipFormat = AnimationPreview::lastFormat;
         // Collapsed preview: the form alone, once.
-        if (previewOff) list.assign(1, 1), clipFrames = 1;
+        // The cancel graph replaces the form (and its preview): one capture.
+        if (previewOff || CancelGraphView::openByDefault) list.assign(1, 1), clipFrames = 1;
         Require(clipFrames > 0, "The preview shows no animation: " + AnimationPreview::lastError);
         for (int f : list) {
             if (f < 1 || f > clipFrames) continue;

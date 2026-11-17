@@ -454,6 +454,16 @@ void EditorForm::Render(bool parent_window_focused)
 		if (m_requestedClosure) {
 			RenderDiscardButtons();
 		}
+		else if (!ShowsApplyButton())
+		{
+			// Content with nothing to apply (a move form's cancel graph): no Apply footer
+			RenderInternal();
+			if (!m_operationError.empty()) ImGuiExtra_TextboxError(m_operationError.c_str());
+			if (parent_window_focused && IsWindowRightClicked()) {
+				ImGui::OpenPopup("ContextMenuPopup");
+				m_canPaste = CanPasteFormFromClipboard();
+			}
+		}
 		else
 		{
 			// Render Apply button
