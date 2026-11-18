@@ -34,7 +34,8 @@ struct Fixture {
     }
 };
 // animationBones = 23: a T7 body animation (rest pose) that the T7 -> retail T8 converter accepts.
-Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animationBones = 1) {
+// cameraMota: a camera MOTA (slot 9) holding one 2-frame 0xC8 camera clip (position, Euler rotation, zoom, roll).
+Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animationBones = 1, bool cameraMota = false) {
     Fixture fixture;
     auto& b = fixture.blocks;
     b.tableBlock = offsetof(MovesetInfo, table);
@@ -56,7 +57,8 @@ Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animati
     const uint32_t animationFrames = 2;
     b.motaBlock = b.animationBlock + (std::max)(size_t(40), (8 + animationBones * 4 + size_t(animationFrames) * animationBones * 12 + 7) & ~size_t(7)); // C8 extent
     const size_t animationOffset = sharedMota ? 28 : 24;
-    b.movelistBlock = b.motaBlock + animationOffset + 36;
+    const size_t cameraAt = (animationOffset + 36 + 7) & ~size_t(7), cameraClip = 8 + 4 * 4 + 2 * 4 * 12;
+    b.movelistBlock = b.motaBlock + (cameraMota ? cameraAt + 24 + cameraClip : animationOffset + 36);
     const size_t displayables = 40, playables = displayables + sizeof(MvlDisplayable), inputs = playables + sizeof(MvlPlayable);
     fixture.payload.resize(b.movelistBlock + inputs + sizeof(MvlInput));
     auto& info = fixture.Info();
@@ -91,6 +93,17 @@ Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animati
     if (sharedMota) memcpy(mota + 24, &offset, 4);
     memcpy(mota + offset, animation, 36);
     const uint16_t motaBones = 1; memcpy(mota + offset + 2, &motaBones, 2); // the MOTA keeps a 1-bone, 36-byte C8 animation
+    if (cameraMota) {
+        info.motas.motas[9] = static_cast<gameAddr>(cameraAt);
+        auto camera = mota + cameraAt;
+        memcpy(camera, "MOTA", 4); camera[4] = 1; camera[0x11] = 1; // little endian
+        const uint32_t clips = 1, clipOffset = 24; memcpy(camera + 12, &clips, 4); memcpy(camera + 20, &clipOffset, 4);
+        auto clip = camera + clipOffset;
+        const uint16_t c8 = 0xc8, channels = 4; const uint32_t clipFrames = 2, descriptors[4] = {0x0B, 0x07, 0x0F, 0x15};
+        memcpy(clip, &c8, 2); memcpy(clip + 2, &channels, 2); memcpy(clip + 4, &clipFrames, 4); memcpy(clip + 8, descriptors, 16);
+        const float values[2][12] = {{0, 1500, 3000, 0, 0, 0, 1, 0, 0, 0, 0, 0}, {100, 1500, 3000, 0, 0, 0, 1, 0, 0, 0, 0, 0}};
+        memcpy(clip + 24, values, sizeof(values));
+    }
     auto& training = fixture.Training();
     memcpy(training.mvlString, "MVLT", 4);
     training.displayables_count = training.playables_count = 1;
@@ -228,6 +241,18 @@ void RunSemanticValidationTests() {
 
 std::vector<Byte> SemanticFixture() { return Valid().File(); }
 std::vector<Byte> SemanticBodyFixture() { return Valid(false, 1, 23).File(); }
+// A 23-bone body move whose extra properties play the camera MOTA's clip 0 on either side (T7 33845, character MOTA bit
+// 0x4000) next to a drama camera row (33443), then a list end.
+std::vector<Byte> SemanticCameraFixture() {
+    auto fixture = Valid(false, 4, 23, true);
+    auto rows = fixture.Records<ExtraMoveProperty>(fixture.Info().table.extraMoveProperty);
+    rows[0].starting_frame = 0x8001; rows[0].id = 33845; rows[0].value_unsigned = 0x4000;
+    rows[1].starting_frame = 0x8001; rows[1].id = 33443; rows[1].value_unsigned = 1;
+    rows[2].starting_frame = 0x8001; rows[2].id = 0x8020; rows[2].value_unsigned = 0;
+    std::string error;
+    Check(Validate(fixture, &error), ("Camera fixture is invalid: " + error).c_str());
+    return fixture.File();
+}
 std::vector<Byte> SemanticFixtureWithPropertyList(size_t rows) {
     auto fixture = Valid(false, rows);
     std::string error;

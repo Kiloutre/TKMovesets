@@ -360,6 +360,7 @@ void EditorT7::RecomputeDisplayableMoveFlags(uint16_t moveId)
 	displayedMove->aliasId = aliasId;
 	displayedMove->flags = flags;
 	displayedMove->screw = MoveUsesScrew(moveId);
+	displayedMove->rage = MoveSpendsRage(moveId);
 }
 
 void EditorT7::ReloadDisplayableMoveList()
@@ -411,6 +412,7 @@ void EditorT7::ReloadDisplayableMoveList()
 			.aliasId = 0,
 			.flags = flags,
 			.screw = MoveUsesScrew(static_cast<uint16_t>(moveId)),
+			.rage = MoveSpendsRage(static_cast<uint16_t>(moveId)),
 		}));
         newRows.push_back(ownedRows.back().get());
 	}
@@ -582,6 +584,35 @@ bool EditorT7::MoveUsesScrew(uint16_t moveId) const
 		if (isDefault) break; // the list's default entry ends it
 	}
 	return false;
+}
+
+bool EditorT7::MoveSpendsRage(uint16_t moveId) const
+{
+	constexpr uint32_t SpendRage = 0x8272;
+	if (moveId >= m_iterators.moves.size()) return false;
+	const auto* move = m_iterators.moves[moveId];
+	// Extra properties end at id 0
+	const uint64_t extraCount = m_iterators.extra_move_properties.size();
+	if (const uint64_t first = move->extra_move_property_addr; first != MOVESET_ADDR_MISSING)
+		for (uint64_t row = first; row < extraCount && row < first + 512; ++row) {
+			const auto* property = m_iterators.extra_move_properties[row];
+			if (property->id == 0) break;
+			if (property->id == SpendRage && property->value_unsigned != 0) return true;
+		}
+	// Start and end properties end at the requirement terminator (not scanned while the editor has no constants)
+	const auto terminator = constants.find(EditorConstants_RequirementEnd);
+	if (terminator == constants.end()) return false;
+	const uint32_t end = terminator->second;
+	auto scan = [&](uint64_t first, const auto& list) {
+		if (first == MOVESET_ADDR_MISSING) return false;
+		for (uint64_t row = first; row < list.size() && row < first + 512; ++row) {
+			const auto* property = list[row];
+			if (property->extraprop == end) break;
+			if (property->extraprop == SpendRage && property->value != 0) return true;
+		}
+		return false;
+	};
+	return scan(move->move_start_extraprop_addr, m_iterators.move_start_properties) || scan(move->move_end_extraprop_addr, m_iterators.move_end_properties);
 }
 
 int32_t EditorT7::ResolveMoveId(uint32_t moveId) const

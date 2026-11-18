@@ -163,6 +163,23 @@ Extra properties (table 9), for each T7 row until id 0:
 - Projectile spawn (`map:t7_t8_projectile_prop`, T7 33291 -> retail `0x827B`): kept when the value is a valid projectile
   row (the table is converted row for row), else dropped.
 - Throw (`map:t7_t8_throw_prop`, T7 33852 -> retail `0x868F`): kept when the value is a valid throw row, else dropped.
+- Hand animation (T7 `0x842E` left / `0x842F` right -> retail `0x8610` / `0x8611`, `T7HandToRetailT8::HandProperties`):
+  kept when its animation converted (see [Animations](#animations)), with the animation's retail hand index as value;
+  else dropped, as before.
+- Camera animation (`T7CameraToRetailT8::CameraProperties`: T7 33849, 33850, 33861..33865 -> their alias-catalog
+  targets `0x868C`, `0x868D`, `0x8698..0x869C`): kept the same way, with the retail camera index as value. T7 33845
+  (either side) becomes two rows, `0x868C` + `0x868D`: its catalog target `0x8688` ignores its value in retail, and in
+  game a converted `0x8688` row flew the camera across the stage and left it there.
+  A list that plays a converted camera drops its T7 drama camera rows (33443 type, 33444 number; catalog targets
+  `0x8313` SetDramaType, `0x8314` SetDramaNo): in retail the drama camera replaces the camera animation, so Kazuya's
+  intros 2155/2157/2236 and win poses 2323..2331 showed the sky, the floor or the empty stage. Drama rows of lists
+  without a camera animation are kept.
+  Throw cameras need nothing: T7 and T8 camera data rows use the same shared camera ids (`0x814`, `0x901`...).
+- Wing animation (`T7WingToRetailT8::WingProperties`: T7 33840 "Play Wing Animations" -> `0x8683`): kept the same way,
+  with the retail wing (swing) index as value. Only T7 Kazuya uses it (19 rows).
+- Face animation (`T7FaceToRetailT8::FaceProperties`: T7 33986 "Play Facial Animation Sequence" -> `0x877A`): kept the
+  same way, with the retail face index as value (639 rows over 48 characters). "Facial Expression" (33985) takes an
+  expression code, not an animation, and is unchanged.
 - `t7_to_t8_prop` transform or alias block -> retail id and parameters.
 - Otherwise `mapProperty`: `map:t7_t8_prop`, then static catalog rows, cross votes, other catalog rows. A target in
   `list:t7_t8_drop_t8_props` (hand, face, wing, camera asset properties) is dropped.
@@ -187,6 +204,50 @@ Lists are cached by head row and bounded to 4096 rows per list. Property lists o
   fails. Exceeding the budget throws `std::length_error` (the whole conversion fails).
 - An animation that fails to convert is logged and counted (`conversion_failed`); its moves use the idle's animation
   (`fallback_idle`).
+- Hand animations (`T7HandToRetailT8.cpp`): every (hand, T7 hand animation) an extra-property row plays is converted
+  once. The T7 value indexes hand MOTA slot 2, or slot 3 with bit `0x4000`; the hand comes from the property (retail keeps
+  a left and a right copy of the same T7 animation). Each T7 channel is one finger joint (19 channels, or 15 without the
+  metacarpals); the retail rotation is the inverse of the T7 0x64 axis-angle rotation, mirrored (x and y negated) for the
+  left hand; translations keep the native rest offsets (`T7HandToRetailT8Skeleton.inc`, generated with
+  `--headless panm-skeleton-inc` from two native T8 Kazuya hand PANMs). Against native T8 Kazuya, 46 right and 50 left
+  same-length pairs match within 1e-4 rad on average (int16 quantization). Converted hand animations get retail hand
+  indices from `0x2000` (native lists hold a few hundred; retail masks bits 14 and 15 out of the index) and are embedded
+  as category 1 with instance `0x00020000 | index`. One that does not convert is counted (`animations.hands.failed`) and
+  its rows stay dropped. Start and end lists are not covered: no T7 character plays a hand animation there.
+- Camera animations (`T7CameraToRetailT8.cpp`): every T7 camera an extra-property row plays (slot 8, or slot 9 with bit
+  `0x4000`; all 0xC8 clips) is converted once:
+  - position: the first `0x0B` channel, or the second in look-at clips (the first is the target), / 10;
+  - rotation: the `0x07` channel as ZYX Euler (`Rz * Ry * Rx`), or a look-at (local -Z towards the target, world up +Y);
+  - roll: the first `0x15` channel, in degrees, about world Z before the rotation (`Rz(roll) * q`); further `0x15`
+    channels are ignored; quaternion signs are kept continuous;
+  - FOV: the `0x0F` channel x 9/16; smoothing `0x03` -> a `Camera_Param` track's scale (x animated, y and z at their
+    first value, the native shape);
+  - written in the native camera layout (`RetailPanm::EncodeGroups`: group 1 `cam_transform` Transform and
+    `Camera_Param`, group 5 `cam_transform` FieldOfView; packed codec `PackTransforms` / `PackScalars`, a constant FOV
+    static). Every native camera PANM re-encodes byte for byte except 2 of 395 with a layout no converter writes.
+  Against native T8 cameras of the same length: 176 pairs within 0.006 cm, 2e-4 rad and 3e-4 FOV, roll included. Indices
+  from `0x2000`, category 4, instance `0x00040000 | index`; report `animations.cameras`.
+- Wing animations (`T7WingToRetailT8.cpp`): every T7 wing animation an extra-property row plays (slot 6, or slot 7 with
+  bit `0x4000`) is converted once. Each bone is a channel group (`0x0B` position, `0x07` rotation, optional `0x03`
+  scale): rotation = the inverse of the 0x64 axis-angle rotation, position / 10, scale copied. The bone names come from
+  the built-in rigs (`T7WingToRetailT8Rigs.inc`, from native T8 swing PANMs of the shared archive; T8 Kazuya's own
+  swing list plays 17 of that kind): the rig with the animation's bone count whose rest offsets its frame-0 positions
+  match within 0.05 cm. Written as raw tracks without options, like native raw swing PANMs; category 3, instance
+  `0x00030000 | index`; report `animations.wings`. Against native T8 swing PANMs: all 34 T7 wing animations that get a
+  rig match one, within 0.034 rad (0.001 rad on all longer than 30 frames), positions exact. T7 Kazuya plays 8: 7
+  convert; #7 (a larger wing, bones 20 cm longer) matches no rig and its row is dropped. The 10-bone `OPT600` rig is left
+  out (no T7 property plays it, and one of its bone names is only inferred).
+- Face animations (`T7FaceToRetailT8.cpp`): every T7 face animation an extra-property row plays (slot 4, or slot 5 with
+  bit `0x4000`) is converted once onto the legacy 43-bone `*_Joint` face rig. Channels 2k / 2k+1 are bone k's position
+  and rotation (the four trailing scale channels are 1.0 everywhere and dropped); rotation = the inverse of the 0x64
+  axis-angle rotation, position / 10. Written like native face PANMs: one group, packed tracks (static for a bone that
+  never moves), options {3, 1}, {4, 1}. Against the 10 native T8 files of this rig with a T7 source (com x3, hms x6 =
+  T7 Emilie 5#11..16, test x1): 43 of 43 bones, mean 1e-4 rad, worst 0.018 rad and 0.006 cm. Category 2, instance
+  `0x00050000 | index`; report `animations.faces`. Over 51 characters 559 face animations convert; Negan's 10 played
+  faces (116 channels) do not, and their 10 rows stay dropped.
+  **Caveat:** 5,940 of the 5,969 T8 face PANMs (T8 Kazuya: 165 of 166) use the 185/186-bone T8 face rig, which shares 8
+  bone names with the legacy one at other rest positions; on a character whose model has only that rig the converted
+  faces may not move anything ([.docs/t7-to-retail-t8-face-wings.md](../.docs/t7-to-retail-t8-face-wings.md)).
 - Converted files normally play through the memory-only import. When the target's animation map is not ready,
   `ImporterT8` imports them through the target fallback instead (moves play the target's idle animation; see
   [t8-behaviour.md](t8-behaviour.md)).
@@ -215,6 +276,10 @@ sets stay 0: `paired_moves`, `animations.by_move_name`, `animations.by_animation
 | --- | --- |
 | `moves`, `source_character`, `converted_character` | Move count, T7 header character, 124 |
 | `animations.converted_from_t7`, `fallback_idle`, `conversion_failed`, `custom_animation_bytes`, `converted_moves` | Animation results |
+| `animations.hands.converted`, `failed`, `property_rows` | Hand animations converted, not converted, and hand rows kept |
+| `animations.cameras.converted`, `failed`, `property_rows` | The same for camera animations |
+| `animations.wings.converted`, `failed`, `property_rows` | The same for wing animations |
+| `animations.faces.converted`, `failed`, `property_rows` | The same for face animations |
 | `walk_cancels_retimed`, `packed_hitboxes`, `voiceclips.converted` | Record counters |
 | `requirements.catalog`, `cross_character_votes`, `unresolved`, `unresolved_assumed_true`, `unresolved_properties_dropped`, `unresolved_ids` | Requirement id resolution (`unresolved_ids`: `{id, rows}`) |
 | `properties.catalog`, `cross_character_votes`, `dropped`, `dropped_ids` | Property id resolution |
@@ -225,10 +290,11 @@ sets stay 0: `paired_moves`, `animations.by_move_name`, `animations.by_animation
 Dropped (conversion continues):
 
 - Property rows with no retail id, rows the import profile strips, rows a transform drops (`miss = drop`).
-- Properties that play hand, face, wing or camera assets by id (`list:t7_t8_drop_t8_props`).
+- Hand, face, camera or wing animations whose animation did not convert, and the other asset properties of
+  `list:t7_t8_drop_t8_props`.
 - Projectile spawns and throws whose row is out of range.
 - Property calls (`0x8000`+) inside requirement lists without a retail id.
-- MOTA files, the training movelist and dialogues: not converted.
+- MOTA archives themselves (only the animations properties play are converted), the training movelist and dialogues.
 - T7 projectile fields `0x7C`, `0x44`, `0x98`.
 - T7 unknown aliases 32..35.
 
@@ -238,6 +304,28 @@ Rejected (the conversion throws):
 - Unterminated property lists, references outside a table.
 - Property lists over 64 MiB, any table over 512 MiB, converted animations over 1 GiB, out of memory.
 - A converted file whose reference graph fails `RetailT8Import::Prepare`.
+
+### Live edition (`LiveConversion`)
+
+Editing a T7 moveset that was imported into retail T8 does not convert the whole moveset again. `T7ToRetailT8::LiveConversion`
+runs the full conversion once (its file is the bytes `ConvertStandalone` returns) and keeps what the row rules read: the
+table layout, the rebuilt property-list and voiceclip starts, the converted animation of each T7 animation offset and
+the move names. `UpdateRow` then converts one edited T7 row with the same rules and writes its records into the file:
+
+- Tables converted row for row (reactions, requirements, hit conditions, projectiles, pushbacks, cancels, group
+  cancels, extradata, input sequences, inputs, parry, cameras, throws): the T8 row of the same index.
+- Property lists (9, 10, 11) and voiceclips (13): the output rows the T7 row became (a row walked from two list heads
+  is written twice). A row no move reaches changes nothing.
+- Moves: the row, as long as its names, animation and list starts stay as converted.
+
+The edits a single row cannot carry return a reason and change nothing: a property that gains or loses a retail
+equivalent, a moved list end, a move pointing at a list no move used, a renamed move or a new animation. They need a
+new import. `MovesetRegressionTests --check-t7-live FILE...` checks on real files that single-row updates give the
+bytes of a full conversion of the edited moveset.
+
+In the editor (`Editor_t7_LiveRetail.cpp`), the T7 live writers write into `T7LiveShadow`, a copy of the T7 moveset in
+file layout, instead of the game; the edited rows are converted with `UpdateRow` and written into the published moveset
+by `RetailLiveEdit::Sync`, which applies the importer's identity, profile and animation fixups.
 
 ## Retail T8 -> T7 (`T8ToT7::Convert`)
 

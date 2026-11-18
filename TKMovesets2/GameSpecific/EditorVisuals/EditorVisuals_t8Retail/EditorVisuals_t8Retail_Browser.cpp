@@ -48,7 +48,7 @@ void EditorVisualsT8Retail::RebuildBrowser() {
             if(move.name.ends_with("_y"))move.flags|=EditorMoveFlags_Throw;
             else if(move.name.ends_with("_n"))move.flags|=EditorMoveFlags_ThrowReaction;
             if(move.name.starts_with(MOVESET_CUSTOM_MOVE_NAME_PREFIX) || (row>=m_originalMoveCrc.size() || m_editor->MoveFingerprint(row)!=m_originalMoveCrc[row]))move.flags|=EditorMoveFlags_Custom;
-            move.tornado=m_editor->MoveUsesTornado(row);
+            move.tornado=m_editor->MoveUsesTornado(row);move.rage=m_editor->MoveSpendsRage(row);move.heat=m_editor->MoveSpendsHeat(row);
             move.colour=TEditorUtils::GetMoveColorFromFlag(move.flags);m_moveRows.push_back(std::move(move));
         }
         m_indexTable=m_table;m_indexRevision=m_editRevision;m_filterDirty=true;
@@ -108,7 +108,13 @@ void EditorVisualsT8Retail::RenderBrowser() {
                 // A name search stays in the box (and keeps filtering) when a listed move is clicked.
                 try {if(m_table==12){m_selectedMove=row;m_browserKeepFocus=3;}OpenRecord(m_table,row);}catch(const std::exception& e){m_previewMessage=e.what();}
             }
-            if(m_table==12 && m_moveRows[row].tornado){const float size=ImGui::GetTextLineHeight();ImGuiExtra::ScrewIcon(ImVec2(nameCell.x+nameWidth-size-2,nameCell.y),size,_("edition.move_tornado"));}
+            if(m_table==12) {
+                // Right to left: tornado, rage, heat
+                const auto& move=m_moveRows[row];const float size=ImGui::GetTextLineHeight();int slot=0;
+                if(move.tornado)ImGuiExtra::ScrewIcon(ImVec2(ImGuiExtra::MoveIconX(nameCell.x,nameWidth,size,slot++),nameCell.y),size,_("edition.move_tornado"));
+                if(move.rage)ImGuiExtra::RageIcon(ImVec2(ImGuiExtra::MoveIconX(nameCell.x,nameWidth,size,slot++),nameCell.y),size,_("edition.move_rage"));
+                if(move.heat)ImGuiExtra::HeatIcon(ImVec2(ImGuiExtra::MoveIconX(nameCell.x,nameWidth,size,slot++),nameCell.y),size,_("edition.move_heat"));
+            }
             if(ImGui::BeginPopupContextItem("Record actions")) {
                 if(ImGui::MenuItem(_("edition.t8.open")))OpenRecord(m_table,row);
                 if(ImGui::MenuItem(_("edition.t8.find_references")))FindReferences(m_table,row);

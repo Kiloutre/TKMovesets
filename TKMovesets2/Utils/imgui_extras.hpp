@@ -9,6 +9,12 @@ namespace ImGuiExtra
 	// Screw (tornado) icon of the move lists: a spiral in a square of side `size` at `min`, drawn over the last item.
 	// Shows `tooltip` when the pointer is over it.
 	void ScrewIcon(ImVec2 min, float size, const char* tooltip);
+	// Rage icon of the move lists (the move spends rage): a red flame. Same placement and tooltip as ScrewIcon.
+	void RageIcon(ImVec2 min, float size, const char* tooltip);
+	// Heat icon of the move lists (the move spends heat): a blue lightning bolt. Same placement and tooltip as ScrewIcon.
+	void HeatIcon(ImVec2 min, float size, const char* tooltip);
+	// Left edge of the [slot]th move-list icon (0 = rightmost) in a name cell at [cellX], [cellWidth] wide.
+	inline float MoveIconX(float cellX, float cellWidth, float size, int slot) { return cellX + cellWidth - (size + 2) * float(slot + 1); }
 	// Class that can be created in a block, will disable everything inside of that block
 	class DisableBlockIf
 	{

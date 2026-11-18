@@ -493,6 +493,45 @@ std::vector<AnimPreview::Displacement> EditorT8Retail::MoveDisplacements(uint32_
     return result;
 }
 
+// Whether one of the move's extra (9), start (10) or end (11) properties satisfies [match](id, parameter 1). Each list
+// ends at property id 0.
+template<class Match> static bool AnyMoveProperty(const EditorT8Retail& editor, uint32_t row, Match match)
+{
+    auto field = [](size_t table, std::string_view name) -> const EditorT8Retail::Field* {
+        for (const auto& f : EditorT8Retail::Schema(table)) if (f.name == name) return &f;
+        return nullptr;
+    };
+    if (row >= editor.Count(12)) return false;
+    constexpr std::pair<const char*, size_t> lists[] = {{"properties", 9}, {"start_properties", 10}, {"end_properties", 11}};
+    for (const auto& [name, table] : lists) {
+        const auto *reference = field(12, name), *id = field(table, "property"), *parameter = field(table, "parameter_1");
+        if (!reference || !id || !parameter) continue;
+        const auto first = editor.ReferenceIndex(12, row, *reference);
+        if (!first) continue;
+        for (uint64_t at = *first; at < editor.Count(table) && at < *first + 512; ++at) {
+            const auto record = editor.Record(table, uint32_t(at));
+            uint32_t property = 0, value = 0;
+            if (id->offset + 4 <= record.size()) memcpy(&property, record.data() + id->offset, 4);
+            if (parameter->offset + 4 <= record.size()) memcpy(&value, record.data() + parameter->offset, 4);
+            if (property == 0) break;
+            if (match(property, value)) return true;
+        }
+    }
+    return false;
+}
+
+bool EditorT8Retail::MoveSpendsRage(uint32_t row) const
+{
+    return AnyMoveProperty(*this, row, [](uint32_t id, uint32_t value) { return id == 0x82E2 && (value & 1); });
+}
+
+bool EditorT8Retail::MoveSpendsHeat(uint32_t row) const
+{
+    return AnyMoveProperty(*this, row, [](uint32_t id, uint32_t value) {
+        return (id == 0x814E && int32_t(value) < 0) || (id == 0x8383 && int16_t(value & 0xFFFF) < 0);
+    });
+}
+
 bool EditorT8Retail::MoveUsesTornado(uint32_t row) const
 {
     auto field = [](size_t table, std::string_view name) -> const Field* {

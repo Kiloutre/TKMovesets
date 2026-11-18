@@ -2,7 +2,10 @@
 #include "RetailT8Records.hpp"
 #include "MovesetStructs.h"
 #include "ImportProfile.hpp"
+#include <memory>
+#include <optional>
 #include <set>
+#include <string>
 #include <nlohmann/json_fwd.hpp>
 
 // Shared by offline conversion and the retail import preflight. This intermediate
@@ -75,6 +78,15 @@ struct ConversionReport {
     uint64_t projectilesDropped = 0, projectileSpawns = 0, throwsDropped = 0, votedRequirementIds = 0, votedPropertyIds = 0;
     uint64_t animationsConverted = 0, carriersAvailable = 0, animationsUnconverted = 0, animationsConversionFailed = 0, customAnimationBytes = 0, animationTemplateBytes = 0, embeddedNativeAnimations = 0;
     uint64_t animationsLengthRejected = 0, animationsSynthetic = 0;
+    // Hand animations (T7 hand MOTAs): distinct (hand, animation) pairs converted, ones that did not convert (their
+    // properties are dropped), and the hand-animation property rows kept.
+    uint64_t handAnimationsConverted = 0, handAnimationsFailed = 0, handAnimationProperties = 0;
+    // Camera animations (T7 camera MOTAs), counted the same way.
+    uint64_t cameraAnimationsConverted = 0, cameraAnimationsFailed = 0, cameraAnimationProperties = 0;
+    // Wing animations (T7 wing MOTAs), counted the same way.
+    uint64_t wingAnimationsConverted = 0, wingAnimationsFailed = 0, wingAnimationProperties = 0;
+    // Face animations (T7 face MOTAs, onto the legacy 43-bone face rig), counted the same way.
+    uint64_t faceAnimationsConverted = 0, faceAnimationsFailed = 0, faceAnimationProperties = 0;
     uint64_t requirementPropertiesDropped = 0; // unmapped property calls (IDs >= 0x8000) in requirement lists, dropped
     bool idleTemplate = false;
     uint32_t convertedCharacter = 0, sourceCharacter = 0; // convertedCharacter: the output's placeholder identity
@@ -89,4 +101,27 @@ inline constexpr uint32_t ConvertedCharacter = 124;
 std::vector<Byte> ConvertStandalone(const TKMovesetHeader& header, const StructsT7::TKMovesetHeaderBlocks& blocks,
     std::span<const Byte> payload, ConversionReport* report = nullptr, bool convertAnimations = true,
     const ImportProfile::Profile& profile = {});
+
+// Incremental conversion for live editing a T7 moveset imported into retail T8. Built once with the full conversion
+// (File() holds the same bytes ConvertStandalone returns, animations included); then UpdateRow converts a single
+// edited T7 row with the same rules and writes its records into File(), with no full conversion. Most tables convert
+// row for row. Property lists (9, 10, 11) and voiceclips (13) drop the rows without a retail equivalent, so their
+// rows map through what the conversion emitted; a move's names, animation and list starts must stay as converted.
+// An edit outside those bounds returns the reason: it needs a full conversion and a new import.
+class LiveConversion {
+public:
+    LiveConversion(const TKMovesetHeader& header, const StructsT7::TKMovesetHeaderBlocks& blocks,
+        std::span<const Byte> payload, const ImportProfile::Profile& profile);
+    ~LiveConversion();
+    LiveConversion(LiveConversion&&) noexcept;
+    LiveConversion& operator=(LiveConversion&&) noexcept;
+    // The converted retail container (TKM2), updated by UpdateRow. Its CRC is the full conversion's.
+    const std::vector<Byte>& File() const;
+    const ConversionReport& Report() const;
+    // `t7Row`: the edited row of T7 table `table` (0..18) in file layout (row indices, UINT64_MAX = null).
+    std::optional<std::string> UpdateRow(size_t table, uint64_t row, std::span<const Byte> t7Row);
+private:
+    struct State;
+    std::unique_ptr<State> m;
+};
 }

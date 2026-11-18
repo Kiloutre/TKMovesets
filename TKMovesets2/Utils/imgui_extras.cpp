@@ -144,3 +144,36 @@ void ImGuiExtra::ScrewIcon(ImVec2 min, float size, const char* tooltip)
 	draw->PathStroke(ink, 0, (std::max)(1.5f, size * 0.11f));
 	if (tooltip && ImGui::IsMouseHoveringRect(min, ImVec2(min.x + size, min.y + size)) && ImGui::IsWindowHovered()) ImGui::SetTooltip("%s", tooltip);
 }
+
+namespace
+{
+	void IconTooltip(ImVec2 min, float size, const char* tooltip)
+	{
+		if (tooltip && ImGui::IsMouseHoveringRect(min, ImVec2(min.x + size, min.y + size)) && ImGui::IsWindowHovered()) ImGui::SetTooltip("%s", tooltip);
+	}
+}
+
+void ImGuiExtra::RageIcon(ImVec2 min, float size, const char* tooltip)
+{
+	auto* draw = ImGui::GetWindowDrawList();
+	auto at = [&](float x, float y) { return ImVec2(min.x + x * size, min.y + y * size); };
+	// Flame: a pointed outer tongue, then a lighter inner one.
+	const ImVec2 outer[] = { at(0.50f, 0.06f), at(0.68f, 0.30f), at(0.84f, 0.52f), at(0.80f, 0.78f), at(0.62f, 0.94f),
+		at(0.38f, 0.94f), at(0.20f, 0.78f), at(0.16f, 0.54f), at(0.30f, 0.36f) };
+	draw->AddConvexPolyFilled(outer + 1, 8, IM_COL32(225, 45, 35, 255)); // body (convex part)
+	draw->AddTriangleFilled(outer[0], outer[1], outer[8], IM_COL32(225, 45, 35, 255)); // tip
+	const ImVec2 inner[] = { at(0.52f, 0.46f), at(0.66f, 0.68f), at(0.60f, 0.86f), at(0.40f, 0.86f), at(0.34f, 0.68f) };
+	draw->AddConvexPolyFilled(inner, 5, IM_COL32(255, 170, 60, 255));
+	IconTooltip(min, size, tooltip);
+}
+
+void ImGuiExtra::HeatIcon(ImVec2 min, float size, const char* tooltip)
+{
+	auto* draw = ImGui::GetWindowDrawList();
+	auto at = [&](float x, float y) { return ImVec2(min.x + x * size, min.y + y * size); };
+	const ImU32 ink = IM_COL32(70, 170, 255, 255);
+	// Lightning bolt: two triangles meeting at the middle.
+	draw->AddTriangleFilled(at(0.62f, 0.04f), at(0.22f, 0.56f), at(0.56f, 0.52f), ink);
+	draw->AddTriangleFilled(at(0.44f, 0.48f), at(0.78f, 0.44f), at(0.36f, 0.96f), ink);
+	IconTooltip(min, size, tooltip);
+}

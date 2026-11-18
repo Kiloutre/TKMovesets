@@ -78,6 +78,12 @@ public:
     AnimPreview::ReactionMoves MoveHitReactions(uint32_t row, bool opponentAirborne) const;
     // The move's hit uses the tornado: one of its hit conditions requires 724 "Tornado Available".
     bool MoveUsesTornado(uint32_t row) const;
+    // The move spends rage: one of its extra, start or end properties is 0x82E2 "Spend Rage" with parameter bit 0 set
+    // (the handler copies that bit; 0 allows rage again). Requirements on the property are not judged.
+    bool MoveSpendsRage(uint32_t row) const;
+    // The move spends heat: one of its extra, start or end properties is 0x814E "Spend Heat Dash Charge" (heat dashes
+    // -300, heat smashes -600) or 0x8383 "Refill / Drain Heat Gauge" with a negative amount. Requirements not judged.
+    bool MoveSpendsHeat(uint32_t row) const;
     // A move already bound to these exact bytes (native or custom asset).
     std::optional<uint32_t> FindBoundAnimation(std::span<const Byte> panm) const;
     // Writes every distinct embedded body animation used by a move plus animations.json.

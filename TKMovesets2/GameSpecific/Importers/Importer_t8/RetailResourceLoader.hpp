@@ -1,6 +1,7 @@
 #pragma once
 #include "GameProcess.hpp"
 #include "GameAddressesWrapper.hpp"
+#include <array>
 #include <cstdint>
 #include <span>
 #include <vector>
@@ -40,6 +41,17 @@ RegisteredAnimation BuildRegisteredAnimation(std::span<const Byte> panm, gameAdd
 // Throws when the map is not populated or an id is already present. Returns the number published.
 struct PublishedAnimation { uint32_t id; gameAddr node; };
 size_t PublishAnimations(GameProcess& process, gameAddr map, std::span<const PublishedAnimation> entries);
+// Non-body animations (.docs/retail-t8-nonbody-anim-re.md): hand, face, swing, camera and extra properties play a list
+// index, which the anim manager's category index maps to a handle per domain, key = index | 1 << (20 + category).
+// The domain's category index map inside `manager` (t8-retail_anim_manager), 0 when the domain has none yet.
+gameAddr CategoryIndexMap(const GameProcess& process, gameAddr manager, uint32_t domain);
+constexpr uint32_t CategoryKey(uint32_t category, uint32_t index) { return index | (1U << (20 + category)); }
+// Handle stored at `key` in a category index map, the way the game's readers find it; 0 when absent.
+uint64_t CategoryHandle(const GameProcess& process, gameAddr map, uint32_t key);
+// A category index node: next/prev (written at publication), u32 key at +0x10, handle at +0x18.
+std::array<Byte, 0x20> CategoryNode(uint32_t key, uint64_t handle);
+// Links uploaded category nodes into `map` through its buckets only, as PublishAnimations does (`id` = the key).
+size_t PublishCategoryIndex(GameProcess& process, gameAddr map, std::span<const PublishedAnimation> entries);
 // Content-derived id (top bit set) for a custom animation in `domain`, unused in domain 0x81 and `domain` and not in
 // `taken`. `registered` is true when the id already resolves to our own entry holding the same PANM bytes (an earlier
 // import), which is then reused instead of uploading again: re-importing does not grow memory.

@@ -7,6 +7,10 @@
 #include "RetailResourceLoader.hpp"
 #include "T7ToRetailT8.hpp"
 #include "T7AnimToRetailT8.hpp"
+#include "T7HandToRetailT8.hpp"
+#include "T7CameraToRetailT8.hpp"
+#include "T7WingToRetailT8.hpp"
+#include "T7FaceToRetailT8.hpp"
 #include "Editor_t8Retail/Editor_t8Retail.hpp"
 #include <bit>
 #include <chrono>
@@ -115,6 +119,7 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
         m_memoryOnly = false; m_publishedAnimations = 0; m_reusedAnimations = 0; m_memoryOnlyFallbackMoves = 0;
         m_memoryOnlyHandles.clear(); m_memoryOnlyStringRow = 0; m_memoryOnlyDomain = 0; m_memoryOnlyContainer = 0;
         m_nativeBoundAnimations = 0; m_nativeUnloadedKept = 0; m_native.reset(); m_memoryOnlyNames.clear(); m_memoryOnlyAnimations.clear();
+        m_handIndices.clear(); m_handAnimations = 0; m_publishedHandIndices = 0; m_silencedHandProperties = 0;
         // v4 native snapshots carry their source's strings and external cancel lists (.docs/retail-t8-extraction.md).
         if (!convertedT7) try { m_native = R::ReadExtension(payload); } catch (const std::exception&) { m_native.reset(); }
         std::map<uint32_t, R::AssetEntry> bodyAssets; // file instance -> PANM (converted ones win over embedded natives)
@@ -387,6 +392,17 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
             for (const auto& [instance, asset] : bodyAssets) panms[instance] = payload.subspan(asset.offset, asset.size);
             for (const auto& [instance, bytes] : diskAssets) panms[instance] = bytes;
             m_archiveAnimations = diskAssets.size();
+            // Id of the entry playing `panm`: one upload per distinct PANM, or our identical entry from an earlier import.
+            auto chooseId = [&](std::span<const Byte> panm) {
+                uint32_t digest = 0x811c9dc5; for (auto byte : panm) { digest ^= byte; digest *= 0x01000193; }
+                auto& same = uploaded[{panm.size(), digest}];
+                for (const auto& [bytes, existing] : same) if (std::equal(bytes.begin(), bytes.end(), panm.begin(), panm.end())) return existing;
+                const auto chosen = RS::ChooseAnimationId(m_process, animContainer, m_memoryOnlyDomain, panm, engine, taken);
+                taken.insert(chosen.id); same.push_back({panm, chosen.id});
+                if (chosen.registered) ++m_reusedAnimations;
+                else uploads.push_back({chosen.id, panm});
+                return chosen.id;
+            };
             for (const auto& [instance, panm] : panms) {
                 // Native snapshot of an animation the target's maps already hold with the same bytes: bind to it.
                 if (m_native) {
@@ -406,37 +422,77 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
                         continue;
                     }
                 }
-                uint32_t digest = 0x811c9dc5; for (auto byte : panm) { digest ^= byte; digest *= 0x01000193; }
-                auto& same = uploaded[{panm.size(), digest}];
-                uint32_t id = 0;
-                for (const auto& [bytes, existing] : same) if (std::equal(bytes.begin(), bytes.end(), panm.begin())) id = existing;
-                if (!id) {
-                    const auto chosen = RS::ChooseAnimationId(m_process, animContainer, m_memoryOnlyDomain, panm, engine, taken);
-                    id = chosen.id; taken.insert(id); same.push_back({panm, id});
-                    if (chosen.registered) ++m_reusedAnimations;
-                    else uploads.push_back({id, panm});
-                }
-                memoryOnlyHandles[instance] = 0xef00000000000000ULL | (uint64_t(m_memoryOnlyDomain & 0xff) << 40) | id;
+                memoryOnlyHandles[instance] = 0xef00000000000000ULL | (uint64_t(m_memoryOnlyDomain & 0xff) << 40) | chooseId(panm);
             }
-            // One region for all new entries (16-aligned each; an entry's layout size does not depend on its address).
-            // Never freed: players keep pointers into it after binding (retained like published movesets).
+            // Converted T7 hand, face, wing and camera animations (categories 1..4, .docs/retail-t8-nonbody-anim-re.md): an
+            // instance-map entry like a body animation, plus a node in the domain's category index. The file's index is
+            // used when that key is free; a key holding another animation (the target's, or another import's) is never
+            // shadowed: the next free index is taken and the rows are remapped to it (ApplyHandIndices below).
+            std::vector<std::pair<uint32_t, uint64_t>> handNodes; // key, handle of the new category nodes
+            gameAddr handMap = 0;
+            if (convertedT7) {
+                namespace H = T7HandToRetailT8;
+                std::vector<R::AssetEntry> hands;
+                for (const auto& asset : R::Assets(payload))
+                    if ((asset.type == H::HandCategory || asset.type == T7CameraToRetailT8::CameraCategory ||
+                         asset.type == T7WingToRetailT8::WingCategory || asset.type == T7FaceToRetailT8::FaceCategory) && asset.size &&
+                        asset.address == T7AnimToRetailT8::CustomAssetAddress) hands.push_back(asset);
+                m_handAnimations = hands.size();
+                if (!hands.empty()) try { handMap = RS::CategoryIndexMap(m_process, m_game.ReadPtrPath("anim_manager"), m_memoryOnlyDomain); }
+                catch (const std::exception& error) { DEBUG_ERR("Retail T8 import: no category index: %s", error.what()); handMap = 0; }
+                std::set<uint32_t> usedKeys;
+                constexpr uint32_t span = H::LastRetailIndex - H::FirstRetailIndex + 1;
+                if (handMap) for (const auto& asset : hands) {
+                    const auto fileIndex = H::AssetIndex(asset.instance);
+                    if (fileIndex < H::FirstRetailIndex || fileIndex > H::LastRetailIndex || m_handIndices.count({asset.type, fileIndex})) continue;
+                    const auto handle = 0xef00000000000000ULL | (uint64_t(m_memoryOnlyDomain & 0xff) << 40) | chooseId(payload.subspan(asset.offset, asset.size));
+                    for (uint32_t probe = 0; probe < span; ++probe) {
+                        const auto index = H::FirstRetailIndex + (fileIndex - H::FirstRetailIndex + probe) % span;
+                        const auto key = RS::CategoryKey(asset.type, index);
+                        if (usedKeys.count(key)) continue;
+                        const auto existing = RS::CategoryHandle(m_process, handMap, key);
+                        if (existing && existing != handle) continue;
+                        usedKeys.insert(key); m_handIndices[{asset.type, fileIndex}] = index;
+                        if (!existing) handNodes.push_back({key, handle}); // else: our own node from an earlier import
+                        break;
+                    }
+                }
+            }
+            // One region for all new entries (16-aligned each; an entry's layout size does not depend on its address),
+            // then the category nodes. Never freed: players keep pointers into it after binding (retained like published
+            // movesets).
             std::vector<uint64_t> offsets; uint64_t total = 0;
             for (const auto& [id, panm] : uploads) {
                 offsets.push_back(total);
                 total = (total + RS::BuildRegisteredAnimation(panm, 0, engine, id).image.size() + 15) & ~uint64_t(15);
             }
+            const auto nodesAt = total;
+            total += handNodes.size() * 0x20;
+            std::vector<RS::PublishedAnimation> handPublish;
             if (total) {
                 const auto region = m_process.allocateMem(total);
                 if (!region) return ImportationErrcode_GameAllocationErr;
                 for (size_t i = 0; i < uploads.size(); ++i) {
                     const auto entry = RS::BuildRegisteredAnimation(uploads[i].second, region + offsets[i], engine, uploads[i].first);
-                    if (offsets[i] + entry.image.size() > total || !m_process.writeBytes(region + offsets[i], entry.image.data(), entry.image.size()))
+                    if (offsets[i] + entry.image.size() > nodesAt || !m_process.writeBytes(region + offsets[i], entry.image.data(), entry.image.size()))
                         return ImportationErrcode_GameWriteError;
                     publish.push_back({uploads[i].first, entry.node});
                 }
+                for (size_t i = 0; i < handNodes.size(); ++i) {
+                    const auto node = RS::CategoryNode(handNodes[i].first, handNodes[i].second);
+                    if (!m_process.writeBytes(region + nodesAt + i * 0x20, node.data(), node.size())) return ImportationErrcode_GameWriteError;
+                    handPublish.push_back({handNodes[i].first, region + nodesAt + i * 0x20});
+                }
             }
             m_publishedAnimations = RS::PublishAnimations(m_process, targetMap, publish);
+            // After the entries: a published index resolves to an entry that is already linked (both in this batch).
+            m_publishedHandIndices = RS::PublishCategoryIndex(m_process, handMap, handPublish);
             m_customAnimations = panms.size();
+        }
+        // Hand rows play the published index; without one (another route, no category index, no free key) they never fire.
+        if (convertedT7) {
+            const auto rows = std::span<Byte>(plan.tables).subspan(plan.offsets[9], plan.counts[9] * R::Tables[9].stride);
+            RetailT8Import::ApplyHandIndices(rows, m_memoryOnly ? &m_handIndices : nullptr, &m_silencedHandProperties);
         }
         for (const auto& asset : assets) {
             if (m_memoryOnly || m_targetFallback) break; // the target fallback writes nothing into game resources

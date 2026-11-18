@@ -325,16 +325,15 @@ AnimationId ChooseAnimationId(const GameProcess& process, gameAddr container, ui
     throw std::runtime_error("No free retail animation id");
 }
 
-size_t PublishAnimations(GameProcess& process, gameAddr map, std::span<const PublishedAnimation> entries) {
+namespace {
+// Bucket-only publication into an MSVC unordered_map whose list head is at `map + 0x10`, bucket vector at `+0x20` and
+// mask at `+0x38` (the instance maps; a category index map is read the same way from 8 bytes before it). Each node's
+// key is its u32 at +0x10.
+size_t LinkBucketOnly(GameProcess& process, gameAddr map, std::span<const PublishedAnimation> entries) {
     namespace RT = RetailT8Runtime;
-    if (entries.empty()) return 0;
-    // Readers only see a fully populated map; a later rebuild is a new map (guarded by the caller's container read).
-    const auto populated = RT::Read<uint8_t>(process, map + 0x48);
     const auto head = RT::Read<uint64_t>(process, map + 0x10), buckets = RT::Read<uint64_t>(process, map + 0x20);
     const auto mask = RT::Read<uint64_t>(process, map + 0x38);
-    if (populated != 1) throw std::runtime_error("Retail animation map is not populated yet");
-    if (!process.ExpectBytes(map + 0x48, &populated, 1) || !process.ExpectBytes(map + 0x10, &head, 8) ||
-        !process.ExpectBytes(map + 0x20, &buckets, 8) || !process.ExpectBytes(map + 0x38, &mask, 8))
+    if (!process.ExpectBytes(map + 0x10, &head, 8) || !process.ExpectBytes(map + 0x20, &buckets, 8) || !process.ExpectBytes(map + 0x38, &mask, 8))
         throw std::runtime_error("Cannot guard retail animation map");
     // Bucket-only links: the node goes on top of its bucket's prev chain (bucket.hi), never into the list. Every
     // reader walks hi -> prev -> ... -> lo; teardown, rehash and readiness walk the list by next and never reach it,
@@ -362,6 +361,45 @@ size_t PublishAnimations(GameProcess& process, gameAddr map, std::span<const Pub
         if (bucket.Empty() && !process.writeUInt64(address, nodes.front())) throw std::runtime_error("Cannot publish custom animation");
     }
     return entries.size();
+}
+}
+
+size_t PublishAnimations(GameProcess& process, gameAddr map, std::span<const PublishedAnimation> entries) {
+    namespace RT = RetailT8Runtime;
+    if (entries.empty()) return 0;
+    // Readers only see a fully populated map; a later rebuild is a new map (guarded by the caller's container read).
+    const auto populated = RT::Read<uint8_t>(process, map + 0x48);
+    if (populated != 1) throw std::runtime_error("Retail animation map is not populated yet");
+    if (!process.ExpectBytes(map + 0x48, &populated, 1)) throw std::runtime_error("Cannot guard retail animation map");
+    return LinkBucketOnly(process, map, entries);
+}
+
+gameAddr CategoryIndexMap(const GameProcess& process, gameAddr manager, uint32_t domain) {
+    namespace RT = RetailT8Runtime;
+    // Map A of the anim manager: domain -> inner map, list head +0x2090, buckets +0x20A0, mask +0x20B8; the inner map
+    // sits at outer node +0x18.
+    const auto node = RT::Lookup(process, RT::Read<uint64_t>(process, manager + 0x2090), RT::Read<uint64_t>(process, manager + 0x20A0),
+        RT::Read<uint64_t>(process, manager + 0x20B8), domain);
+    return node ? node + 0x18 : 0;
+}
+
+uint64_t CategoryHandle(const GameProcess& process, gameAddr map, uint32_t key) {
+    namespace RT = RetailT8Runtime;
+    const auto node = RT::MapNode(process, map - 8, key);
+    return node ? RT::Read<uint64_t>(process, node + 0x18) : 0;
+}
+
+std::array<Byte, 0x20> CategoryNode(uint32_t key, uint64_t handle) {
+    std::array<Byte, 0x20> node{};
+    memcpy(node.data() + 0x10, &key, 4); memcpy(node.data() + 0x18, &handle, 8);
+    return node;
+}
+
+size_t PublishCategoryIndex(GameProcess& process, gameAddr map, std::span<const PublishedAnimation> entries) {
+    if (entries.empty()) return 0;
+    // Built once per domain lifetime, never rehashed afterwards; its teardown walks the list by next, like the
+    // instance maps, so bucket-only nodes are found by every lookup and never freed by the engine.
+    return LinkBucketOnly(process, map - 8, entries);
 }
 
 gameAddr AttachCustomAnimation(GameProcess& source, const EngineAddresses& engine, gameAddr resource, std::span<const Byte> panm,

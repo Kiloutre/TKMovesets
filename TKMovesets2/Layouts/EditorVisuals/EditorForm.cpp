@@ -9,6 +9,8 @@
 #include "Keybinds.hpp"
 #include "AppTheme.hpp"
 #include "TEditor.hpp"
+#include "Settings.hpp"
+#include "constants.h"
 
 namespace {
 ImU32 FormTabAccent(EditorWindowType type) {
@@ -124,14 +126,24 @@ void EditorForm::RenderDiscardButtons()
 
 void EditorForm::Apply()
 {
+    const auto live = m_editor->live_loadedMoveset;
+    bool applied = false;
     EditForm([&] {
         FlushPendingFields();
         if (!IsFormValid()) return false;
         m_editor->SaveItem(windowType, structureId, m_fieldIdentifierMap);
         unsavedChanges = false; justAppliedChanges = true; m_requestedClosure = false;
         OnApply();
+        applied = true;
         return true;
     });
+    KeepLiveAfterApply(live, applied);
+}
+
+void EditorForm::KeepLiveAfterApply(gameAddr live, bool applied)
+{
+    // An edit transaction ends live edition; an editor that publishes the applied bytes keeps it.
+    if (applied && live && m_editor->Live_OnApplied(live)) m_editor->live_loadedMoveset = live;
 }
 
 void EditorForm::RenderInputs(int listIdx, std::vector<EditorInput*>& inputs, int category, int columnCount)
@@ -466,31 +478,35 @@ void EditorForm::Render(bool parent_window_focused)
 		}
 		else
 		{
-			// Render Apply button
+			// Render Apply button, unless edits apply themselves (setting editor.auto_apply)
+			const bool autoApply = Settings::Get(SETTING_EDITOR_AUTO_APPLY_KEY, SETTING_EDITOR_AUTO_APPLY);
 			bool enabledBtn = unsavedChanges;
 			const float buttonHeight = 25;// ImGui::GetFrameHeightWithSpacing();
 
 			ImVec2 startPos = ImGui::GetCursorPos();
 
-			if (enabledBtn) {
-				ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
-			}
-			ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - buttonHeight + ImGui::GetScrollY()));
-			if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, buttonHeight))) {
-				TryApply();
-			}
-			if (enabledBtn) {
-				ImGui::PopStyleColor();
+			if (!autoApply) {
+				if (enabledBtn) {
+					ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
+				}
+				ImGui::SetCursorPos(ImVec2(0, m_winInfo.size.y - buttonHeight + ImGui::GetScrollY()));
+				if (ImGuiExtra::RenderButtonEnabled(_("edition.apply"), enabledBtn, ImVec2(ImGui::GetContentRegionAvail().x, buttonHeight))) {
+					TryApply();
+				}
+				if (enabledBtn) {
+					ImGui::PopStyleColor();
+				}
 			}
 		
 			// Render form content
 			ImGui::SetCursorPos(startPos);
 			RenderInternal();
+			if (autoApply) AutoApply();
 			if (!m_operationError.empty()) ImGuiExtra_TextboxError(m_operationError.c_str());
 
 			// Render Apply button (again)
 			// Yes, it's a bit off to render a button twice, but i didn't find any other reliable way to give priority to the button input
-			if (ImGui::GetCursorPosY() + buttonHeight >= m_winInfo.size.y)
+			if (!autoApply && ImGui::GetCursorPosY() + buttonHeight >= m_winInfo.size.y)
 			{
 				if (enabledBtn) {
 					ImGui::PushStyleColor(ImGuiCol_Button, FORM_SAVE_BTN);
@@ -666,6 +682,16 @@ EditorForm::~EditorForm()
 	m_categories.clear();
 	m_categoryStringIdentifiers.clear();
 }
+void EditorForm::AutoApply()
+{
+	// Typing in a field: wait until it is left, so a value is applied once and not at every keystroke
+	if (ImGui::IsAnyItemActive()) { m_autoApplyBlocked = false; return; }
+	if (!unsavedChanges || m_autoApplyBlocked || !IsFormValid()) return;
+	TryApply();
+	// A failed apply keeps its error and waits for the next edit
+	m_autoApplyBlocked = !m_operationError.empty();
+}
+
 void EditorForm::TryApply()
 {
     try {

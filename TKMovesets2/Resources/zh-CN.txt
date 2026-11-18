@@ -1,0 +1,1032 @@
+# 简体中文
+# This is a comment
+# key = Text
+# Each line represents a different translation.
+# '\n' can be used for inserting newlines in paragraphs. Leading and trailing spaces of keys and texts are removed.
+# " navmenu =  This  is a    test   " becomes "navmenu=This  is a    test", so feel free to align what needs to be aligned
+
+# Utils #
+
+item = 项
+end = 结束
+yes = 是
+no = 否
+mota_00 = 动画 1
+mota_01 = 动画 2
+mota_02 = 手部 1
+mota_03 = 手部 2
+mota_04 = 面部 1
+mota_05 = 面部 2
+mota_06 = 翅膀 1
+mota_07 = 翅膀 2
+mota_08 = 镜头 1
+mota_09 = 镜头 2
+mota_10 = 未知 1
+mota_11 = 未知 2
+close = 关闭
+close_window = 关闭窗口
+1p = 玩家 1
+2p = 玩家 2
+3p = 玩家 3
+4p = 玩家 4
+select_game = 选择游戏
+hash = 哈希
+
+# Process #
+
+process.status = 状态：
+process.game_not_attached = 当前未尝试附加到游戏。请选择一个游戏。
+process.game_not_running = 游戏未运行或未找到。
+process.game_version_mismatch = game_address.txt 不支持当前游戏版本。
+process.game_attach_err = 已找到游戏，但无法附加。可能是权限不足导致的。
+process.dll_version_mismatch = 当前注入的 DLL 与本程序版本不一致。请重启游戏和本工具。
+
+# Moveset #
+moveset.origin = 来源
+moveset.name = 名称
+moveset.game = 游戏
+moveset.target_character = 角色
+moveset.original_character = 原角色
+moveset.date = 日期
+moveset.extraction_date = 提取日期
+moveset.invalid = 无效
+moveset.size = 大小
+moveset.size_mb = MB
+moveset.size_kb = KB
+moveset.rename = 重命名
+moveset.convert = 转换
+moveset.duplicate = 复制
+moveset.import = 导入
+moveset.edit = 编辑
+moveset.delete = 删除
+moveset.version = 版本
+moveset.hash = 哈希
+
+## Main ##
+
+# Navmenu #
+navmenu.category_moveset = 招式表
+navmenu.category_play = 游玩
+navmenu.extraction = 提取
+navmenu.import = 导入
+navmenu.online = 联机游玩
+navmenu.persistent_play = 持续模式
+
+navmenu.category_tools = 工具
+navmenu.moveset_edit = 招式表编辑
+navmenu.addresses = 地址
+navmenu.extra = 其他功能
+navmenu.camera = 镜头
+
+navmenu.category_other = 其他
+navmenu.documentation = 文档
+navmenu.about = 关于
+
+settings.general = 常规设置
+settings.language = 语言
+settings.vsync = 垂直同步
+settings.vsync_explanation = 如果本软件占用过多 GPU，可用于限制其刷新率。
+settings.file_association = 关联 .tkmvst / .tkanimXX
+settings.file_association_explanation = 将招式表文件 (.tkmvst) 和动画文件与本工具关联。
+打开招式表时会在其原位置用编辑器打开，打开动画时会将其复制到本工具的动画库。
+settings.auto_update_check = 自动检查更新
+settings.auto_addr_update_check = 自动更新地址
+settings.importation = 导入设置
+settings.apply_instantly = 立即应用
+settings.apply_instantly_explanation = 关闭此项后，游戏会等当前招式结束后再切换到新的招式表。\n对于某些招式（例如 Negan 的待机动画），这可能需要相当长的时间。
+settings.free_unused_movesets = 释放未使用的招式表
+settings.free_unused_movesets_explanation = 开启后，之前分配但已不再使用的招式表会从内存中释放。\n这可以避免本工具占满你的内存。
+settings.edition = 编辑
+settings.editor_auto_apply = 自动应用编辑
+settings.editor_auto_apply_explanation = 开启后，编辑器表单不再有“应用”按钮：只要表单有效，在你离开正在输入的字段时编辑就会立即应用。
+settings.exportation = 导出设置
+settings.overwrite_duplicate = 覆盖同名招式表
+settings.overwrite_explanation = 开启后会覆盖同名的招式表。\n关闭后会通过添加数字后缀来解决名称冲突。\n例如：T7_JIN (2)
+settings.keybinds = 快捷键
+settings.keybind_rebind = 重新绑定
+settings.reset_keybinds = 重置快捷键
+settings.finish_keybind = 完成绑定
+
+keybind_editor.import_p1 = 导入到 P1
+keybind_editor.import_p2 = 导入到 P2
+keybind_editor.import_both = 导入到 P1 和 P2
+keybind_editor.save = 保存
+keybind_editor.change_data_type = 更改数据类型
+
+sidemenu.settings = 设置
+sidemenu.up_to_date = 已是最新
+sidemenu.updated_addr = 地址已更新！
+sidemenu.update_check = 正在检查更新...
+sidemenu.update = 更新
+sidemenu.update_error = 更新出错
+sidemenu.update_explanation = 发现新版本。\n是否立即下载并重启程序？
+sidemenu.update_bad_file = 无法应用更新。\n请手动更新。
+
+sidemenu.changelog = 更新日志
+
+## Submenus ##
+
+# Extraction #
+extraction.explanation = 招式表必须先从游戏中提取出来才能使用。只提取招式表：不包括模型或视觉特效。\n提取需在游戏运行时进行（从内存中读取），目标角色需已加载并显示在屏幕上（游戏模式不限）。\n理想情况下，提取期间角色不应移动（或者暂停游戏）。
+extraction.extraction = 提取
+extraction.extract = 提取
+extraction.extract_all = 提取（全部）
+extraction.extract_from = 提取自：
+extraction.progress = 正在提取... (%u%%)
+extraction.progress_error = 提取出错 (%u%%)
+extraction.progress_done = 正在提取... 完成！
+extraction.extracted_movesets = 已提取的招式表
+extraction.cant_extract = 无法提取：角色尚未加载。
+extraction.error_file_creation = 创建招式表文件时出错
+extraction.error_compression = 压缩招式表文件时出错
+extraction.error_allocation = 复制招式表数据时发生内存分配错误
+extraction.mota_explanation = 附加动画
+extraction.settings = 设置
+extraction.settings.other = 其他
+extraction.settings.displayable_movelist = 可显示的出招表
+extraction.settings.compress_moveset = 压缩招式表
+extraction.settings.compression_type = 压缩类型
+extraction.settings.compression_type.none = 不压缩
+extraction.settings.extract_unsupported_motas = 提取边缘 MOTA（不支持的格式）
+
+# Importation #
+importation.explanation = 招式表提取并保存到电脑后，可以通过此子菜单加载到正在进行的游戏中（不能是联机对战）。这是一次性的：在此加载的招式表在经过任何加载画面后都会被卸载，因此主要用于练习模式。\n联机游玩请参阅“联机”部分。
+importation.importation = 导入
+importation.select_moveset = 选择要导入的招式表
+importation.cant_import = 无法导入：你当前不在进行中的对局里（练习模式等）。
+importation.import_to = 导入到：
+importation.progress = 正在导入... (%u%%)
+importation.progress_error = 导入出错 (%u%%)
+importation.progress_done = 正在导入... 完成！
+importation.error_file_reading = 读取招式表文件时出错
+importation.error_allocation = 读取招式表数据时发生内存分配错误
+importation.error_game_allocation = 写入招式表数据时发生游戏内存分配错误
+importation.error_decompression = 解压招式表数据时出错
+
+# Persistent play #
+persistent.explanation = 持续模式允许你选择要应用到各玩家的招式表，这些招式表在经过加载画面甚至交换所在一侧后依然保留。\n如果对手也运行了本工具，并且双方都已下载/提取了两份招式表，就可以在联机时使用：\n双方都需要将自己的招式表（或“无”）设为“玩家 1”，将对手的招式表（或“无”）设为“玩家 2”，然后锁定。
+persistent.player_1 = 玩家 1：
+persistent.player_2 = 玩家 2：
+persistent.player_3 = 玩家 3：
+persistent.player_4 = 玩家 4：
+persistent.none = 无招式表
+persistent.lock = 锁定角色
+persistent.unlock = 解锁
+persistent.hash = 哈希：
+persistent.select_moveset = 选择招式表
+persistent.clear_moveset = 清除招式表
+
+# Online #
+online.explanation = 联机游玩需要双方玩家都运行本工具。\n双方都需要在对局加载画面之前选择各自的招式表（也可以不选），工具会在后台同步招式表文件，无需你们互相发送。\n如果你或对手没有运行本工具，或者任意一方没有在本工具中锁定角色选择，自定义招式表将不会被加载。
+online.no_selected_moveset = 未选择招式表
+online.dll_not_loaded = DLL 未加载，请注入
+online.inject_dll = 注入
+online.injecting_dll = 正在注入...
+online.select_moveset = 选择
+online.selected_moveset = 已选择：
+online.lock_to_play = 锁定你的选择以加载招式表。
+
+# Movest Edition : rename #
+edition.rename.new_moveset_name = 新招式表名称
+edition.rename.empty_name = 名称为空
+edition.rename.already_exists = 该名称已被其他文件使用
+edition.rename.rename_err = 重命名时出错。字符是否有效？
+edition.rename.invalid_name = 名称包含无效字符。(/\|<>:"?*)
+edition.convert.format_target = 要转换成的格式
+
+# Moveset Edition #
+edition.explanation = 你可以在此编辑已提取的招式表。教程和实用资源请参阅文档。\n开启“实时编辑”可快速修改自定义招式表：简单的数值修改会立即写入内存，无需任何加载时间。
+edition.select_moveset = 选择要修改的招式表
+edition.last_saved = 上次保存：
+edition.save = 保存
+edition.saving_error = 保存出错
+edition.discard_changes = 放弃更改？\n如果开启了实时编辑，这不会将游戏内的结构恢复到原始状态。
+edition.process_err = 错误
+edition.live_edition = 实时编辑
+edition.live_edition_explanation = 开启后，简单数值修改之类的小改动可以直接应用到游戏内存中，无需重新导入招式表。\n在列表中添加或删除项目，或任何需要增大招式表体积的操作，都需要重新导入。
+edition.move_name = 名称
+edition.move_generic_id = 别名
+edition.moves_all = 全部
+edition.moves_attacks = 攻击
+edition.moves_generic = 通用
+edition.moves_throws = 投技
+edition.moves_custom = 自定义
+edition.moves_char_specific = 角色专属
+edition.move_id_hint = 招式 ID/名称...
+edition.move_screw = 使用螺旋：某条命中条件需要“Screw available”。
+edition.move_tornado = 使用龙卷：某条命中条件需要“Tornado Available”。
+edition.move_rage = 消耗怒气：某条属性为“Spend Rage”且参数为 1。
+edition.move_heat = 消耗热能：某条属性会消耗热能冲刺次数或热能槽。
+edition.move_current = 当前
+edition.move_current_1p = 当前 (1P)
+edition.move_current_2p = 当前 (2P)
+edition.play_move_1p = 播放 (1P)
+edition.play_move_2p = 播放 (2P)
+edition.window_title = 编辑器
+edition.apply = 应用
+edition.window_controls_explanation = 点击出招表中的招式可打开其对应窗口。新窗口会替换之前打开的窗口，除非之前的窗口有未保存的更改，或者你点击招式时按住了左 CTRL。窗口可以拖动到任意位置，可以停靠在一起，组成各种布局。
+
+edition.tools = 工具
+edition.extract_animations = 提取动画
+edition.extract_animations_finished = 动画提取完成！
+edition.animation_extraction.extraction_status = 提取状态
+edition.animation_extraction.not_started = 未开始
+edition.animation_extraction.skipped = 已跳过
+edition.animation_extraction.skipped_exists = 已存在
+edition.animation_extraction.error = 错误
+edition.animation_extraction.interrupt = 中断
+edition.t7_disk.button = 从文件提取
+edition.t7_disk.executable = Tekken 7 可执行文件 (TekkenGame-Win64-Shipping.exe)
+edition.t7_disk.title = 从游戏文件中提取所有 T7 招式表
+edition.t8_disk.button = 从文件提取
+edition.t8_disk.executable = Tekken 8 可执行文件 (Polaris-Win64-Shipping.exe)
+edition.t8_disk.executable_hint = 粘贴 exe 路径或浏览；游戏运行时会自动填写
+edition.t8_disk.title = 从游戏文件中提取所有 T8 招式表
+edition.t8_disk.explanation = 从游戏文件中提取角色。角色文件可能较大。
+edition.t8_disk.start = 开始
+edition.t8_disk.characters = 角色
+edition.t8_disk.column_name = 名称
+edition.t8_disk.column_code = 代码
+edition.t8_disk.column_status = 状态
+edition.t8_disk.select_none = 全不选
+edition.t8_disk.building = 正在生成...
+edition.t8_disk.built = {} 个招式，{} 个动画
+edition.t8_disk.finished = 所有招式表已完成！
+edition.open_characters_directory = 打开角色目录
+edition.open_editor_library = 打开编辑器库
+edition.open_editor_backups = 打开编辑器备份
+edition.refresh_movesets = 刷新招式表
+
+edition.form_popup.copy_structure_clipboard = 复制结构
+edition.form_popup.copy_single_item_clipboard = 复制单项
+edition.form_popup.paste_structure_clipboard = 粘贴结构
+edition.form_popup.duplicate_structure = 复制一份结构
+edition.form_popup.duplicate_item = 将此行复制到列表末尾
+edition.form_popup.delete_structure = 删除结构
+edition.form_popup.what_references_this_move = 哪些结构用到了此招式？
+edition.form_popup.what_references_this_cancel = 哪些招式使用此取消列表？
+edition.form_popup.deletion_are_you_sure = 确定要删除此结构吗？\n建议不要删除结构，以免它在许多其他地方被引用时出现问题。
+edition.form_popup.yes_delete = 是的，删除。
+
+edition.create_new = 新建
+edition.goto = 转到
+edition.goto_open = 打开
+edition.requirement = 条件列表
+edition.move = 招式
+edition.voiceclips = 语音
+edition.cancel_list = 取消列表
+edition.grouped_cancel_list = 分组取消列表
+edition.cancel_extradata = 取消额外数据
+edition.extra_properties = 额外属性
+edition.move_begin_properties = 招式开始属性
+edition.move_end_properties = 招式结束属性
+edition.hit_conditions = 命中条件列表
+edition.reactions = 受击反应
+edition.pushback = 推力
+edition.pushback_extra = 推力额外数据
+edition.input_sequence = 输入序列
+edition.inputs = 输入
+edition.projectile = 飞行道具
+edition.throw_camera = 投技镜头
+edition.camera_data = 镜头数据
+edition.mvl_playable = 出招表：可演示
+edition.mvl_inputs = 出招表：输入
+
+edition.update_labels = 更新标签
+edition.updating_labels = 标签：正在更新...
+edition.updating_labels_err = 标签：错误
+edition.up_to_date_labels = 标签：已是最新
+edition.updated_labels = 标签：已更新！
+
+edition.open_movelist = 打开出招表
+
+edition.move.window_name = 招式
+edition.move.category_2 = 引用
+edition.move.category_3 = 附加项
+edition.move.category_5 = 未命名字段
+edition.move.move_name = 名称
+edition.move.move_name.description = 招式名称，不影响游戏玩法。
+edition.move.anim_name = 动画
+edition.move.anim_name.description = 此招式将播放的动画。
+edition.move.vulnerability = 受击判定
+edition.move.vulnerability.description = 决定哪些攻击段位可以命中此招式。
+edition.move.hitlevel = 攻击段位
+edition.move.hitlevel.description = 攻击类型（上段/中段/下段等）
+edition.move.transition = 衔接
+edition.move.transition.description = 此招式结束时向另一个招式的视觉衔接
+edition.move.anim_len = 动画长度
+edition.move.hitbox_location = 判定框位置
+edition.move.hitbox_location.description = 此招式的判定框所在位置
+edition.move.first_active_frame = 首个有效帧
+edition.move.last_active_frame = 最后有效帧
+edition.move.airborne_start = 浮空开始
+edition.move.airborne_end = 浮空结束
+edition.move.ground_fall = 落地
+edition.move.distance = 距离
+edition.move.hit_condition_addr = 命中条件 ID
+edition.move.hit_condition_addr.description = 伤害，以及对手在命中/防御时的行为
+edition.move.extra_properties_addr = 额外属性 ID
+edition.move.extra_properties_addr.description = 此招式期间触发的属性
+edition.move.move_start_extraprop_addr = 开始额外属性 ID
+edition.move.move_end_extraprop_addr = 结束额外属性 ID
+edition.move.voiceclip_addr = 语音 ID
+edition.move.voiceclip_addr.description = 此招式期间播放的语音
+edition.move.cancel_addr = 取消 ID
+edition.move.cancel_addr_2 = 取消 ID (2)
+edition.move.cancel_related_id_2 = 取消 ID 2：关联
+edition.move.cancel_addr_3 = 取消 ID (4)
+edition.move.cancel_related_id_3 = 取消 ID 3：关联
+edition.move.cancel_addr_4 = 取消 ID (4)
+edition.move.cancel_related_id_4 = 取消 ID 4：关联
+edition.move._0x98_int = 朝向/附加？
+
+edition.voiceclip.window_name = 语音
+edition.voiceclip.id = ID
+edition.voiceclip.limb_swinging = 挥动肢体音效
+edition.voiceclip.hit = 命中音效
+edition.voiceclip.end = 结束
+
+edition.extraproperty.window_name = 额外属性列表
+edition.extraproperty.starting_frame = 起始帧
+edition.extraproperty.id = ID
+edition.extraproperty.throw_camera_id = 投技镜头 ID
+edition.extraproperty.throw_camera_id.description = 要播放的镜头运动 ID
+edition.extraproperty.projectile_id = 飞行道具 ID
+edition.extraproperty.projectile_id.description = 要生成的飞行道具 ID
+edition.extraproperty.instant = 立即
+edition.extraproperty.every_frame = 每帧
+edition.extraproperty.every_nth_frame = 每 %d 帧
+edition.extraproperty.value_unsigned = 值 (U32)
+edition.extraproperty.value_signed = 值 (S32)
+edition.extraproperty.value_hex = 值 (H32)
+edition.extraproperty.value_float = 值 (Float)
+
+edition.move_start_extraprop.window_name = 开始属性列表
+edition.move_start_extraprop.requirements_addr = 条件 ID
+edition.move_start_extraprop.extraprop = 属性 / 条件
+edition.move_start_extraprop.value = 值
+
+edition.move_end_extraprop.window_name = 结束属性列表
+edition.move_end_extraprop.requirements_addr = 条件 ID
+edition.move_end_extraprop.extraprop =  属性 / 条件
+edition.move_end_extraprop.value = 值
+
+edition.cancel.window_name = 取消列表
+edition.cancel.command = 指令
+edition.cancel.requirements_addr = 条件 ID
+edition.cancel.requirements_addr.description = 此取消发生所必须满足的条件 ID
+edition.cancel.extradata_addr = 额外数据 ID
+edition.cancel.extradata_addr.description = 取消额外数据 ID：为取消赋予特定属性的位标志，例如跳帧、保持当前帧、追踪。
+edition.cancel.detection_start = 检测开始
+edition.cancel.detection_start.description = 此取消可以开始的第一帧（如果其指令和条件匹配）
+edition.cancel.detection_end = 检测结束
+edition.cancel.detection_end.description = 此取消可以开始的最后一帧
+edition.cancel.starting_frame = 起始帧
+edition.cancel.starting_frame.description = 指令和条件检测成功后，此取消开始的第一帧
+edition.cancel.move_id = 招式 ID
+edition.cancel.group_id = 取消组 ID
+edition.cancel.group_id.description = 此取消所引用的分组取消 ID
+edition.cancel.sequence_id = 序列 ID
+edition.cancel.cancel_option = 取消选项
+edition.cancel.invalid_sequence_id = 无效 ID
+
+edition.grouped_cancel.window_name = 分组取消列表
+edition.grouped_cancel.command = 指令
+edition.grouped_cancel.requirements_addr = 条件 ID
+edition.grouped_cancel.requirements_addr.description = 此取消发生所必须满足的条件 ID
+edition.grouped_cancel.extradata_addr = 额外数据 ID
+edition.grouped_cancel.extradata_addr.description = 取消额外数据 ID：为取消赋予特定属性的位标志，例如跳帧、保持当前帧、追踪。
+edition.grouped_cancel.detection_start = 检测开始
+edition.grouped_cancel.detection_start.description = 此取消可以开始的第一帧（如果其指令和条件匹配）
+edition.grouped_cancel.detection_end = 检测结束
+edition.grouped_cancel.detection_end.description = 此取消可以开始的最后一帧
+edition.grouped_cancel.starting_frame = 起始帧
+edition.grouped_cancel.starting_frame.description = 指令和条件检测成功后，此取消开始的第一帧
+edition.grouped_cancel.move_id = 招式 ID
+edition.grouped_cancel.cancel_option = 取消选项
+
+edition.cancel_extra.window_name = 取消额外数据
+edition.cancel_extra.value = 值
+
+edition.requirement.window_name = 条件列表
+edition.requirement.condition = 条件
+edition.requirement.condition.description = 将被检查的条件 ID
+edition.requirement.param_unsigned = 参数
+edition.requirement.param_float = 参数 (Float)
+
+edition.hit_condition.window_name = 命中条件列表
+edition.hit_condition.requirements_addr = 条件 ID
+edition.hit_condition.requirements_addr.description = 此命中条件生效所必须全部成立的条件列表 ID
+edition.hit_condition.damage = 伤害
+edition.hit_condition.reactions_addr = 受击反应 ID
+edition.hit_condition.reactions_addr.description = 用于决定对手在命中/防御时行为的受击反应列表 ID
+
+edition.reactions.window_name = 受击反应
+edition.reactions.category_1 = 推力 ID
+edition.reactions.category_3 = 招式 ID
+edition.reactions.category_5 = 方向
+edition.reactions.category_7 = 其他
+edition.reactions.front_pushback = 正面
+edition.reactions.backturned_pushback = 背身
+edition.reactions.left_side_pushback = 左侧
+edition.reactions.right_side_pushback = 右侧
+edition.reactions.front_counterhit_pushback = 正面反击
+edition.reactions.downed_pushback = 倒地
+edition.reactions.block_pushback = 防御
+edition.reactions.front_direction = 正面
+edition.reactions.back_direction = 背面
+edition.reactions.left_side_direction = 左侧
+edition.reactions.right_side_direction = 右侧
+edition.reactions.front_counterhit_direction = 正面反击
+edition.reactions.downed_direction = 倒地
+edition.reactions.0x44_long = _0x44_long
+edition.reactions.front_rotation = 正面
+edition.reactions.back_rotation = 背面
+edition.reactions.left_side_rotation = 左侧
+edition.reactions.right_side_rotation = 右侧
+edition.reactions.front_counterhit_rotation = 正面反击
+edition.reactions.downed_rotation = 倒地
+edition.reactions.vertical_pushback = 垂直推力
+edition.reactions.standing_moveid = 站立
+edition.reactions.default_moveid = 默认
+edition.reactions.crouch_moveid = 蹲姿
+edition.reactions.counterhit_moveid = 反击
+edition.reactions.crouch_counterhit_moveid = 蹲姿反击
+edition.reactions.left_side_moveid = 左侧
+edition.reactions.crouch_left_side_moveid = 蹲姿左侧
+edition.reactions.right_side_moveid = 右侧
+edition.reactions.crouch_right_side_moveid = 蹲姿右侧
+edition.reactions.backturned_moveid = 背身
+edition.reactions.crouch_backturned_moveid = 蹲姿背身
+edition.reactions.block_moveid = 防御
+edition.reactions.crouch_block_moveid = 蹲防
+edition.reactions.wallslump_moveid = 靠墙瘫倒
+edition.reactions.downed_moveid = 倒地
+
+edition.input_sequence.window_name = 输入序列
+edition.input_sequence.input_window_frames = 时间窗口
+edition.input_sequence.input_amount = 输入数量
+edition.input_sequence.input_addr = 输入 ID
+
+edition.input.window_name = 输入
+edition.input.direction = 方向
+edition.input.button = 按键
+edition.input.inputs = 输入
+
+edition.projectile.window_name = 飞行道具
+edition.projectile.category_2 = 引用
+edition.projectile.category_3 = 未命名
+edition.projectile.vfx_id = 特效 ID
+edition.projectile.vfx_variation_id = 特效变体 ID
+edition.projectile.delay = 延迟
+edition.projectile.vertical_velocity = 垂直速度
+edition.projectile.horizontal_velocity = 水平速度
+edition.projectile.duration = 持续时间
+edition.projectile.no_collision = 无碰撞
+edition.projectile.size = 大小
+edition.projectile.hash = 哈希
+edition.projectile.can_hitbox_connect = 判定框可命中
+edition.projectile.gravity = 重力
+edition.projectile.hit_level = 攻击段位
+edition.projectile.hit_condition_addr = 命中条件 ID
+edition.projectile.cancel_addr = 取消 ID
+edition.projectile.voiceclip_on_hit = 语音（命中）
+
+edition.pushback.window_name = 推力
+edition.pushback.duration = 持续时间
+edition.pushback.duration.description = 线性位移的持续时间
+edition.pushback.num_of_loops = 推力额外数据数量
+edition.pushback.num_of_loops.description = 在招式前 %d 帧应用的推力值
+edition.pushback.offsets_count = 推力额外数据数量
+edition.pushback.offsets_count.description = 在招式前 %d 帧应用的推力值
+edition.pushback.displacement = 位移
+edition.pushback.displacement.description = 前 %d 帧之后应用的线性位移
+edition.pushback.extradata_addr = 额外数据 ID
+edition.pushback.extradata_addr.description = 每帧应用的推力值列表
+
+edition.pushback_extradata.window_name = 推力额外数据
+edition.pushback_extradata.horizontal_offset = 水平偏移
+
+edition.form_list.item = 项
+edition.form_list.end = 结束
+edition.form_list.invalid = 无效
+edition.form_list.controls_disabled_explanation =  只有起始 ID 大于 1 的列表才能使用列表控制功能
+
+edition.animation_list.anim_name = 动画名称
+edition.animation_list.duration = 时长（帧）
+edition.animation_list.size = 大小
+edition.animation_list.import = 导入到招式
+edition.animation_list.search_animation = 搜索要导入当前招式的动画名称...
+edition.animation_list.no_anim = 动画库中未找到任何动画。请前往编辑器子菜单，点击“提取动画”按钮，将角色动画提取到动画库。
+edition.animation_list.loading = 正在加载动画列表...
+edition.animation_list.import_file = 从文件导入...
+edition.animation_list.clear_filter = 清除筛选
+
+edition.throw_camera.window_name = 投技镜头
+edition.throw_camera.side = 方向侧
+edition.throw_camera.cameradata_addr = 镜头数据 ID
+
+edition.camera_data.window_name = 镜头数据
+edition.camera_data._0x0_int = 选中概率
+edition.camera_data._0x0_int.description = 此镜头值被选中的几率\n1：普通\n2：双倍
+edition.camera_data.pick_probability = 选中概率
+edition.camera_data.pick_probability.description = 此镜头值被选中的几率\n1：普通\n2：双倍
+edition.camera_data._0x4_short = 镜头类型
+edition.camera_data._0x4_short.description = 镜头类型\n15：动画\n16：自定义
+edition.camera_data.camera_type = 镜头类型
+edition.camera_data.camera_type.description = 镜头类型\n15：动画\n16：自定义
+edition.camera_data.left_side_camera_data = 左侧镜头数据
+edition.camera_data.right_side_camera_data = 右侧镜头数据
+edition.camera_data._0xA_short = 额外旋转
+edition.camera_data.additional_rotation = 额外旋转
+
+edition.mvl_displayable.window_name = 出招表：显示项
+edition.mvl_displayable.type = 类型
+edition.mvl_displayable.playable_id = 可演示 ID
+edition.mvl_displayable.playable = （可演示）
+edition.mvl_displayable.not_playable = （不可演示）
+edition.mvl_displayable.category_1 = 未知
+edition.mvl_displayable.title_translation_0 = 日文标题
+edition.mvl_displayable.title_translation_1 = 标题
+edition.mvl_displayable.title_translation_2 = 日文标题 2
+edition.mvl_displayable.title_translation_3 = 标题 2
+edition.mvl_displayable.translation_0 = 日语
+edition.mvl_displayable.translation_1 = 英语
+edition.mvl_displayable.translation_2 = 葡萄牙语
+edition.mvl_displayable.translation_3 = 西班牙语
+edition.mvl_displayable.translation_4 = 法语
+edition.mvl_displayable.translation_5 = 意大利语
+edition.mvl_displayable.translation_6 = 德语
+edition.mvl_displayable.translation_7 = 墨西哥西班牙语
+edition.mvl_displayable.translation_8 = 西里尔文
+edition.mvl_displayable.translation_9 = 阿拉伯语
+edition.mvl_displayable.translation_10 = 中文
+edition.mvl_displayable.translation_11 = 韩语
+edition.mvl_displayable.icons = 图标
+edition.mvl_displayable.icons_2 = 图标 2
+edition.mvl_displayable.combo_difficulty = 难度
+edition.mvl_displayable.combo_damage = 伤害
+edition.mvl_displayable.p2_action = P2 动作
+
+edition.mvl_playable.window_name = 出招表：可演示
+edition.mvl_playable.distance = 距离
+edition.mvl_playable.p2_rotation = P2 旋转
+edition.mvl_playable.input_count = 输入数量
+edition.mvl_playable.input_count.description = 序列中要读取的输入数量。
+edition.mvl_playable.input_sequence_id = 输入序列 ID
+edition.mvl_playable.has_rage = 有怒气
+
+edition.mvl_input.window_name = 出招表：输入
+edition.mvl_input.directions = 方向
+edition.mvl_input.buttons = 按键
+edition.mvl_input.frame_duration = 持续时间
+edition.mvl_input.trigger_highlight = 触发高亮
+edition.mvl_input.frame = 帧
+edition.mvl_input.frames = 帧
+
+references.used_by = 被以下使用
+references.no_reference = 未找到引用
+references.move.title = 引用：招式
+references.move.view_move = 查看招式
+references.reactions = 受击反应
+references.reactions.situations = 情形
+references.list_start = 列表（起始）
+references.moves = 招式
+references.cancel.title = 取消
+references.cancels = 取消
+references.cancels.view_cancel = 查看取消
+references.cancels.requirements = 条件
+references.grouped_cancels = 分组取消
+references.projectiles = 飞行道具
+
+# Documentation #
+
+# About #
+
+about.explanation = TKMovesets 是由独立 Mod 作者制作的软件，与本软件所交互的游戏在法律上没有任何关联。\n本软件采用 GPLv3 授权：它是自由软件（自由指的是自由权利），只要不更改授权协议，你就可以自由获取、修改和再分发。\n如果你为本软件付了钱，那么你被骗了。
+about.credits = 鸣谢：
+about.kilo_explanation = 招式表提取器的主要开发者，逆向分析了绝大部分数据结构，确立了导出/导入的方法，并编写了这套招式表导出/导入/编辑软件。
+about.ali_explanation = 协助逆向分析了招式表结构，在破解招式表编辑所需的 ID 上提供了大量帮助，制作了招式表编辑教程，并促成了镜头和手部动画等许多功能
+about.fletch_explanation = 为大量招式表编辑属性编写了文档并制作了许多教程，将招式表编辑推向了新的高度
+about.koenji_explanation = 很早就投入招式表编辑，极大地帮助理解了其工作流程，也参与破解了许多招式表属性
+about.sadamitsu_explanation = 帮助深入理解了各类动画、它们的结构以及存储位置
+about.dennis_stanistan_explanation = 无意中通过 Discord 上的一条帖子提供了帮助，让第一个招式表提取器得以起步
+
+extraction.retail_tables_only = 正式版 T8 会导出记录表以及全部六类已加载的 PANM 动画。不可用的动画 ID 会被明确记录。旧版 MOTA/练习出招表选项不适用。不支持正式版导入以及单独的练习出招表。
+
+importation.mota_explanation = 选择要使用文件中的哪些 MOTA 档案。未勾选的槽位保留当前角色的档案。缺失的档案同样保留当前档案。适用于 T7 导入，包括转换得到的招式表。
+
+extraction.settings.reset_motas = 重置 MOTA 选择
+
+extraction.panm.title = 动画
+extraction.panm.reset = 重置动画选择
+extraction.panm.all = 全部
+extraction.panm.none = 无（仅表）
+extraction.panm.explanation = 选择要包含的动画，方式与 MOTA 选择相同。未勾选的类别在导入时复用游戏的源资源。不选择任何动画则只导出表。默认包含身体、手部和镜头。提取只读取内存。
+extraction.panm.body = 身体动画
+extraction.panm.hands = 手部动画
+extraction.panm.face = 面部动画
+extraction.panm.swing = 摆动动画
+extraction.panm.camera = 镜头动画
+extraction.panm.from_archive = 从游戏文件 (tkdata.bin) 中读取游戏尚未加载的动画
+extraction.panm.from_archive_explanation = 游戏只会将部分动画保留在内存中（入场、胜利动作和很少使用的招式会在需要时才加载）。开启：导出时从游戏的 tkdata.bin 中读取这些动画，与游戏加载的字节完全相同，因此文件包含所有动画。关闭：这些动画会被省略；导入该文件时会从 tkdata.bin 中读取它们，否则导入失败。任何招式都不会回退为其他动画。
+extraction.panm.extra = 额外动画
+
+# -- Tekken 8 (retail) editor -- #
+edition.t8.game_attached = 已附加到 Tekken 8
+edition.t8.game_running = Tekken 8 正在运行，未附加
+edition.t8.game_not_running = Tekken 8 未运行
+edition.t8.references.details = 详情
+edition.t8.animation_library.this_moveset = 此招式表
+edition.t8.animation_library.library = 库 (editor_library)
+edition.t8.animation_library.refresh = 刷新
+edition.t8.animation_library.open_folder = 打开文件夹
+edition.t8.animation_library.loading = 正在加载动画库...
+edition.t8.animation_library.empty = editor_library 中没有 .panm 文件。请对某个招式表使用“提取动画”来填充；下方的每个文件夹对应一次提取。
+edition.t8.animation_library.frames = 帧数
+edition.t8.animation_library.import = 导入到招式
+edition.t8.table = 表
+edition.t8.status_counters = {} 项待应用 | {} 项未保存
+edition.t8.saving_failed = 保存失败。你的编辑仍保持打开；请重试保存。
+edition.t8.unsaved_title = 未保存的编辑
+edition.t8.unsaved_unapplied = 部分记录有未应用的编辑。请先应用再保存。
+edition.t8.unsaved_question = 关闭前保存更改吗？
+edition.t8.save_and_close = 保存并关闭
+edition.t8.discard_and_close = 放弃并关闭
+edition.t8.keep_editing = 继续编辑
+edition.t8.apply_other_forms = 更改记录 ID 之前，请先应用其他已打开的表单。
+edition.t8.names_unavailable = 名称不可用：
+edition.t8.animation_missing = 此招式表中不存在该动画名称
+edition.t8.animation_identity = 动画标识不可用
+edition.t8.panm_rewritten = 非原生布局：应用时会基于原生模板重写。
+edition.t8.cannot_write_panm = 无法写入 PANM
+edition.t8.find_references = 查找引用
+edition.t8.import_panm = 导入 PANM
+edition.t8.export_panm = 导出 PANM
+edition.t8.cancel_custom_panm = 取消自定义 PANM
+edition.t8.animation_search_hint = 搜索动画名称或招式 ID
+edition.t8.pending_panm = 待应用的自定义 PANM（点击“应用”生效）。它会成为此招式的一个新动画，以其文件名命名；其他招式不受影响。点击下方的动画可改用该动画。
+edition.t8.new_move_created = 已创建招式 {}，基于待机姿态 ({})：拥有自己的 AUTO 回到待机的取消列表，无额外取消列表、无语音、无属性；命中条件与待机相同。
+edition.t8.unknown_move = 未知招式
+edition.t8.custom_filter_tooltip = 本次会话中编辑过或带有自定义名称的招式
+edition.t8.column_id = ID
+edition.t8.column_record = 记录
+edition.t8.column_table = 表
+edition.t8.column_field = 字段
+edition.t8.open = 打开
+edition.t8.copy_move_id = 复制招式 ID
+edition.t8.no_matching_move = 没有匹配的招式 ID、别名或名称
+edition.t8.play_tooltip = 播放招式前，请先将此文档导入到该玩家。应用编辑后需重新导入。
+edition.t8.record_search_hint = 记录 ID / 标签
+edition.t8.importing = 正在导入文档...
+edition.t8.queuing = 正在排队招式...
+edition.t8.cannot_attach = 无法附加到受支持的正式版游戏
+edition.t8.live_stopped = 已导入的玩家发生变化，实时编辑已停止
+edition.t8.live_edit_written = 实时编辑：已写入 {} 条记录（P{}）
+edition.t8.reimported = 已重新导入到 P{} ({})
+edition.t8.imported = 已导入到 P{}
+edition.t8.move_queued = 已在 P{} 上排队招式
+edition.t8.no_saved_changes = 没有已保存的更改
+edition.t8.live_editing_explanation = 完成编辑时，有效字段会被应用，并直接写入已导入到所选玩家的招式表中。结构性编辑（添加或删除记录、重命名）会重新导入文档。
+edition.t8.cancel_save = 取消保存
+edition.t8.references_title = 引用：
+edition.t8.references_count = {} 处引用，指向 {}
+edition.t8.extracted = 已提取 {} 个 PANM 到 {}
+edition.t8.extract.title = 提取动画
+edition.t8.extract.explanation = 将此招式表中勾选的动画（包括未保存的编辑）写入 editor_library 中的新文件夹。被招式播放的动画以动画名命名；其余的以类别和 ID 命名。
+edition.t8.extract.search_hint = 按名称、类别或 ID 搜索
+edition.t8.extract.select_all = 全选
+edition.t8.extract.select_none = 全不选
+edition.t8.extract.select_explanation = 两个按钮都只作用于搜索显示的行。
+edition.t8.extract.column_name = 动画
+edition.t8.extract.column_category = 类别
+edition.t8.extract.column_id = ID
+edition.t8.extract.column_size = 大小
+edition.t8.extract.selected = {} / {} 已选择
+edition.t8.extract.start = 提取
+edition.t8.extract.stopped = 动画提取已中断；未写入任何内容。
+edition.t8.extract.none = 此招式表不含任何动画。请勾选动画类别后重新导出。
+edition.t8.codec.hit_level = 低 12 位为攻击类型；其上的标志位保持不变。上段、中段、下段和特殊中段来自正式版的条件处理函数；标有 ? 的条目是根据使用它们的招式命名的。原始值可在右侧继续编辑。
+edition.t8.codec.hitbox_location = 单个肢体（0x00aa：从其上一位置到当前位置的连线）或两个肢体之间的连线（0xaabb）。手和脚分别在 1,400 多个拳和踢的招式上进行了匹配；标有 ? 的条目是推测。原始值可在右侧继续编辑。
+
+# Field descriptions (hover). Unverified meanings say so.
+edition.t8.moves.vulnerability.description = 受击判定状态（加密字段，显示为解码后的值）。决定哪些攻击段位可以命中此招式。
+edition.t8.moves.hit_level.description = 攻击类型（加密字段，显示为解码后的值）。0x512 = 上段和 0x217 = 中段已由正式版条件处理函数确认；0x10F = 下段和 0x41F = 特殊中段尚未验证。0 = 无攻击。
+edition.t8.moves.cancels.description = 此招式的取消列表（cancels 表索引，-1 = 无）。列表以 AUTO 取消结尾，它决定在没有其他取消匹配时播放的招式。
+edition.t8.moves.cancels_2.description = 额外取消列表（cancels 表索引）。仅在其门限值大于 0 时使用。
+edition.t8.moves.cancels_3.description = 额外取消列表（cancels 表索引）。仅在其门限值大于 0 时使用。
+edition.t8.moves.cancels_4.description = 额外取消列表（cancels 表索引）。仅在其门限值大于 0 时使用。
+edition.t8.moves.cancel_gate_2.description = 对应额外取消列表的门限值：0 或以下会禁用该列表（导入器随后会清除列表指针）。
+edition.t8.moves.cancel_gate_3.description = 对应额外取消列表的门限值：0 或以下会禁用该列表（导入器随后会清除列表指针）。
+edition.t8.moves.cancel_gate_4.description = 对应额外取消列表的门限值：0 或以下会禁用该列表（导入器随后会清除列表指针）。
+edition.t8.moves.transition.description = 此招式动画结束时自动播放的招式（招式 ID，或通用别名 0x8001 = 待机）。
+edition.t8.moves.end_rotation.description = 招式结束时应用的旋转（未验证）。
+edition.t8.moves.character_id.description = 加密字段，显示为解码后的值：角色 id 对（低 16 位 = -id，高 16 位 = id），例如 0x0005FFFB = Jin (5)。所有招式上都相同。请保持不变。
+edition.t8.moves.move_key.description = 加密字段，显示为解码后的值：CODE_name（例如 JIN_ + 招式名）的 Kamui 哈希，每个招式唯一。请保持不变。
+edition.t8.moves.damage_override.description = 招式的有符号伤害覆盖值；-1 表示沿用命中条件的伤害（99.9 % 的正式版招式为 -1）。
+edition.t8.moves.active_start.description = 招式有效窗口的开始。在此之前没有判定框生效；0 = 此招式没有判定框。
+edition.t8.moves.active_end.description = 招式有效窗口的结束。在此之后没有判定框生效。
+edition.t8.moves.hitbox_start.description = 此判定框的首个有效帧（招式的有效窗口同样适用）。
+edition.t8.moves.hitbox_last.description = 此判定框的最后有效帧。
+edition.t8.moves.hitbox_location.description = 字节 0 = 肢体 A，字节 1 = 肢体 B：命中线从 A 延伸到 B。当 B 为 0 时，命中线为肢体 A 从上一帧位置扫过的轨迹。0 = 槽位未使用。
+edition.t8.moves.hitbox_radius.description = 命中线半径。0 = 角色默认值。
+edition.t8.moves.hitbox_vertical_height.description = 大于 0 时，命中线为以肢体 A 为中心、具有此高度的垂直线段。
+edition.t8.moves.hitbox_offset_a.description = 应用于肢体 A 的偏移（骨骼空间；各分量对应哪个轴尚未验证）。
+edition.t8.moves.hitbox_offset_b.description = 应用于肢体 B 的偏移（骨骼空间；各分量对应哪个轴尚未验证）。
+edition.t8.moves.hitbox_starts_off.description = 1 = 此判定框初始为关闭状态。属性 0x8158 可在招式过程中将其打开或关闭。
+edition.t8.moves.unknown_0x150.description = 未知，按原样保留。
+edition.t8.moves.unknown_0x154.description = 未知，按原样保留。
+edition.t8.moves.hit_conditions.description = 命中条件列表：伤害以及对手在命中/防御时的反应（hit_conditions 表索引，-1 = 无）。
+edition.t8.moves.animation_length_adjuster.description = 对动画长度的有符号调整值（默认 1；未验证）。
+edition.t8.moves.animation_length.description = 以帧为单位的动画长度。导入自定义动画时会根据 PANM 自动填写。
+edition.t8.moves.airborne_start.description = 角色开始被视为浮空的第一帧（0 = 从不）。
+edition.t8.moves.airborne_end.description = 最后一个浮空帧。
+edition.t8.moves.ground_fall.description = 角色重新着地的帧。
+edition.t8.moves.voiceclips.description = 此招式期间播放的语音（voiceclips 表索引，-1 = 无）。
+edition.t8.moves.properties.description = 此招式期间触发的额外属性（extra_properties 表索引，-1 = 无）。
+edition.t8.moves.start_properties.description = 招式开始时应用的属性（start_properties 表索引，-1 = 无）。
+edition.t8.moves.end_properties.description = 招式结束时应用的属性（end_properties 表索引，-1 = 无）。
+edition.t8.moves.collision.description = 碰撞状态 id（未验证）。
+edition.t8.moves.distance.description = 浮空期间移动的距离（未验证）。
+edition.t8.cancels.command.description = 输入：低 dword 为方向位，高 dword 为按键位，解码结果显示在行标题中。特殊值：0x8000 = 列表结束 (AUTO)，0x8012 = 分组取消，0x8013 = 分组列表结束，0x8014 + n = 输入序列 n。
+edition.t8.cancels.requirements.description = 此取消发生所必须满足的条件（requirements 表索引）。
+edition.t8.cancels.extra.description = 取消额外数据（cancel_extra 表索引）：位标志，例如跳帧、保持当前帧、追踪。
+edition.t8.cancels.window_start.description = 此取消可以开始的第一帧（如果其指令和条件匹配）。
+edition.t8.cancels.window_end.description = 此取消可以开始的最后一帧。
+edition.t8.cancels.starting_frame.description = 指令和条件匹配后，目标招式开始时所在的帧。
+edition.t8.cancels.move_id.description = 目标招式 ID 或通用别名（0x8001 = 待机）。对于分组取消（指令 0x8012）：group_cancels 中的行。
+edition.t8.cancels.option.description = 取消选项标志。磁盘上所有取消均为 0；游戏在加载时填写（见过 80、65、336、257）。含义未验证。
+edition.t8.group_cancels.command.description = 编码方式与取消指令相同。0x8013 结束分组列表。
+edition.t8.group_cancels.requirements.description = 此取消发生所必须满足的条件（requirements 表索引）。
+edition.t8.group_cancels.extra.description = 取消额外数据（cancel_extra 表索引）：位标志，例如跳帧、保持当前帧、追踪。
+edition.t8.group_cancels.window_start.description = 此取消可以开始的第一帧（如果其指令和条件匹配）。
+edition.t8.group_cancels.window_end.description = 此取消可以开始的最后一帧。
+edition.t8.group_cancels.starting_frame.description = 指令和条件匹配后，目标招式开始时所在的帧。
+edition.t8.group_cancels.move_id.description = 目标招式 ID 或通用别名（0x8001 = 待机）。
+edition.t8.group_cancels.option.description = 取消选项标志。磁盘上为 0；由游戏在加载时填写。含义未验证。
+edition.t8.cancel_extra.value.description = 取消额外数据位标志（跳帧、保持当前帧、追踪...）。在 T8 中未验证。
+edition.t8.requirements.condition.description = 条件 id（标签显示在行标题中）。1100 结束列表。
+edition.t8.requirements.parameter_1.description = 第一个参数；其含义取决于条件（见行标题）。大多数条件只使用这一个参数。
+edition.t8.requirements.parameter_2.description = 第二个参数。用于槽位检查、角色列表和通用比较（运算符）。
+edition.t8.requirements.parameter_3.description = 第三个参数。用于槽位检查、角色列表和通用比较。
+edition.t8.requirements.parameter_4.description = 第四个参数。用于槽位检查、角色列表和通用比较。
+edition.t8.hit_conditions.requirements.description = 此命中条件生效所必须全部成立的条件（requirements 表索引）。列表在其条件以 1100 开头的条目处结束。
+edition.t8.hit_conditions.damage.description = 此命中条件生效时造成的伤害。
+edition.t8.hit_conditions.unknown_0xC.description = 未知，按原样保留。
+edition.t8.hit_conditions.reactions.description = 决定对手在命中/防御时行为的受击反应列表（reactions 表索引）。
+edition.t8.reactions.vertical_pushback.description = 垂直推力（有符号，数值较小）。
+edition.t8.reactions.front_rotation.description = 旋转，在所有正式版文件中均为 0。
+edition.t8.reactions.back_rotation.description = 旋转，在所有正式版文件中均为 0。
+edition.t8.reactions.left_side_rotation.description = 旋转，在所有正式版文件中均为 0。
+edition.t8.reactions.right_side_rotation.description = 旋转，在所有正式版文件中均为 0。
+edition.t8.reactions.downed_rotation.description = 旋转，在所有正式版文件中均为 0。受击反应选择逻辑不会读取此值。
+edition.t8.reactions.unknown_0x6C.description = 未知，在所有正式版文件中均为 0。
+edition.t8.extra_properties.frame.description = 属性触发的帧：32769 = 立即 (+n)，0x4000 + n = 每 n 帧，9999 = 每帧。
+edition.t8.extra_properties.requirements.description = 此属性生效的条件（requirements 表索引，-1 = 无）。
+edition.t8.extra_properties.property.description = 属性 id（标签显示在行标题中）。0 结束列表。
+edition.t8.extra_properties.parameter_1.description = 属性参数；其含义取决于属性。
+edition.t8.extra_properties.parameter_2.description = 属性参数；其含义取决于属性。
+edition.t8.extra_properties.parameter_3.description = 属性参数；其含义取决于属性。
+edition.t8.extra_properties.parameter_4.description = 属性参数；其含义取决于属性。
+edition.t8.extra_properties.parameter_5.description = 属性参数；其含义取决于属性。
+edition.t8.start_properties.requirements.description = 此属性生效的条件（requirements 表索引，-1 = 无）。
+edition.t8.start_properties.property.description = 招式开始时应用的属性或条件 id。1100 结束列表。
+edition.t8.start_properties.parameter_1.description = 属性参数；其含义取决于属性。
+edition.t8.end_properties.requirements.description = 此属性生效的条件（requirements 表索引，-1 = 无）。
+edition.t8.end_properties.property.description = 招式结束时应用的属性或条件 id。1100 结束列表。
+edition.t8.end_properties.parameter_1.description = 属性参数；其含义取决于属性。
+edition.t8.pushbacks.duration.description = 线性位移的持续时间。
+edition.t8.pushbacks.displacement.description = 逐帧值之后应用的线性位移。
+edition.t8.pushbacks.extra_count.description = 开始时应用的逐帧推力值数量（pushback_extra 条目）。
+edition.t8.pushbacks.extra.description = 逐帧推力值（pushback_extra 表索引）。
+edition.t8.pushback_extra.value.description = 在一帧上应用的水平偏移。
+edition.t8.voiceclips.parameter_1.description = 语音/音效键值。0xFFFFFFFF 结束列表。
+edition.t8.voiceclips.parameter_2.description = 未验证。
+edition.t8.voiceclips.parameter_3.description = 未验证。
+edition.t8.input_sequences.window.description = 序列中两次输入之间允许的帧数（未验证）。
+edition.t8.input_sequences.input_count.description = 序列中读取的输入数量。
+edition.t8.input_sequences.inputs.description = 序列的第一个输入（inputs 表索引）。
+edition.t8.inputs.direction.description = 方向位，布局与取消指令的低 dword 相同。
+edition.t8.inputs.buttons.description = 按键位，布局与取消指令的高 dword 相同。
+edition.t8.parry.key.description = 可被招架的招式键值（未验证）。
+edition.t8.cameras.probability.description = 此镜头被选中的几率（T7：1 普通，2 双倍；在 T8 中未验证）。
+edition.t8.cameras.type.description = 镜头类型（T7：15 动画，16 自定义；在 T8 中未验证）。
+edition.t8.throws.camera.description = 投技镜头（cameras 表索引）。
+edition.t8.throws.side.description = 投技方向侧（未验证）。
+edition.t8.dialogues.requirements.description = 此对白的条件（requirements 表索引）。
+edition.t8.dialogues.voice_key.description = 台词语音键值。
+edition.t8.dialogues.facial_animation.description = 面部动画 id（-1 = 无）。
+edition.t8.projectiles.hit_conditions.description = 飞行道具的命中条件列表（hit_conditions 表索引）。
+edition.t8.projectiles.cancels.description = 飞行道具的取消列表（cancels 表索引）。
+edition.t8.parameter_1 = 参数 1
+edition.t8.param_unused = 未使用
+edition.t8.param_hover = {} [{}]
+{}
+参数 1：{}
+常用值：{}
+edition.t8.param_hover_other = {}: {}
+此 id 没有该参数的说明。
+edition.t8.codec.cancel_option = 由游戏在招式表加载时推算（磁盘上所有取消均为 0）：0x1 = 无指令，0x10 = 有指令，0x100 = 目标为通用别名（在 34,463 个运行中的取消上完全一致）；0x80 跟随指令标志 0x20000000（95%）；其余位尚未解码。编辑它在重新加载后不会产生任何效果。
+edition.t8.codec.requirement_param = 此条件第一个参数的含义。游戏模式、控制器类型和剧情对战代码来自 LukzB 的 TekkenMovesetExtractor，尚未验证；角色 id、标志和按键依据对正式版处理函数的分析。
+edition.t8.codec.vulnerability = 招式的姿态字（在招式开始时复制到玩家上）：位 0-2 = 站立 2 / 蹲下 1 / 倒地 4，0x400 = 浮空，来自正式版条件处理函数。列表包含正式版招式表最常用的值；下拉框会保留其他位。原始值可在右侧继续编辑。
+edition.t8.id_picker_hint = 按 id、十六进制、标签或处理函数名筛选...
+edition.t8.codec.id_picker = 所有已知的条件 / 属性 id 及其标签；已分析但没有社区标签的 id 显示其处理函数名。将鼠标悬停在条目上可查看其含义。原始 id 可在右侧继续编辑。
+
+# Folders, close dialog, conversion and error messages
+settings.folders.title = 角色文件夹
+settings.folders.extraction = 提取文件夹
+settings.folders.extraction_hint = 留空：.\extracted_chars
+settings.folders.browse = 浏览
+settings.folders.save = 保存
+settings.folders.clear = 清除
+settings.folders.extraction_help = 留空则提取到 .\extracted_chars。自定义文件夹必须是绝对路径。
+settings.folders.additional = 其他角色文件夹
+settings.folders.additional_help = 角色列表始终会搜索 .\extracted_chars、提取文件夹以及下方的文件夹。
+settings.folders.remove = 移除
+settings.folders.add = 添加文件夹
+settings.folders.missing = 所选文件夹不存在。
+settings.folders.duplicate = 该文件夹已在列表中。
+settings.folders.add_help = 在资源管理器中选择一个文件夹；其中的角色会出现在列表中。
+close.title = 关闭程序？
+close.busy = 仍有保存操作正在进行。请等待其完成。
+close.unsaved = 部分编辑器有未保存或未应用的编辑。选择继续编辑以应用并保存它们。
+close.discard = 放弃编辑并退出
+close.keep_editing = 继续编辑
+edition.convert.cancel = 取消转换
+edition.convert.t7_to_t8_explanation = 根据此 T7 招式表创建一个独立的 Tekken 8 文件，无需游戏：招式、判定框、镜头、投技、飞行道具以及所有身体动画都来自 T7 文件。在 Tekken 8 中没有对应项的条件和属性不会生效，练习出招表不会被转换。
+edition.convert.t8_to_t7_explanation = 根据此正式版 Tekken 8 招式表创建一个独立的 Tekken 7 文件，无需游戏：招式、判定框、镜头、投技、飞行道具以及所有内嵌的身体动画都来自 T8 文件。在 Tekken 7 中没有对应项的条件和属性不会生效，手部、面部和镜头动画保留目标角色自身的动画，练习出招表不会被转换。
+moveset.import_settings = 导入设置
+edition.import_settings.title = 导入设置
+edition.import_settings.explanation = 此招式表在导入时如何构建。只会更改文件头：招式表数据保持不变。默认设置下的导入结果与以前完全相同。
+edition.import_settings.identity = 角色身份
+edition.import_settings.identity_target = 采用目标角色
+edition.import_settings.identity_fixed = 视为角色 ID
+edition.import_settings.character = 角色 ID
+edition.import_settings.gender = 性别检查
+edition.import_settings.gender_target = 取自目标角色
+edition.import_settings.male = 男性
+edition.import_settings.female = 女性
+edition.import_settings.story_flag = Tekken 8 剧情标志
+edition.import_settings.story_game = 由游戏决定（转换为 Tekken 7 时使用 0，对战）
+edition.import_settings.story_value = 剧情标志值（1 到 4：剧情章节）
+edition.import_settings.in_heat = 视为处于热能状态（Tekken 7 中的 Tekken 8 招式表）
+edition.import_settings.flags_clear = Tekken 8 标志检查视为标志已清除（正常游玩）
+edition.import_settings.defaults = 默认值
+edition.import_settings.save = 保存
+edition.import_settings.saved = 已保存。重新导入招式表即可生效。
+edition.moveset_open_in_editor = 此招式表已在编辑器中打开：请先关闭其编辑器窗口，否则它下次保存时会撤销此更改。
+edition.import_settings.context = 情境检查（未勾选：由游戏决定）
+edition.import_settings.story_mode = 剧情模式检查视为不在剧情中
+edition.import_settings.dlc_story = DLC 剧情检查视为不在 DLC 剧情中 (Tekken 8)
+edition.import_settings.special_modes = 关闭街机、角色篇章和特殊模式检查
+edition.import_settings.stage = 任意场景（关闭场景专属检查）
+edition.import_settings.wave_index = 固定剧情波次索引 (Tekken 8)
+edition.import_settings.battle_script = 固定对战脚本值 (Tekken 8)
+edition.import_settings.value = 值
+edition.import_settings.item = 自定义装扮物品检查
+edition.import_settings.game_decides = 由游戏决定
+edition.import_settings.item_none = 无物品
+edition.import_settings.item_all = 所有物品
+edition.import_settings.body = 体型检查 (Tekken 8)
+edition.import_settings.body_normal = 普通
+edition.import_settings.body_big = 大型
+edition.import_settings.body_bear = 熊
+edition.import_settings.story_effects = 移除剧情演出类属性（字幕、HUD、过场效果）
+edition.import_settings.global_writes = 移除会写入全局游戏状态的属性 (Tekken 8)
+edition.convert.saved = 已保存：
+edition.convert.cancelled = 转换已取消。
+importation.error_game_write = 写入游戏内存失败。已恢复之前的值。
+importation.error_game_rollback = 写入游戏内存失败，且回滚未完成。已保留该内存分配以避免悬空指针。
+importation.error_unsupported_version = 所选游戏版本不支持此文件。
+importation.error_moveset_data = 无法验证或绑定该招式表。正式版 T8 需要已加载的匹配源招式表和动画资源。
+importation.warning_title = 导入完成，但有警告
+importation.warning_idle_fallback = {} 个招式播放待机动画：有 {} 个动画既不在文件中，也不在游戏的 tkdata.bin 中。
+importation.warning_target_fallback = {} 个招式播放待机动画：没有已加载的招式表与此文件匹配，因此使用了目标角色自身的动画。
+importation.warning_first_error = 第一个错误：{}
+extraction.error_title = 提取失败
+extraction.error_moveset_data = 无法一致地读取招式表。请确认角色已加载，然后重试提取。
+about.dantarion_explanation = 他早期对 Tekken 招式表的研究和工具为本项目铺平了道路
+
+# Tools > Addresses
+addresses.title = 游戏地址
+addresses.explanation = 游戏更新后，TKMovesets 用于导出和导入的地址可能会改变。本工具会在磁盘上的游戏可执行文件中（从不读取或写入正在运行的游戏）搜索 game_addresses.ini 中存储的字节特征码，然后将找到的地址写入 game_addresses.ini，并立即应用到本程序使用的地址。找不到的值保持不变。
+addresses.game = 游戏：
+addresses.executable = 游戏可执行文件：
+addresses.executable_hint = Polaris-Win64-Shipping.exe 的路径
+addresses.browse = 浏览
+addresses.detect = 检测
+addresses.not_detected = 未找到游戏可执行文件。请浏览选择 Polaris-Win64-Shipping.exe。
+addresses.invalid_path = 可执行文件路径不是有效的文本。请重新浏览选择该文件。
+addresses.update = 从可执行文件更新地址
+addresses.scanning = 正在搜索可执行文件...
+addresses.busy = 正在等待当前的提取或导入完成。
+addresses.no_patterns = game_addresses.ini 中没有此游戏的字节特征码。
+addresses.write_failed = 无法写入 game_addresses.ini：未做任何更改。
+addresses.up_to_date = 所有地址均已与可执行文件一致。
+addresses.nothing_changed = 未做任何更改。
+addresses.updated = 已在 game_addresses.ini 和本程序中更新 {} 个地址。
+addresses.some_failed = 有 {} 个未找到，保留了当前值。
+addresses.results = 结果
+addresses.exe_build = 可执行文件构建时间戳：0x%X
+addresses.col_key = 地址
+addresses.col_before = 之前
+addresses.col_found = 可执行文件中
+addresses.col_patterns = 找到的特征码
+addresses.col_result = 结果
+addresses.pattern_not_found = 未找到
+addresses.pattern_ambiguous = 找到多处（已忽略）
+addresses.result_updated = 已更新
+addresses.result_unchanged = 未改变
+addresses.result_not_found = 未找到，已保留
+addresses.result_conflict = 特征码结果不一致，已保留
+addresses.result_not_in_ini = ini 中缺失，已保留
+
+# Tools > Extra
+extra.tag.title = 组队 Tag（Tekken 8 练习模式）
+extra.tag.explanation = 在练习模式中进行二对二组队：P3 是 P1 的队友，P4 是 P2 的队友。先开始一场练习对局，然后按下按钮：P3 和 P4 会在几秒内加入正在进行的对局。蓄气（游戏中的 1+2+3+4 键，或 X+Y+A+B）可换入你的队友。快速选择或重新选择角色会关闭 Tag：请在新的对局中再次按下按钮。Tag 仅限练习模式。此功能为实验性功能，仅供调试使用。
+extra.tag.names_missing = 在 TKMovesets2.exe 旁边未找到 TKMInterface/t8-retail_names.json：将使用内置角色列表。
+extra.tag.p3 = P3（P1 的队友）
+extra.tag.p4 = P4（P2 的队友）
+extra.tag.none = 无（P2 单独作战）
+extra.tag.load = 加载 P3/P4 并启用 Tag
+extra.tag.disable = 禁用
+extra.tag.injecting = 正在将招式表加载器注入游戏...
+extra.tag.no_game = Tekken 8 未运行。
+extra.tag.inject_failed = 无法在游戏中启动招式表加载器。
+extra.tag.version_mismatch = 游戏中存在来自其他 TKMovesets2 版本的招式表加载器：请重启游戏。
+
+edition.preview.no_animation = 此招式没有可预览的动画。
+edition.preview.no_renderer = 3D 预览不可用（没有 OpenGL 上下文）。
+edition.preview.loading = 正在加载动画...
+edition.preview.camera_help = 左键或中键拖动：环绕。右键拖动：平移。滚轮：缩放。双击：重置镜头。空格：播放/暂停，左/右方向键：逐帧。
+edition.preview.active = 有效
+edition.preview.active_suffix =  （有效）
+edition.preview.frame = 帧
+edition.preview.previous = 上一帧
+edition.preview.next = 下一帧
+edition.preview.play = 播放
+edition.preview.pause = 暂停
+edition.preview.speed = 播放速度
+edition.preview.loop = 循环
+edition.preview.root_motion = 根运动
+edition.preview.root_motion_help = 按动画的根运动 (GlobalPos) 移动角色。关闭：停留在原点上方。
+edition.preview.follow = 跟随
+edition.preview.follow_help = 让镜头始终对准角色。
+edition.preview.displacement = 位移
+edition.preview.displacement_help = 将招式已知的位移属性应用到根运动上：水平和垂直动画距离倍率，以及前/后和侧向推动。施加在自身上的推力和高度推动不会应用（其每帧效果未知）。
+edition.preview.displacement_disabled = 此招式没有额外位移。
+edition.preview.displacement_horizontal = 水平距离 %
+edition.preview.displacement_vertical = 垂直距离 %
+edition.preview.displacement_forward = 向前推动
+edition.preview.displacement_side = 向左推动
+edition.preview.displacement_conditional = 另有 %d 项带条件，未应用。
+edition.preview.show = 显示动画预览
+edition.preview.hide = 隐藏动画预览
+edition.preview.hitboxes = 判定框
+edition.preview.hitboxes_help = 在有效帧上以红色形状显示招式的判定框：肢体上的球体、两个肢体之间的胶囊体，或肢体自上一帧以来的运动轨迹。仅为近似：放置在人体模型上，招式未指定大小时使用默认大小；手、脚、肘和膝以外的肢体不会绘制。
+edition.preview.opponent = 对手
+edition.preview.opponent_help = 实验性功能。在攻击招式上显示第二个青色角色：放置在第一个判定框所能触及的位置，在第一个判定框帧之前播放待机招式，然后播放最可能命中的那一击的受击反应（没有条件的命中条件）。其状态以及被击中的方向可在此框旁边的设置中调整。仅为粗略模拟：游戏会检查的内容要多得多。
+edition.preview.opponent_no_attack = 此招式没有判定框：无对手。
+edition.preview.opponent_settings = 对手设置
+edition.preview.opponent_airborne = 浮空
+edition.preview.opponent_air_move = 姿势招式
+edition.preview.opponent_air_move_help = 浮空对手在被击中前播放的招式（招式 id 或别名）；-1 或无效 id：待机招式 (32769)。
+edition.preview.opponent_counterhit = 反击
+edition.preview.opponent_counterhit_help = 播放反击受击反应（仅限正面命中）。
+edition.preview.opponent_pushback = 推力
+edition.preview.opponent_pushback_help = 从命中帧开始，按该次命中的推力（与受击反应相同的一侧）将对手向后滑动。仅为近似：先应用逐帧偏移，然后将位移分摊到其持续时间内，单位按毫米计算。
+edition.preview.opponent_facing = 被击方向：
+edition.preview.opponent_front = 正面
+edition.preview.opponent_back = 背面
+edition.preview.opponent_left = 左侧
+edition.preview.opponent_right = 右侧
+edition.preview.opponent_reaction = 受击反应：招式 %d
+edition.preview.opponent_no_reaction = 此次命中没有受击反应招式。
+edition.preview.opponent_no_air_reaction = 此次命中没有针对浮空对手的命中条件：使用地面受击反应。
+edition.cancel_graph.open = 取消图：此招式可取消到的招式
+edition.cancel_graph.back = < 返回招式
+edition.cancel_graph.depth = 深度
+edition.cancel_graph.incoming_help = 显示可取消到此招式的招式（点击时搜索）
+edition.cancel_graph.refresh = 刷新
+edition.cancel_graph.fit = 适应窗口
+edition.cancel_graph.truncated = 已达到节点上限：部分取消未显示
+edition.cancel_graph.help = 拖动以移动视图，滚轮缩放，双击背景以适应窗口。将鼠标悬停在招式上可播放其动画，点击可打开该招式。将鼠标悬停在连线的圆点上可查看其所有取消。通用招式和已显示过的招式不会再次展开；+ 表示超出深度的取消。
+edition.cancel_graph.input_sequence = 输入序列
+edition.cancel_graph.grouped = 分组
+edition.cancel_graph.more = 更多条件
+edition.cancel_graph.more_cancels = 更多取消
+edition.cancel_graph.generic = 通用
+edition.cancel_graph.generic_help = 通用招式：不展开其取消
+edition.cancel_graph.cut_off = 超出深度限制后还有更多取消
+edition.cancel_graph.click_to_open = 点击打开该招式
+edition.cancel_graph.no_cancel = 此招式没有取消
+edition.cancel_graph.no_input = 无输入
+edition.cancel_graph.external = 其取消列表位于招式表之外：不显示
+edition.cancel_graph.incoming_hide = 隐藏可取消到此招式的招式
+edition.cancel_graph.show_common = Co_ 招式
+edition.cancel_graph.show_common_help = 同时显示公共招式（名为 Co_...）：许多取消列表都会指向大量此类招式
+edition.cancel_graph.hidden_common = Co_ 已隐藏
+edition.cancel_graph.kind_attack = 攻击
+edition.cancel_graph.kind_throw = 投技
+edition.cancel_graph.kind_screw = 螺旋
+edition.cancel_graph.kind_tornado = 龙卷

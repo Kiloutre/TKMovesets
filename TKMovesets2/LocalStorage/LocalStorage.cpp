@@ -121,7 +121,7 @@ void LocalStorage::Update()
 	{
 		// Update the list of moveset files. This is better than doing it in the display thread
 		try {
-			ReloadMovesetList();
+			ReloadMovesetList(true);
 		} catch (const std::filesystem::filesystem_error&) {
 			// Files can disappear during directory iteration. Retry on the next scan.
 		}
@@ -140,16 +140,20 @@ void LocalStorage::StopThreadAndCleanup()
     m_publishedMovesets.clear();
     localMovesets.clear();
     m_extractedMovesetFilenames.clear();
+    m_invalidRechecks.clear();
 }
 
-void LocalStorage::ReloadMovesetList()
+void LocalStorage::ReloadMovesetList(bool waitForWrites)
 {
 	std::lock_guard lock(m_listMutex);
 	if (m_refreshMovesets.exchange(false))
 	{
         localMovesets.clear();
         m_extractedMovesetFilenames.clear();
+        m_invalidRechecks.clear();
 	}
+
+	const auto now = std::chrono::steady_clock::now();
 
 	// Delete moveset entries that don't exist anymore (deleted files)
 	for (size_t i = 0; i < localMovesets.size();) {
@@ -157,9 +161,14 @@ void LocalStorage::ReloadMovesetList()
 		struct _stat64 buffer{};
 
 		bool statFailed = _wstat64(moveset->filename.c_str(), &buffer) != 0;
+		// An invalid file may have been read before it was fully written: drop its entry so it is read again
+		const auto recheck = m_invalidRechecks.find(moveset->filename);
+		const bool recheckDue = !moveset->is_valid && recheck != m_invalidRechecks.end() && now >= recheck->second.next;
 
-		if (statFailed ||
+		if (statFailed || recheckDue ||
 			(buffer.st_mtime != moveset->modificationDate || buffer.st_size != moveset->size)) {
+			// A file that changed or disappeared starts over with a fresh number of rechecks
+			if (!recheckDue) m_invalidRechecks.erase(moveset->filename);
 			// File does not exist anymore or was recently modified, de-allocate the info we stored about it
 			// (We remove from the set FIRST because erasing from the vector calls the std::string destuctor)
 			m_extractedMovesetFilenames.erase(m_extractedMovesetFilenames.find(moveset->filename));
@@ -196,10 +205,24 @@ void LocalStorage::ReloadMovesetList()
 			// If new file is detected, fetch its infos
 			if (!m_extractedMovesetFilenames.contains(filename))
 			{
+				// Give a file that was just written a moment to settle before reading it; the next scan picks it up
+				if (waitForWrites) {
+					const auto lastWrite = entry.last_write_time(ec);
+					if (ec || std::filesystem::file_time_type::clock::now() - lastWrite < std::chrono::milliseconds(MOVESET_SETTLE_DELAY_MS)) continue;
+				}
+
 				m_extractedMovesetFilenames.insert(filename);
 				movesetInfo* moveset = fetchMovesetInformations(filename);
 				struct _stat64 fileStat{};
 				_wstat64(filename.c_str(), &fileStat);
+
+				if (moveset != nullptr) m_invalidRechecks.erase(filename);
+				else {
+					auto& recheck = m_invalidRechecks[filename];
+					// After the last read the file stays invalid until it changes
+					if (++recheck.reads <= MOVESET_INVALID_RECHECKS) recheck.next = now + std::chrono::milliseconds(MOVESET_INVALID_RECHECK_DELAY_MS);
+					else recheck.next = (std::chrono::steady_clock::time_point::max)();
+				}
 
 				if (moveset == nullptr) {
 					moveset = new movesetInfo{
@@ -224,7 +247,7 @@ void LocalStorage::ReloadMovesetList()
 	}
     std::erase_if(localMovesets,[&](const auto& moveset) {
         if(seen.contains(moveset->filename))return false;
-        m_extractedMovesetFilenames.erase(moveset->filename);return true;
+        m_extractedMovesetFilenames.erase(moveset->filename);m_invalidRechecks.erase(moveset->filename);return true;
     });
 }
 
@@ -257,4 +280,9 @@ LocalStorage::~LocalStorage()
 void LocalStorage::RefreshMovesets()
 {
 	m_refreshMovesets = true;
+}
+
+std::unique_ptr<movesetInfo> LocalStorage::ReadMovesetInfo(const std::wstring& filename)
+{
+	return std::unique_ptr<movesetInfo>(fetchMovesetInformations(filename));
 }

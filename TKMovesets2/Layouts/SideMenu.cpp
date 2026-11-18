@@ -204,7 +204,7 @@ static void SetWindowsFileAssociation()
 {
 	wchar_t program_path[MAX_PATH] = { 0 };
 	GetModuleFileNameW(nullptr, program_path, MAX_PATH);
-	std::wstring moveset_command = L"\"" + std::wstring(program_path) + L"\" --move-moveset \"%1\"";
+	std::wstring moveset_command = L"\"" + std::wstring(program_path) + L"\" --open-moveset \"%1\"";
 	std::wstring animation_command = L"\"" + std::wstring(program_path) + L"\" --move-animation \"%1\"";
 
 	RegSet(HKEY_CURRENT_USER, "Software\\Classes\\" MOVESET_FILENAME_EXTENSION, "tkmvst_file");
@@ -253,6 +253,7 @@ SideMenu::SideMenu()
 	m_vsync_setting = Settings::Get(SETTING_VSYNC_BUFFER_KEY, SETTING_VSYNC_BUFFER);
 	m_freeUnusedMoveset = Settings::Get(SETTING_FREE_UNUSED_KEY, SETTING_FREE_UNUSED);
 	m_applyInstantly = Settings::Get(SETTING_IMPORT_INSTANT_KEY, SETTING_IMPORT_INSTANT);
+	m_editorAutoApply = Settings::Get(SETTING_EDITOR_AUTO_APPLY_KEY, SETTING_EDITOR_AUTO_APPLY);
 	m_languageId = Localization::GetCurrLangId();
 	Localization::GetTranslationList(&m_translations, &m_translations_count);
 }
@@ -375,6 +376,14 @@ void SideMenu::RenderSettingsMenu()
 
 		ImGui::EndTable();
 	}
+
+	ImGui::SeparatorText(_("settings.edition"));
+	// Editor forms apply their edits without an Apply button
+	if (ImGui::Checkbox(_("settings.editor_auto_apply"), &m_editorAutoApply)) {
+		Settings::Set(SETTING_EDITOR_AUTO_APPLY_KEY, m_editorAutoApply);
+	}
+	ImGui::SameLine();
+	ImGuiExtra::HelpMarker(_("settings.editor_auto_apply_explanation"));
 
 
 	ImGui::SeparatorText(_("settings.keybinds"));

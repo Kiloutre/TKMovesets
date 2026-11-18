@@ -41,6 +41,10 @@
 #include "RetailPanm.hpp"
 #include "AnimationReader.hpp"
 #include "T7AnimToRetailT8.hpp"
+#include "T7HandToRetailT8.hpp"
+#include "T7CameraToRetailT8.hpp"
+#include "T7WingToRetailT8.hpp"
+#include "T7FaceToRetailT8.hpp"
 #include "RetailT8AnimToT7.hpp"
 #include "T8ToT7.hpp"
 #include "ConversionRules.hpp"
@@ -797,6 +801,7 @@ int RunHeadless(std::span<const std::wstring> arguments)
             report["restored_carriers"] = importer.RestoredCarriers();
             report["memory_only"] = importer.MemoryOnly();
             report["published_animations"] = importer.PublishedAnimations();
+            report["hand_animations"] = {{"carried", importer.HandAnimations()}, {"published_indices", importer.PublishedHandIndices()}, {"mapped", importer.HandIndices().size()}, {"silenced_rows", importer.SilencedHandProperties()}};
             report["reused_animations"] = importer.ReusedAnimations();
             report["memory_only_fallback_moves"] = importer.MemoryOnlyFallbackMoves();
             report["native_bound_animations"] = importer.NativeBoundAnimations();
@@ -826,7 +831,7 @@ int RunHeadless(std::span<const std::wstring> arguments)
                     RetailT8Import::MemoryOnlyAudit memoryOnly{importer.MemoryOnlyContainer(), importer.MemoryOnlyDomain(),
                         importer.MemoryOnlyStringRow(), importer.MemoryOnlyHandles(), importer.MemoryOnlyNames(), importer.MemoryOnlyAnimations(),
                         importer.Native() ? &importer.Native()->cancels : nullptr, &importer.DatalessAnimations()};
-                    if (importer.MemoryOnly()) memoryOnly.compiledVtable = importer.Engine().compiledVtable;
+                    if (importer.MemoryOnly()) memoryOnly.compiledVtable = importer.Engine().compiledVtable; memoryOnly.handIndices = &importer.HandIndices();
                     const auto importProfile = ImportProfile::Read(importHeader);
                     auto audit = RetailT8Import::AuditImage(importPayload, shadow, importer.lastLoaded.address,
                         importer.lastLoaded.size, process, importer.BindingRoot(), importHeader.characterId, targetCharacter,
@@ -1289,7 +1294,7 @@ int RunHeadless(std::span<const std::wstring> arguments)
                     RetailT8Import::MemoryOnlyAudit memoryOnly{importer.MemoryOnlyContainer(), importer.MemoryOnlyDomain(),
                         importer.MemoryOnlyStringRow(), handles, importer.MemoryOnlyNames(), importer.MemoryOnlyAnimations(),
                         importer.Native() ? &importer.Native()->cancels : nullptr, &importer.DatalessAnimations()};
-                    if (importer.MemoryOnly()) memoryOnly.compiledVtable = importer.Engine().compiledVtable;
+                    if (importer.MemoryOnly()) memoryOnly.compiledVtable = importer.Engine().compiledVtable; memoryOnly.handIndices = &importer.HandIndices();
                     const auto headerProfile = ImportProfile::Read(header);
                     auto result = RetailT8Import::AuditImage(payload, process, root, size, process, bindingRoot, header.characterId, targetCharacter,
                         header.GetConversionOrigin() == GameVersions::T8::FROM_T7, metadata.stored ? &metadata : nullptr, &importer.MissingCarriers(),
@@ -1460,11 +1465,11 @@ int RunHeadless(std::span<const std::wstring> arguments)
             return 0;
         }
         if (command == L"panm-dump") {
-            // Raw/static-track PANM -> JSON {frames, bones: {name: [[sx,sy,sz,qx,qy,qz,qw,px,py,pz],...]}}
+            // Raw, static or packed-track PANM -> JSON {frames, bones: {name: [[sx,sy,sz,qx,qy,qz,qw,px,py,pz],...]}}
             if (arguments.size() != 3) throw std::invalid_argument("Expected PANM_FILE OUTPUT.json");
             std::ifstream in(arguments[1], std::ios::binary);
             std::vector<Byte> bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-            auto anim = RetailPanm::DecodeRaw(bytes);
+            auto anim = RetailPanm::Decode(bytes);
             json bones = json::object();
             for (const auto& track : anim.tracks) {
                 json rows = json::array();
@@ -1475,6 +1480,193 @@ int RunHeadless(std::span<const std::wstring> arguments)
                 throw std::runtime_error("Cannot write output file");
             std::cout << json({{"ok", true}, {"frames", anim.frames}, {"tracks", anim.tracks.size()}}).dump() << '\n';
             return 0;
+        }
+        if (command == L"panm-groups-reencode") { // research: DecodeGroups then EncodeGroups, for layout diffs
+            if (arguments.size() != 3 || SameFile(arguments[1], arguments[2])) throw std::invalid_argument("Expected PANM_FILE OUTPUT.panm");
+            std::ifstream in(std::filesystem::path(arguments[1]), std::ios::binary);
+            std::vector<Byte> bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+            uint32_t frames = 0; const auto tracks = RetailPanm::DecodeGroups(bytes, &frames);
+            if (!FileIO::WriteAtomically(arguments[2], RetailPanm::EncodeGroups(frames, tracks))) throw std::runtime_error("Cannot write PANM");
+            std::cout << json({{"ok", true}, {"tracks", tracks.size()}}).dump() << '\n'; return 0;
+        }
+        if (command == L"panm-groups-check") {
+            // Research: every *.panm under DIRECTORY with more than one bone group (native cameras) decoded with
+            // DecodeGroups and re-encoded with EncodeGroups (byte comparison), and each packed track re-packed with
+            // PackTransforms / PackScalars (worst value difference after a decode of both).
+            if (arguments.size() != 2 && !(arguments.size() == 3 && arguments[2] == L"all")) throw std::invalid_argument("Expected DIRECTORY [all]");
+            const bool everyFile = arguments.size() == 3; // also single-group files
+            size_t files = 0, identical = 0, tracks = 0; double worstRotation = 0, worstPosition = 0, worstScalar = 0;
+            json mismatches = json::array();
+            for (const auto& entry : std::filesystem::recursive_directory_iterator(arguments[1])) {
+                if (!entry.is_regular_file() || entry.path().extension() != ".panm") continue;
+                std::ifstream in(entry.path(), std::ios::binary);
+                std::vector<Byte> bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+                uint32_t frames = 0; std::vector<RetailPanm::GroupTrack> decoded;
+                try { decoded = RetailPanm::DecodeGroups(bytes, &frames); } catch (const std::exception&) { continue; }
+                std::set<uint32_t> groups; for (const auto& t : decoded) groups.insert(t.group);
+                if (groups.size() < 2 && !everyFile) continue;
+                ++files;
+                if (RetailPanm::EncodeGroups(frames, decoded) == bytes) ++identical;
+                else if (mismatches.size() < 10) mismatches.push_back(entry.path().filename().string());
+                for (const auto& t : decoded) {
+                    if (t.encoding != 3) continue;
+                    ++tracks;
+                    if (t.type == 1) {
+                        const auto a = RetailPanm::DecodePackedTrack(t.data, t.samples);
+                        const auto b = RetailPanm::DecodePackedTrack(RetailPanm::PackTransforms(a), t.samples);
+                        for (size_t i = 0; i < a.size(); ++i) {
+                            double dot = 0; for (int k = 0; k < 4; ++k) dot += double(a[i].rotation[k]) * b[i].rotation[k];
+                            worstRotation = (std::max)(worstRotation, 2 * std::acos((std::min)(1.0, std::abs(dot))));
+                            for (int k = 0; k < 3; ++k) worstPosition = (std::max)(worstPosition,
+                                (std::max)(std::abs(double(a[i].translation[k]) - b[i].translation[k]), std::abs(double(a[i].scale[k]) - b[i].scale[k])));
+                        }
+                    } else {
+                        const auto a = RetailPanm::UnpackScalars(t.data, t.samples);
+                        const auto b = RetailPanm::UnpackScalars(RetailPanm::PackScalars(a), t.samples);
+                        for (size_t i = 0; i < a.size(); ++i) worstScalar = (std::max)(worstScalar, std::abs(double(a[i]) - b[i]));
+                    }
+                }
+            }
+            std::cout << json({{"ok", true}, {"multi_group_files", files}, {"identical_reencodes", identical}, {"mismatches", mismatches},
+                {"packed_tracks", tracks}, {"worst_rotation_rad", worstRotation}, {"worst_position_or_scale", worstPosition},
+                {"worst_scalar", worstScalar}}).dump() << '\n';
+            return 0;
+        }
+        if (command == L"t7-cameras-to-panm") {
+            // Research: every animation of the T7 camera MOTAs (slots 8 and 9) converted, as camera_<slot>_<index>.panm,
+            // plus index.json {slot, index, frames, descriptors, error}.
+            if (arguments.size() != 3) throw std::invalid_argument("Expected T7_FILE NEW_DIRECTORY");
+            if (std::filesystem::exists(arguments[2])) throw std::runtime_error("Output directory must be new");
+            MovesetFile file(arguments[1]); file.Validate();
+            if (file.Header().gameId != GameId_T7) throw std::invalid_argument("Input must be a T7 moveset");
+            StructsT7::TKMovesetHeaderBlocks blocks;
+            memcpy(&blocks, file.Bytes().data() + file.Header().block_list, sizeof(blocks));
+            const auto payload = file.Payload();
+            const auto& info = *reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(payload.data() + blocks.movesetInfoBlock);
+            const auto motaBlock = payload.subspan(blocks.motaBlock, blocks.movelistBlock - blocks.motaBlock);
+            std::filesystem::create_directories(arguments[2]);
+            json index = json::array(); size_t written = 0;
+            for (int slot : {8, 9}) {
+                const auto offset = static_cast<uint64_t>(info.motas.motas[slot]);
+                if (offset == MOVESET_ADDR_MISSING || offset >= motaBlock.size()) continue;
+                const auto animations = T7HandToRetailT8::MotaAnimations(motaBlock.subspan(offset));
+                for (size_t i = 0; i < animations.size(); ++i) {
+                    json entry{{"slot", slot}, {"index", i}};
+                    try {
+                        const auto camera = T7CameraToRetailT8::Read(animations[i]);
+                        entry["frames"] = camera.frames; entry["descriptors"] = camera.descriptors;
+                        const auto panm = T7CameraToRetailT8::Convert(camera);
+                        const auto name = "camera_" + std::to_string(slot) + "_" + std::to_string(i) + ".panm";
+                        if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / name, panm)) throw std::runtime_error("Cannot write PANM");
+                        ++written;
+                    } catch (const std::exception& error) { entry["error"] = error.what(); }
+                    index.push_back(entry);
+                }
+            }
+            if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / "index.json", index.dump(1))) throw std::runtime_error("Cannot write index");
+            std::cout << json({{"ok", true}, {"written", written}}).dump() << '\n'; return 0;
+        }
+        if (command == L"t7-faces-to-panm") {
+            // Research: every animation of the T7 face MOTAs (slots 4 and 5) converted, as face_<slot>_<index>.panm,
+            // plus index.json {slot, index, error}.
+            if (arguments.size() != 3) throw std::invalid_argument("Expected T7_FILE NEW_DIRECTORY");
+            if (std::filesystem::exists(arguments[2])) throw std::runtime_error("Output directory must be new");
+            MovesetFile file(arguments[1]); file.Validate();
+            if (file.Header().gameId != GameId_T7) throw std::invalid_argument("Input must be a T7 moveset");
+            StructsT7::TKMovesetHeaderBlocks blocks;
+            memcpy(&blocks, file.Bytes().data() + file.Header().block_list, sizeof(blocks));
+            const auto payload = file.Payload();
+            const auto& info = *reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(payload.data() + blocks.movesetInfoBlock);
+            const auto motaBlock = payload.subspan(blocks.motaBlock, blocks.movelistBlock - blocks.motaBlock);
+            std::filesystem::create_directories(arguments[2]);
+            json index = json::array(); size_t written = 0;
+            for (int slot : {4, 5}) {
+                const auto offset = static_cast<uint64_t>(info.motas.motas[slot]);
+                if (offset == MOVESET_ADDR_MISSING || offset >= motaBlock.size()) continue;
+                const auto animations = T7HandToRetailT8::MotaAnimations(motaBlock.subspan(offset));
+                for (size_t i = 0; i < animations.size(); ++i) {
+                    json entry{{"slot", slot}, {"index", i}};
+                    try {
+                        const auto panm = T7FaceToRetailT8::Convert(animations[i]);
+                        const auto name = "face_" + std::to_string(slot) + "_" + std::to_string(i) + ".panm";
+                        if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / name, panm)) throw std::runtime_error("Cannot write PANM");
+                        ++written;
+                    } catch (const std::exception& error) { entry["error"] = error.what(); }
+                    index.push_back(entry);
+                }
+            }
+            if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / "index.json", index.dump(1))) throw std::runtime_error("Cannot write index");
+            std::cout << json({{"ok", true}, {"written", written}}).dump() << '\n'; return 0;
+        }
+        if (command == L"t7-wings-to-panm") {
+            // Research: every animation of the T7 wing MOTAs (slots 6 and 7) converted, as swing_<slot>_<index>.panm,
+            // plus index.json {slot, index, rig, error}.
+            if (arguments.size() != 3) throw std::invalid_argument("Expected T7_FILE NEW_DIRECTORY");
+            if (std::filesystem::exists(arguments[2])) throw std::runtime_error("Output directory must be new");
+            MovesetFile file(arguments[1]); file.Validate();
+            if (file.Header().gameId != GameId_T7) throw std::invalid_argument("Input must be a T7 moveset");
+            StructsT7::TKMovesetHeaderBlocks blocks;
+            memcpy(&blocks, file.Bytes().data() + file.Header().block_list, sizeof(blocks));
+            const auto payload = file.Payload();
+            const auto& info = *reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(payload.data() + blocks.movesetInfoBlock);
+            const auto motaBlock = payload.subspan(blocks.motaBlock, blocks.movelistBlock - blocks.motaBlock);
+            std::filesystem::create_directories(arguments[2]);
+            json index = json::array(); size_t written = 0;
+            for (int slot : {6, 7}) {
+                const auto offset = static_cast<uint64_t>(info.motas.motas[slot]);
+                if (offset == MOVESET_ADDR_MISSING || offset >= motaBlock.size()) continue;
+                const auto animations = T7HandToRetailT8::MotaAnimations(motaBlock.subspan(offset));
+                for (size_t i = 0; i < animations.size(); ++i) {
+                    json entry{{"slot", slot}, {"index", i}};
+                    try {
+                        std::string rig;
+                        const auto panm = T7WingToRetailT8::Convert(animations[i], &rig);
+                        entry["rig"] = rig;
+                        const auto name = "swing_" + std::to_string(slot) + "_" + std::to_string(i) + ".panm";
+                        if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / name, panm)) throw std::runtime_error("Cannot write PANM");
+                        ++written;
+                    } catch (const std::exception& error) { entry["error"] = error.what(); }
+                    index.push_back(entry);
+                }
+            }
+            if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / "index.json", index.dump(1))) throw std::runtime_error("Cannot write index");
+            std::cout << json({{"ok", true}, {"written", written}}).dump() << '\n'; return 0;
+        }
+        if (command == L"t7-hands-to-panm") {
+            // Research: every animation of the T7 hand MOTAs (slots 2 and 3) converted for both hands, as
+            // <slot>_<index>_<L|R>.panm, plus index.json {slot, index, frames, channels, error}.
+            if (arguments.size() != 3) throw std::invalid_argument("Expected T7_FILE NEW_DIRECTORY");
+            if (std::filesystem::exists(arguments[2])) throw std::runtime_error("Output directory must be new");
+            MovesetFile file(arguments[1]); file.Validate();
+            if (file.Header().gameId != GameId_T7) throw std::invalid_argument("Input must be a T7 moveset");
+            StructsT7::TKMovesetHeaderBlocks blocks;
+            memcpy(&blocks, file.Bytes().data() + file.Header().block_list, sizeof(blocks));
+            const auto payload = file.Payload();
+            const auto& info = *reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(payload.data() + blocks.movesetInfoBlock);
+            const auto motaBlock = payload.subspan(blocks.motaBlock);
+            std::filesystem::create_directories(arguments[2]);
+            json index = json::array(); size_t written = 0;
+            for (int slot : {2, 3}) {
+                const auto offset = static_cast<uint64_t>(info.motas.motas[slot]);
+                if (offset == MOVESET_ADDR_MISSING || offset >= motaBlock.size()) continue;
+                const auto animations = T7HandToRetailT8::MotaAnimations(motaBlock.subspan(offset));
+                for (size_t i = 0; i < animations.size(); ++i) {
+                    json entry{{"slot", slot}, {"index", i}};
+                    try {
+                        const auto source = RetailPanm::DecodeT7(animations[i]);
+                        entry["frames"] = source.frames; entry["channels"] = source.channels;
+                        for (auto side : {T7HandToRetailT8::Side::Left, T7HandToRetailT8::Side::Right}) {
+                            const auto panm = T7HandToRetailT8::Convert(source, side);
+                            const auto name = std::to_string(slot) + "_" + std::to_string(i) + (side == T7HandToRetailT8::Side::Left ? "_L" : "_R") + ".panm";
+                            if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / name, panm)) throw std::runtime_error("Cannot write PANM");
+                            ++written;
+                        }
+                    } catch (const std::exception& error) { entry["error"] = error.what(); }
+                    index.push_back(entry);
+                }
+            }
+            if (!FileIO::WriteAtomically(std::filesystem::path(arguments[2]) / "index.json", index.dump(1))) throw std::runtime_error("Cannot write index");
+            std::cout << json({{"ok", true}, {"written", written}}).dump() << '\n'; return 0;
         }
         if (command == L"t7-anim-to-panm") {
             if (arguments.size() != 5) throw std::invalid_argument("Expected T7_FILE MOVE_ROW T8_DONOR_WITH_ANIMATIONS OUTPUT.panm");

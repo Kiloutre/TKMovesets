@@ -17,11 +17,13 @@
 #include "Importer_t8/RetailResourceLoader.hpp"
 #include "Importer_t8/RetailPreview.hpp"
 #include "Importer_t8/RetailLiveEdit.hpp"
+#include "Editor_t7/Editor_t7_LiveRetail.hpp"
 #include "Extractor_t8/Extractor_t8cnt.hpp"
 #include "AnimExtractors/AnimExtractor_t8.hpp"
 #include "Compression.hpp"
 #include "T7ToRetailT8.hpp"
 #include "T7AnimToRetailT8.hpp"
+#include "T7HandToRetailT8.hpp"
 #include "RetailNames.hpp"
 #include "Editor_t8Retail/Editor_t8Retail.hpp"
 #include "RetailPanm.hpp"
@@ -255,9 +257,60 @@ void RunMemoryOnlyRegistrationTests() {
         Check(RS::ChooseAnimationId(m,m.container,28,panm,engine,{again.id}).id!=again.id,"Taken id was reused");
     }
 }
+// Converted T7 hand animations: the anim manager's category index (bucket-only nodes) and the hand property rows.
+void RunCategoryIndexTests() {
+    namespace RT=RetailT8Runtime;namespace RS=RetailT8Resources;namespace H=T7HandToRetailT8;
+    Memory m;m.Runtime(28);
+    const auto map=RS::CategoryIndexMap(m,m.manager,28);
+    Check(map && !RS::CategoryIndexMap(m,m.manager,29),"Category index map lookup changed");
+    // Fixture: the domain's index map is the inner map of the manager's domain-28 node; its one native node is the
+    // body slot key 0x100001 (index 1, category 0).
+    const auto domainNode=RT::Lookup(m,m.readUInt64(m.manager+0x2090),m.readUInt64(m.manager+0x20a0),m.readUInt64(m.manager+0x20b8),28);
+    Check(map==domainNode+0x18,"Category index map is not the domain node's inner map");
+    m.Put<uint64_t>(m.slotNode+0x18,0xef001c0012345678ULL);
+    Check(RS::CategoryHandle(m,map,0x100001)==0xef001c0012345678ULL && !RS::CategoryHandle(m,map,RS::CategoryKey(1,H::FirstRetailIndex)),
+        "Category handle lookup changed");
+    Check(RS::CategoryKey(1,0x2000)==0x202000 && RS::CategoryKey(4,7)==0x1000007,"Category key layout changed");
+    const auto head=m.readUInt64(map+8);
+    m.Put<uint64_t>(head,m.slotNode);m.Put<uint64_t>(m.slotNode,head); // the fixture links prev only
+    auto list=[&]{std::vector<gameAddr> nodes;for(auto n=m.readUInt64(head);n!=head;n=m.readUInt64(n))nodes.push_back(n);return nodes;};
+    const auto before=list();
+    std::vector<RS::PublishedAnimation> nodes;
+    for(uint32_t i=0;i<3;++i){
+        const auto key=RS::CategoryKey(1,H::FirstRetailIndex+i);
+        const auto image=RS::CategoryNode(key,0xef001c0080000000ULL|i);
+        const auto at=m.Alloc(image.size());m.writeBytes(at,image.data(),image.size());
+        nodes.push_back({key,at});
+    }
+    Check(RS::PublishCategoryIndex(m,map,nodes)==3,"Category publication count changed");
+    for(uint32_t i=0;i<3;++i)Check(RS::CategoryHandle(m,map,nodes[i].id)==(0xef001c0080000000ULL|i),"Published hand index is not found by the readers' walk");
+    Check(RS::CategoryHandle(m,map,0x100001)==0xef001c0012345678ULL,"Native category node lost after publication");
+    Check(list()==before && m.readUInt64(map+0x10)==1,"Category publication changed the engine's node list or size");
+    bool duplicate=false;try{RS::PublishCategoryIndex(m,map,std::vector<RS::PublishedAnimation>{nodes[0]});}catch(const std::exception&){duplicate=true;}
+    Check(duplicate,"Duplicate category key accepted");
+    // Hand rows: a published index is remapped, an unpublished one never fires, other rows are untouched.
+    std::vector<Byte> rows(7*0x28);
+    auto row=[&](size_t i,uint32_t frame,uint32_t id,uint32_t value){memcpy(rows.data()+i*0x28,&frame,4);memcpy(rows.data()+i*0x28+0x10,&id,4);memcpy(rows.data()+i*0x28+0x14,&value,4);};
+    row(0,5,0x8610,0x2000);row(1,6,0x8611,0x2001);row(2,7,0x8610,3);row(3,8,0x8001,0x2000);row(4,9,0x868C,0x2000);row(5,10,0x8683,0x2000);row(6,11,0x877A,0x2000);
+    auto read=[&](size_t i,size_t at){uint32_t v;memcpy(&v,rows.data()+i*0x28+at,4);return v;};
+    // Hands and cameras both start at 0x2000: the map is keyed by category. Camera 0x2000 is published as 0x2001.
+    const std::map<std::pair<uint32_t,uint32_t>,uint32_t> indices{{{1,0x2000},0x2005},{{4,0x2000},0x2001},{{3,0x2000},0x2002},{{2,0x2000},0x2003}};
+    uint64_t silenced=0;
+    Check(RetailT8Import::ApplyHandIndices(rows,&indices,&silenced)==5 && silenced==1,"Hand row changes miscounted");
+    Check(read(6,0x14)==0x2003 && read(6,0)==11,"Published face index was not remapped by its own category");
+    Check(read(5,0x14)==0x2002 && read(5,0)==10,"Published wing index was not remapped by its own category");
+    Check(read(4,0x14)==0x2001 && read(4,0)==9,"Published camera index was not remapped by its own category");
+    Check(read(0,0x14)==0x2005 && read(0,0)==5,"Published hand index was not remapped");
+    Check(read(1,0)==ImportProfile::StrippedFrame && read(1,0x14)==0x2001,"Unpublished hand index still fires");
+    Check(read(2,0)==7 && read(2,0x14)==3 && read(3,0)==8 && read(3,0x14)==0x2000,"Native hand rows or other properties changed");
+    Check(RetailT8Import::ApplyHandIndices(rows,nullptr,&silenced)==5 && silenced==5 && read(0,0)==ImportProfile::StrippedFrame && read(2,0)==7 &&
+        read(4,0)==ImportProfile::StrippedFrame,
+        "Without published indices every converted hand row must be silenced");
+}
 }
 void RunRetailSnapshotTests() {
     RunMemoryOnlyRegistrationTests();
+    RunCategoryIndexTests();
     {
         // QA 1.0 (CntTablesFitBlock): the legacy CNT extractor rewrites every listed record in place; lists must
         // lie inside the copied block (from `reactions` to the end of the last list).
@@ -1094,6 +1147,71 @@ void RunRetailImportTests() {
         sync=RetailLiveEdit::Sync(m,m.player,root,file,edited,FixtureOffsets);
         Check(!sync.structural && sync.records==2 && m.readUInt32(moves+0x120)==61 && m.readUInt32(m.readUInt64(root+0x200)+4)==0x55,
             "Valid live edit was not applied");
+    }
+    {
+        // Live edition of a T7 moveset imported into retail T8 (T7RetailLive): the T7 editor's live writers write into
+        // the T7 shadow (pointers as addresses), the edited rows are converted alone and written into the published
+        // moveset; an edit one row cannot carry stops with the reason and writes nothing.
+        namespace S7 = StructsT7;
+        Memory m; fixture(m, 8);
+        const auto t7 = T7RetailConvertibleFixture();
+        T7RetailLive live(t7);
+        GameAddressesFile addresses; addresses.Reload(); GameData game; game.SetProcess(&m, &addresses);
+        auto info = RetailInfo(); game.SetCurrentGame(&info);
+        ImporterT8 importer(m, game, &info); uint8_t progress = 0;
+        Check(importer.Import(live.Container().data(), live.Container().size(), m.player, ImportSettings_ApplyInstantly, progress) == ImportationErrcode_Successful,
+            (std::string("T7 live edition container did not import: ") + importer.LastError()).c_str());
+        Check(importer.GetCharacterAddress(0) == m.player, "Fixture player is not slot 0");
+        const auto root = importer.lastLoaded.address;
+        live.Bind(root, 0, &info);
+        const auto& header = *reinterpret_cast<const TKMovesetHeader*>(t7.data());
+        S7::TKMovesetHeaderBlocks blocks; memcpy(&blocks, t7.data() + header.block_list, sizeof(blocks));
+        const auto& table = reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(t7.data() + header.moveset_data_start)->table;
+        const auto block = live.Shadow().Address() + blocks.movesetBlock;
+        auto& shadow = live.Shadow();
+        // A plain field: the T7 animation length is the retail move's animation_length (+0x120).
+        const auto movesAddress = m.readUInt64(root + R::Tables[12].pointerOffset);
+        const auto length = m.readUInt32(movesAddress + 0x120);
+        shadow.writeUInt32(block + table.move + offsetof(S7::Move, anim_len), length + 7);
+        live.Publish(m, game);
+        Check(live.LastRecords() == 1 && m.readUInt32(movesAddress + 0x120) == length + 7, "Live T7 move edit was not written into the retail moveset");
+        // A reference written as an address is stored as the T7 row index; the edited cancel row is converted and written.
+        if (table.cancelCount && table.requirementCount) {
+            shadow.writeUInt64(block + table.cancel + offsetof(S7::Cancel, requirements_addr), block + table.requirement);
+            Check(shadow.Invalid().empty(), "A valid reference write was refused");
+            uint64_t index; memcpy(&index, shadow.Row(6, 0).data() + offsetof(StructsT7_gameAddr::Cancel, requirements_addr), 8);
+            Check(index == 0, "The shadow kept a reference as an address");
+            live.Publish(m, game);
+            const auto cancels = m.readUInt64(root + R::Tables[6].pointerOffset), requirements = m.readUInt64(root + R::Tables[1].pointerOffset);
+            Check(m.readUInt64(cancels + 8) == requirements, "Live T7 cancel reference was not relocated into the retail moveset");
+        }
+        {
+            // Apply keeps live edition bound: the applied moveset's rows that differ are published like live edits.
+            auto applied = t7;
+            auto* move = reinterpret_cast<StructsT7_gameAddr::Move*>(applied.data() + header.moveset_data_start + blocks.movesetBlock + table.move);
+            move->anim_len = length + 11;
+            shadow.SyncFrom(applied);
+            live.Publish(m, game);
+            Check(shadow.Invalid().empty() && live.LastRecords() == 1 && m.readUInt32(movesAddress + 0x120) == length + 11,
+                "An applied T7 row was not published into the retail moveset");
+            // A list that changed size is invalid for a single-row update.
+            T7RetailLive resized(t7);
+            auto grown = t7;
+            reinterpret_cast<StructsT7_gameAddr::MovesetInfo*>(grown.data() + header.moveset_data_start)->table.entries[1].listCount += 1;
+            resized.Shadow().SyncFrom(grown);
+            Check(!resized.Shadow().Invalid().empty(), "A resized list was published row by row");
+        }
+        // A renamed move needs a new import: nothing is written.
+        const auto published = m.regions;
+        uint64_t name; shadow.readBytes(block + table.move + offsetof(StructsT7_gameAddr::Move, name_addr), &name, 8);
+        shadow.writeUInt64(block + table.move + offsetof(StructsT7_gameAddr::Move, name_addr), live.Shadow().Address() + blocks.nameBlock + name + 1);
+        bool stopped = false;
+        try { live.Publish(m, game); } catch (const std::exception& error) { stopped = std::string(error.what()).find("import") != std::string::npos; }
+        Check(stopped && m.regions == published, "A renamed move did not stop live edition, or wrote records");
+        // An address outside every table marks the shadow invalid.
+        T7RetailLive other(t7);
+        other.Shadow().writeUInt64(block + table.move + offsetof(StructsT7_gameAddr::Move, cancel_addr), 0x1234);
+        Check(!other.Shadow().Invalid().empty(), "A reference outside its table was accepted");
     }
     for(unsigned fail=0;fail<=7;++fail) {
         Memory m;fixture(m);m.Put<uint16_t>(Memory::Root+0xaa,0);const auto before=m.regions;

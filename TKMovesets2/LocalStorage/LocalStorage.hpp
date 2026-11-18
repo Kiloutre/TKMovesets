@@ -1,6 +1,8 @@
 #pragma once
 
 #include <set>
+#include <map>
+#include <chrono>
 #include <memory>
 #include <filesystem>
 #include "constants.h"
@@ -55,6 +57,9 @@ private:
 	std::vector<std::shared_ptr<movesetInfo>> m_publishedMovesets;
 	// A set containing the list of moveset files in the configured extraction dir. Used to determine when to fetch new movesets info
 	std::set<std::wstring> m_extractedMovesetFilenames;
+	// Files that read as invalid, maybe because they were still being written: how many times they were read, and when to read them again
+	struct InvalidRecheck { unsigned reads; std::chrono::steady_clock::time_point next; };
+	std::map<std::wstring, InvalidRecheck> m_invalidRechecks;
 	// If true, will clear the moveset list and refresh it in the next run
 	std::atomic_bool m_refreshMovesets = false;
 	std::mutex m_listMutex;
@@ -72,11 +77,14 @@ public:
 	// Stops the thread started above
 	void StopThreadAndCleanup() override;
 	// Reads movesets from their configured extraction dir. Accessible under .extractedMovesets
-	void ReloadMovesetList();
+	// waitForWrites: leave files written in the last few milliseconds for a later call, which the periodic scan makes
+	void ReloadMovesetList(bool waitForWrites = false);
 	// Frees the content of .garbage. Must be called by the display thread after being finished with .extractedMovesets
 	void CleanupUnusedMovesetInfos();
 	// Delete a moveset's file entirely, returns false if deletion failed
 	bool DeleteMoveset(const wchar_t* filename);
 	// Force movesets to refresj
 	void RefreshMovesets();
+	// Reads one moveset file's header, wherever it is. Null if the file is not a valid moveset.
+	static std::unique_ptr<movesetInfo> ReadMovesetInfo(const std::wstring& filename);
 };

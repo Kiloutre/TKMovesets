@@ -206,6 +206,14 @@ std::vector<Sample> DecodePacked(std::span<const Byte> track,uint32_t samples) {
         if(low[c]==high)width[c]=0;
         range[c]=high-low[c];used+=width[c];
     }
+    // Flag 1 with scale y and z missing from the stream: a uniform scale (y = z = x). 12 native swing tracks, e.g.
+    // com/swing_19FAADA3 ATH_wingL_top: x, y and z listed 1.0..1.3, 70 bits per frame for 101 listed.
+    const auto flags=Read<uint16_t>(track,2);
+    bool uniform=false;
+    if(bitsPerFrame!=used && bitsPerFrame!=used+1 && (flags&1) && width[0]) {
+        const auto narrow=used-width[1]-width[2];
+        if(bitsPerFrame==narrow || bitsPerFrame==narrow+1) { uniform=true;used=narrow;width[1]=width[2]=0; }
+    }
     Check(bitsPerFrame==used || bitsPerFrame==used+1,"Packed PANM bit count differs from its channels");
     const bool sign=bitsPerFrame==used+1;
     Check((uint64_t(samples)*bitsPerFrame+7)/8<=track.size()-header,"Truncated packed PANM track");
@@ -225,6 +233,7 @@ std::vector<Sample> DecodePacked(std::span<const Byte> track,uint32_t samples) {
             value[c]=static_cast<float>(low[c]+double(range[c])*double(q)/double((uint64_t(1)<<width[c])-1));
         }
         auto& out=result[frame];
+        if(uniform)value[1]=value[2]=value[0];
         out.scale={value[0],value[1],value[2]};out.translation={value[6],value[7],value[8]};
         double x=value[3],y=value[4],z=value[5],xyz=x*x+y*y+z*z;
         if(xyz>1) { const auto n=std::sqrt(xyz);x/=n;y/=n;z/=n;xyz=1; } // quantization overshoot
@@ -275,6 +284,193 @@ Animation DecodeTracks(std::span<const Byte> bytes,bool packed) {
     return result;
 }
 
+}
+
+std::vector<Byte> EncodeGroups(uint32_t frames,const std::vector<GroupTrack>& tracks) {
+    Check(frames && frames<=1000000 && !tracks.empty() && tracks.size()<=255,"Invalid PANM frame or track count");
+    std::vector<uint32_t> order; // groups in first-seen order
+    for(const auto& t:tracks) {
+        Check(t.group>=1 && t.group<=5 && t.type>=1 && t.type<=9 && t.encoding>=1 && t.encoding<=3,"Invalid PANM group, track type or encoding");
+        Check(!t.bone.empty() && t.bone.size()<=256 && t.bone.find('\0')==std::string::npos && !t.name.empty() && t.name.size()<=256 &&
+            t.name.find('\0')==std::string::npos,"Invalid PANM bone or track name");
+        Check(t.samples && (t.encoding!=2 || t.samples==1) && (t.encoding==2 || t.samples==frames) && !t.data.empty() && t.data.size()<=Limit,
+            "PANM track length differs from animation");
+        if(std::find(order.begin(),order.end(),t.group)==order.end())order.push_back(t.group);
+        std::set<uint8_t> fields;
+        for(const auto& option:t.options)Check(option.field<32 && fields.insert(option.field).second,"Invalid PANM track option");
+    }
+    // Sample block: each track starts 16-aligned; the block ends 16-aligned after an 8-byte gap.
+    std::vector<size_t> offsets;size_t end=0;
+    for(const auto& t:tracks) {
+        const auto at=(end+15)&~size_t(15);Check(at<=Limit && t.data.size()<=Limit-at,"PANM samples exceed budget");
+        offsets.push_back(at);end=at+t.data.size();
+    }
+    const auto rawSize=(end+8+15)&~size_t(15);
+    // Like native files: every track table first (in track order), then each group with its bones.
+    Builder b;std::vector<size_t> built(tracks.size()),groups(order.size());
+    for(size_t i=0;i<tracks.size();++i) {
+        const auto& t=tracks[i];auto options=t.options;
+        std::sort(options.begin(),options.end(),[](const auto& x,const auto& y){ return x.field>y.field; });
+        b.StartTable();for(const auto& option:options)b.Add<uint8_t>(option.field,option.value);
+        const auto flags=b.EndTable(),type=b.String(t.name);
+        b.Pad(4);
+        b.StartTable();
+        b.Add<uint32_t>(8,4);b.Add<uint32_t>(7,static_cast<uint32_t>(t.data.size()));
+        b.Add<uint32_t>(6,static_cast<uint32_t>(offsets[i]));b.AddOffset(5,flags);b.Add<uint32_t>(4,t.samples);
+        b.Add<uint32_t>(3,t.encoding);b.Add<uint32_t>(2,t.type);b.AddOffset(1,type);
+        built[i]=b.EndTable();
+    }
+    for(size_t g=0;g<order.size();++g) {
+        std::vector<size_t> bones;
+        for(size_t i=0;i<tracks.size();++i) {
+            if(tracks[i].group!=order[g])continue;
+            const auto name=b.String(tracks[i].bone),vector=b.Vector({built[i]});
+            b.StartTable();b.AddOffset(2,vector);b.AddOffset(1,name);bones.push_back(b.EndTable());
+        }
+        const auto boneVector=b.Vector(bones);
+        b.StartTable();b.AddOffset(2,boneVector);b.Add<uint32_t>(1,order[g]);groups[g]=b.EndTable();
+    }
+    b.Pad(4); // between the groups and the mode table
+    b.StartTable();b.Add<uint32_t>(3,4);b.Add<float>(2,1);const auto mode=b.EndTable();
+    const auto groupVector=b.Vector(groups);
+    const auto extent=static_cast<uint32_t>(rawSize);
+    b.StartTable();b.AddOffset(10,mode);b.Add<uint32_t>(9,extent);b.Add<uint32_t>(7,extent);b.Add<uint32_t>(6,extent);
+    b.Add<uint32_t>(5,UINT32_MAX);const auto baseField=b.Size();
+    b.AddOffset(4,groupVector);b.Add<uint32_t>(3,1);b.Add<float>(2,60);b.Add<uint32_t>(1,frames-1);
+    const auto anim=b.EndTable();
+    b.StartTable();b.AddOffset(3,anim);b.Add<uint8_t>(2,1);const auto root=b.EndTable();
+    auto bytes=b.Finish(root);
+    const auto base=static_cast<uint32_t>(bytes.size());memcpy(bytes.data()+bytes.size()-baseField,&base,4);
+    Check(rawSize<=Limit-bytes.size(),"PANM exceeds the 32 MiB budget");
+    bytes.resize(bytes.size()+rawSize);
+    for(size_t i=0;i<tracks.size();++i)memcpy(bytes.data()+base+offsets[i],tracks[i].data.data(),tracks[i].data.size());
+    return bytes;
+}
+
+std::vector<GroupTrack> DecodeGroups(std::span<const Byte> bytes,uint32_t* frames) {
+    Check(bytes.size()>=8 && bytes.size()<=Limit && !memcmp(bytes.data()+4,"PANM",4),"Invalid PANM signature or size");
+    Reader r{bytes};
+    const auto anim=r.Object(r.Offset(0),3),groups=r.Object(anim,4);
+    if(frames)*frames=r.Value(anim,1)+1;
+    const auto base=r.Value(anim,5),extent=r.Value(anim,6);
+    Check(base<=bytes.size() && extent==bytes.size()-base,"Invalid PANM sample extent");
+    std::vector<GroupTrack> result;
+    for(size_t g=0,groupCount=r.Count(groups);g<groupCount;++g) {
+        const auto group=r.Offset(groups+4+g*4),bones=r.Object(group,2);
+        for(size_t i=0,count=r.Count(bones);i<count;++i) {
+            const auto bone=r.Offset(bones+4+i*4);const auto name=r.String(r.Object(bone,1));
+            const auto list=r.Object(bone,2);
+            for(size_t k=0,tracks=r.Count(list);k<tracks;++k) {
+                const auto track=r.Offset(list+4+k*4);
+                GroupTrack t;t.group=r.Value(group,1);t.bone=name;t.name=r.String(r.Object(track,1));
+                t.type=r.Value(track,2);t.encoding=r.Value(track,3);t.samples=r.Value(track,4);t.options=r.Options(r.Object(track,5));
+                const auto offset=r.Value(track,6),size=r.Value(track,7);
+                Check(offset<=extent && size<=extent-offset && size,"Invalid PANM track extent");
+                t.data.assign(bytes.begin()+base+offset,bytes.begin()+base+offset+size);
+                result.push_back(std::move(t));
+                Check(result.size()<=255,"Too many PANM tracks");
+            }
+        }
+    }
+    return result;
+}
+
+namespace {
+// Bits that keep (high - low) / (2^bits - 1) at or below `step`; 0 for a constant channel.
+uint32_t PackedWidth(float low,float high,double step) {
+    if(!(high>low))return 0;
+    uint32_t bits=1;while(bits<24 && double(high-low)/double((uint64_t(1)<<bits)-1)>step)++bits;
+    return bits;
+}
+struct BitWriter {
+    std::vector<Byte>& out;size_t start;uint64_t position=0;
+    void Put(uint64_t value,uint32_t count) {
+        for(uint32_t i=0;i<count;++i,++position) {
+            const auto at=start+size_t(position>>3);if(at>=out.size())out.resize(at+1,0);
+            if((value>>i)&1)out[at]|=Byte(1u<<(position&7));
+        }
+    }
+};
+uint64_t Quantize(float value,float low,float high,uint32_t bits) {
+    const auto top=(uint64_t(1)<<bits)-1;
+    const double q=std::round(double(value-low)/double(high-low)*double(top));
+    return q<=0?0:q>=double(top)?top:uint64_t(q);
+}
+template<class T> void PutAt(std::vector<Byte>& out,size_t at,T value) { memcpy(out.data()+at,&value,sizeof(value)); }
+}
+
+std::vector<Byte> PackTransforms(std::span<const Sample> source) {
+    Check(!source.empty() && source.size()<=1000000,"Invalid packed PANM sample count");
+    // A rotation with no bits in the stream is rebuilt with w >= 0: store a constant rotation in that form. Animated
+    // rotations keep their own (continuous) sign through the per-frame w-sign bit.
+    std::vector<Sample> samples(source.begin(),source.end());
+    auto canonical=[](Sample s){ if(s.rotation[3]<0)for(auto& v:s.rotation)v=-v;return s.rotation; };
+    if(std::all_of(samples.begin(),samples.end(),[&](const Sample& s){ return canonical(s)==canonical(samples[0]); }))
+        for(auto& s:samples)s.rotation=canonical(s);
+    std::array<float,9> low,high;low.fill(INFINITY);high.fill(-INFINITY);
+    auto channels=[](const Sample& s){ return std::array<float,9>{s.scale[0],s.scale[1],s.scale[2],s.rotation[0],s.rotation[1],s.rotation[2],
+        s.translation[0],s.translation[1],s.translation[2]}; };
+    for(const auto& s:samples) {
+        ValidateSample(s);
+        const auto v=channels(s);
+        for(size_t c=0;c<9;++c) { low[c]=(std::min)(low[c],v[c]);high[c]=(std::max)(high[c],v[c]); }
+    }
+    std::array<uint32_t,9> width{};uint32_t used=0;
+    // w is rebuilt from x, y and z, which amplifies their error near w = 0: rotations get the finest step (24 bits).
+    for(size_t c=0;c<9;++c) { width[c]=PackedWidth(low[c],high[c],c>=3 && c<6?1e-7:1e-4);used+=width[c]; }
+    const bool scale=width[0]||width[1]||width[2],rotation=width[3]||width[4]||width[5],position=width[6]||width[7]||width[8];
+    const uint16_t flags=uint16_t((scale?1:0)|(rotation?4:0)|(position?8:0)|((rotation||position)?2:0));
+    const uint32_t bitsPerFrame=used+(rotation?1:0);
+    Check(bitsPerFrame<=0xffff,"Packed PANM frame too wide");
+    constexpr size_t header=16+9*16+sizeof(Sample);
+    std::vector<Byte> out(header,0);
+    PutAt<uint16_t>(out,0,4);PutAt<uint16_t>(out,2,flags);PutAt<uint16_t>(out,4,16+9*16);PutAt<uint16_t>(out,6,uint16_t(bitsPerFrame));
+    PutAt<uint32_t>(out,8,uint32_t(header));PutAt<uint32_t>(out,12,uint32_t(samples.size()));
+    // Like native files, a constant channel keeps a nominal width in its row but takes no bits (low == high).
+    for(size_t c=0;c<9;++c) { PutAt<float>(out,16+c*16,low[c]);PutAt<float>(out,20+c*16,high[c]);PutAt<uint32_t>(out,24+c*16,width[c]?width[c]:16); }
+    memcpy(out.data()+16+9*16,&samples[0],sizeof(Sample)); // frame 0, as native files store it
+    BitWriter bits{out,header};
+    for(const auto& s:samples) {
+        const auto v=channels(s);
+        for(size_t c=0;c<9;++c)if(width[c])bits.Put(Quantize(v[c],low[c],high[c],width[c]),width[c]);
+        if(rotation)bits.Put(s.rotation[3]<0?1:0,1);
+    }
+    out.resize(header+size_t((uint64_t(samples.size())*bitsPerFrame+7)/8),0);
+    return out;
+}
+
+std::vector<Byte> PackScalars(std::span<const float> samples) {
+    Check(!samples.empty() && samples.size()<=1000000,"Invalid packed PANM sample count");
+    float low=INFINITY,high=-INFINITY;
+    for(float v:samples) { Check(std::isfinite(v),"Nonfinite PANM scalar");low=(std::min)(low,v);high=(std::max)(high,v); }
+    const auto width=PackedWidth(low,high,1e-5);
+    constexpr size_t header=16+16+4;
+    std::vector<Byte> out(header,0);
+    PutAt<uint16_t>(out,0,4);PutAt<uint16_t>(out,2,0);PutAt<uint16_t>(out,4,32);PutAt<uint16_t>(out,6,uint16_t(width));
+    PutAt<uint32_t>(out,8,uint32_t(header));PutAt<uint32_t>(out,12,uint32_t(samples.size()));
+    PutAt<float>(out,16,low);PutAt<float>(out,20,high);PutAt<uint32_t>(out,24,width?width:16);PutAt<float>(out,32,samples[0]);
+    BitWriter bits{out,header};
+    if(width)for(float v:samples)bits.Put(Quantize(v,low,high,width),width);
+    out.resize(header+size_t((uint64_t(samples.size())*width+7)/8),0);
+    return out;
+}
+
+std::vector<float> UnpackScalars(std::span<const Byte> track,uint32_t samples) {
+    Check(track.size()>=36 && Read<uint16_t>(track,0)==4,"Unsupported packed PANM track version");
+    const auto bitsPerFrame=Read<uint16_t>(track,6);const auto header=Read<uint32_t>(track,8);
+    Check(header==36 && Read<uint32_t>(track,12)==samples,"Unsupported packed PANM scalar header");
+    const auto low=Read<float>(track,16),high=Read<float>(track,20);auto width=Read<uint32_t>(track,24);
+    Check(std::isfinite(low) && std::isfinite(high) && width<=32,"Invalid packed PANM channel");
+    if(low==high)width=0;
+    Check(bitsPerFrame==width,"Packed PANM bit count differs from its channel");
+    Check((uint64_t(samples)*width+7)/8<=track.size()-header,"Truncated packed PANM track");
+    std::vector<float> result(samples,low);
+    for(uint32_t frame=0;width && frame<samples;++frame) {
+        uint64_t q=0,position=uint64_t(frame)*width;
+        for(uint32_t i=0;i<width;++i,++position)q|=uint64_t((track[header+size_t(position>>3)]>>(position&7))&1)<<i;
+        result[frame]=static_cast<float>(low+double(high-low)*double(q)/double((uint64_t(1)<<width)-1));
+    }
+    return result;
 }
 
 T7Animation DecodeT7(std::span<const Byte> bytes,uint32_t maxFrames) {

@@ -44,6 +44,7 @@ private:
 		bool m_auto_addr_update_check;
 		// If true, force the current player move to end early
 		bool m_applyInstantly;
+		bool m_editorAutoApply;
 		// If true, old unused movesets will be free whenever a new one is imported
 		bool m_freeUnusedMoveset;
 

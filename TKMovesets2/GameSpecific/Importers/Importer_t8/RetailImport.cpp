@@ -6,6 +6,10 @@
 #include "GameIDs.hpp"
 #include "Extractor_t8/RetailRuntime.hpp"
 #include "RetailResourceLoader.hpp"
+#include "T7HandToRetailT8.hpp"
+#include "T7CameraToRetailT8.hpp"
+#include "T7WingToRetailT8.hpp"
+#include "T7FaceToRetailT8.hpp"
 #include <cstring>
 #include <stdexcept>
 #include <bit>
@@ -307,6 +311,27 @@ uint64_t ApplyProfileProperties(std::span<Byte> records, const ImportProfile::Pr
     }
     return changed;
 }
+uint64_t ApplyHandIndices(std::span<Byte> records, const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* indices, uint64_t* silenced) {
+    if (records.size() % 0x28) throw std::runtime_error("Invalid retail extra property records");
+    uint64_t changed = 0;
+    if (silenced) *silenced = 0;
+    for (size_t at = 0; at < records.size(); at += 0x28) {
+        const auto id = Read<uint32_t>(records, at + 0x10), value = Read<uint32_t>(records, at + 0x14);
+        const uint32_t category = T7HandToRetailT8::FindRetailProperty(id) ? T7HandToRetailT8::HandCategory :
+            T7CameraToRetailT8::FindRetailProperty(id) ? T7CameraToRetailT8::CameraCategory :
+            T7WingToRetailT8::FindRetailProperty(id) ? T7WingToRetailT8::WingCategory :
+            T7FaceToRetailT8::FindRetailProperty(id) ? T7FaceToRetailT8::FaceCategory : 0;
+        if (!category || value < T7HandToRetailT8::FirstRetailIndex || value > T7HandToRetailT8::LastRetailIndex) continue;
+        if (indices) if (const auto found = indices->find({category, value}); found != indices->end()) {
+            if (found->second != value) { memcpy(records.data() + at + 0x14, &found->second, 4); ++changed; }
+            continue;
+        }
+        const uint32_t frame = ImportProfile::StrippedFrame;
+        memcpy(records.data() + at, &frame, 4); ++changed;
+        if (silenced) ++*silenced;
+    }
+    return changed;
+}
 uint64_t AdaptCharacterRequirements(std::span<Byte> records, uint32_t source, uint32_t primaryTarget, uint32_t targetSecondary) {
     if (records.size() % 20) throw std::runtime_error("Invalid retail requirement records");
     const uint32_t secondaryTarget = targetSecondary == UINT32_MAX ? primaryTarget : targetSecondary;
@@ -388,6 +413,7 @@ Audit AuditImage(std::span<const Byte> payload, const GameProcess& image, gameAd
             AdaptCharacterRequirements(expected, ProfileIdentity(importProfile, sourceCharacter), targetCharacter, targetSecondary);
         if (table == 1) ApplyProfileConditions(expected, importProfile);
         if (table == 9) ApplyProfileProperties(expected, importProfile);
+        if (table == 9 && convertedT7) ApplyHandIndices(expected, memoryOnly ? memoryOnly->handIndices : nullptr);
         if (table == 12 && convertedT7 && targetCharacter != UINT32_MAX) {
             std::vector<Byte> scratch(R::SourceHeaderSize);
             ApplyConvertedIdentity(scratch, expected, targetCharacter);

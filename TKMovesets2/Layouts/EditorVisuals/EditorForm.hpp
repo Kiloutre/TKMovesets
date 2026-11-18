@@ -62,6 +62,10 @@ protected:
 	EditorVisuals* m_baseWindow = nullptr;
 	// Become true if there were unsaved changes but the user attempted to close the window anyway. Confirmation will be required.
 	bool m_requestedClosure = false;
+	// Auto-apply (setting editor.auto_apply) failed: retried once a field is edited again, not every frame
+	bool m_autoApplyBlocked = false;
+	// With auto-apply on: applies the form once it is valid and no field is being typed in
+	void AutoApply();
 	// Contains the string identifiers to avoid having to compute them at every individual Render() call
 	std::map<int, std::string> m_categoryStringIdentifiers;
 	// Contains the base title of the main window that we will preprend our title to
@@ -139,6 +143,8 @@ protected:
 	virtual void RenderLabel(int listIdx, EditorInput* field);
 	// Called when clicking the apply button, will check for field errors, set variables and then save the data
 	virtual void Apply();
+	// After a successful Apply: restores the live binding `live` when the editor published the applied bytes
+	void KeepLiveAfterApply(gameAddr live, bool applied);
 	// Returns false if any field has an error state
 	virtual bool IsFormValid() const;
 	// Inits the form

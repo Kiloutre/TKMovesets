@@ -32,6 +32,8 @@ void EditorFormList::OnInitEnd()
 
 void EditorFormList::Apply()
 {
+    const auto live = m_editor->live_loadedMoveset;
+    bool applied = false;
     EditList([&] {
         FlushPendingFields();
         if (!IsFormValid()) return;
@@ -58,7 +60,9 @@ void EditorFormList::Apply()
         m_requestedClosure = false;
         if (!m_listSize) popen = false;
         OnApply();
+        applied = true;
     });
+    KeepLiveAfterApply(live, applied);
 }
 
 void EditorFormList::CopyFormToClipboard() const
@@ -510,11 +514,16 @@ void EditorFormList::OnReorder()
 		return;
 	}
 
-	for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
-		for (auto& [key, field] : m_items[listIdx]->identifierMap)
-		{
-			m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+	try {
+		for (int listIdx = 0; listIdx < m_listSize; ++listIdx) {
+			for (auto& [key, field] : m_items[listIdx]->identifierMap)
+			{
+				m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+			}
 		}
+	} catch (const std::exception& error) {
+		m_editor->live_loadedMoveset = 0;
+		m_operationError = error.what();
 	}
 }
 
@@ -538,7 +547,13 @@ void EditorFormList::RequestFieldUpdate(EditorWindowType winType, int valueChang
 
 void EditorFormList::OnUpdate(int listIdx, EditorInput* field)
 {
-	m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+	// Same as EditorForm::OnUpdate: a failed live edit stops live edition and shows why.
+	try {
+		m_editor->Live_OnFieldEdit(windowType, structureId + listIdx, field);
+	} catch (const std::exception& error) {
+		m_editor->live_loadedMoveset = 0;
+		m_operationError = error.what();
+	}
 }
 
 EditorFormList::~EditorFormList() = default;

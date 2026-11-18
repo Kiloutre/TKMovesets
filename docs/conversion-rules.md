@@ -150,7 +150,7 @@ Within one map, two lines may not give one source value a target in the same dir
 | --- | --- | --- |
 | `t7_to_t8_req_known_false` | `418, 739` | T7 -> T8: unresolved ids with no T7 evaluator case below the highest case: never-true |
 | `t7_to_t8_req_default_false` | `560, 563, 636` | T7 -> T8: unknown flag checks not assumed true (customization, game mode, assist) |
-| `t7_t8_drop_t8_props` | `0x860F..0x8613, 0x8683..0x8685, 0x8780, 0x8688..0x86B0, 0x877A..0x877B` | Both directions: retail properties that play hand, face, wing or camera assets by id; dropped |
+| `t7_t8_drop_t8_props` | `0x860F..0x8613, 0x8683..0x8685, 0x8780, 0x8688..0x86B0, 0x877A..0x877B` | Both directions: retail properties that play hand, face, wing or camera assets by id; dropped. Exception: T7 -> T8 hand, face, wing and camera animations that convert (`T7HandToRetailT8`, `T7FaceToRetailT8`, `T7WingToRetailT8`, `T7CameraToRetailT8`, see [conversion.md](conversion.md#animations)) |
 | `t8_to_t7_voice_drop` | `2` | T8 -> T7: voiceclip categories with no T7 value; dropped |
 
 ### Tables

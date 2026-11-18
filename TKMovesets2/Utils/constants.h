@@ -63,6 +63,11 @@
 
 # define GAME_FREEING_DELAY_SEC           (10)
 # define GAME_INTERACTION_THREAD_SLEEP_MS (200)
+// Moveset list: how long a new moveset file must go unwritten before it is read
+# define MOVESET_SETTLE_DELAY_MS (50)
+// Moveset list: an invalid moveset is read again this many times, this far apart, in case it was not fully written
+# define MOVESET_INVALID_RECHECKS (5)
+# define MOVESET_INVALID_RECHECK_DELAY_MS (500)
 # define EDITOR_BACKUP_FREQUENCY_MINUTES  (20)
 
 # define MAX_FPS                       (60.0f)
@@ -81,6 +86,9 @@
 # define SETTING_IMPORT_INSTANT        (true)
 # define SETTING_FREE_UNUSED_KEY       ("import.free_unused")
 # define SETTING_FREE_UNUSED           (true)
+// Editor forms apply their edits as soon as they are valid (no Apply button)
+# define SETTING_EDITOR_AUTO_APPLY_KEY ("editor.auto_apply")
+# define SETTING_EDITOR_AUTO_APPLY     (false)
 
 # define TEXTBOX_HORIZ_PADDING   15
 # define TEXTBOX_VERT_PADDING    10

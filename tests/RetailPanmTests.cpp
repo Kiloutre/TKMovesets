@@ -2,7 +2,12 @@
 #include "Extractor_t8/RetailSnapshot.hpp"
 #include "Importer_t8/RetailResourceLoader.hpp"
 #include "T7AnimToRetailT8.hpp"
+#include "T7HandToRetailT8.hpp"
+#include "T7CameraToRetailT8.hpp"
+#include "T7WingToRetailT8.hpp"
+#include "T7FaceToRetailT8.hpp"
 #include "RetailT8AnimToT7.hpp"
+#include <numbers>
 #include "Animations.hpp"
 #include <cmath>
 #include "AnimationReader.hpp"
@@ -255,9 +260,216 @@ void RunPanmToT7Tests() {
             "HARA_ROT1 is not upright for the pelvis-in-FullBody layout");
     }
 }
+// T7 hand MOTA animation -> retail hand PANM (T7HandToRetailT8; verified against native T8 Kazuya hands).
+void RunHandTests() {
+    namespace P=RetailPanm;namespace H=T7HandToRetailT8;
+    // 19 channels, 2 frames: channel 1 (T8 Thumb0) has axis-angle (a, b, c) = (0.3, 0.2, 0.5) on frame 1, all else 0.
+    P::T7Animation source{2,19,std::vector<float>(2*19*3,0.0f),true};
+    const double a=0.3,b=0.2,c=0.5;
+    source.values[(19+1)*3+0]=float(a);source.values[(19+1)*3+1]=float(b);source.values[(19+1)*3+2]=float(c);
+    const double s=std::sin(c/2);
+    const std::array<double,4> right{-std::cos(a)*std::sin(b)*s,std::sin(a)*s,-std::cos(a)*std::cos(b)*s,std::cos(c/2)};
+    auto rotation=[&](const P::Animation& out,const std::string& bone,uint32_t frame){
+        for(const auto& t:out.tracks)if(t.name==bone)return t.samples.size()==1?t.samples[0]:t.samples.at(frame);
+        throw std::runtime_error("Converted hand lacks a bone");
+    };
+    for(auto side:{H::Side::Right,H::Side::Left}){
+        const auto out=P::Decode(H::Convert(source,side));
+        const std::string prefix=side==H::Side::Left?"L_":"R_";
+        Check(out.frames==2 && out.tracks.size()==19,"Converted hand has another skeleton");
+        for(const auto& t:out.tracks)Check(t.name.rfind(prefix,0)==0 && t.options.empty() && t.samples.size()==2,"Converted hand bone, options or length changed");
+        const auto sample=rotation(out,prefix+"Thumb0",1);
+        const double mirror=side==H::Side::Left?-1:1;
+        Check(std::abs(sample.rotation[0]-mirror*right[0])<1e-6 && std::abs(sample.rotation[1]-mirror*right[1])<1e-6 &&
+            std::abs(sample.rotation[2]-right[2])<1e-6 && std::abs(sample.rotation[3]-right[3])<1e-6,"Hand rotation is not the (mirrored) inverse axis-angle");
+        const auto rest=rotation(out,prefix+"Index1",0);
+        Check(rest.rotation==std::array<float,4>{0,0,0,1} && rest.translation[0]>10 && rest.scale==std::array<float,3>{1,1,1},
+            "Hand bones lost their native rest offsets");
+    }
+    // 15 channels: no metacarpals; Index0/Middle0/Ring0/Pinky0 keep the native rest pose (static tracks).
+    P::T7Animation fifteen{3,15,std::vector<float>(3*15*3,0.1f),true};
+    const auto out=P::Decode(H::Convert(fifteen,H::Side::Right));
+    size_t statics=0;for(const auto& t:out.tracks)statics+=t.samples.size()==1;
+    Check(out.tracks.size()==19 && statics==4 && rotation(out,"R_Index0",0).rotation==std::array<float,4>{0,0,0,1},"15-channel hand mapping changed");
+    bool refused=false;try{H::Convert(P::T7Animation{2,23,std::vector<float>(2*23*3),true},H::Side::Right);}catch(const std::invalid_argument&){refused=true;}
+    Check(refused,"A body animation was converted as a hand");
+    // MOTA archives: little- and big-endian offset lists, bounds checks.
+    std::vector<Byte> mota(0x40,0);memcpy(mota.data(),"MOTA",4);mota[0x11]=1;
+    auto put=[&](size_t at,uint32_t v,bool little){for(int i=0;i<4;++i)mota[at+i]=Byte(little?(v>>(8*i)):(v>>(8*(3-i))));};
+    put(0x0C,2,true);put(0x14,0x20,true);put(0x18,0x30,true);
+    auto list=H::MotaAnimations(mota);
+    Check(list.size()==2 && list[0].data()==mota.data()+0x20 && list[1].data()==mota.data()+0x30 && list[1].size()==0x10,"MOTA animation list changed");
+    mota[0x11]=0;put(0x0C,2,false);put(0x14,0x20,false);put(0x18,0x30,false);
+    Check(H::MotaAnimations(mota).size()==2 && H::MotaAnimations(mota)[1].data()==mota.data()+0x30,"Big-endian MOTA list misread");
+    put(0x18,0x40,false);
+    refused=false;try{H::MotaAnimations(mota);}catch(const std::invalid_argument&){refused=true;}
+    Check(refused,"MOTA animation past the archive accepted");
+    put(0x0C,0x1000,false);
+    refused=false;try{H::MotaAnimations(mota);}catch(const std::invalid_argument&){refused=true;}
+    Check(refused,"MOTA count past the archive accepted");
+    Check(H::FindT7Property(0x842E)->retail==0x8610 && H::FindT7Property(0x842F)->side==H::Side::Right && !H::FindT7Property(0x842D) &&
+        H::FindRetailProperty(0x8611)->t7==0x842F && H::AssetIndex(H::AssetInstance(0x2abc))==0x2abc,"Hand property table changed");
+}
+}
+// Native camera PANM layout (EncodeGroups, packed codecs) and T7 camera MOTA conversion (T7CameraToRetailT8).
+std::vector<RetailPanm::TrackOption> Sorted(std::vector<RetailPanm::TrackOption> o) {
+    std::sort(o.begin(),o.end(),[](const auto& a,const auto& b){ return a.field<b.field; });return o;
+}
+void RunCameraTests() {
+    namespace P=RetailPanm;namespace C=T7CameraToRetailT8;
+    // Packed transforms: animated parts within their steps, constant channels take no bits, sign of w kept.
+    std::vector<P::Sample> samples(50);
+    for(size_t i=0;i<samples.size();++i){
+        const double a=0.07*double(i)-1.5;
+        samples[i].rotation={float(std::sin(a/2)*0.6),float(std::sin(a/2)*0.8),0.0f,float(std::cos(a/2))};
+        samples[i].translation={float(i)*0.5f,100.0f,-3.0f*float(i)};
+    }
+    samples[30].rotation={-samples[30].rotation[0],-samples[30].rotation[1],-samples[30].rotation[2],-samples[30].rotation[3]}; // w < 0
+    const auto packed=P::PackTransforms(samples);
+    uint16_t flags;memcpy(&flags,packed.data()+2,2);
+    Check(flags==14,"Packed camera transform flags differ from native (rotation and position animated)");
+    const auto back=P::DecodePackedTrack(packed,uint32_t(samples.size()));
+    for(size_t i=0;i<samples.size();++i){
+        for(int k=0;k<4;++k)Check(std::abs(back[i].rotation[k]-samples[i].rotation[k])<2e-4f,"Packed rotation drifted (or lost the sign of w)");
+        for(int k=0;k<3;++k)Check(std::abs(back[i].translation[k]-samples[i].translation[k])<1e-3f && back[i].scale[k]==1.0f,"Packed position or scale drifted");
+    }
+    // A constant rotation with w < 0 is stored as its w >= 0 equivalent (the stream has no sign bit for it).
+    std::vector<P::Sample> still(3);for(auto& s:still)s.rotation={0,0,-0.6f,-0.8f};
+    const auto stillBack=P::DecodePackedTrack(P::PackTransforms(still),3);
+    Check(std::abs(stillBack[1].rotation[2]-0.6f)<1e-6f && std::abs(stillBack[1].rotation[3]-0.8f)<1e-6f,"Constant rotation lost its orientation");
+    std::vector<float> fov{0.4f,0.45f,0.5f,0.5f};
+    const auto fovBack=P::UnpackScalars(P::PackScalars(fov),4);
+    for(size_t i=0;i<fov.size();++i)Check(std::abs(fovBack[i]-fov[i])<2e-5f,"Packed scalar drifted");
+    Check(P::UnpackScalars(P::PackScalars(std::vector<float>{0.3f,0.3f}),2)==std::vector<float>{0.3f,0.3f},"Constant scalar changed");
+    // Groups: decode gives back the tracks verbatim; groups keep first-seen order; data 16-aligned.
+    std::vector<P::GroupTrack> tracks(3);
+    tracks[0]={1,"cam_transform","Transform",1,3,50,{{3,1},{4,1}},packed};
+    tracks[1]={5,"cam_transform","FieldOfView",3,2,1,{},std::vector<Byte>(4,0x3e)};
+    tracks[2]={1,"Camera_Param","Transform",1,3,50,{{1,1},{2,1},{4,1}},P::PackTransforms(std::vector<P::Sample>(50))};
+    uint32_t frames=0;const auto decoded=P::DecodeGroups(P::EncodeGroups(50,tracks),&frames);
+    Check(frames==50 && decoded.size()==3 && decoded[0].bone=="cam_transform" && decoded[1].bone=="Camera_Param" && decoded[1].group==1 &&
+        decoded[2].group==5 && decoded[2].name=="FieldOfView" && decoded[2].type==3 && decoded[2].encoding==2 && decoded[0].data==packed &&
+        Sorted(decoded[0].options)==Sorted(tracks[0].options) && decoded[2].data==tracks[1].data,"Grouped PANM round trip changed");
+    // T7 clips: 0xC8, u16 channels, u32 frames, u32 descriptors, then frames x channels x 3 floats.
+    auto clip=[](std::vector<uint32_t> desc,std::vector<std::vector<std::array<float,3>>> frames,bool big){
+        std::vector<Byte> b;auto u16=[&](uint16_t v){for(int i=0;i<2;++i)b.push_back(Byte(big?v>>(8*(1-i)):v>>(8*i)));};
+        auto u32=[&](uint32_t v){for(int i=0;i<4;++i)b.push_back(Byte(big?v>>(8*(3-i)):v>>(8*i)));};
+        u16(0xC8);u16(uint16_t(desc.size()));u32(uint32_t(frames.size()));for(auto d:desc)u32(d);
+        for(const auto& f:frames)for(const auto& ch:f)for(float v:ch){uint32_t r;memcpy(&r,&v,4);u32(r);}
+        return b;
+    };
+    auto track=[](const std::vector<P::GroupTrack>& t,const std::string& bone,const std::string& name)->const P::GroupTrack&{
+        for(const auto& x:t)if(x.bone==bone && x.name==name)return x;
+        throw std::runtime_error("Converted camera lacks a track");
+    };
+    // Euler layout: position mm -> cm, q = Rz Ry Rx, FOV = zoom x 9/16 (constant: static track), no Camera_Param.
+    for(bool big:{false,true}){
+        const auto bytes=clip({C::Position,C::Rotation,C::Zoom,C::Roll},
+            {{{100,200,300},{0.1f,0.2f,0.3f},{1,0,0},{0,0,0}},{{110,200,300},{0.1f,0.2f,0.3f},{1,0,0},{0,0,0}}},big);
+        const auto camera=C::Read(bytes);
+        Check(camera.frames==2 && camera.descriptors.size()==4 && C::Convertible(camera),"T7 camera clip misread");
+        const auto out=P::DecodeGroups(C::Convert(camera));
+        Check(out.size()==2,"Euler camera has a Camera_Param track");
+        const auto& t=track(out,"cam_transform","Transform");const auto& f=track(out,"cam_transform","FieldOfView");
+        Check(t.group==1 && f.group==5 && f.type==3 && f.encoding==2 && Sorted(t.options)==Sorted({{3,1},{4,1}}),"Camera tracks differ from the native layout");
+        float v;memcpy(&v,f.data.data(),4);Check(std::abs(v-0.5625f)<1e-6f,"FOV is not zoom x 9/16");
+        const auto s=P::DecodePackedTrack(t.data,2);
+        const double cx=std::cos(0.05),sx=std::sin(0.05),cy=std::cos(0.1),sy=std::sin(0.1),cz=std::cos(0.15),sz=std::sin(0.15);
+        const std::array<double,4> q{cz*cy*sx-sz*sy*cx,cz*sy*cx+sz*cy*sx,sz*cy*cx-cz*sy*sx,cz*cy*cx+sz*sy*sx};
+        for(int k=0;k<4;++k)Check(std::abs(s[0].rotation[k]-q[k])<1e-5,"Euler rotation is not Rz*Ry*Rx");
+        Check(std::abs(s[0].translation[0]-10)<1e-3f && std::abs(s[1].translation[0]-11)<1e-3f && std::abs(s[0].translation[2]-30)<1e-3f,"Camera position is not mm/10");
+    }
+    // Look-at layout: target, camera; roll 90 degrees about world Z before the look-at rotation; smoothing -> Camera_Param.
+    const auto lookAt=C::Convert(C::Read(clip({C::Position,C::Position,C::Zoom,C::Smoothing,C::Roll},
+        {{{0,0,-1000},{0,0,0},{1,0,0},{1,0.1f,1},{90,0,0}},{{0,0,-1000},{0,0,0},{0.8f,0,0},{1,0.1f,1},{0,0,0}}},false)));
+    const auto out=P::DecodeGroups(lookAt);
+    const auto look=P::DecodePackedTrack(track(out,"cam_transform","Transform").data,2);
+    Check(std::abs(look[1].rotation[3]-1)<1e-5 && std::abs(look[0].rotation[2]-std::sin(std::numbers::pi/4))<1e-4 &&
+        std::abs(look[0].rotation[3]-std::cos(std::numbers::pi/4))<1e-4,"Look-at rotation or degree roll changed");
+    const auto params=P::DecodePackedTrack(track(out,"Camera_Param","Transform").data,2);
+    Check(std::abs(params[0].scale[1]-0.1f)<1e-3f && params[0].rotation[3]==1,"Smoothing is not in Camera_Param's scale");
+    Check(track(out,"cam_transform","FieldOfView").encoding==3,"Animated FOV is not packed");
+    bool refused=false;try{C::Read(std::vector<Byte>{0x64,0,1,0,2,0,0,0});}catch(const std::invalid_argument&){refused=true;}
+    Check(refused,"Keyframed T7 camera clip accepted");
+    Check(C::FindT7Property(33845)->retail==0x868C && C::FindT7Property(33845)->paired==0x868D && !C::FindRetailProperty(0x8688) && C::FindRetailProperty(0x868D)->t7==33850 && !C::FindT7Property(33852) &&
+        C::AssetIndex(C::AssetInstance(0x2001))==0x2001,"Camera property table changed");
+}
+// Packed tracks with a uniform scale (flag 1, only scale x in the stream) and T7 wing MOTA conversion (T7WingToRetailT8).
+void RunWingTests() {
+    namespace P=RetailPanm;namespace W=T7WingToRetailT8;
+    // Uniform scale: x, y and z listed 1..2 with 8 bits each, 8 bits per frame (x only), 3 frames 0, 128, 255.
+    std::vector<Byte> track(16+9*16+44+3,0);
+    auto put32=[&](size_t at,uint32_t v){memcpy(track.data()+at,&v,4);};auto putf=[&](size_t at,float v){memcpy(track.data()+at,&v,4);};
+    uint16_t h[4]={4,1,160,8};memcpy(track.data(),h,8);put32(8,204);put32(12,3);
+    for(int c=0;c<9;++c){putf(16+c*16,c<3?1.0f:c==6?0.0f:0.0f);putf(20+c*16,c<3?2.0f:0.0f);put32(24+c*16,c<3?8:16);}
+    P::Sample base;memcpy(track.data()+160,&base,sizeof(base));
+    track[204]=0;track[205]=128;track[206]=255;
+    const auto uniform=P::DecodePackedTrack(track,3);
+    Check(uniform[2].scale==std::array<float,3>{2,2,2} && uniform[0].scale==std::array<float,3>{1,1,1} &&
+        std::abs(uniform[1].scale[1]-(1+128.0f/255))<1e-5f && uniform[1].scale[1]==uniform[1].scale[0] && uniform[1].rotation[3]==1,
+        "Uniform packed scale misread");
+    const uint16_t odd=12;memcpy(track.data()+6,&odd,2);track.resize(track.size()+3,0); // neither 24/25 nor 8/9 bits
+    bool refused=false;try{P::DecodePackedTrack(track,3);}catch(const std::exception&){refused=true;}
+    Check(refused,"Packed track with an unexplained bit count accepted");
+    // Wings: a 0xC8 clip of 6 bones (position, rotation) at the eye rig's rest offsets x 10 (mm).
+    const float rest[6][3]={{14,8.70568f,0},{14,8.70568f,0.01f},{14,8.70568f,-0.01f},{10.002f,0,9.55463f},{10.002f,0.01f,9.55463f},{10.002f,-0.01f,9.55463f}};
+    auto clip=[&](float offset){
+        std::vector<Byte> b;auto u16=[&](uint16_t v){b.push_back(Byte(v));b.push_back(Byte(v>>8));};
+        auto u32=[&](uint32_t v){for(int i=0;i<4;++i)b.push_back(Byte(v>>(8*i)));};auto f32=[&](float v){uint32_t r;memcpy(&r,&v,4);u32(r);};
+        u16(0xC8);u16(12);u32(2);for(int i=0;i<6;++i){u32(0x0B);u32(0x07);}
+        for(int f=0;f<2;++f)for(int i=0;i<6;++i){for(int k=0;k<3;++k)f32(rest[i][k]*10+(k==0?offset:0));f32(f*0.2f);f32(0);f32(0);}
+        return b;
+    };
+    std::string rig;
+    const auto out=P::Decode(W::Convert(clip(0),&rig));
+    Check(rig=="com/swing_9AD06629.panm" && out.tracks.size()==6 && out.tracks[0].name=="ATH_Spine2_eye" && out.tracks[5].name=="ATH_Head_Reyelid" &&
+        out.tracks[0].options.empty() && std::abs(out.tracks[3].samples[0].translation[2]-9.55463f)<1e-4f,"Wing bones or rest offsets changed");
+    const auto& r=out.tracks[1].samples[1].rotation; // ZYX Euler (0.2, 0, 0) -> x rotation
+    Check(std::abs(r[0]-std::sin(0.1))<1e-5 && std::abs(r[3]-std::cos(0.1))<1e-5 && out.tracks[1].samples[1].scale==std::array<float,3>{1,1,1},
+        "Wing rotation or default scale changed");
+    refused=false;try{W::Convert(clip(5));}catch(const std::invalid_argument&){refused=true;} // 0.5 cm off the rig
+    Check(refused,"Wing animation off every rig's rest offsets converted");
+    Check(W::FindT7Property(33840)->retail==0x8683 && W::FindRetailProperty(0x8683)->t7==33840 && W::AssetIndex(W::AssetInstance(0x2003))==0x2003,
+        "Wing property table changed");
+}
+// T7 face MOTA conversion onto the legacy 43-bone face rig (T7FaceToRetailT8).
+void RunFaceTests() {
+    namespace P=RetailPanm;namespace F=T7FaceToRetailT8;
+    // 0xC8 clip: 43 x (position, rotation) then four scale channels; bone 33 (Jaw_Joint) opens on frame 1.
+    auto clip=[](std::vector<uint32_t> desc){
+        std::vector<Byte> b;auto u16=[&](uint16_t v){b.push_back(Byte(v));b.push_back(Byte(v>>8));};
+        auto u32=[&](uint32_t v){for(int i=0;i<4;++i)b.push_back(Byte(v>>(8*i)));};auto f32=[&](float v){uint32_t r;memcpy(&r,&v,4);u32(r);};
+        u16(0xC8);u16(uint16_t(desc.size()));u32(2);for(auto d:desc)u32(d);
+        for(int f=0;f<2;++f)for(size_t c=0;c<desc.size();++c){
+            if(desc[c]==0x0B){f32(float(c)*10);f32(20);f32(30);}
+            else if(desc[c]==0x07){f32(c==67 && f==1?0.3f:0.0f);f32(0);f32(0);}
+            else{f32(1);f32(1);f32(1);}
+        }
+        return b;
+    };
+    std::vector<uint32_t> desc;for(int k=0;k<43;++k){desc.push_back(0x0B);desc.push_back(0x07);}for(int k=0;k<4;++k)desc.push_back(0x03);
+    const auto bytes=F::Convert(clip(desc));
+    uint32_t frames=0;const auto tracks=P::DecodeGroups(bytes,&frames);
+    Check(frames==2 && tracks.size()==43 && tracks[0].bone=="L_Mayu1_Joint" && tracks[33].bone=="Jaw_Joint" && tracks[42].bone=="Bero3_Joint" &&
+        Sorted(tracks[0].options)==Sorted({{3,1},{4,1}}),"Face bones or options changed");
+    Check(tracks[0].encoding==2 && tracks[0].samples==1 && tracks[33].encoding==3 && tracks[33].samples==2,"Still and moving face bones are not static and packed");
+    P::Sample still;memcpy(&still,tracks[0].data.data(),sizeof(still));
+    Check(std::abs(still.translation[0])<1e-6f && std::abs(still.translation[1]-2)<1e-6f && still.rotation[3]==1,"Face position is not mm/10");
+    const auto jaw=P::DecodePackedTrack(tracks[33].data,2);
+    Check(std::abs(jaw[1].rotation[0]-std::sin(0.15))<1e-5 && std::abs(jaw[1].translation[0]-66)<1e-3f,"Face rotation (inverse stored as Euler) changed");
+    for(auto bad:{std::vector<uint32_t>(70,0x07),std::vector<uint32_t>(desc.begin(),desc.end()-1)}){
+        bool refused=false;try{F::Convert(clip(bad));}catch(const std::invalid_argument&){refused=true;}
+        Check(refused,"Face animation of another layout converted");
+    }
+    Check(F::FindT7Property(33986)->retail==0x877A && F::FindRetailProperty(0x877A)->t7==33986 && F::AssetIndex(F::AssetInstance(0x2004))==0x2004 &&
+        F::AssetInstance(0x2000)!=T7HandToRetailT8::AssetInstance(0x2000),"Face property table or instances changed");
 }
 void RunRetailPanmTests() {
     namespace P=RetailPanm;
+    RunHandTests();
+    RunCameraTests();
+    RunWingTests();
+    RunFaceTests();
     P::Animation animation{3,{{"Top",std::vector<P::Sample>(3),{{8,1}}},{"Hip",std::vector<P::Sample>(1),{{1,1},{3,1},{4,1},{8,1}}}}};
     animation.tracks[0].samples[0].translation={1,2,3};
     animation.tracks[0].samples[1].translation={4,5,6};

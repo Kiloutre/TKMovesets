@@ -2,6 +2,7 @@
 #include "GameSharedMem.hpp"
 #include "Compression.hpp"
 #include "Localization.hpp"
+#include "GameIDs.hpp"
 // Structures
 #include "Structures/TEditorStructures.hpp"
 #include "Structures/DisplayableMovelist/TEditorMovelist.hpp"
@@ -142,7 +143,7 @@ void EditorVisuals_T7::OnKeyboardShortcut(const std::string& identifier)
 	if (identifier == "keybind_editor.import_p1")
 	{
 		bool isAttached = m_importerHelper->process.IsAttached();
-		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame;
+		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && !RetailConversionBusy();
 
 		if (canImport) {
 			ImportToPlayer(0);
@@ -151,7 +152,7 @@ void EditorVisuals_T7::OnKeyboardShortcut(const std::string& identifier)
 	else if (identifier == "keybind_editor.import_p2")
 	{
 		bool isAttached = m_importerHelper->process.IsAttached();
-		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame;
+		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && !RetailConversionBusy();
 
 		if (canImport) {
 			ImportToPlayer(1);
@@ -160,7 +161,7 @@ void EditorVisuals_T7::OnKeyboardShortcut(const std::string& identifier)
 	else if (identifier == "keybind_editor.import_both")
 	{
 		bool isAttached = m_importerHelper->process.IsAttached();
-		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame;
+		bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && !RetailConversionBusy();
 
 		if (canImport) {
 			ImportToPlayer(-1);
@@ -185,7 +186,62 @@ void EditorVisuals_T7::ImportToPlayer(int playerid)
 	m_editor->live_loadedMoveset = 0;
 	m_importNeeded = false;
 	m_loadedMoveset = 0; // We will get the loaded moveset later since the import is in another thread
+	static_cast<EditorT7*>(m_abstractEditor.get())->SetRetailLive(nullptr);
+	static_cast<EditorT7*>(m_abstractEditor.get())->SetLiveBaseline({});
+	m_retailPending.reset();
+	m_t7PendingBaseline.clear();
 
+	if (TargetsRetailT8()) {
+		// Converted once off the UI thread; PollRetailImport imports the result and binds it for live edition.
+		if (RetailConversionBusy()) return;
+		auto bytes = std::make_shared<const std::vector<Byte>>(moveset, moveset + movesetSize);
+		m_retailImportPlayer = playerid;
+		m_localProcessError = "Converting the moveset for Tekken 8...";
+		m_retailConversion = std::async(std::launch::async, [bytes] { return std::make_unique<T7RetailLive>(*bytes); });
+		return;
+	}
+	// The editor keeps the imported bytes: an Apply writes the rows that changed since (Live_OnApplied)
+	m_t7PendingBaseline.assign(moveset, moveset + movesetSize);
+	QueueImport(playerid, moveset, movesetSize);
+}
+
+bool EditorVisuals_T7::TargetsRetailT8() const
+{
+	const auto* game = m_importerHelper->currentGame;
+	return game && game->gameId == GameId_T8 && game->minorVersion == GameVersions::T8::RETAIL;
+}
+
+void EditorVisuals_T7::PollRetailImport()
+{
+	auto* editor = static_cast<EditorT7*>(m_abstractEditor.get());
+	if (m_retailConversion.valid() && m_retailConversion.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+		try {
+			auto live = m_retailConversion.get();
+			const auto& container = live->Container();
+			const auto player = m_retailImportPlayer;
+			// m_loadedMoveset receives the currently selected player's moveset: live edition follows that player.
+			const bool followed = player < 0 || player == static_cast<int>(m_importerHelper->currentPlayerId);
+			m_retailPendingSlot = static_cast<uint8_t>(m_importerHelper->currentPlayerId);
+			QueueImport(player, container.data(), container.size());
+			if (followed) m_retailPending = std::move(live);
+			m_localProcessError.clear();
+		} catch (const std::exception& error) {
+			m_localProcessError = std::string("T7 to T8 conversion failed: ") + error.what();
+			m_importNeeded = true;
+		}
+	}
+	if (!m_t7PendingBaseline.empty() && m_loadedMoveset != 0 && !TargetsRetailT8()) {
+		editor->SetLiveBaseline(std::move(m_t7PendingBaseline));
+		m_t7PendingBaseline.clear();
+	}
+	if (m_retailPending && m_loadedMoveset != 0 && TargetsRetailT8()) {
+		m_retailPending->Bind(m_loadedMoveset, m_retailPendingSlot, m_importerHelper->currentGame);
+		editor->SetRetailLive(std::move(m_retailPending));
+	}
+}
+
+void EditorVisuals_T7::QueueImport(int playerid, const Byte* moveset, uint64_t movesetSize)
+{
 	if (playerid == 0 || playerid == 1) {
 		// Import on player 0 OR player 1
 		m_importerHelper->QueueCharacterImportation(playerid, moveset, movesetSize, ImportSettings_DEFAULT, playerid == m_importerHelper->currentPlayerId  ? &m_loadedMoveset : nullptr);

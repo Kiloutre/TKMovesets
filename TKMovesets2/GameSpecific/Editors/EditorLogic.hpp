@@ -194,6 +194,8 @@ struct DisplayableMove
 	EditorMoveFlags flags;
 	// The move's hit uses the screw (tornado): a hit condition requires "screw available". Shown as an icon.
 	bool screw = false;
+	// The move spends rage: one of its properties is "Spend Rage" with parameter 1. Shown as an icon.
+	bool rage = false;
 };
 
 struct DeleteEditorInput {
@@ -475,6 +477,10 @@ public:
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
 	virtual void Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* field) { };
+	// Called after a form or list was applied while live edition was bound to `live` (the in-game moveset). True when
+	// the editor brought it up to date with the applied bytes, so live edition stays bound; false ends it (a new
+	// import is needed).
+	virtual bool Live_OnApplied(gameAddr live) { return false; }
 
 	// CRC32 calculation
 	virtual uint32_t CalculateCRC32() = 0;

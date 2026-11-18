@@ -6,6 +6,8 @@
 #include "Importer_t8/RetailImport.hpp"
 #include <nlohmann/json.hpp>
 #include <cstring>
+#include <set>
+#include <string>
 
 std::vector<Byte> SemanticFixtureWithPropertyList(size_t rows);
 namespace {
@@ -52,6 +54,7 @@ struct Fixture {
 
 std::vector<Byte> SemanticFixture();
 std::vector<Byte> SemanticBodyFixture();
+std::vector<Byte> SemanticCameraFixture();
 std::vector<Byte> T7RetailConvertibleFixture() {
     // A real 23-bone T7 body animation: the converter refuses any move it cannot animate (no idle fallback).
     auto bytes=SemanticBodyFixture();
@@ -61,6 +64,85 @@ std::vector<Byte> T7RetailConvertibleFixture() {
     auto& info=*reinterpret_cast<StructsT7_gameAddr::MovesetInfo*>(bytes.data()+header.moveset_data_start);
     for(size_t table:{size_t(3),size_t(17),size_t(18)}) info.table.entries[table].listCount=0;
     return bytes;
+}
+
+// Edits rows of every T7 table with changes a single-row update carries, applies each with
+// LiveConversion::UpdateRow, and checks the result against a full conversion of the edited moveset (byte for byte,
+// animations included). Rows whose edit needs a full conversion (UpdateRow gives a reason) are put back. Returns the
+// number of rows edited. Also used on real files: MovesetRegressionTests --check-t7-live FILE...
+size_t CheckT7LiveConversion(std::span<const Byte> file) {
+    namespace S = StructsT7;
+    namespace G = StructsT7_gameAddr;
+    const auto& header = *reinterpret_cast<const TKMovesetHeader*>(file.data());
+    StructsT7::TKMovesetHeaderBlocks blocks; memcpy(&blocks, file.data() + header.block_list, sizeof(blocks));
+    std::vector<Byte> payload(file.begin() + header.moveset_data_start, file.end());
+    const auto profile = ImportProfile::Read(header);
+    T7ToRetailT8::LiveConversion live(header, blocks, payload, profile);
+    Check(live.File() == T7ToRetailT8::ConvertStandalone(header, blocks, payload, nullptr, true, profile),
+        "Live conversion differs from the full conversion");
+    const auto& info = *reinterpret_cast<const G::MovesetInfo*>(payload.data() + blocks.movesetInfoBlock);
+    constexpr size_t strides[19] = {
+        sizeof(S::Reactions), sizeof(S::Requirement), sizeof(S::HitCondition), sizeof(S::Projectile),
+        sizeof(S::Pushback), sizeof(S::PushbackExtradata), sizeof(S::Cancel), sizeof(S::Cancel),
+        sizeof(S::CancelExtradata), sizeof(S::ExtraMoveProperty), sizeof(S::OtherMoveProperty),
+        sizeof(S::OtherMoveProperty), sizeof(S::Move), sizeof(S::Voiceclip), sizeof(S::InputSequence),
+        sizeof(S::Input), sizeof(S::UnknownParryRelated), sizeof(S::CameraData), sizeof(S::ThrowCamera)};
+    auto edited = payload;
+    size_t edits = 0;
+    for (size_t table = 0; table < 19; ++table) {
+        const auto count = info.table.entries[table].listCount;
+        if (!count) continue;
+        const std::set<uint64_t> rows{0, count / 2, count - 1};
+        for (auto row : rows) {
+            Byte* r = edited.data() + blocks.movesetBlock + info.table.entries[table].listAddr + row * strides[table];
+            const std::vector<Byte> original(r, r + strides[table]);
+            auto add = [&](size_t offset, auto delta) {
+                decltype(delta) v; memcpy(&v, r + offset, sizeof(v)); v = decltype(delta)(v + delta); memcpy(r + offset, &v, sizeof(v));
+            };
+            auto flip = [&](size_t offset) { r[offset] ^= 1; };
+            switch (table) {
+            case 0: flip(offsetof(S::Reactions, front_direction)); break;
+            case 1: add(offsetof(S::Requirement, param_unsigned), uint32_t(1)); break;
+            case 2: add(offsetof(S::HitCondition, damage), uint32_t(1)); break;
+            case 3: add(0x80, uint32_t(1)); flip(0x38); break;
+            case 4: add(offsetof(S::Pushback, duration), uint16_t(1)); break;
+            case 5: add(offsetof(S::PushbackExtradata, horizontal_offset), uint16_t(1)); break;
+            case 6: case 7: {
+                add(offsetof(S::Cancel, detection_end), uint32_t(1));
+                uint64_t requirement; memcpy(&requirement, r + offsetof(G::Cancel, requirements_addr), 8);
+                if (requirement != UINT64_MAX && requirement != 0) { requirement = 0; memcpy(r + offsetof(G::Cancel, requirements_addr), &requirement, 8); }
+                break;
+            }
+            case 8: flip(offsetof(S::CancelExtradata, value)); break;
+            case 9: add(offsetof(S::ExtraMoveProperty, value_unsigned), uint32_t(1)); break;
+            case 10: case 11: add(offsetof(S::OtherMoveProperty, value), uint32_t(1)); break;
+            case 12:
+                flip(offsetof(S::Move, hitlevel)); add(offsetof(S::Move, first_active_frame), uint32_t(1));
+                add(offsetof(S::Move, distance), uint16_t(3));
+                break;
+            case 13: { uint32_t v; memcpy(&v, r, 4); if (v != UINT32_MAX) flip(0); break; }
+            case 14: add(offsetof(S::InputSequence, input_window_frames), uint16_t(1)); break;
+            case 15: flip(offsetof(S::Input, direction)); break;
+            case 16: flip(0); break;
+            case 17: flip(offsetof(S::CameraData, _0x0_int)); break;
+            case 18: flip(offsetof(S::ThrowCamera, side)); break;
+            }
+            if (!memcmp(r, original.data(), original.size())) continue;
+            if (live.UpdateRow(table, row, {r, strides[table]})) memcpy(r, original.data(), original.size());
+            else ++edits;
+        }
+    }
+    auto full = T7ToRetailT8::ConvertStandalone(header, blocks, edited, nullptr, true, profile);
+    // The live file keeps the CRC of its first conversion (it is never imported once edited).
+    auto& fullHeader = *reinterpret_cast<TKMovesetHeader*>(full.data());
+    const auto& liveHeader = *reinterpret_cast<const TKMovesetHeader*>(live.File().data());
+    fullHeader.crc32 = liveHeader.crc32; fullHeader.orig_crc32 = liveHeader.orig_crc32;
+    if (live.File() != full) {
+        size_t at = 0;
+        while (at < full.size() && at < live.File().size() && full[at] == live.File()[at]) ++at;
+        throw std::runtime_error("Live row conversion differs from the full conversion of the edited moveset at byte " + std::to_string(at));
+    }
+    return edits;
 }
 
 void RunT7ToRetailT8Tests() {
@@ -177,6 +259,31 @@ void RunT7ToRetailT8Tests() {
         uint32_t frame=1,id=1; memcpy(&frame,table.data(),4); memcpy(&id,table.data()+16,4);
         Check(frame==0 && id==0,"Converted property list end is not a {0, 0} row");
     }
+    {
+        // T7 camera on either side (33845) -> the retail side pair 0x868C + 0x868D with the converted camera's index; the
+        // list's drama camera row (33443 -> 0x8313) is left out, since in retail the drama camera overrides it (2026-11-18).
+        namespace R=RetailT8Snapshot;
+        auto source=SemanticCameraFixture();
+        auto& header=*reinterpret_cast<TKMovesetHeader*>(source.data());
+        header.characterId=9; strcpy_s(header.version_string,"1.0");
+        const auto& blocks=*reinterpret_cast<const StructsT7::TKMovesetHeaderBlocks*>(source.data()+header.block_list);
+        auto& info=*reinterpret_cast<StructsT7_gameAddr::MovesetInfo*>(source.data()+header.moveset_data_start);
+        for(size_t table:{size_t(3),size_t(17),size_t(18)}) info.table.entries[table].listCount=0;
+        const auto t7=std::span<const Byte>(source).subspan(header.moveset_data_start);
+        T7ToRetailT8::ConversionReport report;
+        auto converted=T7ToRetailT8::ConvertStandalone(header,blocks,t7,&report);
+        const auto& result=*reinterpret_cast<const TKMovesetHeader*>(converted.data());
+        auto table=R::Table(std::span<const Byte>(converted).subspan(result.moveset_data_start),9);
+        std::vector<std::pair<uint32_t,uint32_t>> rows;
+        for(size_t at=0;at+R::Tables[9].stride<=table.size();at+=R::Tables[9].stride) {
+            uint32_t id,value; memcpy(&id,table.data()+at+16,4); memcpy(&value,table.data()+at+20,4); rows.push_back({id,value});
+        }
+        Check(report.cameraAnimationsConverted==1 && report.cameraAnimationProperties==1,"Camera clip or row not converted");
+        Check(rows.size()==3 && rows[0]==std::pair<uint32_t,uint32_t>{0x868C,0x2000} && rows[1]==std::pair<uint32_t,uint32_t>{0x868D,0x2000} &&
+            rows[2].first==0,"Either-side camera is not the 0x868C/0x868D pair");
+        for(const auto& row:rows) Check(row.first!=0x8313,"Drama camera row kept beside a camera animation");
+        Check(CheckT7LiveConversion(source)>0,"Camera fixture live conversion");
+    }
     const auto* strong = RetailT8::FindAlias(false,225);
     Check(strong && strong->target == 228,"Existing requirement alignment was lost");
     const auto* camera = RetailT8::FindAlias(true,0x83a2);
@@ -227,4 +334,40 @@ void RunT7ToRetailT8Tests() {
     rejected = false;
     try { wrongGame.Build(); } catch (const std::exception&) { rejected = true; }
     Check(rejected,"Retail/CNT input accepted as T7");
+    {
+        // Live edition of a T7 moveset in retail T8: one converted row gives the bytes of a full conversion.
+        Check(CheckT7LiveConversion(T7RetailConvertibleFixture()) > 0, "Live conversion edited no row of the convertible fixture");
+        Check(CheckT7LiveConversion(SemanticFixture()) > 0, "Live conversion edited no row of the semantic fixture");
+        // Edits a single row cannot carry give the reason (a new import is needed) and change nothing.
+        const auto file = T7RetailConvertibleFixture();
+        const auto& header = *reinterpret_cast<const TKMovesetHeader*>(file.data());
+        StructsT7::TKMovesetHeaderBlocks blocks; memcpy(&blocks, file.data() + header.block_list, sizeof(blocks));
+        const auto payload = std::span<const Byte>(file).subspan(header.moveset_data_start);
+        T7ToRetailT8::LiveConversion live(header, blocks, payload, ImportProfile::Read(header));
+        const auto before = live.File();
+        const auto& info = *reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(payload.data());
+        auto row = [&](size_t table, uint64_t index, size_t stride) {
+            auto at = payload.data() + blocks.movesetBlock + info.table.entries[table].listAddr + index * stride;
+            return std::vector<Byte>(at, at + stride);
+        };
+        auto move = row(12, 0, sizeof(StructsT7::Move));
+        reinterpret_cast<StructsT7_gameAddr::Move*>(move.data())->name_addr += 1;
+        Check(live.UpdateRow(12, 0, move).has_value() && live.File() == before, "A renamed move was converted alone");
+        move = row(12, 0, sizeof(StructsT7::Move));
+        reinterpret_cast<StructsT7_gameAddr::Move*>(move.data())->anim_addr += 8;
+        Check(live.UpdateRow(12, 0, move).has_value() && live.File() == before, "A move animation change was converted alone");
+        move = row(12, 0, sizeof(StructsT7::Move));
+        auto& head = reinterpret_cast<StructsT7_gameAddr::Move*>(move.data())->extra_move_property_addr;
+        head = head == UINT64_MAX ? info.table.extraMovePropertyCount + 5 : UINT64_MAX - 2;
+        Check(live.UpdateRow(12, 0, move).has_value() && live.File() == before, "A move's new property list was converted alone");
+        for (uint64_t index = 0; index < info.table.extraMovePropertyCount; ++index) {
+            auto property = row(9, index, sizeof(StructsT7::ExtraMoveProperty));
+            auto& id = reinterpret_cast<StructsT7::ExtraMoveProperty*>(property.data())->id;
+            if (id != 0) continue;
+            id = 0x8001; // the list end moves
+            Check(live.UpdateRow(9, index, property).has_value() && live.File() == before, "A moved property list end was converted alone");
+            break;
+        }
+        Check(live.UpdateRow(19, 0, move).has_value() && live.UpdateRow(12, 1u << 20, move).has_value(), "An out-of-range row was accepted");
+    }
 }

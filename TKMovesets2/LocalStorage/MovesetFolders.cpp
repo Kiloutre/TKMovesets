@@ -65,13 +65,4 @@ std::vector<std::filesystem::path> SearchDirectories() {
     for(const auto& path:c.additional)add(std::filesystem::u8path(path));
     return result;
 }
-bool IsInSearchDirectory(const std::filesystem::path& file) {
-    // Same normalization as SearchDirectories(), compared case-insensitively like Windows paths.
-    auto lower=[](std::wstring text){for(auto& c:text)c=std::towlower(c);return text;};
-    std::error_code ec; auto parent=std::filesystem::weakly_canonical(file,ec).parent_path();
-    if(ec)return false;
-    const auto key=lower(parent.wstring());
-    for(const auto& directory:SearchDirectories())if(lower(directory.wstring())==key)return true;
-    return false;
-}
 }

@@ -12,6 +12,7 @@
 #include "Online_t7.hpp"
 
 #include "Structs_t7.h"
+#include "Editor_t7_LiveRetail.hpp"
 
 namespace EditorT7Utils
 {
@@ -32,6 +33,16 @@ private:
 	StructsT7::MovesetInfo* m_infos = nullptr;
 	// Contains a ptr to the head of the displayable movelist
 	StructsT7::MvlHead* m_mvlHead = nullptr;
+	// Retail T8 live edition (see SetRetailLive); the live writers write into its shadow while it is the target.
+	std::unique_ptr<T7RetailLive> m_retailLive;
+	GameProcess* m_liveTarget = nullptr;
+	// T7 live edition: the moveset file the game holds, as imported then updated by each Apply (file layout)
+	std::vector<Byte> m_liveBaseline;
+	// The process the live writers write into: the game, or the retail live edition's T7 shadow.
+	GameProcess& LiveProcess() { return m_liveTarget ? *m_liveTarget : m_process; }
+	// Routes a field edit to its live writer.
+	void Live_Dispatch(EditorWindowType type, int id, EditorInput* field);
+	void Live_OnRetailFieldEdit(EditorWindowType type, int id, EditorInput* field);
 	// Contains iterators for the various structure lists
 	struct
 	{
@@ -321,6 +332,9 @@ public:
 	AnimPreview::ReactionMoves MoveHitReactions(uint16_t moveId, bool opponentAirborne);
 	// The move's hit uses the screw: one of its hit conditions requires 615 "Screw available".
 	bool MoveUsesScrew(uint16_t moveId) const;
+	// The move spends rage: one of its extra, start or end properties is 0x8272 "Spend Rage" with a non-zero
+	// parameter (1 removes rage, 0 allows it again). Requirements on the property are not judged.
+	bool MoveSpendsRage(uint16_t moveId) const;
 	// Move id with aliases (0x8000 + n) resolved; -1 when out of range.
 	int32_t ResolveMoveId(uint32_t moveId) const;
 	// Moves reached from [moveId] through its cancel list (grouped cancels expanded), breadth first, up to [maxDepth]
@@ -376,6 +390,15 @@ public:
 	// -- Live edition -- //
 	// Called whenever a field is edited. Returns false if a re-import is needed.
 	void Live_OnFieldEdit(EditorWindowType type, int id, EditorInput* field) override;
+	// Live edition of this moveset imported into retail T8 (Editor_t7_LiveRetail.cpp): set after such an import,
+	// null for a T7 target. While set, field edits are converted row by row and written into the T8 moveset.
+	void SetRetailLive(std::unique_ptr<T7RetailLive> live);
+	T7RetailLive* RetailLive() const { return m_retailLive.get(); }
+	// The applied rows that differ from the moveset the game holds are written into it, so live edition stays bound:
+	// converted to retail records for retail T8, relocated T7 rows for T7. False when the edit needs a new import.
+	bool Live_OnApplied(gameAddr live) override;
+	// The moveset file as it was imported into T7 (live edition compares applied bytes against it); empty for none.
+	void SetLiveBaseline(std::vector<Byte> imported) { m_liveBaseline = std::move(imported); }
 
 	// CRC32 calculation
 	uint32_t CalculateCRC32() override;

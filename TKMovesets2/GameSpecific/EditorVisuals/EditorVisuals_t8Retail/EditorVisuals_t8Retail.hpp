@@ -25,7 +25,7 @@ class EditorVisualsT8Retail final : public EditorVisuals {
     uint64_t m_indexRevision=UINT64_MAX, m_savedRevision=0;
     size_t m_indexTable=SIZE_MAX;
     std::vector<std::string> m_searchIndex;
-    struct MoveRow {std::string name,aliases;uint32_t flags=0;ImU32 colour=0;bool tornado=false;};
+    struct MoveRow {std::string name,aliases;uint32_t flags=0;ImU32 colour=0;bool tornado=false,rage=false,heat=false;};
     std::vector<MoveRow> m_moveRows;
     std::vector<uint32_t> m_originalMoveCrc;
     int m_moveFilter=0;

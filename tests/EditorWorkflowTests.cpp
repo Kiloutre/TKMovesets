@@ -1,4 +1,6 @@
 #include "Editor_t7/Editor_t7.hpp"
+#include "Importer_t7/Importer_t7_Utils.hpp"
+#include "GameAddressesFile.hpp"
 #include "MovesetFile.hpp"
 #include "Compression.hpp"
 #include "FileIO.hpp"
@@ -96,7 +98,63 @@ void BenchmarkEditor(const fs::path& path) {
     std::cout << nlohmann::json({{"file", path.string()}, {"edits", 100}, {"payload_bytes", bytes.size()},
         {"allocations", editor.allocations}, {"allocated_bytes", editor.allocationBytes}, {"milliseconds", elapsed}}).dump() << '\n';
 }
+// Apply keeps T7 live edition bound: the applied rows are written into the moveset the game holds, relocated as the
+// importer relocates them; an Apply that changed more than table rows (a name) asks for an import and writes nothing.
+void RunT7LiveApplyTests() {
+    class GameMemory : public GameProcess {
+    public:
+        gameAddr base = 0x40000000; std::vector<Byte> bytes;
+        GameMemory() { status = GameProcessErrcode_PROC_ATTACHED; }
+    protected:
+        bool ReadMemoryRaw(gameAddr address, void* data, size_t size) const override {
+            if (address < base || address - base > bytes.size() || size > bytes.size() - (address - base)) return false;
+            memcpy(data, bytes.data() + (address - base), size); return true;
+        }
+        bool WriteMemoryRaw(gameAddr address, const void* data, size_t size) override {
+            if (address < base || address - base > bytes.size() || size > bytes.size() - (address - base)) return false;
+            memcpy(bytes.data() + (address - base), data, size); return true;
+        }
+        bool SuspendProcessRaw() override { return true; }
+        bool ResumeProcessRaw() override { return true; }
+    };
+    // The game's copy of a T7 moveset file: its payload with references relocated to `base`.
+    auto image = [](const std::vector<Byte>& file, gameAddr base) {
+        const auto& header = *reinterpret_cast<const TKMovesetHeader*>(file.data());
+        const auto& blocks = *reinterpret_cast<const StructsT7::TKMovesetHeaderBlocks*>(file.data() + header.block_list);
+        std::vector<Byte> payload(file.begin() + header.moveset_data_start, file.end());
+        const auto table = reinterpret_cast<const StructsT7_gameAddr::MovesetInfo*>(payload.data())->table;
+        Check(T7ImportUtils::ConvertMovesetIndexes(payload.data(), base, &table, &blocks), "fixture relocation failed");
+        return payload;
+    };
+    const auto original = SemanticFixture();
+    GameAddressesFile addresses; GameMemory memory; GameData game; game.SetProcess(&memory, &addresses);
+    GameInfo info{}; info.dataString = info.minorDataString = "t7";
+    Editor editor(memory, game, &info);
+    editor.constants[EditorConstants_RequirementEnd] = 881;
+    Load(editor, original);
+    memory.bytes = image(original, memory.base);
+    editor.SetLiveBaseline(original);
+    Check(!editor.Live_OnApplied(0), "Apply published without a live moveset");
+    {
+        Form requirement(editor, TEditorWindowType_Requirement, 0);
+        requirement.Set("param_unsigned", "91");
+        editor.SaveItem(TEditorWindowType_Requirement, 0, requirement.fields);
+        Form move(editor, TEditorWindowType_Move, 0);
+        move.Set("vulnerability", "47");
+        editor.SaveItem(TEditorWindowType_Move, 0, move.fields);
+    }
+    Check(editor.Live_OnApplied(memory.base), "Applied rows did not keep T7 live edition bound");
+    Check(memory.bytes == image(Bytes(editor), memory.base), "Applied T7 rows differ from the moveset an import would publish");
+    const auto published = memory.bytes;
+    {
+        Form move(editor, TEditorWindowType_Move, 0);
+        move.Set("move_name", "renamed live");
+        editor.SaveItem(TEditorWindowType_Move, 0, move.fields);
+    }
+    Check(!editor.Live_OnApplied(memory.base) && memory.bytes == published, "A renamed move was published row by row");
+}
 void RunEditorWorkflowTests() {
+    RunT7LiveApplyTests();
     Directory directory;
     const auto original = SemanticFixture();
     const auto source = directory.path / "source.tkmvst";

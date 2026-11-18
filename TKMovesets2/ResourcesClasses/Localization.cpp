@@ -14,6 +14,8 @@ extern "C" const char de_DE_txt[];
 extern "C" const char es_ES_txt[];
 extern "C" const char ja_JP_txt[];
 extern "C" const char ko_KR_txt[];
+extern "C" const char zh_CN_txt[];
+extern "C" const char ru_RU_txt[];
 // --
 
 const TranslationData g_translation_datas[] = {
@@ -41,13 +43,25 @@ const TranslationData g_translation_datas[] = {
 		.data = ko_KR_txt,
 		.matchingLocale = { "ko" }
 	},
-	/*
 	{
-		.displayName = "Español",
+		.displayName = (const char*)u8"简体中文",
+		.locale = "zh-CN",
+		.data = zh_CN_txt,
+		.matchingLocale = { "zh", "zh-sg", "zh-hans", "zh-hans-cn", "zh-hans-sg" }
+	},
+	{
+		.displayName = (const char*)u8"Español",
 		.locale = "es-ES",
 		.data = es_ES_txt,
-		.matchingLocale = { "es-ar", "es-bo", "es-cl", "es-co", "es-cr", "es-do", "es-ec", "es-sv", "es-gt", "es-hn", "es-mx", "es-ni", "es-pa", "es-py", "es-pe", "es-pr", "es-uy", "es-ve" }
+		.matchingLocale = { "es", "es-ar", "es-bo", "es-cl", "es-co", "es-cr", "es-do", "es-ec", "es-sv", "es-gt", "es-hn", "es-mx", "es-ni", "es-pa", "es-py", "es-pe", "es-pr", "es-uy", "es-ve", "es-us", "es-419" }
 	},
+	{
+		.displayName = (const char*)u8"Русский",
+		.locale = "ru-RU",
+		.data = ru_RU_txt,
+		.matchingLocale = { "ru", "ru-by", "ru-kz", "ru-kg", "ru-md", "ru-ua" }
+	},
+	/*
 	{
 		.displayName = "Deutsch",
 		.locale = "de-DE",

@@ -33,8 +33,6 @@ private:
 	void HandleOpenRequests();
 	// True if the moveset file is open in one of the editor windows (same file, whatever the path spelling)
 	bool IsMovesetOpenInEditor(const std::wstring& filename) const;
-	struct PendingOpen { std::wstring path; std::chrono::steady_clock::time_point deadline; };
-	std::vector<PendingOpen> m_pendingOpens;
 
 
 	// Navigation menu, also handles language selection and update button

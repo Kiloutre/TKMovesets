@@ -32,4 +32,27 @@ std::vector<Sample> DecodePackedTrack(std::span<const Byte> track, uint32_t samp
 struct T7Animation { uint32_t frames; uint16_t channels; std::vector<float> values; bool keyframed = false; };
 // `maxFrames`: refuse longer animations before decoding (0x64 decoding cost grows with frames squared).
 T7Animation DecodeT7(std::span<const Byte> bytes, uint32_t maxFrames = UINT32_MAX);
+
+// ---- Multi-group PANMs (native camera layout) --------------------------------------------------------
+// One track of one bone in one bone group, its sample bytes verbatim. Native cameras: group 1 holds "cam_transform"
+// (and "Camera_Param") Transform tracks (type 1), group 5 the "cam_transform" FieldOfView track (type 3, one float per
+// sample). Encoding 1 raw, 2 static (one sample), 3 packed (PackTransforms / PackScalars).
+struct GroupTrack {
+    uint32_t group = 1; std::string bone, name = "Transform"; uint32_t type = 1, encoding = 3, samples = 0;
+    std::vector<TrackOption> options; std::vector<Byte> data;
+};
+// Native camera PANM layout (same builder as Encode, tracks in the given order, grouped by `group` in first-seen
+// order; each track's data starts 16-aligned, the block ends 16-aligned after an 8-byte gap). Every native camera
+// PANM decoded with DecodeGroups re-encodes byte for byte.
+std::vector<Byte> EncodeGroups(uint32_t frames, const std::vector<GroupTrack>& tracks);
+std::vector<GroupTrack> DecodeGroups(std::span<const Byte> panm, uint32_t* frames = nullptr);
+// Packed (encoding 3) streams: per channel the range and a bit width that keeps the quantization step at or below
+// `step` (rotation 1e-7 capped at 24 bits, positions and scale 1e-4, scalars 1e-5); channels whose value never
+// changes take no bits.
+// Transforms set flags 1 (scale), 4 (rotation), 8 (position) and 2 (rotation or position) for the animated parts,
+// and one w-sign bit per frame when the rotation is animated. Some native swing tracks use flag 1 for a uniform scale
+// (x only in the stream): animate scale x only when the track must read the same under both meanings.
+std::vector<Byte> PackTransforms(std::span<const Sample> samples);
+std::vector<Byte> PackScalars(std::span<const float> samples);
+std::vector<float> UnpackScalars(std::span<const Byte> track, uint32_t samples);
 }

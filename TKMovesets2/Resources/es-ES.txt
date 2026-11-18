@@ -1,1 +1,1032 @@
-Spanish
+# Español
+# Esto es un comentario
+# clave = Texto
+# Cada línea representa una traducción distinta.
+# '\n' se puede usar para insertar saltos de línea en los párrafos. Los espacios al inicio y al final de las claves y los textos se eliminan.
+# " navmenu =  Esto  es una    prueba   " se convierte en "navmenu=Esto  es una    prueba", así que puedes alinear lo que haga falta
+
+# Utilidades #
+
+item = Elemento
+end = FIN
+yes = Sí
+no = No
+mota_00 = Anims 1
+mota_01 = Anims 2
+mota_02 = Manos 1
+mota_03 = Manos 2
+mota_04 = Cara 1
+mota_05 = Cara 2
+mota_06 = Alas 1
+mota_07 = Alas 2
+mota_08 = Cámara 1
+mota_09 = Cámara 2
+mota_10 = Desconocido 1
+mota_11 = Desconocido 2
+close = Cerrar
+close_window = Cerrar ventana
+1p = Jugador 1
+2p = Jugador 2
+3p = Jugador 3
+4p = Jugador 4
+select_game = Selecciona un juego
+hash = Hash
+
+# Proceso #
+
+process.status = Estado:
+process.game_not_attached = Sin intentar conectarse por ahora. Selecciona un juego.
+process.game_not_running = El juego no se está ejecutando o no se pudo encontrar.
+process.game_version_mismatch = La versión actual del juego no es compatible con game_address.txt.
+process.game_attach_err = Se encontró el juego, pero no fue posible conectarse a él. Puede deberse a permisos insuficientes.
+process.dll_version_mismatch = La DLL inyectada no coincide con la versión del programa. Reinicia el juego y esta herramienta.
+
+# Moveset #
+moveset.origin = Origen
+moveset.name = Nombre
+moveset.game = Juego
+moveset.target_character = Personaje
+moveset.original_character = Personaje original
+moveset.date = Fecha
+moveset.extraction_date = Fecha de extracción
+moveset.invalid = INVÁLIDO
+moveset.size = Tamaño
+moveset.size_mb = MB
+moveset.size_kb = KB
+moveset.rename = Renombrar
+moveset.convert = Convertir
+moveset.duplicate = Duplicar
+moveset.import = Importar
+moveset.edit = Editar
+moveset.delete = Eliminar
+moveset.version = Versión
+moveset.hash = Hash
+
+## Principal ##
+
+# Menú de navegación #
+navmenu.category_moveset = Movesets
+navmenu.category_play = Jugar
+navmenu.extraction = Extracción
+navmenu.import = Importación
+navmenu.online = Juego en línea
+navmenu.persistent_play = Juego persistente
+
+navmenu.category_tools = Herramientas
+navmenu.moveset_edit = Edición de movesets
+navmenu.addresses = Direcciones
+navmenu.extra = Extra
+navmenu.camera = Cámara
+
+navmenu.category_other = Otros
+navmenu.documentation = Documentación
+navmenu.about = Acerca de
+
+settings.general = Ajustes generales
+settings.language = Idioma
+settings.vsync = Sincronización vertical
+settings.vsync_explanation = Puede servir para limitar la tasa de refresco de este programa si alguna vez consume demasiada GPU.
+settings.file_association = Asociar .tkmvst / .tkanimXX
+settings.file_association_explanation = Asocia los archivos de moveset (.tkmvst) y de animación con esta herramienta.
+Abrir un moveset lo abre en el editor desde su ubicación; abrir una animación la copia a la biblioteca de animaciones de esta herramienta.
+settings.auto_update_check = Buscar actualizaciones automáticamente
+settings.auto_addr_update_check = Actualizar direcciones automáticamente
+settings.importation = Ajustes de importación
+settings.apply_instantly = Aplicar al instante
+settings.apply_instantly_explanation = Si lo desactivas, el juego esperará a que termine el movimiento actual antes de cambiar al nuevo moveset.\nCon algunos movimientos (como la animación idle de Negan), esto puede tardar bastante.
+settings.free_unused_movesets = Liberar movesets sin usar
+settings.free_unused_movesets_explanation = Si está activado, los movesets que se asignaron antes pero que ya no se usan se liberarán de la memoria.\nEsto evita que esta herramienta consuma toda tu RAM.
+settings.edition = Edición
+settings.editor_auto_apply = Aplicar ediciones automáticamente
+settings.editor_auto_apply_explanation = Si está activado, los formularios del editor no tienen botón Aplicar: una edición se aplica en cuanto su formulario es válido, al salir del campo en el que escribías.
+settings.exportation = Ajustes de exportación
+settings.overwrite_duplicate = Sobrescribir moveset con el mismo nombre
+settings.overwrite_explanation = Actívalo para sobrescribir los movesets con el mismo nombre.\nDesactívalo para resolver los conflictos de nombre con sufijos numéricos.\nEj.: T7_JIN (2)
+settings.keybinds = Atajos de teclado
+settings.keybind_rebind = Reasignar
+settings.reset_keybinds = Restablecer atajos
+settings.finish_keybind = Terminar atajo
+
+keybind_editor.import_p1 = Importar en J1
+keybind_editor.import_p2 = Importar en J2
+keybind_editor.import_both = Importar en J1 y J2
+keybind_editor.save = Guardar
+keybind_editor.change_data_type = Cambiar tipo de dato
+
+sidemenu.settings = Ajustes
+sidemenu.up_to_date = Actualizado
+sidemenu.updated_addr = ¡Direcciones actualizadas!
+sidemenu.update_check = Buscando actualizaciones...
+sidemenu.update = Actualizar
+sidemenu.update_error = Error al actualizar
+sidemenu.update_explanation = Se encontró una actualización.\n¿Quieres descargarla y reiniciar el programa ahora?
+sidemenu.update_bad_file = No se pudo aplicar la actualización.\nActualiza manualmente.
+
+sidemenu.changelog = Registro de cambios
+
+## Submenús ##
+
+# Extracción #
+extraction.explanation = Primero hay que extraer los movesets del juego para poder usarlos. Solo se extraen movesets: ni modelos ni efectos visuales.\nLa extracción se hace con el juego en ejecución (desde la memoria), con el o los personajes deseados cargados y visibles en pantalla (no importa el modo de juego).\nLo ideal es que los personajes no se muevan durante la extracción (o que el juego esté en pausa).
+extraction.extraction = Extracción
+extraction.extract = Extraer
+extraction.extract_all = Extraer (todos)
+extraction.extract_from = Extraer de:
+extraction.progress = Extrayendo... (%u%%)
+extraction.progress_error = Error de extracción (%u%%)
+extraction.progress_done = Extrayendo... ¡Listo!
+extraction.extracted_movesets = Movesets extraídos
+extraction.cant_extract = No se puede extraer porque los personajes no están cargados.
+extraction.error_file_creation = Se produjo un error al crear el archivo del moveset
+extraction.error_compression = Se produjo un error al comprimir el archivo del moveset
+extraction.error_allocation = Se produjo un error de asignación de memoria al copiar los datos del moveset
+extraction.mota_explanation = Animaciones adicionales
+extraction.settings = Ajustes
+extraction.settings.other = Otros
+extraction.settings.displayable_movelist = Lista de movimientos visible
+extraction.settings.compress_moveset = Comprimir moveset
+extraction.settings.compression_type = Tipo de compresión
+extraction.settings.compression_type.none = Sin compresión
+extraction.settings.extract_unsupported_motas = Extraer MOTA marginales (formatos no compatibles)
+
+# Importación #
+importation.explanation = Una vez extraídos y guardados en tu equipo, los movesets se pueden cargar en una partida activa (no en línea) desde este submenú. Es algo de un solo uso: los movesets cargados aquí se descargan al pasar por cualquier pantalla de carga, así que sirve sobre todo para el modo práctica.\nPara jugar en línea, consulta la sección "En línea".
+importation.importation = Importación
+importation.select_moveset = Selecciona el moveset a importar
+importation.cant_import = No se puede importar porque no estás en una partida activa (modo práctica, etc.).
+importation.import_to = Importar en:
+importation.progress = Importando... (%u%%)
+importation.progress_error = Error de importación (%u%%)
+importation.progress_done = Importando... ¡Listo!
+importation.error_file_reading = Se produjo un error al leer el archivo del moveset
+importation.error_allocation = Se produjo un error de asignación de memoria al leer los datos del moveset
+importation.error_game_allocation = Se produjo un error de asignación de memoria en el juego al escribir los datos del moveset
+importation.error_decompression = Se produjo un error al descomprimir los datos del moveset
+
+# Juego persistente #
+persistent.explanation = El modo persistente te permite elegir los movesets que se aplican a los jugadores; esos movesets se mantienen tras las pantallas de carga e incluso si cambias de lado.\nSe puede usar en línea si el rival también tiene esta herramienta abierta y ambos ya han descargado/extraído los dos movesets:\nCada uno debe poner su propio moveset (o Ninguno) como "Jugador 1" y el moveset del rival (o Ninguno) como "Jugador 2", y luego bloquear la selección.
+persistent.player_1 = Jugador 1:
+persistent.player_2 = Jugador 2:
+persistent.player_3 = Jugador 3:
+persistent.player_4 = Jugador 4:
+persistent.none = Sin moveset
+persistent.lock = Bloquear personajes
+persistent.unlock = Desbloquear
+persistent.hash = Hash:
+persistent.select_moveset = Seleccionar moveset
+persistent.clear_moveset = Quitar moveset
+
+# En línea #
+online.explanation = Para jugar en línea, ambos jugadores deben tener esta herramienta abierta.\nCada uno debe elegir su moveset (o ninguno, si quiere) antes de la pantalla de carga de la partida; la herramienta sincronizará los archivos de moveset en segundo plano sin que tengan que enviárselos.\nLos movesets personalizados no se cargarán si tú o tu rival no tienen la herramienta abierta, o si alguno de los dos no ha bloqueado su selección de personaje en esta herramienta.
+online.no_selected_moveset = Ningún moveset seleccionado
+online.dll_not_loaded = La DLL no está cargada, inyéctala
+online.inject_dll = Inyectar
+online.injecting_dll = Inyectando...
+online.select_moveset = Seleccionar
+online.selected_moveset = Seleccionado:
+online.lock_to_play = Bloquea tu selección para que se carguen los movesets.
+
+# Edición de movesets: renombrar #
+edition.rename.new_moveset_name = Nuevo nombre del moveset
+edition.rename.empty_name = El nombre está vacío
+edition.rename.already_exists = El nombre ya lo usa otro archivo
+edition.rename.rename_err = Error al intentar renombrar. ¿Los caracteres son válidos?
+edition.rename.invalid_name = El nombre contiene caracteres no válidos. (/\|<>:"?*)
+edition.convert.format_target = Formato al que convertir
+
+# Edición de movesets #
+edition.explanation = Aquí puedes editar los movesets extraídos. Consulta la documentación para ver tutoriales y recursos útiles.\nActiva la 'Edición en vivo' para modificar rápidamente el moveset personalizado: los cambios simples de valores se aplicarán al instante en la memoria, sin tiempo de carga.
+edition.select_moveset = Elige el moveset a modificar
+edition.last_saved = Último guardado:
+edition.save = Guardar
+edition.saving_error = Error al guardar
+edition.discard_changes = ¿Descartar los cambios?\nSi la edición en vivo está activada, esto no devolverá la estructura a su estado original dentro del juego.
+edition.process_err = Error
+edition.live_edition = Edición en vivo
+edition.live_edition_explanation = Actívala para que los cambios triviales, como modificar valores simples, se apliquen directamente en la memoria del juego sin tener que importar de nuevo el moveset.\nAñadir o quitar elementos de una lista, o cualquier cosa que aumente el tamaño del moveset, requerirá una nueva importación.
+edition.move_name = Nombre
+edition.move_generic_id = Alias
+edition.moves_all = Todos
+edition.moves_attacks = Ataques
+edition.moves_generic = Genéricos
+edition.moves_throws = Agarres
+edition.moves_custom = Personalizados
+edition.moves_char_specific = Personaje
+edition.move_id_hint = ID/Nombre del movimiento...
+edition.move_screw = Usa el screw: una condición de golpe requiere "Screw available".
+edition.move_tornado = Usa el tornado: una condición de golpe requiere "Tornado Available".
+edition.move_rage = Gasta la Rage: una propiedad es "Spend Rage" con el parámetro 1.
+edition.move_heat = Gasta el Heat: una propiedad gasta la carga de Heat Dash o vacía el medidor de Heat.
+edition.move_current = Actual
+edition.move_current_1p = Actual (J1)
+edition.move_current_2p = Actual (J2)
+edition.play_move_1p = Reproducir (J1)
+edition.play_move_2p = Reproducir (J2)
+edition.window_title = Editor
+edition.apply = Aplicar
+edition.window_controls_explanation = Haz clic en un movimiento de la lista de movimientos para abrir su ventana. La nueva ventana reemplazará a la abierta anteriormente, SALVO que esta tenga cambios sin guardar O que mantuvieras pulsado CTRL IZQUIERDO al hacer clic en el movimiento. Las ventanas se pueden arrastrar a cualquier lugar, acoplar entre sí y formar distintas disposiciones.
+
+edition.tools = Herramientas
+edition.extract_animations = Extraer animaciones
+edition.extract_animations_finished = ¡Extracción de animaciones terminada!
+edition.animation_extraction.extraction_status = Estado de la extracción
+edition.animation_extraction.not_started = Sin empezar
+edition.animation_extraction.skipped = Omitido
+edition.animation_extraction.skipped_exists = Ya existe
+edition.animation_extraction.error = Error
+edition.animation_extraction.interrupt = Interrumpir
+edition.t7_disk.button = Extraer de los archivos
+edition.t7_disk.executable = Ejecutable de Tekken 7 (TekkenGame-Win64-Shipping.exe)
+edition.t7_disk.title = Extraer todos los movesets de T7 de los archivos del juego
+edition.t8_disk.button = Extraer de los archivos
+edition.t8_disk.executable = Ejecutable de Tekken 8 (Polaris-Win64-Shipping.exe)
+edition.t8_disk.executable_hint = Pega la ruta del exe o búscala; se rellena cuando el juego está abierto
+edition.t8_disk.title = Extraer todos los movesets de T8 de los archivos del juego
+edition.t8_disk.explanation = Extrae los personajes de los archivos del juego. Los personajes pueden ocupar mucho espacio.
+edition.t8_disk.start = Iniciar
+edition.t8_disk.characters = Personajes
+edition.t8_disk.column_name = Nombre
+edition.t8_disk.column_code = Código
+edition.t8_disk.column_status = Estado
+edition.t8_disk.select_none = Ninguno
+edition.t8_disk.building = Generando...
+edition.t8_disk.built = {} movimientos, {} animaciones
+edition.t8_disk.finished = ¡Todos los movesets listos!
+edition.open_characters_directory = Abrir carpeta de personajes
+edition.open_editor_library = Abrir biblioteca del editor
+edition.open_editor_backups = Abrir copias de seguridad del editor
+edition.refresh_movesets = Actualizar movesets
+
+edition.form_popup.copy_structure_clipboard = Copiar estructura
+edition.form_popup.copy_single_item_clipboard = Copiar un solo elemento
+edition.form_popup.paste_structure_clipboard = Pegar estructura
+edition.form_popup.duplicate_structure = Duplicar estructura
+edition.form_popup.duplicate_item = Duplicar esta fila al final de la lista
+edition.form_popup.delete_structure = Eliminar estructura
+edition.form_popup.what_references_this_move = ¿Qué estructuras usan este movimiento?
+edition.form_popup.what_references_this_cancel = ¿Qué movimientos usan esta lista de cancelaciones?
+edition.form_popup.deletion_are_you_sure = ¿Seguro que quieres eliminar esta estructura?\nSe recomienda no eliminar estructuras para evitar problemas cuando están referenciadas en muchos otros lugares.
+edition.form_popup.yes_delete = Sí, eliminar.
+
+edition.create_new = Crear nuevo
+edition.goto = Ir a
+edition.goto_open = Abrir
+edition.requirement = Lista de requisitos
+edition.move = Movimiento
+edition.voiceclips = Voiceclips
+edition.cancel_list = Lista de cancelaciones
+edition.grouped_cancel_list = Lista de cancelaciones agrupadas
+edition.cancel_extradata = Datos extra de cancelación
+edition.extra_properties = Propiedades extra
+edition.move_begin_properties = Propiedades de inicio del movimiento
+edition.move_end_properties = Propiedades de fin del movimiento
+edition.hit_conditions = Lista de condiciones de golpe
+edition.reactions = Reacciones
+edition.pushback = Pushback
+edition.pushback_extra = Pushback extra
+edition.input_sequence = Secuencia de inputs
+edition.inputs = Inputs
+edition.projectile = Proyectil
+edition.throw_camera = Cámara de agarre
+edition.camera_data = Datos de cámara
+edition.mvl_playable = Lista de movimientos: Jugable
+edition.mvl_inputs = Lista de movimientos: Inputs
+
+edition.update_labels = Actualizar etiquetas
+edition.updating_labels = Etiquetas: Actualizando...
+edition.updating_labels_err = Etiquetas: ERROR
+edition.up_to_date_labels = Etiquetas: Al día
+edition.updated_labels = Etiquetas: ¡Actualizadas!
+
+edition.open_movelist = Abrir lista de movimientos
+
+edition.move.window_name = Movimiento
+edition.move.category_2 = Referencias
+edition.move.category_3 = Extras
+edition.move.category_5 = Campos sin nombre
+edition.move.move_name = Nombre
+edition.move.move_name.description = Nombre del movimiento, no afecta a la jugabilidad.
+edition.move.anim_name = Animación
+edition.move.anim_name.description = Animación que reproducirá este movimiento.
+edition.move.vulnerability = Vuln
+edition.move.vulnerability.description = Determina qué nivel de golpe puede impactar a este movimiento.
+edition.move.hitlevel = Nivel de golpe
+edition.move.hitlevel.description = El tipo de ataque (Alto/Medio/Bajo/etc...)
+edition.move.transition = Transición
+edition.move.transition.description = Transición visual a otro movimiento al terminar este
+edition.move.anim_len = Duración de la anim
+edition.move.hitbox_location = Ubicación de la hitbox
+edition.move.hitbox_location.description = Dónde se encuentran la(s) hitbox(es) del movimiento
+edition.move.first_active_frame = Primer frame activo
+edition.move.last_active_frame = Último frame activo
+edition.move.airborne_start = Inicio en el aire
+edition.move.airborne_end = Fin en el aire
+edition.move.ground_fall = Caída al suelo
+edition.move.distance = Distancia
+edition.move.hit_condition_addr = ID de condiciones de golpe
+edition.move.hit_condition_addr.description = Daño y comportamiento del rival al recibir el golpe/bloquearlo
+edition.move.extra_properties_addr = ID de propiedades extra
+edition.move.extra_properties_addr.description = Propiedades ejecutadas durante este movimiento
+edition.move.move_start_extraprop_addr = ID de prop. extra de inicio
+edition.move.move_end_extraprop_addr = ID de prop. extra de fin
+edition.move.voiceclip_addr = ID de voiceclip
+edition.move.voiceclip_addr.description = Voiceclips reproducidos durante este movimiento
+edition.move.cancel_addr = ID de cancelaciones
+edition.move.cancel_addr_2 = ID de cancelaciones (2)
+edition.move.cancel_related_id_2 = ID de cancelación 2: relacionado
+edition.move.cancel_addr_3 = ID de cancelaciones (4)
+edition.move.cancel_related_id_3 = ID de cancelación 3: relacionado
+edition.move.cancel_addr_4 = ID de cancelaciones (4)
+edition.move.cancel_related_id_4 = ID de cancelaciones 4: relacionado
+edition.move._0x98_int = ¿Orientación/Extras?
+
+edition.voiceclip.window_name = Voiceclip
+edition.voiceclip.id = ID
+edition.voiceclip.limb_swinging = SFX de movimiento de extremidad
+edition.voiceclip.hit = SFX de golpe
+edition.voiceclip.end = FIN
+
+edition.extraproperty.window_name = Lista de propiedades extra
+edition.extraproperty.starting_frame = Frame de inicio
+edition.extraproperty.id = ID
+edition.extraproperty.throw_camera_id = ID de cámara de agarre
+edition.extraproperty.throw_camera_id.description = ID del movimiento de cámara a reproducir
+edition.extraproperty.projectile_id = ID de proyectil
+edition.extraproperty.projectile_id.description = ID del proyectil a generar
+edition.extraproperty.instant = INSTANTÁNEO
+edition.extraproperty.every_frame = CADA FRAME
+edition.extraproperty.every_nth_frame = CADA %d FRAMES
+edition.extraproperty.value_unsigned = Valor (U32)
+edition.extraproperty.value_signed = Valor (S32)
+edition.extraproperty.value_hex = Valor (H32)
+edition.extraproperty.value_float = Valor (Float)
+
+edition.move_start_extraprop.window_name = Lista de propiedades de inicio
+edition.move_start_extraprop.requirements_addr = ID de requisitos
+edition.move_start_extraprop.extraprop = Propiedad / Requisito
+edition.move_start_extraprop.value = Valor
+
+edition.move_end_extraprop.window_name = Lista de propiedades de fin
+edition.move_end_extraprop.requirements_addr = ID de requisitos
+edition.move_end_extraprop.extraprop =  Propiedad / Requisito
+edition.move_end_extraprop.value = Valor
+
+edition.cancel.window_name = Lista de cancelaciones
+edition.cancel.command = Comando
+edition.cancel.requirements_addr = ID de requisitos
+edition.cancel.requirements_addr.description = ID de las condiciones que esta cancelación debe cumplir para producirse
+edition.cancel.extradata_addr = ID de datos extra
+edition.cancel.extradata_addr.description = ID de los datos extra de cancelación: flags de bits que dan ciertas propiedades a la cancelación, como saltar frames, conservar el frame actual o el seguimiento (homing).
+edition.cancel.detection_start = Inicio de detección
+edition.cancel.detection_start.description = Primer frame en el que esta cancelación puede iniciarse (si su comando y su requisito se cumplen)
+edition.cancel.detection_end = Fin de detección
+edition.cancel.detection_end.description = Último frame en el que esta cancelación puede iniciarse
+edition.cancel.starting_frame = Frame de inicio
+edition.cancel.starting_frame.description = Primer frame en el que se iniciará esta cancelación si la detección del comando y de los requisitos ha tenido éxito
+edition.cancel.move_id = ID de movimiento
+edition.cancel.group_id = ID de grupo de cancelaciones
+edition.cancel.group_id.description = ID del grupo de cancelaciones al que se refiere esta cancelación
+edition.cancel.sequence_id = ID de secuencia
+edition.cancel.cancel_option = Opción de cancelación
+edition.cancel.invalid_sequence_id = ID no válido
+
+edition.grouped_cancel.window_name = Lista de cancelaciones agrupadas
+edition.grouped_cancel.command = Comando
+edition.grouped_cancel.requirements_addr = ID de requisitos
+edition.grouped_cancel.requirements_addr.description = ID de las condiciones que esta cancelación debe cumplir para producirse
+edition.grouped_cancel.extradata_addr = ID de datos extra
+edition.grouped_cancel.extradata_addr.description = ID de los datos extra de cancelación: flags de bits que dan ciertas propiedades a la cancelación, como saltar frames, conservar el frame actual o el seguimiento (homing).
+edition.grouped_cancel.detection_start = Inicio de detección
+edition.grouped_cancel.detection_start.description = Primer frame en el que esta cancelación puede iniciarse (si su comando y su requisito se cumplen)
+edition.grouped_cancel.detection_end = Fin de detección
+edition.grouped_cancel.detection_end.description = Último frame en el que esta cancelación puede iniciarse
+edition.grouped_cancel.starting_frame = Frame de inicio
+edition.grouped_cancel.starting_frame.description = Primer frame en el que se iniciará esta cancelación si la detección del comando y de los requisitos ha tenido éxito
+edition.grouped_cancel.move_id = ID de movimiento
+edition.grouped_cancel.cancel_option = Opción de cancelación
+
+edition.cancel_extra.window_name = Datos extra de cancelación
+edition.cancel_extra.value = Valor
+
+edition.requirement.window_name = Lista de requisitos
+edition.requirement.condition = Condición
+edition.requirement.condition.description = ID de la condición que se comprobará
+edition.requirement.param_unsigned = Parámetro
+edition.requirement.param_float = Parámetro (Float)
+
+edition.hit_condition.window_name = Lista de condiciones de golpe
+edition.hit_condition.requirements_addr = ID de requisitos
+edition.hit_condition.requirements_addr.description = ID de la lista de condiciones que deben cumplirse para que se produzca esta condición de golpe
+edition.hit_condition.damage = Daño
+edition.hit_condition.reactions_addr = ID de reacciones
+edition.hit_condition.reactions_addr.description = ID de la lista de reacciones que determinará el comportamiento del rival al recibir el golpe/bloquearlo
+
+edition.reactions.window_name = Reacciones
+edition.reactions.category_1 = ID de pushback
+edition.reactions.category_3 = ID de movimientos
+edition.reactions.category_5 = Dirección
+edition.reactions.category_7 = Otros
+edition.reactions.front_pushback = Frente
+edition.reactions.backturned_pushback = De espaldas
+edition.reactions.left_side_pushback = Lado izquierdo
+edition.reactions.right_side_pushback = Lado derecho
+edition.reactions.front_counterhit_pushback = Frente CH
+edition.reactions.downed_pushback = En el suelo
+edition.reactions.block_pushback = Bloqueando
+edition.reactions.front_direction = Frente
+edition.reactions.back_direction = Espalda
+edition.reactions.left_side_direction = Lado izquierdo
+edition.reactions.right_side_direction = Lado derecho
+edition.reactions.front_counterhit_direction = Frente CH
+edition.reactions.downed_direction = En el suelo
+edition.reactions.0x44_long = _0x44_long
+edition.reactions.front_rotation = Frente
+edition.reactions.back_rotation = Espalda
+edition.reactions.left_side_rotation = Lado izquierdo
+edition.reactions.right_side_rotation = Lado derecho
+edition.reactions.front_counterhit_rotation = Frente CH
+edition.reactions.downed_rotation = En el suelo
+edition.reactions.vertical_pushback = Pushback vertical
+edition.reactions.standing_moveid = De pie
+edition.reactions.default_moveid = Por defecto
+edition.reactions.crouch_moveid = Agachado
+edition.reactions.counterhit_moveid = Counter hit
+edition.reactions.crouch_counterhit_moveid = CH agachado
+edition.reactions.left_side_moveid = Lado izquierdo
+edition.reactions.crouch_left_side_moveid = Lado izquierdo agachado
+edition.reactions.right_side_moveid = Lado derecho
+edition.reactions.crouch_right_side_moveid = Lado derecho agachado
+edition.reactions.backturned_moveid = De espaldas
+edition.reactions.crouch_backturned_moveid = De espaldas agachado
+edition.reactions.block_moveid = Bloqueando
+edition.reactions.crouch_block_moveid = Bloqueando agachado
+edition.reactions.wallslump_moveid = Wallslump
+edition.reactions.downed_moveid = En el suelo
+
+edition.input_sequence.window_name = Secuencia de inputs
+edition.input_sequence.input_window_frames = Ventana de tiempo
+edition.input_sequence.input_amount = Cantidad de inputs
+edition.input_sequence.input_addr = ID de input
+
+edition.input.window_name = Input
+edition.input.direction = Dirección
+edition.input.button = Botones
+edition.input.inputs = Inputs
+
+edition.projectile.window_name = Proyectil
+edition.projectile.category_2 = Referencias
+edition.projectile.category_3 = Sin nombre
+edition.projectile.vfx_id = ID de VFX
+edition.projectile.vfx_variation_id = ID de variación de VFX
+edition.projectile.delay = Retraso
+edition.projectile.vertical_velocity = Velocidad vertical
+edition.projectile.horizontal_velocity = Velocidad horizontal
+edition.projectile.duration = Duración
+edition.projectile.no_collision = Sin colisión
+edition.projectile.size = Tamaño
+edition.projectile.hash = Hash
+edition.projectile.can_hitbox_connect = La hitbox puede conectar
+edition.projectile.gravity = Gravedad
+edition.projectile.hit_level = Nivel de golpe
+edition.projectile.hit_condition_addr = ID de condiciones de golpe
+edition.projectile.cancel_addr = ID de cancelaciones
+edition.projectile.voiceclip_on_hit = Voiceclip (golpe)
+
+edition.pushback.window_name = Pushback
+edition.pushback.duration = Duración
+edition.pushback.duration.description = Duración del desplazamiento lineal
+edition.pushback.num_of_loops = Núm. de pushbacks extra
+edition.pushback.num_of_loops.description = Valores de pushback aplicados en los primeros %d frames de un movimiento
+edition.pushback.offsets_count = Núm. de pushbacks extra
+edition.pushback.offsets_count.description = Valores de pushback aplicados en los primeros %d frames de un movimiento
+edition.pushback.displacement = Desplazamiento
+edition.pushback.displacement.description = Desplazamiento lineal aplicado después de los primeros %d frames
+edition.pushback.extradata_addr = ID de datos extra
+edition.pushback.extradata_addr.description = Lista de valores de pushback aplicados en cada frame
+
+edition.pushback_extradata.window_name = Datos extra de pushback
+edition.pushback_extradata.horizontal_offset = Desplazamiento horizontal
+
+edition.form_list.item = Elemento
+edition.form_list.end = FIN
+edition.form_list.invalid = INVÁLIDO
+edition.form_list.controls_disabled_explanation =  Solo las listas con un ID inicial mayor que 1 tienen acceso a los controles de lista
+
+edition.animation_list.anim_name = Nombre de la animación
+edition.animation_list.duration = Duración (frames)
+edition.animation_list.size = Tamaño
+edition.animation_list.import = Importar en el movimiento
+edition.animation_list.search_animation = Busca el nombre de la animación a importar en el movimiento actual...
+edition.animation_list.no_anim = No se encontró ninguna animación en la biblioteca de animaciones. Usa el botón 'Extraer animaciones' del submenú del editor para extraer las animaciones de los personajes a la biblioteca.
+edition.animation_list.loading = Cargando la lista de animaciones...
+edition.animation_list.import_file = Importar desde archivo...
+edition.animation_list.clear_filter = Quitar filtro
+
+edition.throw_camera.window_name = Cámara de agarre
+edition.throw_camera.side = Lado
+edition.throw_camera.cameradata_addr = ID de datos de cámara
+
+edition.camera_data.window_name = Datos de cámara
+edition.camera_data._0x0_int = Probabilidad de elección
+edition.camera_data._0x0_int.description = Probabilidad de que se elija este valor de cámara\n1: Normal\n2: Doble
+edition.camera_data.pick_probability = Probabilidad de elección
+edition.camera_data.pick_probability.description = Probabilidad de que se elija este valor de cámara\n1: Normal\n2: Doble
+edition.camera_data._0x4_short = Tipo de cámara
+edition.camera_data._0x4_short.description = Tipo de cámara\n15: Animación\n16: Personalizada
+edition.camera_data.camera_type = Tipo de cámara
+edition.camera_data.camera_type.description = Tipo de cámara\n15: Animación\n16: Personalizada
+edition.camera_data.left_side_camera_data = Datos de cámara del lado izquierdo
+edition.camera_data.right_side_camera_data = Datos de cámara del lado derecho
+edition.camera_data._0xA_short = Rotación adicional
+edition.camera_data.additional_rotation = Rotación adicional
+
+edition.mvl_displayable.window_name = Lista de movimientos: Visible
+edition.mvl_displayable.type = Tipo
+edition.mvl_displayable.playable_id = ID jugable
+edition.mvl_displayable.playable = (Jugable)
+edition.mvl_displayable.not_playable = (No jugable)
+edition.mvl_displayable.category_1 = Desconocido
+edition.mvl_displayable.title_translation_0 = Título japonés
+edition.mvl_displayable.title_translation_1 = Título
+edition.mvl_displayable.title_translation_2 = Título japonés 2
+edition.mvl_displayable.title_translation_3 = Título 2
+edition.mvl_displayable.translation_0 = Japonés
+edition.mvl_displayable.translation_1 = Inglés
+edition.mvl_displayable.translation_2 = Portugués
+edition.mvl_displayable.translation_3 = Español
+edition.mvl_displayable.translation_4 = Francés
+edition.mvl_displayable.translation_5 = Italiano
+edition.mvl_displayable.translation_6 = Alemán
+edition.mvl_displayable.translation_7 = Mexicano
+edition.mvl_displayable.translation_8 = Cirílico
+edition.mvl_displayable.translation_9 = Árabe
+edition.mvl_displayable.translation_10 = Chino
+edition.mvl_displayable.translation_11 = Coreano
+edition.mvl_displayable.icons = Iconos
+edition.mvl_displayable.icons_2 = Iconos 2
+edition.mvl_displayable.combo_difficulty = Dificultad
+edition.mvl_displayable.combo_damage = Daño
+edition.mvl_displayable.p2_action = Acción del J2
+
+edition.mvl_playable.window_name = Lista de movimientos: Jugable
+edition.mvl_playable.distance = Distancia
+edition.mvl_playable.p2_rotation = Rotación del J2
+edition.mvl_playable.input_count = Número de inputs
+edition.mvl_playable.input_count.description = Cantidad de inputs a leer en la secuencia.
+edition.mvl_playable.input_sequence_id = ID de secuencia de inputs
+edition.mvl_playable.has_rage = Tiene Rage
+
+edition.mvl_input.window_name = Lista de movimientos: Input
+edition.mvl_input.directions = Direcciones
+edition.mvl_input.buttons = Botones
+edition.mvl_input.frame_duration = Duración
+edition.mvl_input.trigger_highlight = Activar resaltado
+edition.mvl_input.frame = Frame
+edition.mvl_input.frames = frames
+
+references.used_by = Usado por
+references.no_reference = No se encontraron referencias
+references.move.title = Referencias: Movimiento
+references.move.view_move = Ver movimiento
+references.reactions = Reacciones
+references.reactions.situations = Situaciones
+references.list_start = Lista (inicio)
+references.moves = Movimientos
+references.cancel.title = Cancelación
+references.cancels = Cancelaciones
+references.cancels.view_cancel = Ver cancelación
+references.cancels.requirements = Requisitos
+references.grouped_cancels = Cancelaciones agrupadas
+references.projectiles = Proyectiles
+
+# Documentación #
+
+# Acerca de #
+
+about.explanation = TKMovesets es un software creado por modders independientes que no tienen ninguna afiliación legal con los juegos con los que interactúa este software.\nEste software está licenciado bajo la GPLv3: es software libre (en el sentido de libertad) que puedes obtener, modificar y redistribuir libremente siempre que no cambies la licencia.\nSi pagaste por este software, te han estafado.
+about.credits = Créditos:
+about.kilo_explanation = Desarrollador principal del extractor de movesets, responsable de la ingeniería inversa de la gran mayoría de las estructuras de datos, de establecer el método de exportación/importación y de escribir estos programas de exportación/importación/edición de movesets.
+about.ali_explanation = Entre otras cosas, ayudó con la ingeniería inversa de las estructuras de movesets, ayudó mucho a descifrar los ID para la edición de movesets, creó tutoriales de edición de movesets e hizo posibles muchas funciones, como las animaciones de cámara y de manos
+about.fletch_explanation = Llevó la edición de movesets muy lejos documentando una gran cantidad de propiedades de edición de movesets y creando muchos tutoriales al respecto
+about.koenji_explanation = Se metió pronto en la edición de movesets y ayudó muchísimo a entender su flujo de trabajo; también contribuyó a descifrar muchas propiedades de los movesets
+about.sadamitsu_explanation = Ayudó a entender mucho mejor las animaciones de distintos tipos, cómo estaban estructuradas y dónde se almacenaban
+about.dennis_stanistan_explanation = Ayudó sin saberlo con una publicación casual en Discord que permitió poner en marcha el primer extractor de movesets
+
+extraction.retail_tables_only = T8 retail exporta las tablas de registros y las seis categorías de animaciones PANM cargadas. Los ID de animación no disponibles se registran explícitamente. Las opciones heredadas de MOTA/lista de práctica no se aplican. La importación retail y la lista de movimientos de práctica separada no son compatibles.
+
+importation.mota_explanation = Selecciona qué archivos MOTA del archivo usar. Las ranuras sin marcar conservan los archivos del personaje actual. Los archivos que falten también conservan los actuales. Se aplica a las importaciones de T7, incluidos los movesets convertidos.
+
+extraction.settings.reset_motas = Restablecer selección de MOTA
+
+extraction.panm.title = Animaciones
+extraction.panm.reset = Restablecer selección de animaciones
+extraction.panm.all = Todas
+extraction.panm.none = Ninguna (solo tablas)
+extraction.panm.explanation = Selecciona las animaciones a incluir, igual que en la selección de MOTA. Las categorías sin marcar reutilizan los recursos de origen del juego al importar. Si no se selecciona ninguna animación, solo se exportan las tablas. Por defecto se incluyen cuerpo, manos y cámaras. La extracción solo lee la memoria.
+extraction.panm.body = Animaciones del cuerpo
+extraction.panm.hands = Animaciones de las manos
+extraction.panm.face = Animaciones de la cara
+extraction.panm.swing = Animaciones de balanceo
+extraction.panm.camera = Animaciones de cámara
+extraction.panm.from_archive = Leer de sus archivos (tkdata.bin) las animaciones que el juego no ha cargado
+extraction.panm.from_archive_explanation = El juego solo mantiene algunas animaciones en memoria (las intros, outros y movimientos poco usados se cargan cuando hacen falta). Activado: la exportación los lee del tkdata.bin del juego, los mismos bytes que carga el juego, así que el archivo contiene todas las animaciones. Desactivado: se omiten; al importar el archivo se leen entonces del tkdata.bin, o la importación falla. Ningún movimiento recurre nunca a otra animación.
+extraction.panm.extra = Animaciones extra
+
+# -- Editor de Tekken 8 (retail) -- #
+edition.t8.game_attached = Conectado a Tekken 8
+edition.t8.game_running = Tekken 8 en ejecución, sin conectar
+edition.t8.game_not_running = Tekken 8 no está en ejecución
+edition.t8.references.details = Detalles
+edition.t8.animation_library.this_moveset = Este moveset
+edition.t8.animation_library.library = Biblioteca (editor_library)
+edition.t8.animation_library.refresh = Actualizar
+edition.t8.animation_library.open_folder = Abrir carpeta
+edition.t8.animation_library.loading = Cargando la biblioteca de animaciones...
+edition.t8.animation_library.empty = No hay ningún archivo .panm en editor_library. Usa 'Extraer animaciones' en un moveset para llenarla; cada carpeta de abajo corresponde a una extracción.
+edition.t8.animation_library.frames = Frames
+edition.t8.animation_library.import = Importar en el movimiento
+edition.t8.table = Tabla
+edition.t8.status_counters = {} pendientes | {} sin guardar
+edition.t8.saving_failed = Error al guardar. Tus ediciones siguen abiertas; vuelve a pulsar Guardar.
+edition.t8.unsaved_title = Ediciones sin guardar
+edition.t8.unsaved_unapplied = Algunos registros tienen ediciones sin aplicar. Aplícalas antes de guardar.
+edition.t8.unsaved_question = ¿Guardar los cambios antes de cerrar?
+edition.t8.save_and_close = Guardar y cerrar
+edition.t8.discard_and_close = Descartar y cerrar
+edition.t8.keep_editing = Seguir editando
+edition.t8.apply_other_forms = Aplica los demás formularios abiertos antes de cambiar los ID de registro.
+edition.t8.names_unavailable = Nombres no disponibles:
+edition.t8.animation_missing = El nombre de la animación no está en este moveset
+edition.t8.animation_identity = La identidad de la animación no está disponible
+edition.t8.panm_rewritten = Estructura no nativa: se reescribirá sobre una plantilla nativa al Aplicar.
+edition.t8.cannot_write_panm = No se puede escribir el PANM
+edition.t8.find_references = Buscar referencias
+edition.t8.import_panm = Importar PANM
+edition.t8.export_panm = Exportar PANM
+edition.t8.cancel_custom_panm = Cancelar PANM personalizado
+edition.t8.animation_search_hint = Buscar nombre de animación o ID de movimiento
+edition.t8.pending_panm = PANM personalizado pendiente (se aplica con Aplicar). Se convierte en una nueva animación de este movimiento, con el nombre de su archivo; ningún otro movimiento cambia. Haz clic en una animación de abajo para usar esa en su lugar.
+edition.t8.new_move_created = Movimiento {} creado a partir de la postura idle ({}): con su propia lista de cancelaciones AUTO hacia idle, sin listas de cancelaciones extra, sin voiceclips ni propiedades; las condiciones de golpe son las del idle.
+edition.t8.unknown_move = Movimiento desconocido
+edition.t8.custom_filter_tooltip = Movimientos editados en esta sesión o con nombres personalizados
+edition.t8.column_id = ID
+edition.t8.column_record = Registro
+edition.t8.column_table = Tabla
+edition.t8.column_field = Campo
+edition.t8.open = Abrir
+edition.t8.copy_move_id = Copiar ID del movimiento
+edition.t8.no_matching_move = Ningún ID de movimiento, alias o nombre coincide
+edition.t8.play_tooltip = Importa este documento en este jugador antes de reproducir movimientos. Vuelve a importarlo después de aplicar ediciones.
+edition.t8.record_search_hint = ID / etiqueta del registro
+edition.t8.importing = Importando el documento...
+edition.t8.queuing = Poniendo el movimiento en cola...
+edition.t8.cannot_attach = No se puede conectar a la versión retail compatible del juego
+edition.t8.live_stopped = La edición en vivo se detuvo porque cambió el jugador importado
+edition.t8.live_edit_written = Edición en vivo: {} registro(s) escrito(s) en J{}
+edition.t8.reimported = Reimportado en J{} ({})
+edition.t8.imported = Importado en J{}
+edition.t8.move_queued = Movimiento en cola en J{}
+edition.t8.no_saved_changes = No hay cambios guardados
+edition.t8.live_editing_explanation = Los campos válidos se aplican cuando terminas de editarlos y se escriben directamente en el moveset importado en el jugador seleccionado. Las ediciones estructurales (registros añadidos o eliminados, cambios de nombre) vuelven a importar el documento.
+edition.t8.cancel_save = Cancelar guardado
+edition.t8.references_title = Referencias:
+edition.t8.references_count = {} referencias a {}
+edition.t8.extracted = {} PANM extraídos en {}
+edition.t8.extract.title = Extraer animaciones
+edition.t8.extract.explanation = Escribe las animaciones marcadas de este moveset (incluidas las ediciones sin guardar) en una nueva carpeta de editor_library. Las animaciones que reproducen los movimientos llevan el nombre de la animación; las demás, su categoría e ID.
+edition.t8.extract.search_hint = Buscar por nombre, categoría o ID
+edition.t8.extract.select_all = Seleccionar todo
+edition.t8.extract.select_none = No seleccionar nada
+edition.t8.extract.select_explanation = Ambos botones se aplican a las filas que muestra la búsqueda.
+edition.t8.extract.column_name = Animación
+edition.t8.extract.column_category = Categoría
+edition.t8.extract.column_id = ID
+edition.t8.extract.column_size = Tamaño
+edition.t8.extract.selected = {} de {} seleccionadas
+edition.t8.extract.start = Extraer
+edition.t8.extract.stopped = Extracción de animaciones interrumpida; no se escribió nada.
+edition.t8.extract.none = Este moveset no contiene ninguna animación. Vuelve a exportarlo con categorías de animación seleccionadas.
+edition.t8.codec.hit_level = Tipo de ataque en los 12 bits bajos; los bits de flag superiores se conservan. Alto, medio, bajo y medio especial provienen de los handlers de requisitos de la versión retail; las entradas marcadas con ? se nombraron a partir de los movimientos que las usan. El valor bruto sigue siendo editable a la derecha.
+edition.t8.codec.hitbox_location = Una extremidad (0x00aa: línea desde su posición anterior hasta la actual) o una línea entre dos extremidades (0xaabb). Las manos y los pies se identificaron con más de 1,400 movimientos de puñetazo y de patada cada uno; las entradas marcadas con ? son hipótesis. El valor bruto sigue siendo editable a la derecha.
+
+# Descripciones de campos (al pasar el ratón). Los significados no verificados se indican como tales.
+edition.t8.moves.vulnerability.description = Estado de la hurtbox (campo cifrado, mostrado descifrado). Determina qué nivel de golpe puede impactar a este movimiento.
+edition.t8.moves.hit_level.description = Tipo de ataque (campo cifrado, mostrado descifrado). 0x512 = alto y 0x217 = medio están confirmados por los handlers de requisitos de la versión retail; 0x10F = bajo y 0x41F = medio especial no están verificados. 0 = sin ataque.
+edition.t8.moves.cancels.description = Lista de cancelaciones de este movimiento (índice de la tabla cancels, -1 = ninguna). La lista termina con la cancelación AUTO, que decide el movimiento que se reproduce cuando no se cumple ningún otro.
+edition.t8.moves.cancels_2.description = Lista de cancelaciones extra (índice de la tabla cancels). Solo se usa cuando su umbral es mayor que 0.
+edition.t8.moves.cancels_3.description = Lista de cancelaciones extra (índice de la tabla cancels). Solo se usa cuando su umbral es mayor que 0.
+edition.t8.moves.cancels_4.description = Lista de cancelaciones extra (índice de la tabla cancels). Solo se usa cuando su umbral es mayor que 0.
+edition.t8.moves.cancel_gate_2.description = Umbral de la lista de cancelaciones extra correspondiente: 0 o menos la desactiva (el importador borra entonces el puntero de la lista).
+edition.t8.moves.cancel_gate_3.description = Umbral de la lista de cancelaciones extra correspondiente: 0 o menos la desactiva (el importador borra entonces el puntero de la lista).
+edition.t8.moves.cancel_gate_4.description = Umbral de la lista de cancelaciones extra correspondiente: 0 o menos la desactiva (el importador borra entonces el puntero de la lista).
+edition.t8.moves.transition.description = Movimiento que se reproduce automáticamente cuando termina la animación de este movimiento (ID de movimiento, o alias genérico 0x8001 = idle).
+edition.t8.moves.end_rotation.description = Rotación aplicada al final del movimiento (no verificado).
+edition.t8.moves.character_id.description = Campo cifrado, mostrado descifrado: el par de ID del personaje (16 bits bajos = -id, 16 bits altos = id), p. ej. 0x0005FFFB = Jin (5). Igual en todos los movimientos. Consérvalo.
+edition.t8.moves.move_key.description = Campo cifrado, mostrado descifrado: hash Kamui de CODIGO_nombre (p. ej. JIN_ + nombre del movimiento), único por movimiento. Consérvalo.
+edition.t8.moves.damage_override.description = Daño forzado (con signo) del movimiento; -1 conserva el daño de las condiciones de golpe (-1 en el 99.9 % de los movimientos retail).
+edition.t8.moves.active_start.description = Inicio de la ventana activa del movimiento. Ninguna hitbox está activa antes; 0 = el movimiento no tiene hitbox.
+edition.t8.moves.active_end.description = Fin de la ventana activa del movimiento. Ninguna hitbox está activa después.
+edition.t8.moves.hitbox_start.description = Primer frame activo de esta hitbox (la ventana activa del movimiento también se aplica).
+edition.t8.moves.hitbox_last.description = Último frame activo de esta hitbox.
+edition.t8.moves.hitbox_location.description = Byte 0 = extremidad A, byte 1 = extremidad B: la línea de golpe va de A a B. Cuando B es 0, la línea barre la extremidad A desde su posición en el frame anterior. 0 = ranura sin usar.
+edition.t8.moves.hitbox_radius.description = Radio de la línea de golpe. 0 = el valor por defecto del personaje.
+edition.t8.moves.hitbox_vertical_height.description = Si es mayor que 0, la línea de golpe es un segmento vertical de esta altura centrado en la extremidad A.
+edition.t8.moves.hitbox_offset_a.description = Desplazamiento aplicado a la extremidad A (espacio del hueso; qué componente corresponde a cada eje no está verificado).
+edition.t8.moves.hitbox_offset_b.description = Desplazamiento aplicado a la extremidad B (espacio del hueso; qué componente corresponde a cada eje no está verificado).
+edition.t8.moves.hitbox_starts_off.description = 1 = esta hitbox empieza desactivada. La propiedad 0x8158 la activa o desactiva durante el movimiento.
+edition.t8.moves.unknown_0x150.description = Desconocido, se conserva tal cual.
+edition.t8.moves.unknown_0x154.description = Desconocido, se conserva tal cual.
+edition.t8.moves.hit_conditions.description = Lista de condiciones de golpe: daño y reacción del rival al recibir el golpe/bloquearlo (índice de la tabla hit_conditions, -1 = ninguna).
+edition.t8.moves.animation_length_adjuster.description = Ajuste (con signo) de la duración de la animación (por defecto 1; no verificado).
+edition.t8.moves.animation_length.description = Duración de la animación en frames. Se rellena a partir del PANM cuando se importa una animación personalizada.
+edition.t8.moves.airborne_start.description = Primer frame en el que el personaje cuenta como en el aire (0 = nunca).
+edition.t8.moves.airborne_end.description = Último frame en el aire.
+edition.t8.moves.ground_fall.description = Frame en el que el personaje vuelve a tocar el suelo.
+edition.t8.moves.voiceclips.description = Voiceclips reproducidos durante este movimiento (índice de la tabla voiceclips, -1 = ninguno).
+edition.t8.moves.properties.description = Propiedades extra ejecutadas durante este movimiento (índice de la tabla extra_properties, -1 = ninguna).
+edition.t8.moves.start_properties.description = Propiedades aplicadas cuando empieza el movimiento (índice de la tabla start_properties, -1 = ninguna).
+edition.t8.moves.end_properties.description = Propiedades aplicadas cuando termina el movimiento (índice de la tabla end_properties, -1 = ninguna).
+edition.t8.moves.collision.description = ID del estado de colisión (no verificado).
+edition.t8.moves.distance.description = Distancia recorrida en el aire (no verificado).
+edition.t8.cancels.command.description = Input: bits de dirección en el dword bajo, botones en el dword alto, descifrados en el título de la fila. Especiales: 0x8000 = fin de lista (AUTO), 0x8012 = cancelación de grupo, 0x8013 = fin de lista de grupo, 0x8014 + n = secuencia de inputs n.
+edition.t8.cancels.requirements.description = Condiciones que esta cancelación debe cumplir para producirse (índice de la tabla requirements).
+edition.t8.cancels.extra.description = Datos extra de cancelación (índice de la tabla cancel_extra): flags de bits como saltar frames, conservar el frame actual o el seguimiento (homing).
+edition.t8.cancels.window_start.description = Primer frame en el que esta cancelación puede iniciarse (si su comando y sus requisitos se cumplen).
+edition.t8.cancels.window_end.description = Último frame en el que esta cancelación puede iniciarse.
+edition.t8.cancels.starting_frame.description = Frame en el que empieza el movimiento de destino una vez cumplidos el comando y los requisitos.
+edition.t8.cancels.move_id.description = ID del movimiento de destino o alias genérico (0x8001 = idle). Para una cancelación de grupo (comando 0x8012): la fila de group_cancels.
+edition.t8.cancels.option.description = Flags de opción de cancelación. 0 en disco para todas las cancelaciones; el juego lo rellena al cargar (se han visto 80, 65, 336, 257). Significado no verificado.
+edition.t8.group_cancels.command.description = Misma codificación que un comando de cancelación. 0x8013 termina la lista de grupo.
+edition.t8.group_cancels.requirements.description = Condiciones que esta cancelación debe cumplir para producirse (índice de la tabla requirements).
+edition.t8.group_cancels.extra.description = Datos extra de cancelación (índice de la tabla cancel_extra): flags de bits como saltar frames, conservar el frame actual o el seguimiento (homing).
+edition.t8.group_cancels.window_start.description = Primer frame en el que esta cancelación puede iniciarse (si su comando y sus requisitos se cumplen).
+edition.t8.group_cancels.window_end.description = Último frame en el que esta cancelación puede iniciarse.
+edition.t8.group_cancels.starting_frame.description = Frame en el que empieza el movimiento de destino una vez cumplidos el comando y los requisitos.
+edition.t8.group_cancels.move_id.description = ID del movimiento de destino o alias genérico (0x8001 = idle).
+edition.t8.group_cancels.option.description = Flags de opción de cancelación. 0 en disco; el juego lo rellena al cargar. Significado no verificado.
+edition.t8.cancel_extra.value.description = Flags de bits de datos extra de cancelación (saltar frames, conservar el frame actual, homing...). No verificado para T8.
+edition.t8.requirements.condition.description = ID de la condición (etiqueta en el título de la fila). 1100 termina la lista.
+edition.t8.requirements.parameter_1.description = Primer parámetro; su significado depende de la condición (ver el título de la fila). La mayoría de las condiciones solo usan este.
+edition.t8.requirements.parameter_2.description = Segundo parámetro. Lo usan las comprobaciones de ranura, las listas de personajes y las comparaciones genéricas (operador).
+edition.t8.requirements.parameter_3.description = Tercer parámetro. Lo usan las comprobaciones de ranura, las listas de personajes y las comparaciones genéricas.
+edition.t8.requirements.parameter_4.description = Cuarto parámetro. Lo usan las comprobaciones de ranura, las listas de personajes y las comparaciones genéricas.
+edition.t8.hit_conditions.requirements.description = Condiciones que deben cumplirse para que se aplique esta condición de golpe (índice de la tabla requirements). La lista termina en la entrada cuyos requisitos empiezan por 1100.
+edition.t8.hit_conditions.damage.description = Daño infligido cuando se aplica esta condición de golpe.
+edition.t8.hit_conditions.unknown_0xC.description = Desconocido, se conserva tal cual.
+edition.t8.hit_conditions.reactions.description = Lista de reacciones que decide el comportamiento del rival al recibir el golpe/bloquearlo (índice de la tabla reactions).
+edition.t8.reactions.vertical_pushback.description = Pushback vertical (con signo, valores pequeños).
+edition.t8.reactions.front_rotation.description = Rotación, 0 en todos los archivos retail.
+edition.t8.reactions.back_rotation.description = Rotación, 0 en todos los archivos retail.
+edition.t8.reactions.left_side_rotation.description = Rotación, 0 en todos los archivos retail.
+edition.t8.reactions.right_side_rotation.description = Rotación, 0 en todos los archivos retail.
+edition.t8.reactions.downed_rotation.description = Rotación, 0 en todos los archivos retail. El selector de reacciones no lo lee.
+edition.t8.reactions.unknown_0x6C.description = Desconocido, 0 en todos los archivos retail.
+edition.t8.extra_properties.frame.description = Frame en el que se activa la propiedad: 32769 = instantáneo (+n), 0x4000 + n = cada n frames, 9999 = cada frame.
+edition.t8.extra_properties.requirements.description = Condiciones para que se aplique esta propiedad (índice de la tabla requirements, -1 = ninguna).
+edition.t8.extra_properties.property.description = ID de la propiedad (etiqueta en el título de la fila). 0 termina la lista.
+edition.t8.extra_properties.parameter_1.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.extra_properties.parameter_2.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.extra_properties.parameter_3.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.extra_properties.parameter_4.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.extra_properties.parameter_5.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.start_properties.requirements.description = Condiciones para que se aplique esta propiedad (índice de la tabla requirements, -1 = ninguna).
+edition.t8.start_properties.property.description = ID de la propiedad o requisito aplicado cuando empieza el movimiento. 1100 termina la lista.
+edition.t8.start_properties.parameter_1.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.end_properties.requirements.description = Condiciones para que se aplique esta propiedad (índice de la tabla requirements, -1 = ninguna).
+edition.t8.end_properties.property.description = ID de la propiedad o requisito aplicado cuando termina el movimiento. 1100 termina la lista.
+edition.t8.end_properties.parameter_1.description = Parámetro de la propiedad; su significado depende de la propiedad.
+edition.t8.pushbacks.duration.description = Duración del desplazamiento lineal.
+edition.t8.pushbacks.displacement.description = Desplazamiento lineal aplicado después de los valores por frame.
+edition.t8.pushbacks.extra_count.description = Número de valores de pushback por frame (entradas de pushback_extra) aplicados al inicio.
+edition.t8.pushbacks.extra.description = Valores de pushback por frame (índice de la tabla pushback_extra).
+edition.t8.pushback_extra.value.description = Desplazamiento horizontal aplicado en un frame.
+edition.t8.voiceclips.parameter_1.description = Clave de voz/sonido. 0xFFFFFFFF termina la lista.
+edition.t8.voiceclips.parameter_2.description = No verificado.
+edition.t8.voiceclips.parameter_3.description = No verificado.
+edition.t8.input_sequences.window.description = Frames permitidos entre dos inputs de la secuencia (no verificado).
+edition.t8.input_sequences.input_count.description = Número de inputs leídos en la secuencia.
+edition.t8.input_sequences.inputs.description = Primer input de la secuencia (índice de la tabla inputs).
+edition.t8.inputs.direction.description = Bits de dirección, con la misma estructura que el dword bajo de un comando de cancelación.
+edition.t8.inputs.buttons.description = Bits de botones, con la misma estructura que el dword alto de un comando de cancelación.
+edition.t8.parry.key.description = Clave del movimiento que se puede parar (no verificado).
+edition.t8.cameras.probability.description = Probabilidad de que se elija esta cámara (T7: 1 normal, 2 doble; no verificado para T8).
+edition.t8.cameras.type.description = Tipo de cámara (T7: 15 animación, 16 personalizada; no verificado para T8).
+edition.t8.throws.camera.description = Cámara de agarre (índice de la tabla cameras).
+edition.t8.throws.side.description = Lado del agarre (no verificado).
+edition.t8.dialogues.requirements.description = Condiciones para este diálogo (índice de la tabla requirements).
+edition.t8.dialogues.voice_key.description = Clave de la línea de voz.
+edition.t8.dialogues.facial_animation.description = ID de la animación facial (-1 = ninguna).
+edition.t8.projectiles.hit_conditions.description = Lista de condiciones de golpe del proyectil (índice de la tabla hit_conditions).
+edition.t8.projectiles.cancels.description = Lista de cancelaciones del proyectil (índice de la tabla cancels).
+edition.t8.parameter_1 = Parámetro 1
+edition.t8.param_unused = sin usar
+edition.t8.param_hover = {} [{}]
+{}
+Parámetro 1: {}
+Valores comunes: {}
+edition.t8.param_hover_other = {}: {}
+Este parámetro no está descrito para este ID.
+edition.t8.codec.cancel_option = Lo calcula el juego al cargar el moveset (0 en disco para todas las cancelaciones): 0x1 = sin comando, 0x10 = tiene comando, 0x100 = el destino es un alias genérico (exacto en 34,463 cancelaciones en memoria); 0x80 sigue al flag de comando 0x20000000 (95%); los demás bits no están descifrados. Editarlo no tiene efecto tras una recarga.
+edition.t8.codec.requirement_param = Significado del primer parámetro para este requisito. Los modos de juego, los tipos de mando y el código de combate de la historia provienen de TekkenMovesetExtractor de LukzB y no están verificados; los ID de personaje, los flags y los botones siguen la revisión de los handlers de la versión retail.
+edition.t8.codec.vulnerability = Palabra de postura del movimiento (copiada al jugador al empezar el movimiento): bits 0-2 = de pie 2 / agachado 1 / en el suelo 4, 0x400 = en el aire, según los handlers de requisitos de la versión retail. La lista contiene los valores que más usan los movesets retail; el desplegable conserva los demás bits. El valor bruto sigue siendo editable a la derecha.
+edition.t8.id_picker_hint = Filtrar por ID, hex, etiqueta o nombre de handler...
+edition.t8.codec.id_picker = Todos los ID de condición / propiedad conocidos con su etiqueta; los ID revisados sin etiqueta de la comunidad muestran el nombre de su handler. Pasa el ratón sobre una entrada para ver su significado. El ID bruto sigue siendo editable a la derecha.
+
+# Carpetas, diálogo de cierre, conversión y mensajes de error
+settings.folders.title = Carpetas de personajes
+settings.folders.extraction = Carpeta de extracción
+settings.folders.extraction_hint = Vacío: .\extracted_chars
+settings.folders.browse = Examinar
+settings.folders.save = Guardar
+settings.folders.clear = Vaciar
+settings.folders.extraction_help = Déjalo vacío para extraer en .\extracted_chars. Una carpeta personalizada debe ser una ruta absoluta.
+settings.folders.additional = Carpetas de personajes adicionales
+settings.folders.additional_help = Las listas de personajes siempre buscan en .\extracted_chars, en la carpeta de extracción y en las carpetas de abajo.
+settings.folders.remove = Quitar
+settings.folders.add = Añadir carpeta
+settings.folders.missing = La carpeta elegida no existe.
+settings.folders.duplicate = Esa carpeta ya está en la lista.
+settings.folders.add_help = Elige una carpeta en el explorador; sus personajes aparecerán en las listas.
+close.title = ¿Cerrar la aplicación?
+close.busy = Todavía hay un guardado en curso. Espera a que termine.
+close.unsaved = Algunos editores tienen ediciones sin guardar o sin aplicar. Sigue editando para aplicarlas y guardarlas.
+close.discard = Descartar ediciones y salir
+close.keep_editing = Seguir editando
+edition.convert.cancel = Cancelar conversión
+edition.convert.t7_to_t8_explanation = Crea un archivo de Tekken 8 separado a partir de este moveset de T7, sin necesidad del juego: los movimientos, hitboxes, cámaras, agarres, proyectiles y todas las animaciones del cuerpo provienen del archivo de T7. Las condiciones y propiedades sin equivalente en Tekken 8 no tienen efecto, y las listas de movimientos de práctica no se convierten.
+edition.convert.t8_to_t7_explanation = Crea un archivo de Tekken 7 separado a partir de este moveset retail de Tekken 8, sin necesidad del juego: los movimientos, hitboxes, cámaras, agarres, proyectiles y todas las animaciones del cuerpo incluidas provienen del archivo de T8. Las condiciones y propiedades sin equivalente en Tekken 7 no tienen efecto, las animaciones de manos, cara y cámara siguen siendo las del personaje de destino, y las listas de movimientos de práctica no se convierten.
+moveset.import_settings = Ajustes de importación
+edition.import_settings.title = Ajustes de importación
+edition.import_settings.explanation = Cómo se construye este moveset al importarlo. Solo cambia la cabecera del archivo: los datos del moveset se quedan como están. Los valores por defecto lo importan exactamente como antes.
+edition.import_settings.identity = Identidad del personaje
+edition.import_settings.identity_target = Adoptar el personaje de destino
+edition.import_settings.identity_fixed = Actuar como el ID de personaje
+edition.import_settings.character = ID de personaje
+edition.import_settings.gender = Comprobaciones de género
+edition.import_settings.gender_target = Del personaje de destino
+edition.import_settings.male = Masculino
+edition.import_settings.female = Femenino
+edition.import_settings.story_flag = Flag de historia de Tekken 8
+edition.import_settings.story_game = Lo decide el juego (las conversiones a Tekken 7 usan 0, versus)
+edition.import_settings.story_value = Valor del flag de historia (1 a 4: capítulos de la historia)
+edition.import_settings.in_heat = Cuenta como en Heat (movesets de Tekken 8 en Tekken 7)
+edition.import_settings.flags_clear = Las comprobaciones de flags de Tekken 8 ven los flags vacíos (juego normal)
+edition.import_settings.defaults = Por defecto
+edition.import_settings.save = Guardar
+edition.import_settings.saved = Guardado. Vuelve a importar el moveset para aplicarlo.
+edition.moveset_open_in_editor = Este moveset está abierto en un editor: cierra primero su ventana del editor; si no, su próximo guardado desharía este cambio.
+edition.import_settings.context = Comprobaciones de contexto (sin marcar: lo decide el juego)
+edition.import_settings.story_mode = Las comprobaciones del modo historia responden como fuera de la historia
+edition.import_settings.dlc_story = Las comprobaciones de historia DLC responden como fuera de la historia DLC (Tekken 8)
+edition.import_settings.special_modes = Comprobaciones de arcade, episodio y modos especiales desactivadas
+edition.import_settings.stage = Cualquier escenario (comprobaciones específicas de escenario desactivadas)
+edition.import_settings.wave_index = Índice fijo de oleada de la historia (Tekken 8)
+edition.import_settings.battle_script = Valor fijo del script de combate (Tekken 8)
+edition.import_settings.value = Valor
+edition.import_settings.item = Comprobaciones de objetos de personalización
+edition.import_settings.game_decides = Lo decide el juego
+edition.import_settings.item_none = Ningún objeto
+edition.import_settings.item_all = Todos los objetos
+edition.import_settings.body = Comprobaciones de tipo de cuerpo (Tekken 8)
+edition.import_settings.body_normal = Normal
+edition.import_settings.body_big = Grande
+edition.import_settings.body_bear = Oso
+edition.import_settings.story_effects = Quitar las propiedades de presentación de la historia (subtítulos, HUD, efectos de cinemáticas)
+edition.import_settings.global_writes = Quitar las propiedades que escriben el estado global del juego (Tekken 8)
+edition.convert.saved = Guardado:
+edition.convert.cancelled = Conversión cancelada.
+importation.error_game_write = Falló la escritura en la memoria del juego. Se restauraron los valores anteriores.
+importation.error_game_rollback = Falló la escritura en la memoria del juego y la restauración quedó incompleta. Se mantuvo la asignación para evitar punteros colgantes.
+importation.error_unsupported_version = Este archivo no es compatible con la versión del juego seleccionada.
+importation.error_moveset_data = No se pudo validar ni vincular el moveset. T8 retail requiere un moveset de origen cargado que coincida y los recursos de animación.
+importation.warning_title = Importado con advertencias
+importation.warning_idle_fallback = {} movimiento(s) reproducen la animación idle: {} animación(es) no se encontraron ni en el archivo ni en el tkdata.bin del juego.
+importation.warning_target_fallback = {} movimiento(s) reproducen la animación idle: ningún moveset cargado coincidía con este archivo, así que se usaron las animaciones propias del personaje de destino.
+importation.warning_first_error = Primer error: {}
+extraction.error_title = Error de extracción
+extraction.error_moveset_data = No se pudo leer el moveset de forma coherente. Comprueba que el personaje esté cargado y vuelve a intentar la extracción.
+about.dantarion_explanation = Sus primeras investigaciones y herramientas sobre los movesets de Tekken abrieron el camino a este proyecto
+
+# Herramientas > Direcciones
+addresses.title = Direcciones del juego
+addresses.explanation = Cuando el juego se actualiza, las direcciones que TKMovesets usa para exportar e importar pueden cambiar. Esta herramienta busca en el ejecutable del juego en disco (nunca lee ni escribe el juego en ejecución) los patrones de bytes guardados en game_addresses.ini, y luego escribe las direcciones que encuentra en game_addresses.ini y en las direcciones que usa este programa de inmediato. Los valores que no se encuentran se dejan como están.
+addresses.game = Juego:
+addresses.executable = Ejecutable del juego:
+addresses.executable_hint = Ruta a Polaris-Win64-Shipping.exe
+addresses.browse = Examinar
+addresses.detect = Detectar
+addresses.not_detected = No se encontró el ejecutable del juego. Busca Polaris-Win64-Shipping.exe.
+addresses.invalid_path = La ruta del ejecutable no es un texto válido. Vuelve a buscar el archivo.
+addresses.update = Actualizar direcciones desde el ejecutable
+addresses.scanning = Buscando en el ejecutable...
+addresses.busy = Esperando a que termine la extracción o importación en curso.
+addresses.no_patterns = game_addresses.ini no contiene patrones de bytes para este juego.
+addresses.write_failed = No se pudo escribir game_addresses.ini: no se cambió nada.
+addresses.up_to_date = Todas las direcciones ya coinciden con el ejecutable.
+addresses.nothing_changed = No se cambió nada.
+addresses.updated = {} dirección(es) actualizada(s) en game_addresses.ini y en este programa.
+addresses.some_failed = {} no se pudieron encontrar y conservaron su valor actual.
+addresses.results = Resultados
+addresses.exe_build = Marca de tiempo de compilación del ejecutable: 0x%X
+addresses.col_key = Dirección
+addresses.col_before = Antes
+addresses.col_found = En el ejecutable
+addresses.col_patterns = Patrones encontrados
+addresses.col_result = Resultado
+addresses.pattern_not_found = no encontrado
+addresses.pattern_ambiguous = encontrado más de una vez (ignorado)
+addresses.result_updated = Actualizado
+addresses.result_unchanged = Sin cambios
+addresses.result_not_found = No encontrado, se conserva
+addresses.result_conflict = Los patrones no coinciden, se conserva
+addresses.result_not_in_ini = Falta en el ini, se conserva
+
+# Herramientas > Extra
+extra.tag.title = Tag (Práctica de Tekken 8)
+extra.tag.explanation = Dos equipos de dos en Práctica: J3 es el compañero de J1 y J4 es el compañero de J2. Inicia una partida de Práctica y luego pulsa el botón: J3 y J4 se unen a la partida en curso en unos segundos. Ki Charge (el botón 1+2+3+4 del juego, o X+Y+A+B) hace entrar a tu compañero. Una Selección rápida o un cambio de personaje desactiva el Tag: vuelve a pulsar el botón en la nueva partida. Tag solo en Práctica. Esta función es experimental y solo para depuración.
+extra.tag.names_missing = No se encontró TKMInterface/t8-retail_names.json junto a TKMovesets2.exe: se usa la plantilla de personajes integrada.
+extra.tag.p3 = J3 (compañero de J1)
+extra.tag.p4 = J4 (compañero de J2)
+extra.tag.none = Ninguno (J2 pelea solo)
+extra.tag.load = Cargar J3/J4 y activar Tag
+extra.tag.disable = Desactivar
+extra.tag.injecting = Inyectando el cargador de movesets en el juego...
+extra.tag.no_game = Tekken 8 no está en ejecución.
+extra.tag.inject_failed = No se pudo iniciar el cargador de movesets en el juego.
+extra.tag.version_mismatch = El juego tiene un cargador de movesets de otra versión de TKMovesets2: reinicia el juego.
+
+edition.preview.no_animation = Este movimiento no tiene ninguna animación que previsualizar.
+edition.preview.no_renderer = Vista previa 3D no disponible (sin contexto OpenGL).
+edition.preview.loading = Cargando la animación...
+edition.preview.camera_help = Arrastrar con el botón izquierdo o central: orbitar. Arrastrar con el derecho: desplazar. Rueda: zoom. Doble clic: restablecer la cámara. Espacio: reproducir/pausar, flechas izquierda/derecha: avanzar frame a frame.
+edition.preview.active = ACTIVO
+edition.preview.active_suffix =  (activo)
+edition.preview.frame = Frame
+edition.preview.previous = Frame anterior
+edition.preview.next = Frame siguiente
+edition.preview.play = Reproducir
+edition.preview.pause = Pausa
+edition.preview.speed = Velocidad de reproducción
+edition.preview.loop = Bucle
+edition.preview.root_motion = Root motion
+edition.preview.root_motion_help = Mueve el personaje con el root motion de la animación (GlobalPos). Desactivado: se queda sobre el origen.
+edition.preview.follow = Seguir
+edition.preview.follow_help = Mantiene la cámara sobre el personaje.
+edition.preview.displacement = Desplazamiento
+edition.preview.displacement_help = Aplica al root motion las propiedades de desplazamiento conocidas del movimiento: multiplicadores de distancia horizontal y vertical de la animación, y empujes hacia delante/atrás y laterales. No se aplican los pushbacks infligidos a uno mismo ni los empujes de altura (se desconoce su efecto por frame).
+edition.preview.displacement_disabled = Este movimiento no tiene desplazamiento extra.
+edition.preview.displacement_horizontal = distancia horizontal %
+edition.preview.displacement_vertical = distancia vertical %
+edition.preview.displacement_forward = empuje hacia delante
+edition.preview.displacement_side = empuje a la izquierda
+edition.preview.displacement_conditional = %d más con condiciones, no aplicados.
+edition.preview.show = Mostrar la vista previa de la animación
+edition.preview.hide = Ocultar la vista previa de la animación
+edition.preview.hitboxes = Hitboxes
+edition.preview.hitboxes_help = Muestra las hitboxes del movimiento en sus frames activos como formas rojas: una esfera en la extremidad, una cápsula entre dos extremidades o la trayectoria de la extremidad desde el frame anterior. Aproximado: se colocan sobre el maniquí, con un tamaño por defecto cuando el movimiento no indica ninguno; no se dibujan las extremidades que no sean manos, pies, codos y rodillas.
+edition.preview.opponent = Rival
+edition.preview.opponent_help = Experimental. Un segundo personaje, en verde azulado, en los ataques: colocado donde llega la primera hitbox, reproduce el movimiento idle hasta el primer frame con hitbox y luego la reacción del golpe con más probabilidades de conectar (la condición de golpe sin requisitos). Su estado y el lado desde el que recibe el golpe están en los ajustes junto a esta casilla. Rudimentario: el juego comprueba mucho más.
+edition.preview.opponent_no_attack = Este movimiento no tiene hitboxes: sin rival.
+edition.preview.opponent_settings = Ajustes del rival
+edition.preview.opponent_airborne = En el aire
+edition.preview.opponent_air_move = Movimiento de pose
+edition.preview.opponent_air_move_help = Movimiento que reproduce el rival en el aire antes del golpe (ID de movimiento o alias); -1 o un ID no válido: el movimiento idle (32769).
+edition.preview.opponent_counterhit = Counter hit
+edition.preview.opponent_counterhit_help = Reproduce la reacción de counter hit (solo golpes de frente).
+edition.preview.opponent_pushback = Pushback
+edition.preview.opponent_pushback_help = Desliza al rival hacia atrás según el pushback del golpe (el del lado, como la reacción) a partir del frame del golpe. Aproximado: los desplazamientos por frame y luego el desplazamiento repartido a lo largo de su duración, leídos como milímetros.
+edition.preview.opponent_facing = Golpeado desde:
+edition.preview.opponent_front = Frente
+edition.preview.opponent_back = Espalda
+edition.preview.opponent_left = Lado izquierdo
+edition.preview.opponent_right = Lado derecho
+edition.preview.opponent_reaction = Reacción: movimiento %d
+edition.preview.opponent_no_reaction = No hay movimiento de reacción para este golpe.
+edition.preview.opponent_no_air_reaction = Este golpe no tiene condición de golpe para un rival en el aire: se usa la reacción en el suelo.
+edition.cancel_graph.open = Grafo de cancelaciones: los movimientos a los que cancela este movimiento
+edition.cancel_graph.back = < Volver al movimiento
+edition.cancel_graph.depth = Profundidad
+edition.cancel_graph.incoming_help = Mostrar los movimientos que cancelan hacia este (se buscan al hacer clic)
+edition.cancel_graph.refresh = Actualizar
+edition.cancel_graph.fit = Ajustar
+edition.cancel_graph.truncated = Límite de nodos alcanzado: algunas cancelaciones no se muestran
+edition.cancel_graph.help = Arrastra para moverte, usa la rueda para hacer zoom y haz doble clic en el fondo para ajustar. Pasa el ratón sobre un movimiento para reproducir su animación y haz clic para abrirlo. Pasa el ratón sobre el punto de un enlace para ver todas sus cancelaciones. Los movimientos genéricos y los ya mostrados no se vuelven a expandir; un + marca las cancelaciones más allá de la profundidad.
+edition.cancel_graph.input_sequence = Secuencia de inputs
+edition.cancel_graph.grouped = agrupada
+edition.cancel_graph.more = requisitos más
+edition.cancel_graph.more_cancels = cancelaciones más
+edition.cancel_graph.generic = Genérico
+edition.cancel_graph.generic_help = Movimiento genérico: sus cancelaciones no se expanden
+edition.cancel_graph.cut_off = Tiene más cancelaciones más allá del límite de profundidad
+edition.cancel_graph.click_to_open = Haz clic para abrir el movimiento
+edition.cancel_graph.no_cancel = Este movimiento no tiene cancelaciones
+edition.cancel_graph.no_input = Sin input
+edition.cancel_graph.external = Su lista de cancelaciones está fuera del moveset: no se muestra
+edition.cancel_graph.incoming_hide = Ocultar los movimientos que cancelan hacia este
+edition.cancel_graph.show_common = Movimientos Co_
+edition.cancel_graph.show_common_help = Mostrar también los movimientos comunes (llamados Co_...): muchas listas de cancelaciones llevan a muchos de ellos
+edition.cancel_graph.hidden_common = Co_ ocultos
+edition.cancel_graph.kind_attack = Ataque
+edition.cancel_graph.kind_throw = Agarre
+edition.cancel_graph.kind_screw = Screw
+edition.cancel_graph.kind_tornado = Tornado

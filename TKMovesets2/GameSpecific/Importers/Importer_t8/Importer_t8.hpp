@@ -37,6 +37,9 @@ class ImporterT8 : public Importer {
     const std::shared_ptr<const GameStaticData> m_names = GameStaticData::LoadShared("t8-retail");
     std::optional<RetailT8Snapshot::NativeData> m_native;
     std::vector<std::optional<std::string>> m_memoryOnlyNames, m_memoryOnlyAnimations;
+    // Converted T7 hand and camera animations: (category, file index) -> index published in the target's category index.
+    std::map<std::pair<uint32_t, uint32_t>, uint32_t> m_handIndices;
+    uint64_t m_handAnimations = 0, m_publishedHandIndices = 0, m_silencedHandProperties = 0;
     ImportationErrcode_ ImportMovesetData(const TKMovesetHeader*, Byte*, uint64_t, gameAddr, ImportSettings, uint8_t&) override;
 public:
     using Importer::Importer;
@@ -75,6 +78,14 @@ public:
     // Animation ids the game's archives declare without data (nothing to import; the move keeps the id).
     const std::set<uint32_t>& DatalessAnimations() const { return m_dataless; }
     uint64_t PublishedAnimations() const { return m_publishedAnimations; }
+    // Converted T7 hand and camera animations (memory-only route): (category, file index) -> published index, for the
+    // image audit.
+    const std::map<std::pair<uint32_t, uint32_t>, uint32_t>& HandIndices() const { return m_handIndices; }
+    // Hand and camera animations the file carries, category index entries published (others were ours already), and
+    // property rows that never fire because their animation could not be published (another route, or no index).
+    uint64_t HandAnimations() const { return m_handAnimations; }
+    uint64_t PublishedHandIndices() const { return m_publishedHandIndices; }
+    uint64_t SilencedHandProperties() const { return m_silencedHandProperties; }
     uint64_t ReusedAnimations() const { return m_reusedAnimations; }
     // Moves whose animation the file does not carry, bound to the idle animation.
     uint64_t MemoryOnlyFallbackMoves() const { return m_memoryOnlyFallbackMoves; }

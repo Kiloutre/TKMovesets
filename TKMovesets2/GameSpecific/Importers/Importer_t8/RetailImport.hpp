@@ -86,7 +86,17 @@ struct MemoryOnlyAudit {
     const std::set<uint32_t>* dataless = nullptr;
     // The game's compiled animation vtable (ImporterT8::Engine()); required.
     gameAddr compiledVtable = 0;
+    // Converted T7 hand and camera animations: (category, file index) -> index published in the target's category
+    // index (ImporterT8::HandIndices()). Null or missing: those rows were silenced (ApplyHandIndices).
+    const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* handIndices = nullptr;
 };
+// Converted T7 hand and camera animations (T7HandToRetailT8, T7CameraToRetailT8): extra-property rows playing a
+// converted hand or camera index get the index
+// the import published (`indices`); a row whose index was not published never fires (its frame becomes
+// ImportProfile::StrippedFrame), so it cannot play another animation or a missing one. Returns the rows changed;
+// `silenced` (optional) receives how many of them were silenced.
+uint64_t ApplyHandIndices(std::span<Byte> extraProperties, const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* indices,
+    uint64_t* silenced = nullptr);
 // Swaps the source and target identities in self-character checks: primary checks (220/221, 499/500) use `target`
 // (player +0x168), secondary checks (224/225, 503/504) use `targetSecondary` (player +0x16c; UINT32_MAX = `target`).
 uint64_t AdaptCharacterRequirements(std::span<Byte> records, uint32_t source, uint32_t target, uint32_t targetSecondary = UINT32_MAX);

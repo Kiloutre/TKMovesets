@@ -2,6 +2,7 @@
 
 #include "EditorVisuals.hpp"
 #include "Editors/Editor_t7/Editor_t7.hpp"
+#include <future>
 
 namespace EditorVisualsT7
 {
@@ -76,6 +77,21 @@ private:
 
 	// Imports a moveset to a specific player. -1 for both players, -2 for the currently selected player
 	void ImportToPlayer(int playerid);
+	// Queues the importation of `moveset` as ImportToPlayer describes `playerid`
+	void QueueImport(int playerid, const Byte* moveset, uint64_t movesetSize);
+
+	// Import into retail T8: the moveset is converted off the UI thread (T7RetailLive, which keeps what live edition
+	// needs), its container is imported, and live edits are then converted row by row (EditorT7::SetRetailLive).
+	std::future<std::unique_ptr<T7RetailLive>> m_retailConversion;
+	int m_retailImportPlayer = -2;
+	// Converted and queued; bound once the import reports the published moveset
+	std::unique_ptr<T7RetailLive> m_retailPending;
+	uint8_t m_retailPendingSlot = 0;
+	// T7 import: the file sent to the game, kept by the editor for Apply once the import reports the moveset
+	std::vector<Byte> m_t7PendingBaseline;
+	bool TargetsRetailT8() const;
+	bool RetailConversionBusy() const { return m_retailConversion.valid(); }
+	void PollRetailImport();
 
 	// If wanting to scorll to a specific move, this function will reset the filter to ALL if needed, and do nothing if not
 	void FilterMovelistIfMoveNotFound(uint16_t moveToSet);

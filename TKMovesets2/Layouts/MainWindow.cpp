@@ -74,26 +74,21 @@ bool MainWindow::IsMovesetOpenInEditor(const std::wstring& filename) const
 
 void MainWindow::HandleOpenRequests()
 {
-	const auto now = std::chrono::steady_clock::now();
-	for (auto& path : OpenRequests::Take()) {
-		m_pendingOpens.push_back({ std::move(path), now + std::chrono::seconds(10) });
-	}
-	if (m_pendingOpens.empty()) return;
-
-	// The moveset list fills in from its own thread, so a request may wait a few frames for its file to be listed
-	std::erase_if(m_pendingOpens, [&](const PendingOpen& request) {
-		for (movesetInfo* moveset : m_storage.extractedMovesets) {
-			if (_wcsicmp(moveset->filename.c_str(), request.path.c_str()) != 0) continue;
-			SetActiveMenu(NAV__MENU_EDITION);
-			// Same rule as the edition menu's Edit button
-			if (moveset->editable) LoadMovesetEditor(moveset);
-			return true;
+	// The file is opened where it is, so it does not have to be in a folder the moveset list reads
+	for (const auto& path : OpenRequests::Take()) {
+		const auto moveset = LocalStorage::ReadMovesetInfo(path);
+		if (!moveset) {
+			DEBUG_ERR("'%S' is not a valid moveset, not opening it", path.c_str());
+			continue;
 		}
-		if (now < request.deadline) return false;
-		DEBUG_ERR("Moveset '%S' never appeared in the moveset list, not opening it", request.path.c_str());
-		return true;
-	});
+		SetActiveMenu(NAV__MENU_EDITION);
+		// Same rule as the edition menu's Edit button
+		if (moveset->editable) LoadMovesetEditor(moveset.get());
+	}
 }
+
+// Embedded Simplified Chinese translation (its characters select the Chinese font glyphs)
+extern "C" const char zh_CN_txt[];
 
 static void TryLoadWindowsFont(std::vector<const char*> filenames, float size_pixels, ImGuiIO& io, ImFontConfig* config, const ImWchar* glyphRange)
 {
@@ -124,6 +119,17 @@ MainWindow::MainWindow(bool offline)
 	TryLoadWindowsFont({ "msgothic.ttc" }, 15, io, &config, io.Fonts->GetGlyphRangesJapanese());
 	TryLoadWindowsFont({ "CascadiaMono.ttf" }, 15, io, &config, io.Fonts->GetGlyphRangesCyrillic());
 	TryLoadWindowsFont({ "malgun.ttf" }, 16, io, &config, io.Fonts->GetGlyphRangesKorean());
+	{
+		// Simplified Chinese (Microsoft YaHei): only the characters the translation uses, so the atlas stays small.
+		// The ranges must outlive the atlas build.
+		static ImVector<ImWchar> chineseRanges;
+		if (chineseRanges.empty()) {
+			ImFontGlyphRangesBuilder builder;
+			builder.AddText(zh_CN_txt);
+			builder.BuildRanges(&chineseRanges);
+		}
+		TryLoadWindowsFont({ "msyh.ttc" }, 16, io, &config, chineseRanges.Data);
+	}
 
 
 	ImGuiExtra::InitMarkdownConfig();

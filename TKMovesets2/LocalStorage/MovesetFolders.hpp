@@ -11,5 +11,4 @@ void Save(Configuration configuration);
 std::filesystem::path ExtractionDirectory();
 std::vector<std::filesystem::path> SearchDirectories();
 // True if the file sits directly in one of the folders the moveset list is built from
-bool IsInSearchDirectory(const std::filesystem::path& file);
 }

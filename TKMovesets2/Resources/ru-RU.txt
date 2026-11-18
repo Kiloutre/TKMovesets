@@ -1,0 +1,1032 @@
+# Русский
+# Это комментарий
+# ключ = Текст
+# Каждая строка - отдельный перевод.
+# '\n' можно использовать для переноса строки в абзацах. Пробелы в начале и в конце ключей и текстов удаляются.
+# " navmenu =  This  is a    test   " превращается в "navmenu=This  is a    test", так что можно выравнивать что угодно
+
+# Утилиты #
+
+item = Элемент
+end = КОНЕЦ
+yes = Да
+no = Нет
+mota_00 = Анимации 1
+mota_01 = Анимации 2
+mota_02 = Руки 1
+mota_03 = Руки 2
+mota_04 = Лицо 1
+mota_05 = Лицо 2
+mota_06 = Крылья 1
+mota_07 = Крылья 2
+mota_08 = Камера 1
+mota_09 = Камера 2
+mota_10 = Неизвестно 1
+mota_11 = Неизвестно 2
+close = Закрыть
+close_window = Закрыть окно
+1p = Игрок 1
+2p = Игрок 2
+3p = Игрок 3
+4p = Игрок 4
+select_game = Выберите игру
+hash = Хеш
+
+# Процесс #
+
+process.status = Статус:
+process.game_not_attached = Подключение не выполняется. Выберите игру.
+process.game_not_running = Игра не запущена или не найдена.
+process.game_version_mismatch = Текущая версия игры не поддерживается файлом game_address.txt.
+process.game_attach_err = Игра найдена, но подключиться не удалось. Возможно, не хватает прав доступа.
+process.dll_version_mismatch = Внедренная DLL не соответствует версии программы. Перезапустите игру и эту программу.
+
+# Мувсет #
+moveset.origin = Источник
+moveset.name = Имя
+moveset.game = Игра
+moveset.target_character = Персонаж
+moveset.original_character = Исходный персонаж
+moveset.date = Дата
+moveset.extraction_date = Дата извлечения
+moveset.invalid = НЕДОПУСТИМ
+moveset.size = Размер
+moveset.size_mb = МБ
+moveset.size_kb = КБ
+moveset.rename = Переименовать
+moveset.convert = Конвертировать
+moveset.duplicate = Дублировать
+moveset.import = Импорт
+moveset.edit = Изменить
+moveset.delete = Удалить
+moveset.version = Версия
+moveset.hash = Хеш
+
+## Главное ##
+
+# Меню навигации #
+navmenu.category_moveset = Мувсеты
+navmenu.category_play = Игра
+navmenu.extraction = Извлечение
+navmenu.import = Импорт
+navmenu.online = Онлайн-игра
+navmenu.persistent_play = Постоянный режим
+
+navmenu.category_tools = Инструменты
+navmenu.moveset_edit = Редактор мувсетов
+navmenu.addresses = Адреса
+navmenu.extra = Дополнительно
+navmenu.camera = Камера
+
+navmenu.category_other = Прочее
+navmenu.documentation = Документация
+navmenu.about = О программе
+
+settings.general = Общие настройки
+settings.language = Язык
+settings.vsync = Вертикальная синхронизация
+settings.vsync_explanation = Может помочь ограничить частоту обновления этой программы, если она слишком нагружает видеокарту.
+settings.file_association = Связать .tkmvst / .tkanimXX
+settings.file_association_explanation = Связывает файлы мувсетов (.tkmvst) и файлы анимаций с этой программой.
+Открытие мувсета открывает его в редакторе там, где он лежит, открытие анимации копирует ее в библиотеку анимаций программы.
+settings.auto_update_check = Проверять обновления
+settings.auto_addr_update_check = Автообновление адресов
+settings.importation = Настройки импорта
+settings.apply_instantly = Применять сразу
+settings.apply_instantly_explanation = Если выключить, игра будет ждать окончания текущего приема, прежде чем переключиться на новый мувсет.\nДля некоторых приемов (например, анимации стойки Нигана) это может занять довольно много времени.
+settings.free_unused_movesets = Освобождать неиспользуемые мувсеты
+settings.free_unused_movesets_explanation = Если включено, ранее выделенные, но больше не используемые мувсеты будут освобождаться из памяти.\nЭто не дает программе занять всю оперативную память.
+settings.edition = Редактирование
+settings.editor_auto_apply = Применять правки автоматически
+settings.editor_auto_apply_explanation = Если включено, в формах редактора нет кнопки "Применить": правка применяется, как только форма корректна и вы покидаете поле, в котором печатали.
+settings.exportation = Настройки экспорта
+settings.overwrite_duplicate = Перезаписывать мувсет с тем же именем
+settings.overwrite_explanation = Включите, чтобы перезаписывать мувсеты с одинаковыми именами.\nВыключите, чтобы конфликты имен решались числовыми суффиксами.\nПример: T7_JIN (2)
+settings.keybinds = Горячие клавиши
+settings.keybind_rebind = Назначить
+settings.reset_keybinds = Сбросить клавиши
+settings.finish_keybind = Завершить назначение
+
+keybind_editor.import_p1 = Импорт на P1
+keybind_editor.import_p2 = Импорт на P2
+keybind_editor.import_both = Импорт на P1 и P2
+keybind_editor.save = Сохранить
+keybind_editor.change_data_type = Сменить тип данных
+
+sidemenu.settings = Настройки
+sidemenu.up_to_date = Актуальная версия
+sidemenu.updated_addr = Адреса обновлены!
+sidemenu.update_check = Проверка обновлений...
+sidemenu.update = Обновить
+sidemenu.update_error = Ошибка обновления
+sidemenu.update_explanation = Найдено обновление.\nЗагрузить его и перезапустить программу сейчас?
+sidemenu.update_bad_file = Не удалось применить обновление.\nОбновите программу вручную.
+
+sidemenu.changelog = Список изменений
+
+## Подменю ##
+
+# Извлечение #
+extraction.explanation = Чтобы использовать мувсеты, их сначала нужно извлечь из игры. Извлекаются только мувсеты: не модели и не визуальные эффекты.\nИзвлечение выполняется при запущенной игре (из памяти), когда нужные персонажи загружены и видны на экране (режим игры не важен).\nВ идеале персонажи не должны двигаться во время извлечения (или игра должна стоять на паузе).
+extraction.extraction = Извлечение
+extraction.extract = Извлечь
+extraction.extract_all = Извлечь (все)
+extraction.extract_from = Извлечь из:
+extraction.progress = Извлечение... (%u%%)
+extraction.progress_error = Ошибка извлечения (%u%%)
+extraction.progress_done = Извлечение... Готово!
+extraction.extracted_movesets = Извлеченные мувсеты
+extraction.cant_extract = Невозможно извлечь: персонажи не загружены.
+extraction.error_file_creation = Ошибка при создании файла мувсета
+extraction.error_compression = Ошибка при сжатии файла мувсета
+extraction.error_allocation = Ошибка выделения памяти при копировании данных мувсета
+extraction.mota_explanation = Дополнительные анимации
+extraction.settings = Настройки
+extraction.settings.other = Прочее
+extraction.settings.displayable_movelist = Отображаемый список приемов
+extraction.settings.compress_moveset = Сжимать мувсет
+extraction.settings.compression_type = Тип сжатия
+extraction.settings.compression_type.none = Без сжатия
+extraction.settings.extract_unsupported_motas = Извлекать редкие MOTA (неподдерживаемые форматы)
+
+# Импорт #
+importation.explanation = После того как мувсеты извлечены и сохранены на компьютере, их можно загрузить в активную игру (не онлайн) в этом подменю. Это действует однократно: загруженные здесь мувсеты выгружаются после любого экрана загрузки, поэтому это в основном для режима тренировки.\nДля онлайн-игры см. раздел "Онлайн".
+importation.importation = Импорт
+importation.select_moveset = Выберите мувсет для импорта
+importation.cant_import = Невозможно импортировать: вы не находитесь в активной игре (тренировка и т.п.).
+importation.import_to = Импорт на:
+importation.progress = Импорт... (%u%%)
+importation.progress_error = Ошибка импорта (%u%%)
+importation.progress_done = Импорт... Готово!
+importation.error_file_reading = Ошибка при чтении файла мувсета
+importation.error_allocation = Ошибка выделения памяти при чтении данных мувсета
+importation.error_game_allocation = Ошибка выделения памяти игры при записи данных мувсета
+importation.error_decompression = Ошибка при распаковке данных мувсета
+
+# Постоянный режим #
+persistent.explanation = Постоянный режим позволяет выбрать мувсеты для игроков, и они сохраняются между экранами загрузки, даже если вы смените сторону.\nЭто можно использовать онлайн, если у соперника тоже запущена эта программа и вы оба уже скачали/извлекли оба мувсета:\nКаждый должен выбрать свой мувсет (или ничего) как "Игрок 1", мувсет соперника (или ничего) как "Игрок 2" и зафиксировать выбор.
+persistent.player_1 = Игрок 1:
+persistent.player_2 = Игрок 2:
+persistent.player_3 = Игрок 3:
+persistent.player_4 = Игрок 4:
+persistent.none = Нет мувсета
+persistent.lock = Зафиксировать
+persistent.unlock = Разблокировать
+persistent.hash = Хеш:
+persistent.select_moveset = Выбрать мувсет
+persistent.clear_moveset = Сбросить мувсет
+
+# Онлайн #
+online.explanation = Для онлайн-игры у обоих игроков должна быть запущена эта программа.\nКаждый должен выбрать свой мувсет (или ничего) до экрана загрузки матча, программа сама синхронизирует файлы мувсетов в фоне, пересылать их друг другу не нужно.\nСвои мувсеты не загрузятся, если у вас или у соперника не запущена программа или если кто-то из игроков не зафиксировал выбор персонажа в ней.
+online.no_selected_moveset = Мувсет не выбран
+online.dll_not_loaded = DLL не загружена, внедрите ее
+online.inject_dll = Внедрить
+online.injecting_dll = Внедрение...
+online.select_moveset = Выбрать
+online.selected_moveset = Выбрано:
+online.lock_to_play = Зафиксируйте выбор, чтобы мувсеты загрузились.
+
+# Редактирование мувсета: переименование #
+edition.rename.new_moveset_name = Новое имя мувсета
+edition.rename.empty_name = Имя пустое
+edition.rename.already_exists = Имя уже занято другим файлом
+edition.rename.rename_err = Ошибка при переименовании. Допустимы ли символы?
+edition.rename.invalid_name = Имя содержит недопустимые символы. (/\|<>:"?*)
+edition.convert.format_target = Формат для конвертации
+
+# Редактирование мувсета #
+edition.explanation = Здесь можно редактировать извлеченные мувсеты. Уроки и полезные материалы ищите в документации.\nВключите "Редактирование в реальном времени", чтобы быстро менять свой мувсет: простые изменения значений сразу применяются в памяти без загрузки.
+edition.select_moveset = Выберите мувсет для изменения
+edition.last_saved = Последнее сохранение:
+edition.save = Сохранить
+edition.saving_error = Ошибка сохранения
+edition.discard_changes = Отменить изменения?\nЕсли включено редактирование в реальном времени, структура в игре не вернется в исходное состояние.
+edition.process_err = Ошибка
+edition.live_edition = Редактирование в реальном времени
+edition.live_edition_explanation = Включите, чтобы простые изменения, например правка значений, применялись прямо в памяти игры без повторного импорта мувсета.\nДобавление или удаление элементов списка и все, что увеличивает размер мувсета, потребует нового импорта.
+edition.move_name = Имя
+edition.move_generic_id = Алиас
+edition.moves_all = Все
+edition.moves_attacks = Атаки
+edition.moves_generic = Общие
+edition.moves_throws = Броски
+edition.moves_custom = Свои
+edition.moves_char_specific = Персонаж
+edition.move_id_hint = ID/имя приема...
+edition.move_screw = Использует скрю: условие попадания требует "Screw available".
+edition.move_tornado = Использует торнадо: условие попадания требует "Tornado Available".
+edition.move_rage = Тратит ярость: есть свойство "Spend Rage" с параметром 1.
+edition.move_heat = Тратит Heat: свойство тратит заряд Heat Dash или расходует шкалу Heat.
+edition.move_current = Текущий
+edition.move_current_1p = Текущий (1P)
+edition.move_current_2p = Текущий (2P)
+edition.play_move_1p = Играть (1P)
+edition.play_move_2p = Играть (2P)
+edition.window_title = Редактор
+edition.apply = Применить
+edition.window_controls_explanation = Нажмите на прием в списке приемов, чтобы открыть его окно. Новое окно заменит ранее открытое, ЕСЛИ в нем нет несохраненных изменений И вы не удерживали левый CTRL при нажатии на прием. Окна можно перетаскивать куда угодно, стыковать друг с другом и собирать в разные раскладки.
+
+edition.tools = Инструменты
+edition.extract_animations = Извлечь анимации
+edition.extract_animations_finished = Извлечение анимаций завершено!
+edition.animation_extraction.extraction_status = Статус извлечения
+edition.animation_extraction.not_started = Не начато
+edition.animation_extraction.skipped = Пропущено
+edition.animation_extraction.skipped_exists = Уже есть
+edition.animation_extraction.error = Ошибка
+edition.animation_extraction.interrupt = Прервать
+edition.t7_disk.button = Извлечь из файлов
+edition.t7_disk.executable = Исполняемый файл Tekken 7 (TekkenGame-Win64-Shipping.exe)
+edition.t7_disk.title = Извлечь все мувсеты T7 из файлов игры
+edition.t8_disk.button = Извлечь из файлов
+edition.t8_disk.executable = Исполняемый файл Tekken 8 (Polaris-Win64-Shipping.exe)
+edition.t8_disk.executable_hint = Вставьте путь к exe или выберите его; заполняется, когда игра запущена
+edition.t8_disk.title = Извлечь все мувсеты T8 из файлов игры
+edition.t8_disk.explanation = Извлекает персонажей из файлов игры. Персонажи могут занимать много места.
+edition.t8_disk.start = Начать
+edition.t8_disk.characters = Персонажи
+edition.t8_disk.column_name = Имя
+edition.t8_disk.column_code = Код
+edition.t8_disk.column_status = Статус
+edition.t8_disk.select_none = Ничего
+edition.t8_disk.building = Сборка...
+edition.t8_disk.built = Приемов: {}, анимаций: {}
+edition.t8_disk.finished = Все мувсеты готовы!
+edition.open_characters_directory = Открыть папку персонажей
+edition.open_editor_library = Открыть библиотеку редактора
+edition.open_editor_backups = Открыть резервные копии
+edition.refresh_movesets = Обновить мувсеты
+
+edition.form_popup.copy_structure_clipboard = Копировать структуру
+edition.form_popup.copy_single_item_clipboard = Копировать элемент
+edition.form_popup.paste_structure_clipboard = Вставить структуру
+edition.form_popup.duplicate_structure = Дублировать структуру
+edition.form_popup.duplicate_item = Дублировать эту строку в конец списка
+edition.form_popup.delete_structure = Удалить структуру
+edition.form_popup.what_references_this_move = Какие структуры ссылаются на этот прием?
+edition.form_popup.what_references_this_cancel = Какие приемы используют этот список отмен?
+edition.form_popup.deletion_are_you_sure = Вы уверены, что хотите удалить эту структуру?\nСтруктуры лучше не удалять, чтобы избежать проблем, если на них ссылаются из многих мест.
+edition.form_popup.yes_delete = Да, удалить.
+
+edition.create_new = Создать
+edition.goto = Перейти
+edition.goto_open = Открыть
+edition.requirement = Список условий
+edition.move = Прием
+edition.voiceclips = Озвучка
+edition.cancel_list = Список отмен
+edition.grouped_cancel_list = Список групповых отмен
+edition.cancel_extradata = Доп. данные отмены
+edition.extra_properties = Доп. свойства
+edition.move_begin_properties = Свойства начала приема
+edition.move_end_properties = Свойства конца приема
+edition.hit_conditions = Список условий попадания
+edition.reactions = Реакции
+edition.pushback = Отталкивание
+edition.pushback_extra = Доп. отталкивание
+edition.input_sequence = Последовательность ввода
+edition.inputs = Вводы
+edition.projectile = Снаряд
+edition.throw_camera = Камера броска
+edition.camera_data = Данные камеры
+edition.mvl_playable = Список приемов: проигрываемые
+edition.mvl_inputs = Список приемов: вводы
+
+edition.update_labels = Обновить метки
+edition.updating_labels = Метки: обновление...
+edition.updating_labels_err = Метки: ОШИБКА
+edition.up_to_date_labels = Метки: актуальны
+edition.updated_labels = Метки: обновлены!
+
+edition.open_movelist = Открыть список приемов
+
+edition.move.window_name = Прием
+edition.move.category_2 = Ссылки
+edition.move.category_3 = Дополнительно
+edition.move.category_5 = Безымянные поля
+edition.move.move_name = Имя
+edition.move.move_name.description = Имя приема, не влияет на геймплей.
+edition.move.anim_name = Анимация
+edition.move.anim_name.description = Анимация, которую проигрывает этот прием.
+edition.move.vulnerability = Уязвимость
+edition.move.vulnerability.description = Определяет, удары какого уровня могут попасть по этому приему.
+edition.move.hitlevel = Уровень удара
+edition.move.hitlevel.description = Тип атаки (High/Mid/Low и т.д.)
+edition.move.transition = Переход
+edition.move.transition.description = Визуальный переход в другой прием в конце этого
+edition.move.anim_len = Длина анимации
+edition.move.hitbox_location = Положение хитбокса
+edition.move.hitbox_location.description = Где расположены хитбоксы приема
+edition.move.first_active_frame = Первый активный кадр
+edition.move.last_active_frame = Последний активный кадр
+edition.move.airborne_start = Начало полета
+edition.move.airborne_end = Конец полета
+edition.move.ground_fall = Приземление
+edition.move.distance = Дистанция
+edition.move.hit_condition_addr = ID условий попадания
+edition.move.hit_condition_addr.description = Урон и поведение соперника при попадании/блоке
+edition.move.extra_properties_addr = ID доп. свойств
+edition.move.extra_properties_addr.description = Свойства, срабатывающие во время этого приема
+edition.move.move_start_extraprop_addr = ID доп. свойств начала
+edition.move.move_end_extraprop_addr = ID доп. свойств конца
+edition.move.voiceclip_addr = ID озвучки
+edition.move.voiceclip_addr.description = Озвучка, звучащая во время этого приема
+edition.move.cancel_addr = ID отмен
+edition.move.cancel_addr_2 = ID отмен (2)
+edition.move.cancel_related_id_2 = ID отмен 2: связанный
+edition.move.cancel_addr_3 = ID отмен (4)
+edition.move.cancel_related_id_3 = ID отмен 3: связанный
+edition.move.cancel_addr_4 = ID отмен (4)
+edition.move.cancel_related_id_4 = ID отмен 4: связанный
+edition.move._0x98_int = Направление/доп.?
+
+edition.voiceclip.window_name = Озвучка
+edition.voiceclip.id = ID
+edition.voiceclip.limb_swinging = Звук взмаха конечности
+edition.voiceclip.hit = Звук удара
+edition.voiceclip.end = КОНЕЦ
+
+edition.extraproperty.window_name = Список доп. свойств
+edition.extraproperty.starting_frame = Начальный кадр
+edition.extraproperty.id = ID
+edition.extraproperty.throw_camera_id = ID камеры броска
+edition.extraproperty.throw_camera_id.description = ID проигрываемого движения камеры
+edition.extraproperty.projectile_id = ID снаряда
+edition.extraproperty.projectile_id.description = ID создаваемого снаряда
+edition.extraproperty.instant = МГНОВЕННО
+edition.extraproperty.every_frame = КАЖДЫЙ КАДР
+edition.extraproperty.every_nth_frame = КАЖДЫЕ %d КАДР.
+edition.extraproperty.value_unsigned = Значение (U32)
+edition.extraproperty.value_signed = Значение (S32)
+edition.extraproperty.value_hex = Значение (H32)
+edition.extraproperty.value_float = Значение (Float)
+
+edition.move_start_extraprop.window_name = Свойства начала
+edition.move_start_extraprop.requirements_addr = ID условий
+edition.move_start_extraprop.extraprop = Свойство / условие
+edition.move_start_extraprop.value = Значение
+
+edition.move_end_extraprop.window_name = Свойства конца
+edition.move_end_extraprop.requirements_addr = ID условий
+edition.move_end_extraprop.extraprop =  Свойство / условие
+edition.move_end_extraprop.value = Значение
+
+edition.cancel.window_name = Список отмен
+edition.cancel.command = Команда
+edition.cancel.requirements_addr = ID условий
+edition.cancel.requirements_addr.description = ID условий, которым должна соответствовать эта отмена, чтобы сработать
+edition.cancel.extradata_addr = ID доп. данных
+edition.cancel.extradata_addr.description = ID доп. данных отмены: битовые флаги, дающие отмене особые свойства, например пропуск кадров, сохранение текущего кадра, наведение.
+edition.cancel.detection_start = Начало проверки
+edition.cancel.detection_start.description = Первый кадр, на котором может начаться эта отмена (если совпали команда и условия)
+edition.cancel.detection_end = Конец проверки
+edition.cancel.detection_end.description = Последний кадр, на котором может начаться эта отмена
+edition.cancel.starting_frame = Начальный кадр
+edition.cancel.starting_frame.description = Кадр, с которого начнется эта отмена, если проверка команды и условий прошла успешно
+edition.cancel.move_id = ID приема
+edition.cancel.group_id = ID группы отмен
+edition.cancel.group_id.description = ID групповой отмены, на которую ссылается эта отмена
+edition.cancel.sequence_id = ID последовательности
+edition.cancel.cancel_option = Опция отмены
+edition.cancel.invalid_sequence_id = Неверный ID
+
+edition.grouped_cancel.window_name = Список групповых отмен
+edition.grouped_cancel.command = Команда
+edition.grouped_cancel.requirements_addr = ID условий
+edition.grouped_cancel.requirements_addr.description = ID условий, которым должна соответствовать эта отмена, чтобы сработать
+edition.grouped_cancel.extradata_addr = ID доп. данных
+edition.grouped_cancel.extradata_addr.description = ID доп. данных отмены: битовые флаги, дающие отмене особые свойства, например пропуск кадров, сохранение текущего кадра, наведение.
+edition.grouped_cancel.detection_start = Начало проверки
+edition.grouped_cancel.detection_start.description = Первый кадр, на котором может начаться эта отмена (если совпали команда и условия)
+edition.grouped_cancel.detection_end = Конец проверки
+edition.grouped_cancel.detection_end.description = Последний кадр, на котором может начаться эта отмена
+edition.grouped_cancel.starting_frame = Начальный кадр
+edition.grouped_cancel.starting_frame.description = Кадр, с которого начнется эта отмена, если проверка команды и условий прошла успешно
+edition.grouped_cancel.move_id = ID приема
+edition.grouped_cancel.cancel_option = Опция отмены
+
+edition.cancel_extra.window_name = Доп. данные отмены
+edition.cancel_extra.value = Значение
+
+edition.requirement.window_name = Список условий
+edition.requirement.condition = Условие
+edition.requirement.condition.description = ID проверяемого условия
+edition.requirement.param_unsigned = Параметр
+edition.requirement.param_float = Параметр (Float)
+
+edition.hit_condition.window_name = Список условий попадания
+edition.hit_condition.requirements_addr = ID условий
+edition.hit_condition.requirements_addr.description = ID списка условий, которые должны выполняться, чтобы сработало это условие попадания
+edition.hit_condition.damage = Урон
+edition.hit_condition.reactions_addr = ID реакций
+edition.hit_condition.reactions_addr.description = ID списка реакций, определяющего поведение соперника при попадании/блоке
+
+edition.reactions.window_name = Реакции
+edition.reactions.category_1 = ID отталкиваний
+edition.reactions.category_3 = ID приемов
+edition.reactions.category_5 = Направление
+edition.reactions.category_7 = Прочее
+edition.reactions.front_pushback = Спереди
+edition.reactions.backturned_pushback = Спиной
+edition.reactions.left_side_pushback = Левый бок
+edition.reactions.right_side_pushback = Правый бок
+edition.reactions.front_counterhit_pushback = Спереди CH
+edition.reactions.downed_pushback = Лежа
+edition.reactions.block_pushback = Блок
+edition.reactions.front_direction = Спереди
+edition.reactions.back_direction = Сзади
+edition.reactions.left_side_direction = Левый бок
+edition.reactions.right_side_direction = Правый бок
+edition.reactions.front_counterhit_direction = Спереди CH
+edition.reactions.downed_direction = Лежа
+edition.reactions.0x44_long = _0x44_long
+edition.reactions.front_rotation = Спереди
+edition.reactions.back_rotation = Сзади
+edition.reactions.left_side_rotation = Левый бок
+edition.reactions.right_side_rotation = Правый бок
+edition.reactions.front_counterhit_rotation = Спереди CH
+edition.reactions.downed_rotation = Лежа
+edition.reactions.vertical_pushback = Вертикальное отталкивание
+edition.reactions.standing_moveid = Стоя
+edition.reactions.default_moveid = По умолчанию
+edition.reactions.crouch_moveid = Присед
+edition.reactions.counterhit_moveid = Контрудар
+edition.reactions.crouch_counterhit_moveid = Присед CH
+edition.reactions.left_side_moveid = Левый бок
+edition.reactions.crouch_left_side_moveid = Присед, левый бок
+edition.reactions.right_side_moveid = Правый бок
+edition.reactions.crouch_right_side_moveid = Присед, правый бок
+edition.reactions.backturned_moveid = Спиной
+edition.reactions.crouch_backturned_moveid = Присед спиной
+edition.reactions.block_moveid = Блок
+edition.reactions.crouch_block_moveid = Блок в приседе
+edition.reactions.wallslump_moveid = Оседание у стены
+edition.reactions.downed_moveid = Лежа
+
+edition.input_sequence.window_name = Последовательность ввода
+edition.input_sequence.input_window_frames = Окно (кадры)
+edition.input_sequence.input_amount = Число вводов
+edition.input_sequence.input_addr = ID ввода
+
+edition.input.window_name = Ввод
+edition.input.direction = Направление
+edition.input.button = Кнопки
+edition.input.inputs = Вводы
+
+edition.projectile.window_name = Снаряд
+edition.projectile.category_2 = Ссылки
+edition.projectile.category_3 = Безымянные
+edition.projectile.vfx_id = ID VFX
+edition.projectile.vfx_variation_id = ID варианта VFX
+edition.projectile.delay = Задержка
+edition.projectile.vertical_velocity = Вертикальная скорость
+edition.projectile.horizontal_velocity = Горизонтальная скорость
+edition.projectile.duration = Длительность
+edition.projectile.no_collision = Без столкновений
+edition.projectile.size = Размер
+edition.projectile.hash = Хеш
+edition.projectile.can_hitbox_connect = Хитбокс может попасть
+edition.projectile.gravity = Гравитация
+edition.projectile.hit_level = Уровень удара
+edition.projectile.hit_condition_addr = ID условий попадания
+edition.projectile.cancel_addr = ID отмен
+edition.projectile.voiceclip_on_hit = Озвучка (попадание)
+
+edition.pushback.window_name = Отталкивание
+edition.pushback.duration = Длительность
+edition.pushback.duration.description = Длительность линейного смещения
+edition.pushback.num_of_loops = Число доп. отталкиваний
+edition.pushback.num_of_loops.description = Значения отталкивания, применяемые на первых %d кадрах приема
+edition.pushback.offsets_count = Число доп. отталкиваний
+edition.pushback.offsets_count.description = Значения отталкивания, применяемые на первых %d кадрах приема
+edition.pushback.displacement = Смещение
+edition.pushback.displacement.description = Линейное смещение, применяемое после первых %d кадров
+edition.pushback.extradata_addr = ID доп. данных
+edition.pushback.extradata_addr.description = Список значений отталкивания, применяемых на каждом кадре
+
+edition.pushback_extradata.window_name = Доп. данные отталкивания
+edition.pushback_extradata.horizontal_offset = Горизонтальное смещение
+
+edition.form_list.item = Элемент
+edition.form_list.end = КОНЕЦ
+edition.form_list.invalid = НЕДОПУСТИМ
+edition.form_list.controls_disabled_explanation =  Управление списком доступно только спискам с начальным ID больше 1
+
+edition.animation_list.anim_name = Имя анимации
+edition.animation_list.duration = Длительность (кадры)
+edition.animation_list.size = Размер
+edition.animation_list.import = Импорт в прием
+edition.animation_list.search_animation = Поиск анимации для импорта в текущий прием...
+edition.animation_list.no_anim = В библиотеке анимаций ничего не найдено. Нажмите кнопку "Извлечь анимации" в подменю редактора, чтобы извлечь анимации персонажа в библиотеку.
+edition.animation_list.loading = Загрузка списка анимаций...
+edition.animation_list.import_file = Импорт из файла...
+edition.animation_list.clear_filter = Сбросить фильтр
+
+edition.throw_camera.window_name = Камера броска
+edition.throw_camera.side = Сторона
+edition.throw_camera.cameradata_addr = ID данных камеры
+
+edition.camera_data.window_name = Данные камеры
+edition.camera_data._0x0_int = Вероятность выбора
+edition.camera_data._0x0_int.description = Шанс выбора этого значения камеры\n1: обычный\n2: двойной
+edition.camera_data.pick_probability = Вероятность выбора
+edition.camera_data.pick_probability.description = Шанс выбора этого значения камеры\n1: обычный\n2: двойной
+edition.camera_data._0x4_short = Тип камеры
+edition.camera_data._0x4_short.description = Тип камеры\n15: анимация\n16: своя
+edition.camera_data.camera_type = Тип камеры
+edition.camera_data.camera_type.description = Тип камеры\n15: анимация\n16: своя
+edition.camera_data.left_side_camera_data = Данные камеры (слева)
+edition.camera_data.right_side_camera_data = Данные камеры (справа)
+edition.camera_data._0xA_short = Доп. поворот
+edition.camera_data.additional_rotation = Доп. поворот
+
+edition.mvl_displayable.window_name = Список приемов: отображаемые
+edition.mvl_displayable.type = Тип
+edition.mvl_displayable.playable_id = ID проигрываемого
+edition.mvl_displayable.playable = (Проигрываемый)
+edition.mvl_displayable.not_playable = (Не проигрываемый)
+edition.mvl_displayable.category_1 = Неизвестно
+edition.mvl_displayable.title_translation_0 = Японское название
+edition.mvl_displayable.title_translation_1 = Название
+edition.mvl_displayable.title_translation_2 = Японское название 2
+edition.mvl_displayable.title_translation_3 = Название 2
+edition.mvl_displayable.translation_0 = Японский
+edition.mvl_displayable.translation_1 = Английский
+edition.mvl_displayable.translation_2 = Португальский
+edition.mvl_displayable.translation_3 = Испанский
+edition.mvl_displayable.translation_4 = Французский
+edition.mvl_displayable.translation_5 = Итальянский
+edition.mvl_displayable.translation_6 = Немецкий
+edition.mvl_displayable.translation_7 = Мексиканский
+edition.mvl_displayable.translation_8 = Кириллица
+edition.mvl_displayable.translation_9 = Арабский
+edition.mvl_displayable.translation_10 = Китайский
+edition.mvl_displayable.translation_11 = Корейский
+edition.mvl_displayable.icons = Иконки
+edition.mvl_displayable.icons_2 = Иконки 2
+edition.mvl_displayable.combo_difficulty = Сложность
+edition.mvl_displayable.combo_damage = Урон
+edition.mvl_displayable.p2_action = Действие P2
+
+edition.mvl_playable.window_name = Список приемов: проигрываемые
+edition.mvl_playable.distance = Дистанция
+edition.mvl_playable.p2_rotation = Поворот P2
+edition.mvl_playable.input_count = Число вводов
+edition.mvl_playable.input_count.description = Сколько вводов прочитать в последовательности.
+edition.mvl_playable.input_sequence_id = ID последовательности ввода
+edition.mvl_playable.has_rage = С яростью
+
+edition.mvl_input.window_name = Список приемов: ввод
+edition.mvl_input.directions = Направления
+edition.mvl_input.buttons = Кнопки
+edition.mvl_input.frame_duration = Длительность
+edition.mvl_input.trigger_highlight = Подсветка
+edition.mvl_input.frame = Кадр
+edition.mvl_input.frames = кадр.
+
+references.used_by = Используется в
+references.no_reference = Ссылки не найдены
+references.move.title = Ссылки: прием
+references.move.view_move = Показать прием
+references.reactions = Реакции
+references.reactions.situations = Ситуации
+references.list_start = Список (начало)
+references.moves = Приемы
+references.cancel.title = Отмена
+references.cancels = Отмены
+references.cancels.view_cancel = Показать отмену
+references.cancels.requirements = Условия
+references.grouped_cancels = Групповые отмены
+references.projectiles = Снаряды
+
+# Документация #
+
+# О программе #
+
+about.explanation = TKMovesets - программа, созданная независимыми моддерами, юридически никак не связанными с играми, с которыми она взаимодействует.\nПрограмма распространяется под лицензией GPLv3: это свободное ПО, которое можно получать, изменять и распространять, если не менять лицензию.\nЕсли вы заплатили за эту программу, вас обманули.
+about.credits = Благодарности:
+about.kilo_explanation = Основной разработчик извлекателя мувсетов: исследовал большую часть структур данных, разработал методику экспорта/импорта и написал эти программы для экспорта, импорта и редактирования мувсетов.
+about.ali_explanation = Среди прочего помогал исследовать структуры мувсетов, внес большой вклад в расшифровку ID для редактирования, создал уроки по редактированию мувсетов и принес много функций, например анимации камеры и рук
+about.fletch_explanation = Сильно продвинул редактирование мувсетов, задокументировав множество свойств и создав по ним много уроков
+about.koenji_explanation = Рано занялся редактированием мувсетов и очень помог понять процесс работы, а также помог расшифровать многие свойства мувсетов
+about.sadamitsu_explanation = Помог гораздо лучше разобраться в анимациях разных типов: как они устроены и где хранятся
+about.dennis_stanistan_explanation = Сам того не зная, помог случайным постом в Discord, с которого и начался первый извлекатель мувсетов
+
+extraction.retail_tables_only = Retail T8 экспортирует таблицы записей и все шесть загруженных категорий анимаций PANM. Недоступные ID анимаций явно записываются. Старые опции MOTA и списка тренировки не применяются. Импорт retail и отдельный список приемов тренировки не поддерживаются.
+
+importation.mota_explanation = Выберите, какие архивы MOTA взять из файла. Неотмеченные слоты сохраняют архивы текущего персонажа. Отсутствующие архивы тоже остаются текущими. Применяется к импорту T7, включая конвертированные мувсеты.
+
+extraction.settings.reset_motas = Сбросить выбор MOTA
+
+extraction.panm.title = Анимации
+extraction.panm.reset = Сбросить выбор анимаций
+extraction.panm.all = Все
+extraction.panm.none = Нет (только таблицы)
+extraction.panm.explanation = Выберите анимации для включения, как при выборе MOTA. Для неотмеченных категорий при импорте используются исходные ресурсы игры. Если анимации не выбраны, экспортируются только таблицы. По умолчанию: тело, руки и камеры. Извлечение только читает память.
+extraction.panm.body = Анимации тела
+extraction.panm.hands = Анимации рук
+extraction.panm.face = Анимации лица
+extraction.panm.swing = Анимации взмахов
+extraction.panm.camera = Анимации камеры
+extraction.panm.from_archive = Читать незагруженные игрой анимации из ее файлов (tkdata.bin)
+extraction.panm.from_archive_explanation = Игра держит в памяти только часть анимаций (вступления, концовки и редкие приемы загружаются по необходимости). Вкл.: экспорт читает их из tkdata.bin игры, те же байты, что загружает игра, и файл содержит все анимации. Выкл.: они не включаются; тогда при импорте файла они читаются из tkdata.bin, иначе импорт не удастся. Ни один прием никогда не подменяется другой анимацией.
+extraction.panm.extra = Доп. анимации
+
+# -- Редактор Tekken 8 (retail) -- #
+edition.t8.game_attached = Подключено к Tekken 8
+edition.t8.game_running = Tekken 8 запущен, не подключено
+edition.t8.game_not_running = Tekken 8 не запущен
+edition.t8.references.details = Подробности
+edition.t8.animation_library.this_moveset = Этот мувсет
+edition.t8.animation_library.library = Библиотека (editor_library)
+edition.t8.animation_library.refresh = Обновить
+edition.t8.animation_library.open_folder = Открыть папку
+edition.t8.animation_library.loading = Загрузка библиотеки анимаций...
+edition.t8.animation_library.empty = В editor_library нет файлов .panm. Используйте "Извлечь анимации" на мувсете, чтобы заполнить ее; каждая папка ниже - одно извлечение.
+edition.t8.animation_library.frames = Кадры
+edition.t8.animation_library.import = Импорт в прием
+edition.t8.table = Таблица
+edition.t8.status_counters = Ожидают: {} | Не сохранено: {}
+edition.t8.saving_failed = Сохранение не удалось. Ваши правки остаются открытыми; повторите "Сохранить".
+edition.t8.unsaved_title = Несохраненные правки
+edition.t8.unsaved_unapplied = В некоторых записях есть непримененные правки. Примените их перед сохранением.
+edition.t8.unsaved_question = Сохранить изменения перед закрытием?
+edition.t8.save_and_close = Сохранить и закрыть
+edition.t8.discard_and_close = Отменить и закрыть
+edition.t8.keep_editing = Продолжить
+edition.t8.apply_other_forms = Примените другие открытые формы, прежде чем менять ID записей.
+edition.t8.names_unavailable = Имена недоступны:
+edition.t8.animation_missing = Имени анимации нет в этом мувсете
+edition.t8.animation_identity = Идентификатор анимации недоступен
+edition.t8.panm_rewritten = Нестандартная структура: при применении будет перезаписана поверх стандартного шаблона.
+edition.t8.cannot_write_panm = Невозможно записать PANM
+edition.t8.find_references = Найти ссылки
+edition.t8.import_panm = Импорт PANM
+edition.t8.export_panm = Экспорт PANM
+edition.t8.cancel_custom_panm = Отменить свой PANM
+edition.t8.animation_search_hint = Поиск по имени анимации или ID приема
+edition.t8.pending_panm = Ожидающий свой PANM (применяется кнопкой "Применить"). Он станет новой анимацией этого приема с именем его файла; другие приемы не меняются. Нажмите на анимацию ниже, чтобы использовать ее вместо него.
+edition.t8.new_move_created = Прием {} создан из стойки ({}): свой список отмен AUTO в стойку, без доп. списков отмен, без озвучки, без свойств; условия попадания - как у стойки.
+edition.t8.unknown_move = Неизвестный прием
+edition.t8.custom_filter_tooltip = Приемы, измененные в этом сеансе или со своими именами
+edition.t8.column_id = ID
+edition.t8.column_record = Запись
+edition.t8.column_table = Таблица
+edition.t8.column_field = Поле
+edition.t8.open = Открыть
+edition.t8.copy_move_id = Копировать ID приема
+edition.t8.no_matching_move = Нет приема с таким ID, алиасом или именем
+edition.t8.play_tooltip = Импортируйте этот документ на этого игрока, прежде чем проигрывать приемы. После применения правок импортируйте снова.
+edition.t8.record_search_hint = ID записи / метка
+edition.t8.importing = Импорт документа...
+edition.t8.queuing = Постановка приема в очередь...
+edition.t8.cannot_attach = Не удается подключиться к поддерживаемой retail-версии игры
+edition.t8.live_stopped = Редактирование в реальном времени остановлено: импортированный игрок изменился
+edition.t8.live_edit_written = Редактирование в реальном времени: записей: {}, игрок P{}
+edition.t8.reimported = Повторно импортировано на P{} ({})
+edition.t8.imported = Импортировано на P{}
+edition.t8.move_queued = Прием поставлен в очередь на P{}
+edition.t8.no_saved_changes = Нет сохраненных изменений
+edition.t8.live_editing_explanation = Корректные поля применяются, когда вы заканчиваете правку, и записываются прямо в мувсет, импортированный на выбранного игрока. Структурные правки (добавление или удаление записей, переименования) заново импортируют документ.
+edition.t8.cancel_save = Отменить сохранение
+edition.t8.references_title = Ссылки:
+edition.t8.references_count = Ссылок: {} (на {})
+edition.t8.extracted = Извлечено PANM: {} (в {})
+edition.t8.extract.title = Извлечь анимации
+edition.t8.extract.explanation = Записывает отмеченные анимации этого мувсета (включая несохраненные правки) в новую папку в editor_library. Анимации, которые проигрывают приемы, называются по имени анимации; остальные - по категории и ID.
+edition.t8.extract.search_hint = Поиск по имени, категории или ID
+edition.t8.extract.select_all = Выбрать все
+edition.t8.extract.select_none = Снять все
+edition.t8.extract.select_explanation = Обе кнопки действуют на строки, показанные поиском.
+edition.t8.extract.column_name = Анимация
+edition.t8.extract.column_category = Категория
+edition.t8.extract.column_id = ID
+edition.t8.extract.column_size = Размер
+edition.t8.extract.selected = Выбрано {} из {}
+edition.t8.extract.start = Извлечь
+edition.t8.extract.stopped = Извлечение анимаций прервано; ничего не записано.
+edition.t8.extract.none = В этом мувсете нет анимаций. Экспортируйте его снова с выбранными категориями анимаций.
+edition.t8.codec.hit_level = Тип атаки в младших 12 битах; биты флагов выше сохраняются. High, mid, low и special mid взяты из обработчиков условий retail-версии; значения с ? названы по приемам, которые их используют. Исходное значение можно изменить справа.
+edition.t8.codec.hitbox_location = Одна конечность (0x00aa: линия от ее прошлого положения к текущему) или линия между двумя конечностями (0xaabb). Руки и ноги сверены более чем на 1 400 ударах руками и ногами каждая; значения с ? - гипотезы. Исходное значение можно изменить справа.
+
+# Описания полей (при наведении). Непроверенные значения помечены.
+edition.t8.moves.vulnerability.description = Состояние хёртбокса (зашифрованное поле, показано расшифрованным). Определяет, удары какого уровня могут попасть по этому приему.
+edition.t8.moves.hit_level.description = Тип атаки (зашифрованное поле, показано расшифрованным). 0x512 = high и 0x217 = mid подтверждены обработчиками условий retail-версии; 0x10F = low и 0x41F = special mid не проверены. 0 = нет атаки.
+edition.t8.moves.cancels.description = Список отмен этого приема (индекс в таблице cancels, -1 = нет). Список заканчивается отменой AUTO, которая решает, какой прием проиграется, если больше ничего не совпало.
+edition.t8.moves.cancels_2.description = Доп. список отмен (индекс в таблице cancels). Используется, только если его порог больше 0.
+edition.t8.moves.cancels_3.description = Доп. список отмен (индекс в таблице cancels). Используется, только если его порог больше 0.
+edition.t8.moves.cancels_4.description = Доп. список отмен (индекс в таблице cancels). Используется, только если его порог больше 0.
+edition.t8.moves.cancel_gate_2.description = Порог соответствующего доп. списка отмен: 0 или меньше отключает его (тогда импортер обнуляет указатель на список).
+edition.t8.moves.cancel_gate_3.description = Порог соответствующего доп. списка отмен: 0 или меньше отключает его (тогда импортер обнуляет указатель на список).
+edition.t8.moves.cancel_gate_4.description = Порог соответствующего доп. списка отмен: 0 или меньше отключает его (тогда импортер обнуляет указатель на список).
+edition.t8.moves.transition.description = Прием, автоматически проигрываемый по окончании анимации этого приема (ID приема или общий алиас 0x8001 = стойка).
+edition.t8.moves.end_rotation.description = Поворот, применяемый в конце приема (не проверено).
+edition.t8.moves.character_id.description = Зашифрованное поле, показано расшифрованным: пара ID персонажа (младшие 16 бит = -id, старшие 16 бит = id), например 0x0005FFFB = Jin (5). Одинаково во всех приемах. Не меняйте.
+edition.t8.moves.move_key.description = Зашифрованное поле, показано расшифрованным: хеш Kamui от CODE_name (например JIN_ + имя приема), уникален для каждого приема. Не меняйте.
+edition.t8.moves.damage_override.description = Знаковая замена урона приема; -1 оставляет урон из условий попадания (-1 у 99.9 % приемов retail).
+edition.t8.moves.active_start.description = Начало активного окна приема. До него хитбоксы не действуют; 0 = у приема нет хитбокса.
+edition.t8.moves.active_end.description = Конец активного окна приема. После него хитбоксы не действуют.
+edition.t8.moves.hitbox_start.description = Первый активный кадр этого хитбокса (активное окно приема тоже действует).
+edition.t8.moves.hitbox_last.description = Последний активный кадр этого хитбокса.
+edition.t8.moves.hitbox_location.description = Байт 0 = конечность A, байт 1 = конечность B: линия удара идет от A к B. Если B равно 0, линия проходит по пути конечности A от ее положения на прошлом кадре. 0 = слот не используется.
+edition.t8.moves.hitbox_radius.description = Радиус линии удара. 0 = значение персонажа по умолчанию.
+edition.t8.moves.hitbox_vertical_height.description = Если больше 0, линия удара - вертикальный отрезок такой высоты с центром на конечности A.
+edition.t8.moves.hitbox_offset_a.description = Смещение конечности A (в пространстве кости; какой компонент какой оси соответствует, не проверено).
+edition.t8.moves.hitbox_offset_b.description = Смещение конечности B (в пространстве кости; какой компонент какой оси соответствует, не проверено).
+edition.t8.moves.hitbox_starts_off.description = 1 = этот хитбокс изначально выключен. Свойство 0x8158 включает или выключает его во время приема.
+edition.t8.moves.unknown_0x150.description = Неизвестно, сохраняется как есть.
+edition.t8.moves.unknown_0x154.description = Неизвестно, сохраняется как есть.
+edition.t8.moves.hit_conditions.description = Список условий попадания: урон и реакция соперника при попадании/блоке (индекс в таблице hit_conditions, -1 = нет).
+edition.t8.moves.animation_length_adjuster.description = Знаковая поправка к длине анимации (по умолчанию 1; не проверено).
+edition.t8.moves.animation_length.description = Длина анимации в кадрах. Заполняется из PANM при импорте своей анимации.
+edition.t8.moves.airborne_start.description = Первый кадр, на котором персонаж считается в воздухе (0 = никогда).
+edition.t8.moves.airborne_end.description = Последний кадр в воздухе.
+edition.t8.moves.ground_fall.description = Кадр, на котором персонаж снова на земле.
+edition.t8.moves.voiceclips.description = Озвучка во время этого приема (индекс в таблице voiceclips, -1 = нет).
+edition.t8.moves.properties.description = Доп. свойства во время этого приема (индекс в таблице extra_properties, -1 = нет).
+edition.t8.moves.start_properties.description = Свойства, применяемые в начале приема (индекс в таблице start_properties, -1 = нет).
+edition.t8.moves.end_properties.description = Свойства, применяемые в конце приема (индекс в таблице end_properties, -1 = нет).
+edition.t8.moves.collision.description = ID состояния столкновений (не проверено).
+edition.t8.moves.distance.description = Дистанция, пройденная в воздухе (не проверено).
+edition.t8.cancels.command.description = Ввод: биты направления в младшем dword, кнопки в старшем dword, расшифровка в заголовке строки. Особые: 0x8000 = конец списка (AUTO), 0x8012 = групповая отмена, 0x8013 = конец группового списка, 0x8014 + n = последовательность ввода n.
+edition.t8.cancels.requirements.description = Условия, которым должна соответствовать эта отмена, чтобы сработать (индекс в таблице requirements).
+edition.t8.cancels.extra.description = Доп. данные отмены (индекс в таблице cancel_extra): битовые флаги, например пропуск кадров, сохранение текущего кадра, наведение.
+edition.t8.cancels.window_start.description = Первый кадр, на котором может начаться эта отмена (если совпали команда и условия).
+edition.t8.cancels.window_end.description = Последний кадр, на котором может начаться эта отмена.
+edition.t8.cancels.starting_frame.description = Кадр, с которого начинается целевой прием, когда команда и условия совпали.
+edition.t8.cancels.move_id.description = ID целевого приема или общий алиас (0x8001 = стойка). Для групповой отмены (команда 0x8012): строка group_cancels.
+edition.t8.cancels.option.description = Флаги опций отмены. На диске 0 у каждой отмены; игра заполняет их при загрузке (встречались 80, 65, 336, 257). Значение не проверено.
+edition.t8.group_cancels.command.description = Та же кодировка, что у команды отмены. 0x8013 завершает групповой список.
+edition.t8.group_cancels.requirements.description = Условия, которым должна соответствовать эта отмена, чтобы сработать (индекс в таблице requirements).
+edition.t8.group_cancels.extra.description = Доп. данные отмены (индекс в таблице cancel_extra): битовые флаги, например пропуск кадров, сохранение текущего кадра, наведение.
+edition.t8.group_cancels.window_start.description = Первый кадр, на котором может начаться эта отмена (если совпали команда и условия).
+edition.t8.group_cancels.window_end.description = Последний кадр, на котором может начаться эта отмена.
+edition.t8.group_cancels.starting_frame.description = Кадр, с которого начинается целевой прием, когда команда и условия совпали.
+edition.t8.group_cancels.move_id.description = ID целевого приема или общий алиас (0x8001 = стойка).
+edition.t8.group_cancels.option.description = Флаги опций отмены. На диске 0; игра заполняет их при загрузке. Значение не проверено.
+edition.t8.cancel_extra.value.description = Битовые флаги доп. данных отмены (пропуск кадров, сохранение текущего кадра, наведение...). Для T8 не проверено.
+edition.t8.requirements.condition.description = ID условия (метка в заголовке строки). 1100 завершает список.
+edition.t8.requirements.parameter_1.description = Первый параметр; его смысл зависит от условия (см. заголовок строки). Большинство условий используют только его.
+edition.t8.requirements.parameter_2.description = Второй параметр. Используется проверками слотов, списками персонажей и общими сравнениями (оператор).
+edition.t8.requirements.parameter_3.description = Третий параметр. Используется проверками слотов, списками персонажей и общими сравнениями.
+edition.t8.requirements.parameter_4.description = Четвертый параметр. Используется проверками слотов, списками персонажей и общими сравнениями.
+edition.t8.hit_conditions.requirements.description = Условия, которые должны выполняться, чтобы применилось это условие попадания (индекс в таблице requirements). Список заканчивается на записи, условия которой начинаются с 1100.
+edition.t8.hit_conditions.damage.description = Урон, наносимый, когда применяется это условие попадания.
+edition.t8.hit_conditions.unknown_0xC.description = Неизвестно, сохраняется как есть.
+edition.t8.hit_conditions.reactions.description = Список реакций, определяющий поведение соперника при попадании/блоке (индекс в таблице reactions).
+edition.t8.reactions.vertical_pushback.description = Вертикальное отталкивание (знаковое, малые значения).
+edition.t8.reactions.front_rotation.description = Поворот, 0 во всех файлах retail.
+edition.t8.reactions.back_rotation.description = Поворот, 0 во всех файлах retail.
+edition.t8.reactions.left_side_rotation.description = Поворот, 0 во всех файлах retail.
+edition.t8.reactions.right_side_rotation.description = Поворот, 0 во всех файлах retail.
+edition.t8.reactions.downed_rotation.description = Поворот, 0 во всех файлах retail. Не читается при выборе реакции.
+edition.t8.reactions.unknown_0x6C.description = Неизвестно, 0 во всех файлах retail.
+edition.t8.extra_properties.frame.description = Кадр срабатывания свойства: 32769 = мгновенно (+n), 0x4000 + n = каждые n кадров, 9999 = каждый кадр.
+edition.t8.extra_properties.requirements.description = Условия применения этого свойства (индекс в таблице requirements, -1 = нет).
+edition.t8.extra_properties.property.description = ID свойства (метка в заголовке строки). 0 завершает список.
+edition.t8.extra_properties.parameter_1.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.extra_properties.parameter_2.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.extra_properties.parameter_3.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.extra_properties.parameter_4.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.extra_properties.parameter_5.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.start_properties.requirements.description = Условия применения этого свойства (индекс в таблице requirements, -1 = нет).
+edition.t8.start_properties.property.description = ID свойства или условия, применяемого в начале приема. 1100 завершает список.
+edition.t8.start_properties.parameter_1.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.end_properties.requirements.description = Условия применения этого свойства (индекс в таблице requirements, -1 = нет).
+edition.t8.end_properties.property.description = ID свойства или условия, применяемого в конце приема. 1100 завершает список.
+edition.t8.end_properties.parameter_1.description = Параметр свойства; его смысл зависит от свойства.
+edition.t8.pushbacks.duration.description = Длительность линейного смещения.
+edition.t8.pushbacks.displacement.description = Линейное смещение, применяемое после покадровых значений.
+edition.t8.pushbacks.extra_count.description = Число покадровых значений отталкивания (записей pushback_extra), применяемых в начале.
+edition.t8.pushbacks.extra.description = Покадровые значения отталкивания (индекс в таблице pushback_extra).
+edition.t8.pushback_extra.value.description = Горизонтальное смещение, применяемое на одном кадре.
+edition.t8.voiceclips.parameter_1.description = Ключ голоса/звука. 0xFFFFFFFF завершает список.
+edition.t8.voiceclips.parameter_2.description = Не проверено.
+edition.t8.voiceclips.parameter_3.description = Не проверено.
+edition.t8.input_sequences.window.description = Допустимое число кадров между двумя вводами последовательности (не проверено).
+edition.t8.input_sequences.input_count.description = Число вводов, читаемых в последовательности.
+edition.t8.input_sequences.inputs.description = Первый ввод последовательности (индекс в таблице inputs).
+edition.t8.inputs.direction.description = Биты направления, та же раскладка, что у младшего dword команды отмены.
+edition.t8.inputs.buttons.description = Биты кнопок, та же раскладка, что у старшего dword команды отмены.
+edition.t8.parry.key.description = Ключ парируемого приема (не проверено).
+edition.t8.cameras.probability.description = Шанс выбора этой камеры (T7: 1 обычный, 2 двойной; для T8 не проверено).
+edition.t8.cameras.type.description = Тип камеры (T7: 15 анимация, 16 своя; для T8 не проверено).
+edition.t8.throws.camera.description = Камера броска (индекс в таблице cameras).
+edition.t8.throws.side.description = Сторона броска (не проверено).
+edition.t8.dialogues.requirements.description = Условия этого диалога (индекс в таблице requirements).
+edition.t8.dialogues.voice_key.description = Ключ реплики.
+edition.t8.dialogues.facial_animation.description = ID лицевой анимации (-1 = нет).
+edition.t8.projectiles.hit_conditions.description = Список условий попадания снаряда (индекс в таблице hit_conditions).
+edition.t8.projectiles.cancels.description = Список отмен снаряда (индекс в таблице cancels).
+edition.t8.parameter_1 = Параметр 1
+edition.t8.param_unused = не используется
+edition.t8.param_hover = {} [{}]
+{}
+Параметр 1: {}
+Частые значения: {}
+edition.t8.param_hover_other = {}: {}
+Этот параметр не описан для данного ID.
+edition.t8.codec.cancel_option = Вычисляется игрой при загрузке мувсета (на диске 0 у каждой отмены): 0x1 = нет команды, 0x10 = есть команда, 0x100 = цель - общий алиас (точно на 34 463 отменах в памяти); 0x80 следует за флагом команды 0x20000000 (95%); остальные биты не расшифрованы. Изменение не действует после перезагрузки.
+edition.t8.codec.requirement_param = Смысл первого параметра для этого условия. Режимы игры, типы контроллеров и код сюжетного боя взяты из TekkenMovesetExtractor от LukzB и не проверены; ID бойцов, флаги и кнопки - по разбору обработчиков retail-версии.
+edition.t8.codec.vulnerability = Слово позы приема (копируется игроку в начале приема): биты 0-2 = стоя 2 / присед 1 / лежа 4, 0x400 = в воздухе, по обработчикам условий retail-версии. В списке - значения, чаще всего используемые мувсетами retail; выпадающий список сохраняет остальные биты. Исходное значение можно изменить справа.
+edition.t8.id_picker_hint = Фильтр по ID, hex, метке или имени обработчика...
+edition.t8.codec.id_picker = Все известные ID условий / свойств с метками; у проверенных ID без метки сообщества показано имя обработчика. Наведите на запись, чтобы увидеть ее смысл. Исходный ID можно изменить справа.
+
+# Папки, окно закрытия, конвертация и сообщения об ошибках
+settings.folders.title = Папки персонажей
+settings.folders.extraction = Папка извлечения
+settings.folders.extraction_hint = Пусто: .\extracted_chars
+settings.folders.browse = Обзор
+settings.folders.save = Сохранить
+settings.folders.clear = Очистить
+settings.folders.extraction_help = Оставьте пустым, чтобы извлекать в .\extracted_chars. Своя папка должна быть задана абсолютным путем.
+settings.folders.additional = Доп. папки персонажей
+settings.folders.additional_help = Списки персонажей всегда ищут в .\extracted_chars, в папке извлечения и в папках ниже.
+settings.folders.remove = Убрать
+settings.folders.add = Добавить папку
+settings.folders.missing = Выбранная папка не существует.
+settings.folders.duplicate = Эта папка уже есть в списке.
+settings.folders.add_help = Выберите папку в проводнике; ее персонажи появятся в списках.
+close.title = Закрыть программу?
+close.busy = Сохранение еще идет. Дождитесь его завершения.
+close.unsaved = В некоторых редакторах есть несохраненные или непримененные правки. Продолжите редактирование, чтобы применить и сохранить их.
+close.discard = Отменить правки и выйти
+close.keep_editing = Продолжить
+edition.convert.cancel = Отменить конвертацию
+edition.convert.t7_to_t8_explanation = Создает отдельный файл Tekken 8 из этого мувсета T7 без участия игры: приемы, хитбоксы, камеры, броски, снаряды и все анимации тела берутся из файла T7. Условия и свойства без аналога в Tekken 8 не действуют, списки приемов тренировки не конвертируются.
+edition.convert.t8_to_t7_explanation = Создает отдельный файл Tekken 7 из этого retail-мувсета Tekken 8 без участия игры: приемы, хитбоксы, камеры, броски, снаряды и все встроенные анимации тела берутся из файла T8. Условия и свойства без аналога в Tekken 7 не действуют, анимации рук, лица и камеры остаются от целевого персонажа, списки приемов тренировки не конвертируются.
+moveset.import_settings = Настройки импорта
+edition.import_settings.title = Настройки импорта
+edition.import_settings.explanation = Как этот мувсет собирается при импорте. Меняется только заголовок файла: данные мувсета остаются прежними. Значения по умолчанию импортируют его точно как раньше.
+edition.import_settings.identity = Идентичность персонажа
+edition.import_settings.identity_target = Как целевой персонаж
+edition.import_settings.identity_fixed = Как персонаж с ID
+edition.import_settings.character = ID персонажа
+edition.import_settings.gender = Проверки пола
+edition.import_settings.gender_target = От целевого
+edition.import_settings.male = Мужской
+edition.import_settings.female = Женский
+edition.import_settings.story_flag = Сюжетный флаг Tekken 8
+edition.import_settings.story_game = Решает игра (конвертации в Tekken 7 используют 0, versus)
+edition.import_settings.story_value = Значение сюжетного флага (1-4: главы сюжета)
+edition.import_settings.in_heat = Считается в Heat (мувсеты Tekken 8 в Tekken 7)
+edition.import_settings.flags_clear = Проверки флагов Tekken 8 видят сброшенные флаги (обычная игра)
+edition.import_settings.defaults = По умолчанию
+edition.import_settings.save = Сохранить
+edition.import_settings.saved = Сохранено. Импортируйте мувсет снова, чтобы применить.
+edition.moveset_open_in_editor = Этот мувсет открыт в редакторе: сначала закройте окно редактора, иначе его следующее сохранение отменит это изменение.
+edition.import_settings.context = Проверки контекста (не отмечено: решает игра)
+edition.import_settings.story_mode = Проверки сюжета как вне сюжета
+edition.import_settings.dlc_story = Проверки сюжета DLC как вне сюжета DLC (Tekken 8)
+edition.import_settings.special_modes = Отключить проверки аркады, эпизода и особых режимов
+edition.import_settings.stage = Любая арена (проверки арены отключены)
+edition.import_settings.wave_index = Фиксированный индекс волны сюжета (Tekken 8)
+edition.import_settings.battle_script = Фиксированное значение скрипта боя (Tekken 8)
+edition.import_settings.value = Значение
+edition.import_settings.item = Проверки предметов кастомизации
+edition.import_settings.game_decides = Решает игра
+edition.import_settings.item_none = Без предмета
+edition.import_settings.item_all = Все предметы
+edition.import_settings.body = Проверки типа тела (Tekken 8)
+edition.import_settings.body_normal = Обычный
+edition.import_settings.body_big = Крупный
+edition.import_settings.body_bear = Медведь
+edition.import_settings.story_effects = Убрать свойства сюжетной подачи (субтитры, HUD, эффекты катсцен)
+edition.import_settings.global_writes = Убрать свойства, меняющие глобальное состояние игры (Tekken 8)
+edition.convert.saved = Сохранено:
+edition.convert.cancelled = Конвертация отменена.
+importation.error_game_write = Запись в память игры не удалась. Прежние значения восстановлены.
+importation.error_game_rollback = Запись в память игры не удалась, откат выполнен не полностью. Выделенная память сохранена, чтобы избежать висячих указателей.
+importation.error_unsupported_version = Этот файл не поддерживается выбранной версией игры.
+importation.error_moveset_data = Не удалось проверить или привязать мувсет. Для retail T8 нужен подходящий загруженный исходный мувсет и ресурсы анимаций.
+importation.warning_title = Импортировано с предупреждениями
+importation.warning_idle_fallback = Приемов с анимацией стойки: {}, так как анимаций ({}) нет ни в файле, ни в tkdata.bin игры.
+importation.warning_target_fallback = Приемов с анимацией стойки: {}, так как ни один загруженный мувсет не подошел к этому файлу и использованы анимации целевого персонажа.
+importation.warning_first_error = Первая ошибка: {}
+extraction.error_title = Извлечение не удалось
+extraction.error_moveset_data = Не удалось согласованно прочитать мувсет. Убедитесь, что персонаж загружен, и повторите извлечение.
+about.dantarion_explanation = Его ранние исследования мувсетов Tekken и инструменты проложили путь этому проекту
+
+# Инструменты > Адреса
+addresses.title = Адреса игры
+addresses.explanation = При обновлении игры адреса, которые TKMovesets использует для экспорта и импорта, могут сместиться. Этот инструмент ищет в исполняемом файле игры на диске (он никогда не читает и не пишет в запущенную игру) шаблоны байтов из game_addresses.ini, затем записывает найденные адреса в game_addresses.ini и сразу в адреса, которые использует программа. Ненайденные значения остаются как есть.
+addresses.game = Игра:
+addresses.executable = Исполняемый файл игры:
+addresses.executable_hint = Путь к Polaris-Win64-Shipping.exe
+addresses.browse = Обзор
+addresses.detect = Найти
+addresses.not_detected = Исполняемый файл игры не найден. Укажите путь к Polaris-Win64-Shipping.exe.
+addresses.invalid_path = Путь к исполняемому файлу не является допустимым текстом. Выберите файл снова.
+addresses.update = Обновить адреса из исполняемого файла
+addresses.scanning = Поиск в исполняемом файле...
+addresses.busy = Ожидание завершения текущего извлечения или импорта.
+addresses.no_patterns = В game_addresses.ini нет шаблонов байтов для этой игры.
+addresses.write_failed = Не удалось записать game_addresses.ini: ничего не изменено.
+addresses.up_to_date = Все адреса уже соответствуют исполняемому файлу.
+addresses.nothing_changed = Ничего не изменено.
+addresses.updated = Обновлено адресов: {} (в game_addresses.ini и в программе).
+addresses.some_failed = Не найдено: {}, текущие значения сохранены.
+addresses.results = Результаты
+addresses.exe_build = Метка времени сборки exe: 0x%X
+addresses.col_key = Адрес
+addresses.col_before = До
+addresses.col_found = В исполняемом файле
+addresses.col_patterns = Найдено шаблонов
+addresses.col_result = Результат
+addresses.pattern_not_found = не найден
+addresses.pattern_ambiguous = найден более одного раза (пропущен)
+addresses.result_updated = Обновлено
+addresses.result_unchanged = Без изменений
+addresses.result_not_found = Не найдено, сохранено
+addresses.result_conflict = Шаблоны расходятся, сохранено
+addresses.result_not_in_ini = Нет в ini, сохранено
+
+# Инструменты > Дополнительно
+extra.tag.title = Tag (Tekken 8, тренировка)
+extra.tag.explanation = Две команды по двое в тренировке: P3 - напарник P1, P4 - напарник P2. Начните матч в тренировке и нажмите кнопку: P3 и P4 присоединятся к идущему матчу за несколько секунд. Ki Charge (кнопка игры 1+2+3+4 или X+Y+A+B) вызывает напарника. Quick Select или повторный выбор персонажа выключает Tag: нажмите кнопку снова в новом матче. Tag только в тренировке. Функция экспериментальная и предназначена только для отладки.
+extra.tag.names_missing = TKMInterface/t8-retail_names.json не найден рядом с TKMovesets2.exe: используется встроенный список персонажей.
+extra.tag.p3 = P3 (напарник P1)
+extra.tag.p4 = P4 (напарник P2)
+extra.tag.none = Нет (P2 дерется один)
+extra.tag.load = Загрузить P3/P4 и включить Tag
+extra.tag.disable = Выключить
+extra.tag.injecting = Внедрение загрузчика мувсетов в игру...
+extra.tag.no_game = Tekken 8 не запущен.
+extra.tag.inject_failed = Не удалось запустить загрузчик мувсетов в игре.
+extra.tag.version_mismatch = В игре загрузчик мувсетов от другой версии TKMovesets2: перезапустите игру.
+
+edition.preview.no_animation = У этого приема нет анимации для просмотра.
+edition.preview.no_renderer = 3D-просмотр недоступен (нет контекста OpenGL).
+edition.preview.loading = Загрузка анимации...
+edition.preview.camera_help = Левая или средняя кнопка: вращение. Правая: сдвиг. Колесо: масштаб. Двойной щелчок: сброс камеры. Пробел: пуск/пауза, стрелки влево/вправо: шаг.
+edition.preview.active = АКТИВЕН
+edition.preview.active_suffix =  (активен)
+edition.preview.frame = Кадр
+edition.preview.previous = Предыдущий кадр
+edition.preview.next = Следующий кадр
+edition.preview.play = Пуск
+edition.preview.pause = Пауза
+edition.preview.speed = Скорость
+edition.preview.loop = Повтор
+edition.preview.root_motion = Root motion
+edition.preview.root_motion_help = Двигать персонажа по root motion анимации (GlobalPos). Выкл.: остается над началом координат.
+edition.preview.follow = Следить
+edition.preview.follow_help = Держать камеру на персонаже.
+edition.preview.displacement = Смещение
+edition.preview.displacement_help = Применяет к root motion известные свойства смещения приема: множители горизонтальной и вертикальной дистанции анимации, толчки вперед/назад и вбок. Отталкивания самого себя и толчки по высоте не применяются (их покадровый эффект неизвестен).
+edition.preview.displacement_disabled = У этого приема нет доп. смещения.
+edition.preview.displacement_horizontal = горизонт. дистанция %
+edition.preview.displacement_vertical = вертик. дистанция %
+edition.preview.displacement_forward = толчок вперед
+edition.preview.displacement_side = толчок влево
+edition.preview.displacement_conditional = Еще %d с условиями, не применены.
+edition.preview.show = Показать просмотр анимации
+edition.preview.hide = Скрыть просмотр анимации
+edition.preview.hitboxes = Хитбоксы
+edition.preview.hitboxes_help = Показывает хитбоксы приема на их активных кадрах красными фигурами: сфера на конечности, капсула между двумя конечностями или путь конечности с прошлого кадра. Приблизительно: размещены на манекене, с размером по умолчанию, если прием его не задает; конечности, кроме кистей, стоп, локтей и коленей, не рисуются.
+edition.preview.opponent = Соперник
+edition.preview.opponent_help = Экспериментально. Второй персонаж бирюзового цвета для атак: стоит там, куда достает первый хитбокс, проигрывает стойку до кадра первого хитбокса, затем реакцию на удар, который вероятнее всего попадет (условие попадания без условий). Его состояние и сторона, с которой по нему бьют, - в настройках рядом с этой галочкой. Грубо: игра проверяет гораздо больше.
+edition.preview.opponent_no_attack = У этого приема нет хитбоксов: соперника нет.
+edition.preview.opponent_settings = Настройки соперника
+edition.preview.opponent_airborne = В воздухе
+edition.preview.opponent_air_move = Прием позы
+edition.preview.opponent_air_move_help = Прием, проигрываемый соперником в воздухе до удара (ID приема или алиас); -1 или неверный ID: стойка (32769).
+edition.preview.opponent_counterhit = Контрудар
+edition.preview.opponent_counterhit_help = Проигрывает реакцию на контрудар (только удары спереди).
+edition.preview.opponent_pushback = Отталкивание
+edition.preview.opponent_pushback_help = Сдвигает соперника назад на отталкивание удара (для стороны, как реакция) начиная с кадра удара. Приблизительно: покадровые смещения, затем смещение, распределенное на его длительность, в миллиметрах.
+edition.preview.opponent_facing = Удар с:
+edition.preview.opponent_front = Спереди
+edition.preview.opponent_back = Сзади
+edition.preview.opponent_left = Левый бок
+edition.preview.opponent_right = Правый бок
+edition.preview.opponent_reaction = Реакция: прием %d
+edition.preview.opponent_no_reaction = Нет приема реакции на этот удар.
+edition.preview.opponent_no_air_reaction = У этого удара нет условия попадания для соперника в воздухе: используется наземная реакция.
+edition.cancel_graph.open = Граф отмен: приемы, в которые отменяется этот прием
+edition.cancel_graph.back = < Назад к приему
+edition.cancel_graph.depth = Глубина
+edition.cancel_graph.incoming_help = Показать приемы, отменяющиеся в этот (поиск при нажатии)
+edition.cancel_graph.refresh = Обновить
+edition.cancel_graph.fit = Вписать
+edition.cancel_graph.truncated = Достигнут предел узлов: часть отмен не показана
+edition.cancel_graph.help = Перетаскивайте для перемещения, колесо - масштаб, двойной щелчок по фону - вписать. Наведите на прием, чтобы проиграть его анимацию, нажмите, чтобы открыть. Наведите на точку связи, чтобы увидеть все ее отмены. Общие и уже показанные приемы не раскрываются повторно; + отмечает отмены за пределом глубины.
+edition.cancel_graph.input_sequence = Последовательность ввода
+edition.cancel_graph.grouped = групповая
+edition.cancel_graph.more = еще условия
+edition.cancel_graph.more_cancels = еще отмены
+edition.cancel_graph.generic = Общий
+edition.cancel_graph.generic_help = Общий прием: его отмены не раскрываются
+edition.cancel_graph.cut_off = Есть еще отмены за пределом глубины
+edition.cancel_graph.click_to_open = Нажмите, чтобы открыть прием
+edition.cancel_graph.no_cancel = У этого приема нет отмен
+edition.cancel_graph.no_input = Без ввода
+edition.cancel_graph.external = Его список отмен вне мувсета: не показан
+edition.cancel_graph.incoming_hide = Скрыть приемы, отменяющиеся в этот
+edition.cancel_graph.show_common = Приемы Co_
+edition.cancel_graph.show_common_help = Показывать и общие приемы (с именами Co_...): многие списки отмен ведут к множеству таких
+edition.cancel_graph.hidden_common = Co_ скрыты
+edition.cancel_graph.kind_attack = Атака
+edition.cancel_graph.kind_throw = Бросок
+edition.cancel_graph.kind_screw = Скрю
+edition.cancel_graph.kind_tornado = Торнадо

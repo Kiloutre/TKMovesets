@@ -31,6 +31,7 @@ std::vector<Byte> T7RetailConvertibleFixture();
 #include <iostream>
 #include <memory>
 #include <vector>
+size_t CheckT7LiveConversion(std::span<const Byte> file);
 
 namespace fs = std::filesystem;
 namespace raw = CompressionUtils::RAW;
@@ -530,6 +531,15 @@ int main(int argc, char** argv)
         if (argc == 2 && std::string(argv[1]) == "--test-semantic") { RunSemanticValidationTests(); std::cout << "Semantic validation tests passed\n"; return 0; }
         if (argc == 2 && std::string(argv[1]) == "--test-retail-import") { RunRetailImportTests(); std::cout << "Retail import tests passed\n"; return 0; }
         if (argc == 3 && std::string(argv[1]) == "--export-retail-live") { ExportLiveRetail(argv[2]); return 0; }
+        if (argc >= 3 && std::string(argv[1]) == "--check-t7-live") {
+            // Live edition of real T7 movesets in retail T8: single-row conversions match full conversions.
+            for (int i = 2; i < argc; ++i) {
+                MovesetFile file(std::filesystem::u8path(argv[i]));
+                const auto bytes = file.Bytes();
+                std::cout << argv[i] << ": " << CheckT7LiveConversion(bytes) << " rows edited live" << std::endl;
+            }
+            return 0;
+        }
         if (argc == 3 && std::string(argv[1]) == "--benchmark-editor") {
             BenchmarkEditor(argv[2]); return 0;
         }

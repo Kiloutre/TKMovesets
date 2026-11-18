@@ -381,7 +381,7 @@ void EditorVisuals_T7::RenderStatusBar()
 
 	// Import button
 	ImGui::SameLine();
-	bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && m_importNeeded;
+	bool canImport = isAttached && !m_importerHelper->IsBusy() && m_canInteractWithGame && m_importNeeded && !RetailConversionBusy();
 	if (ImGuiExtra::RenderButtonEnabled(_("moveset.import"), canImport)) {
 		ImportToPlayer(-2);
 	}
@@ -477,8 +477,10 @@ void EditorVisuals_T7::RenderMovelist()
 					m_movelistKeepFocus = 3;
 				}
 				// Over the row (and its selection highlight), at the right of the name cell.
-				if (move->screw) {
-					ImGuiExtra::ScrewIcon(ImVec2(nameCell.x + nameWidth - iconSize - 2, nameCell.y), iconSize, _("edition.move_screw"));
+				{
+					int slot = 0;
+					if (move->screw) ImGuiExtra::ScrewIcon(ImVec2(ImGuiExtra::MoveIconX(nameCell.x, nameWidth, iconSize, slot++), nameCell.y), iconSize, _("edition.move_screw"));
+					if (move->rage) ImGuiExtra::RageIcon(ImVec2(ImGuiExtra::MoveIconX(nameCell.x, nameWidth, iconSize, slot++), nameCell.y), iconSize, _("edition.move_rage"));
 				}
 				ImGui::PopID();
 
@@ -608,6 +610,9 @@ void EditorVisuals_T7::RenderGameSpecific(int dockid)
 	// Check for important changes here
 	m_canInteractWithGame = m_importerHelper->CanStart();
 
+	// Retail T8 imports: import the finished conversion, bind the published moveset for live edition.
+	PollRetailImport();
+
 	if (m_loadedMoveset != m_prevLoadedMoveset) {
 		// Only set live_loadedMoveset once per import: That way, setting it to zero anywhere will invalidate the live edition and force the player to re-import
 		m_editor->live_loadedMoveset = m_loadedMoveset;
@@ -623,6 +628,10 @@ void EditorVisuals_T7::RenderGameSpecific(int dockid)
 			m_loadedMoveset = 0;
 			m_editor->live_loadedMoveset = 0;
 		}
+	}
+	// The T7 live writers target T7 memory: in retail T8 only a bound retail live edition may write.
+	if (TargetsRetailT8() && !static_cast<EditorT7*>(m_abstractEditor.get())->RetailLive()) {
+		m_editor->live_loadedMoveset = 0;
 	}
 
 	// Layout start

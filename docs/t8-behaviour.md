@@ -305,7 +305,7 @@ Then, on the plan buffer:
 
 ### Animations
 
-Memory-only route (body category only):
+Memory-only route (body animations, plus the hand, face, wing and camera animations of converted T7 files):
 
 - Every move's body animation comes from the file (converted animations first, then embedded natives) or, when the
   file lacks it, from the game's `tkdata.bin` (`Source::Panm`).
@@ -321,6 +321,17 @@ Memory-only route (body category only):
 - Move handles are set to `0xEF << 56 | targetDomain << 40 | id`. An id the archives declare without data keeps its
   id. An animation found in neither the file nor the archives makes its move play the target's idle animation
   (counted in `MemoryOnlyFallbackMoves`; the first archive error is kept in `ArchiveError`).
+- Converted T7 hand, face, wing and camera animations (`T8AN` categories 1..4) get an entry the same way, then a node in the
+  target domain's category index: the anim manager's map `+0x2088` (domain -> inner map at node `+0x18`), key
+  `index | 1 << (20 + category)`,
+  value the entry's handle ([retail-t8-nonbody-anim-re.md](../.docs/retail-t8-nonbody-anim-re.md)). The file's index
+  (`0x2000` up) is used when the key is free or already holds this same handle (an earlier import); a key holding
+  another animation is never shadowed, the next free index is taken instead. `PublishCategoryIndex` links the nodes
+  bucket-only, after the entries, like `PublishAnimations`.
+- `ApplyHandIndices` then rewrites the hand, face, wing and camera rows (`0x8610` / `0x8611`, `0x877A`, `0x8683`, and the camera ids of
+  `T7CameraToRetailT8::CameraProperties`, with a value in `0x2000..0x3FFF`) to the published index of their category. A row without one (another route, no category index for the domain, no free key) gets the
+  never-reached frame `ImportProfile::StrippedFrame`, so it never plays a missing or foreign animation. The image audit
+  applies the same rewrite. Report: `hand_animations.carried`, `published_indices`, `mapped`, `silenced_rows`.
 
 Binding route:
 
