@@ -204,14 +204,14 @@ RetailPanm::T7Animation ToChannels(const RetailPanm::Animation& panm) {
             e[LocalPos][i] = sample("Trans", f)->translation[i] * 10.0;
         }
         q[DirY] = rot("MUKI", f);
-        // Native T7 layout: the pelvis in LowerBody (relative to its rest), FullBody still. Native T7 keeps FullBody
-        // still in most animations (median range 0 over T7 Jin) and T7 blends move transitions on LowerBody; pelvis
-        // motion carried in FullBody snapped at every move end (T8 Jin ws2 / dash on T7, 2026-11-14).
-        // T7AnimToRetailT8 reads this back through its native branch (LowerBody not at rest).
-        const Quat pelvis = rot("Rot", f);
-        q[FullBody] = Identity;
-        q[LowerBody] = Norm(Mul(pelvis, FromEuler(LowerBodyRest)));
-        q[UpperBody] = Norm(Mul(pelvis, Mul(HipRotation, Mul(rot("Spine1", f), rot("Spine2", f)))));
+        // Native T7 layout: FullBody is the body state (T8 HARA_ROT1: upright, face up/down, turned; still in most
+        // animations, median range 0 over T7 Jin) and LowerBody the pelvis relative to it and to its rest. T7 blends
+        // move transitions on LowerBody; pelvis motion carried in FullBody snapped at every move end (T8 Jin ws2 / dash
+        // on T7, 2026-11-14). T7AnimToRetailT8 reads Rot back as FullBody * LowerBody and HARA_ROT1 as FullBody.
+        const Quat pelvis = rot("Rot", f), body = rot("HARA_ROT1", f), orient = Norm(Mul(Conj(body), pelvis));
+        q[FullBody] = body;
+        q[LowerBody] = Norm(Mul(orient, FromEuler(LowerBodyRest)));
+        q[UpperBody] = Norm(Mul(orient, Mul(HipRotation, Mul(rot("Spine1", f), rot("Spine2", f)))));
         q[Neck] = rot("Neck", f);
         const Quat head = rot("Head", f);
         q[Head] = Mul(CHead, {head[1], head[2], head[0], head[3]});

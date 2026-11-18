@@ -88,9 +88,11 @@ Bones ConvertFrame(const Frame& f, bool native) {
     // Native T8 layout: MUKI is the facing (T7 DirY: identity, or a 180 degree yaw for back-turned moves) and
     // HARA_ROT1 is the T7 FullBody rotation, the body state the game reads during juggles and downs (upright,
     // turned, face up/down). Putting FullBody into MUKI instead flipped juggled opponents (issue #178).
-    // Files converted from T8 that carry the pelvis in FullBody (not native) have no such state: HARA_ROT1 stays upright.
+    // This holds when LowerBody stays at its rest too: T7 down loops (Mco_dwkam0, DOWN_AO_TES...) keep the pelvis at
+    // rest and lie through FullBody, and native T8 has that lying rotation in HARA_ROT1. An upright HARA_ROT1 there
+    // made every move ending on the ground flip the body when it handed over to them.
     out["MUKI"].rotation = Norm(q(DirY));
-    out["HARA_ROT1"].rotation = native ? Norm(q(FullBody)) : Identity;
+    out["HARA_ROT1"].rotation = Norm(q(FullBody));
     const Quat upper = Norm(Mul(Conj(HipRotation), Mul(Conj(orient), q(UpperBody))));
     const Quat spine1 = Slerp(Identity, upper, Spine1Ratio);
     out["Spine1"].rotation = spine1;

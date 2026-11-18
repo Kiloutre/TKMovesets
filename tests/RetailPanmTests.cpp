@@ -255,9 +255,12 @@ void RunPanmToT7Tests() {
         }
         const auto still=body(true,false);
         Check(track(still,"HARA_ROT1").samples.size()==1 && sameRotation(track(still,"HARA_ROT1").samples[0],identity),"Still HARA_ROT1 is not one upright sample");
-        const auto fromT8=body(false,true);
-        Check(track(fromT8,"HARA_ROT1").samples.size()==1 && sameRotation(track(fromT8,"HARA_ROT1").samples[0],identity),
-            "HARA_ROT1 is not upright for the pelvis-in-FullBody layout");
+        // LowerBody at its rest (T7 down loops such as Mco_dwkam0): HARA_ROT1 still carries FullBody, as native T8 does.
+        const auto restLower=body(false,true);
+        const auto& restHara=track(restLower,"HARA_ROT1");
+        Check(restHara.samples.size()==6,"HARA_ROT1 is not animated with LowerBody at rest");
+        for(size_t f=0;f<6;++f)
+            Check(sameRotation(restHara.samples[f],f>=3?faceUp:identity),"HARA_ROT1 does not carry FullBody with LowerBody at rest");
     }
 }
 // T7 hand MOTA animation -> retail hand PANM (T7HandToRetailT8; verified against native T8 Kazuya hands).
