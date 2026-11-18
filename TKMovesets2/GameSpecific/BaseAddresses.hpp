@@ -15,5 +15,8 @@ uint64_t GetRPCS3BaseAddr(const GameInfo* game, const GameAddressesFile* addrFil
 // PCSX2 base addr is constant
 uint64_t GetPCSX2BaseAddr(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process);
 
+// Cemu base addr changes with every start: the 4 GB block holding the Wii U's memory
+uint64_t GetCemuBaseAddr(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process);
+
 // PPSSPP base addr is variable
 uint64_t GetPPSSPPBaseAddr(const GameInfo* game, const GameAddressesFile* addrFile, const GameProcess* process);

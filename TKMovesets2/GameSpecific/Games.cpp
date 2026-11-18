@@ -172,6 +172,28 @@ const GameInfo cg_gamesInfo[] = {
 		.bigEndian = true,
 		.matchingProcessSubstrings = { "BLES01702" }
 	},
+	{
+		.name = "Tekken Tag 2  Wii U EU v32 Cemu",
+		.processName = "Cemu.exe",
+		.movesetNamePrefix = "TTT2_",
+		.gameId = GameId_TTT2,
+		.minorVersion = GameVersions::TTT2::CEMU_1010F800_V32,
+		.characterCount = 4,
+		.ptrSize = 4,
+		.flags = 0,
+		.dataString = "ttt2",
+		.minorDataString = "ttt2-cemu-1010f800",
+		.supportedImports = {},
+		.supportedOnlineImports = {},
+		.extractor = new GameFactory<ExtractorTTT2>,
+		.importer = nullptr,
+		.editorLogic = nullptr,
+		.editorVisuals = nullptr,
+		.onlineHandler = nullptr,
+		.GetBaseAddressFunc = GetCemuBaseAddr,
+		.bigEndian = true,
+		.matchingProcessSubstrings = { "1010f800" }   // Cemu's window title holds the title id
+	},
 
 	// -- TREV -- //
 	{

@@ -46,6 +46,7 @@ namespace GameVersions
 		{
 			RPCS3_BLES01702_0100 = 0,
 			RPCS3_BLES01702_0103 = 1,
+			CEMU_1010F800_V32 = 2,   // Wii U EU v32 (title 00050000-1010f800)
 		};
 	}
 

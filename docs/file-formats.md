@@ -79,7 +79,7 @@ From `GameSpecific/GameIDs.hpp`. Values are serialized and must not change.
 | --- | --- | --- |
 | 0 | Tekken 7 (`GameId_T7`) | 0 (`NONE`) |
 | 1 | Tekken 8 (`GameId_T8`) | 0 closed network test, 1 closed beta test, 2 retail |
-| 2 | Tekken Tag Tournament 2 | 0 RPCS3 BLES01702 v01.00, 1 RPCS3 BLES01702 v01.03 |
+| 2 | Tekken Tag Tournament 2 | 0 RPCS3 BLES01702 v01.00, 1 RPCS3 BLES01702 v01.03, 2 Cemu Wii U EU v32 (title 00050000-1010f800) |
 | 3 | Tekken Revolution | (none defined) |
 | 4 | Tekken 6 | 0 RPCS3 BLES00635, 1 PPSSPP ULUS10466, 2 RPCS3 BLUS30369 |
 | 5 | Tekken 5 | 0 default, 1 Dark Resurrection online |
