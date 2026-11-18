@@ -2179,6 +2179,23 @@ bool PatternMatchesAt(const char* pattern, uint64_t at, std::string& why)
 		if (bytes[i] >= 0 && Rd<uint8_t>(at + i) != (uint8_t)bytes[i]) { why = "bytes differ"; return false; }
 	return true;
 }
+
+// Does the function start with a jump another mod wrote over its prologue? (UE4SS hooks UObject::ProcessEvent this
+// way: jmp rel32, jmp [rip+0], or mov rax/r11, imm64 + jmp reg)
+bool StartsWithHookJump(uint64_t at)
+{
+	const uint8_t b0 = Rd<uint8_t>(at), b1 = Rd<uint8_t>(at + 1);
+	if (b0 == 0xE9) return true;                                                     // jmp rel32
+	if (b0 == 0xFF && b1 == 0x25) return true;                                       // jmp [rip+disp32]
+	if (b0 == 0x48 && b1 == 0xB8 && Rd<uint8_t>(at + 10) == 0xFF && Rd<uint8_t>(at + 11) == 0xE0) return true; // mov rax; jmp rax
+	if (b0 == 0x49 && b1 == 0xBB && Rd<uint8_t>(at + 10) == 0x41 && Rd<uint8_t>(at + 11) == 0xFF
+		&& Rd<uint8_t>(at + 12) == 0xE3) return true;                                // mov r11; jmp r11
+	return false;
+}
+
+// Functions tag mode only calls (never hooks or patches). Another mod's hook on them forwards to the game's code, so
+// calling through it is fine.
+bool IsCallOnly(const char* key) { return !strcmp(key, "tag_process_event"); }
 } // namespace
 
 namespace TagT8
@@ -2200,8 +2217,13 @@ bool Init(MovesetLoader* loader, uint64_t moduleBase, uint64_t moduleSize, const
 		const char* sig = nullptr;
 		const std::string sigKey = std::string("sig_") + key + "_1";
 		std::string why;
-		if (addresses.addrFile->GetStringEx(addresses.gameKey, sigKey.c_str(), sig) && sig && !PatternMatchesAt(sig, at, why))
+		if (addresses.addrFile->GetStringEx(addresses.gameKey, sigKey.c_str(), sig) && sig && !PatternMatchesAt(sig, at, why)) {
+			if (StartsWithHookJump(at)) {
+				if (IsCallOnly(key)) { Log("init: %s is hooked by another mod (UE4SS?); calling through its hook", key); return at; }
+				why = "hooked by another mod (UE4SS?); remove it to use tag mode";
+			}
 			error += std::string(key) + ": " + why + "; ";
+		}
 		return at;
 	};
 	auto glob = [&](const char* key) -> uint64_t { const int64_t rva = val(key); return rva ? moduleBase + (uint64_t)rva : 0; };
