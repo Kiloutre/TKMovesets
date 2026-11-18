@@ -13,6 +13,7 @@ Reference notes on the structures, file formats, functions and behaviour that th
 | [t8-behaviour.md](t8-behaviour.md) | Retail Tekken 8 addresses, extraction, game files, import, editor |
 | [conversion.md](conversion.md) | T7 -> T8 and T8 -> T7 conversion |
 | [conversion-rules.md](conversion-rules.md) | Conversion rules file format |
+| [legacy-json.md](legacy-json.md) | Old TekkenMovesetExtractor JSON folders and their conversion |
 | [headless.md](headless.md) | `--headless` commands and regression tests |
 
 A few pages cite `.docs/` for research details: those are local notes, git-ignored and not part of the repository.

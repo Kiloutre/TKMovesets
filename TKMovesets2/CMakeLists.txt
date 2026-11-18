@@ -182,6 +182,7 @@ set(GAMESPECIFIC_SOURCES
                     "GameSpecific/Extractors/Extractor_t8/RetailGameData.cpp"
                     "GameSpecific/Extractors/Extractor_t8/RetailDiskMoveset.cpp"
                     "GameSpecific/Extractors/Extractor_t7/T7DiskMoveset.cpp"
+                    "GameSpecific/Extractors/LegacyJsonMoveset.cpp"
                     "GameSpecific/Importers/Importer_t8/RetailImport.cpp"
                     "GameSpecific/Importers/Importer_t8/Importer_t8.cpp"
                     "GameSpecific/Importers/Importer_t8/RetailResourceLoader.cpp"

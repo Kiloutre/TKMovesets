@@ -15,6 +15,7 @@
 #include "AddressScanner/AddressUpdate.hpp"
 #include "Extractor_t8/RetailDiskMoveset.hpp"
 #include "Extractor_t7/T7DiskMoveset.hpp"
+#include "LegacyJsonMoveset.hpp"
 #include "AnimExtractors/AnimExtractor_t8.hpp"
 #include <atomic>
 #include "Animations.hpp"
@@ -330,6 +331,8 @@ int RunHeadless(std::span<const std::wstring> arguments)
                 "  extract-disk-animations-t8 TKDATA_BIN NEW_DIRECTORY [CODE,...]\n"
                 "  build-disk-movesets-t8 TKDATA_BIN DIRECTORY [CODE,...|all] [CATEGORIES] [CODEC]   CODEC default compact-zstd\n"
                 "  build-disk-movesets-t7 TKDATA_BIN DIRECTORY [CODE,...|all] [CODEC]                CODEC default lz4\n"
+                "  convert-json DIRECTORY FOLDER... [--codec CODEC] old TekkenMovesetExtractor folders (T7, Tag2) to\n"
+                "                                                  .tkmvst; CODEC default lz4, existing files left alone\n"
                 "  verify-anmbin-t8 FILE ANMBIN_DIRECTORY\n"
                 "  dump-payload-t8 FILE OUT_FILE                   decompressed T8RS snapshot\n"
                 "  t8-record-stats OUTPUT.json IDLE_DIRECTORY FILE...\n"
@@ -487,6 +490,32 @@ int RunHeadless(std::span<const std::wstring> arguments)
                     const auto r = T7Disk::WriteMovesetFile(arguments[1], code, common, arguments[2], codec);
                     movesets.push_back({{"code", code}, {"ok", true}, {"name", r.name}, {"character", r.characterId}, {"moves", r.moves}, {"animations", r.animations}, {"existed", r.existed}});
                 } catch (const std::exception& error) { movesets.push_back({{"code", code}, {"ok", false}, {"error", error.what()}}); ok = false; }
+            }
+            std::cout << json({{"ok", ok}, {"movesets", movesets}}).dump() << '\n'; return ok ? 0 : 1;
+        }
+        if (command == L"convert-json") { // movesets saved by the old Python TekkenMovesetExtractor
+            std::vector<std::wstring> folders;
+            auto codec = TKMovesetCompressionType_LZ4;
+            for (size_t i = 2; i < arguments.size(); ++i) {
+                if (arguments[i] == L"--codec") {
+                    if (++i == arguments.size()) throw std::invalid_argument("--codec needs a value");
+                    codec = Codec(arguments[i]);
+                } else folders.push_back(arguments[i]);
+            }
+            if (arguments.size() < 3 || folders.empty()) throw std::invalid_argument("Expected DIRECTORY FOLDER... [--codec CODEC]");
+            std::filesystem::create_directories(arguments[1]);
+            json movesets = json::array(); bool ok = true;
+            for (const auto& folder : folders) {
+                const auto source = Helpers::to_utf8(std::filesystem::path(folder).filename().wstring());
+                try {
+                    const auto r = LegacyJson::WriteMovesetFile(folder, arguments[1], codec);
+                    movesets.push_back({{"folder", source}, {"ok", true}, {"game", r.game}, {"name", r.name}, {"character", r.characterId},
+                        {"moves", r.moves}, {"animations", r.animations}, {"borrowed_animations", r.borrowedAnimations},
+                        {"padded_animations", r.paddedAnimations}, {"unswapped_animations", r.unswappedAnimations},
+                        {"unswapped_mota_animations", r.unswappedMotaAnimations}, {"replaced_animations", r.replacedAnimations}, {"motas", r.motas},
+                        {"skipped_motas", r.skippedMotas}, {"dropped_references", r.droppedReferences},
+                        {"file", Helpers::to_utf8(r.path.filename().wstring())}, {"existed", r.existed}});
+                } catch (const std::exception& error) { movesets.push_back({{"folder", source}, {"ok", false}, {"error", error.what()}}); ok = false; }
             }
             std::cout << json({{"ok", ok}, {"movesets", movesets}}).dump() << '\n'; return ok ? 0 : 1;
         }
