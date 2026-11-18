@@ -31,6 +31,46 @@ namespace TTT2_T7_Aliases
 	void ApplyHitboxAlias(unsigned int& hitbox);
 };
 
+namespace {
+#include "Converter_ttt2_to_t7_Votes.inc"
+}
+
+// Rules voted from characters present in both games (tools/vote_ttt2_t7_rules.py), over the hand-made dictionary and its
+// gap filling. A rule that keeps the id adds its parameter values to the id's table; one that changes the id replaces it.
+void MovesetConverter::TTT2ToT7::ApplyVotedRules(std::map<unsigned int, s_propAlias>& aliases)
+{
+	size_t param = 0;
+	for (const auto& [source, target, count] : VotedRules) {
+		const auto found = aliases.find(source);
+		const bool sameTarget = found != aliases.end() ? found->second.target_id == target : source == target;
+		s_propAlias alias = found != aliases.end() && sameTarget ? found->second : s_propAlias{};
+		alias.target_id = target;
+		for (uint32_t i = 0; i < count; ++i, ++param) alias.param_alias[VotedParams[param][0]] = VotedParams[param][1];
+		aliases[source] = alias;
+	}
+}
+
+// Each hitbox byte names a limb. The voted bytes, then the two the hand-made table had for Alisa (one character, so
+// below the vote's threshold; the old table never applied them, as it looked 0x42 up among odd bytes).
+void MovesetConverter::TTT2ToT7::ConvertHitbox(unsigned int& hitbox)
+{
+	Byte bytes[4];
+	memcpy(bytes, &hitbox, 4);
+	for (auto& b : bytes) {
+		bool done = false;
+		for (const auto& [from, to] : VotedHitboxBytes) if (b == from && from != to) { b = to; done = true; break; }
+		if (done) continue;
+		if (b == 0x41) b = 0x51;      // Alisa DES F1
+		else if (b == 0x42) b = 0x52; // Alisa DES2
+	}
+	memcpy(&hitbox, bytes, 4);
+}
+
+void MovesetConverter::TREVToT7::ConvertHitbox(unsigned int& hitbox)
+{
+	TTT2_T7_Aliases::ApplyHitboxAlias(hitbox); // Tekken Revolution keeps the hand-made TTT2 tables
+}
+
 static Byte* AllocateMovesetArea(const TKMovesetHeader* header, Byte* moveset, uint64_t s_moveset, uint64_t& size_out, TKMovesetHeaderBlocks& blocks_out)
 {
 	auto offsets = (const TTT2::TKMovesetHeaderBlocks*)((char*)header + header->block_list);
@@ -176,6 +216,7 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 
 	auto propertyAliases = InitAliasDictionary();
 	Aliases::BuildAliasDictionary(propertyAliases);
+	ApplyVotedRules(propertyAliases);
 
 	// ** ** //
 	for (unsigned int i = 0; i < table.reactionsCount; ++i)
@@ -320,7 +361,7 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->move_end_extraprop_addr = CONVERT_POSSIBLE_MISSING_ADDR(source->move_end_extraprop_addr);
 		target->_0x98_int = TTT2_T7_Aliases::ConvertMove0x98(source->_0x98_int);
 		target->hitbox_location = source->hitbox_location;
-		TTT2_T7_Aliases::ApplyHitboxAlias(target->hitbox_location);
+		ConvertHitbox(target->hitbox_location);
 		target->first_active_frame = source->first_active_frame;
 		target->last_active_frame = source->last_active_frame;
 		target->_0xA8_short = source->_0x6c_short;

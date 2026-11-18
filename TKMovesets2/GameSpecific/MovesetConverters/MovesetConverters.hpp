@@ -19,6 +19,9 @@ namespace MovesetConverter
 	{
 	private:
 		virtual std::map<unsigned int, s_propAlias> InitAliasDictionary();
+		// TTT2 rules voted against T7 movesets (Converter_ttt2_to_t7_Votes.inc)
+		virtual void ApplyVotedRules(std::map<unsigned int, s_propAlias>& aliases);
+		virtual void ConvertHitbox(unsigned int& hitbox);
 	public:
 
 		bool Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
@@ -29,6 +32,8 @@ namespace MovesetConverter
 	{
 	private:
 		std::map<unsigned int, s_propAlias> InitAliasDictionary() override;
+		void ApplyVotedRules(std::map<unsigned int, s_propAlias>&) override {} // the votes are TTT2's
+		void ConvertHitbox(unsigned int& hitbox) override;
 	};
 
 

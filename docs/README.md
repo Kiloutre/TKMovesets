@@ -12,6 +12,7 @@ Reference notes on the structures, file formats, functions and behaviour that th
 | [t8-structures.md](t8-structures.md) | Retail Tekken 8 moveset records and animations |
 | [t8-behaviour.md](t8-behaviour.md) | Retail Tekken 8 addresses, extraction, game files, import, editor |
 | [conversion.md](conversion.md) | T7 -> T8 and T8 -> T7 conversion |
+| [ttt2-conversion.md](ttt2-conversion.md) | Tag Tournament 2 -> T7 conversion and its voted rules |
 | [conversion-rules.md](conversion-rules.md) | Conversion rules file format |
 | [legacy-json.md](legacy-json.md) | Old TekkenMovesetExtractor JSON folders and their conversion |
 | [headless.md](headless.md) | `--headless` commands and regression tests |

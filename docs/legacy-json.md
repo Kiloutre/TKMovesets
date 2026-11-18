@@ -50,7 +50,7 @@ own; `orig_character_name` holds the character's in-game name. `characterId` is 
 
 ## Batch of 2026-11-18
 
-`extracted_chars` (TekkenMovesetExtractor): 57 `tag2_*`, 7 `rpcs3_tag2_*` and 56 of 58 `t7_*` folders converted, all
+`extracted_chars` (TekkenMovesetExtractor): 54 `tag2_*`, 7 `rpcs3_tag2_*` and 59 of 61 `t7_*` folders converted, all
 pass `validate`. Refused: `t7_GILL` (8 cancels to move `0xFFFF`) and `t7_CHUN_LI` (`ValidateT7Semantics`: invalid
 cancel target, input sequence or requirement list; cause not found yet). `t4_*`, `t5_*`, `t6_*` were not converted.
 
