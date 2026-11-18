@@ -197,6 +197,7 @@ edition.convert.format_target = 要转换成的格式
 # Moveset Edition #
 edition.explanation = 你可以在此编辑已提取的招式表。教程和实用资源请参阅文档。\n开启“实时编辑”可快速修改自定义招式表：简单的数值修改会立即写入内存，无需任何加载时间。
 edition.select_moveset = 选择要修改的招式表
+edition.search_hint = 按名称、游戏或角色搜索
 edition.last_saved = 上次保存：
 edition.save = 保存
 edition.saving_error = 保存出错

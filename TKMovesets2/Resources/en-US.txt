@@ -197,6 +197,7 @@ edition.convert.format_target = Format to convert to
 # Moveset Edition #
 edition.explanation = You can hereedit extracted movesets. Refer to documentation for tutorials and helpful ressources.\nTurn on 'Live edition' for quickly modifying the custom moveset: Simple values changes will be instantly applied in memory with zero loading time.
 edition.select_moveset = Chose the moveset to modify
+edition.search_hint = Search by name, game or character
 edition.last_saved = Last save:
 edition.save = Save
 edition.saving_error = Saving error

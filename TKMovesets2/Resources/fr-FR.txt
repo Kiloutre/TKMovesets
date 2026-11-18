@@ -196,6 +196,7 @@ edition.convert.format_target = Format cible
 # Modifcation de moveset #
 edition.explanation = Vous pouvez ici modifier les personnage extraits. Consultez la documentation pour les information utiles et les tutoriels.\nActivez le mode 'Prévisualisation directe' pour rapidement modifier le personnage choisi : Les petits changement seront immédiatement appliqués dans le jeu, sans temps de chargement.
 edition.select_moveset = Choisissez un personnage
+edition.search_hint = Rechercher par nom, jeu ou personnage
 edition.last_saved = Dernière sauvegarde le:
 edition.save = Sauvegarder
 edition.saving_error = Err. de sauvegarde

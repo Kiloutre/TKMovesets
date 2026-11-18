@@ -197,6 +197,7 @@ edition.convert.format_target = 変換先の形式
 # Moveset Edition #
 edition.explanation = ここではエクスポートしたMovesetを編集できます。チュートリアルや役立つリソースについては、ドキュメントを参照してください。\n「ライブ編集」をオンにすると、CustomMovesetをすばやく変更できます。単純な値の変更は、即メモリに適用されます。
 edition.select_moveset = 編集するMovesetを選択
+edition.search_hint = 名前、ゲーム、キャラクターで検索
 edition.last_saved = 最終保存日時:
 edition.save = 保存
 edition.saving_error = 保存エラー

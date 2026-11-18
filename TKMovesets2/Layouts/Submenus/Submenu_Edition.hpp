@@ -36,6 +36,8 @@ private:
 	bool m_conversionPopup = false;
 	// Name of the moveset to apply in the rename popup
 	char m_newName[FILENAME_MAX];
+	// Moveset list filter: shows the movesets whose name, game or character contains it (case-insensitive)
+	char m_search[128] = {};
 	// Moveset to rename/convert in the popups
 	movesetInfo m_actionTarget;
 	// Import settings popup (the moveset's import profile, docs/import-profile.md)

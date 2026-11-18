@@ -197,6 +197,7 @@ edition.convert.format_target = Formato al que convertir
 # Edición de movesets #
 edition.explanation = Aquí puedes editar los movesets extraídos. Consulta la documentación para ver tutoriales y recursos útiles.\nActiva la 'Edición en vivo' para modificar rápidamente el moveset personalizado: los cambios simples de valores se aplicarán al instante en la memoria, sin tiempo de carga.
 edition.select_moveset = Elige el moveset a modificar
+edition.search_hint = Buscar por nombre, juego o personaje
 edition.last_saved = Último guardado:
 edition.save = Guardar
 edition.saving_error = Error al guardar
