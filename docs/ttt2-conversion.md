@@ -19,13 +19,17 @@ An id without a rule passes through unchanged.
 
 ## How the rules are voted
 
-`tools/vote_ttt2_t7_rules.py EXTRACTED_CHARS T7_DUMP_DIR OUT.json --emit Converter_ttt2_to_t7_Votes.inc` reads the
-TTT2 movesets saved by the old Python TekkenMovesetExtractor (raw TTT2 ids, see [legacy-json.md](legacy-json.md))
-and payload dumps of T7 movesets built from the game's files (`dump-payload-t8`). For the 34 characters in both
-games (Kazuya, Jin, Heihachi, Devil Jin and Asuka from both the Wii U and PS3 copies), moves are paired by name
-(about 85% of each moveset). In each pair of moves:
+`tools/vote_ttt2_t7_rules.py EXTRACTED_CHARS T7_DUMP_DIR OUT.json [--cemu DIR] --emit Converter_ttt2_to_t7_Votes.inc`
+reads the TTT2 movesets saved by the old Python TekkenMovesetExtractor (raw TTT2 ids, see
+[legacy-json.md](legacy-json.md)) and payload dumps of T7 movesets built from the game's files (`dump-payload-t8` of
+`build-disk-movesets-t7` output). With `--cemu DIR`, TKMovesets2 extractions of the Wii U game
+(`TTT2_<name>.tkmvst`, uncompressed with `--headless recompress FILE OUT none`) replace the JSON folder of the same
+character. The JSON lacks the move start/end property lists and the second and third cancel lists of moves; the
+extractions have them. For the 35 characters in both games, moves are paired by name (about 85% of each moveset). In
+each pair of moves:
 
 - extra properties starting on the same frame are aligned on their ids;
+- move start and end properties (extractions only) are aligned on their ids, with their requirement lists;
 - cancels are paired by target move name and frame windows, group cancels the same way; their requirement lists
   are aligned on their ids;
 - hit conditions pair when both lists have the same length, with their requirement lists;
@@ -60,6 +64,28 @@ The converter's output compared with the game's T7 movesets, on the paired recor
 
 Ids in the output that no T7 moveset uses: requirements 10.5% of uses -> 9.7%, properties 3.8% -> 1.4%.
 
+## Results with the Cemu extractions (2026-11-19)
+
+The same vote with `--cemu` on the 58 Wii U EU v32 extractions (`.dev/ttt2-wiiu-cemu`). Its votes include the move
+start/end property lists, so it scores the rules on more records. Id and value right:
+
+| Rules | Requirements (2,957,725) | Properties (192,334) |
+| --- | --- | --- |
+| Voted from the JSON only | 99.34% | 95.60% |
+| Voted with the extractions | 99.33% | 96.70% |
+
+New and larger rules come from start/end lists: `0x81ee -> 0x8345` (400 votes), `0x81f3 -> 0x834a` (20 values, 2,541
+votes), `0x81eb -> 0x8342` (29 -> 58 values), `0x81ed -> 0x8344` (42 -> 44 values).
+
+Ids used only in start/end lists that the vote cannot decide:
+
+- `0x81c8` (14 uses): every paired move, in the same character and in other characters, has T7 `0x832a` instead
+  (25 of 25 across all T7 movesets), the value being a per-game id (126 -> 159 on Lee's and Violet's `Vi_IKombot*`,
+  53 -> 107 on Bruce's `Ba_IChicken`). Only Lee pairs with his own T7 moveset (6 votes, one character): below the
+  rule's threshold.
+- `0x81c7` (26 uses, Unknown's `Uj_*RHand`) and `0x8267` (37 uses, Devil Jin's `Dj_*T`): no T7 move has these
+  names. `0x82ce` (1 use, Raven's `Nj_utusemi01`): the T7 move has no end property.
+
 ## Left as is
 
 - Requirements used only by Tag mechanics (tag changes `Co_Change_Kam`, `Co_ChgIn*`, `Co_runchng`, two-character
@@ -69,3 +95,9 @@ Ids in the output that no T7 moveset uses: requirements 10.5% of uses -> 9.7%, p
   values). The other differences are flags T7 added to particular moves, which the TTT2 value does not carry.
 - Frame data, move length, vulnerability, hit level: 97-99.9% equal; the differences are T7 changes to those moves.
 - Transitions: equal by target move name, except the `Co_Dummy_*` placeholder moves, which loop on themselves in T7.
+- Projectiles: written as zeros. TTT2 rows are 0x88 bytes, big-endian as the game holds them (the extractor does
+  not swap them), with no hit condition or cancel reference; T7 rows are 0xa8 bytes. TTT2 spawns them with property
+  `0x8168` (value = projectile row: 1 to row count - 1 in all 58 extractions), T7 with `0x820b`. No move pairs them:
+  the 111 TTT2 moves that spawn one (the balloon items `Co_IBalloon*`, Bob's extra rows) and the 212 T7 ones
+  (`Co_ISyuriken`, `Co_IThrowKnife`, `Co_IGrenade`...) share no name, so the layout cannot be voted. `0x8168`
+  passes through unchanged.

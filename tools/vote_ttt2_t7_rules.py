@@ -1,6 +1,8 @@
 """Votes Tag Tournament 2 -> Tekken 7 requirement and property ids, from characters present in both games.
 
-TTT2 side: folders saved by the old Python TekkenMovesetExtractor (`tag2_*`, `rpcs3_tag2_*`: raw TTT2 ids).
+TTT2 side: folders saved by the old Python TekkenMovesetExtractor (`tag2_*`, `rpcs3_tag2_*`: raw TTT2 ids), and with
+`--cemu DIR` TKMovesets2 extractions (`TTT2_<name>.tkmvst`, uncompressed: `--headless recompress FILE OUT none`), which
+replace the JSON folder of the same character. Only extractions have the move start/end property lists.
 T7 side: payload dumps of T7 movesets built from the game's files
 (`TKMovesets2.exe --headless dump-payload-t8 T7_<name>.tkmvst <dir>/T7_<name>.bin > <dir>/T7_<name>.json`).
 
@@ -8,7 +10,8 @@ Moves are paired by name. In each pair of moves, these lists are paired, and eac
 - extra properties, aligned on their starting frames;
 - cancels, paired by target move name and frame windows; their requirement lists vote position by position when
   both have the same length; group cancels (0x800b) are followed the same way;
-- hit conditions, position by position when both lists have the same length, with their requirement lists.
+- hit conditions, position by position when both lists have the same length, with their requirement lists;
+- move start and end properties (extractions only), aligned on their ids, with their requirement lists.
 Each id's votes are compared with the converter's current rule (Converter_ttt2_to_t7_Aliases.cpp, with the gap filling
 of Aliases::BuildAliasDictionary; ids without a rule pass through unchanged).
 
@@ -16,7 +19,7 @@ Accepted rules (--emit): at least 10 votes from 3 characters, 80% agreeing. A pa
 2 characters agree on it and none disagrees. "Player (not) character id" checks keep their values: the importer
 compares them with the file's own character id, which stays in TTT2 numbering.
 
-Usage: python -I tools/vote_ttt2_t7_rules.py EXTRACTED_CHARS T7_DUMP_DIR OUTPUT.json [--emit Converter_ttt2_to_t7_Votes.inc]
+Usage: python -I tools/vote_ttt2_t7_rules.py EXTRACTED_CHARS T7_DUMP_DIR OUTPUT.json [--cemu DIR] [--emit Converter_ttt2_to_t7_Votes.inc]
 """
 import collections
 import difflib
@@ -105,10 +108,110 @@ class TTT2:
             index += 1
         return out
 
+    def other_properties(self, kind, index):
+        return []  # the extractor JSON holds no move start/end property lists
+
     def moves(self):
         for i, x in enumerate(self.m['moves']):
             yield x['name'], {'cancel': x['cancel_idx'], 'hit': x['hit_condition_idx'], 'prop': x['extra_properties_idx'],
-                              'hitbox': x['hitbox_location']}
+                              'start': -1, 'end': -1, 'hitbox': x['hitbox_location']}
+
+# -- TTT2 (TKMovesets2 extraction, uncompressed .tkmvst) -- #
+
+TTT2_SIZES = [0x50, 8, 0xc, 0x88, 0xc, 2, 0x20, 0x20, 4, 0xc, 0xc, 0xc, 0x70, 4, 8, 8, 4, 0xc, 8]
+NONE32 = 2 ** 32 - 1
+
+class TTT2File:
+    """A TTT2 moveset extracted from the game by TKMovesets2 (`--headless export`), stored uncompressed
+    (`--headless recompress FILE OUT none`). Records are little-endian, references are row indices. Unlike the extractor
+    JSON it has the move start/end property lists."""
+    def __init__(self, path):
+        self.b = open(path, 'rb').read()
+        if self.b[:4] != b'TKM2' or self.b[0x60] != 0:
+            raise ValueError('%s: not an uncompressed .tkmvst (run --headless recompress FILE OUT none)' % path)
+        block_list, block_count, start = struct.unpack_from('<III', self.b, 0x48)
+        blocks = [start + x for x in struct.unpack_from('<%dQ' % block_count, self.b, block_list)]
+        self.names_at, self.mb = blocks[3], blocks[4]
+        self.table = [struct.unpack_from('<II', self.b, blocks[1] + 8 * i) for i in range(19)]
+        self.aliases = struct.unpack_from('<56H', self.b, blocks[0] + 0x18 + 112)  # current aliases
+        self.move_count = self.table[12][1]
+        self.names = [self.string(struct.unpack_from('<I', self.b, self.record(12, i))[0]) for i in range(self.move_count)]
+
+    def string(self, offset):
+        s = self.names_at + offset
+        return self.b[s:self.b.index(b'\0', s)].decode('latin1')
+
+    def record(self, table, index):
+        return self.mb + self.table[table][0] + index * TTT2_SIZES[table]
+
+    def valid(self, table, index):
+        return 0 <= index != NONE32 and index < self.table[table][1]
+
+    def target(self, move_id):
+        if move_id >= 0x8000:
+            k = move_id - 0x8000
+            if k >= len(self.aliases): return None
+            move_id = self.aliases[k]
+        return self.names[move_id] if move_id < len(self.names) else None
+
+    def requirements(self, index):
+        out = []
+        while self.valid(1, index):
+            c, p = struct.unpack_from('<II', self.b, self.record(1, index))
+            out.append((c, p))
+            if c == TTT2_END_REQ: break
+            index += 1
+        return out
+
+    def cancels(self, index, group=False):
+        out, table = [], 7 if group else 6
+        end = END_GROUP if group else END_CANCEL
+        while self.valid(table, index):
+            command, req, _, ws, we, sf, target = struct.unpack_from('<QIIIIIH', self.b, self.record(table, index))
+            out.append({'command': command, 'req': req, 'target': target, 'window': (ws, we, sf)})
+            if command == end: break
+            index += 1
+        return out
+
+    def properties(self, index):
+        out = []
+        while self.valid(9, index):
+            f, i, v = struct.unpack_from('<III', self.b, self.record(9, index))
+            out.append((f, i, v))
+            if i == 0: break
+            index += 1
+        return out
+
+    def other_properties(self, kind, index):
+        """Move start (kind 'start') or end property list: (requirement list, id, value), up to the list terminator."""
+        out, table = [], 10 if kind == 'start' else 11
+        while self.valid(table, index):
+            req, i, v = struct.unpack_from('<III', self.b, self.record(table, index))
+            out.append((req, i, v))
+            if i == TTT2_END_REQ: break
+            index += 1
+        return out
+
+    def hit_conditions(self, index):
+        out = []
+        while self.valid(2, index):
+            req, damage = struct.unpack_from('<II', self.b, self.record(2, index))
+            out.append({'req': req, 'damage': damage})
+            reqs = self.requirements(req)
+            if reqs and reqs[0][0] == TTT2_END_REQ: break
+            index += 1
+        return out
+
+    def moves(self):
+        for i in range(self.move_count):
+            o = self.record(12, i)
+            cancel, = struct.unpack_from('<I', self.b, o + 0x14)
+            hit, = struct.unpack_from('<I', self.b, o + 0x38)
+            prop, start, end = struct.unpack_from('<III', self.b, o + 0x50)
+            hitbox, = struct.unpack_from('<I', self.b, o + 0x60)
+            n = lambda v: -1 if v == NONE32 else v
+            yield self.names[i], {'cancel': n(cancel), 'hit': n(hit), 'prop': n(prop), 'start': n(start), 'end': n(end),
+                                  'hitbox': hitbox}
 
 # -- T7 (payload dump) -- #
 
@@ -171,6 +274,15 @@ class T7:
             index += 1
         return out
 
+    def other_properties(self, kind, index):
+        out, table = [], 10 if kind == 'start' else 11
+        while self.valid(table, index):
+            req, i, v = struct.unpack_from('<QII', self.b, self.record(table, index))
+            out.append((req, i, v))
+            if i == T7_END_REQ: break
+            index += 1
+        return out
+
     def hit_conditions(self, index):
         out = []
         while self.valid(2, index):
@@ -186,9 +298,9 @@ class T7:
             o = self.record(12, i)
             cancel, = struct.unpack_from('<Q', self.b, o + 0x20)
             hit, = struct.unpack_from('<Q', self.b, o + 0x60)
-            prop, = struct.unpack_from('<Q', self.b, o + 0x80)
+            prop, start, end = struct.unpack_from('<QQQ', self.b, o + 0x80)
             hitbox, = struct.unpack_from('<I', self.b, o + 0x9c)
-            yield self.names[i], {'cancel': cancel, 'hit': hit, 'prop': prop, 'hitbox': hitbox}
+            yield self.names[i], {'cancel': cancel, 'hit': hit, 'prop': prop, 'start': start, 'end': end, 'hitbox': hitbox}
 
 # -- Votes -- #
 
@@ -250,6 +362,14 @@ def compare(votes, ttt2, t7, character, mapping):
             ga = [p for p in pa if p[0] == frame]; gb = [p for p in pb if p[0] == frame]
             for i, j in aligned_pairs([p[1] for p in ga], [p[1] for p in gb], mapping):
                 votes.add('property', ga[i][1], gb[j][1], ga[i][2], gb[j][2], character)
+        # Move start and end properties (TKMovesets2 extractions only): aligned on their ids, with their requirement lists
+        for kind in ('start', 'end'):
+            la = ttt2.other_properties(kind, a[kind]) if a[kind] >= 0 else []
+            lb = t7.other_properties(kind, b[kind]) if b[kind] != NONE else []
+            la = [p for p in la if p[1] != TTT2_END_REQ]; lb = [p for p in lb if p[1] != T7_END_REQ]
+            for i, j in aligned_pairs([p[1] for p in la], [p[1] for p in lb], mapping):
+                votes.add('property', la[i][1], lb[j][1], la[i][2], lb[j][2], character)
+                vote_requirements(votes, ttt2.requirements(la[i][0]), t7.requirements(lb[j][0]), character, mapping)
         # Cancels and their requirement lists, group cancels
         for ca, cb in pair_cancels(ttt2.cancels(a['cancel']), t7.cancels(b['cancel']), ttt2, t7):
             vote_requirements(votes, ttt2.requirements(ca['req']), t7.requirements(cb['req']), character, mapping)
@@ -319,13 +439,25 @@ def emit(rules, path, hitbox=()):
     with open(path, 'w', encoding='utf-8', newline=chr(10)) as out:
         out.write(chr(10).join(lines) + chr(10))
 
-def collect(extracted, t7_files, mapping, report=None):
-    votes = Votes()
+def ttt2_sources(extracted, cemu=None):
+    """name -> (label, loader): extractor JSON folders, replaced by TKMovesets2 extractions of the same character."""
+    sources = {}
     for folder in sorted(glob.glob(os.path.join(extracted, 'tag2_*')) + glob.glob(os.path.join(extracted, 'rpcs3_tag2_*'))):
         base = os.path.basename(folder)
         name = re.sub(r'^(rpcs3_)?tag2_', '', base).replace('_', ' ').lower()
+        sources.setdefault(name, (base, lambda f=folder: TTT2(f)))
+    if cemu:
+        for path in sorted(glob.glob(os.path.join(cemu, '*.tkmvst'))):
+            base = os.path.basename(path)[:-len('.tkmvst')]
+            name = re.sub(r'^TTT2_', '', base).lower()
+            sources[name] = (base, lambda p=path: TTT2File(p))
+    return sources
+
+def collect(extracted, t7_files, mapping, report=None, cemu=None):
+    votes = Votes()
+    for name, (base, load) in sorted(ttt2_sources(extracted, cemu).items()):
         if name not in t7_files: continue
-        ttt2, t7 = TTT2(folder), T7(t7_files[name])
+        ttt2, t7 = load(), T7(t7_files[name])
         paired = compare(votes, ttt2, t7, base, mapping)
         if report is not None:
             report['pairs'].append({'ttt2': base, 't7': os.path.basename(t7_files[name]), 'moves': len(ttt2.names), 'paired_moves': paired})
@@ -353,12 +485,13 @@ def summarize(votes, rules, filled):
 
 def main(extracted, t7_dir, output, *options):
     rules, filled = current_rules()
+    cemu = options[options.index('--cemu') + 1] if '--cemu' in options else None
     t7_files = {os.path.basename(p)[3:-4].lower(): p for p in glob.glob(os.path.join(t7_dir, 'T7_*.bin'))}
     # Pass 1 aligns lists with the current rules, pass 2 with the rules pass 1 accepted
     mapping = dict(filled)
-    for x in decide(summarize(collect(extracted, t7_files, mapping), rules, filled)): mapping[x['ttt2']] = x['t7']
+    for x in decide(summarize(collect(extracted, t7_files, mapping, cemu=cemu), rules, filled)): mapping[x['ttt2']] = x['t7']
     report = {'pairs': []}
-    votes = collect(extracted, t7_files, mapping, report)
+    votes = collect(extracted, t7_files, mapping, report, cemu)
     ids = summarize(votes, rules, filled)
     report['ids'] = ids
     # Every vote, to score a rule set: [kind, ttt2 id, t7 id, ttt2 param, t7 param, count]
