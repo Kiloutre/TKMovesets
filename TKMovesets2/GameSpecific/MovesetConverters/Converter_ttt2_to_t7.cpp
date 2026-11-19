@@ -385,7 +385,8 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->move_id = source->move_id;
 		target->cancel_option = source->cancel_option;
 
-		if (forbiddenMoveIds.contains(target->move_id)) {
+		// Cancels on the tag button (button bit 0x100): T7 has none, and T8 reads that bit as another input
+		if (forbiddenMoveIds.contains(target->move_id) || (HasTagButton() && (source->button & TagButton))) {
 			target->command = 0xFFFFFFFFFFFFFFFF;
 		}
 	}
@@ -406,7 +407,8 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		target->move_id = source->move_id;
 		target->cancel_option = source->cancel_option;
 
-		if (forbiddenMoveIds.contains(target->move_id)) {
+		// Cancels on the tag button (button bit 0x100): T7 has none, and T8 reads that bit as another input
+		if (forbiddenMoveIds.contains(target->move_id) || (HasTagButton() && (source->button & TagButton))) {
 			target->command = 0xFFFFFFFFFFFFFFFF;
 		}
 	}

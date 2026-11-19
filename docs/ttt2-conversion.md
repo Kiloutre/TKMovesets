@@ -52,6 +52,14 @@ entries from the old hand-made table (one character, below the vote's threshold)
 odd table); `0x1e` -> `0x16` applied everywhere although every character keeps `0x1e`. Tekken Revolution keeps the
 old tables.
 
+## Tag button cancels
+
+Bit `0x100` of a cancel's button word is TTT2's tag button: those cancels lead to tag changes, tag-ins, tag throws
+and Devil transformation by tag (199 in Jin; no game T7 moveset uses the bit). T7 has no tag button, and the T7 ->
+T8 converter copies the bit, which retail T8 reads as another input: Jin's EWHF input played the tag throw
+`Thrmv_2ptN00`, whose Tag-only requirement 481 the T8 converter assumes true. The converter disables these cancels
+(command `0xFFFFFFFFFFFFFFFF`, as for forbidden moves). Not for Tekken Revolution (`HasTagButton`).
+
 ## Results (2026-11-18)
 
 The converter's output compared with the game's T7 movesets, on the paired records:

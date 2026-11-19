@@ -22,6 +22,9 @@ namespace MovesetConverter
 		// TTT2 rules voted against T7 movesets (Converter_ttt2_to_t7_Votes.inc)
 		virtual void ApplyVotedRules(std::map<unsigned int, s_propAlias>& aliases);
 		virtual void ConvertHitbox(unsigned int& hitbox);
+		// TTT2's tag button, bit 0x100 of a cancel's button word (tag changes, tag throws, tag-in moves)
+		static constexpr uint32_t TagButton = 0x100;
+		virtual bool HasTagButton() const { return true; }
 	public:
 
 		bool Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
@@ -34,6 +37,7 @@ namespace MovesetConverter
 		std::map<unsigned int, s_propAlias> InitAliasDictionary() override;
 		void ApplyVotedRules(std::map<unsigned int, s_propAlias>&) override {} // the votes are TTT2's
 		void ConvertHitbox(unsigned int& hitbox) override;
+		bool HasTagButton() const override { return false; }
 	};
 
 
