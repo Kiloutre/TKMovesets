@@ -3,6 +3,7 @@
 #include "LocalStorage.hpp"
 #include <ImGui.h>
 #include <algorithm>
+#include <cwctype>
 #include <span>
 
 namespace MovesetListSort {
@@ -66,6 +67,27 @@ inline std::vector<Group> GroupedTableView(std::span<movesetInfo* const> source)
         return descending ? order > 0 : order < 0;
     });
     return groups;
+}
+
+// -- Search box filter, shared by the moveset lists -- //
+
+// Lower-cased wide copy of a UTF-8 string, for case-insensitive search (works for non-Latin names too)
+inline std::wstring LowerForSearch(const std::string& utf8) {
+    std::wstring text = Helpers::to_unicode(utf8.c_str());
+    std::transform(text.begin(),text.end(),text.begin(),[](wchar_t c) { return (wchar_t)std::towlower(c); });
+    return text;
+}
+// True if the moveset's name, game or target character contains the (lower-cased) search text
+inline bool MatchesSearch(const movesetInfo& moveset, const std::wstring& needle) {
+    for (const char* field : { moveset.name.c_str(), moveset.origin.c_str(), moveset.target_character.c_str() })
+        if (LowerForSearch(field).find(needle) != std::wstring::npos) return true;
+    return false;
+}
+// Keeps the group's movesets that match; false when none does (the game is hidden, header included)
+inline bool Filter(Group& group, const std::wstring& needle) {
+    if (needle.empty()) return true;
+    std::erase_if(group.movesets,[&](const movesetInfo* m) { return !MatchesSearch(*m,needle); });
+    return !group.movesets.empty();
 }
 
 // Category header row: collapsible, spans the whole table width. Returns true when open.

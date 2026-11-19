@@ -18,26 +18,8 @@
 #include "Extractor_t8/RetailGameData.hpp"
 #include "GameStaticData.hpp"
 #include <algorithm>
-#include <cwctype>
 
 // -- Static helpers -- //
-
-// Lower-cased wide copy of a UTF-8 string, for case-insensitive search (works for non-Latin names too)
-static std::wstring LowerForSearch(const std::string& utf8)
-{
-	std::wstring text = Helpers::to_unicode(utf8.c_str());
-	std::transform(text.begin(), text.end(), text.begin(), [](wchar_t c) { return (wchar_t)std::towlower(c); });
-	return text;
-}
-
-// True if the moveset's name, game or target character contains the (lower-cased) search text
-static bool MatchesSearch(const movesetInfo& moveset, const std::wstring& needle)
-{
-	for (const char* field : { moveset.name.c_str(), moveset.origin.c_str(), moveset.target_character.c_str() }) {
-		if (LowerForSearch(field).find(needle) != std::wstring::npos) return true;
-	}
-	return false;
-}
 
 static bool IsConversionTarget(const GameInfo& game, uint16_t sourceGameId)
 {
@@ -504,7 +486,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 
 	ImGui::SetNextItemWidth(-FLT_MIN);
 	ImGui::InputTextWithHint("##movesetSearch", _("edition.search_hint"), m_search, sizeof(m_search));
-	const std::wstring searchNeedle = LowerForSearch(m_search);
+	const std::wstring searchNeedle = MovesetListSort::LowerForSearch(m_search);
 
 	movesetInfo* movesetToLoad = nullptr;
 
@@ -540,11 +522,7 @@ movesetInfo* Submenu_Edition::Render(LocalStorage& storage)
 		// Movesets are guaranteed not to be freed until after this loop
 		for (auto& group : MovesetListSort::GroupedTableView(storage.extractedMovesets))
 		{
-		if (!searchNeedle.empty()) {
-			// Games without a matching moveset are hidden entirely, header included
-			std::erase_if(group.movesets, [&](const movesetInfo* m) { return !MatchesSearch(*m, searchNeedle); });
-			if (group.movesets.empty()) continue;
-		}
+		if (!MovesetListSort::Filter(group, searchNeedle)) continue;
 		if (!MovesetListSort::GroupHeader(group, group.game == "INVALID" ? _("moveset.invalid") : group.game.c_str())) continue;
 		for (movesetInfo* moveset : group.movesets)
 		{

@@ -151,10 +151,13 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		break;
 	}
 
+	ImGui::SeparatorText(_("importation.select_moveset"));
+	ImGui::SetNextItemWidth(-FLT_MIN);
+	ImGui::InputTextWithHint("##movesetSearch", _("edition.search_hint"), m_search, sizeof(m_search));
+	const std::wstring searchNeedle = MovesetListSort::LowerForSearch(m_search);
+
 	auto availableSpace = ImGui::GetContentRegionAvail();
 	ImVec2 tableSize = ImVec2(0, availableSpace.y - ImGui::GetFrameHeightWithSpacing());
-
-	ImGui::SeparatorText(_("importation.select_moveset"));
 	if (ImGui::BeginTable("MovesetImportationList", 5, ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY
 		| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoHostExtendY | ImGuiTableFlags_Sortable, tableSize))
 	{
@@ -168,8 +171,9 @@ void Submenu_Import::Render(GameImport& importerHelper)
 		ImGui::PushID(&importerHelper);
 
 		// Movesets are guaranteed not to be freed until after this loop
-		for (const auto& group : MovesetListSort::GroupedTableView(importerHelper.storage->extractedMovesets))
+		for (auto& group : MovesetListSort::GroupedTableView(importerHelper.storage->extractedMovesets))
 		{
+		if (!MovesetListSort::Filter(group, searchNeedle)) continue;
 		if (!MovesetListSort::GroupHeader(group, group.game == "INVALID" ? _("moveset.invalid") : group.game.c_str())) continue;
 		for (movesetInfo* moveset : group.movesets)
 		{
