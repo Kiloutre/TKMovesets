@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <format>
+#include <string>
 #include <set>
 #include <vector>
 #include "AnimationReader.hpp"
@@ -170,18 +172,31 @@ namespace T7ImportUtils
         for (const auto& projectile : std::span(reinterpret_cast<const G::Projectile*>(records + table.projectile), table.projectileCount))
             if (!validHitList(projectile.hit_condition_addr) || !terminated(projectile.cancel_addr, cancelEnd))
                 return fail("Unterminated projectile list");
-        auto validateCancels = [&](auto entries) {
-            for (const auto& cancel : entries) {
-                if (!validRequirement(cancel.requirements_addr)) return false;
-                if (cancel.command == 0x800b) { if (!terminated(cancel.move_id, groupEnd)) return false; }
-                else if (cancel.command != 0x8000 && cancel.command != 0x800c && !validMove(cancel.move_id)) return false;
+        std::string cancelError;
+        auto validateCancels = [&](auto entries, const char* list) {
+            for (size_t i = 0; i < entries.size(); ++i) {
+                const auto& cancel = entries[i];
+                const char* why = nullptr;
                 // This is the editor's existing encoded-input range, retaining the high command bits.
                 const auto command = static_cast<uint32_t>(cancel.command);
-                if (command >= 0x800d && command < 0x10000 && command - 0x800d >= table.inputSequenceCount) return false;
+                if (!validRequirement(cancel.requirements_addr)) why = "requirement list";
+                else if (cancel.command == 0x800b) { if (!terminated(cancel.move_id, groupEnd)) why = "group cancel list"; }
+                else if (cancel.command != 0x8000 && cancel.command != 0x800c && !validMove(cancel.move_id)) why = "target move";
+                if (!why && command >= 0x800d && command < 0x10000 && command - 0x800d >= table.inputSequenceCount)
+                    why = "input sequence";
+                if (why) {
+                    cancelError = std::format("Invalid cancel target, input sequence or requirement list ({} {}: {}, command 0x{:x}, move 0x{:x}, requirement {})",
+                        list, i, why, static_cast<uint64_t>(cancel.command), static_cast<uint64_t>(cancel.move_id),
+                        static_cast<uint64_t>(cancel.requirements_addr));
+                    return false;
+                }
             }
             return true;
         };
-        if (!validateCancels(cancels) || !validateCancels(groups)) return fail("Invalid cancel target, input sequence or requirement list");
+        if (!validateCancels(cancels, "cancel") || !validateCancels(groups, "group cancel")) {
+            if (error) *error = cancelError;
+            return false;
+        }
         for (const auto& hit : std::span(reinterpret_cast<const G::HitCondition*>(records + table.hitCondition), table.hitConditionCount))
             if (!validRequirement(hit.requirements_addr)) return fail("Unterminated hit-condition requirements");
         for (auto entries : {begin, end})
