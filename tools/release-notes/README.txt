@@ -1,4 +1,4 @@
-TKMovesets2 1.1
+TKMovesets2 1.3
 ===============
 
 Moveset export, import and editing tool for Tekken, now with retail Tekken 8
@@ -8,14 +8,16 @@ support and Tekken 7 -> Tekken 8 conversion.
 Supported game build
 --------------------
 
-Tekken 8, Steam build 26155785 (PE timestamp 0x6ADB1AD5).
+Tekken 8, Steam build 26651490 (PE timestamp 0x6AF749A0, the 2026-11-20 patch).
+Build 26155785 (PE timestamp 0x6ADB1AD5) used the same addresses except for 15
+Tag mode functions.
 
-The Tekken 8 addresses live in game_addresses.ini (section t8-retail). The
-program checks the game's PE timestamp and will not detect players on any other
-build. A game patch therefore needs new addresses: until an updated
-game_addresses.ini is published (the program can download a newer one from the
-project repository) or a new release ships, Tekken 8 export, import and live
-features will not work on the patched game.
+The Tekken 8 addresses live in game_addresses.ini (section t8-retail). When a
+patch moves them, Tools > Addresses scans the game's executable with the byte
+patterns stored in the same file and writes the new values; nothing does this
+automatically. The program can also download a newer game_addresses.ini from
+the project repository. About 30 entries are structure offsets without a
+pattern: a patch that changes the game's structures needs a new release.
 
 
 Read before use
@@ -27,6 +29,74 @@ Read before use
   export or import. Players P1 and P2 are supported.
 - Keep backups of your files. Saves are atomic and the first overwrite keeps a
   backup of the original file, but this is still a modding tool.
+
+
+What's new in 1.3
+-----------------
+
+Tekken 8
+- Addresses for Steam build 26651490 (the 2026-11-20 patch). Export, import
+  and moveset state were checked on it in Practice; Tag mode's 15 moved
+  functions were updated by the address scan but Tag mode was not tested on
+  this build yet.
+
+Tekken 5 Dark Resurrection (RPCS3) -> Tekken 7 / Tekken 8 conversion
+- Requirement "always true" now converts to Tekken 7's "always true". It used
+  to become "backturned", so most cancels never fired and imported fighters
+  stood stuck in the round's director move.
+- Cancel option bits are recomputed with Tekken 7's own rules instead of being
+  copied from Tekken 5, whose bits mean different things. Moves now return to
+  idle the way native Tekken 7 moves do.
+- Pushback loop counts are converted from Tekken 5's fixed point (1.0 =
+  65536). Copied as is, every hit pushed the opponent tens of thousands of
+  times too long, until the game snapped them back across the stage.
+
+Tag Tournament 2 -> Tekken 7 / Tekken 8 conversion
+- Wii U extractions (EU v32, Cemu) are supported.
+- Requirement and property ids, value tables and hitbox bytes now come from
+  rules voted over the Wii U extractions, start and end properties included.
+- Cancels on the tag button are disabled.
+- Projectiles: the game's projectile rows are converted, and item spawns
+  (balloons, cloches) map to Tekken 7's spawn properties. The original item
+  models do not exist in Tekken 7 or 8.
+
+Old TekkenMovesetExtractor folders
+- Headless convert-json turns folders saved by the old Python extractor
+  (Tekken 7 and Tag 2 JSON, anim/, mota files) into .tkmvst files.
+- Cancels and reactions that point to moves the folder does not have (modded
+  movesets such as Gill and Chun-Li) are sent to valid moves instead of
+  making the file invalid. Tag 2 projectile rows the extractor saved as zeros
+  get the game's rows.
+
+Interface and tools
+- Search boxes for the moveset lists in the Import and Editor tabs.
+- Tekken 7 validation names the cancel it refuses (list, index, reason).
+- Tag mode accepts another mod's hook on ProcessEvent.
+
+
+What's new in 1.2
+-----------------
+
+- Tekken 7 -> Tekken 8: hand, face, wing and camera animations are converted.
+- Tekken 8 editor: live editing of an imported moveset.
+- Editor: cancel graph for Tekken 7 and Tekken 8 moves.
+- Tekken 7 editor: grouped cancel references, pushback deletion and MOTA
+  animation counts finished.
+- Chinese and Russian translations.
+- Converted animations keep the body state of down loops.
+
+
+What's new in 1.1.1 and 1.1.2
+-----------------------------
+
+- Tekken 7 -> Tekken 8 animations: facing and juggle body state use Tekken 8's
+  own layout, so juggled opponents no longer flip toward the attacker and
+  turning moves no longer spin (issue #178).
+- Tag mode starts its loader without restarting the game.
+- Tekken 7 editor: Create new no longer crashes on movesets without a
+  movelist, and it is all or nothing.
+- Tekken 8 editor: hitbox locations show the game's bone names; float fields
+  are coloured.
 
 
 What's new in 1.0
