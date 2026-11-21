@@ -514,7 +514,8 @@ int RunHeadless(std::span<const std::wstring> arguments)
                         {"padded_animations", r.paddedAnimations}, {"unswapped_animations", r.unswappedAnimations},
                         {"unswapped_mota_animations", r.unswappedMotaAnimations}, {"replaced_animations", r.replacedAnimations}, {"motas", r.motas},
                         {"skipped_motas", r.skippedMotas}, {"dropped_references", r.droppedReferences},
-                        {"file", Helpers::to_utf8(r.path.filename().wstring())}, {"existed", r.existed}});
+                        {"retargeted_cancels", r.retargetedCancels},
+                        {"retargeted_reactions", r.retargetedReactions}, {"filled_projectiles", r.filledProjectiles}, {"file", Helpers::to_utf8(r.path.filename().wstring())}, {"existed", r.existed}});
                 } catch (const std::exception& error) { movesets.push_back({{"folder", source}, {"ok", false}, {"error", error.what()}}); ok = false; }
             }
             std::cout << json({{"ok", ok}, {"movesets", movesets}}).dump() << '\n'; return ok ? 0 : 1;

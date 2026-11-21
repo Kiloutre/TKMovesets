@@ -21,6 +21,9 @@ struct Report {
     uint64_t unswappedMotaAnimations = 0;        // the same, inside the kept MOTA files
     std::vector<int> motas, skippedMotas;        // MOTA files kept, MOTA files that are not valid MOTA data
     uint64_t droppedReferences = 0;              // record indexes outside their list, written as "none"
+    uint64_t retargetedCancels = 0;              // T7 cancels to a move that does not exist, sent to alias 0x8000
+    uint64_t retargetedReactions = 0;            // T7 reaction moves that do not exist, given the first reaction list's
+    uint64_t filledProjectiles = 0;              // TTT2 projectile rows the extractor saved as zeros, given the game's rows
     std::filesystem::path path; bool existed = false;
 };
 // The moveset file (uncompressed TKMovesetHeader + blocks) of an extracted folder.

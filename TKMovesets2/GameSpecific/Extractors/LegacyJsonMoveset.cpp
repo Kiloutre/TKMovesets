@@ -82,6 +82,35 @@ uint64_t ParseDate(const std::string& value) {
     return seconds > 0 ? static_cast<uint64_t>(seconds) : 0;
 }
 
+// TTT2 projectile rows: the extractor saved zeros. These are the game's rows (34 big-endian words, nonzero words
+// listed), the same in the 58 TKMovesets2 extractions of the Wii U game: the three item balloons, Bob's cloches,
+// Angel's and Combot's extra rows (their hit condition word, a raw Wii U pointer in the extractions, left null).
+using ProjectileWords = std::vector<std::pair<int, uint32_t>>;
+ProjectileWords Balloon(uint32_t effect, uint32_t r, uint32_t g, uint32_t b) {
+    ProjectileWords words{{0, effect}, {4, 1}, {5, 0x4b0}, {7, 0x64}, {8, 0x64}, {9, 0x707}, {14, 0xc000191}, {16, 0xc000192},
+        {18, 0xc000192}, {21, 1}, {22, 1}, {23, 1}, {24, 0x1f4}, {26, 2}, {27, r}, {28, g}, {29, b}, {30, 0xc8}};
+    std::erase_if(words, [](const auto& word) { return word.second == 0; });
+    return words;
+}
+ProjectileWords Cloche(uint32_t effect, uint32_t word13) {
+    return {{0, effect}, {4, 1}, {5, 0x4b0}, {7, 0x104}, {8, 0xc8}, {9, 0x707}, {13, word13}, {16, 0xc001002}, {18, 0xc000193},
+        {21, 1}, {22, 1}, {24, 0x1f4}, {27, 0x80}, {28, 0x80}, {29, 0x80}, {30, 0xa}};
+}
+// Rows by TTT2 character id (JSON character_id): Bob 34, Slim Bob 46, Combot 49, Angel 50; row 0 is empty.
+std::vector<ProjectileWords> TTT2Projectiles(uint32_t character) {
+    std::vector<ProjectileWords> rows(1);
+    const ProjectileWords combot{{0, 0x9101}, {4, 1}, {5, 0x34bc0}, {7, 0x64}, {8, 0x64}, {9, 0x707}, {16, 0x75}, {21, 1}, {22, 1}};
+    if (character == 49) { rows.push_back(combot); rows.push_back(combot); }
+    rows.push_back(Balloon(0x6d01, 0x88, 0x1a, 0x18));
+    rows.push_back(Balloon(0x6d02, 0x9a, 0x95, 0x00));
+    rows.push_back(Balloon(0x6d03, 0x32, 0x46, 0xb8));
+    if (character == 50) rows.push_back({{0, 1}, {2, 0xc8}, {4, 1}, {5, 0x168}, {7, 0x64}, {8, 0x64}, {9, 0x217}, {22, 1}});
+    if (character == 34 || character == 46)
+        for (const uint32_t word13 : {1u, 0x14u, 0xau})
+            for (const uint32_t step : {0u, 6u, 12u}) rows.push_back(Cloche(0x7402 + step + (word13 == 1 ? 0 : word13 == 0x14 ? 2 : 4), word13));
+    return rows;
+}
+
 enum List { Reactions, Requirement, HitCondition, Projectile, Pushback, PushbackExtra, Cancel, GroupCancel, CancelExtra, ExtraProp,
     StartProp, EndProp, Move, Voiceclip, InputSequence, Input, Parry, CameraData, ThrowCamera, ListCount };
 // The JSON list of each table entry. The extractor did not save the move start and end property lists.
@@ -359,6 +388,21 @@ std::vector<Byte> BuildT7(Source& s) {
         r.block_moveid = (uint16_t)U(j, "block"); r.crouch_block_moveid = (uint16_t)U(j, "crouch_block");
         r.wallslump_moveid = (uint16_t)U(j, "wallslump"); r.downed_moveid = (uint16_t)U(j, "downed");
     }
+    // t7_CHUN_LI's custom throw reactions go to moves 2220..2286 (and one to 0x7FC6) while its JSON holds 2220 moves: those
+    // moves are not in the folder. Each one takes the same slot of the first reaction list (a reaction of the same kind),
+    // or alias 0x8000 when that one is missing too, listed in the report.
+    {
+        auto valid = [&](uint16_t id) { return id < s.counts[Move] || (id >= 0x8000 && id - 0x8000 < 56); };
+        const G::Reactions* first = s.counts[Reactions] ? &At<G::Reactions>(image, record(Reactions, 0)) : nullptr;
+        for (uint64_t i = 0; i < s.counts[Reactions]; ++i) {
+            auto& r = At<G::Reactions>(image, record(Reactions, i));
+            for (size_t k = 1; k < std::size(r.moveids); ++k) { // moveids[0] is vertical_pushback
+                if (valid(r.moveids[k])) continue;
+                r.moveids[k] = first && valid(first->moveids[k]) ? first->moveids[k] : 0x8000;
+                ++s.report.retargetedReactions;
+            }
+        }
+    }
     for (uint64_t i = 0; i < s.counts[Requirement]; ++i) {
         const auto& j = s.Records(Requirement)[i];
         auto& r = At<StructsT7::Requirement>(image, record(Requirement, i));
@@ -396,6 +440,12 @@ std::vector<Byte> BuildT7(Source& s) {
             r.requirements_addr = pointer(Requirement, S(j, "requirement_idx")); r.extradata_addr = pointer(CancelExtra, S(j, "extradata_idx"));
             r.detection_start = (uint32_t)U(j, "frame_window_start"); r.detection_end = (uint32_t)U(j, "frame_window_end");
             r.starting_frame = (uint32_t)U(j, "starting_frame"); r.move_id = (uint16_t)U(j, "move_id"); r.cancel_option = (uint16_t)U(j, "cancel_option");
+            // Modded movesets (t7_GILL, t7_CHUN_LI) have cancels to move "none" (0xFFFF / -1) in moves they added. There is no
+            // such move: the cancel goes to alias 0x8000 (back to stand) instead, listed in the report.
+            const auto list_end = r.command == 0x8000 || r.command == 0x800b || r.command == 0x800c;
+            if (!list_end && r.move_id >= s.counts[Move] && (r.move_id < 0x8000 || r.move_id - 0x8000 >= 56)) {
+                r.move_id = 0x8000; ++s.report.retargetedCancels;
+            }
         }
     for (uint64_t i = 0; i < s.counts[CancelExtra]; ++i)
         At<StructsT7::CancelExtradata>(image, record(CancelExtra, i)).value = (uint32_t)U(s.Records(CancelExtra)[i]);
@@ -566,7 +616,22 @@ std::vector<Byte> BuildTTT2(Source& s) {
         r.requirements_addr = index(Requirement, S(j, "requirement_idx")); r.damage = (uint32_t)U(j, "damage");
         r.reactions_addr = index(Reactions, S(j, "reaction_list_idx"));
     }
-    // Projectiles: the extractor did not read TTT2 projectiles (it saved zeros), and neither do the TTT2 converters
+    // Projectiles: the extractor did not read TTT2 projectiles (it saved zeros). When the folder has the game's row count,
+    // the game's rows are written (big-endian, as ExtractorTTT2 leaves them).
+    if (const auto game = TTT2Projectiles(s.report.characterId); s.counts[Projectile] == game.size()) {
+        for (uint64_t i = 0; i < s.counts[Projectile]; ++i) {
+            const auto& j = s.Records(Projectile)[i];
+            bool empty = true;
+            for (const char* key : {"u1", "u2"})
+                if (j.contains(key)) for (const auto& v : j.at(key)) empty = empty && U(v) == 0;
+            if (!empty || game[i].empty()) continue;
+            for (const auto& [word, value] : game[i]) {
+                const auto big = _byteswap_ulong(value);
+                memcpy(records.data() + record(Projectile, i) + word * 4, &big, 4);
+            }
+            ++s.report.filledProjectiles;
+        }
+    }
     for (uint64_t i = 0; i < s.counts[Pushback]; ++i) {
         const auto& j = s.Records(Pushback)[i];
         auto& r = At<T2::Pushback>(records, record(Pushback, i));

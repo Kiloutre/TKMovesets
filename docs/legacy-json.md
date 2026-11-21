@@ -47,12 +47,27 @@ own; `orig_character_name` holds the character's in-game name. `characterId` is 
   (`unswapped_animations`, `unswapped_mota_animations`).
 - An animation no folder has in a readable form is played by the moveset's first animation; its name is kept and
   the report lists it (`replaced_animations`).
+- T7 cancels to a move that does not exist (neither a move row nor one of the 56 aliases) go to alias `0x8000`
+  instead (`retargeted_cancels`). Modded movesets have them in moves they added: `t7_GILL` has 8 to move `0xFFFF`
+  (`Kg_CREsc_y`, `COPY_Ym_suisui_y`), `t7_CHUN_LI` 1,602 to move -1 (`Hyouyoku_*`, `Esc_*_y`, `Unused*`).
+- T7 reaction moves that do not exist take the same slot of the first reaction list, or alias `0x8000` when that one
+  is missing too (`retargeted_reactions`). `t7_CHUN_LI`'s custom throw reactions (`Ln_Bnage_y`, `Unused*`) go to
+  moves 2220 to 2286 and `0x7FC6` while its JSON holds 2220 moves: 143 slots.
+
+- TTT2 projectile rows the extractor saved as zeros get the game's rows (`filled_projectiles`), from a table in the
+  converter built from the 58 Wii U extractions: balloons in rows 1-3 (Combot 3-5), Bob's and Slim Bob's cloches in
+  4-12, Angel's row 4, Combot's rows 1-2 (by JSON `character_id`: 34, 46, 50, 49). Only when the folder has the
+  game's row count; the raw Wii U hit condition pointer of Angel's and Combot's rows is left null.
 
 ## Batch of 2026-11-18
 
 `extracted_chars` (TekkenMovesetExtractor): 54 `tag2_*`, 7 `rpcs3_tag2_*` and 59 of 61 `t7_*` folders converted, all
-pass `validate`. Refused: `t7_GILL` (8 cancels to move `0xFFFF`) and `t7_CHUN_LI` (`ValidateT7Semantics`: invalid
-cancel target, input sequence or requirement list; cause not found yet). `t4_*`, `t5_*`, `t6_*` were not converted.
+pass `validate`. Refused then: `t7_GILL` and `t7_CHUN_LI`. `t4_*`, `t5_*`, `t6_*` were not converted.
+
+2026-11-19: with the retargeting above, all 61 `t7_*` folders convert, and Gill and Chun-Li pass `validate`. Both were
+imported on retail T8 (Practice, Kazuya vs Kazuya: Gill on P1, Chun-Li on P2), and their moves were queued, the
+retargeted ones included (Gill 1876, 2103, 2141, 2129; Chun-Li 1669, 1985, 2162, 2127 -> 2135 -> 2139). Each move
+played, and the game was still running afterwards.
 
 ## What the JSON format does not hold
 
@@ -66,7 +81,7 @@ The extractor did not save these fields. The converter writes them empty (none /
 | Move `_0x5E_short` | lost | - |
 | Reactions `standing_moveid` (0x4E / 0x32) and the two ints before `vertical_pushback` | 0 | 0 |
 | Hit condition `_0xC_int` | 0 | - |
-| Projectiles | kept | zeros: the extractor did not read TTT2 projectiles |
+| Projectiles | kept | zeros: the extractor did not read TTT2 projectiles; the game's rows are written instead when the row count matches (below) |
 | Training movelist | none | none |
 
 Checked against `T7_Kazuya.tkmvst` built from the game's files: the game has 677 move end properties used by 156 of
