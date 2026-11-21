@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -471,10 +472,43 @@ bool MovesetConverter::TTT2ToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		gAddr::Projectile* target = (gAddr::Projectile*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.projectile) + i;
 		const TTT2::Projectile* source = (TTT2::Projectile*)(old_blocks->GetBlock(TTT2::TKMovesetHeaderBlocks_Moveset, moveset) + old_movesetInfo->table.projectile) + i;
 
-		// As of this time, don't do any conversion for projectiles
-		// Its format is different from the T7 format
-		// (The data is still there, in big endian, ready to be parsed by any importer)
 		memset(target, 0, sizeof(Projectile));
+		if (!ConvertsProjectiles()) continue;
+
+		// TTT2 rows are 0x88 bytes, big-endian as the game holds them (neither extractor swaps them). Words 0 to 9 are
+		// T7's 0x00, 0x18 to 0x38 (T7 adds 5 words after the effect id), word 16 is T7's 0x54, words 19 and 20 the hit
+		// condition and cancel pointers (docs/ttt2-conversion.md). The game's rows hold null or a raw Wii U pointer the
+		// extractor did not turn into an index, so both stay empty.
+		uint32_t w[sizeof(TTT2::Projectile) / 4];
+		memcpy(w, source, sizeof(w));
+		for (auto& word : w) word = _byteswap_ulong(word);
+		if (std::all_of(std::begin(w), std::end(w), [](uint32_t v) { return v == 0; })) {
+			target->hit_condition_addr = MOVESET_ADDR_MISSING;
+			target->cancel_addr = MOVESET_ADDR_MISSING;
+			continue;
+		}
+		// Word 0 is a TTT2 item model (0xXXYY: model XX, part YY; the item moves set the same value in 0x81fb-0x81fe). T7
+		// and T8 have neither the balloon nor the cloche: they take the effect of an item both games keep (the 6 item rows
+		// every T8 character has: 0x3c knife, 0x08 grenade, 0x30 Cupid arrow, 0x23 bouquet, 0x3e). Other models are kept.
+		const uint32_t model = w[0] >> 8;
+		target->vfx_id = model == 0x6d ? 0x23 : model == 0x74 ? 0x08 : w[0];
+		target->delay = w[1];
+		target->vertical_velocity = w[2];
+		target->horizontal_velocity = w[3];
+		target->_0x24_int = w[4];
+		target->duration = w[5];
+		target->no_collision = w[6];
+		target->size = w[7];
+		target->_0x34_int = w[8];
+		target->hit_level = w[9];
+		target->voiceclip_on_hit = w[16];
+		target->hit_condition_addr = MOVESET_ADDR_MISSING;
+		target->cancel_addr = MOVESET_ADDR_MISSING;
+		// The rest of the TTT2 row has no known T7 counterpart. T7's own rows: 0x74 = 1 (377 of 377), 0x78 = twice the
+		// size and 0x7C = 0x34 (331 of 377)
+		target->_0x74_int = 1;
+		target->can_hitbox_connect = 2 * w[7];
+		target->_0x7C_int = w[8];
 	}
 
 	for (unsigned int i = 0; i < table.cameraDataCount; ++i)

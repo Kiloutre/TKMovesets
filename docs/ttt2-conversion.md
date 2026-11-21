@@ -103,9 +103,49 @@ Ids used only in start/end lists that the vote cannot decide:
   values). The other differences are flags T7 added to particular moves, which the TTT2 value does not carry.
 - Frame data, move length, vulnerability, hit level: 97-99.9% equal; the differences are T7 changes to those moves.
 - Transitions: equal by target move name, except the `Co_Dummy_*` placeholder moves, which loop on themselves in T7.
-- Projectiles: written as zeros. TTT2 rows are 0x88 bytes, big-endian as the game holds them (the extractor does
-  not swap them), with no hit condition or cancel reference; T7 rows are 0xa8 bytes. TTT2 spawns them with property
-  `0x8168` (value = projectile row: 1 to row count - 1 in all 58 extractions), T7 with `0x820b`. No move pairs them:
-  the 111 TTT2 moves that spawn one (the balloon items `Co_IBalloon*`, Bob's extra rows) and the 212 T7 ones
-  (`Co_ISyuriken`, `Co_IThrowKnife`, `Co_IGrenade`...) share no name, so the layout cannot be voted. `0x8168`
-  passes through unchanged.
+
+## Projectiles (2026-11-19)
+
+TTT2 rows are 0x88 bytes, big-endian as the game holds them (the extractor does not swap them); T7 rows are 0xa8
+bytes. No move pairs them by name (TTT2 balloons `Co_IBalloon*` and Bob's cloches `Sl_ICloche*`, T7 `Co_ISyuriken`,
+`Co_IGrenade`...), so the layout was aligned by hand on the 58 Wii U extractions (16 distinct rows) and the T7 game
+files (371 distinct rows):
+
+| TTT2 word (offset) | T7 field |
+| --- | --- |
+| 0 (0x00) | `vfx_id` (0x00) |
+| 1, 2, 3 (0x04-0x0C) | `delay`, `vertical_velocity`, `horizontal_velocity` (0x18-0x20); Angel's beam row has its speed in word 2 |
+| 4-9 (0x10-0x24) | `_0x24` (1 = on), `duration`, `no_collision`, `size`, `_0x34`, `hit_level` (0x24-0x38) |
+| 16 (0x40) | `voiceclip_on_hit` (0x54), aligned back from the hit condition |
+| 19, 20 (0x4C, 0x50) | hit condition, cancel: null or a raw Wii U pointer in the extractions (Angel row 4, Combot rows 1-2), left empty |
+
+T7's `0x74` is set to 1 (377 of 377 T7 rows), `0x78` to twice the size and `0x7C` to `0x34` (331 of 377). TTT2 words
+10-15, 17, 18 and 21-33 (two more voiceclips, balloon colour bytes 27-29...) have no known T7 field and are left out.
+Tekken Revolution rows stay zeros (`ConvertsProjectiles`).
+
+Spawn properties: TTT2 items set `0x8169`, `0x816a`, `0x816b`, `0x816c` then `0x8168` = row, as T7 items set
+`0x820c`-`0x820f` then `0x820b` = row (`0x8169` = 9 like T7's `0x820c` bone 9): they map one to one (hand-made
+dictionary). The T7 -> T8 converter then turns `0x820b` into retail `0x827B` (Bob: 12 spawns, other characters 3).
+
+Old extractor folders hold zero rows; `convert-json` writes the game's rows when the folder has the game's row count
+(`filled_projectiles`, see [legacy-json.md](legacy-json.md)): the 265 rows of the 61 folders equal the Wii U
+extractions.
+
+In game (retail T8, Practice, Kazuya body): Bob's converted moveset on P1, `Co_IBalloonR/Y/B` (661-663) and
+`Sl_ICloche1/5/9` (2231, 2235, 2239) queued: each played and returned to stand, the game kept running. Effects: word 0 is a TTT2 item model (`0xXXYY`, the value the item moves also set in `0x81fb`-`0x81fe`: balloon `0x6d`,
+cloche `0x74`), not an effect id. Neither model exists in T7 or T8, so balloons take the bouquet effect `0x23` and
+cloches the grenade effect `0x08`, two of the item effects every native T8 moveset keeps (`0x3c`, `0x08`, `0x30`, `0x23`,
+`0x3e`, read from the 27 T8 extractions converted to T7). Other models (Angel's `1`, Combot's `0x9101`) are kept.
+
+In game (retail T8, Practice, Kazuya body, 2026-11-19): Bob's converted moveset on P1, `Co_IBalloonR/Y/B` (661-663)
+and `Sl_ICloche1/5/9` (2231, 2235, 2239) queued. Each move played and returned to stand, and the game kept running. The
+frame data panel shows the projectile's active frames, 29 to 1228 (spawn on frame 28, duration 1200). No bouquet or
+grenade shows in the video, with either the TTT2 model ids or the mapped effects.
+
+Native T7 item projectiles were checked the same way: Kazuya's T7 moveset (built from the game's files) on P1,
+`Co_ISyuriken`, `Co_IThrowKnife`, `Co_IGrenade`, `Co_ICupid`, `Co_IBouquet`, `Co_IFishGun` (711-713, 743, 744, 758)
+queued. They hit P2 (20 damage, knocked across the stage, with T8's hit effect), but no item is drawn in flight
+either. T8 draws none of these item projectiles; what shows is the hit, and the TTT2 rows have no hit condition (the
+game's balloons and cloches do not hit), so nothing shows for them. T8's own item moves (`Co_IHummer`,
+`Co_IFrenchBread`...) show a held model through `0x8342`, `0x8333` and `0x832b`/`0x8343`/`0x8344`, and no T8 move
+spawns the item projectile rows.

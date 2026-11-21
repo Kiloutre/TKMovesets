@@ -25,6 +25,8 @@ namespace MovesetConverter
 		// TTT2's tag button, bit 0x100 of a cancel's button word (tag changes, tag throws, tag-in moves)
 		static constexpr uint32_t TagButton = 0x100;
 		virtual bool HasTagButton() const { return true; }
+		// TTT2 projectile rows (0x88 bytes, big-endian) converted to T7 rows; Tekken Revolution's layout is not known
+		virtual bool ConvertsProjectiles() const { return true; }
 	public:
 
 		bool Convert(const TKMovesetHeader* header, Byte*& moveset, uint64_t& s_moveset, StructsT7::TKMovesetHeaderBlocks& blocks_out);
@@ -38,6 +40,7 @@ namespace MovesetConverter
 		void ApplyVotedRules(std::map<unsigned int, s_propAlias>&) override {} // the votes are TTT2's
 		void ConvertHitbox(unsigned int& hitbox) override;
 		bool HasTagButton() const override { return false; }
+		bool ConvertsProjectiles() const override { return false; }
 	};
 
 
