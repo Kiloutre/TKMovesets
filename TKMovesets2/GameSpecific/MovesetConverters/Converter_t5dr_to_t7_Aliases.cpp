@@ -11,7 +11,7 @@
  std::map<unsigned int, s_propAlias> MovesetConverter::T5DRToT7::InitAliasDictionary()
 {
 	return std::map<unsigned int, s_propAlias> {
-		{ 0, { .target_id = 72 }},
+		{ 0, { .target_id = 0 }}, // Always true (72 is Backturned in T7)
 		{ 2, {.target_id = 3 } },
 		{ 3, {.target_id = 4 } },
 		{ 4, {.target_id = 5 } },

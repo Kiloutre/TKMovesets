@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "helpers.hpp"
 #include "Aliases.hpp"
@@ -265,7 +267,9 @@ bool MovesetConverter::T5DRToT7::Convert(const TKMovesetHeader* header, Byte*& m
 
 		target->duration = source->duration;
 		target->displacement = source->displacement;
-		target->num_of_loops = source->num_of_loops;
+		// T5 stores the loop count as 16.16 fixed point (1.0 = 0x10000); T7 counts loops. Every T5DR row has a zero
+		// fraction (1..19 << 16 across the 36 RPCS3 movesets); copied as is, a hit pushed the opponent ~65536x too long.
+		target->num_of_loops = source->num_of_loops >> 16;
 		target->extradata_addr = source->extradata_addr;
 	}
 
@@ -454,6 +458,36 @@ bool MovesetConverter::T5DRToT7::Convert(const TKMovesetHeader* header, Byte*& m
 		*/
 	}
 
+
+	// T5DR option bits are the ones the T5 loader computes (T5 requirement ids, T5 extradata codes); T7 reads its own.
+	// Recompute the T7 loader's bits (T7DiskMoveset.cpp / T8ToT7.cpp) from the converted requirement ids and target.
+	// Bits 0x40/0x80 depend on the cancel extradata, which is copied unconverted: they keep their T5 value.
+	{
+		const auto* requirements = (const Requirement*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.requirement);
+		constexpr uint32_t NoRoute[] = { 0x22e, 0x22f, 0x27a, 0x32b, 0x27c };
+		auto recompute = [&](gAddr::Cancel& cancel, bool mainCancel) {
+			std::vector<uint32_t> ids;
+			for (uint64_t r = (uint64_t)cancel.requirements_addr; r < table.requirementCount && ids.size() < 4096; ++r) {
+				if (requirements[r].condition == 881) break;
+				ids.push_back(requirements[r].condition);
+			}
+			auto has = [&](uint32_t id) { return std::find(ids.begin(), ids.end(), id) != ids.end(); };
+			const bool command0 = cancel.command == 0;
+			uint16_t option = (uint16_t)(cancel.cancel_option & (0x40 | 0x80));
+			if (command0) option |= 1;
+			if (std::any_of(ids.begin(), ids.end(), [](uint32_t id) { return id >= 0x32c && !(id & 0x8000); })) option |= 2;
+			if (std::any_of(ids.begin(), ids.end(), [](uint32_t id) { return id >= 0x349 && !(id & 0x8000); })) option |= 4;
+			if (has(0x84ce)) option |= 8;
+			if ((!command0 || has(0x83) || has(0x84) || has(0x85)) && std::none_of(std::begin(NoRoute), std::end(NoRoute), has)) option |= 0x10;
+			const uint16_t move = cancel.move_id;
+			if (mainCancel && (move & 0x8000) && (move == 0x8024 || move <= 0x801d || move >= 0x8028)) option |= 0x100;
+			cancel.cancel_option = option;
+		};
+		for (unsigned int i = 0; i < table.cancelCount; ++i)
+			recompute(*((gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.cancel) + i), true);
+		for (unsigned int i = 0; i < table.groupCancelCount; ++i)
+			recompute(*((gAddr::Cancel*)(blocks_out.GetBlock(TKMovesetHeaderBlocks_Moveset, new_moveset) + table.groupCancel) + i), false);
+	}
 
 	for (unsigned int i = 0; i < _countof(new_movesetInfo->motas.motas); ++i) {
 		gameAddr32 motaAddr32 = old_movesetInfo->motas.motas[i];
