@@ -162,7 +162,10 @@ Extra properties (table 9), for each T7 row until id 0:
 - `ImportProfile::StripsProperty` -> row left out.
 - Projectile spawn (`map:t7_t8_projectile_prop`, T7 33291 -> retail `0x827B`): kept when the value is a valid projectile
   row (the table is converted row for row), else dropped.
-- Throw (`map:t7_t8_throw_prop`, T7 33852 -> retail `0x868F`): kept when the value is a valid throw row, else dropped.
+- Throw (T7 33852 -> retail `0x868F`, Rage Art 33853 -> `0x8690`): the value selects a table-18 row. Its table-17
+  variants keep their weights, side and rotation. Presets (`0x16`) keep their shared IDs. Animated variants (`0x15`)
+  use the embedded category-4 clips from the T7 camera MOTAs. A missing variant drops the call during conversion, or
+  silences it at import if either custom camera could not be published. Import remaps the IDs of both sides after collisions.
 - Hand animation (T7 `0x842E` left / `0x842F` right -> retail `0x8610` / `0x8611`, `T7HandToRetailT8::HandProperties`):
   kept when its animation converted (see [Animations](#animations)), with the animation's retail hand index as value;
   else dropped, as before.
@@ -174,7 +177,6 @@ Extra properties (table 9), for each T7 row until id 0:
   `0x8313` SetDramaType, `0x8314` SetDramaNo): in retail the drama camera replaces the camera animation, so Kazuya's
   intros 2155/2157/2236 and win poses 2323..2331 showed the sky, the floor or the empty stage. Drama rows of lists
   without a camera animation are kept.
-  Throw cameras need nothing: T7 and T8 camera data rows use the same shared camera ids (`0x814`, `0x901`...).
 - Wing animation (`T7WingToRetailT8::WingProperties`: T7 33840 "Play Wing Animations" -> `0x8683`): kept the same way,
   with the retail wing (swing) index as value. Only T7 Kazuya uses it (19 rows).
 - Face animation (`T7FaceToRetailT8::FaceProperties`: T7 33986 "Play Facial Animation Sequence" -> `0x877A`): kept the

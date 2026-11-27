@@ -49,6 +49,7 @@ namespace S = StructsT7;
 namespace G = StructsT7_gameAddr;
 namespace R = RetailT8Snapshot;
 namespace S8 = StructsT8;
+namespace C = T7CameraToRetailT8;
 // Retail field offset (Structs_t8.h). Offsets read from T7 rows (Get on a T7 row) stay T7 layout literals.
 #define AT(record, member) uint32_t(offsetof(S8::record, member))
 constexpr uint64_t Null7 = UINT64_MAX;
@@ -283,6 +284,8 @@ struct Converter {
     // Hand, camera and wing animations: (T7 property id, T7 value) -> retail category index of its converted animation
     // (T7HandToRetailT8, T7CameraToRetailT8, T7WingToRetailT8).
     std::map<std::pair<uint32_t, uint32_t>, uint32_t> handIndex;
+    std::map<uint16_t, uint16_t> cameraIndices; // T7 camera MOTA value -> category 4 file index
+    std::vector<bool> availableThrows;
     // T7 drama camera rows (33443 type, 33444 number; catalog targets 0x8313 SetDramaType, 0x8314 SetDramaNo) in an
     // extra-property list that also plays a converted camera animation: left out. In retail the drama camera takes
     // over the camera animation (Kazuya intros 2155/2157/2236 and win poses 2323..2331 showed sky, floor or the empty
@@ -425,16 +428,19 @@ struct Converter {
             // Projectile spawn: retail 0x827B takes the projectile row (table converted row for row below);
             // the spawn bone/offsets 33292..33295 map to 0x827C..0x827F through the catalog. Bone indices
             // are the same in both games (retail 0x14195B770: 0 Trans, 9 R_Hand, 13 L_Hand).
-            if (id == t7Projectile) { if (value < t7count[3]) { mapped = t8Projectile; ++rep->projectileSpawns; } else ++rep->projectilesDropped; }
-            else if (id == t7Throw) {
-                // Throw: the value indexes the throw table, which is converted from T7 row for row.
-                if (value < t7count[18]) mapped = t8Throw; else ++rep->throwsDropped;
+            if (id == t7Throw || id == C::T7RageThrowProperty) {
+                if (value >= availableThrows.size() || !availableThrows[value]) { ++rep->throwsDropped; return p; }
+                mapped = id == t7Throw ? t8Throw : C::RetailRageThrowProperty;
             }
-            bool drop = false;
-            const auto converted = p.last ? std::optional<ConvertedProperty>() : ParamProperty(id, value, drop, settings);
-            if (converted) { mapped = converted->id; ++rep->propertiesCatalog; }
-            else if (drop && id != t7Projectile && id != t7Throw) { ++rep->propertiesDropped; }
-            else if (!mapped && id != t7Projectile && id != t7Throw) mapped = MapProperty(id);
+            else if (id == t7Projectile) { if (value < t7count[3]) { mapped = t8Projectile; ++rep->projectileSpawns; } else ++rep->projectilesDropped; }
+            std::optional<ConvertedProperty> converted;
+            if (!p.last && id != t7Throw && id != C::T7RageThrowProperty) {
+                bool drop = false;
+                converted = ParamProperty(id, value, drop, settings);
+                if (converted) { mapped = converted->id; ++rep->propertiesCatalog; }
+                else if (drop && id != t7Projectile) { ++rep->propertiesDropped; }
+                else if (!mapped && id != t7Projectile) mapped = MapProperty(id);
+            }
             if (!p.last && !mapped) return p;
             // The retail end row is written as {frame 0, id 0} even when the T7 terminator kept a frame.
             Set<uint32_t>(out, AT(ExtraMoveProperty, frame), p.last ? 0 : frame); Set<uint32_t>(out, AT(ExtraMoveProperty, id), p.last ? 0 : *mapped);
@@ -517,8 +523,17 @@ struct Converter {
             memcpy(out.data(), r.data(), r.size());
             Ref(out, AT(Pushback, extra), 5, Get<uint64_t>(r, 8));
             break;
-        case 5: case 8: case 15: case 16: case 17: // pushback extra, cancel extra, inputs, parry, cameras: same layout
+        case 5: case 8: case 15: case 16: // pushback extra, cancel extra, inputs, parry: same layout
             memcpy(out.data(), r.data(), r.size());
+            break;
+        case 17: // camera presets and list ends share the retail layout; animation IDs use the converted MOTA assets.
+            memcpy(out.data(), r.data(), r.size());
+            if (Get<uint16_t>(r, 4) == C::AnimatedThrowCamera) {
+                for (const auto offset : {AT(CameraData, left_camera), AT(CameraData, right_camera)}) {
+                    if (const auto index = cameraIndices.find(Get<uint16_t>(r, offset)); index != cameraIndices.end())
+                        Set(out, offset, index->second);
+                }
+            }
             break;
         case 6: case 7: { // cancels, group cancels
             memcpy(out.data(), r.data(), r.size());
@@ -665,9 +680,9 @@ Built Build(Converter& c, const S::TKMovesetHeaderBlocks& blocks, std::span<cons
         uint32_t handCount = 0, cameraCount = 0, wingCount = 0, faceCount = 0;
         // (MOTA, animation, hand, or 2 for a camera, 3 for a wing, 4 for a face) -> retail index
         std::map<std::tuple<size_t, uint32_t, int>, std::optional<uint32_t>> done;
-        auto visit = [&](uint32_t id, uint32_t value) {
+        auto visit = [&](uint32_t id, uint32_t value, bool throwCamera = false) {
             const auto* hand = T7HandToRetailT8::FindT7Property(id);
-            const auto* camera = T7CameraToRetailT8::FindT7Property(id);
+            const bool camera = throwCamera || C::FindT7Property(id);
             const auto* wing = T7WingToRetailT8::FindT7Property(id);
             const auto* face = T7FaceToRetailT8::FindT7Property(id);
             if ((!hand && !camera && !wing && !face) || c.handIndex.count({id, value})) return;
@@ -705,11 +720,35 @@ Built Build(Converter& c, const S::TKMovesetHeaderBlocks& blocks, std::span<cons
                     ++(camera ? rep.cameraAnimationsFailed : wing ? rep.wingAnimationsFailed : face ? rep.faceAnimationsFailed : rep.handAnimationsFailed);
                 }
             }
-            if (it->second) c.handIndex[{id, value}] = *it->second;
+            if (it->second) {
+                if (camera) c.cameraIndices.emplace(uint16_t(value), uint16_t(*it->second));
+                if (!throwCamera) c.handIndex[{id, value}] = *it->second;
+            }
         };
         // Extra properties only: no T7 character plays a hand or camera animation from a start or end list, and the
         // importer silences an unpublished row by its frame, which only extra properties have.
         for (uint64_t row = 0; row < t7.count[9]; ++row) { auto r = t7.Row(9, row); visit(Get<uint32_t>(r, 4), Get<uint32_t>(r, 8)); }
+        for (uint64_t row = 0; row < t7.count[17]; ++row) {
+            const auto r = t7.Row(17, row);
+            if (!Get<uint32_t>(r, 0) || Get<uint16_t>(r, 4) != C::AnimatedThrowCamera) continue;
+            visit(0, Get<uint16_t>(r, 6), true);
+            visit(0, Get<uint16_t>(r, 8), true);
+        }
+    }
+
+    // A throw selects from consecutive variants up to the zero-weight terminator.
+    std::vector<bool> availableCameras(t7.count[17]);
+    bool available = false;
+    for (uint64_t row = t7.count[17]; row-- > 0;) {
+        const auto r = t7.Row(17, row);
+        if (!Get<uint32_t>(r, 0)) { available = true; continue; }
+        if (Get<uint16_t>(r, 4) == C::AnimatedThrowCamera)
+            available &= c.cameraIndices.contains(Get<uint16_t>(r, 6)) && c.cameraIndices.contains(Get<uint16_t>(r, 8));
+        availableCameras[row] = available;
+    }
+    for (uint64_t row = 0; row < t7.count[18]; ++row) {
+        const auto camera = Get<uint64_t>(t7.Row(18, row), 8);
+        c.availableThrows.push_back(camera < availableCameras.size() && availableCameras[camera]);
     }
 
     // ---- Output layout ---------------------------------------------------
@@ -1074,7 +1113,11 @@ std::optional<std::string> LiveConversion::UpdateRow(size_t table, uint64_t row,
             previous = next;
             return std::nullopt;
         }
-        write(table, row, c.Row(table, t7Row));
+        if (table == 17) return "camera data changes can affect throw lists and embedded animations";
+        auto converted = c.Row(table, t7Row);
+        if (table == 18 && Get<uint64_t>(converted, 8) != Get<uint64_t>({m->Row(table, row), stride}, 8))
+            return "a throw changed its camera data list";
+        write(table, row, converted);
         return std::nullopt;
     } catch (const std::exception& error) {
         return std::string(error.what());

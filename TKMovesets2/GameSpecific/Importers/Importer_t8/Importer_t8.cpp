@@ -489,10 +489,14 @@ ImportationErrcode_ ImporterT8::ImportMovesetData(const TKMovesetHeader* outer, 
             m_publishedHandIndices = RS::PublishCategoryIndex(m_process, handMap, handPublish);
             m_customAnimations = panms.size();
         }
-        // Hand rows play the published index; without one (another route, no category index, no free key) they never fire.
+        // Category properties and throw cameras use the indices this import published.
         if (convertedT7) {
-            const auto rows = std::span<Byte>(plan.tables).subspan(plan.offsets[9], plan.counts[9] * R::Tables[9].stride);
-            RetailT8Import::ApplyHandIndices(rows, m_memoryOnly ? &m_handIndices : nullptr, &m_silencedHandProperties);
+            const auto tables = std::span<Byte>(plan.tables);
+            const auto properties = tables.subspan(plan.offsets[9], plan.counts[9] * R::Tables[9].stride);
+            const auto cameras = tables.subspan(plan.offsets[17], plan.counts[17] * R::Tables[17].stride);
+            const auto* indices = m_memoryOnly ? &m_handIndices : nullptr;
+            RetailT8Import::ApplyHandIndices(properties, indices, &m_silencedHandProperties);
+            m_silencedHandProperties += RetailT8Import::ApplyThrowCameraIndices(properties, cameras, payload, indices);
         }
         for (const auto& asset : assets) {
             if (m_memoryOnly || m_targetFallback) break; // the target fallback writes nothing into game resources
