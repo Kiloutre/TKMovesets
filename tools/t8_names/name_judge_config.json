@@ -1,0 +1,22 @@
+{
+ "ablation_negatives": 200000,
+ "depth": 4,
+ "false_accept_per_decoy_lists": 1000,
+ "goss_rest": 0.1,
+ "goss_top": 0.1,
+ "l2": 2.0,
+ "learning_rate": 0.1,
+ "max_bins": 24,
+ "min_hess": 2.0,
+ "prior_in_list": {
+  "100000": 0.3,
+  "100000+stems": 0.35,
+  "1000000": 0.4,
+  "1000000+stems": 0.45
+ },
+ "seed": 7,
+ "train_bucket_percent": 60,
+ "training_budget": "100000+stems",
+ "trees": 300,
+ "version": "name-judge-v2"
+}
