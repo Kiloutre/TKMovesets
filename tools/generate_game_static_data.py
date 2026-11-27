@@ -19,7 +19,7 @@ def read_csv(path):
         return list(csv.DictReader(source))
 
 
-def generate(fighters, moves):
+def generate(fighters, moves, extra_names=None):
     characters, ids, codes = [], set(), set()
     for row in read_csv(fighters):
         code, chr_id = row["code"], row["chr_id"]
@@ -62,9 +62,18 @@ def generate(fighters, moves):
             if value in names and names[value] != name:
                 raise ValueError(f"Ambiguous name hash 0x{value:08X}")
             names[value] = name
+    # Optional names of hashes that no move row uses ({"0x%08X": name}), e.g. the rest of a public dictionary.
+    # A row name always wins; a different name for a row hash is an error, so conflicts are settled before this step.
+    if extra_names:
+        for key, name in json.loads(extra_names.read_text(encoding="utf-8")).items():
+            value = int(key, 16)
+            if not 0 <= value <= 0xffffffff or not name:
+                raise ValueError(f"Invalid extra name entry: {key}")
+            if names.setdefault(value, name) != name:
+                raise ValueError(f"Extra name conflicts with a row name: 0x{value:08X}")
     return dict(schema_version=1, profile="t8-retail",
                 sources=[dict(file=p.name, sha256=hashlib.sha256(p.read_bytes()).hexdigest())
-                         for p in (fighters, moves)],
+                         for p in (fighters, moves, extra_names) if p],
                 statistics=dict(fighters=len(characters), move_rows=count,
                                 unnamed_move_rows=unresolved, name_hashes=len(names)),
                 characters=sorted(characters, key=lambda c: c["code"]),
@@ -77,9 +86,10 @@ def main():
     parser.add_argument("--moves", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().parents[1] /
                         "TKMovesets2/Resources/TKMInterface/t8-retail_names.json")
+    parser.add_argument("--extra-names", type=Path, help="JSON of names for hashes that no move row uses")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    data = (json.dumps(generate(args.fighters, args.moves), ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    data = (json.dumps(generate(args.fighters, args.moves, args.extra_names), ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     if args.check:
         if not args.output.exists() or args.output.read_bytes() != data:
             raise SystemExit("Static name data is out of date")

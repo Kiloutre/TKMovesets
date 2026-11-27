@@ -67,6 +67,17 @@ class GeneratorTests(unittest.TestCase):
         self.rows.append(dict(self.rows[0], name="conflicting"))
         with self.assertRaises(ValueError): self.build()
 
+    def test_extra_names_fill_only_unused_hashes(self):
+        self.build()
+        extra = self.root / "extra.json"
+        extra.write_text('{"0x00000003": "extra", "0x00000001": "move"}', encoding="utf-8")
+        data = generator.generate(self.fighters, self.moves, extra)
+        self.assertEqual(data["names"]["0x00000003"], "extra")
+        self.assertEqual(len(data["names"]), 3)
+        self.assertEqual(len(data["sources"]), 3)
+        extra.write_text('{"0x00000001": "other"}', encoding="utf-8")
+        with self.assertRaises(ValueError): generator.generate(self.fighters, self.moves, extra)
+
     def test_duplicate_character_rejected(self):
         self.characters.append(dict(self.characters[0], code="other"))
         with self.assertRaises(ValueError): self.build()
