@@ -1,5 +1,5 @@
-TKMovesets2 1.3
-===============
+TKMovesets2 1.3.1
+=================
 
 Moveset export, import and editing tool for Tekken, now with retail Tekken 8
 support and Tekken 7 -> Tekken 8 conversion.
@@ -29,6 +29,15 @@ Read before use
   export or import. Players P1 and P2 are supported.
 - Keep backups of your files. Saves are atomic and the first overwrite keeps a
   backup of the original file, but this is still a modding tool.
+
+
+What's new in 1.3.1
+-------------------
+
+- Tekken 7 -> Tekken 8: converted camera animations no longer slide or turn
+  the wrong way (issue #182).
+- Tekken 8 move names: 47,095 names (was 34,534); unnamed move rows across
+  the 53 fighters drop from 3,074 to 1,582.
 
 
 What's new in 1.3
