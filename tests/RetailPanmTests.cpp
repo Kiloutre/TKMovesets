@@ -331,6 +331,12 @@ void RunCameraTests() {
     const auto packed=P::PackTransforms(samples);
     uint16_t flags;memcpy(&flags,packed.data()+2,2);
     Check(flags==14,"Packed camera transform flags differ from native (rotation and position animated)");
+    // Listed widths (issue #182): a constant channel of an animated group lists 0 like native files (rotation z, position
+    // y here); only the groups the track does not animate (scale) list a nominal 16.
+    auto width=[&](size_t c){uint32_t w;memcpy(&w,packed.data()+24+c*16,4);return w;};
+    Check(width(0)==16 && width(1)==16 && width(2)==16,"Unanimated scale channels do not list the native nominal width");
+    Check(width(5)==0 && width(7)==0,"Constant channel of an animated group lists a width (issue #182)");
+    Check(width(3)>0 && width(4)>0 && width(6)>0 && width(8)>0,"Animated channel lists no width");
     const auto back=P::DecodePackedTrack(packed,uint32_t(samples.size()));
     for(size_t i=0;i<samples.size();++i){
         for(int k=0;k<4;++k)Check(std::abs(back[i].rotation[k]-samples[i].rotation[k])<2e-4f,"Packed rotation drifted (or lost the sign of w)");

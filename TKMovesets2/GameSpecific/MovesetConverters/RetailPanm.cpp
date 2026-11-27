@@ -426,8 +426,15 @@ std::vector<Byte> PackTransforms(std::span<const Sample> source) {
     std::vector<Byte> out(header,0);
     PutAt<uint16_t>(out,0,4);PutAt<uint16_t>(out,2,flags);PutAt<uint16_t>(out,4,16+9*16);PutAt<uint16_t>(out,6,uint16_t(bitsPerFrame));
     PutAt<uint32_t>(out,8,uint32_t(header));PutAt<uint32_t>(out,12,uint32_t(samples.size()));
-    // Like native files, a constant channel keeps a nominal width in its row but takes no bits (low == high).
-    for(size_t c=0;c<9;++c) { PutAt<float>(out,16+c*16,low[c]);PutAt<float>(out,20+c*16,high[c]);PutAt<uint32_t>(out,24+c*16,width[c]?width[c]:16); }
+    // A constant channel (low == high) takes no bits. Native files list width 0 for it when its group (scale 1, rotation
+    // 4, position 8) is in the flags, and a nominal 16 only for the groups the track does not animate (all 22,859 packed
+    // tracks of a native Kazuya export). The game reads the listed width of an animated group's channels: a 16 there
+    // shifted every following channel of the frame (issue #182: converted cameras slid and turned the wrong way).
+    for(size_t c=0;c<9;++c) {
+        const bool animatedGroup=(flags&(c<3?1:c<6?4:8))!=0;
+        PutAt<float>(out,16+c*16,low[c]);PutAt<float>(out,20+c*16,high[c]);
+        PutAt<uint32_t>(out,24+c*16,width[c]?width[c]:animatedGroup?0:16);
+    }
     memcpy(out.data()+16+9*16,&samples[0],sizeof(Sample)); // frame 0, as native files store it
     BitWriter bits{out,header};
     for(const auto& s:samples) {
