@@ -64,7 +64,7 @@ void RunGameStaticDataTests() {
         Check(!GameStaticData::LoadOptional("t8-retail", path).Error().empty(), "Oversized optional file accepted");
         Check(loaded.CharacterName(6) == "Jin Kazama", "Loaded metadata borrowed mutable file storage");
         auto shipped = GameStaticData::LoadOptional("t8-retail");
-        Check(shipped.CharacterCount() == 53 && shipped.NameCount() == 47095 && shipped.CharacterName(6) == "Jin Kazama" &&
+        Check(shipped.CharacterCount() == 53 && shipped.NameCount() == 47151 && shipped.CharacterName(6) == "Jin Kazama" &&
             shipped.CharacterName(8) == "Kazuya Mishima" && shipped.CharacterName(15) == "Sergei Dragunov" &&
             shipped.FindCharacter("zbr") && shipped.FindCharacter("zbr")->name == "Reina", "Shipped retail data did not load beside executable");
         Check(shipped.FindName(0x0a27d720) && *shipped.FindName(0x0a27d720) == "Ycmn_dm_harai", "Shipped animation name hash failed");
@@ -75,7 +75,7 @@ void RunGameStaticDataTests() {
                 "Observed runtime character did not resolve to its moveset code");
         }
         Check(shipped.FindCharacter(38) == shipped.FindCharacter("dog"), "Runtime correction changed animation asset identity");
-        std::cout << "Static data tests passed: 53 fighters, 47095 names\n";
+        std::cout << "Static data tests passed: 53 fighters, 47151 names\n";
     } catch (...) { std::filesystem::remove_all(folder); throw; }
     std::filesystem::remove_all(folder);
 }
