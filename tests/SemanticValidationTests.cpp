@@ -35,7 +35,8 @@ struct Fixture {
 };
 // animationBones = 23: a T7 body animation (rest pose) that the T7 -> retail T8 converter accepts.
 // cameraMota: a camera MOTA (slot 9) holding one 2-frame 0xC8 camera clip (position, Euler rotation, zoom, roll).
-Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animationBones = 1, bool cameraMota = false) {
+Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animationBones = 1, bool cameraMota = false,
+    size_t cameraRows = 1) {
     Fixture fixture;
     auto& b = fixture.blocks;
     b.tableBlock = offsetof(MovesetInfo, table);
@@ -50,7 +51,7 @@ Fixture Valid(bool sharedMota = false, size_t propertyRows = 1, uint16_t animati
     for (size_t i = 0; i < std::size(strides); ++i) {
         size = (size + 7) & ~size_t(7);
         table.entries[i].listAddr = size;
-        table.entries[i].listCount = i == 1 || i == 2 || i == 6 ? 2 : i == 9 ? propertyRows : 1;
+        table.entries[i].listCount = i == 1 || i == 2 || i == 6 ? 2 : i == 9 ? propertyRows : i == 17 ? cameraRows : 1;
         size += strides[i] * table.entries[i].listCount;
     }
     b.animationBlock = b.movesetBlock + size;
@@ -251,6 +252,20 @@ std::vector<Byte> SemanticCameraFixture() {
     rows[2].starting_frame = 0x8001; rows[2].id = 0x8020; rows[2].value_unsigned = 0;
     std::string error;
     Check(Validate(fixture, &error), ("Camera fixture is invalid: " + error).c_str());
+    return fixture.File();
+}
+std::vector<Byte> SemanticThrowCameraFixture() {
+    auto fixture = Valid(false, 5, 23, true, 3);
+    auto& info = fixture.Info();
+    info.motas.motas[8] = info.motas.motas[9];
+    const ExtraMoveProperty calls[] = {{0x8001, 33852, 0}, {0x8002, 33853, 0}, {0x8003, 33853, 1}, {0x8004, 33849, 0x4000}, {}};
+    memcpy(fixture.Records<ExtraMoveProperty>(info.table.extraMoveProperty), calls, sizeof(calls));
+    auto cameras = fixture.Records<CameraData>(info.table.cameraData);
+    cameras[0] = {2, 0x16, 0x901, 0x901, 90};
+    cameras[1] = {1, 0x15, 0, 0x4000, 180};
+    fixture.Records<G::ThrowCamera>(info.table.throwCameras)[0] = {2, 0};
+    std::string error;
+    Check(Validate(fixture, &error), ("Throw camera fixture is invalid: " + error).c_str());
     return fixture.File();
 }
 std::vector<Byte> SemanticFixtureWithPropertyList(size_t rows) {

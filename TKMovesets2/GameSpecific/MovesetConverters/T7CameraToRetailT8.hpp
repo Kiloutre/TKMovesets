@@ -38,6 +38,8 @@ inline const CameraProperty* FindRetailProperty(uint32_t id) {
     return nullptr;
 }
 inline constexpr uint32_t T7CharacterMota = 0x4000;
+inline constexpr uint32_t T7RageThrowProperty = 0x843D, RetailRageThrowProperty = 0x8690, RetailThrowProperty = 0x868F;
+inline constexpr uint16_t AnimatedThrowCamera = 0x15;
 inline constexpr uint32_t CameraCategory = 4;
 // Retail camera indices converted animations use (as for hands: above native lists, below the masked flag bits).
 inline constexpr uint32_t FirstRetailIndex = 0x2000, LastRetailIndex = 0x3FFF;

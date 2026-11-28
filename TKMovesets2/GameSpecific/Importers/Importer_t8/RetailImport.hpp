@@ -87,7 +87,7 @@ struct MemoryOnlyAudit {
     // The game's compiled animation vtable (ImporterT8::Engine()); required.
     gameAddr compiledVtable = 0;
     // Converted T7 hand and camera animations: (category, file index) -> index published in the target's category
-    // index (ImporterT8::HandIndices()). Null or missing: those rows were silenced (ApplyHandIndices).
+    // index (ImporterT8::HandIndices()). A missing mapping silences the affected call.
     const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* handIndices = nullptr;
 };
 // Converted T7 hand and camera animations (T7HandToRetailT8, T7CameraToRetailT8): extra-property rows playing a
@@ -97,6 +97,10 @@ struct MemoryOnlyAudit {
 // `silenced` (optional) receives how many of them were silenced.
 uint64_t ApplyHandIndices(std::span<Byte> extraProperties, const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* indices,
     uint64_t* silenced = nullptr);
+// Remap both sides of animated throw-camera variants and silence calls whose variant list has an unpublished camera.
+// `payload` supplies the snapshot's original table-18 references. Returns the number of calls silenced.
+uint64_t ApplyThrowCameraIndices(std::span<Byte> extraProperties, std::span<Byte> cameraData, std::span<const Byte> payload,
+    const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* indices);
 // Swaps the source and target identities in self-character checks: primary checks (220/221, 499/500) use `target`
 // (player +0x168), secondary checks (224/225, 503/504) use `targetSecondary` (player +0x16c; UINT32_MAX = `target`).
 uint64_t AdaptCharacterRequirements(std::span<Byte> records, uint32_t source, uint32_t target, uint32_t targetSecondary = UINT32_MAX);

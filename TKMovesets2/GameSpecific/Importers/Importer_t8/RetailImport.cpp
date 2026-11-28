@@ -332,6 +332,50 @@ uint64_t ApplyHandIndices(std::span<Byte> records, const std::map<std::pair<uint
     }
     return changed;
 }
+uint64_t ApplyThrowCameraIndices(std::span<Byte> extraProperties, std::span<Byte> cameraData, std::span<const Byte> payload,
+    const std::map<std::pair<uint32_t, uint32_t>, uint32_t>* indices) {
+    namespace C = T7CameraToRetailT8;
+    constexpr auto stride = R::Tables[17].stride;
+    if (cameraData.size() % stride || extraProperties.size() % R::Tables[9].stride)
+        throw std::runtime_error("Invalid retail throw camera records");
+    std::vector<bool> unavailable(cameraData.size() / stride);
+    bool missing = false;
+    for (size_t row = unavailable.size(); row-- > 0;) {
+        const auto at = row * stride;
+        if (!Read<uint32_t>(cameraData, at)) { missing = false; continue; }
+        if (Read<uint16_t>(cameraData, at + 4) == C::AnimatedThrowCamera) {
+            for (const auto offset : {at + 6, at + 8}) {
+                const auto value = Read<uint16_t>(cameraData, offset);
+                if (value < C::FirstRetailIndex) continue;
+                if (indices) if (const auto found = indices->find({C::CameraCategory, value}); found != indices->end()) {
+                    const auto published = static_cast<uint16_t>(found->second);
+                    memcpy(cameraData.data() + offset, &published, sizeof(published));
+                    continue;
+                }
+                missing = true;
+            }
+        }
+        unavailable[row] = missing;
+    }
+    const auto throws = R::Table(payload, 18);
+    const auto header = Read<R::Header>(payload, 0);
+    const auto cameraBase = Read<R::Entry>(payload, header.directoryOffset + 17 * sizeof(R::Entry)).address;
+    uint64_t silenced = 0;
+    for (size_t at = 0; at < extraProperties.size(); at += R::Tables[9].stride) {
+        const auto id = Read<uint32_t>(extraProperties, at + 0x10);
+        if (id != C::RetailThrowProperty && id != C::RetailRageThrowProperty) continue;
+        const auto value = Read<uint32_t>(extraProperties, at + 0x14);
+        if (value >= throws.size() / R::Tables[18].stride) continue;
+        const auto camera = Read<uint64_t>(throws, value * R::Tables[18].stride + 8);
+        if (!camera || camera < cameraBase || (camera - cameraBase) % stride) continue;
+        const auto row = (camera - cameraBase) / stride;
+        if (row >= unavailable.size() || !unavailable[row] || Read<uint32_t>(extraProperties, at) == ImportProfile::StrippedFrame) continue;
+        const auto frame = ImportProfile::StrippedFrame;
+        memcpy(extraProperties.data() + at, &frame, sizeof(frame));
+        ++silenced;
+    }
+    return silenced;
+}
 uint64_t AdaptCharacterRequirements(std::span<Byte> records, uint32_t source, uint32_t primaryTarget, uint32_t targetSecondary) {
     if (records.size() % 20) throw std::runtime_error("Invalid retail requirement records");
     const uint32_t secondaryTarget = targetSecondary == UINT32_MAX ? primaryTarget : targetSecondary;
@@ -406,14 +450,24 @@ Audit AuditImage(std::span<const Byte> payload, const GameProcess& image, gameAd
     for (size_t field = 0x2b0; field <= 0x310; field += 8) Write(expectedHeader, field, Read<uint64_t>(current, field));
     if (expectedHeader != header) throw std::runtime_error("Retail header audit differs from export and runtime bindings");
     audit.bytes += header.size();
+    std::vector<Byte> extraProperties, cameraData;
+    if (convertedT7) {
+        const auto properties = R::Table(payload, 9), cameras = R::Table(payload, 17);
+        extraProperties.assign(properties.begin(), properties.end());
+        cameraData.assign(cameras.begin(), cameras.end());
+        const auto* indices = memoryOnly ? memoryOnly->handIndices : nullptr;
+        ApplyProfileProperties(extraProperties, importProfile);
+        ApplyHandIndices(extraProperties, indices);
+        ApplyThrowCameraIndices(extraProperties, cameraData, payload, indices);
+    }
     for (size_t table = 0; table < entries.size(); ++table) {
         const auto& entry = entries[table]; if (!entry.count) continue;
-        auto expected = std::vector<Byte>(payload.begin() + entry.offset, payload.begin() + entry.offset + entry.count * entry.stride);
+        auto expected = table == 9 && convertedT7 ? std::move(extraProperties) : table == 17 && convertedT7 ? std::move(cameraData) :
+            std::vector<Byte>(payload.begin() + entry.offset, payload.begin() + entry.offset + entry.count * entry.stride);
         if (table == 1 && sourceCharacter != UINT32_MAX && targetCharacter != UINT32_MAX)
             AdaptCharacterRequirements(expected, ProfileIdentity(importProfile, sourceCharacter), targetCharacter, targetSecondary);
         if (table == 1) ApplyProfileConditions(expected, importProfile);
-        if (table == 9) ApplyProfileProperties(expected, importProfile);
-        if (table == 9 && convertedT7) ApplyHandIndices(expected, memoryOnly ? memoryOnly->handIndices : nullptr);
+        if (table == 9 && !convertedT7) ApplyProfileProperties(expected, importProfile);
         if (table == 12 && convertedT7 && targetCharacter != UINT32_MAX) {
             std::vector<Byte> scratch(R::SourceHeaderSize);
             ApplyConvertedIdentity(scratch, expected, targetCharacter);

@@ -4,7 +4,9 @@
 #include "RetailNames.hpp"
 #include "MovesetFileConverter.hpp"
 #include "Importer_t8/RetailImport.hpp"
+#include "Structs_t8.h"
 #include <nlohmann/json.hpp>
+#include <algorithm>
 #include <cstring>
 #include <set>
 #include <string>
@@ -55,6 +57,7 @@ struct Fixture {
 std::vector<Byte> SemanticFixture();
 std::vector<Byte> SemanticBodyFixture();
 std::vector<Byte> SemanticCameraFixture();
+std::vector<Byte> SemanticThrowCameraFixture();
 std::vector<Byte> T7RetailConvertibleFixture() {
     // A real 23-bone T7 body animation: the converter refuses any move it cannot animate (no idle fallback).
     auto bytes=SemanticBodyFixture();
@@ -283,6 +286,56 @@ void RunT7ToRetailT8Tests() {
             rows[2].first==0,"Either-side camera is not the 0x868C/0x868D pair");
         for(const auto& row:rows) Check(row.first!=0x8313,"Drama camera row kept beside a camera animation");
         Check(CheckT7LiveConversion(source)>0,"Camera fixture live conversion");
+    }
+    {
+        namespace R = RetailT8Snapshot;
+        const auto source = SemanticThrowCameraFixture();
+        const auto& header = *reinterpret_cast<const TKMovesetHeader*>(source.data());
+        const auto& blocks = *reinterpret_cast<const StructsT7::TKMovesetHeaderBlocks*>(source.data() + header.block_list);
+        const auto t7 = std::span<const Byte>(source).subspan(header.moveset_data_start);
+        T7ToRetailT8::ConversionReport report;
+        const auto converted = T7ToRetailT8::ConvertStandalone(header, blocks, t7, &report);
+        const auto& output = *reinterpret_cast<const TKMovesetHeader*>(converted.data());
+        const auto payload = std::span<const Byte>(converted).subspan(output.moveset_data_start);
+        auto image = RetailT8Import::Prepare(output, payload);
+        Check(image.Ok() && report.cameraAnimationsConverted == 2 && report.throwsDropped == 1,
+            "Throw camera conversion did not share the direct camera or drop an invalid throw row");
+        const auto files = R::Assets(payload);
+        for (uint32_t id : {0x2000, 0x2001})
+            Check(std::count_if(files.begin(), files.end(), [&](const R::AssetEntry& asset) {
+                return asset.type == 4 && asset.instance == (0x40000 | id);
+            }) == 1, "Throw camera asset is missing or duplicated");
+        const auto tables = std::span<Byte>(image.tables);
+        const auto cases = tables.subspan(image.offsets[9], image.counts[9] * R::Tables[9].stride);
+        const auto cameras = tables.subspan(image.offsets[17], image.counts[17] * R::Tables[17].stride);
+        auto property = [&](size_t row) {
+            StructsT8::ExtraMoveProperty result;
+            memcpy(&result, cases.data() + row * sizeof(result), sizeof(result)); return result;
+        };
+        auto variant = [&](size_t row) {
+            StructsT8::CameraData result;
+            memcpy(&result, cameras.data() + row * sizeof(result), sizeof(result)); return result;
+        };
+        Check(image.counts[9] == 4 && property(0).id == 0x868F && property(0).params[0] == 0 &&
+            property(1).id == 0x8690 && property(1).params[0] == 0 && property(1).frame == 0x8002 &&
+            property(2).id == 0x868C && property(2).params[0] == 0x2000,
+            "Throw property, index zero, frame or direct camera was lost");
+        Check(variant(1).left_camera == 0x2001 && variant(1).right_camera == 0x2000 && variant(1).rotation == 180,
+            "Throw camera MOTA indices or rotation did not survive conversion");
+        const std::map<std::pair<uint32_t, uint32_t>, uint32_t> collision{{{4, 0x2000}, 0x2001}, {{4, 0x2001}, 0x2002}};
+        Check(RetailT8Import::ApplyThrowCameraIndices(cases, cameras, payload, &collision) == 0 &&
+            variant(1).left_camera == 0x2002 && variant(1).right_camera == 0x2001 && variant(0).left_camera == 0x901 &&
+            variant(0).probability == 2 && variant(2).probability == 0 && property(1).frame == 0x8002,
+            "Collision remapping changed a preset, list terminator or live throw timing");
+        const auto exportedCameras = R::Table(payload, 17);
+        std::copy(exportedCameras.begin(), exportedCameras.end(), cameras.begin());
+        const std::map<std::pair<uint32_t, uint32_t>, uint32_t> partial{{{4, 0x2001}, 0x2002}, {{1, 0x2000}, 0x2001}};
+        Check(RetailT8Import::ApplyThrowCameraIndices(cases, cameras, payload, &partial) == 2 &&
+            property(0).frame == ImportProfile::StrippedFrame && property(1).frame == ImportProfile::StrippedFrame &&
+            property(2).frame == 0x8004,
+            "An unpublished throw-camera variant did not silence both callers, or affected the direct camera");
+        T7ToRetailT8::ConvertStandalone(header, blocks, t7, &report, false);
+        Check(report.throwsDropped == 3, "Throw calls with unavailable embedded cameras survived record-only conversion");
     }
     const auto* strong = RetailT8::FindAlias(false,225);
     Check(strong && strong->target == 228,"Existing requirement alignment was lost");
